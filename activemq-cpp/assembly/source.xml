@@ -26,7 +26,7 @@
   </formats>
   <files>
     <file>
-      <source>autogen.sh</source>
+      <source>legacy-autotools/autogen.sh</source>
       <outputDirectory>/</outputDirectory>
       <filtered>false</filtered>
       <fileMode>0755</fileMode>
@@ -46,8 +46,8 @@
         <include>aclocal.m4</include>
         <include>KEYS</include>
         <include>doxygen.cfg</include>
-        <include>activemq-cpp.pc.in</include>
-        <include>activemqcpp-config.in</include>
+        <include>legacy-autotools/activemq-cpp.pc.in</include>
+        <include>legacy-autotools/activemqcpp-config.in</include>
         <include>*.txt</include>
         <include>*.win</include>
         <include>*.ac</include>

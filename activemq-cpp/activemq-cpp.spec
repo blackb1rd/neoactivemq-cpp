@@ -74,8 +74,10 @@ for your clients to communicate.
 %prep
 %setup -q -n activemq-cpp-library-%{version}
 
+#build
+# Run the legacy autogen script from the relocated legacy-autotools folder if needed
 %build
-./autogen.sh
+./legacy-autotools/autogen.sh
 # Build pdf(30MB) rather than default html(400MB).
 %configure --disable-static --disable-doxygen-html --enable-doxygen-pdf
 make %{?_smp_mflags}

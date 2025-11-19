@@ -16,6 +16,7 @@
  */
 
 #include "ByteArrayOutputStreamTest.h"
+#include <cstring>
 
 #ifdef HAVE_STRING_H
 #include <string.h>

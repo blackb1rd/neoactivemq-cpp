@@ -24,6 +24,8 @@
 #include <strings.h>
 #endif
 
+#include <cstring>
+
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;

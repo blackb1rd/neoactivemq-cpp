@@ -10,40 +10,61 @@
       "name": "default",
       "hidden": true,
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build",
+      "binaryDir": "${sourceDir}/bin/build/${presetName}",
+      "installDir": "${sourceDir}/bin/install/${presetName}",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_TOOLCHAIN_FILE": "${env.VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       }
     },
     {
-      "name": "release-vcpkg",
+      "name": "release",
       "inherits": "default",
       "description": "Release build using vcpkg toolchain"
     },
     {
-      "name": "debug-vcpkg",
+      "name": "debug",
       "inherits": "default",
       "description": "Debug build using vcpkg toolchain",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
     }
-  ],
-  "environmentPresets": [
+    ,
     {
-      "name": "vs2022",
-      "environmentVariables": {}
+      "name": "release-with-tests",
+      "inherits": "release",
+      "description": "Release build with tests enabled",
+      "cacheVariables": {
+        "AMQCPP_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "debug-with-tests",
+      "inherits": "debug",
+      "description": "Debug build with tests enabled",
+      "cacheVariables": {
+        "AMQCPP_BUILD_TESTS": "ON"
+      }
     }
   ],
   "buildPresets": [
     {
       "name": "build-release",
-      "configurePreset": "release-vcpkg"
+      "configurePreset": "release"
     },
     {
       "name": "build-debug",
-      "configurePreset": "debug-vcpkg"
+      "configurePreset": "debug"
+    }
+    ,
+    {
+      "name": "build-release-with-tests",
+      "configurePreset": "release-with-tests"
+    },
+    {
+      "name": "build-debug-with-tests",
+      "configurePreset": "debug-with-tests"
     }
   ]
 }

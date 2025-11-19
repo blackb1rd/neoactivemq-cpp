@@ -19,6 +19,8 @@
 
 #include <decaf/util/Date.h>
 #include <decaf/lang/Thread.h>
+#include <cstdlib>
+#include <time.h>
 
 using namespace std;
 using namespace decaf;
@@ -58,6 +60,10 @@ void DateTest::test() {
 
 ////////////////////////////////////////////////////////////////////////////////
 void DateTest::testToString() {
+
+    // Force the timezone to America/New_York for deterministic output
+    setenv("TZ", "America/New_York", 1);
+    tzset();
 
     Date now(1443038174960LL);
     CPPUNIT_ASSERT(now.toString() != "");

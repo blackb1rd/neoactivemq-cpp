@@ -1,0 +1,66 @@
+name: CMake + vcpkg CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build curl build-essential
+
+      - name: Setup vcpkg
+        run: |
+          VCPKG_DIR="$RUNNER_TEMP/vcpkg"
+          git clone https://github.com/microsoft/vcpkg.git "$VCPKG_DIR"
+          "$VCPKG_DIR/bootstrap-vcpkg.sh"
+          echo "VCPKG_ROOT=$VCPKG_DIR" >> $GITHUB_ENV
+
+      - name: vcpkg manifest install
+        run: |
+          # install manifest dependencies (default triplet x64-linux)
+          "$VCPKG_DIR"/vcpkg install --triplet x64-linux
+
+      - name: Configure CMake
+        run: |
+          cmake -S activemq-cpp -B activemq-cpp/build -G Ninja -DCMAKE_TOOLCHAIN_FILE="$RUNNER_TEMP/vcpkg/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build activemq-cpp/build -- -j$(nproc)
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup vcpkg
+        shell: pwsh
+        run: |
+          $v = "$env:RUNNER_TEMP\\vcpkg"
+          git clone https://github.com/microsoft/vcpkg.git $v
+          & "$v\\bootstrap-vcpkg.bat"
+          Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_ROOT=$v"
+
+      - name: vcpkg manifest install
+        shell: pwsh
+        run: |
+          # install manifest dependencies (default triplet x64-windows)
+          & "$env:VCPKG_ROOT\\vcpkg.exe" install --triplet x64-windows
+
+      - name: Configure CMake (VS generator)
+        shell: pwsh
+        run: |
+          $toolchain = "$env:RUNNER_TEMP\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+          cmake -S activemq-cpp -B activemq-cpp\\build -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=$toolchain -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build (MSBuild)
+        shell: pwsh
+        run: cmake --build activemq-cpp\\build --config Release

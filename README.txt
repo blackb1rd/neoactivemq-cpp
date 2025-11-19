@@ -110,10 +110,11 @@ using /usr/sbin/update-alternatives.
 This assumes you have all of the project dependencies installed.  We're
 now ready to create the configure script.  To do this, run:
 
-  ./autogen.sh
+  activemq-cpp/legacy-autotools/autogen.sh
 
 This should be run the first time and any time you change configure.ac or
-any of the Makefile.am files.
+any of the Makefile.am files (these legacy files were moved into
+`activemq-cpp/legacy-autotools/` during cleanup).
 
     -----------------------------------------------------------------------
     |MacOS X Note:                                                        |

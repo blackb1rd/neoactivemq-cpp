@@ -21,6 +21,22 @@ if [ ! -f "$TOOLCHAIN_FILE" ]; then
   exit 1
 fi
 
+# If a vcpkg manifest exists in the project, run vcpkg install for the detected triplet
+if [ -f "$ROOT_DIR/vcpkg.json" ]; then
+  echo "Found vcpkg.json in project — using vcpkg manifest mode to install dependencies"
+  case "$(uname -s)" in
+    Linux*) TRIPLET="x64-linux" ;;
+    Darwin*) TRIPLET="x64-osx" ;;
+    *) TRIPLET="x64-windows" ;;
+  esac
+  VCPKG_EXE="$VCPKG_ROOT/vcpkg"
+  if [ -f "${VCPKG_EXE}.exe" ]; then
+    VCPKG_EXE="${VCPKG_EXE}.exe"
+  fi
+  echo "Running: $VCPKG_EXE install --triplet $TRIPLET (manifest)"
+  "$VCPKG_EXE" install --triplet "$TRIPLET"
+fi
+
 mkdir -p "$BUILD_DIR"
 cmake -S "$ROOT_DIR" -B "$BUILD_DIR" -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN_FILE" "$@"
 cmake --build "$BUILD_DIR" -- -j"$(nproc)"

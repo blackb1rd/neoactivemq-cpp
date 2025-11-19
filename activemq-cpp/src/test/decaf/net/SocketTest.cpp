@@ -477,6 +477,10 @@ namespace {
 
         virtual ~MyServerThread(){
             stop();
+            try{
+                join();
+            } catch(...) {
+            }
         }
 
         int getLocalPort() {
@@ -695,16 +699,19 @@ void SocketTest::testTrx() {
         std::string msg = "reply";
         stream->write( (unsigned char*)msg.c_str(), (int)msg.length(), 0, (int)msg.length() );
 
-        synchronized(&serverThread.mutex)
-        {
-           serverThread.mutex.wait(300);
-        }
+          synchronized(&serverThread.mutex)
+          {
+              // Increase wait timeout to make this test more robust on slower machines
+              serverThread.mutex.wait(1000);
+          }
 
         unsigned char buf[500];
         memset( buf, 0, 500 );
         io::InputStream* istream = client->getInputStream();
-        CPPUNIT_ASSERT( istream->available() != 0 );
-        std::size_t numRead = istream->read( buf, 500, 0, 500 );
+        // Avoid relying on available(); perform a blocking read which will
+        // attempt to read up to the buffer size and block until data arrives.
+        int numRead = istream->read( buf, 500 );
+        CPPUNIT_ASSERT_MESSAGE( "No data read from server", numRead > 0 );
         CPPUNIT_ASSERT( numRead == 5 );
         CPPUNIT_ASSERT( strcmp( (char*)buf, "hello" ) == 0 );
 

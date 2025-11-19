@@ -37,6 +37,9 @@
 #if !defined(HAVE_WINSOCK2_H)
     #include <sys/select.h>
     #include <sys/socket.h>
+    #include <arpa/inet.h>
+    #include <fcntl.h>
+    #include <errno.h>
 #else
     #include <Winsock2.h>
 #endif
@@ -318,20 +321,173 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout) {
         apr_socket_opt_get(impl->socketHandle, APR_SO_NONBLOCK, &oldNonblockSetting);
         apr_socket_timeout_get(impl->socketHandle, &oldTimeoutSetting);
 
-        // Temporarily make it what we want, blocking.
-        apr_socket_opt_set(impl->socketHandle, APR_SO_NONBLOCK, 0);
+        // We'll perform a non-blocking connect so we can poll and allow close()
+        // to interrupt the operation. Set socket non-blocking for the duration.
+        apr_socket_opt_set(impl->socketHandle, APR_SO_NONBLOCK, 1);
 
-        // Timeout and non-timeout case require very different logic.
-        if (timeout <= 0) {
-            apr_socket_timeout_set(impl->socketHandle, -1);
-        } else {
-            apr_socket_timeout_set(impl->socketHandle, timeout * 1000);
+        // If a positive timeout was provided convert to microseconds, else
+        // use -1 to indicate we should wait until closed or success.
+        apr_interval_time_t waitTimeout = (timeout > 0) ? (apr_interval_time_t)timeout * 1000 : -1;
+
+        // Attempt initial connect. Instead of using apr_socket_connect (which
+        // can block in APR internals), perform a native non-blocking connect
+        // on the underlying OS socket. That lets us poll and abort the
+        // operation when `close()` is called.
+
+        // Get the underlying OS socket descriptor for native connect/select.
+        apr_os_sock_t osSock = -1;
+        apr_os_sock_get(&osSock, impl->socketHandle);
+
+        if (osSock < 0) {
+            throw SocketException(__FILE__, __LINE__, SocketError::getErrorString().c_str());
         }
 
-        // try to Connect to the provided address.
-        checkResult (apr_socket_connect(impl->socketHandle, impl->remoteAddress) );
+        bool connectSucceeded = false;
+        int savedFlags = -1;
 
-        // Now that we are connected, we want to go back to old settings.
+#ifdef HAVE_WINSOCK2_H
+        // Windows: ensure non-blocking using ioctlsocket and perform connect.
+        u_long mode = 1;
+        ioctlsocket((SOCKET)osSock, FIONBIO, &mode);
+
+        struct sockaddr_in sinw;
+        memset(&sinw, 0, sizeof(sinw));
+        sinw.sin_family = AF_INET;
+        sinw.sin_port = htons(port);
+        inet_pton(AF_INET, hostname.c_str(), &sinw.sin_addr);
+
+        int cres_native = connect((SOCKET)osSock, (struct sockaddr*)&sinw, sizeof(sinw));
+        if (cres_native == 0) {
+            connectSucceeded = true;
+        }
+
+    #else
+    // POSIX: ensure non-blocking and use native connect.
+    int flags = fcntl((int)osSock, F_GETFL, 0);
+    savedFlags = flags;
+    fcntl((int)osSock, F_SETFL, flags | O_NONBLOCK);
+
+        struct sockaddr_in sinp;
+        memset(&sinp, 0, sizeof(sinp));
+        sinp.sin_family = AF_INET;
+        sinp.sin_port = htons(port);
+        inet_pton(AF_INET, hostname.c_str(), &sinp.sin_addr);
+
+        int cres_native = ::connect((int)osSock, (struct sockaddr*)&sinp, sizeof(sinp));
+        if (cres_native == 0) {
+            connectSucceeded = true;
+        } else {
+            int err = errno;
+            if (err == EINPROGRESS || err == EWOULDBLOCK) {
+                // expected for non-blocking connect; fall through to poll
+            } else {
+                // unexpected error — surface it
+                throw SocketException(__FILE__, __LINE__, SocketError::getErrorString().c_str());
+            }
+        }
+#endif
+
+        if (!connectSucceeded) {
+            // Poll the socket until it's writable, the timeout elapses or
+            // the socket is closed by another thread via close().
+
+            // Poll in short intervals so we can check impl->closed frequently.
+            const int pollIntervalMs = 100;
+            apr_interval_time_t elapsed = 0;
+
+            while (true) {
+                if (impl->closed.get()) {
+                    // The socket was closed from another thread; abort connect.
+                    try { apr_socket_shutdown(impl->socketHandle, APR_SHUTDOWN_READWRITE); } catch (...) {}
+                    throw SocketException(__FILE__, __LINE__, "TcpSocket::connect aborted by close()");
+                }
+
+                fd_set wfds;
+                FD_ZERO(&wfds);
+
+                struct timeval tv;
+                if (waitTimeout == -1) {
+                    tv.tv_sec = pollIntervalMs / 1000;
+                    tv.tv_usec = (pollIntervalMs % 1000) * 1000;
+                } else {
+                    apr_interval_time_t remaining = (waitTimeout > elapsed) ? (waitTimeout - elapsed) : 0;
+                    if (remaining == 0) {
+                        // timeout expired
+                        try { apr_socket_shutdown(impl->socketHandle, APR_SHUTDOWN_READWRITE); } catch (...) {}
+                        throw SocketException(__FILE__, __LINE__, "TcpSocket::connect() timed out");
+                    }
+                    apr_interval_time_t usec = (remaining > pollIntervalMs * 1000) ? (pollIntervalMs * 1000) : remaining;
+                    tv.tv_sec = (long)(usec / 1000000);
+                    tv.tv_usec = (long)(usec % 1000000);
+                }
+
+#ifdef HAVE_WINSOCK2_H
+                // On Windows the first parameter to select is ignored, and
+                // sockets use the SOCKET type. apr_os_sock_t maps to SOCKET.
+                FD_SET((apr_os_sock_t)osSock, &wfds);
+                int sel = select(0, NULL, &wfds, NULL, &tv);
+#else
+                FD_SET((int)osSock, &wfds);
+                int sel = select((int)osSock + 1, NULL, &wfds, NULL, &tv);
+#endif
+
+                if (sel > 0) {
+                    bool writable = false;
+#ifdef HAVE_WINSOCK2_H
+                    if (FD_ISSET((apr_os_sock_t)osSock, &wfds)) writable = true;
+#else
+                    if (FD_ISSET((int)osSock, &wfds)) writable = true;
+#endif
+                    if (writable) {
+                        // Check socket error to determine if connect completed.
+                        int soerr = 0;
+                        socklen_t len = sizeof(soerr);
+#ifdef HAVE_WINSOCK2_H
+                        int gres = getsockopt((SOCKET)osSock, SOL_SOCKET, SO_ERROR, (char*)&soerr, &len);
+#else
+                        int gres = getsockopt((int)osSock, SOL_SOCKET, SO_ERROR, &soerr, &len);
+#endif
+                        if (gres == 0 && soerr == 0) {
+                            // Connect succeeded
+                            break;
+                        } else if (gres == 0) {
+                            // Connect failed with error in soerr
+                            throw SocketException(__FILE__, __LINE__, SocketError::getErrorString().c_str());
+                        }
+                        // Otherwise continue polling until timeout/closed.
+                    }
+                }
+
+                if (waitTimeout != -1) {
+                    elapsed += (apr_interval_time_t)(pollIntervalMs * 1000);
+                    if (elapsed >= waitTimeout) {
+                        try { apr_socket_shutdown(impl->socketHandle, APR_SHUTDOWN_READWRITE); } catch (...) {}
+                        throw SocketException(__FILE__, __LINE__, "TcpSocket::connect() timed out");
+                    }
+                }
+            }
+        }
+
+        // Now that we are connected (or had earlier success), restore OS-level
+        // non-blocking state we modified earlier.
+#ifdef HAVE_WINSOCK2_H
+        {
+            apr_os_sock_t osSockRestore = -1;
+            apr_os_sock_get(&osSockRestore, impl->socketHandle);
+            u_long mode = 0;
+            ioctlsocket((SOCKET)osSockRestore, FIONBIO, &mode);
+        }
+#else
+        {
+            apr_os_sock_t osSockRestore = -1;
+            apr_os_sock_get(&osSockRestore, impl->socketHandle);
+            if (osSockRestore >= 0 && savedFlags != -1) {
+                // restore original flags
+                fcntl((int)osSockRestore, F_SETFL, savedFlags);
+            }
+        }
+        #endif
+
         apr_socket_opt_set(impl->socketHandle, APR_SO_NONBLOCK, oldNonblockSetting);
         apr_socket_timeout_set(impl->socketHandle, oldTimeoutSetting);
 

@@ -52,28 +52,28 @@
     #if defined(_WIN32)
 
         #ifndef HAVE_OBJBASE_H
-            #define HAVE_OBJBASE_H
+            #define HAVE_OBJBASE_H 1
         #endif
         #ifndef HAVE_RPCDCE_H
-            #define HAVE_RPCDCE_H
+            #define HAVE_RPCDCE_H 1
         #endif
         #ifndef HAVE_WINSOCK2_H
-            #define HAVE_WINSOCK2_H
+            #define HAVE_WINSOCK2_H 1
         #endif
         #ifndef HAVE_STRUCT_ADDRINFO
-            #define HAVE_STRUCT_ADDRINFO
+            #define HAVE_STRUCT_ADDRINFO 1
         #endif
         #ifndef HAVE_SYS_TIMEB_H
-            #define HAVE_SYS_TIMEB_H
+            #define HAVE_SYS_TIMEB_H 1
         #endif
         #ifndef HAVE_FTIME
-            #define HAVE_FTIME
+            #define HAVE_FTIME 1
         #endif
         #ifndef HAVE_WINDOWS_H
-            #define HAVE_WINDOWS_H
+            #define HAVE_WINDOWS_H 1
         #endif
         #ifndef HAVE_PROCESS_H
-            #define HAVE_PROCESS_H
+            #define HAVE_PROCESS_H 1
         #endif
         #ifdef _NATIVE_WCHAR_T_DEFINED
             #define HAVE_WCHAR_T
@@ -142,13 +142,13 @@
 
     #else
         #ifndef HAVE_UUID_UUID_H
-            #define HAVE_UUID_UUID_H
+            #define HAVE_UUID_UUID_H 1
         #endif
         #ifndef HAVE_UUID_T
-            #define HAVE_UUID_T
+            #define HAVE_UUID_T 1
         #endif
         #ifndef HAVE_PTHREAD_H
-            #define HAVE_PTHREAD_H
+            #define HAVE_PTHREAD_H 1
         #endif
     #endif
 

@@ -97,6 +97,15 @@ namespace util {
     };
     #endif
 
+    #if !defined(HAVE_WCHAR_T)
+    template<>
+    struct HashCode<unsigned char> : public HashCodeUnaryBase<unsigned char> {
+        int operator()(unsigned char arg) const {
+            return (int) arg;
+        }
+    };
+    #endif
+
     template<>
     struct HashCode<char> : public HashCodeUnaryBase<char> {
         int operator()(char arg) const {

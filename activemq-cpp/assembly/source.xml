@@ -78,7 +78,7 @@
       <lineEnding>keep</lineEnding>
     </fileSet>
     <fileSet>
-      <directory>vs2010-build</directory>
+      <directory>legacy-vs2010</directory>
       <lineEnding>keep</lineEnding>
     </fileSet>
   </fileSets>

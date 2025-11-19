@@ -14,6 +14,9 @@ target
 eclipse-classes
 build
 dependency-reduced-pom.xml
+activemq-cpp/bin/
+activemq-cpp/build/
+activemq-cpp/vcpkg_installed/
 activemq-cpp/autom4te.cache/
 activemq-cpp/m4/
 activemq-cpp/config/

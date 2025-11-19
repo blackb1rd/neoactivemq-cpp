@@ -18,6 +18,7 @@
 #include <decaf/io/DataInputStream.h>
 
 #include <decaf/io/PushbackInputStream.h>
+#include <cstring>
 
 #ifdef HAVE_STRING_H
 #include <string.h>

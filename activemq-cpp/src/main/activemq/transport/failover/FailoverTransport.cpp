@@ -110,6 +110,7 @@ namespace failover {
         Pointer<URIPool> updated;
         Pointer<URI> connectedTransportURI;
         Pointer<Transport> connectedTransport;
+        Pointer<Transport> connectingTransport;
         Pointer<Exception> connectionFailure;
         Pointer<BackupTransportPool> backups;
         Pointer<CloseTransportsTask> closeTask;
@@ -631,6 +632,9 @@ void FailoverTransport::close() {
 
             if (this->impl->connectedTransport != NULL) {
                 transportToStop.swap(this->impl->connectedTransport);
+            } else if (this->impl->connectingTransport != NULL) {
+                // If we're in the middle of connecting, attempt to stop that transport too
+                transportToStop.swap(this->impl->connectingTransport);
             }
 
             this->impl->reconnectMutex.notifyAll();
@@ -950,10 +954,20 @@ bool FailoverTransport::iterate() {
                             }
 
                             transport = createTransport(uri);
+                            // Mark this transport as the one being connected so close()
+                            // can cancel it if requested concurrently.
+                            synchronized(&this->impl->reconnectMutex) {
+                                this->impl->connectingTransport = transport;
+                            }
                         }
 
                         transport->setTransportListener(this->impl->myTransportListener.get());
                         transport->start();
+
+                        // Clear the connectingTransport marker now that start() returned.
+                        synchronized(&this->impl->reconnectMutex) {
+                            this->impl->connectingTransport.reset(NULL);
+                        }
 
                         if (this->impl->started && !this->impl->firstConnection) {
                             restoreTransport(transport);
@@ -1017,6 +1031,10 @@ bool FailoverTransport::iterate() {
                             this->impl->closeTask->add(transport);
                             this->impl->taskRunner->wakeup();
                             transport.reset(NULL);
+                            // Clear any connectingTransport marker if we failed while connecting.
+                            synchronized(&this->impl->reconnectMutex) {
+                                this->impl->connectingTransport.reset(NULL);
+                            }
                         }
 
                         failures.add(uri);

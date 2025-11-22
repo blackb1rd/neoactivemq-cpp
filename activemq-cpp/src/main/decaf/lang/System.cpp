@@ -32,9 +32,10 @@
 
 #if HAVE_SYS_TIME_H
 #include <sys/time.h>
-#endif
-#if !defined(HAVE_SYS_TIME_H)
-#include <sys/time.h>
+#elif HAVE_SYS_TIMEB_H
+#include <sys/timeb.h>
+#else
+#include <time.h>
 #endif
 #if HAVE_UNISTD_H
 #include <unistd.h>

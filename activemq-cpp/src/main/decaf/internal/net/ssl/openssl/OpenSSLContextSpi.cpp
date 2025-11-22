@@ -158,9 +158,11 @@ OpenSSLContextSpi::~OpenSSLContextSpi() {
     try{
 
 #ifdef HAVE_OPENSSL
-        // Clean up all the OpenSSL resources.
-        CRYPTO_set_locking_callback( 0 );
-        EVP_cleanup();
+    // Clean up all the OpenSSL resources.
+#if defined(OPENSSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER < 0x10100000L)
+    CRYPTO_set_locking_callback( 0 );
+#endif
+    EVP_cleanup();
 #endif
 
         delete this->data;
@@ -183,20 +185,46 @@ void OpenSSLContextSpi::providerInit( SecureRandom* random ) {
 
         // General library initialization.
     #ifdef WIN32
+        /* CRYPTO_malloc_init was removed/changed in OpenSSL 1.1+.  Only call
+         * it on older OpenSSL versions. For OpenSSL >= 1.1 the library
+         * initializes allocation functions internally. Use the
+         * OPENSSL_VERSION_NUMBER macro to detect the version.
+         */
+#if defined(OPENSSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER < 0x10100000L)
         CRYPTO_malloc_init();
+#endif
     #endif
         SSL_load_error_strings();
         SSL_library_init();
         OpenSSL_add_all_algorithms();
 
         // Initialize our data object and store the RNG for later.
+        /* CRYPTO_num_locks and custom locking callbacks are required for
+         * OpenSSL < 1.1.0. Newer OpenSSL versions manage internal locking
+         * themselves and these functions are no-ops or removed. Guard
+         * usage to support both older and newer OpenSSL builds.
+         */
+    #if defined(OPENSSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER < 0x10100000L)
         this->data = new ContextData( CRYPTO_num_locks() );
+    #else
+        this->data = new ContextData( 1 );
+    #endif
         this->data->random.reset( random );
         this->data->openSSLContext = SSL_CTX_new( SSLv23_method() );
 
         // Setup the Crypto Library Thread callbacks.
+        /* Only set the id callback for OpenSSL < 1.1.0. Newer versions
+         * manage thread id/locking internally.
+         */
+    #if defined(OPENSSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER < 0x10100000L)
         CRYPTO_set_id_callback( &ContextData::getThreadId );
+    #endif
+        /* Only install a locking callback on OpenSSL < 1.1.0; the API is
+         * no-op or unnecessary on newer OpenSSL versions.
+         */
+    #if defined(OPENSSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER < 0x10100000L)
         CRYPTO_set_locking_callback( &ContextData::lockCallback );
+    #endif
 
         // Load the Library default CA paths and Context Options.
         SSL_CTX_set_default_verify_paths( this->data->openSSLContext );

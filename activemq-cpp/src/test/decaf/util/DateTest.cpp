@@ -20,6 +20,7 @@
 #include <decaf/util/Date.h>
 #include <decaf/lang/Thread.h>
 #include <cstdlib>
+#include <decaf/lang/System.h>
 #include <time.h>
 
 using namespace std;
@@ -62,7 +63,7 @@ void DateTest::test() {
 void DateTest::testToString() {
 
     // Force the timezone to America/New_York for deterministic output
-    setenv("TZ", "America/New_York", 1);
+    decaf::lang::System::setenv("TZ", "America/New_York");
     tzset();
 
     Date now(1443038174960LL);

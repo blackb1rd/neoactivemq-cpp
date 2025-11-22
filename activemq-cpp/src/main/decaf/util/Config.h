@@ -107,6 +107,12 @@
             #ifndef WIN32_LEAN_AND_MEAN
                 #define WIN32_LEAN_AND_MEAN
             #endif
+            /* Prevent macros for min/max from Windows headers that might
+             * collide with std::min/std::max in C++ code.
+             */
+            #ifndef NOMINMAX
+                #define NOMINMAX
+            #endif
             #ifndef _WIN32_WINNT
 
             /*

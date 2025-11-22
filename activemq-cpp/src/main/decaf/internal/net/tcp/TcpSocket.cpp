@@ -356,7 +356,11 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout) {
         sinw.sin_port = htons(port);
         inet_pton(AF_INET, hostname.c_str(), &sinw.sin_addr);
 
-        int cres_native = connect((SOCKET)osSock, (struct sockaddr*)&sinw, sizeof(sinw));
+        /* Ensure we call the global ::connect and not this->connect since
+         * we're inside a member function named connect. On Windows the
+         * socket type is SOCKET, so qualify with the global namespace.
+         */
+        int cres_native = ::connect((SOCKET)osSock, (struct sockaddr*)&sinw, sizeof(sinw));
         if (cres_native == 0) {
             connectSucceeded = true;
         }

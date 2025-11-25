@@ -63,13 +63,11 @@ namespace commands {
 
         virtual void beforeMarshal(wireformat::WireFormat* wireFormat);
 
-        virtual std::string toString() const;
+    virtual std::string toString() const;
 
-        virtual bool equals(const DataStructure* value) const;
+    virtual bool equals(const DataStructure* value) const;
 
-        virtual void clearBody() throw (cms::CMSException);
-
-    public: // CMS Message
+    virtual void clearBody();    public: // CMS Message
 
         virtual cms::MapMessage* clone() const;
 

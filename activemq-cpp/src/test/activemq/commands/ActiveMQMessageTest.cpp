@@ -48,7 +48,7 @@ namespace{
          * @throw CMSException
          */
         virtual void acknowledgeMessage( const commands::Message* message )
-            throw ( cms::CMSException ) {
+             {
 
             this->wasAcked = true;
         }

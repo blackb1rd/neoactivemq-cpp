@@ -66,15 +66,13 @@ namespace cmsutil {
             return new DummyConsumer(messageContext, destination, "", false);
         }
 
-        virtual cms::MessageConsumer* createConsumer(const cms::Destination* destination, const std::string& selector) throw (cms::CMSException) {
+        virtual cms::MessageConsumer* createConsumer(const cms::Destination* destination, const std::string& selector) {
             return new DummyConsumer(messageContext, destination, selector, false);
-        }
+    }
 
-        virtual cms::MessageConsumer* createConsumer(const cms::Destination* destination, const std::string& selector, bool noLocal) throw (cms::CMSException) {
-            return new DummyConsumer(messageContext, destination, selector, noLocal);
-        }
-
-        virtual cms::MessageConsumer* createDurableConsumer(const cms::Topic* destination, const std::string& name, const std::string& selector, bool noLocal = false) {
+    virtual cms::MessageConsumer* createConsumer(const cms::Destination* destination, const std::string& selector, bool noLocal) {
+        return new DummyConsumer(messageContext, destination, selector, noLocal);
+    }        virtual cms::MessageConsumer* createDurableConsumer(const cms::Topic* destination, const std::string& name, const std::string& selector, bool noLocal = false) {
             return NULL;
         }
 
@@ -114,27 +112,25 @@ namespace cmsutil {
             return NULL;
         }
 
-        virtual cms::BytesMessage* createBytesMessage(const unsigned char* bytes, int bytesSize) {
-            return NULL;
-        }
+    virtual cms::BytesMessage* createBytesMessage(const unsigned char* bytes, int bytesSize) {
+        return NULL;
+    }
 
-        virtual cms::StreamMessage* createStreamMessage() throw (cms::CMSException) {
-            return NULL;
-        }
+    virtual cms::StreamMessage* createStreamMessage() {
+        return NULL;
+    }
 
-        virtual cms::TextMessage* createTextMessage() throw (cms::CMSException) {
-            return NULL;
-        }
+    virtual cms::TextMessage* createTextMessage() {
+        return NULL;
+    }
 
-        virtual cms::TextMessage* createTextMessage(const std::string& text) throw (cms::CMSException) {
-            return NULL;
-        }
+    virtual cms::TextMessage* createTextMessage(const std::string& text) {
+        return NULL;
+    }
 
-        virtual cms::MapMessage* createMapMessage() throw (cms::CMSException) {
-            return NULL;
-        }
-
-        virtual cms::Session::AcknowledgeMode getAcknowledgeMode() const {
+    virtual cms::MapMessage* createMapMessage() {
+        return NULL;
+    }        virtual cms::Session::AcknowledgeMode getAcknowledgeMode() const {
             return mode;
         }
 

@@ -96,7 +96,7 @@ bool ActiveMQMapMessage::equals(const DataStructure* value) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessage::clearBody() throw (cms::CMSException) {
+void ActiveMQMapMessage::clearBody() {
     ActiveMQMessageTemplate<cms::MapMessage>::clearBody();
     this->getMap().clear();
 }

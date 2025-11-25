@@ -60,7 +60,7 @@ namespace test {
             return text;
         }
 
-        virtual cms::Message* createMessage(cms::Session* session) throw (cms::CMSException) {
+        virtual cms::Message* createMessage(cms::Session* session) {
 
             return session->createTextMessage(text);
         }

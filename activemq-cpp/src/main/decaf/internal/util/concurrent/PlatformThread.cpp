@@ -261,15 +261,24 @@ void PlatformThread::interruptibleWaitOnCondition(decaf_condition_t condition, d
     }
 
     // Save recursion depth and fully unlock the CustomReentrantLock
+    // This releases the internal mutex temporarily
     int recursionDepth = mutex->fullyUnlock();
 
-    // Wait with repeated checks using the internal mutex
+    // Reacquire the internal mutex directly for use with condition_variable
+    // Note: Between fullyUnlock() and this lock, unpark() may have been called.
+    // That's OK because we check the completion condition in the loop.
     std::unique_lock<std::mutex> lock(mutex->getInternalMutex());
+
+    // Wait loop with timeout to ensure we eventually wake up even if notification is lost
+    // Check condition before and after each wait
     while (!complete()) {
-        condition->cv.wait_for(lock, std::chrono::milliseconds(1));
+        // Use wait_for with a reasonable timeout as a fallback
+        // If notify_all() works, we'll wake up immediately
+        // If not, we'll wake up after timeout and recheck
+        condition->cv.wait_for(lock, std::chrono::milliseconds(100));
     }
 
-    // Explicitly unlock before calling reLock
+    // Explicitly unlock before restoring the CustomReentrantLock
     lock.unlock();
 
     // Restore the CustomReentrantLock with original recursion depth

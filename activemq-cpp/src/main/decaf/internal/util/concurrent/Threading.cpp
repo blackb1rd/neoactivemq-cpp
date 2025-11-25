@@ -1432,6 +1432,8 @@ bool Threading::park( Thread* thread, long long mills, int nanos) {
 
     if (handle->unparked == true) {
         handle->unparked = false;
+        PlatformThread::unlockMutex(handle->mutex);
+        return timedOut;
     } else if (handle->interrupted == true) {
         interrupted = true;
     } else {
@@ -1481,13 +1483,16 @@ void Threading::unpark(Thread* thread) {
     // it without needing to actually wait.
     handle->unparked = true;
 
-    // If the thread is actually parked then we send it a signal so
-    // that it will resume.
-    if (handle->parked) {
-        PlatformThread::notifyAll(handle->condition);
-    }
+    // Check if we need to notify while holding the lock
+    bool shouldNotify = handle->parked;
 
     PlatformThread::unlockMutex(handle->mutex);
+
+    // Notify AFTER releasing the lock to ensure the waiting thread can
+    // immediately acquire the lock when woken
+    if (shouldNotify) {
+        PlatformThread::notifyAll(handle->condition);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1113,11 +1113,13 @@ namespace {
         virtual bool operator()() {
 
             if (target != NULL) {
-                // The target mutex is already locked by the caller (interruptibleWaitOnCondition)
-                // so we can safely read the state without locking again
-                bool terminated = (target->state == Thread::TERMINATED);
+                // Read the target state - this is safe because interruptibleWaitOnCondition
+                // holds the target's internal mutex, providing synchronization with threadExit
+                // which sets the state and notifies while holding the same mutex.
+                volatile int* statePtr = &(target->state);
+                int currentState = *statePtr;
 
-                if (terminated) {
+                if (currentState == Thread::TERMINATED) {
                     return true;
                 }
 

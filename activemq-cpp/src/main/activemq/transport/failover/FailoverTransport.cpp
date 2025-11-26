@@ -37,6 +37,7 @@
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/Integer.h>
+#include <decaf/lang/exceptions/IllegalThreadStateException.h>
 
 using namespace std;
 using namespace activemq;
@@ -701,11 +702,15 @@ void FailoverTransport::reconnect(bool rebalance) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::restoreTransport(const Pointer<Transport> transport) {
+void FailoverTransport::restoreTransport(const Pointer<Transport> transport, bool alreadyStarted) {
 
     try {
 
-        transport->start();
+        // Only start the transport if it hasn't been started already.
+        // Backup transports are pre-started, so we skip the start() call for them.
+        if (!alreadyStarted) {
+            transport->start();
+        }
 
         //send information to the broker - informing it we are an ft client
         Pointer<ConnectionControl> cc(new ConnectionControl());
@@ -940,17 +945,34 @@ bool FailoverTransport::iterate() {
                 URI uri;
                 bool transportAlreadyStarted = false;
 
-                if (this->impl->backups->isEnabled()) {
+                // Check if we should disconnect from current connection to use a priority backup
+                if (this->impl->backups->isEnabled() && this->impl->priorityBackup &&
+                    !this->impl->connectedToPrioirty && this->impl->backups->isPriorityBackupAvailable()) {
+                    // We have a priority backup available and aren't connected to priority.
+                    // Close any priority backups and disconnect to trigger reconnection.
+                    while (this->impl->backups->isPriorityBackupAvailable()) {
+                        Pointer<BackupTransport> priorityBackup = this->impl->backups->getBackup();
+                        if (priorityBackup != NULL && priorityBackup->isPriority()) {
+                            try {
+                                priorityBackup->getTransport()->close();
+                            } catch (...) {
+                                // Ignore close errors
+                            }
+                        } else {
+                            // Put it back if it's not a priority backup - but can't put it back
+                            // Just break, we've hit a non-priority backup
+                            break;
+                        }
+                    }
+                    this->impl->disconnect();
+                    // Don't get any backup - let the normal connection logic reconnect
+                } else if (this->impl->backups->isEnabled()) {
+                    // Get backup transport if available
                     Pointer<BackupTransport> backupTransport = this->impl->backups->getBackup();
                     if (backupTransport != NULL) {
                         transport = backupTransport->getTransport();
                         uri = backupTransport->getUri();
                         transportAlreadyStarted = true;
-                        if (this->impl->priorityBackup && this->impl->backups->isPriorityBackupAvailable()) {
-                            // A priority connection is available and we aren't connected to
-                            // any other priority transports so disconnect and use the backup.
-                            this->impl->disconnect();
-                        }
                     }
                 }
 
@@ -992,7 +1014,6 @@ bool FailoverTransport::iterate() {
 
                         // Clear the connectingTransport marker now that start() returned.
                         this->impl->connectingTransport.reset(NULL);
-                        transportAlreadyStarted = false;  // Reset for next iteration
 
                         // Check if we were closed during the blocking start() operation
                         if (this->impl->closed) {
@@ -1001,9 +1022,10 @@ bool FailoverTransport::iterate() {
                         }
 
                         if (this->impl->started && !this->impl->firstConnection) {
-                            restoreTransport(transport);
+                            restoreTransport(transport, transportAlreadyStarted);
                         }
 
+                        transportAlreadyStarted = false;  // Reset for next iteration
                         // Check if we were closed during the blocking restoreTransport() operation
                         if (this->impl->closed) {
                             transport->close();

@@ -251,7 +251,7 @@ namespace failover {
          *
          * @throw IOException if an errors occurs while restoring the old state.
          */
-        void restoreTransport(const Pointer<Transport> transport);
+        void restoreTransport(const Pointer<Transport> transport, bool alreadyStarted = false);
 
         /**
          * Called when this class' TransportListener is notified of a Failure.

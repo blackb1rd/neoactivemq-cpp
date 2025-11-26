@@ -255,7 +255,9 @@ namespace {
 
         thread->state.store(Thread::RUNNABLE, std::memory_order_release);
 
-        thread->threadMain(thread->threadArg);
+        if (thread->threadMain != NULL) {
+            thread->threadMain(thread->threadArg);
+        }
 
         threadExit(thread);
         PLATFORM_THREAD_RETURN()
@@ -389,6 +391,7 @@ namespace {
         thread->joiners = NULL;
         thread->interruptingThread = NULL;
         thread->monitor = NULL;
+        thread->joiningThread = NULL;
 
         ::memset(thread->tls, 0, sizeof(thread->tls));
 
@@ -741,9 +744,6 @@ namespace {
 
         if (mills || nanos) {
             thread->timerSet = true;
-            thread->state.store(Thread::TIMED_WAITING, std::memory_order_release);
-        } else {
-            thread->state.store(Thread::WAITING, std::memory_order_release);
         }
 
         thread->monitor = monitor;
@@ -760,6 +760,13 @@ namespace {
 
         // This thread now enters the wait queue.
         enqueueThread(&monitor->waiting, thread);
+
+        // Set the state after the thread is enqueued and about to wait
+        if (mills || nanos) {
+            thread->state.store(Thread::TIMED_WAITING, std::memory_order_release);
+        } else {
+            thread->state.store(Thread::WAITING, std::memory_order_release);
+        }
 
         MonitorWaitCompletionCondition completion(thread);
 
@@ -1061,6 +1068,13 @@ void Threading::interrupt(ThreadHandle* thread) {
 
         if (thread->sleeping || thread->parked) {
             PlatformThread::notifyAll(thread->condition);
+
+            // If the thread is sleeping in a join, it's waiting on another thread's condition
+            // Notify that thread's condition as well
+            if (thread->joiningThread != NULL) {
+                //printf("DEBUG interrupt: Thread is joining %p, notifying that thread's condition\n", thread->joiningThread);
+                PlatformThread::notifyAll(thread->joiningThread->condition);
+            }
         } else if(thread->waiting == true) {
             if (interruptWaitingThread(self, thread)) {
                 thread->blocked = true;
@@ -1190,6 +1204,11 @@ bool Threading::join(ThreadHandle* thread, long long mills, int nanos) {
         self->state.store(Thread::SLEEPING, std::memory_order_release);
 
         self->timerSet = true;
+
+        // Note: interruptibleWaitOnCondition will re-acquire the mutex,
+        // but we're already holding it. The wait needs to atomically unlock
+        // and wait, so the current implementation should handle this correctly.
+        // However, for consistency with the other wait path, we could unlock first.
         timedOut = PlatformThread::interruptibleWaitOnCondition(self->condition, self->mutex,
                                                                 mills, nanos, completion);
 
@@ -1222,6 +1241,7 @@ bool Threading::join(ThreadHandle* thread, long long mills, int nanos) {
             self->sleeping = true;
             self->interruptible = true;
             self->state.store(Thread::SLEEPING, std::memory_order_release);
+            self->joiningThread = thread;  // Track which thread we're joining
 
             JoinCompletionCondition completion(self, thread);
 
@@ -1250,26 +1270,39 @@ bool Threading::join(ThreadHandle* thread, long long mills, int nanos) {
             self->state.store(Thread::RUNNABLE, std::memory_order_release);
             self->sleeping = false;
             self->interruptible = false;
+            self->joiningThread = NULL;  // Clear the joining thread
 
             if (self->interrupted == true) {
                 interrupted = true;
                 self->interrupted = false;
             }
 
-            // Save handle before dereferencing to ensure it remains valid for join
+            // Check if the thread actually terminated or if we just timed out
+            // IMPORTANT: Must read state BEFORE dereferencing, as dereference may delete the thread
+            PlatformThread::lockMutex(thread->mutex);
+            int finalState = thread->state.load(std::memory_order_acquire);
+            bool threadTerminated = (finalState == Thread::TERMINATED);
+
+            // Save handle before unlocking/dereferencing to ensure it remains valid for join
             decaf_thread_t threadHandle = thread->handle;
+            PlatformThread::unlockMutex(thread->mutex);
+
+            //printf("DEBUG Threading::join: finalState=%d, threadTerminated=%d\n", finalState, threadTerminated);
 
             // Release our reference on the thread now that we're done waiting
             dereferenceThread(thread);
 
-            // Call the underlying std::thread::join() using saved handle
-            PlatformThread::joinThread(threadHandle);
+            // Only call the underlying std::thread::join() if the thread actually terminated
+            // If we timed out, the thread is still running, so don't block on join
+            if (threadTerminated) {
+                PlatformThread::joinThread(threadHandle);
+            }
         } else {
             // Thread is either not yet started (NEW) or already terminated
             // For NEW state threads, we should not call join on the underlying thread
             // because it was never properly started - just unlock and return
             // For TERMINATED threads, we still need to join for proper synchronization
-            
+
             if (currentState == Thread::NEW) {
                 // Thread was never started, just unlock and return
                 PlatformThread::unlockMutex(thread->mutex);

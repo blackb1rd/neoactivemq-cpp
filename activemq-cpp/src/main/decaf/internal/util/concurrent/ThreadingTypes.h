@@ -87,6 +87,7 @@ namespace concurrent{
         ThreadHandle* next;
         ThreadHandle* joiners;
         MonitorHandle* monitor;
+        ThreadHandle* joiningThread;  // The thread this thread is currently joining (NULL if not joining)
     };
 
     struct MonitorHandle {

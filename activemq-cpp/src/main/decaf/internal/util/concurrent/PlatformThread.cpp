@@ -48,7 +48,7 @@ namespace {
     }
 
     std::map<decaf_tls_key, void*>& getTlsStorage() {
-        static std::map<decaf_tls_key, void*> storage;
+        thread_local std::map<decaf_tls_key, void*> storage;
         return storage;
     }
 

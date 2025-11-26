@@ -18,6 +18,8 @@
 #include <decaf/util/concurrent/Mutex.h>
 
 #include <decaf/internal/util/concurrent/CustomReentrantLock.h>
+#include <decaf/internal/util/concurrent/Threading.h>
+#include <decaf/internal/util/concurrent/ThreadingTypes.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Thread.h>
 
@@ -151,6 +153,15 @@ void Mutex::wait( long long millisecs, int nanos ) {
         throw IllegalArgumentException(__FILE__, __LINE__, "Nanoseconds value must be in the range [0..999999].");
     }
 
+    // Check if the current thread has been interrupted before waiting
+    if (Thread::interrupted()) {
+        throw InterruptedException(__FILE__, __LINE__, "Thread interrupted before wait");
+    }
+
+    // Get current thread handle to manage state
+    Thread* currentThread = Thread::currentThread();
+    Thread::State savedState = currentThread->getState();
+
     // Save the recursion count
     int savedRecursionCount = this->properties->reentrantLock.getRecursionCount();
 
@@ -162,13 +173,58 @@ void Mutex::wait( long long millisecs, int nanos ) {
     // Create unique_lock adopting the already-locked internal mutex
     std::unique_lock<std::mutex> lock(this->properties->reentrantLock.getInternalMutex(), std::adopt_lock);
 
-    // Wait on condition variable (this unlocks and relocks the mutex)
+    // Set thread state before waiting
+    decaf::internal::util::concurrent::ThreadHandle* handle = decaf::internal::util::concurrent::Threading::getCurrentThreadHandle();
     if (millisecs == 0 && nanos == 0) {
-        this->properties->condition.wait(lock);
+        handle->state.store(Thread::WAITING, std::memory_order_release);
     } else {
+        handle->state.store(Thread::TIMED_WAITING, std::memory_order_release);
+    }
+
+    // Wait on condition variable (this unlocks and relocks the mutex)
+    // We need to wait in a loop to check for interruption periodically
+    if (millisecs == 0 && nanos == 0) {
+        // For indefinite wait, use short polling to check for interruption
+        while (true) {
+            auto timeout = std::chrono::milliseconds(100);
+            auto result = this->properties->condition.wait_for(lock, timeout);
+
+            // Check if thread was interrupted
+            if (Thread::interrupted()) {
+                // Restore thread state
+                handle->state.store(savedState, std::memory_order_release);
+                // Release the unique_lock without unlocking the mutex
+                lock.release();
+                // Restore the CustomReentrantLock state (mutex is already locked)
+                this->properties->reentrantLock.adoptLock(savedRecursionCount);
+                throw InterruptedException(__FILE__, __LINE__, "Thread interrupted during wait");
+            }
+
+            // If we were notified (not timed out), exit the wait loop
+            if (result == std::cv_status::no_timeout) {
+                break;
+            }
+            // Otherwise, continue waiting (timeout occurred, loop again to check interruption)
+        }
+    } else {
+        // For timed wait, just wait for the specified duration
         auto duration = std::chrono::milliseconds(millisecs) + std::chrono::nanoseconds(nanos);
         this->properties->condition.wait_for(lock, duration);
+
+        // Check if thread was interrupted after the wait
+        if (Thread::interrupted()) {
+            // Restore thread state
+            handle->state.store(savedState, std::memory_order_release);
+            // Release the unique_lock without unlocking the mutex
+            lock.release();
+            // Restore the CustomReentrantLock state (mutex is already locked)
+            this->properties->reentrantLock.adoptLock(savedRecursionCount);
+            throw InterruptedException(__FILE__, __LINE__, "Thread interrupted during wait");
+        }
     }
+
+    // Restore thread state after waiting
+    handle->state.store(savedState, std::memory_order_release);
 
     // Release the unique_lock without unlocking the mutex
     lock.release();

@@ -1065,8 +1065,9 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker2ComesOnline
     Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
 
     // Both brokers offline initially
+    // Use longer reconnect delay and more attempts to ensure broker has time to start
     std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)?randomize=false&startupMaxReconnectAttempts=10&initialReconnectDelay=100";
+                                  "tcp://localhost:61628)?randomize=false&startupMaxReconnectAttempts=50&initialReconnectDelay=200&maxReconnectDelay=1000";
 
     PriorityBackupListener listener;
     FailoverTransportFactory factory;
@@ -1083,8 +1084,8 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker2ComesOnline
 
     transport->start();
 
-    // Give it a moment to attempt connection
-    Thread::sleep(500);
+    // Give it a moment to attempt connection, then start broker2
+    Thread::sleep(300);
 
     // Start broker2
     broker2->start();
@@ -1624,22 +1625,21 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
     CPPUNIT_ASSERT(failover != NULL);
+    CPPUNIT_ASSERT(failover->isRandomize() == false);
 
     transport->start();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to get reconnected in time", listener.awaitResumed());
+    CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", listener.awaitResumed());
     listener.reset();
-
     CPPUNIT_ASSERT(failover->isConnected() == true);
 
     // Stop broker1, should failover to broker2
     broker1->stop();
     broker1->waitUntilStopped();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to get interrupted in time", listener.awaitInterruption());
-    CPPUNIT_ASSERT_MESSAGE("Failed to get reconnected in time", listener.awaitResumed());
+    CPPUNIT_ASSERT_MESSAGE("Failed to get interrupted", listener.awaitInterruption());
+    CPPUNIT_ASSERT_MESSAGE("Failed to reconnect", listener.awaitResumed());
     listener.reset();
-
     CPPUNIT_ASSERT(failover->isConnected() == true);
 
     // Restart broker1
@@ -1652,10 +1652,9 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     broker2->stop();
     broker2->waitUntilStopped();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to get interrupted in time", listener.awaitInterruption());
-    CPPUNIT_ASSERT_MESSAGE("Failed to get reconnected in time", listener.awaitResumed());
+    CPPUNIT_ASSERT_MESSAGE("Failed to get interrupted", listener.awaitInterruption());
+    CPPUNIT_ASSERT_MESSAGE("Failed to reconnect", listener.awaitResumed());
     listener.reset();
-
     CPPUNIT_ASSERT(failover->isConnected() == true);
 
     // Restart broker2

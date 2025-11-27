@@ -554,7 +554,8 @@ void ThreadTest::testIsAlive() {
 
 ////////////////////////////////////////////////////////////////////////////////
 void ThreadTest::testGetId() {
-    CPPUNIT_ASSERT( Thread::currentThread()->getId() > 0 );
+    // Check that the thread ID is valid (not default-constructed)
+    CPPUNIT_ASSERT( Thread::currentThread()->getId() != std::thread::id() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -12,6 +12,11 @@
 - This project uses **C++17**
 - Prefer standard library features over custom implementations where appropriate
 
+### Testing
+- **Always use timeouts when running tests** - Tests are configured with a 5-minute (300 second) timeout by default
+- Use `timeout` command when running test executables directly: `timeout 300 ./activemq-test`
+- CTest automatically applies the configured timeout via test properties
+
 ## Building the Project
 
 ### Using CMake Presets
@@ -65,13 +70,12 @@ ctest --preset x64-linux-debug --output-on-failure
 
 **Run a specific test:**
 ```bash
-ctest --preset x64-linux-debug -V:w
- -R activemq-unit-tests
+ctest --preset x64-linux-debug -R activemq-unit-tests
 ```
 
 **Run the test executable directly:**
 ```bash
-ctest --preset x64-linux-debug -V
+./output/build/x64-linux-debug/src/test/activemq-test
 ```
 
 ## Architecture Notes

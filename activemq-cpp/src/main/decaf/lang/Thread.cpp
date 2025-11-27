@@ -147,7 +147,16 @@ void Thread::start() {
 
     try {
 
-        if (Threading::getThreadState(this->properties->handle) > Thread::NEW) {
+        Thread::State currentState = Threading::getThreadState(this->properties->handle);
+
+        // If thread has terminated, allow it to be restarted by recreating the thread handle
+        if (currentState == Thread::TERMINATED) {
+            // Join the old thread to ensure it's fully cleaned up
+            Threading::join(this->properties->handle, 0, 0);
+
+            // Reinitialize the thread handle for a new run
+            Threading::reinitialize(this->properties->handle);
+        } else if (currentState > Thread::NEW) {
             throw IllegalThreadStateException(
                 __FILE__, __LINE__,
                 "Thread::start - Thread already started");

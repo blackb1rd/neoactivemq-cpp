@@ -1046,6 +1046,51 @@ void Threading::start(ThreadHandle* thread) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void Threading::reinitialize(ThreadHandle* thread) {
+
+    try {
+
+        if (thread->state.load(std::memory_order_acquire) != Thread::TERMINATED) {
+            throw IllegalThreadStateException(__FILE__, __LINE__, "Thread must be terminated before reinitializing");
+        }
+
+        PlatformThread::lockMutex(thread->mutex);
+
+        // Destroy the old platform thread handle if it exists
+        if (thread->handle != NULL) {
+            PlatformThread::detachThread(thread->handle);
+            thread->handle = NULL;
+        }
+
+        // Reset thread state to NEW
+        thread->state.store(Thread::NEW, std::memory_order_release);
+
+        // Reset various flags
+        thread->interrupted = false;
+        thread->canceled = false;
+        thread->unparked = false;
+        thread->parked = false;
+        thread->sleeping = false;
+        thread->waiting = false;
+        thread->notified = false;
+        thread->blocked = false;
+        thread->suspended = true;  // Start in suspended state as per createNewThread
+        thread->interruptingThread = NULL;
+        thread->joiners = NULL;
+        thread->joiningThread = NULL;
+
+        PlatformThread::unlockMutex(thread->mutex);
+
+        // Create a new OS thread for this handle
+        createThreadInstance(thread, thread->stackSize, thread->priority, true, runCallback, thread);
+    }
+    DECAF_CATCH_RETHROW(IllegalThreadStateException)
+    DECAF_CATCH_RETHROW(RuntimeException)
+    DECAF_CATCH_EXCEPTION_CONVERT(NullPointerException, RuntimeException)
+    DECAF_CATCHALL_THROW(RuntimeException)
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void Threading::yeild() {
     PlatformThread::yeild();
 }

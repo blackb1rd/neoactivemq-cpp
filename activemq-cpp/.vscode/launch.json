@@ -46,7 +46,7 @@
             "program": "${workspaceFolder}/output/build/x64-linux-debug/src/test/test",
             "args": [
                 "-test",
-                "activemq::transport::failover::FailoverTransportTest::testPriorityBackupRapidSwitchingOnRestore"
+                "activemq::transport::failover::FailoverTransportTest::testFuzzyBrokerAvailability"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

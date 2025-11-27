@@ -211,6 +211,15 @@ namespace concurrent {
         static void start(ThreadHandle* thread);
 
         /**
+         * Reinitializes a terminated thread handle so it can be started again.
+         * This method must only be called on a thread that has reached TERMINATED state.
+         *
+         * @param thread
+         *      The thread instance to reinitialize.
+         */
+        static void reinitialize(ThreadHandle* thread);
+
+        /**
          * Joins the given thread instance and waits for it to either terminate or for the
          * given timeout period to expire.  If the value of of the timeout is zero then this
          * method waits forever.
@@ -333,7 +342,7 @@ namespace concurrent {
         static void setThreadLocalValue(int slot, void* value);
 
         static void destoryThreadLocalSlot(int slot);
-	
+
         static void releaseCurrentThreadHandle();
 
     private:

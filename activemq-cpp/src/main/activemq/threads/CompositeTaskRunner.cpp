@@ -220,15 +220,17 @@ bool CompositeTaskRunner::iterate() {
         for (int i = 0; i < impl->tasks.size(); ++i) {
             CompositeTask* task = impl->tasks.pop();
 
-            if (task->isPending()) {
-                task->iterate();
-                impl->tasks.addLast(task);
+            if (task != NULL) {
+                if (task->isPending()) {
+                    task->iterate();
+                    impl->tasks.addLast(task);
 
-                // Always return true, so that we check again for any of
-                // the other tasks that might now be pending.
-                return true;
-            } else {
-                impl->tasks.addLast(task);
+                    // Always return true, so that we check again for any of
+                    // the other tasks that might now be pending.
+                    return true;
+                } else {
+                    impl->tasks.addLast(task);
+                }
             }
         }
     }

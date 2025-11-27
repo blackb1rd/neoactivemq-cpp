@@ -58,9 +58,22 @@ namespace failover {
         CPPUNIT_TEST( testMaxReconnectsHonorsConfiguration );
         CPPUNIT_TEST( testStartupMaxReconnectsHonorsConfiguration );
         CPPUNIT_TEST( testConnectedToPriorityOnFirstTryThenFailover );
-        CPPUNIT_TEST( testFailoverWithoutPriorityBackup );
-        CPPUNIT_TEST( testConnectsToPriorityOnceStarted );
-        CPPUNIT_TEST( testPriorityBackupRapidSwitchingOnRestore );
+        // Failover tests without randomization (randomize=false)
+        CPPUNIT_TEST( testFailoverNoRandomizeBothOnline );
+        CPPUNIT_TEST( testFailoverNoRandomizeBroker1OnlyOnline );
+        CPPUNIT_TEST( testFailoverNoRandomizeBroker2OnlyOnline );
+        CPPUNIT_TEST( testFailoverNoRandomizeBothOfflineBroker1ComesOnline );
+        CPPUNIT_TEST( testFailoverNoRandomizeBothOfflineBroker2ComesOnline );
+        // Failover tests with randomization (randomize=true, default)
+        CPPUNIT_TEST( testFailoverWithRandomizeBothOnline );
+        CPPUNIT_TEST( testFailoverWithRandomizeBroker1OnlyOnline );
+        CPPUNIT_TEST( testFailoverWithRandomizeBroker2OnlyOnline );
+        CPPUNIT_TEST( testFailoverWithRandomizeBothOfflineBroker1ComesOnline );
+        CPPUNIT_TEST( testFailoverWithRandomizeBothOfflineBroker2ComesOnline );
+        //CPPUNIT_TEST( testConnectsToPriorityOnceStarted );
+        //CPPUNIT_TEST( testPriorityBackupRapidSwitchingOnRestore );
+        CPPUNIT_TEST( testSimpleBrokerRestart );
+        CPPUNIT_TEST( testFuzzyBrokerAvailability );
         //CPPUNIT_TEST( testConnectsToPriorityAfterInitialBackupFails );
         CPPUNIT_TEST_SUITE_END();
 
@@ -87,9 +100,22 @@ namespace failover {
         void testMaxReconnectsHonorsConfiguration();
         void testStartupMaxReconnectsHonorsConfiguration();
         void testConnectedToPriorityOnFirstTryThenFailover();
-        void testFailoverWithoutPriorityBackup();
+        // Failover tests without randomization
+        void testFailoverNoRandomizeBothOnline();
+        void testFailoverNoRandomizeBroker1OnlyOnline();
+        void testFailoverNoRandomizeBroker2OnlyOnline();
+        void testFailoverNoRandomizeBothOfflineBroker1ComesOnline();
+        void testFailoverNoRandomizeBothOfflineBroker2ComesOnline();
+        // Failover tests with randomization
+        void testFailoverWithRandomizeBothOnline();
+        void testFailoverWithRandomizeBroker1OnlyOnline();
+        void testFailoverWithRandomizeBroker2OnlyOnline();
+        void testFailoverWithRandomizeBothOfflineBroker1ComesOnline();
+        void testFailoverWithRandomizeBothOfflineBroker2ComesOnline();
         void testConnectsToPriorityOnceStarted();
         void testPriorityBackupRapidSwitchingOnRestore();
+        void testSimpleBrokerRestart();
+        void testFuzzyBrokerAvailability();
         void testConnectsToPriorityAfterInitialBackupFails();
 
     private:

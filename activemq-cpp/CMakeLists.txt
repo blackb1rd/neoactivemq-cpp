@@ -48,6 +48,7 @@ add_subdirectory(src/examples)
 if(WITH_TESTS)
     find_package(CppUnit CONFIG REQUIRED)
 	add_subdirectory(src/test)
+	add_subdirectory(src/test-benchmarks)
 
 	# Enable CTest and register the test executable
 	enable_testing()

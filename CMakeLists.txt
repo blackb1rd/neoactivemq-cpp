@@ -59,6 +59,13 @@ endif()
 add_subdirectory(activemq-cpp/src/main/decaf)
 add_subdirectory(activemq-cpp/src/main/activemq)
 add_subdirectory(activemq-cpp/src/main/cms)
+
+# Create a single unified INTERFACE library that bundles all components
+# This allows users to simply: target_link_libraries(myapp PRIVATE neoactivemq-cpp)
+add_library(neoactivemq-cpp INTERFACE)
+target_link_libraries(neoactivemq-cpp INTERFACE activemq_cms activemq_core decaf)
+add_library(neoactivemq-cpp::neoactivemq-cpp ALIAS neoactivemq-cpp)
+
 add_subdirectory(activemq-cpp/src/examples)
 
 if(WITH_TESTS)
@@ -184,7 +191,7 @@ endif()
 include(GNUInstallDirs)
 
 # Install libraries
-install(TARGETS decaf activemq_core activemq_cms
+install(TARGETS neoactivemq-cpp decaf activemq_core activemq_cms
 	EXPORT neoactivemq-cpp-targets
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

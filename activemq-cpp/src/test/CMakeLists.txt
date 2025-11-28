@@ -4,7 +4,7 @@ set(TEST_SRCS
   # Top level launcher / registry
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/testRegistry.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/util/StackTrace.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/../util/StackTrace.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/util/teamcity/TeamCityProgressListener.cpp
 
   activemq/cmsutil/CmsAccessorTest.cpp
@@ -271,6 +271,7 @@ add_executable(activemq-test ${TEST_MAIN} ${TEST_SRCS})
 target_include_directories(activemq-test PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../main
   ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
 # Add /bigobj flag for MSVC to handle large object files with many sections

@@ -5,6 +5,9 @@ set(BENCHMARK_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/testRegistry.cpp
 
+  # Shared utility support (from src/util directory)
+  ${CMAKE_CURRENT_SOURCE_DIR}/../util/StackTrace.cpp
+
   # Benchmark utilities
   benchmark/PerformanceTimer.cpp
 
@@ -40,6 +43,7 @@ add_executable(activemq-benchmark ${BENCHMARK_MAIN} ${BENCHMARK_SRCS})
 target_include_directories(activemq-benchmark PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../main
   ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
 # Add /bigobj flag for MSVC to handle large object files with many sections

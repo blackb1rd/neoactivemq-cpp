@@ -24,6 +24,7 @@ set(INTEGRATION_TEST_SRCS
 
   # Utilities and support
   util/teamcity/TeamCityProgressListener.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/../util/StackTrace.cpp
   activemq/util/CMSListener.cpp
   activemq/util/CMSProvider.cpp
   activemq/util/IntegrationCommon.cpp
@@ -100,6 +101,7 @@ add_executable(activemq-integration-test ${INTEGRATION_TEST_MAIN} ${INTEGRATION_
 target_include_directories(activemq-integration-test PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../main
   ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
 # Add /bigobj flag for MSVC to handle large object files with many sections

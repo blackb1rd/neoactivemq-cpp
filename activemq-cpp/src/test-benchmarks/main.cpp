@@ -17,36 +17,229 @@
 
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
+#include <cppunit/TestListener.h>
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/Outputter.h>
+#include <cppunit/XmlOutputter.h>
+#include <cppunit/CompilerOutputter.h>
 #include <cppunit/TestResult.h>
+#include <util/StackTrace.h>
 #include <activemq/util/Config.h>
 #include <activemq/library/ActiveMQCPP.h>
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <memory>
+#include <thread>
+#include <atomic>
+#include <chrono>
+#include <mutex>
+#include <condition_variable>
+#include <stdexcept>
 
-int main( int argc AMQCPP_UNUSED, char **argv AMQCPP_UNUSED ) {
+class BenchmarkRunner {
+private:
+    CppUnit::TextUi::TestRunner* runner;
+    std::string testPath;
+    std::atomic<bool> wasSuccessful;
+    std::atomic<bool> completed;
+    std::thread thread;
+    std::mutex mutex;
+    std::condition_variable cv;
+
+public:
+    BenchmarkRunner(CppUnit::TextUi::TestRunner* r, const std::string& path)
+        : runner(r), testPath(path), wasSuccessful(false), completed(false) {
+    }
+
+    void start() {
+        thread = std::thread([this]() {
+            try {
+                bool result = runner->run(testPath, false);
+                wasSuccessful.store(result);
+            } catch (...) {
+                wasSuccessful.store(false);
+            }
+            completed.store(true);
+            cv.notify_all();
+        });
+    }
+
+    bool waitFor(long long timeoutMillis) {
+        if (timeoutMillis <= 0) {
+            if (thread.joinable()) {
+                thread.join();
+            }
+            return completed.load();
+        }
+
+        std::unique_lock<std::mutex> lock(mutex);
+        auto timeout = std::chrono::milliseconds(timeoutMillis);
+
+        if (cv.wait_for(lock, timeout, [this]() { return completed.load(); })) {
+            if (thread.joinable()) {
+                thread.join();
+            }
+            return true;
+        }
+
+        return false; // Timeout occurred
+    }
+
+    bool getResult() const {
+        return wasSuccessful.load();
+    }
+
+    bool isCompleted() const {
+        return completed.load();
+    }
+
+    void dumpStackTrace() {
+        test::util::dumpAllThreadStackTraces();
+    }
+
+    ~BenchmarkRunner() {
+        if (thread.joinable()) {
+            thread.detach();
+        }
+    }
+};
+
+int main( int argc, char **argv ) {
+
+    test::util::initializeStackTrace();
 
     activemq::library::ActiveMQCPP::initializeLibrary();
+
     bool wasSuccessful = false;
+    std::ofstream outputFile;
+    bool useXMLOutputter = false;
+    std::string testPath = "";
+    long long timeoutSeconds = 0; // 0 means no timeout
+    std::unique_ptr<CppUnit::TestListener> listener( new CppUnit::BriefTestProgressListener );
 
-    try {
-        CppUnit::TextUi::TestRunner runner;
-        CppUnit::TestFactoryRegistry &registry =
-            CppUnit::TestFactoryRegistry::getRegistry();
-        runner.addTest( registry.makeTest() );
+    if( argc > 1 ) {
+        for( int i = 1; i < argc; ++i ) {
+            const std::string arg( argv[i] );
+            if( arg == "-quiet" ) {
+                listener.reset( NULL );
+            } else if( arg == "-xml" ) {
+                if( ( i + 1 ) >= argc ) {
+                    std::cout << "-xml requires a filename to be specified" << std::endl;
+                    return -1;
+                }
 
-        std::cout << "=====================================================\n";
-        std::cout << "Starting the Benchmarks:" << std::endl;
-        std::cout << "-----------------------------------------------------\n";
+                std::ofstream outputFile( argv[++i] );
+                useXMLOutputter = true;
+            } else if( arg == "-test" ) {
+                if( ( i + 1 ) >= argc ) {
+                    std::cout << "-test requires a test name or path to be specified" << std::endl;
+                    return -1;
+                }
+                testPath = argv[++i];
+            } else if( arg == "-timeout" ) {
+                if( ( i + 1 ) >= argc ) {
+                    std::cout << "-timeout requires a timeout value in seconds" << std::endl;
+                    return -1;
+                }
+                try {
+                    timeoutSeconds = std::stoll( argv[++i] );
+                    if( timeoutSeconds < 0 ) {
+                        std::cout << "Timeout value must be positive" << std::endl;
+                        return -1;
+                    }
+                } catch( std::exception& ex ) {
+                    std::cout << "Invalid timeout value specified on command line: "
+                              << argv[i] << std::endl;
+                    return -1;
+                }
+            } else if( arg == "-help" || arg == "--help" || arg == "-h" ) {
+                std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
+                std::cout << "Options:" << std::endl;
+                std::cout << "  -test <name>       Run specific benchmark or suite" << std::endl;
+                std::cout << "  -timeout <sec>     Set benchmark timeout in seconds (0 = no timeout)" << std::endl;
+                std::cout << "  -quiet             Suppress progress output" << std::endl;
+                std::cout << "  -xml <file>        Output results in XML format" << std::endl;
+                std::cout << "  -help, --help, -h  Show this help message" << std::endl;
+                activemq::library::ActiveMQCPP::shutdownLibrary();
+                return 0;
+            }
+        }
+    }
 
-        wasSuccessful = runner.run( "", false );
+    CppUnit::TextUi::TestRunner runner;
+    CppUnit::TestFactoryRegistry &registry =
+        CppUnit::TestFactoryRegistry::getRegistry();
+    runner.addTest( registry.makeTest() );
 
-        std::cout << "-----------------------------------------------------\n";
-        std::cout << "Finished with the Benchmarks." << std::endl;
-        std::cout << "=====================================================\n";
+    // Shows a message as each test starts
+    if( listener.get() != NULL ) {
+        runner.eventManager().addListener( listener.get() );
+    }
 
-    } catch(...) {
-        std::cout << "----------------------------------------" << std::endl;
-        std::cout << "- AN ERROR HAS OCCURED:                -" << std::endl;
-        std::cout << "----------------------------------------" << std::endl;
+    // Specify XML output and inform the test runner of this format.
+    if( useXMLOutputter ) {
+        runner.setOutputter( new CppUnit::XmlOutputter( &runner.result(), outputFile ) );
+    } else {
+        // Use CompilerOutputter for better error formatting with stack traces
+        runner.setOutputter( new CppUnit::CompilerOutputter( &runner.result(), std::cerr ) );
+    }
+
+    std::cout << "=====================================================\n";
+    std::cout << "Starting the Benchmarks:" << std::endl;
+    std::cout << "-----------------------------------------------------\n";
+
+    if( timeoutSeconds > 0 ) {
+        BenchmarkRunner benchmarkRunner(&runner, testPath);
+        benchmarkRunner.start();
+
+        bool completed = benchmarkRunner.waitFor(timeoutSeconds * 1000);
+
+        if( !completed ) {
+            std::cerr << std::endl << "ERROR: Benchmark execution timed out after "
+                      << timeoutSeconds << " seconds" << std::endl;
+
+            // Dump stack traces of all threads before terminating
+            benchmarkRunner.dumpStackTrace();
+
+            std::cerr << "Forcibly terminating process due to timeout..." << std::endl;
+            if( useXMLOutputter ) {
+                outputFile.close();
+            }
+            // Force exit since we can't safely stop the benchmark thread
+            std::_Exit(-1);
+        }
+
+        wasSuccessful = benchmarkRunner.getResult();
+
+        // If benchmarks failed (but didn't timeout), dump stack traces
+        if( !wasSuccessful ) {
+            std::cerr << std::endl << "ERROR: Benchmark execution failed" << std::endl;
+            benchmarkRunner.dumpStackTrace();
+        }
+    } else {
+        try {
+            wasSuccessful = runner.run( testPath, false );
+
+            // If benchmarks failed, dump stack traces
+            if( !wasSuccessful ) {
+                std::cerr << std::endl << "ERROR: Benchmark execution failed" << std::endl;
+                test::util::dumpAllThreadStackTraces();
+            }
+        } catch(...) {
+            std::cout << "----------------------------------------" << std::endl;
+            std::cout << "- AN ERROR HAS OCCURED:                -" << std::endl;
+            std::cout << "----------------------------------------" << std::endl;
+            test::util::dumpAllThreadStackTraces();
+        }
+    }
+
+    std::cout << "-----------------------------------------------------\n";
+    std::cout << "Finished with the Benchmarks." << std::endl;
+    std::cout << "=====================================================\n";
+
+    if( useXMLOutputter ) {
+        outputFile.close();
     }
 
     activemq::library::ActiveMQCPP::shutdownLibrary();

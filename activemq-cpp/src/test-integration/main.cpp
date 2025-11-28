@@ -21,21 +21,104 @@
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/Outputter.h>
 #include <cppunit/XmlOutputter.h>
+#include <cppunit/CompilerOutputter.h>
 #include <cppunit/TestResult.h>
 #include <util/teamcity/TeamCityProgressListener.h>
+#include <util/StackTrace.h>
 #include <activemq/util/Config.h>
 #include <activemq/library/ActiveMQCPP.h>
 #include <decaf/lang/Runtime.h>
 #include <decaf/lang/Integer.h>
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <memory>
+#include <thread>
+#include <atomic>
+#include <chrono>
+#include <mutex>
+#include <condition_variable>
+#include <stdexcept>
 
-int main( int argc AMQCPP_UNUSED, char **argv AMQCPP_UNUSED ) {
+class IntegrationTestRunner {
+private:
+    CppUnit::TextUi::TestRunner* runner;
+    std::string testPath;
+    std::atomic<bool> wasSuccessful;
+    std::atomic<bool> completed;
+    std::thread thread;
+    std::mutex mutex;
+    std::condition_variable cv;
+
+public:
+    IntegrationTestRunner(CppUnit::TextUi::TestRunner* r, const std::string& path)
+        : runner(r), testPath(path), wasSuccessful(false), completed(false) {
+    }
+
+    void start() {
+        thread = std::thread([this]() {
+            try {
+                bool result = runner->run(testPath, false);
+                wasSuccessful.store(result);
+            } catch (...) {
+                wasSuccessful.store(false);
+            }
+            completed.store(true);
+            cv.notify_all();
+        });
+    }
+
+    bool waitFor(long long timeoutMillis) {
+        if (timeoutMillis <= 0) {
+            if (thread.joinable()) {
+                thread.join();
+            }
+            return completed.load();
+        }
+
+        std::unique_lock<std::mutex> lock(mutex);
+        auto timeout = std::chrono::milliseconds(timeoutMillis);
+
+        if (cv.wait_for(lock, timeout, [this]() { return completed.load(); })) {
+            if (thread.joinable()) {
+                thread.join();
+            }
+            return true;
+        }
+
+        return false; // Timeout occurred
+    }
+
+    bool getResult() const {
+        return wasSuccessful.load();
+    }
+
+    bool isCompleted() const {
+        return completed.load();
+    }
+
+    void dumpStackTrace() {
+        test::util::dumpAllThreadStackTraces();
+    }
+
+    ~IntegrationTestRunner() {
+        if (thread.joinable()) {
+            thread.detach();
+        }
+    }
+};
+
+int main( int argc, char **argv ) {
+
+    test::util::initializeStackTrace();
 
     activemq::library::ActiveMQCPP::initializeLibrary();
 
+    bool wasSuccessful = false;
     std::ofstream outputFile;
     bool useXMLOutputter = false;
+    std::string testPath = "";
+    long long timeoutSeconds = 0; // 0 means no timeout
     std::unique_ptr<CppUnit::TestListener> listener( new CppUnit::BriefTestProgressListener );
 
     if( argc > 1 ) {
@@ -53,6 +136,39 @@ int main( int argc AMQCPP_UNUSED, char **argv AMQCPP_UNUSED ) {
 
                 std::ofstream outputFile( argv[++i] );
                 useXMLOutputter = true;
+            } else if( arg == "-test" ) {
+                if( ( i + 1 ) >= argc ) {
+                    std::cout << "-test requires a test name or path to be specified" << std::endl;
+                    return -1;
+                }
+                testPath = argv[++i];
+            } else if( arg == "-timeout" ) {
+                if( ( i + 1 ) >= argc ) {
+                    std::cout << "-timeout requires a timeout value in seconds" << std::endl;
+                    return -1;
+                }
+                try {
+                    timeoutSeconds = std::stoll( argv[++i] );
+                    if( timeoutSeconds < 0 ) {
+                        std::cout << "Timeout value must be positive" << std::endl;
+                        return -1;
+                    }
+                } catch( std::exception& ex ) {
+                    std::cout << "Invalid timeout value specified on command line: "
+                              << argv[i] << std::endl;
+                    return -1;
+                }
+            } else if( arg == "-help" || arg == "--help" || arg == "-h" ) {
+                std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
+                std::cout << "Options:" << std::endl;
+                std::cout << "  -test <name>       Run specific test or test suite" << std::endl;
+                std::cout << "  -timeout <sec>     Set test timeout in seconds (0 = no timeout)" << std::endl;
+                std::cout << "  -teamcity          Use TeamCity progress listener" << std::endl;
+                std::cout << "  -quiet             Suppress test progress output" << std::endl;
+                std::cout << "  -xml <file>        Output results in XML format" << std::endl;
+                std::cout << "  -help, --help, -h  Show this help message" << std::endl;
+                activemq::library::ActiveMQCPP::shutdownLibrary();
+                return 0;
             }
         }
     }
@@ -72,9 +188,48 @@ int main( int argc AMQCPP_UNUSED, char **argv AMQCPP_UNUSED ) {
         // will delete the passed XmlOutputter for us.
         if( useXMLOutputter ) {
             runner.setOutputter( new CppUnit::XmlOutputter( &runner.result(), outputFile ) );
+        } else {
+            // Use CompilerOutputter for better error formatting with stack traces
+            runner.setOutputter( new CppUnit::CompilerOutputter( &runner.result(), std::cerr ) );
         }
 
-        bool wasSuccessful = runner.run( "", false );
+        if( timeoutSeconds > 0 ) {
+            IntegrationTestRunner testRunner(&runner, testPath);
+            testRunner.start();
+
+            bool completed = testRunner.waitFor(timeoutSeconds * 1000);
+
+            if( !completed ) {
+                std::cerr << std::endl << "ERROR: Test execution timed out after "
+                          << timeoutSeconds << " seconds" << std::endl;
+
+                // Dump stack traces of all threads before terminating
+                testRunner.dumpStackTrace();
+
+                std::cerr << "Forcibly terminating process due to timeout..." << std::endl;
+                if( useXMLOutputter ) {
+                    outputFile.close();
+                }
+                // Force exit since we can't safely stop the test thread
+                std::_Exit(-1);
+            }
+
+            wasSuccessful = testRunner.getResult();
+
+            // If tests failed (but didn't timeout), dump stack traces
+            if( !wasSuccessful ) {
+                std::cerr << std::endl << "ERROR: Test execution failed" << std::endl;
+                testRunner.dumpStackTrace();
+            }
+        } else {
+            wasSuccessful = runner.run( testPath, false );
+
+            // If tests failed, dump stack traces
+            if( !wasSuccessful ) {
+                std::cerr << std::endl << "ERROR: Test execution failed" << std::endl;
+                test::util::dumpAllThreadStackTraces();
+            }
+        }
 
         if( useXMLOutputter ) {
             outputFile.close();
@@ -89,7 +244,10 @@ int main( int argc AMQCPP_UNUSED, char **argv AMQCPP_UNUSED ) {
         std::cout << "- AN ERROR HAS OCCURED:                -" << std::endl;
         std::cout << "- Do you have a Broker Running?        -" << std::endl;
         std::cout << "----------------------------------------" << std::endl;
+        test::util::dumpAllThreadStackTraces();
         activemq::library::ActiveMQCPP::shutdownLibrary();
     }
+
+    return -1;
 }
 

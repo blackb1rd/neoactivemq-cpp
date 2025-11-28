@@ -19,10 +19,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { preset: x86-windows-debug-test, build_type: Debug, arch: x86 }
-          - { preset: x86-windows-release-test, build_type: Release, arch: x86 }
-          - { preset: x64-windows-debug-test, build_type: Debug, arch: x64 }
-          - { preset: x64-windows-release-test, build_type: Release, arch: x64 }
+          - { preset: x86-windows-debug-test, build_type: Debug, arch: amd64_x86 }
+          - { preset: x86-windows-release-test, build_type: Release, arch: amd64_x86 }
+          - { preset: x64-windows-debug-test, build_type: Debug, arch: amd64 }
+          - { preset: x64-windows-release-test, build_type: Release, arch: amd64 }
 
     steps:
     - name: Checkout code

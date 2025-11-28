@@ -226,11 +226,11 @@ long long Long::parse(const String& value, int offset, int radix, bool negative)
     }
 
     if (!negative) {
-        result = -result;
-        if (result < 0) {
+        if (result == Long::MIN_VALUE) {
             throw exceptions::NumberFormatException(__FILE__, __LINE__,
                 "Long::parseLong - Value less than zero, but no minus sign.");
         }
+        result = -result;
     }
 
     return result;

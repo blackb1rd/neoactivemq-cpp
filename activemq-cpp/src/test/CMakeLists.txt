@@ -4,6 +4,7 @@ set(TEST_SRCS
   # Top level launcher / registry
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/testRegistry.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/util/StackTrace.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/util/teamcity/TeamCityProgressListener.cpp
 
   activemq/cmsutil/CmsAccessorTest.cpp

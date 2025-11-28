@@ -119,15 +119,16 @@ namespace mock {
         }
 
         void waitUntilStopped() {
+            // Thread should exit cleanly now that done is set and sockets are closed
             this->join();
 
-            // Now that thread has exited, safely close server socket
+            // Thread has exited, ensure sockets are cleaned up
             std::lock_guard<std::mutex> lock(socketMutex);
             if (server.get() != NULL) {
-                try {
-                    server->close();
-                } catch (...) {}
                 server.reset(NULL);
+            }
+            if (clientSocket.get() != NULL) {
+                clientSocket.reset(NULL);
             }
         }
 
@@ -135,15 +136,16 @@ namespace mock {
             try {
                 done.store(true, std::memory_order_release);
 
-                // Only close the client socket to unblock any pending read/write operations
-                // DO NOT close server socket here - causes exception unwinding deadlock
-                // The 1-second timeout on accept() ensures thread exits cleanly
+                // Close the server socket to stop accepting new connections
+                // DO NOT close clientSocket here - let the run() thread clean it up
+                // after its DataInputStream/DataOutputStream are destroyed
                 std::lock_guard<std::mutex> lock(socketMutex);
 
-                if (clientSocket.get() != NULL) {
+                if (server.get() != NULL) {
                     try {
-                        clientSocket->close();
+                        server->close();
                     } catch (...) {}
+                    server.reset(NULL);
                 }
             } catch (...) {}
         }
@@ -156,7 +158,7 @@ namespace mock {
                 try {
                     server.reset(new ServerSocket(configuredPort));
                     server->setReuseAddress(true);
-                    server->setSoTimeout(1000); // 1 second timeout on accept
+                    server->setSoTimeout(100); // 100ms timeout for quick shutdown response
                 } catch (IOException& e) {
                     // Failed to create/bind server socket - notify and exit
                     error.store(true, std::memory_order_release);
@@ -178,10 +180,17 @@ namespace mock {
                 while (!done.load(std::memory_order_acquire)) {
                     Socket* socketPtr = NULL;
                     try {
-                        // Check done flag before blocking accept call to avoid
-                        // exception unwinding issues during shutdown
+                        // Check done flag before blocking accept call
                         if (done.load(std::memory_order_acquire)) {
                             break;
+                        }
+
+                        // Check if server socket is still valid before calling accept
+                        {
+                            std::lock_guard<std::mutex> lock(socketMutex);
+                            if (server.get() == NULL || done.load(std::memory_order_acquire)) {
+                                break;
+                            }
                         }
 
                         socketPtr = server->accept();

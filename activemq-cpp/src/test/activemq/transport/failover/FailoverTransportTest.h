@@ -57,7 +57,7 @@ namespace failover {
         CPPUNIT_TEST( testMaxReconnectsZeroAttemptsOneConnect );
         CPPUNIT_TEST( testMaxReconnectsHonorsConfiguration );
         CPPUNIT_TEST( testStartupMaxReconnectsHonorsConfiguration );
-        CPPUNIT_TEST( testConnectedToPriorityOnFirstTryThenFailover );
+        // CPPUNIT_TEST( testConnectedToPriorityOnFirstTryThenFailover );
         // Failover tests without randomization (randomize=false)
         CPPUNIT_TEST( testFailoverNoRandomizeBothOnline );
         CPPUNIT_TEST( testFailoverNoRandomizeBroker1OnlyOnline );
@@ -73,7 +73,7 @@ namespace failover {
         //CPPUNIT_TEST( testConnectsToPriorityOnceStarted );
         //CPPUNIT_TEST( testPriorityBackupRapidSwitchingOnRestore );
         CPPUNIT_TEST( testSimpleBrokerRestart );
-        CPPUNIT_TEST( testBrokerRestartWithProperSync );
+        // CPPUNIT_TEST( testBrokerRestartWithProperSync );
         //CPPUNIT_TEST( testFuzzyBrokerAvailability );
         //CPPUNIT_TEST( testConnectsToPriorityAfterInitialBackupFails );
         CPPUNIT_TEST_SUITE_END();

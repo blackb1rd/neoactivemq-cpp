@@ -774,7 +774,7 @@ void FailoverTransportTest::testStartupMaxReconnectsHonorsConfiguration() {
 
     std::string uri = "failover://(mock://localhost:61616?failOnCreate=true,"
                                   "mock://localhost:61617?failOnCreate=true)"
-                                  "?randomize=false&startupMaxReconnectAttempts=2";
+                                  "?randomize=false&startupMaxReconnectAttempts=2&maxReconnectAttempts=0&initialReconnectDelay=100&useExponentialBackOff=false";
 
     Pointer<WireFormatInfo> info(new WireFormatInfo());
 
@@ -792,6 +792,10 @@ void FailoverTransportTest::testStartupMaxReconnectsHonorsConfiguration() {
     CPPUNIT_ASSERT(failover->isRandomize() == false);
 
     transport->start();
+
+    // Wait for reconnection attempts to complete (2 attempts * 100ms delay = 200ms minimum)
+    // Add extra time to ensure the connection attempts have finished
+    Thread::sleep(500);
 
     CPPUNIT_ASSERT_THROW_MESSAGE("Send should have failed after max connect attempts of two",
             transport->oneway(info), Exception);

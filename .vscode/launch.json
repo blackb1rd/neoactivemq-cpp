@@ -29,10 +29,10 @@
             "name": "Debug Specific Test",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/output/build/x86-windows-debug/src/test/test.exe",
+            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/activemq-test.exe",
             "args": [
                 "-test",
-                "activemq::transport::failover::FailoverTransportTest::testPriorityBackupRapidSwitchingOnRestore"
+                "activemq::transport::failover::FailoverTransportTest::testFailoverNoRandomizeBothOnline"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

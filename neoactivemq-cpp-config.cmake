@@ -7,6 +7,7 @@
 include(CMakeFindDependencyMacro)
 
 # Find required dependencies
+find_dependency(Threads REQUIRED)
 find_dependency(apr CONFIG)
 
 # Optional: OpenSSL support

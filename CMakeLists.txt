@@ -61,7 +61,8 @@ add_subdirectory(activemq-cpp/src/main/activemq)
 add_subdirectory(activemq-cpp/src/main/cms)
 
 # Create a single unified INTERFACE library that bundles all components
-# This allows users to simply: target_link_libraries(myapp PRIVATE neoactivemq-cpp)
+# This allows users to simply: target_link_libraries(myapp PRIVATE neoactivemq-cpp::neoactivemq-cpp)
+# The component libraries (activemq_cms, activemq_core, decaf) are the actual libraries
 add_library(neoactivemq-cpp INTERFACE)
 target_link_libraries(neoactivemq-cpp INTERFACE activemq_cms activemq_core decaf)
 add_library(neoactivemq-cpp::neoactivemq-cpp ALIAS neoactivemq-cpp)

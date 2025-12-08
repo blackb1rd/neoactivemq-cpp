@@ -122,13 +122,6 @@ std::string Date::toString() const {
         savedTz = originalTz;
     }
 
-    // [DEBUG] Entry point
-    std::cout << "[DEBUG Date::toString] Entry - originalTz: " << (originalTz ? originalTz : "NULL") << std::endl;
-    std::cout << "[DEBUG Date::toString] hadOriginalTz: " << hadOriginalTz << std::endl;
-    if (hadOriginalTz) {
-        std::cout << "[DEBUG Date::toString] savedTz: '" << savedTz << "'" << std::endl;
-    }
-
     // Check if TZ environment variable is set
     const char* tzEnv = std::getenv("TZ");
     std::string originalTzValue;  // Store the original TZ value for later use
@@ -136,14 +129,11 @@ std::string Date::toString() const {
 
     if (tzEnv && strlen(tzEnv) > 0) {
         originalTzValue = std::string(tzEnv);  // Store the original value
-        // [DEBUG] TZ env var is set
-        std::cout << "[DEBUG Date::toString] tzEnv set to: '" << tzEnv << "'" << std::endl;
 
         // Set the timezone environment variable to affect localtime()
 #ifdef _WIN32
         // Windows timezone handling - convert IANA timezone names to Windows format
         std::string winTzFormat = convertToWindowsTimezone(tzEnv);
-        std::cout << "[DEBUG Date::toString] Windows TZ format: '" << winTzFormat << "'" << std::endl;
         _putenv_s("TZ", winTzFormat.c_str());
 #else
         // POSIX systems can use IANA timezone names directly
@@ -153,19 +143,14 @@ std::string Date::toString() const {
 
         // Convert using the new timezone
         timeInfo = localtime(&seconds);
-        std::cout << "[DEBUG Date::toString] After localtime, timeInfo->tm_hour: " << (timeInfo ? timeInfo->tm_hour : -1) << std::endl;
 
-        // Restore original timezone
-        std::cout << "[DEBUG Date::toString] Restoring TZ - hadOriginalTz: " << hadOriginalTz << std::endl;
         if (hadOriginalTz) {
-            std::cout << "[DEBUG Date::toString] Restoring to savedTz: '" << savedTz << "'" << std::endl;
 #ifdef _WIN32
             _putenv_s("TZ", savedTz.c_str());
 #else
             setenv("TZ", savedTz.c_str(), 1);
 #endif
         } else {
-            std::cout << "[DEBUG Date::toString] Clearing TZ" << std::endl;
 #ifdef _WIN32
             _putenv_s("TZ", "");
 #else
@@ -173,7 +158,6 @@ std::string Date::toString() const {
 #endif
         }
         tzset(); // Restore timezone
-        std::cout << "[DEBUG Date::toString] After tzset, TZ is now: " << (std::getenv("TZ") ? std::getenv("TZ") : "NULL") << std::endl;
 
     } else {
         // No timezone specified, use local time
@@ -191,11 +175,6 @@ std::string Date::toString() const {
     if (!originalTzValue.empty()) {
         char timeBuffer[80];
         strftime(timeBuffer, sizeof(timeBuffer), "%a %b %d %H:%M:%S", timeInfo);
-
-        // [DEBUG] Show formatted time
-        std::cout << "[DEBUG Date::toString] Formatted time from strftime: '" << timeBuffer << "'" << std::endl;
-        std::cout << "[DEBUG Date::toString] timeInfo values - tm_hour: " << timeInfo->tm_hour
-                  << ", tm_min: " << timeInfo->tm_min << ", tm_sec: " << timeInfo->tm_sec << std::endl;
 
         // Determine timezone abbreviation manually for Windows
         std::string tzAbbr = "???";
@@ -320,10 +299,19 @@ std::string Date::toString() const {
 ////////////////////////////////////////////////////////////////////////////////
 std::string Date::convertToWindowsTimezone(const std::string& ianaTimezone) const {
     // Convert common IANA timezone names to Windows timezone format
-    // Use formats that Windows can properly interpret for %Z formatting
+    // Use POSIX TZ format: std offset dst [offset],start[/time],end[/time]
+    // Where start/end are in format: Mm.n.d (month m, nth occurrence of day d)
+    // The /time suffix specifies the transition time (default is 02:00:00)
+
+    // For US timezones:
+    // - DST starts: Second Sunday in March (M3.2.0) at 2:00 AM
+    // - DST ends: First Sunday in November (M11.1.0) at 2:00 AM
 
     if (ianaTimezone == "America/New_York") {
-        return "EST5EDT,M3.2.0,M11.1.0";
+        // EST is UTC-5, EDT is UTC-4
+        // Format: EST5EDT,M3.2.0/2,M11.1.0/2
+        // This means: Standard time is EST (5 hours behind UTC), DST is EDT
+        return "EST5EDT,M3.2.0/2,M11.1.0/2";
     } else if (ianaTimezone == "America/Chicago") {
         return "CST6CDT,M3.2.0/2,M11.1.0/2";
     } else if (ianaTimezone == "America/Denver") {
@@ -333,13 +321,16 @@ std::string Date::convertToWindowsTimezone(const std::string& ianaTimezone) cons
     } else if (ianaTimezone == "UTC" || ianaTimezone == "GMT") {
         return "UTC0";
     } else if (ianaTimezone == "Europe/London") {
-        return "GMT0BST1,M3.5.0/1,M10.5.0/2";
+        // GMT is UTC+0, BST is UTC+1
+        // DST starts: Last Sunday in March at 1:00 AM, ends: Last Sunday in October at 2:00 AM
+        return "GMT0BST,M3.5.0/1,M10.5.0/2";
     } else if (ianaTimezone == "Europe/Paris" || ianaTimezone == "Europe/Berlin") {
-        return "CET-1CEST-2,M3.5.0/2,M10.5.0/3";
+        // CET is UTC+1, CEST is UTC+2
+        return "CET-1CEST,M3.5.0/2,M10.5.0/3";
     } else if (ianaTimezone == "Asia/Tokyo") {
         return "JST-9";
     } else if (ianaTimezone == "Australia/Sydney") {
-        return "AEST-10AEDT-11,M10.1.0/2,M4.1.0/3";
+        return "AEST-10AEDT,M10.1.0/2,M4.1.0/3";
     }
 
     // If no mapping found, return as-is and hope for the best

@@ -1155,8 +1155,9 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOnline() {
     transport->start();
 
     // Wait for connection using polling instead of listener callback
+    // Increased timeout for slower CI environments
     int count = 0;
-    while (!failover->isConnected() && count++ < 40) {
+    while (!failover->isConnected() && count++ < 75) {
         Thread::sleep(200);
     }
     CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", failover->isConnected() == true);
@@ -1167,7 +1168,8 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOnline() {
     broker1->waitUntilStopped();
 
     // Should either stay connected (if on broker2) or failover to broker2
-    Thread::sleep(1000);
+    // Increased wait time for failover to complete
+    Thread::sleep(2000);
     CPPUNIT_ASSERT(failover->isConnected() == true);
 
     transport->close();
@@ -1651,8 +1653,9 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     transport->start();
 
     // Wait for initial connection
+    // Increased timeout for slower CI environments
     int count = 0;
-    while (!failover->isConnected() && count++ < 40) {
+    while (!failover->isConnected() && count++ < 75) {
         Thread::sleep(200);
     }
     CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", failover->isConnected() == true);

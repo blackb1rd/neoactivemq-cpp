@@ -39,8 +39,8 @@ set(BENCHMARK_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
 
 # Build a single benchmark harness driven by the top-level main.cpp
 list(REMOVE_ITEM BENCHMARK_SRCS ${BENCHMARK_MAIN})
-add_executable(activemq-benchmark ${BENCHMARK_MAIN} ${BENCHMARK_SRCS})
-target_include_directories(activemq-benchmark PRIVATE
+add_executable(neoactivemq-benchmark ${BENCHMARK_MAIN} ${BENCHMARK_SRCS})
+target_include_directories(neoactivemq-benchmark PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../main
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -48,22 +48,22 @@ target_include_directories(activemq-benchmark PRIVATE
 
 # Add /bigobj flag for MSVC to handle large object files with many sections
 if(MSVC)
-  target_compile_options(activemq-benchmark PRIVATE /bigobj)
+  target_compile_options(neoactivemq-benchmark PRIVATE /bigobj)
 endif()
 # Link libraries with proper dependency order for static linking
 # Use LINK_GROUP with RESCAN to ensure circular dependencies between static libraries are resolved
 # Note: LINK_GROUP RESCAN is not supported on Windows/MSVC
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24 AND NOT MSVC)
-  target_link_libraries(activemq-benchmark PRIVATE "$<LINK_GROUP:RESCAN,activemq_cms,activemq_core,decaf>")
+  target_link_libraries(neoactivemq-benchmark PRIVATE "$<LINK_GROUP:RESCAN,activemq_cms,activemq_core,decaf>")
 else()
   # For older CMake or Windows/MSVC, list libraries multiple times to resolve circular dependencies
-  target_link_libraries(activemq-benchmark PRIVATE activemq_cms activemq_core decaf activemq_cms)
+  target_link_libraries(neoactivemq-benchmark PRIVATE activemq_cms activemq_core decaf activemq_cms)
 endif()
 
 if(TARGET CppUnit::CppUnit)
-  target_link_libraries(activemq-benchmark PRIVATE CppUnit::CppUnit)
+  target_link_libraries(neoactivemq-benchmark PRIVATE CppUnit::CppUnit)
 elseif(TARGET CppUnit)
-  target_link_libraries(activemq-benchmark PRIVATE CppUnit)
+  target_link_libraries(neoactivemq-benchmark PRIVATE CppUnit)
 else()
-  target_link_libraries(activemq-benchmark PRIVATE CppUnit)
+  target_link_libraries(neoactivemq-benchmark PRIVATE CppUnit)
 endif()

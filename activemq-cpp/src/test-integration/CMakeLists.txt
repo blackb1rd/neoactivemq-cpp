@@ -97,8 +97,8 @@ set(INTEGRATION_TEST_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
 
 # Build a single integration test harness driven by the top-level main.cpp
 list(REMOVE_ITEM INTEGRATION_TEST_SRCS ${INTEGRATION_TEST_MAIN})
-add_executable(activemq-integration-test ${INTEGRATION_TEST_MAIN} ${INTEGRATION_TEST_SRCS})
-target_include_directories(activemq-integration-test PRIVATE
+add_executable(neoactivemq-integration-test ${INTEGRATION_TEST_MAIN} ${INTEGRATION_TEST_SRCS})
+target_include_directories(neoactivemq-integration-test PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../main
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -106,25 +106,25 @@ target_include_directories(activemq-integration-test PRIVATE
 
 # Add /bigobj flag for MSVC to handle large object files with many sections
 if(MSVC)
-  target_compile_options(activemq-integration-test PRIVATE /bigobj)
+  target_compile_options(neoactivemq-integration-test PRIVATE /bigobj)
 endif()
 
 # Link libraries with proper dependency order for static linking
 # Use LINK_GROUP with RESCAN to ensure circular dependencies between static libraries are resolved
 # Note: LINK_GROUP RESCAN is not supported on Windows/MSVC
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24 AND NOT MSVC)
-  target_link_libraries(activemq-integration-test PRIVATE "$<LINK_GROUP:RESCAN,activemq_cms,activemq_core,decaf>")
+  target_link_libraries(neoactivemq-integration-test PRIVATE "$<LINK_GROUP:RESCAN,activemq_cms,activemq_core,decaf>")
 else()
   # For older CMake or Windows/MSVC, list libraries multiple times to resolve circular dependencies
-  target_link_libraries(activemq-integration-test PRIVATE activemq_cms activemq_core decaf activemq_cms)
+  target_link_libraries(neoactivemq-integration-test PRIVATE activemq_cms activemq_core decaf activemq_cms)
 endif()
 
 if(TARGET CppUnit::CppUnit)
-  target_link_libraries(activemq-integration-test PRIVATE CppUnit::CppUnit)
+  target_link_libraries(neoactivemq-integration-test PRIVATE CppUnit::CppUnit)
 elseif(TARGET CppUnit)
-  target_link_libraries(activemq-integration-test PRIVATE CppUnit)
+  target_link_libraries(neoactivemq-integration-test PRIVATE CppUnit)
 else()
-  target_link_libraries(activemq-integration-test PRIVATE CppUnit)
+  target_link_libraries(neoactivemq-integration-test PRIVATE CppUnit)
 endif()
 
 # Note: Integration tests are NOT registered with CTest by default because they

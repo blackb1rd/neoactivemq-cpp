@@ -69,20 +69,11 @@ void DateTest::test() {
 ////////////////////////////////////////////////////////////////////////////////
 void DateTest::testToString() {
 
-#ifdef _WIN32
-    // Skip timezone-dependent test on Windows - POSIX TZ environment variable
-    // handling is not reliable on Windows for IANA timezone names
-    Date now(1443038174960LL);
-    std::string result = now.toString();
-    CPPUNIT_ASSERT(result != "");
-    CPPUNIT_ASSERT(result.size() >= 20);
-    // Just verify it produces some reasonable output with year
-    CPPUNIT_ASSERT(result.find("2015") != std::string::npos);
-#else
     // Force the timezone to America/New_York for deterministic output
     setenv("TZ", "America/New_York", 1);
 
     Date now(1443038174960LL);
+
     std::string result = now.toString();
 
     CPPUNIT_ASSERT(result != "");
@@ -99,5 +90,4 @@ void DateTest::testToString() {
 
     // Full string check - date library outputs EDT for Eastern Daylight Time
     CPPUNIT_ASSERT_EQUAL(std::string("Wed Sep 23 15:56:14 EDT 2015"), result);
-#endif
 }

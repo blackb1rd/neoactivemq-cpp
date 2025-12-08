@@ -25,10 +25,12 @@
 #include <decaf/util/StlMap.h>
 #include <decaf/util/concurrent/TimeUnit.h>
 #include <decaf/util/Properties.h>
-#include <apr.h>
-#include <apr_errno.h>
-#include <apr_env.h>
 #include <chrono>
+#include <cstdlib>
+
+#ifdef _WIN32
+#include <stdlib.h>  // For _putenv_s on Windows
+#endif
 
 #ifdef _WIN32
 // Windows-specific includes
@@ -77,12 +79,11 @@ namespace lang {
     public:
 
         StlMap<string, string> cachedEnvValues;
-        AprPool aprPool;
         Properties systemProperties;
 
     public:
 
-        SystemData() : cachedEnvValues(), aprPool(), systemProperties() {}
+        SystemData() : cachedEnvValues(), systemProperties() {}
 
         ~SystemData() {}
     };
@@ -112,10 +113,7 @@ void System::shutdownSystem() {
     delete System::sys;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-AprPool& System::getAprPool() {
-    return System::sys->aprPool;
-}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void System::arraycopy(const char* src, std::size_t srcPos, char* dest,
@@ -273,72 +271,52 @@ void System::arraycopy(const double* src, std::size_t srcPos,
 
 ////////////////////////////////////////////////////////////////////////////////
 void System::unsetenv(const std::string& name) {
-
-    apr_status_t result = APR_SUCCESS;
-
-    // Clear the value, errors are thrown out as an exception
-    result = apr_env_delete( name.c_str(), getAprPool().getAprPool() );
-    getAprPool().cleanup();
-
-    if (result != APR_SUCCESS) {
-
-        char buffer[256] = { 0 };
-
-        throw NullPointerException(
+#ifdef _WIN32
+    // On Windows, setting to empty string effectively unsets the variable
+    if (_putenv_s(name.c_str(), "") != 0) {
+        throw RuntimeException(
             __FILE__, __LINE__,
-            "System::getenv - ",
-            apr_strerror(result, buffer, 255));
+            "System::unsetenv - Failed to unset environment variable: %s", name.c_str());
     }
+#else
+    // POSIX systems have unsetenv
+    if (::unsetenv(name.c_str()) != 0) {
+        throw RuntimeException(
+            __FILE__, __LINE__,
+            "System::unsetenv - Failed to unset environment variable: %s", name.c_str());
+    }
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 std::string System::getenv(const std::string& name) {
+    const char* value = std::getenv(name.c_str());
 
-    char* value = NULL;
-    apr_status_t result = APR_SUCCESS;
-
-    // Read the value, errors are thrown out as an exception
-    result = apr_env_get(&value, name.c_str(), getAprPool().getAprPool());
-
-    if (result != APR_SUCCESS) {
-
-        char buffer[256] = { 0 };
-
+    if (value == nullptr) {
         throw NullPointerException(
             __FILE__, __LINE__,
-            "System::getenv - ",
-            apr_strerror(result, buffer, 255));
+            "System::getenv - Environment variable not found: %s", name.c_str());
     }
 
-    // Copy and cleanup
-    if (value == NULL) {
-        return "";
-    }
-
-    std::string envVal(value);
-    getAprPool().cleanup();
-
-    return value;
+    return std::string(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void System::setenv(const std::string& name, const std::string& value) {
-
-    apr_status_t result = APR_SUCCESS;
-
-    // Write the value, errors are thrown out as an exception
-    result = apr_env_set(name.c_str(), value.c_str(), getAprPool().getAprPool());
-    getAprPool().cleanup();
-
-    if (result != APR_SUCCESS) {
-
-        char buffer[256] = { 0 };
-
-        throw NullPointerException(
+#ifdef _WIN32
+    if (_putenv_s(name.c_str(), value.c_str()) != 0) {
+        throw RuntimeException(
             __FILE__, __LINE__,
-            "System::setenv - ",
-            apr_strerror(result, buffer, 255));
+            "System::setenv - Failed to set environment variable: %s", name.c_str());
     }
+#else
+    // POSIX setenv: 1 means overwrite existing value
+    if (::setenv(name.c_str(), value.c_str(), 1) != 0) {
+        throw RuntimeException(
+            __FILE__, __LINE__,
+            "System::setenv - Failed to set environment variable: %s", name.c_str());
+    }
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

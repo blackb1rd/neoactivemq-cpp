@@ -19,10 +19,9 @@
 
 #include <typeinfo>
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <apr.h>
-#include <apr_strings.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include <cms/CMSException.h>
 #include <cms/ConnectionFactory.h>
@@ -228,7 +227,7 @@ int main( int argc, char *argv[] ) {
 
         char *arg = argv[i];
 
-        if( apr_strnatcmp( arg,"-b" ) == 0 ) {
+        if( std::strcmp( arg,"-b" ) == 0 ) {
 
             if( i == argc - 1 || strncmp( argv[i+1], "-", 1 ) == 0 ) {
                 std::cout << "error: missing broker name:port" << "\n";
@@ -239,7 +238,7 @@ int main( int argc, char *argv[] ) {
             continue;
         }
 
-        if( apr_strnatcmp( arg, "-u" ) == 0 ) {
+        if( std::strcmp( arg, "-u" ) == 0 ) {
             if( i == argc - 1 || strncmp( argv[i+1], "-", 1 ) == 0 ) {
                 std::cout << "error: missing user name" << "\n";
                 exit(1);
@@ -249,7 +248,7 @@ int main( int argc, char *argv[] ) {
             continue;
         }
 
-        if( apr_strnatcmp( arg, "-p" ) == 0 ) {
+        if( std::strcmp( arg, "-p" ) == 0 ) {
             if( i == argc - 1 || strncmp( argv[i+1], "-", 1 ) == 0 ) {
                 std::cout << "error: missing password" << "\n";
                 exit(1);
@@ -259,7 +258,7 @@ int main( int argc, char *argv[] ) {
             continue;
         }
 
-        if( apr_strnatcmp( arg, "-h" ) == 0 ) {
+        if( std::strcmp( arg, "-h" ) == 0 ) {
             printUsage();
             exit(1);
         }

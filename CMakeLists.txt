@@ -21,7 +21,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-find_package(apr CONFIG REQUIRED)
+## Locate Asio for networking support (header-only library)
+find_package(asio CONFIG REQUIRED)
 
 # Options
 option(AMQCPP_BUILD_EXAMPLES "Build example programs" ON)
@@ -79,11 +80,11 @@ if(WITH_TESTS)
 	enable_testing()
 
 	# Register unit tests
-	add_test(NAME activemq-unit-tests COMMAND activemq-test)
+	add_test(NAME activemq-unit-tests COMMAND neoactivemq-test)
 	set_tests_properties(activemq-unit-tests PROPERTIES TIMEOUT 3000)
 
 	# Register benchmark tests
-	add_test(NAME activemq-benchmarks COMMAND activemq-benchmark)
+	add_test(NAME activemq-benchmarks COMMAND neoactivemq-benchmark)
 	set_tests_properties(activemq-benchmarks PROPERTIES TIMEOUT 600)
 
 	# Register integration tests with automatic Docker management
@@ -108,7 +109,7 @@ if(WITH_TESTS)
 	)
 
 	# The actual integration tests
-	add_test(NAME activemq-integration-tests COMMAND activemq-integration-test)
+	add_test(NAME activemq-integration-tests COMMAND neoactivemq-integration-test)
 	set_tests_properties(activemq-integration-tests PROPERTIES
 		TIMEOUT 1200
 		LABELS "integration"
@@ -165,7 +166,7 @@ if(WITH_TESTS)
 
 	# Convenience target: Build integration tests and ensure Docker is mentioned
 	add_custom_target(integration-tests
-		DEPENDS activemq-integration-test
+		DEPENDS neoactivemq-integration-test
 		COMMENT "Integration tests built. Start ActiveMQ with: cmake --build . --target docker-up"
 	)
 
@@ -174,10 +175,10 @@ if(WITH_TESTS)
 		COMMAND docker compose up -d
 		COMMAND ${CMAKE_COMMAND} -E sleep 10
 		COMMAND ${CMAKE_COMMAND} -E echo "Running integration tests..."
-		COMMAND $<TARGET_FILE:activemq-integration-test>
+		COMMAND $<TARGET_FILE:neoactivemq-integration-test>
 		COMMAND docker compose down
 		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		DEPENDS activemq-integration-test
+		DEPENDS neoactivemq-integration-test
 		COMMENT "Full integration test workflow (start broker, test, stop broker)..."
 	)
 

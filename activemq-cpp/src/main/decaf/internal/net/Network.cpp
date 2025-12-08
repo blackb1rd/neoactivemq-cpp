@@ -24,7 +24,13 @@
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/internal/util/ResourceLifecycleManager.h>
 
-#include <apr_signal.h>
+#ifdef WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#pragma comment(lib, "ws2_32.lib")
+#else
+#include <signal.h>
+#endif
 
 using namespace decaf;
 using namespace decaf::internal;
@@ -85,7 +91,8 @@ Network::~Network() {
         delete this->data;
     }
     DECAF_CATCH_NOTHROW( Exception)
-    DECAF_CATCHALL_NOTHROW()}
+    DECAF_CATCHALL_NOTHROW()
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 void Network::addNetworkResource(Resource* value) {
@@ -110,10 +117,22 @@ Mutex* Network::getRuntimeLock() {
 ////////////////////////////////////////////////////////////////////////////////
 void Network::initializeNetworking() {
 
-#ifndef WIN32
+#ifdef WIN32
+    // Initialize Winsock
+    WSADATA wsaData;
+    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (result != 0) {
+        throw IllegalStateException(__FILE__, __LINE__,
+            "WSAStartup failed with error: %d", result);
+    }
+#else
     // Remove the SIGPIPE so that the application isn't aborted if a connected
     // socket breaks during a read or write.
-    apr_signal_block(SIGPIPE);
+    struct sigaction sa;
+    sa.sa_handler = SIG_IGN;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sigaction(SIGPIPE, &sa, nullptr);
 #endif
 
     Network::networkRuntime = new Network();
@@ -122,6 +141,10 @@ void Network::initializeNetworking() {
 ////////////////////////////////////////////////////////////////////////////////
 void Network::shutdownNetworking() {
     delete Network::networkRuntime;
+
+#ifdef WIN32
+    WSACleanup();
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

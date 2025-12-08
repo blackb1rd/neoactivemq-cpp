@@ -49,6 +49,7 @@
 #include <string.h>
 #endif
 
+#include <cstdint>
 #include <decaf/lang/System.h>
 #include <decaf/security/DigestException.h>
 
@@ -99,11 +100,11 @@ static const unsigned char PADDING[64] = {
     (a) = ROTATE_LEFT ((a), (s)); \
 }
 #define GG(a, b, c, d, x, s) { \
-    (a) += G ((b), (c), (d)) + (x) + (apr_uint32_t)0x5a827999; \
+    (a) += G ((b), (c), (d)) + (x) + (uint32_t)0x5a827999; \
     (a) = ROTATE_LEFT ((a), (s)); \
 }
 #define HH(a, b, c, d, x, s) { \
-    (a) += H ((b), (c), (d)) + (x) + (apr_uint32_t)0x6ed9eba1; \
+    (a) += H ((b), (c), (d)) + (x) + (uint32_t)0x6ed9eba1; \
     (a) = ROTATE_LEFT ((a), (s)); \
 }
 
@@ -120,7 +121,7 @@ namespace crypto {
     public:
 
         // state (ABCD)
-        apr_uint32_t state[4];
+        uint32_t state[4];
         // number of bits, modulo 2^64 (lsb first)
         unsigned int count[2];
         // Digest Input buffer

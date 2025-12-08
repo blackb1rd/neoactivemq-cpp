@@ -23,7 +23,6 @@
 #include <decaf/util/Properties.h>
 #include <decaf/lang/Exception.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/internal/AprPool.h>
 #include <string>
 
 namespace decaf{
@@ -412,13 +411,6 @@ namespace lang{
          * @return a vector of environment name / value pairs.
          */
         static std::vector< std::string > getEnvArray();
-
-        /**
-         * Gets the one and only APR Pool instance
-         *
-         * @return a reference to the global APR Pool.
-         */
-        static internal::AprPool& getAprPool();
 
     private:
 

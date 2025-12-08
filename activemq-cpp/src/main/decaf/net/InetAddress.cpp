@@ -24,8 +24,7 @@
 #include <decaf/net/UnknownHostException.h>
 #include <decaf/lang/exceptions/RuntimeException.h>
 
-#include <apr_network_io.h>
-#include <decaf/internal/AprPool.h>
+#include <asio.hpp>
 
 using namespace decaf;
 using namespace decaf::net;
@@ -146,40 +145,43 @@ InetAddress InetAddress::getByAddress(const unsigned char* bytes, int numBytes) 
 ////////////////////////////////////////////////////////////////////////////////
 InetAddress InetAddress::getLocalHost() {
 
-    char hostname[APRMAXHOSTLEN + 1] = { 0 };
-
     try {
+        asio::io_context ioContext;
 
-        AprPool pool;
-        apr_status_t result = APR_SUCCESS;
+        // Get the local hostname
+        std::string hostname = asio::ip::host_name();
 
-        try {
-
-            result = apr_gethostname(hostname, APRMAXHOSTLEN + 1, pool.getAprPool());
-
-            if (result != APR_SUCCESS) {
-                return getLoopbackAddress();
-            }
-
-        } catch (...) {
+        if (hostname.empty()) {
+            return getLoopbackAddress();
         }
 
-        apr_sockaddr_t* address = NULL;
-        result = apr_sockaddr_info_get(&address, hostname, APR_UNSPEC, 0, APR_IPV4_ADDR_OK, pool.getAprPool());
+        // Resolve the hostname to get the IP address
+        asio::ip::tcp::resolver resolver(ioContext);
+        asio::error_code ec;
 
-        if (result != APR_SUCCESS || address == NULL) {
+        auto results = resolver.resolve(hostname, "", ec);
+
+        if (ec || results.empty()) {
             throw UnknownHostException(__FILE__, __LINE__, "Could not resolve the IP Address of this host.");
         }
 
-        if (address->family == APR_INET) {
-            return Inet4Address(hostname, (const unsigned char*) address->ipaddr_ptr, address->ipaddr_len);
+        // Get the first result
+        auto endpoint = results.begin()->endpoint();
+        auto address = endpoint.address();
+
+        if (address.is_v4()) {
+            auto v4addr = address.to_v4();
+            auto bytes = v4addr.to_bytes();
+            return Inet4Address(hostname, bytes.data(), 4);
         } else {
-            return Inet6Address(hostname, (const unsigned char*) address->ipaddr_ptr, address->ipaddr_len);
+            auto v6addr = address.to_v6();
+            auto bytes = v6addr.to_bytes();
+            return Inet6Address(hostname, bytes.data(), 16);
         }
     }
-    DECAF_CATCH_RETHROW( UnknownHostException)
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, UnknownHostException)
-    DECAF_CATCHALL_THROW( UnknownHostException)
+    DECAF_CATCH_RETHROW(UnknownHostException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, UnknownHostException)
+    DECAF_CATCHALL_THROW(UnknownHostException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -198,10 +200,10 @@ unsigned int InetAddress::bytesToInt(const unsigned char* bytes, int start) {
 
 ////////////////////////////////////////////////////////////////////////////////
 InetAddress InetAddress::getAnyAddress() {
-    return Inet4Address("localhost", InetAddress::loopbackBytes, 4);
+    return Inet4Address(anyBytes, 4);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 InetAddress InetAddress::getLoopbackAddress() {
-    return Inet4Address(InetAddress::anyBytes, 4);
+    return Inet4Address("localhost", loopbackBytes, 4);
 }

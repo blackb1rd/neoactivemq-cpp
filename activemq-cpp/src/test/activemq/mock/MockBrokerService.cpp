@@ -225,7 +225,8 @@ namespace mock {
                         continue;
                     }
 
-                    clientSocket->setSoLinger(false, 0);
+                    // Don't set SO_LINGER to avoid RST on close
+                    clientSocket->setTcpNoDelay(true);  // Disable Nagle's algorithm for immediate sends
                     // Set socket timeout to allow thread to check done flag periodically
                     clientSocket->setSoTimeout(1000); // 1 second timeout
 
@@ -239,8 +240,17 @@ namespace mock {
                             InputStream* is = clientSocket->getInputStream();
                             DataInputStream dataIn(is);
 
+                            Pointer<WireFormatInfo> preferred = wireFormat->getPreferedWireFormatInfo();
+
+                            // Send our WireFormatInfo first
                             wireFormat->marshal(preferred, &mock, &dataOut);
                             dataOut.flush();
+
+                            // Then receive the client's WireFormatInfo
+                            Pointer<Command> clientWireFormat = wireFormat->unmarshal(&mock, &dataIn);
+
+                            // Small delay to let client process the WireFormatInfo before we start reading commands
+                            Thread::sleep(50);
 
                             while (!done.load(std::memory_order_acquire)) {
                                 try {
@@ -249,6 +259,7 @@ namespace mock {
 
                                     if (response != NULL) {
                                         wireFormat->marshal(response, &mock, &dataOut);
+                                        dataOut.flush();
                                     }
                                 } catch (SocketTimeoutException& ste) {
                                     // Timeout allows us to check done flag

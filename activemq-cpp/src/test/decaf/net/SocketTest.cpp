@@ -17,7 +17,9 @@
 
 #include "SocketTest.h"
 
-#include <apr_signal.h>
+#ifndef _WIN32
+#include <csignal>
+#endif
 
 #include <decaf/net/Socket.h>
 #include <decaf/net/SocketFactory.h>

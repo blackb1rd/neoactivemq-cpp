@@ -22,7 +22,6 @@
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
 #include <decaf/util/Config.h>
-#include <decaf/internal/AprPool.h>
 #include <decaf/io/IOException.h>
 #include <decaf/net/SocketTimeoutException.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
@@ -183,10 +182,6 @@ namespace tcp {
          * @throw IndexOutOfBoundsException if offset + length is greater than buffer size.
          */
         void write(const unsigned char* buffer, int size, int offset, int length);
-
-    protected:
-
-        void checkResult(apr_status_t value) const;
 
     };
 

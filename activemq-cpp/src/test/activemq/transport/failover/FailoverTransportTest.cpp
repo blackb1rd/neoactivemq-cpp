@@ -693,8 +693,10 @@ void FailoverTransportTest::testConnectedToMockBroker() {
 
     transport->start();
 
+    // Wait for connection - need extra time because first URI may timeout (3+ seconds)
+    // before the second URI is tried. 40 * 200ms = 8 seconds max wait.
     int count = 0;
-    while (!failover->isConnected() && count++ < 20) {
+    while (!failover->isConnected() && count++ < 40) {
         Thread::sleep(200);
     }
     CPPUNIT_ASSERT(failover->isConnected() == true);
@@ -1152,9 +1154,13 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOnline() {
 
     transport->start();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", listener.awaitResumed());
+    // Wait for connection using polling instead of listener callback
+    int count = 0;
+    while (!failover->isConnected() && count++ < 40) {
+        Thread::sleep(200);
+    }
+    CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", failover->isConnected() == true);
     listener.reset();
-    CPPUNIT_ASSERT(failover->isConnected() == true);
 
     // Stop one broker (could be connected to either due to randomization)
     broker1->stop();

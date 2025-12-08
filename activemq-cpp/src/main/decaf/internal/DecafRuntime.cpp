@@ -17,10 +17,6 @@
 
 #include "DecafRuntime.h"
 
-#include <apr.h>
-#include <apr_general.h>
-#include <apr_pools.h>
-
 #include <decaf/lang/System.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/internal/net/Network.h>
@@ -37,7 +33,6 @@ using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
-    apr_pool_t* aprPool;
     Mutex* globalLock;
 }
 
@@ -47,11 +42,6 @@ DecafRuntime::DecafRuntime() : decaf::lang::Runtime() {
 
 ////////////////////////////////////////////////////////////////////////////////
 DecafRuntime::~DecafRuntime() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-apr_pool_t* DecafRuntime::getGlobalPool() const {
-    return aprPool;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -67,10 +57,6 @@ Runtime* Runtime::getRuntime() {
 
 ////////////////////////////////////////////////////////////////////////////////
 void Runtime::initializeRuntime(int argc, char **argv) {
-
-    // Initializes the APR Runtime from within a library.
-    apr_initialize();
-    apr_pool_create_ex(&aprPool, NULL, NULL, NULL);
 
     Runtime::getRuntime();
     Threading::initialize();
@@ -104,8 +90,4 @@ void Runtime::shutdownRuntime() {
     // Threading is the last to by shutdown since most other parts of the Runtime
     // need to make use of Thread primitives.
     Threading::shutdown();
-
-    // Cleans up APR data structures.
-    apr_pool_destroy(aprPool);
-    apr_terminate();
 }

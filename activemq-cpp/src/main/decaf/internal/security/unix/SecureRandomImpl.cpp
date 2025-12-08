@@ -23,10 +23,8 @@
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/util/Random.h>
 
-#include <decaf/internal/AprPool.h>
-
 #include <memory>
-#include <apr_file_io.h>
+#include <fstream>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -49,11 +47,10 @@ namespace security {
 
     public:
 
-        AprPool pool;
-        apr_file_t* randFile;
+        std::unique_ptr<std::ifstream> randFile;
         std::unique_ptr<Random> random;
 
-        SRNGData() : pool(), randFile( NULL ), random() {
+        SRNGData() : randFile(), random() {
         }
 
     };
@@ -66,18 +63,17 @@ SecureRandomImpl::SecureRandomImpl() : config( new SRNGData() ) {
     try{
 
         const char* files[] = { "/dev/urandom", "/dev/random" };
-        int index = 0;
-        apr_status_t result = APR_SUCCESS;
 
-        do {
-            // Attempt to find an OS source for secure random bytes.
-            result = apr_file_open( &config->randFile, files[index++],
-                                    APR_READ, APR_OS_DEFAULT,
-                                    config->pool.getAprPool() );
-        } while( index < 2 && result != APR_SUCCESS );
+        for (int i = 0; i < 2; ++i) {
+            auto file = std::make_unique<std::ifstream>(files[i], std::ios::binary);
+            if (file->is_open() && file->good()) {
+                config->randFile = std::move(file);
+                break;
+            }
+        }
 
-        // Defaults to the Decaf version.
-        if( result != APR_SUCCESS ) {
+        // Defaults to the Decaf version if no OS source available.
+        if (!config->randFile || !config->randFile->is_open()) {
             this->config->random.reset( new Random() );
         }
     }
@@ -119,20 +115,24 @@ void SecureRandomImpl::providerNextBytes( unsigned char* bytes, int numBytes ) {
             __FILE__, __LINE__, "Number of bytes to read was negative: %d", numBytes );
     }
 
-    if( this->config->randFile != NULL ) {
+    if( this->config->randFile && this->config->randFile->is_open() ) {
 
-        apr_status_t result = APR_EOF;
-        apr_size_t bytesRead = 0;
-
-        // Instruct APR to read it all.
-        result = apr_file_read_full( this->config->randFile, (void*)bytes, numBytes, &bytesRead );
+        this->config->randFile->read(reinterpret_cast<char*>(bytes), numBytes);
 
         // Since the dev random files are special OS random sources we should never get
         // an EOF or other error, if so its bad.
-        if( result != APR_SUCCESS ) {
+        if( !this->config->randFile->good() && !this->config->randFile->eof() ) {
             throw RuntimeException(
                 __FILE__, __LINE__,
                 "Unexpected error while reading random bytes from system resources." );
+        }
+
+        // Check if we got all the bytes we asked for
+        std::streamsize bytesRead = this->config->randFile->gcount();
+        if( bytesRead != numBytes ) {
+            throw RuntimeException(
+                __FILE__, __LINE__,
+                "Could not read requested number of random bytes." );
         }
 
     } else {
@@ -148,6 +148,13 @@ unsigned char* SecureRandomImpl::providerGenerateSeed( int numBytes ) {
     }
 
     unsigned char* buffer = new unsigned char[numBytes];
-    providerNextBytes( buffer, numBytes );
+
+    try {
+        providerNextBytes( buffer, numBytes );
+    } catch(...) {
+        delete[] buffer;
+        throw;
+    }
+
     return buffer;
 }

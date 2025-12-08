@@ -80,12 +80,12 @@ if(WITH_TESTS)
 	enable_testing()
 
 	# Register unit tests
-	add_test(NAME activemq-unit-tests COMMAND neoactivemq-test)
-	set_tests_properties(activemq-unit-tests PROPERTIES TIMEOUT 3000)
+	add_test(NAME neoactivemq-unit-tests COMMAND neoactivemq-test)
+	set_tests_properties(neoactivemq-unit-tests PROPERTIES TIMEOUT 3000)
 
 	# Register benchmark tests
-	add_test(NAME activemq-benchmarks COMMAND neoactivemq-benchmark)
-	set_tests_properties(activemq-benchmarks PROPERTIES TIMEOUT 600)
+	add_test(NAME neoactivemq-benchmarks COMMAND neoactivemq-benchmark)
+	set_tests_properties(neoactivemq-benchmarks PROPERTIES TIMEOUT 600)
 
 	# Register integration tests with automatic Docker management
 	# Setup fixture: Start Docker before integration tests
@@ -109,8 +109,8 @@ if(WITH_TESTS)
 	)
 
 	# The actual integration tests
-	add_test(NAME activemq-integration-tests COMMAND neoactivemq-integration-test)
-	set_tests_properties(activemq-integration-tests PROPERTIES
+	add_test(NAME neoactivemq-integration-tests COMMAND neoactivemq-integration-test)
+	set_tests_properties(neoactivemq-integration-tests PROPERTIES
 		TIMEOUT 1200
 		LABELS "integration"
 		FIXTURES_REQUIRED IntegrationFixture

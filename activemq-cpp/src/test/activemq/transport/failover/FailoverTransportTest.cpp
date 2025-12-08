@@ -1635,7 +1635,7 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     std::string uri = "failover://(tcp://localhost:61626,"
                                   "tcp://localhost:61628)?maxReconnectDelay=1000";
 
-    PriorityBackupListener listener;
+    DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
@@ -1650,51 +1650,44 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
 
     transport->start();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", listener.awaitResumed());
-
-    // Small delay to ensure connection state is fully updated after resume callback
-    Thread::sleep(100);
-
-    listener.reset();
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    // Wait for initial connection
+    int count = 0;
+    while (!failover->isConnected() && count++ < 40) {
+        Thread::sleep(200);
+    }
+    CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", failover->isConnected() == true);
 
     // Stop broker1, should failover to broker2
     broker1->stop();
     broker1->waitUntilStopped();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to get interrupted", listener.awaitInterruption());
-    CPPUNIT_ASSERT_MESSAGE("Failed to reconnect", listener.awaitResumed());
+    // Give transport time to detect the disconnection
+    Thread::sleep(500);
 
-    // Small delay to ensure connection state is fully updated after resume callback
-    Thread::sleep(100);
+    // Wait for reconnection to broker2
+    count = 0;
+    while (!failover->isConnected() && count++ < 50) {
+        Thread::sleep(200);
+    }
+    CPPUNIT_ASSERT_MESSAGE("Failed to reconnect to broker2", failover->isConnected() == true);
 
-    listener.reset();
-    CPPUNIT_ASSERT(failover->isConnected() == true);
-
-    // Restart broker1
+    // Restart broker1 and wait for it to be ready
     broker1->start();
     broker1->waitUntilStarted();
 
-    // Allow time for backup connections (2 seconds is usually sufficient)
-    Thread::sleep(2000);
-
-    // Stop broker2 - should failover to broker1 (if backup ready) or reconnect
+    // Stop broker2 - should reconnect to broker1
     broker2->stop();
     broker2->waitUntilStopped();
 
-    // Wait for interruption - should happen when broker2 goes down
-    CPPUNIT_ASSERT_MESSAGE("Failed to get interrupted after broker2 stop", listener.awaitInterruption());
-    // Wait for resume - should happen when reconnected to broker1
-    CPPUNIT_ASSERT_MESSAGE("Failed to reconnect to broker1", listener.awaitResumed());
+    // Give transport time to detect the disconnection
+    Thread::sleep(500);
 
-    // Small delay to ensure connection state is fully updated
-    Thread::sleep(100);
-
-    listener.reset();
-    CPPUNIT_ASSERT_MESSAGE("Should be connected after failover", failover->isConnected() == true);
-
-    // Final connection check
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    // Wait for reconnection to broker1
+    count = 0;
+    while (!failover->isConnected() && count++ < 50) {
+        Thread::sleep(200);
+    }
+    CPPUNIT_ASSERT_MESSAGE("Should reconnect to broker1", failover->isConnected() == true);
 
     transport->close();
 

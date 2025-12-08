@@ -32,6 +32,7 @@
 #include <vector>
 #include <list>
 #include <atomic>
+#include <cstring>
 
 #ifdef __SUNPRO_CC
 #include <stdlib.h>

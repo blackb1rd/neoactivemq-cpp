@@ -26,6 +26,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 #ifdef _WIN32
 #include <cstdlib>
@@ -121,6 +122,13 @@ std::string Date::toString() const {
         savedTz = originalTz;
     }
 
+    // [DEBUG] Entry point
+    std::cout << "[DEBUG Date::toString] Entry - originalTz: " << (originalTz ? originalTz : "NULL") << std::endl;
+    std::cout << "[DEBUG Date::toString] hadOriginalTz: " << hadOriginalTz << std::endl;
+    if (hadOriginalTz) {
+        std::cout << "[DEBUG Date::toString] savedTz: '" << savedTz << "'" << std::endl;
+    }
+
     // Check if TZ environment variable is set
     const char* tzEnv = std::getenv("TZ");
     std::string originalTzValue;  // Store the original TZ value for later use
@@ -128,10 +136,14 @@ std::string Date::toString() const {
 
     if (tzEnv && strlen(tzEnv) > 0) {
         originalTzValue = std::string(tzEnv);  // Store the original value
+        // [DEBUG] TZ env var is set
+        std::cout << "[DEBUG Date::toString] tzEnv set to: '" << tzEnv << "'" << std::endl;
+
         // Set the timezone environment variable to affect localtime()
 #ifdef _WIN32
         // Windows timezone handling - convert IANA timezone names to Windows format
         std::string winTzFormat = convertToWindowsTimezone(tzEnv);
+        std::cout << "[DEBUG Date::toString] Windows TZ format: '" << winTzFormat << "'" << std::endl;
         _putenv_s("TZ", winTzFormat.c_str());
 #else
         // POSIX systems can use IANA timezone names directly
@@ -141,15 +153,19 @@ std::string Date::toString() const {
 
         // Convert using the new timezone
         timeInfo = localtime(&seconds);
+        std::cout << "[DEBUG Date::toString] After localtime, timeInfo->tm_hour: " << (timeInfo ? timeInfo->tm_hour : -1) << std::endl;
 
         // Restore original timezone
+        std::cout << "[DEBUG Date::toString] Restoring TZ - hadOriginalTz: " << hadOriginalTz << std::endl;
         if (hadOriginalTz) {
+            std::cout << "[DEBUG Date::toString] Restoring to savedTz: '" << savedTz << "'" << std::endl;
 #ifdef _WIN32
             _putenv_s("TZ", savedTz.c_str());
 #else
             setenv("TZ", savedTz.c_str(), 1);
 #endif
         } else {
+            std::cout << "[DEBUG Date::toString] Clearing TZ" << std::endl;
 #ifdef _WIN32
             _putenv_s("TZ", "");
 #else
@@ -157,6 +173,7 @@ std::string Date::toString() const {
 #endif
         }
         tzset(); // Restore timezone
+        std::cout << "[DEBUG Date::toString] After tzset, TZ is now: " << (std::getenv("TZ") ? std::getenv("TZ") : "NULL") << std::endl;
 
     } else {
         // No timezone specified, use local time
@@ -174,6 +191,11 @@ std::string Date::toString() const {
     if (!originalTzValue.empty()) {
         char timeBuffer[80];
         strftime(timeBuffer, sizeof(timeBuffer), "%a %b %d %H:%M:%S", timeInfo);
+
+        // [DEBUG] Show formatted time
+        std::cout << "[DEBUG Date::toString] Formatted time from strftime: '" << timeBuffer << "'" << std::endl;
+        std::cout << "[DEBUG Date::toString] timeInfo values - tm_hour: " << timeInfo->tm_hour
+                  << ", tm_min: " << timeInfo->tm_min << ", tm_sec: " << timeInfo->tm_sec << std::endl;
 
         // Determine timezone abbreviation manually for Windows
         std::string tzAbbr = "???";

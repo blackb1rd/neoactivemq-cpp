@@ -72,9 +72,25 @@ void DateTest::testToString() {
     // Force the timezone to America/New_York for deterministic output
     setenv("TZ", "America/New_York", 1);
 
+    // [DEBUG] Check TZ before creating Date
+    const char* tzBefore = std::getenv("TZ");
+    std::cout << "[DEBUG DateTest] TZ before Date creation: " << (tzBefore ? tzBefore : "NULL") << std::endl;
+
     Date now(1443038174960LL);
 
+    // [DEBUG] Check TZ after creating Date
+    const char* tzAfter = std::getenv("TZ");
+    std::cout << "[DEBUG DateTest] TZ after Date creation: " << (tzAfter ? tzAfter : "NULL") << std::endl;
+
     std::string result = now.toString();
+
+    // [DEBUG] Show actual result
+    std::cout << "[DEBUG DateTest] Result string: '" << result << "'" << std::endl;
+    std::cout << "[DEBUG DateTest] Result length: " << result.size() << std::endl;
+
+    // [DEBUG] Check TZ after toString
+    const char* tzAfterToString = std::getenv("TZ");
+    std::cout << "[DEBUG DateTest] TZ after toString: " << (tzAfterToString ? tzAfterToString : "NULL") << std::endl;
 
     CPPUNIT_ASSERT(result != "");
     CPPUNIT_ASSERT(result.size() >= 20);

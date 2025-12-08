@@ -119,6 +119,7 @@ int main( int argc, char **argv ) {
     bool useXMLOutputter = false;
     std::string testPath = "";
     long long timeoutSeconds = 0; // 0 means no timeout
+    bool failFast = false;
     std::unique_ptr<CppUnit::TestListener> listener( new CppUnit::BriefTestProgressListener );
 
     if( argc > 1 ) {
@@ -170,6 +171,8 @@ int main( int argc, char **argv ) {
                               << argv[i] << std::endl;
                     return -1;
                 }
+            } else if( arg == "-failfast" ) {
+                failFast = true;
             } else if( arg == "-help" || arg == "--help" || arg == "-h" ) {
                 std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
                 std::cout << "Options:" << std::endl;
@@ -178,6 +181,7 @@ int main( int argc, char **argv ) {
                 std::cout << "                     Examples: -test decaf::lang::MathTest" << std::endl;
                 std::cout << "                               -test decaf::lang::MathTest::test_absD" << std::endl;
                 std::cout << "  -timeout <sec>     Set test timeout in seconds (0 = no timeout)" << std::endl;
+                std::cout << "  -failfast          Stop test execution on first failure" << std::endl;
                 std::cout << "  -teamcity          Use TeamCity progress listener" << std::endl;
                 std::cout << "  -quiet             Suppress test progress output" << std::endl;
                 std::cout << "  -xml <file>        Output results in XML format" << std::endl;
@@ -248,6 +252,12 @@ int main( int argc, char **argv ) {
 
         if( useXMLOutputter ) {
             outputFile.close();
+        }
+
+        // Stop iterations if failfast is enabled and test failed
+        if( failFast && !wasSuccessful ) {
+            std::cerr << std::endl << "Stopping test execution due to -failfast option" << std::endl;
+            break;
         }
     }
 

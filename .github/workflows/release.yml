@@ -139,6 +139,7 @@ jobs:
         path: |
           ${{ github.workspace }}/.cache/vcpkg
           ${{ env.VCPKG_ROOT }}/downloads
+          ${{ env.VCPKG_ROOT }}/buildtrees
         key: vcpkg-release-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
           vcpkg-release-${{ runner.os }}-

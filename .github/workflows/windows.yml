@@ -34,6 +34,8 @@ jobs:
       with:
         path: |
           .cache/vcpkg/installed
+          .cache/vcpkg/buildtrees
+          .cache/vcpkg/downloads
         key: vcpkg-installed-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
         restore-keys: |
           vcpkg-installed-${{ runner.os }}-${{ matrix.config.arch }}-
@@ -96,6 +98,8 @@ jobs:
       with:
         path: |
           .cache/vcpkg/installed
+          .cache/vcpkg/buildtrees
+          .cache/vcpkg/downloads
         key: vcpkg-installed-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
         restore-keys: |
           vcpkg-installed-${{ runner.os }}-${{ matrix.config.arch }}-

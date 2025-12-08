@@ -49,6 +49,7 @@
 #include <string.h>
 #endif
 
+#include <cstring>
 #include <cstdint>
 #include <decaf/lang/System.h>
 #include <decaf/security/DigestException.h>

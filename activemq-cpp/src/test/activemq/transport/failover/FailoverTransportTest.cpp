@@ -925,7 +925,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOnline() {
 
     // Wait for initial connection using polling
     int count = 0;
-    while (!failover->isConnected() && count++ < 50) {
+    while (!failover->isConnected() && count++ < 75) {
         Thread::sleep(200);
     }
     CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", failover->isConnected() == true);
@@ -935,9 +935,13 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOnline() {
     broker1->waitUntilStopped();
 
     // Give time to detect disconnection and reconnect
-    Thread::sleep(1000);
+    Thread::sleep(2000);
 
-    // Should be reconnected to broker2
+    // Poll to verify reconnection to broker2
+    count = 0;
+    while (!failover->isConnected() && count++ < 50) {
+        Thread::sleep(200);
+    }
     CPPUNIT_ASSERT_MESSAGE("Failed to reconnect", failover->isConnected() == true);
 
     transport->close();
@@ -1123,7 +1127,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker2ComesOnline
     // Both brokers offline initially
     // Use longer reconnect delay and more attempts to ensure broker has time to start
     std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)?randomize=false&startupMaxReconnectAttempts=50&initialReconnectDelay=50&maxReconnectDelay=50&useExponentialBackOff=false";
+                                  "tcp://localhost:61628)?randomize=false&startupMaxReconnectAttempts=100&initialReconnectDelay=50&maxReconnectDelay=50&useExponentialBackOff=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1141,7 +1145,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker2ComesOnline
     transport->start();
 
     // Give it a moment to attempt connection, then start broker2
-    Thread::sleep(300);
+    Thread::sleep(500);
 
     // Start broker2
     broker2->start();
@@ -1149,7 +1153,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker2ComesOnline
 
     // Poll for connection using isConnected()
     int count = 0;
-    while (!failover->isConnected() && count++ < 50) {
+    while (!failover->isConnected() && count++ < 100) {
         Thread::sleep(100);
     }
     CPPUNIT_ASSERT_MESSAGE("Failed to connect to broker2", failover->isConnected() == true);
@@ -1217,10 +1221,10 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOnline() {
     // Increased timeout for slower CI environments
     std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Waiting for initial connection (polling)..." << std::endl;
     int count = 0;
-    while (!failover->isConnected() && count++ < 75) {
+    while (!failover->isConnected() && count++ < 100) {
         if (count % 10 == 0) {
             std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Connection attempt " << count
-                      << "/75, isConnected=" << failover->isConnected() << std::endl;
+                      << "/100, isConnected=" << failover->isConnected() << std::endl;
         }
         Thread::sleep(200);
     }

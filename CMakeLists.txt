@@ -21,8 +21,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-## Locate Asio for networking support (header-only library)
 find_package(asio CONFIG REQUIRED)
+find_package(ZLIB REQUIRED)
 
 # Options
 option(AMQCPP_BUILD_EXAMPLES "Build example programs" ON)

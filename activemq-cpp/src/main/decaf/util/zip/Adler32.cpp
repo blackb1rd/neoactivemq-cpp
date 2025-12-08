@@ -17,7 +17,7 @@
 
 #include "Adler32.h"
 
-#include <decaf/internal/util/zip/zlib.h>
+#include <zlib.h>
 
 using namespace decaf;
 using namespace decaf::lang;

@@ -42,6 +42,9 @@ if(OpenSSL_FOUND)
   target_link_libraries(decaf PUBLIC OpenSSL::SSL OpenSSL::Crypto)
 endif()
 
+# link zlib for compression support
+target_link_libraries(decaf PUBLIC ZLIB::ZLIB)
+
 set_target_properties(decaf PROPERTIES
   POSITION_INDEPENDENT_CODE ON
 )

@@ -23,11 +23,6 @@ using namespace decaf::util;
 
 void RandomTest::test(){
 
-#ifdef _WIN32
-    // Skip this test on Windows OS
-    return;
-#endif
-
     Random rand(122760);
     CPPUNIT_ASSERT_EQUAL(-1524104671, rand.nextInt());
     CPPUNIT_ASSERT_EQUAL(2785759620113032781LL, rand.nextLong());

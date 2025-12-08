@@ -26,6 +26,8 @@
 
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 
+#include <cstring>
+
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif

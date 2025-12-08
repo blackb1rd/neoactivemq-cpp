@@ -20,6 +20,7 @@
 #include <decaf/lang/Integer.h>
 #include <decaf/io/ByteArrayInputStream.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
+#include <cstring>
 
 #ifdef HAVE_STRING_H
 #include <string.h>

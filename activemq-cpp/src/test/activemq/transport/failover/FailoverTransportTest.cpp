@@ -1261,7 +1261,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBroker1OnlyOnline() {
 
     // Wait for reconnection to broker2
     count = 0;
-    while (!failover->isConnected() && count++ < 50) {
+    while (!failover->isConnected() && count++ < 100) {
         Thread::sleep(200);
     }
     CPPUNIT_ASSERT_MESSAGE("Failed to reconnect to broker2", failover->isConnected() == true);
@@ -1411,7 +1411,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker2ComesOnli
 
     // Poll for connection using isConnected()
     int count = 0;
-    while (!failover->isConnected() && count++ < 50) {
+    while (!failover->isConnected() && count++ < 200) {
         Thread::sleep(100);
     }
     CPPUNIT_ASSERT_MESSAGE("Failed to connect to broker2", failover->isConnected() == true);

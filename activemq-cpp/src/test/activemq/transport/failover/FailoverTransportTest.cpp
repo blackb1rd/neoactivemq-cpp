@@ -670,14 +670,14 @@ void FailoverTransportTest::testUriOptionsApplied() {
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testConnectedToMockBroker() {
 
-    MockBrokerService broker1(61626);
-    MockBrokerService broker2(61628);
+    MockBrokerService broker1(61000);
+    MockBrokerService broker2(61001);
 
     broker1.start();
     broker1.waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61626,"
-            "tcp://localhost:61628)";
+    std::string uri = "failover://(tcp://localhost:61000,"
+            "tcp://localhost:61001)";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -828,61 +828,47 @@ namespace {
         virtual ~PriorityBackupListener() {}
 
         virtual void transportInterrupted() {
-            std::cout << "[DEBUG PriorityBackupListener] transportInterrupted() called" << std::endl;
             Pointer<CountDownLatch> latch;
             synchronized(&resetMutex) {
                 latch = interruptedLatch;
             }
             if (latch != NULL) {
-                std::cout << "[DEBUG PriorityBackupListener] Counting down interruptedLatch" << std::endl;
                 latch->countDown();
-            } else {
-                std::cout << "[DEBUG PriorityBackupListener] WARNING: interruptedLatch is NULL" << std::endl;
             }
         }
 
         virtual void transportResumed() {
-            std::cout << "[DEBUG PriorityBackupListener] transportResumed() called" << std::endl;
             Pointer<CountDownLatch> latch;
             synchronized(&resetMutex) {
                 latch = resumedLatch;
             }
             if (latch != NULL) {
-                std::cout << "[DEBUG PriorityBackupListener] Counting down resumedLatch" << std::endl;
                 latch->countDown();
-            } else {
-                std::cout << "[DEBUG PriorityBackupListener] WARNING: resumedLatch is NULL" << std::endl;
             }
         }
 
         void reset() {
-            std::cout << "[DEBUG PriorityBackupListener] reset() called" << std::endl;
             synchronized(&resetMutex) {
                 interruptedLatch.reset(new CountDownLatch(1));
                 resumedLatch.reset(new CountDownLatch(1));
             }
-            std::cout << "[DEBUG PriorityBackupListener] Latches reset complete" << std::endl;
         }
 
         bool awaitInterruption() {
-            std::cout << "[DEBUG PriorityBackupListener] awaitInterruption() called (60s timeout)" << std::endl;
             Pointer<CountDownLatch> latch;
             synchronized(&resetMutex) {
                 latch = interruptedLatch;
             }
             bool result = latch->await(60000);
-            std::cout << "[DEBUG PriorityBackupListener] awaitInterruption() returned: " << result << std::endl;
             return result;
         }
 
         bool awaitResumed() {
-            std::cout << "[DEBUG PriorityBackupListener] awaitResumed() called (60s timeout)" << std::endl;
             Pointer<CountDownLatch> latch;
             synchronized(&resetMutex) {
                 latch = resumedLatch;
             }
             bool result = latch->await(60000);
-            std::cout << "[DEBUG PriorityBackupListener] awaitResumed() returned: " << result << std::endl;
             return result;
         }
     };
@@ -895,8 +881,8 @@ namespace {
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testFailoverNoRandomizeBothOnline() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService(61002));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(61003));
 
     // Both brokers online
     broker1->start();
@@ -905,8 +891,8 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOnline() {
     broker2->start();
     broker2->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)?randomize=false";
+    std::string uri = "failover://(tcp://localhost:61002,"
+                                  "tcp://localhost:61003)?randomize=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -954,15 +940,15 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOnline() {
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testFailoverNoRandomizeBroker1OnlyOnline() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService(61004));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(61005));
 
     // Only broker1 online
     broker1->start();
     broker1->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)?randomize=false";
+    std::string uri = "failover://(tcp://localhost:61004,"
+                                  "tcp://localhost:61005)?randomize=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1014,15 +1000,15 @@ void FailoverTransportTest::testFailoverNoRandomizeBroker1OnlyOnline() {
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testFailoverNoRandomizeBroker2OnlyOnline() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService(61006));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(61007));
 
     // Only broker2 online
     broker2->start();
     broker2->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)?randomize=false";
+    std::string uri = "failover://(tcp://localhost:61006,"
+                                  "tcp://localhost:61007)?randomize=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1075,12 +1061,12 @@ void FailoverTransportTest::testFailoverNoRandomizeBroker2OnlyOnline() {
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker1ComesOnline() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService(61008));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(61009));
 
     // Both brokers offline initially
-    std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)?randomize=false&startupMaxReconnectAttempts=50&initialReconnectDelay=50&useExponentialBackOff=false";
+    std::string uri = "failover://(tcp://localhost:61008,"
+                                  "tcp://localhost:61009)?randomize=false&startupMaxReconnectAttempts=50&initialReconnectDelay=50&useExponentialBackOff=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1121,13 +1107,13 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker1ComesOnline
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker2ComesOnline() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService(61010));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(61011));
 
     // Both brokers offline initially
     // Use longer reconnect delay and more attempts to ensure broker has time to start
-    std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)?randomize=false&startupMaxReconnectAttempts=100&initialReconnectDelay=50&maxReconnectDelay=50&useExponentialBackOff=false";
+    std::string uri = "failover://(tcp://localhost:61010,"
+                                  "tcp://localhost:61011)?randomize=false&startupMaxReconnectAttempts=100&initialReconnectDelay=50&maxReconnectDelay=50&useExponentialBackOff=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1172,111 +1158,74 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker2ComesOnline
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testFailoverWithRandomizeBothOnline() {
 
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] ========== Test Starting ==========" << std::endl;
-
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
-
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Created broker1 on port 61626" << std::endl;
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Created broker2 on port 61628" << std::endl;
+    Pointer<MockBrokerService> broker1(new MockBrokerService(61012));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(61013));
 
     // Both brokers online
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Starting broker1..." << std::endl;
     broker1->start();
     broker1->waitUntilStarted();
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Broker1 started and ready" << std::endl;
 
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Starting broker2..." << std::endl;
     broker2->start();
     broker2->waitUntilStarted();
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Broker2 started and ready" << std::endl;
 
-    std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)";
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] URI: " << uri << std::endl;
+    std::string uri = "failover://(tcp://localhost:61012,"
+                                  "tcp://localhost:61013)";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Creating transport..." << std::endl;
     Pointer<Transport> transport(factory.create(uri));
     CPPUNIT_ASSERT(transport != NULL);
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Transport created" << std::endl;
-
     transport->setTransportListener(&listener);
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Transport listener set" << std::endl;
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
     CPPUNIT_ASSERT(failover != NULL);
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] FailoverTransport obtained" << std::endl;
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Randomize enabled: " << failover->isRandomize() << std::endl;
 
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Starting transport..." << std::endl;
     transport->start();
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Transport start() called" << std::endl;
 
-    // Wait for connection using polling instead of listener callback
-    // Increased timeout for slower CI environments
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Waiting for initial connection (polling)..." << std::endl;
+    // Wait for initial connection using polling
     int count = 0;
-    while (!failover->isConnected() && count++ < 100) {
-        if (count % 10 == 0) {
-            std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Connection attempt " << count
-                      << "/100, isConnected=" << failover->isConnected() << std::endl;
-        }
+    while (!failover->isConnected() && count++ < 200) {
         Thread::sleep(200);
     }
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Connection polling completed: count=" << count
-              << ", isConnected=" << failover->isConnected() << std::endl;
     CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", failover->isConnected() == true);
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] ✓ Initially connected" << std::endl;
 
-    // Stop one broker (could be connected to either due to randomization)
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Stopping broker1..." << std::endl;
+    // Stop broker1 (could be connected to either due to randomization)
     broker1->stop();
     broker1->waitUntilStopped();
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Broker1 stopped" << std::endl;
 
     // Should either stay connected (if on broker2) or failover to broker2
-    // Increased wait time for failover to complete - needs more time in CI
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Waiting 5000ms for potential failover..." << std::endl;
-    Thread::sleep(5000);
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] After 5s wait, isConnected="
-              << failover->isConnected() << std::endl;
-    CPPUNIT_ASSERT(failover->isConnected() == true);
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] ✓ Still connected after broker1 stop" << std::endl;
+    // Poll for connection status - may need time for:
+    // - Socket read timeout (up to 1s on server side)
+    // - Client-side failure detection
+    // - Reconnection attempt to broker2
+    count = 0;
+    while (!failover->isConnected() && count++ < 100) {
+        Thread::sleep(200);
+    }
+    CPPUNIT_ASSERT_MESSAGE("Failed to remain connected after broker1 stop", failover->isConnected() == true);
 
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Closing transport..." << std::endl;
     transport->close();
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Transport closed" << std::endl;
-
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Stopping broker1 (if not stopped)..." << std::endl;
     broker1->stop();
     broker1->waitUntilStopped();
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Broker1 cleanup complete" << std::endl;
-
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Stopping broker2..." << std::endl;
     broker2->stop();
     broker2->waitUntilStopped();
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] Broker2 stopped" << std::endl;
-
-    std::cout << "[DEBUG testFailoverWithRandomizeBothOnline] ========== Test Completed Successfully ==========" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testFailoverWithRandomizeBroker1OnlyOnline() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService(61014));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(61015));
 
     // Only broker1 online
     broker1->start();
     broker1->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)";
+    std::string uri = "failover://(tcp://localhost:61014,"
+                                  "tcp://localhost:61015)";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1327,15 +1276,15 @@ void FailoverTransportTest::testFailoverWithRandomizeBroker1OnlyOnline() {
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testFailoverWithRandomizeBroker2OnlyOnline() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService(61016));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(61017));
 
     // Only broker2 online
     broker2->start();
     broker2->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)";
+    std::string uri = "failover://(tcp://localhost:61016,"
+                                  "tcp://localhost:61017)";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1387,12 +1336,12 @@ void FailoverTransportTest::testFailoverWithRandomizeBroker2OnlyOnline() {
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker1ComesOnline() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService(61018));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(61019));
 
     // Both brokers offline initially
-    std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)?startupMaxReconnectAttempts=50&initialReconnectDelay=50&useExponentialBackOff=false";
+    std::string uri = "failover://(tcp://localhost:61018,"
+                                  "tcp://localhost:61019)?startupMaxReconnectAttempts=50&initialReconnectDelay=50&useExponentialBackOff=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1417,7 +1366,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker1ComesOnli
 
     // Poll for connection using isConnected()
     int count = 0;
-    while (!failover->isConnected() && count++ < 50) {
+    while (!failover->isConnected() && count++ < 100) {
         Thread::sleep(100);
     }
     CPPUNIT_ASSERT_MESSAGE("Failed to connect to broker1", failover->isConnected() == true);
@@ -1432,12 +1381,12 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker1ComesOnli
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker2ComesOnline() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService(61020));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(61021));
 
     // Both brokers offline initially
-    std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)?startupMaxReconnectAttempts=50&initialReconnectDelay=50&useExponentialBackOff=false";
+    std::string uri = "failover://(tcp://localhost:61020,"
+                                  "tcp://localhost:61021)?startupMaxReconnectAttempts=50&initialReconnectDelay=50&useExponentialBackOff=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1477,8 +1426,8 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker2ComesOnli
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testConnectedToPriorityOnFirstTryThenFailover() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService(61022));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(61023));
 
     broker1->start();
     broker1->waitUntilStarted();
@@ -1486,8 +1435,8 @@ void FailoverTransportTest::testConnectedToPriorityOnFirstTryThenFailover() {
     broker2->start();
     broker2->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)?randomize=false&priorityBackup=true";
+    std::string uri = "failover://(tcp://localhost:61022,"
+                                  "tcp://localhost:61023)?randomize=false&priorityBackup=true";
 
     PriorityBackupListener listener;
     FailoverTransportFactory factory;
@@ -1534,14 +1483,14 @@ void FailoverTransportTest::testConnectedToPriorityOnFirstTryThenFailover() {
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testConnectsToPriorityOnceStarted() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService(61024));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(61025));
 
     broker2->start();
     broker2->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61626?transport.useInactivityMonitor=false,"
-                                  "tcp://localhost:61628?transport.useInactivityMonitor=false)?randomize=false&priorityBackup=true";
+    std::string uri = "failover://(tcp://localhost:61024?transport.useInactivityMonitor=false,"
+                                  "tcp://localhost:61025?transport.useInactivityMonitor=false)?randomize=false&priorityBackup=true";
 
     PriorityBackupListener listener;
     FailoverTransportFactory factory;
@@ -1589,9 +1538,9 @@ void FailoverTransportTest::testConnectsToPriorityOnceStarted() {
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testConnectsToPriorityAfterInitialBackupFails() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61627));
-    Pointer<MockBrokerService> broker3(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService(61026));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(61027));
+    Pointer<MockBrokerService> broker3(new MockBrokerService(61028));
 
     broker2->start();
     broker2->waitUntilStarted();
@@ -1599,9 +1548,9 @@ void FailoverTransportTest::testConnectsToPriorityAfterInitialBackupFails() {
     broker3->start();
     broker3->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61626?transport.useInactivityMonitor=false,"
-                                  "tcp://localhost:61627?transport.useInactivityMonitor=false,"
-                                  "tcp://localhost:61628?transport.useInactivityMonitor=false)?randomize=false&priorityBackup=true";
+    std::string uri = "failover://(tcp://localhost:61026?transport.useInactivityMonitor=false,"
+                                  "tcp://localhost:61027?transport.useInactivityMonitor=false,"
+                                  "tcp://localhost:61028?transport.useInactivityMonitor=false)?randomize=false&priorityBackup=true";
 
     PriorityBackupListener listener;
     FailoverTransportFactory factory;
@@ -1664,8 +1613,8 @@ void FailoverTransportTest::testConnectsToPriorityAfterInitialBackupFails() {
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testPriorityBackupRapidSwitchingOnRestore() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService(61029));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(61030));
 
     broker1->start();
     broker1->waitUntilStarted();
@@ -1673,8 +1622,8 @@ void FailoverTransportTest::testPriorityBackupRapidSwitchingOnRestore() {
     broker2->start();
     broker2->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)?randomize=false&priorityBackup=true";
+    std::string uri = "failover://(tcp://localhost:61029,"
+                                  "tcp://localhost:61030)?randomize=false&priorityBackup=true";
 
     PriorityBackupListener listener;
     FailoverTransportFactory factory;
@@ -1731,8 +1680,8 @@ void FailoverTransportTest::testPriorityBackupRapidSwitchingOnRestore() {
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testSimpleBrokerRestart() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService(61031));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(61032));
 
     // Start both brokers
     broker1->start();
@@ -1741,8 +1690,8 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     broker2->start();
     broker2->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)?maxReconnectDelay=1000";
+    std::string uri = "failover://(tcp://localhost:61031,"
+                                  "tcp://localhost:61032)?maxReconnectDelay=1000";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -2045,3 +1994,4 @@ void FailoverTransportTest::testFuzzyBrokerAvailability() {
     broker2->stop();
     broker2->waitUntilStopped();
 }
+

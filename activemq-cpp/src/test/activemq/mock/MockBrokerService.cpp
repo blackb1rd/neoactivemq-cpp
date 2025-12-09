@@ -156,9 +156,13 @@ namespace mock {
 
                 // Create and bind the server socket once
                 try {
-                    server.reset(new ServerSocket(configuredPort));
+                    // Create socket without binding first
+                    server.reset(new ServerSocket());
+                    // Set SO_REUSEADDR BEFORE binding to allow immediate port reuse
                     server->setReuseAddress(true);
                     server->setSoTimeout(100); // 100ms timeout for quick shutdown response
+                    // Now bind to the configured port (127.0.0.1 for localhost only)
+                    server->bind("127.0.0.1", configuredPort);
                 } catch (IOException& e) {
                     // Failed to create/bind server socket - notify and exit
                     error.store(true, std::memory_order_release);

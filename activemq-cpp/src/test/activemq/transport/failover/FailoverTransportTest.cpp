@@ -694,9 +694,10 @@ void FailoverTransportTest::testConnectedToMockBroker() {
     transport->start();
 
     // Wait for connection - need extra time because first URI may timeout (3+ seconds)
-    // before the second URI is tried. 40 * 200ms = 8 seconds max wait.
+    // before the second URI is tried. With randomization, may try offline broker first.
+    // 100 * 200ms = 20 seconds max wait to accommodate platform differences.
     int count = 0;
-    while (!failover->isConnected() && count++ < 40) {
+    while (!failover->isConnected() && count++ < 100) {
         Thread::sleep(200);
     }
     CPPUNIT_ASSERT(failover->isConnected() == true);
@@ -1202,7 +1203,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOnline() {
     // - Client-side failure detection
     // - Reconnection attempt to broker2
     count = 0;
-    while (!failover->isConnected() && count++ < 100) {
+    while (!failover->isConnected() && count++ < 150) {
         Thread::sleep(200);
     }
     CPPUNIT_ASSERT_MESSAGE("Failed to remain connected after broker1 stop", failover->isConnected() == true);

@@ -344,9 +344,16 @@ void TcpSocket::bind(const std::string& ipaddress, int port) {
         }
 
         // Set socket options
+        std::cerr << "[DEBUG] Setting SO_REUSEADDR for " << ipaddress << ":" << port << std::endl;
         this->impl->acceptor->set_option(asio::socket_base::reuse_address(true), ec);
+        if (ec) {
+            std::cerr << "[ERROR] Failed to set SO_REUSEADDR: " << ec.message() << std::endl;
+        } else {
+            std::cerr << "[DEBUG] SO_REUSEADDR set successfully" << std::endl;
+        }
 
         // Bind to the endpoint
+        std::cerr << "[DEBUG] Attempting to bind to " << endpoint << std::endl;
         this->impl->acceptor->bind(endpoint, ec);
         if (ec) {
             close();

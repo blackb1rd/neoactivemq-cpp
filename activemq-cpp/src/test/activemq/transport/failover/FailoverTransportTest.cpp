@@ -1198,12 +1198,12 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOnline() {
     broker1->waitUntilStopped();
 
     // Should either stay connected (if on broker2) or failover to broker2
-    // Poll for connection status - may need time for:
-    // - Socket read timeout (up to 1s on server side)
-    // - Client-side failure detection
-    // - Reconnection attempt to broker2
+    // Give time for disconnection detection and failover initiation
+    Thread::sleep(2000);
+
+    // Poll for connection status - may need additional time for reconnection
     count = 0;
-    while (!failover->isConnected() && count++ < 150) {
+    while (!failover->isConnected() && count++ < 100) {
         Thread::sleep(200);
     }
     CPPUNIT_ASSERT_MESSAGE("Failed to remain connected after broker1 stop", failover->isConnected() == true);

@@ -161,8 +161,9 @@ namespace mock {
                     // Set SO_REUSEADDR BEFORE binding to allow immediate port reuse
                     server->setReuseAddress(true);
                     server->setSoTimeout(100); // 100ms timeout for quick shutdown response
-                    // Now bind to the configured port (127.0.0.1 for localhost only)
-                    server->bind("127.0.0.1", configuredPort);
+                    // Bind to all interfaces (0.0.0.0) to accept both IPv4 and IPv6 connections
+                    // This ensures compatibility when clients resolve "localhost" to either 127.0.0.1 or ::1
+                    server->bind("0.0.0.0", configuredPort);
                 } catch (IOException& e) {
                     // Failed to create/bind server socket - notify and exit
                     error.store(true, std::memory_order_release);

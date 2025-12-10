@@ -320,6 +320,7 @@ void TcpSocket::bind(const std::string& ipaddress, int port) {
         // Resolve the address
         asio::ip::address addr;
         if (ipaddress.empty()) {
+            // Empty string means bind to all interfaces (INADDR_ANY)
             addr = asio::ip::address_v4::any();
         } else {
             addr = asio::ip::make_address(ipaddress, ec);
@@ -344,16 +345,13 @@ void TcpSocket::bind(const std::string& ipaddress, int port) {
         }
 
         // Set socket options
-        std::cerr << "[DEBUG] Setting SO_REUSEADDR for " << ipaddress << ":" << port << std::endl;
         this->impl->acceptor->set_option(asio::socket_base::reuse_address(true), ec);
         if (ec) {
-            std::cerr << "[ERROR] Failed to set SO_REUSEADDR: " << ec.message() << std::endl;
-        } else {
-            std::cerr << "[DEBUG] SO_REUSEADDR set successfully" << std::endl;
+            throw SocketException(__FILE__, __LINE__,
+                "Failed to set SO_REUSEADDR: %s", ec.message().c_str());
         }
 
         // Bind to the endpoint
-        std::cerr << "[DEBUG] Attempting to bind to " << endpoint << std::endl;
         this->impl->acceptor->bind(endpoint, ec);
         if (ec) {
             close();

@@ -32,6 +32,9 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y ninja-build ccache
 
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
     - name: Setup ccache
       uses: hendrikmuhs/ccache-action@v1.2
       with:
@@ -100,6 +103,9 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y ninja-build ccache
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
     - name: Setup ccache
       uses: hendrikmuhs/ccache-action@v1.2
@@ -182,6 +188,10 @@ jobs:
       with:
         arch: ${{ matrix.config.arch }}
 
+    - name: Set VCPKG_ROOT environment variable
+      shell: bash
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
     - name: Export GitHub Actions cache environment variable
       shell: bash
       run: echo "ACTIONS_CACHE_URL=${ACTIONS_CACHE_URL}" >> $GITHUB_ENV && echo "ACTIONS_RUNTIME_TOKEN=${ACTIONS_RUNTIME_TOKEN}" >> $GITHUB_ENV
@@ -255,6 +265,10 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: ${{ matrix.config.arch }}
+
+    - name: Set VCPKG_ROOT environment variable
+      shell: bash
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
     - name: Export GitHub Actions cache environment variable
       shell: bash

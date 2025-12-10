@@ -23,9 +23,6 @@ jobs:
           - { preset: x64-linux-debug-test, build_type: Debug }
           - { preset: x64-linux-release-test, build_type: Release }
 
-    env:
-      VCPKG_ROOT: ${{ github.workspace }}/vcpkg
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
@@ -41,18 +38,13 @@ jobs:
         key: ${{ runner.os }}-${{ matrix.config.preset }}
         max-size: 500M
 
-    - name: Setup vcpkg
-      run: |
-        git clone https://github.com/microsoft/vcpkg.git ${{ env.VCPKG_ROOT }}
-        ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.sh
-
     - name: Cache vcpkg packages
       uses: actions/cache@v4
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_ROOT }}/downloads
-          ${{ env.VCPKG_ROOT }}/buildtrees
+          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
+          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
         key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
           vcpkg-${{ runner.os }}-
@@ -100,9 +92,6 @@ jobs:
       matrix:
         preset: [x64-linux-debug, x64-linux-release]
 
-    env:
-      VCPKG_ROOT: ${{ github.workspace }}/vcpkg
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
@@ -118,18 +107,13 @@ jobs:
         key: ${{ runner.os }}-${{ matrix.preset }}
         max-size: 500M
 
-    - name: Setup vcpkg
-      run: |
-        git clone https://github.com/microsoft/vcpkg.git ${{ env.VCPKG_ROOT }}
-        ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.sh
-
     - name: Cache vcpkg packages
       uses: actions/cache@v4
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_ROOT }}/downloads
-          ${{ env.VCPKG_ROOT }}/buildtrees
+          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
+          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
         key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
           vcpkg-${{ runner.os }}-

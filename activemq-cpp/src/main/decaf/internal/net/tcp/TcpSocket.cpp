@@ -16,6 +16,7 @@
  */
 
 #include "TcpSocket.h"
+#include "IoContextManager.h"
 
 #include <decaf/internal/net/SocketFileDescriptor.h>
 #include <decaf/internal/net/tcp/TcpSocketInputStream.h>
@@ -56,8 +57,8 @@ namespace tcp {
     class TcpSocketImpl {
     public:
 
-        // Asio I/O context - each socket has its own for simplicity
-        asio::io_context ioContext;
+        // Reference to shared I/O context from IoContextManager
+        asio::io_context& ioContext;
 
         // The actual TCP socket
         std::unique_ptr<asio::ip::tcp::socket> socket;
@@ -90,7 +91,7 @@ namespace tcp {
         int sendBufferSize;  // -1 = not set
         int recvBufferSize;  // -1 = not set
 
-        TcpSocketImpl() : ioContext(),
+        TcpSocketImpl() : ioContext(IoContextManager::getInstance().getIoContext()),
                           socket(nullptr),
                           acceptor(nullptr),
                           localEndpoint(),
@@ -209,24 +210,39 @@ void TcpSocket::accept(SocketImpl* socket) {
         // Check if we have a timeout set
         if (this->impl->soTimeout > 0) {
             // Use async_accept with a timeout
-            bool acceptComplete = false;
-            asio::error_code acceptEc;
+            // Use shared_ptr for state to prevent use-after-free
+            struct AcceptState {
+                std::mutex mutex;
+                std::condition_variable cv;
+                bool complete;
+                asio::error_code error;
+                AcceptState() : complete(false) {}
+            };
+            auto state = std::make_shared<AcceptState>();
 
             this->impl->acceptor->async_accept(
                 *tcpSocket->impl->socket,
-                [&](const asio::error_code& error) {
-                    acceptEc = error;
-                    acceptComplete = true;
+                [state](const asio::error_code& error) {
+                    {
+                        std::lock_guard<std::mutex> lock(state->mutex);
+                        state->error = error;
+                        state->complete = true;
+                    }
+                    state->cv.notify_one();
                 }
             );
 
-            // Run with timeout
-            this->impl->ioContext.restart();
+            // Wait with timeout, checking for close() periodically
+            std::unique_lock<std::mutex> lock(state->mutex);
             auto deadline = std::chrono::steady_clock::now() +
                            std::chrono::milliseconds(this->impl->soTimeout);
 
-            while (!acceptComplete) {
-                this->impl->ioContext.run_one_for(std::chrono::milliseconds(100));
+            while (!state->complete) {
+                // Wait in small intervals to allow checking closed state
+                if (state->cv.wait_for(lock, std::chrono::milliseconds(100),
+                                      [&state]{ return state->complete; })) {
+                    break; // Accept completed
+                }
 
                 if (this->impl->closed.get()) {
                     this->impl->acceptor->cancel();
@@ -239,7 +255,7 @@ void TcpSocket::accept(SocketImpl* socket) {
                 }
             }
 
-            ec = acceptEc;
+            ec = state->error;
         } else {
             // Blocking accept
             this->impl->acceptor->accept(*tcpSocket->impl->socket, ec);
@@ -249,9 +265,6 @@ void TcpSocket::accept(SocketImpl* socket) {
             throw SocketException(__FILE__, __LINE__,
                 "ServerSocket::accept - %s", ec.message().c_str());
         }
-
-        // Reset the accepted socket's io_context for subsequent operations
-        tcpSocket->impl->ioContext.restart();
 
         tcpSocket->impl->connected = true;
         tcpSocket->impl->remoteEndpoint = tcpSocket->impl->socket->remote_endpoint();
@@ -396,23 +409,38 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout) {
 
         if (timeout > 0) {
             // Async connect with timeout
-            bool connectComplete = false;
-            asio::error_code connectEc;
+            // Use shared_ptr for state to prevent use-after-free
+            struct ConnectState {
+                std::mutex mutex;
+                std::condition_variable cv;
+                bool complete;
+                asio::error_code error;
+                ConnectState() : complete(false) {}
+            };
+            auto state = std::make_shared<ConnectState>();
 
             asio::async_connect(*this->impl->socket, endpoints,
-                [&](const asio::error_code& error, const asio::ip::tcp::endpoint&) {
-                    connectEc = error;
-                    connectComplete = true;
+                [state](const asio::error_code& error, const asio::ip::tcp::endpoint&) {
+                    {
+                        std::lock_guard<std::mutex> lock(state->mutex);
+                        state->error = error;
+                        state->complete = true;
+                    }
+                    state->cv.notify_one();
                 }
             );
 
-            // Run with timeout, checking for close() periodically
-            this->impl->ioContext.restart();
+            // Wait with timeout, checking for close() periodically
+            std::unique_lock<std::mutex> lock(state->mutex);
             auto deadline = std::chrono::steady_clock::now() +
                            std::chrono::milliseconds(timeout);
 
-            while (!connectComplete) {
-                this->impl->ioContext.run_one_for(std::chrono::milliseconds(100));
+            while (!state->complete) {
+                // Wait in small intervals to allow checking closed state
+                if (state->cv.wait_for(lock, std::chrono::milliseconds(100),
+                                      [&state]{ return state->complete; })) {
+                    break; // Connect completed
+                }
 
                 if (this->impl->closed.get()) {
                     this->impl->socket->cancel();
@@ -425,30 +453,43 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout) {
                 }
             }
 
-            if (connectEc) {
+            if (state->error) {
                 throw SocketException(__FILE__, __LINE__,
-                    "Connect failed: %s", connectEc.message().c_str());
+                    "Connect failed: %s", state->error.message().c_str());
             }
-
-            // Reset io_context for subsequent operations
-            this->impl->ioContext.restart();
 
             connectSucceeded = true;
         } else {
             // Blocking connect (but still check for close() periodically)
-            bool connectComplete = false;
-            asio::error_code connectEc;
+            // Use shared_ptr for state to prevent use-after-free
+            struct ConnectState {
+                std::mutex mutex;
+                std::condition_variable cv;
+                bool complete;
+                asio::error_code error;
+                ConnectState() : complete(false) {}
+            };
+            auto state = std::make_shared<ConnectState>();
 
             asio::async_connect(*this->impl->socket, endpoints,
-                [&](const asio::error_code& error, const asio::ip::tcp::endpoint&) {
-                    connectEc = error;
-                    connectComplete = true;
+                [state](const asio::error_code& error, const asio::ip::tcp::endpoint&) {
+                    {
+                        std::lock_guard<std::mutex> lock(state->mutex);
+                        state->error = error;
+                        state->complete = true;
+                    }
+                    state->cv.notify_one();
                 }
             );
 
-            this->impl->ioContext.restart();
-            while (!connectComplete) {
-                this->impl->ioContext.run_one_for(std::chrono::milliseconds(100));
+            // Wait without timeout but check for close() periodically
+            std::unique_lock<std::mutex> lock(state->mutex);
+            while (!state->complete) {
+                // Wait in small intervals to allow checking closed state
+                if (state->cv.wait_for(lock, std::chrono::milliseconds(100),
+                                      [&state]{ return state->complete; })) {
+                    break; // Connect completed
+                }
 
                 if (this->impl->closed.get()) {
                     this->impl->socket->cancel();
@@ -456,13 +497,10 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout) {
                 }
             }
 
-            if (connectEc) {
+            if (state->error) {
                 throw SocketException(__FILE__, __LINE__,
-                    "Connect failed: %s", connectEc.message().c_str());
+                    "Connect failed: %s", state->error.message().c_str());
             }
-
-            // Reset io_context for subsequent operations
-            this->impl->ioContext.restart();
 
             connectSucceeded = true;
         }
@@ -909,33 +947,47 @@ int TcpSocket::read(unsigned char* buffer, int size, int offset, int length) {
 
         if (this->impl->soTimeout > 0) {
             // Async read with timeout
-            bool readComplete = false;
+            // Use shared_ptr for synchronization state to prevent use-after-free if lambda executes after timeout
+            struct ReadState {
+                std::mutex mutex;
+                std::condition_variable cv;
+                bool complete;
+                asio::error_code error;
+                std::size_t bytes;
+                ReadState() : complete(false), bytes(0) {}
+            };
+            auto state = std::make_shared<ReadState>();
 
             this->impl->socket->async_read_some(
                 asio::buffer(buffer + offset, length),
-                [&](const asio::error_code& error, std::size_t bytes) {
-                    ec = error;
-                    bytesRead = bytes;
-                    readComplete = true;
+                [state](const asio::error_code& error, std::size_t bytes) {
+                    {
+                        std::lock_guard<std::mutex> lock(state->mutex);
+                        state->error = error;
+                        state->bytes = bytes;
+                        state->complete = true;
+                    }
+                    state->cv.notify_one();
                 }
             );
 
-            this->impl->ioContext.restart();
-            auto deadline = std::chrono::steady_clock::now() +
-                           std::chrono::milliseconds(this->impl->soTimeout);
+            // Wait with timeout
+            std::unique_lock<std::mutex> lock(state->mutex);
+            if (!state->cv.wait_for(lock, std::chrono::milliseconds(this->impl->soTimeout),
+                                   [&state]{ return state->complete; })) {
+                // Timeout - cancel operation but don't wait for completion
+                // The lambda will still execute but state will be kept alive by shared_ptr
+                this->impl->socket->cancel();
+                throw SocketTimeoutException(__FILE__, __LINE__, "Read timed out");
+            }
 
-            while (!readComplete) {
-                this->impl->ioContext.run_one_for(std::chrono::milliseconds(10));
+            // Operation completed - copy results
+            ec = state->error;
+            bytesRead = state->bytes;
 
-                if (isClosed()) {
-                    this->impl->socket->cancel();
-                    throw IOException(__FILE__, __LINE__, "The connection is closed");
-                }
-
-                if (std::chrono::steady_clock::now() >= deadline) {
-                    this->impl->socket->cancel();
-                    throw SocketTimeoutException(__FILE__, __LINE__, "Read timed out");
-                }
+            // Check if closed during wait
+            if (isClosed()) {
+                throw IOException(__FILE__, __LINE__, "The connection is closed");
             }
 
             // If operation was cancelled (e.g., due to timeout or close), we should have already thrown

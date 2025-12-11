@@ -4,14 +4,37 @@ project(neoactivemq-cpp LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Enable ccache if available
+# Enable compiler caching if available (ccache or sccache)
+# Prefer sccache if both are available
+find_program(SCCACHE_PROGRAM sccache)
 find_program(CCACHE_PROGRAM ccache)
-if(CCACHE_PROGRAM)
-    message(STATUS "Found ccache: ${CCACHE_PROGRAM}")
-    set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
-    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+
+if(SCCACHE_PROGRAM)
+    set(CACHE_PROGRAM ${SCCACHE_PROGRAM})
+    set(CACHE_NAME "sccache")
+elseif(CCACHE_PROGRAM)
+    set(CACHE_PROGRAM ${CCACHE_PROGRAM})
+    set(CACHE_NAME "ccache")
+endif()
+
+if(CACHE_PROGRAM)
+    message(STATUS "Found ${CACHE_NAME}: ${CACHE_PROGRAM}")
+    # Verify the cache program is actually executable before setting it as launcher
+    execute_process(
+        COMMAND ${CACHE_PROGRAM} --version
+        RESULT_VARIABLE CACHE_TEST_RESULT
+        OUTPUT_QUIET
+        ERROR_QUIET
+    )
+    if(CACHE_TEST_RESULT EQUAL 0)
+        set(CMAKE_C_COMPILER_LAUNCHER "${CACHE_PROGRAM}")
+        set(CMAKE_CXX_COMPILER_LAUNCHER "${CACHE_PROGRAM}")
+        message(STATUS "${CACHE_NAME} enabled for compilation")
+    else()
+        message(STATUS "${CACHE_NAME} found but not working - builds will proceed without caching")
+    endif()
 else()
-    message(STATUS "ccache not found - builds will not be cached")
+    message(STATUS "No compiler cache (ccache/sccache) found - builds will proceed without caching")
 endif()
 
 # Platform-specific debug flags

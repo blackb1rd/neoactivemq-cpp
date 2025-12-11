@@ -312,7 +312,9 @@ void Socket::connect( const std::string& host, int port, int timeout ) {
         try {
 
             if( !isBound() ) {
-                this->impl->bind( "", 0 );
+                // Client sockets should bind to localhost, not INADDR_ANY (0.0.0.0)
+                // Binding to 0.0.0.0 can require elevated permissions on Windows
+                this->impl->bind( "127.0.0.1", 0 );
                 this->bound = true;
             }
 

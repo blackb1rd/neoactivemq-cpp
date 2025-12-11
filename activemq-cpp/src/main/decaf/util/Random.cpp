@@ -91,10 +91,13 @@ void Random::nextBytes(unsigned char* buf, int size) {
 
 ////////////////////////////////////////////////////////////////////////////////
 double Random::nextDouble() {
+    // Ensure proper evaluation order by storing values
+    int upper = next(26);
+    int lower = next(27);
     long long divisor = 1LL;
     divisor <<= 31;
     divisor <<= 22;
-    return ((double) (((long long) next(26) << 27) + next(27)) / (double) divisor);
+    return ((double) (((long long) upper << 27) + lower) / (double) divisor);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -157,8 +160,11 @@ int Random::nextInt(int n) {
 ////////////////////////////////////////////////////////////////////////////////
 long long Random::nextLong() {
     // Java uses: return ((long)(next(32)) << 32) + next(32);
-    // However, the second next(32) should be treated as unsigned to avoid sign extension issues
-    return ((long long) next(32) << 32) + ((long long)next(32) & 0xFFFFFFFFL);
+    // In C++, we must prevent sign extension of the lower 32 bits
+    // Store both values first to ensure proper evaluation order
+    int upper = next(32);
+    int lower = next(32);
+    return (((long long) upper) << 32) + ((unsigned int) lower);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

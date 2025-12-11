@@ -18,26 +18,44 @@
 #include "SocketError.h"
 #include <decaf/util/Config.h>
 
-#include <apr.h>
-#include <apr_general.h>
+#include <cstring>
+
+#ifdef _WIN32
+#include <winsock2.h>
+#else
+#include <errno.h>
+#include <cstring>
+#endif
 
 using namespace decaf;
 using namespace decaf::net;
 
 ////////////////////////////////////////////////////////////////////////////////
 int SocketError::getErrorCode() {
-    return apr_get_netos_error();
+#ifdef _WIN32
+    return WSAGetLastError();
+#else
+    return errno;
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 std::string SocketError::getErrorString() {
+    int errorCode = getErrorCode();
 
-    std::string returnValue;
-
-    // Get the error code.
-    apr_status_t errorCode = apr_get_netos_error();
-
-    // Create a buffer and get the error
-    char buffer[256];
-    return apr_strerror( errorCode, buffer, sizeof( buffer ) );
+#ifdef _WIN32
+    char buffer[256] = {0};
+    FormatMessageA(
+        FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        nullptr,
+        errorCode,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        buffer,
+        sizeof(buffer) - 1,
+        nullptr
+    );
+    return std::string(buffer);
+#else
+    return std::string(std::strerror(errorCode));
+#endif
 }

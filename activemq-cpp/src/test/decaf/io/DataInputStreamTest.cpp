@@ -18,6 +18,7 @@
 #include "DataInputStreamTest.h"
 
 #include <decaf/lang/Integer.h>
+#include <cstring>
 
 #ifdef HAVE_STRING_H
 #include <string.h>

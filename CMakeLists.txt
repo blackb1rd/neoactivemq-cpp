@@ -4,10 +4,52 @@ project(neoactivemq-cpp LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Enable compiler caching if available (ccache or sccache)
+# Prefer sccache if both are available
+find_program(SCCACHE_PROGRAM sccache)
+find_program(CCACHE_PROGRAM ccache)
+
+if(SCCACHE_PROGRAM)
+    set(CACHE_PROGRAM ${SCCACHE_PROGRAM})
+    set(CACHE_NAME "sccache")
+elseif(CCACHE_PROGRAM)
+    set(CACHE_PROGRAM ${CCACHE_PROGRAM})
+    set(CACHE_NAME "ccache")
+endif()
+
+if(CACHE_PROGRAM)
+    message(STATUS "Found ${CACHE_NAME}: ${CACHE_PROGRAM}")
+    # Verify the cache program is actually executable before setting it as launcher
+    execute_process(
+        COMMAND ${CACHE_PROGRAM} --version
+        RESULT_VARIABLE CACHE_TEST_RESULT
+        OUTPUT_QUIET
+        ERROR_QUIET
+    )
+    if(CACHE_TEST_RESULT EQUAL 0)
+        # Only enable cache for Debug builds
+        # Release builds use /Zi which requires proper PDB handling
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            set(CMAKE_C_COMPILER_LAUNCHER "${CACHE_PROGRAM}")
+            set(CMAKE_CXX_COMPILER_LAUNCHER "${CACHE_PROGRAM}")
+            message(STATUS "${CACHE_NAME} enabled for Debug builds")
+        else()
+            message(STATUS "${CACHE_NAME} found but disabled for Release builds (requires /Zi)")
+        endif()
+    else()
+        message(STATUS "${CACHE_NAME} found but not working - builds will proceed without caching")
+    endif()
+else()
+    message(STATUS "No compiler cache (ccache/sccache) found - builds will proceed without caching")
+endif()
+
 # Platform-specific debug flags
 if(MSVC)
-    # Windows/MSVC: Use /Zi for debug info, /Od for no optimization
-    set(CMAKE_CXX_FLAGS_DEBUG "/Zi /Od")
+    # Windows/MSVC: Use /Z7 for debug builds (embedded in .obj, avoids PDB locking with parallel builds)
+    # Use /Zi for release builds (separate .pdb file for production debugging)
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT $<$<CONFIG:Debug>:Z7>$<$<CONFIG:Release>:Zi>)
+    set(CMAKE_CXX_FLAGS_DEBUG "/Od")
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2")
 else()
     # GCC/Clang (Linux, macOS, MinGW): Use -g3 for detailed debug info, -O0 for no optimization
     set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0")
@@ -21,7 +63,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-find_package(apr CONFIG REQUIRED)
+find_package(asio CONFIG REQUIRED)
+find_package(ZLIB REQUIRED)
 
 # Options
 option(AMQCPP_BUILD_EXAMPLES "Build example programs" ON)
@@ -79,12 +122,18 @@ if(WITH_TESTS)
 	enable_testing()
 
 	# Register unit tests
-	add_test(NAME activemq-unit-tests COMMAND activemq-test)
-	set_tests_properties(activemq-unit-tests PROPERTIES TIMEOUT 3000)
+	add_test(NAME neoactivemq-unit-tests COMMAND neoactivemq-test)
+	set_tests_properties(neoactivemq-unit-tests PROPERTIES
+		TIMEOUT 3000
+		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
+	)
 
 	# Register benchmark tests
-	add_test(NAME activemq-benchmarks COMMAND activemq-benchmark)
-	set_tests_properties(activemq-benchmarks PROPERTIES TIMEOUT 600)
+	add_test(NAME neoactivemq-benchmarks COMMAND neoactivemq-benchmark)
+	set_tests_properties(neoactivemq-benchmarks PROPERTIES
+		TIMEOUT 600
+		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
+	)
 
 	# Register integration tests with automatic Docker management
 	# Setup fixture: Start Docker before integration tests
@@ -108,11 +157,12 @@ if(WITH_TESTS)
 	)
 
 	# The actual integration tests
-	add_test(NAME activemq-integration-tests COMMAND activemq-integration-test)
-	set_tests_properties(activemq-integration-tests PROPERTIES
+	add_test(NAME neoactivemq-integration-tests COMMAND neoactivemq-integration-test)
+	set_tests_properties(neoactivemq-integration-tests PROPERTIES
 		TIMEOUT 1200
 		LABELS "integration"
 		FIXTURES_REQUIRED IntegrationFixture
+		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
 	)
 
 	# Cleanup fixture: Stop Docker after integration tests
@@ -165,7 +215,7 @@ if(WITH_TESTS)
 
 	# Convenience target: Build integration tests and ensure Docker is mentioned
 	add_custom_target(integration-tests
-		DEPENDS activemq-integration-test
+		DEPENDS neoactivemq-integration-test
 		COMMENT "Integration tests built. Start ActiveMQ with: cmake --build . --target docker-up"
 	)
 
@@ -174,10 +224,10 @@ if(WITH_TESTS)
 		COMMAND docker compose up -d
 		COMMAND ${CMAKE_COMMAND} -E sleep 10
 		COMMAND ${CMAKE_COMMAND} -E echo "Running integration tests..."
-		COMMAND $<TARGET_FILE:activemq-integration-test>
+		COMMAND $<TARGET_FILE:neoactivemq-integration-test>
 		COMMAND docker compose down
 		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		DEPENDS activemq-integration-test
+		DEPENDS neoactivemq-integration-test
 		COMMENT "Full integration test workflow (start broker, test, stop broker)..."
 	)
 

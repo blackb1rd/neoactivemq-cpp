@@ -64,6 +64,8 @@
 #include <string.h>
 #endif
 
+#include <cstring>
+#include <cstdint>
 #include <decaf/lang/System.h>
 #include <decaf/security/DigestException.h>
 
@@ -149,7 +151,7 @@ namespace crypto {
     public:
 
         // state (ABCD)
-        apr_uint32_t state[4];
+        uint32_t state[4];
         // number of bits, modulo 2^64 (lsb first)
         unsigned int count[2];
         // Digest Input buffer

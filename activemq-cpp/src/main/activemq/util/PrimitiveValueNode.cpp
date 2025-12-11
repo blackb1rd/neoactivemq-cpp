@@ -22,6 +22,7 @@
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/StlMap.h>
 #include <decaf/util/LinkedList.h>
+#include <cstring>
 
 #ifdef HAVE_STRING_H
 #include <string.h>

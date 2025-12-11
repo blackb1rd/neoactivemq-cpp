@@ -1078,7 +1078,6 @@ bool FailoverTransport::iterate() {
 
                     } catch (Exception& e) {
                         e.setMark(__FILE__, __LINE__);
-
                         if (transport != NULL) {
                             if (this->impl->disposedListener != NULL) {
                                 transport->setTransportListener(this->impl->disposedListener.get());

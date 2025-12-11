@@ -17,7 +17,6 @@
 
 #include "Boolean.h"
 #include <sstream>
-#include <apr.h>
 
 #include <decaf/internal/util/StringUtils.h>
 

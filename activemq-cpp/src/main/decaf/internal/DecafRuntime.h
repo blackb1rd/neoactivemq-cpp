@@ -22,13 +22,11 @@
 #include <decaf/lang/Runtime.h>
 #include <decaf/util/concurrent/Mutex.h>
 
-#include <apr_pools.h>
-
 namespace decaf {
 namespace internal {
 
     /**
-     * Handles APR initialization and termination.
+     * Handles runtime initialization and termination.
      */
     class DECAF_API DecafRuntime: public decaf::lang::Runtime {
     private:
@@ -39,20 +37,14 @@ namespace internal {
     public:
 
         /**
-         * Initializes the APR Runtime for a library.
+         * Initializes the runtime for a library.
          */
         DecafRuntime();
 
         /**
-         * Terminates the APR Runtime for a library.
+         * Terminates the runtime for a library.
          */
         virtual ~DecafRuntime();
-
-        /**
-         * Grants access to the Global APR Pool instance that should be
-         * used when creating new threads.
-         */
-        apr_pool_t* getGlobalPool() const;
 
         /**
          * Gets a pointer to the Decaf Runtime's Global Lock object, this can be used by

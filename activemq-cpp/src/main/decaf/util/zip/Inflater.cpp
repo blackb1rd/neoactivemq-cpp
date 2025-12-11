@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include <decaf/internal/util/zip/zlib.h>
+#include <zlib.h>
 
 #include <decaf/lang/exceptions/RuntimeException.h>
 

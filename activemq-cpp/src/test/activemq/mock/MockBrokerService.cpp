@@ -156,9 +156,14 @@ namespace mock {
 
                 // Create and bind the server socket once
                 try {
-                    server.reset(new ServerSocket(configuredPort));
+                    // Create socket without binding first
+                    server.reset(new ServerSocket());
+                    // Set SO_REUSEADDR BEFORE binding to allow immediate port reuse
                     server->setReuseAddress(true);
                     server->setSoTimeout(100); // 100ms timeout for quick shutdown response
+                    // Bind to all interfaces (0.0.0.0) to accept both IPv4 and IPv6 connections
+                    // This ensures compatibility when clients resolve "localhost" to either 127.0.0.1 or ::1
+                    server->bind("0.0.0.0", configuredPort);
                 } catch (IOException& e) {
                     // Failed to create/bind server socket - notify and exit
                     error.store(true, std::memory_order_release);
@@ -225,7 +230,8 @@ namespace mock {
                         continue;
                     }
 
-                    clientSocket->setSoLinger(false, 0);
+                    // Don't set SO_LINGER to avoid RST on close
+                    clientSocket->setTcpNoDelay(true);  // Disable Nagle's algorithm for immediate sends
                     // Set socket timeout to allow thread to check done flag periodically
                     clientSocket->setSoTimeout(1000); // 1 second timeout
 
@@ -239,8 +245,17 @@ namespace mock {
                             InputStream* is = clientSocket->getInputStream();
                             DataInputStream dataIn(is);
 
+                            Pointer<WireFormatInfo> preferred = wireFormat->getPreferedWireFormatInfo();
+
+                            // Send our WireFormatInfo first
                             wireFormat->marshal(preferred, &mock, &dataOut);
                             dataOut.flush();
+
+                            // Then receive the client's WireFormatInfo
+                            Pointer<Command> clientWireFormat = wireFormat->unmarshal(&mock, &dataIn);
+
+                            // Small delay to let client process the WireFormatInfo before we start reading commands
+                            Thread::sleep(50);
 
                             while (!done.load(std::memory_order_acquire)) {
                                 try {
@@ -249,6 +264,7 @@ namespace mock {
 
                                     if (response != NULL) {
                                         wireFormat->marshal(response, &mock, &dataOut);
+                                        dataOut.flush();
                                     }
                                 } catch (SocketTimeoutException& ste) {
                                     // Timeout allows us to check done flag

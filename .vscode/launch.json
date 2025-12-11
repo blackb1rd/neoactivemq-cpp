@@ -5,7 +5,7 @@
             "name": "Debug All Tests",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/output/build/x86-windows-debug/src/test/Debug/test.exe",
+            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/neoactivemq-test.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -16,7 +16,7 @@
             "name": "Debug Failover Tests",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/output/build/x86-windows-debug/src/test/test.exe",
+            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/neoactivemq-test.exe",
             "args": [
                 "activemq::transport::failover::FailoverTransportTest"
             ],
@@ -29,7 +29,7 @@
             "name": "Debug Specific Test",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/activemq-test.exe",
+            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/neoactivemq-test.exe",
             "args": [
                 "-test",
                 "activemq::transport::failover::FailoverTransportTest::testFailoverNoRandomizeBothOnline"
@@ -43,7 +43,7 @@
             "name": "Debug Specific Test (Linux)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/output/build/x64-linux-debug/src/test/test",
+            "program": "${workspaceFolder}/output/build/x64-linux-debug-test/bin/neoactivemq-test",
             "args": [
                 "-test",
                 "activemq::transport::failover::FailoverTransportTest::testFuzzyBrokerAvailability"
@@ -64,7 +64,29 @@
             "name": "Debug Example",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/output/build/x86-windows-debug/src/examples/Debug/example.exe",
+            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/examples/producer.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug Benchmark",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/neoactivemq-benchmark.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug Integration Test",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/neoactivemq-integration-test.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -75,7 +97,7 @@
             "name": "Debug Current Test File",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/output/build/x86-windows-debug/src/test/Debug/test.exe",
+            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/neoactivemq-test.exe",
             "args": [
                 "${input:testName}"
             ],

@@ -17,15 +17,13 @@
 #include <stdio.h>
 #include "Exception.h"
 #include <decaf/util/logging/LoggerDefines.h>
-#include <decaf/internal/AprPool.h>
 #include <decaf/lang/Pointer.h>
 
 #include <sstream>
-#include <apr_strings.h>
+#include <vector>
 
 using namespace std;
 using namespace decaf;
-using namespace decaf::internal;
 using namespace decaf::lang;
 using namespace decaf::util::logging;
 
@@ -117,53 +115,33 @@ void Exception::setMessage(const char* msg, ...) {
 ////////////////////////////////////////////////////////////////////////////////
 void Exception::buildMessage(const char* format, va_list& vargs) {
 
-    // Allocate buffer with a guess of it's size
-    AprPool pool;
+    // We need to copy vargs because vsnprintf may consume it.
+    va_list copy;
+    va_copy(copy, vargs);
 
-    // Try to use APR pool based formatting first. If APR isn't available
-    // (for example during shutdown), fall back to a std::vsnprintf based
-    // formatting to avoid passing a NULL pool to apr_pvsprintf.
-    apr_pool_t* apr = pool.getAprPool();
-    if (apr != NULL) {
-        // Allocate a buffer of the specified size via APR.
-        char* buffer = apr_pvsprintf(apr, format, vargs);
-        // Guessed size was enough. Assign the string.
-        if (buffer != NULL) {
-            this->data->message.assign(buffer, strlen(buffer));
-            return;
+    // Start with a reasonable buffer size and grow if needed.
+    std::size_t size = 1024;
+    std::string result;
+    while (true) {
+        std::vector<char> buf(size);
+        int needed = std::vsnprintf(buf.data(), buf.size(), format, copy);
+        if (needed < 0) {
+            // Encoding error; give up and set an empty message.
+            result.clear();
+            break;
         }
-    }
-
-    // Fallback path: use vsnprintf into a dynamically-sized buffer.
-    {
-        // We need to copy vargs because vsnprintf may consume it.
-        va_list copy;
-        va_copy(copy, vargs);
-
-        // Start with a reasonable buffer size and grow if needed.
-        std::size_t size = 1024;
-        std::string result;
-        while (true) {
-            std::vector<char> buf(size);
-            int needed = vsnprintf(buf.data(), buf.size(), format, copy);
-            if (needed < 0) {
-                // Encoding error; give up and set an empty message.
-                result.clear();
-                break;
-            }
-            if ((std::size_t)needed < buf.size()) {
-                // Successfully written.
-                result.assign(buf.data(), (std::size_t)needed);
-                break;
-            }
-            // Need a bigger buffer. Resize and try again.
-            size = (std::size_t)needed + 1;
-            va_end(copy);
-            va_copy(copy, vargs);
+        if (static_cast<std::size_t>(needed) < buf.size()) {
+            // Successfully written.
+            result.assign(buf.data(), static_cast<std::size_t>(needed));
+            break;
         }
+        // Need a bigger buffer. Resize and try again.
+        size = static_cast<std::size_t>(needed) + 1;
         va_end(copy);
-        this->data->message = result;
+        va_copy(copy, vargs);
     }
+    va_end(copy);
+    this->data->message = result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

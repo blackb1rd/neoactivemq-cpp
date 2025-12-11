@@ -20,6 +20,7 @@
 #include <string.h>
 #endif
 
+#include <cstring>
 #include <decaf/lang/System.h>
 #include <decaf/security/DigestException.h>
 

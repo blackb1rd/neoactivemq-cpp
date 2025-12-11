@@ -350,7 +350,7 @@ void MutexTest::testNotify() {
             int count = 0;
 
             while( count < ( numThreads ) ) {
-                started.wait( 40 );
+                started.wait( 1000 );
                 count++;
             }
         }

@@ -269,8 +269,8 @@ set(TEST_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
 # main.cpp from the sources list, then create a single `activemq-test` executable
 # that contains all tests and the runner.
 list(REMOVE_ITEM TEST_SRCS ${TEST_MAIN})
-add_executable(activemq-test ${TEST_MAIN} ${TEST_SRCS})
-target_include_directories(activemq-test PRIVATE
+add_executable(neoactivemq-test ${TEST_MAIN} ${TEST_SRCS})
+target_include_directories(neoactivemq-test PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../main
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -278,14 +278,14 @@ target_include_directories(activemq-test PRIVATE
 
 # Add /bigobj flag for MSVC to handle large object files with many sections
 if(MSVC)
-  target_compile_options(activemq-test PRIVATE /bigobj)
+  target_compile_options(neoactivemq-test PRIVATE /bigobj)
 endif()
 
-target_link_libraries(activemq-test PRIVATE activemq_cms activemq_core decaf)
+target_link_libraries(neoactivemq-test PRIVATE activemq_cms activemq_core decaf)
 if(TARGET CppUnit::CppUnit)
-  target_link_libraries(activemq-test PRIVATE CppUnit::CppUnit)
+  target_link_libraries(neoactivemq-test PRIVATE CppUnit::CppUnit)
 elseif(TARGET CppUnit)
-  target_link_libraries(activemq-test PRIVATE CppUnit)
+  target_link_libraries(neoactivemq-test PRIVATE CppUnit)
 else()
-  target_link_libraries(activemq-test PRIVATE CppUnit)
+  target_link_libraries(neoactivemq-test PRIVATE CppUnit)
 endif()

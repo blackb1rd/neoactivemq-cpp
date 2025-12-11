@@ -19,6 +19,7 @@
 
 #include <decaf/util/Properties.h>
 #include <decaf/net/SocketFactory.h>
+#include <cstring>
 
 #ifdef HAVE_STRING_H
 #include <string.h>

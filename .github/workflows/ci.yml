@@ -1,0 +1,293 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+
+jobs:
+  # Linux builds with tests
+  linux-build-and-test:
+    name: Linux Build and Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x64-linux-debug-test, build_type: Debug }
+          - { preset: x64-linux-release-test, build_type: Release }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build ccache
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ${{ runner.os }}-${{ matrix.config.preset }}
+        max-size: 500M
+
+    - name: Cache vcpkg packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg
+          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
+          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
+        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-${{ runner.os }}-
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.config.preset }} -j $(nproc)
+
+    - name: Start ActiveMQ for integration tests
+      run: |
+        docker compose up -d
+        echo "Waiting for ActiveMQ to be ready..."
+        timeout 60 bash -c 'until docker compose ps | grep -q "healthy"; do sleep 2; done' || true
+        sleep 10
+
+    - name: Run tests
+      run: ctest --preset ${{ matrix.config.preset }} --output-on-failure --verbose
+      continue-on-error: false
+
+    - name: Install
+      run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }}
+
+    - name: Stop ActiveMQ
+      if: always()
+      run: docker compose down
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v5
+      with:
+        name: test-results-${{ matrix.config.preset }}
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # Linux builds without tests
+  linux-build-no-tests:
+    name: Linux Build without tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [x64-linux-debug, x64-linux-release]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build ccache
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ${{ runner.os }}-${{ matrix.preset }}
+        max-size: 500M
+
+    - name: Cache vcpkg packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg
+          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
+          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
+        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-${{ runner.os }}-
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.preset }}
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.preset }} -j $(nproc)
+
+    - name: Install
+      run: cmake --install output/build/${{ matrix.preset }} --prefix output/install/${{ matrix.preset }}
+
+    - name: Verify no test executables were built
+      run: |
+        if [ -d "output/build/${{ matrix.preset }}/src/test" ]; then
+          echo "ERROR: Test directory should not exist in non-test build"
+          exit 1
+        fi
+        echo "SUCCESS: No test directories found as expected"
+
+  # Windows builds with tests
+  windows-build-and-test:
+    name: Windows Build and Test
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x86-windows-debug-test, build_type: Debug, arch: amd64_x86 }
+          - { preset: x86-windows-release-test, build_type: Release, arch: amd64_x86 }
+          - { preset: x64-windows-debug-test, build_type: Debug, arch: amd64 }
+          - { preset: x64-windows-release-test, build_type: Release, arch: amd64 }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Cache vcpkg installed packages
+      id: cache-vcpkg
+      uses: actions/cache@v4
+      with:
+        path: |
+          .cache/vcpkg/installed
+          .cache/vcpkg/buildtrees
+          .cache/vcpkg/downloads
+        key: vcpkg-installed-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+        restore-keys: |
+          vcpkg-installed-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Install Ninja and ccache
+      run: |
+        choco install ninja -y
+        choco install ccache -y
+
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ${{ runner.os }}-${{ matrix.config.preset }}
+        max-size: 500M
+        variant: sccache
+
+    - name: Setup MSVC Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.config.arch }}
+
+    - name: Set VCPKG_ROOT environment variable
+      shell: bash
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Export GitHub Actions cache environment variable
+      shell: bash
+      run: echo "ACTIONS_CACHE_URL=${ACTIONS_CACHE_URL}" >> $GITHUB_ENV && echo "ACTIONS_RUNTIME_TOKEN=${ACTIONS_RUNTIME_TOKEN}" >> $GITHUB_ENV
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}
+
+    - name: Run unit tests and benchmarks (no Docker on Windows CI)
+      run: |
+        ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -E "integration" --output-on-failure --verbose
+      continue-on-error: false
+
+    - name: Install
+      run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v5
+      with:
+        name: test-results-${{ matrix.config.preset }}
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # Windows builds without tests
+  windows-build-no-tests:
+    name: Windows Build without tests
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x86-windows-debug, build_type: Debug, arch: x86 }
+          - { preset: x86-windows-release, build_type: Release, arch: x86 }
+          - { preset: x64-windows-debug, build_type: Debug, arch: x64 }
+          - { preset: x64-windows-release, build_type: Release, arch: x64 }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Cache vcpkg installed packages
+      id: cache-vcpkg
+      uses: actions/cache@v4
+      with:
+        path: |
+          .cache/vcpkg/installed
+          .cache/vcpkg/buildtrees
+          .cache/vcpkg/downloads
+        key: vcpkg-installed-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+        restore-keys: |
+          vcpkg-installed-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Install Ninja and ccache
+      run: |
+        choco install ninja -y
+        choco install ccache -y
+
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ${{ runner.os }}-${{ matrix.config.preset }}
+        max-size: 500M
+        variant: sccache
+
+    - name: Setup MSVC Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.config.arch }}
+
+    - name: Set VCPKG_ROOT environment variable
+      shell: bash
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Export GitHub Actions cache environment variable
+      shell: bash
+      run: echo "ACTIONS_CACHE_URL=${ACTIONS_CACHE_URL}" >> $GITHUB_ENV && echo "ACTIONS_RUNTIME_TOKEN=${ACTIONS_RUNTIME_TOKEN}" >> $GITHUB_ENV
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}
+
+    - name: Install
+      run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}
+
+    - name: Verify no test executables were built
+      shell: pwsh
+      run: |
+        if (Test-Path "output/build/${{ matrix.config.preset }}/src/test") {
+          Write-Host "ERROR: Test directory should not exist in non-test build"
+          exit 1
+        }
+        Write-Host "SUCCESS: No test directories found as expected"

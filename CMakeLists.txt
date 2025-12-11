@@ -27,9 +27,15 @@ if(CACHE_PROGRAM)
         ERROR_QUIET
     )
     if(CACHE_TEST_RESULT EQUAL 0)
-        set(CMAKE_C_COMPILER_LAUNCHER "${CACHE_PROGRAM}")
-        set(CMAKE_CXX_COMPILER_LAUNCHER "${CACHE_PROGRAM}")
-        message(STATUS "${CACHE_NAME} enabled for compilation")
+        # Only enable cache for Debug builds
+        # Release builds use /Zi which requires proper PDB handling
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            set(CMAKE_C_COMPILER_LAUNCHER "${CACHE_PROGRAM}")
+            set(CMAKE_CXX_COMPILER_LAUNCHER "${CACHE_PROGRAM}")
+            message(STATUS "${CACHE_NAME} enabled for Debug builds")
+        else()
+            message(STATUS "${CACHE_NAME} found but disabled for Release builds (requires /Zi)")
+        endif()
     else()
         message(STATUS "${CACHE_NAME} found but not working - builds will proceed without caching")
     endif()
@@ -39,8 +45,11 @@ endif()
 
 # Platform-specific debug flags
 if(MSVC)
-    # Windows/MSVC: Use /Zi for debug info, /Od for no optimization
-    set(CMAKE_CXX_FLAGS_DEBUG "/Zi /Od")
+    # Windows/MSVC: Use /Z7 for debug builds (embedded in .obj, avoids PDB locking with parallel builds)
+    # Use /Zi for release builds (separate .pdb file for production debugging)
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT $<$<CONFIG:Debug>:Z7>$<$<CONFIG:Release>:Zi>)
+    set(CMAKE_CXX_FLAGS_DEBUG "/Od")
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2")
 else()
     # GCC/Clang (Linux, macOS, MinGW): Use -g3 for detailed debug info, -O0 for no optimization
     set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0")

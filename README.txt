@@ -19,8 +19,6 @@ Tool        Recommended Version
 autoconf    >= 2.60
 automake    >= 1.10
 libtool     >= 1.5.24
-APR         >= 1.3*
-APR-Util    >= 1.3*
 CPPUnit     >= 1.10.2*
 libuuid     >= ?*
 openssl     >= 1.0.2
@@ -69,25 +67,9 @@ http://cppunit.sourceforge.net/cppunit-wiki/BuildingCppUnit1
 This covers both MSVC along with many other platforms and tool suites.
 The included Visual Studio projects are configured with the assumption
 that you will configure Visual Studio with the locations of the Platform
-SDK and the CPPUnit and APR libraries and headers.
+SDK and the CPPUnit libraries and headers.
 
-1.3 APR and APR Util
--------------------------------------------------------------------------
-
-The build requires the APR library and the APR-Util.  These libraries can
-be obtained from the APR site at: http://apr.apache.org/  See the
-documentation there on how to build these libraries for your platform.  On
-many Unix system the libraries can be installed using the systems package
-installer.
-
-The Library has been tested using version v1.3 and higher of the APR libs,
-the older 0.9 version will definitely not work with this library.
-
-Many of the Unix type OS'es currently shipping include APR 1.2.x and
-APR-Util 1.2.x, this implies that you will need to build and install APR from
-the source download at Apache.
-
-1.4 GNU Build System (for building on Unix/Linux/OS X)
+1.3 GNU Build System (for building on Unix/Linux/OS X)
 --------------------------------------------------------------------------
 
 To Generate the ./configure script use to create the Makefiles, you need
@@ -233,12 +215,6 @@ the MSVC compile succeeds.
   error complaining that its not found, then you'll need to fix your PATH.
 
 * The Project files reference the CPPUnit libraries for the Integration and
-  Unit tests builds. In order for these to build correctly you must
-  either configure the global settings in Visual Studio for include and library
-  folders or add new settings to each of the projects in the solution to point
-  to these locations.
-
-* The Project files reference the APR libraries for the Integration and
   Unit tests builds. In order for these to build correctly you must
   either configure the global settings in Visual Studio for include and library
   folders or add new settings to each of the projects in the solution to point

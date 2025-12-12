@@ -20,7 +20,6 @@ BuildRequires:  tetex-latex
 BuildRequires:  automake >= 1.10
 BuildRequires:  autoconf >= 2.63
 BuildRequires:  libtool  >= 1.5.24
-BuildRequires:  apr-devel%{?_isa} >= 1.3
 BuildRequires:  cppunit-devel%{?_isa} >= 1.10.2
 BuildRequires:  openssl-devel%{?_isa} >= 1.0.2
 

@@ -19,7 +19,6 @@ Tool        Recommended Version
 autoconf    >= 2.61
 automake    >= 1.10
 libtool     >= 1.5.24
-APR         >= 1.3*
 CPPUnit     >= 1.10.2* ( 1.12.1 is recommended )
 OpenSSL     >= 0.9.8m* ( 1.0.0 or higher is recommended, this is an optional dependency)
 
@@ -52,45 +51,9 @@ http://cppunit.sourceforge.net/cppunit-wiki/BuildingCppUnit1
 This covers both MSVC along with many other platforms and tool suites.
 The included Visual Studio projects are configured with the assumption
 that you will configure Visual Studio with the locations of the Platform
-SDK and the CPPUnit and APR libraries and headers.
+SDK and the CPPUnit libraries and headers.
 
-1.2 APR
--------------------------------------------------------------------------
-
-The build requires the APR library.  This library can be obtained from the APR
-site at: http://apr.apache.org/  See the documentation there on how to build
-this libraries for your platform.  On many Unix system the library can be
-installed using the systems package installer.
-
-The Library has been tested using version v1.3 and higher of the APR libs,
-the older 0.9 version will definitely not work with this library.
-
-Some of the Unix type OS'es currently shipping include APR 1.2.x, this implies
-that you will need to build and install APR from the source download at Apache.
-
-    -----------------------------------------------------------------------
-    |MacOS X Note:                                                        |
-    | If you have installed APR via MacPorts                              |
-    | (http://www.macports.org/) and you are building ActiveMQ-CPP from   |
-    | source, you will need to specify the location of the APR library    |
-    | to the configure script. This is easy to do and only requires one   |
-    | extra option for compilation. An example of this is shown below     |
-    | using the standard location for this library as installed by        |
-    | MacPorts:                                                           |
-    |                                                                     |
-    | $ ./configure \                                                     |
-    | --with-apr=/opt/local/var/macports/software/apr/1.3.3_0/opt/local/  |
-    |                                                                     |
-    | Please notice that this is simply a single option to the            |
-    | configure script that has been broken into two lines by escaping    |
-    | the newline character to fit the formatting of this file.           |
-    |                                                                     |
-    | If you have manually compiled and installed the APR libraries into  |
-    | a custom location, then you will need to point to that location     |
-    | using the argument above.                                           |
-    -----------------------------------------------------------------------
-
-1.3 OpenSSL
+1.2 OpenSSL
 --------------------------------------------------------------------------
 
 If you wish to use the SSL Transport then you will need to have OpenSSL and
@@ -109,7 +72,7 @@ the system path or in the System32 directory.  In the Visual Studio project you 
 add the HAVE_OPENSSL flag to the preprocessor directives and add the paths for the
 includes and libraries so that the compiler and linker can find them.
 
-1.4 GNU Build System (for building on Unix/Linux/OS X)
+1.3 GNU Build System (for building on Unix/Linux/OS X)
 --------------------------------------------------------------------------
 
 To Generate the ./configure script use to create the Makefiles, you need
@@ -273,22 +236,12 @@ set of variables is as follows:
 
     Library        Recommended Version     Windows Env Var
     ------------------------------------------------------------
-      APR             >= 1.5+                ${APR_DIST}
       CPPUNIT         >= 1.10.2              ${CPPUNIT_DIST}
       OpenSSL         >= 1.5.24              ${OPENSSL_DIST}
       Platform SDK    {varies}               ${PLATFORM_SDK}
 
 Under each of the library dependencies the structure should be layed out as follows:
 
-      ${APR_DIST}\
-          win32\
-             include\
-             lib\
-             bin\
-          x64\
-             include\
-             lib\
-             bin\
       ${CPPUNIT_DIST}\
           win32\
              include\
@@ -315,33 +268,7 @@ installed on you system.  This is not always simple on windows, we will offer a 
 and make getting a copy of each here but you might also want to consult Google and ask on the
 mailing list for more help.
 
-6.2.1  APR library.
-
-APR is provided in source form only from the Apache Software Foundation.  You will need to build
-a library from source by downloading the latest release from:
-
-    http://apr.apache.org/
-
-At the time of this writing the latest version was v1.5.2 and is recommended since its build
-support files are working with the Visual Studio 2010 tools.
-
-APR is built from the command line using its provided Make files.  When building the library you
-need to ensure you are in the right environment to produce the desired architecture builds (x64 or
-win32).  You can open a command line that's correct by using the shortcuts under the Visual Studio
-start menu location (ex. Visual Studio 2010 / Visual Studio Tools / Visual Studio x64 win 64 Command Prompt
-
-Once you are in the proper command prompt change to the directory where your APR source code is
-located (ex: C:\APR) and then run the build for the library to produce the desired ARCH build.
-
-For a 32 bit library which installs into a proper distribution directory run:
-
-   nmake -f Makefile.win ARCH="win32 Release" PREFIX=C:\dist\APR\x64 buildall install clean
-
-and for a 64 bit build of the library use the command.
-
-   nmake -f Makefile.win ARCH="x64 Release" PREFIX=C:\dist\APR\x64 buildall install clean
-
-6.2.2  CPPUnit
+6.2.1  CPPUnit
 
 To build the CPPUnit library for later Visual Studio versions such as 2010+ you need to download the
 most up to date code for CPPUnit v1.12.1+ from its SVN location.  The current location is:

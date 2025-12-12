@@ -340,7 +340,6 @@ cc_sources = \
     cms/XAResource.cpp \
     cms/XASession.cpp \
     cms/Xid.cpp \
-    decaf/internal/AprPool.cpp \
     decaf/internal/DecafRuntime.cpp \
     decaf/internal/io/StandardErrorOutputStream.cpp \
     decaf/internal/io/StandardInputStream.cpp \
@@ -1023,7 +1022,6 @@ h_sources = \
     cms/XAResource.h \
     cms/XASession.h \
     cms/Xid.h \
-    decaf/internal/AprPool.h \
     decaf/internal/DecafRuntime.h \
     decaf/internal/io/StandardErrorOutputStream.h \
     decaf/internal/io/StandardInputStream.h \

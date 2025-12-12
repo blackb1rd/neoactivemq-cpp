@@ -8,6 +8,8 @@ include(CMakeFindDependencyMacro)
 
 # Find required dependencies
 find_dependency(Threads REQUIRED)
+find_dependency(asio CONFIG REQUIRED)
+find_dependency(ZLIB REQUIRED)
 
 # Optional: OpenSSL support
 if(@AMQCPP_HAVE_OPENSSL@)

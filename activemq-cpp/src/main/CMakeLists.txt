@@ -1,0 +1,746 @@
+# ---------------------------------------------------------------------------
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ---------------------------------------------------------------------------
+
+# Source files explicitly listed (no glob) matching Makefile.am
+set(ACTIVEMQ_CPP_SOURCES
+    # activemq sources
+    activemq/cmsutil/CachedConsumer.cpp
+    activemq/cmsutil/CachedProducer.cpp
+    activemq/cmsutil/CmsAccessor.cpp
+    activemq/cmsutil/CmsDestinationAccessor.cpp
+    activemq/cmsutil/CmsTemplate.cpp
+    activemq/cmsutil/DestinationResolver.cpp
+    activemq/cmsutil/DynamicDestinationResolver.cpp
+    activemq/cmsutil/MessageCreator.cpp
+    activemq/cmsutil/PooledSession.cpp
+    activemq/cmsutil/ProducerCallback.cpp
+    activemq/cmsutil/ResourceLifecycleManager.cpp
+    activemq/cmsutil/SessionCallback.cpp
+    activemq/cmsutil/SessionPool.cpp
+    activemq/commands/ActiveMQBlobMessage.cpp
+    activemq/commands/ActiveMQBytesMessage.cpp
+    activemq/commands/ActiveMQDestination.cpp
+    activemq/commands/ActiveMQMapMessage.cpp
+    activemq/commands/ActiveMQMessage.cpp
+    activemq/commands/ActiveMQObjectMessage.cpp
+    activemq/commands/ActiveMQQueue.cpp
+    activemq/commands/ActiveMQStreamMessage.cpp
+    activemq/commands/ActiveMQTempDestination.cpp
+    activemq/commands/ActiveMQTempQueue.cpp
+    activemq/commands/ActiveMQTempTopic.cpp
+    activemq/commands/ActiveMQTextMessage.cpp
+    activemq/commands/ActiveMQTopic.cpp
+    activemq/commands/BrokerError.cpp
+    activemq/commands/BrokerId.cpp
+    activemq/commands/BrokerInfo.cpp
+    activemq/commands/ConnectionControl.cpp
+    activemq/commands/ConnectionError.cpp
+    activemq/commands/ConnectionId.cpp
+    activemq/commands/ConnectionInfo.cpp
+    activemq/commands/ConsumerControl.cpp
+    activemq/commands/ConsumerId.cpp
+    activemq/commands/ConsumerInfo.cpp
+    activemq/commands/ControlCommand.cpp
+    activemq/commands/DataArrayResponse.cpp
+    activemq/commands/DataResponse.cpp
+    activemq/commands/DestinationInfo.cpp
+    activemq/commands/DiscoveryEvent.cpp
+    activemq/commands/ExceptionResponse.cpp
+    activemq/commands/FlushCommand.cpp
+    activemq/commands/IntegerResponse.cpp
+    activemq/commands/JournalQueueAck.cpp
+    activemq/commands/JournalTopicAck.cpp
+    activemq/commands/JournalTrace.cpp
+    activemq/commands/JournalTransaction.cpp
+    activemq/commands/KeepAliveInfo.cpp
+    activemq/commands/LastPartialCommand.cpp
+    activemq/commands/LocalTransactionId.cpp
+    activemq/commands/Message.cpp
+    activemq/commands/MessageAck.cpp
+    activemq/commands/MessageDispatch.cpp
+    activemq/commands/MessageDispatchNotification.cpp
+    activemq/commands/MessageId.cpp
+    activemq/commands/MessagePull.cpp
+    activemq/commands/NetworkBridgeFilter.cpp
+    activemq/commands/PartialCommand.cpp
+    activemq/commands/ProducerAck.cpp
+    activemq/commands/ProducerId.cpp
+    activemq/commands/ProducerInfo.cpp
+    activemq/commands/RemoveInfo.cpp
+    activemq/commands/RemoveSubscriptionInfo.cpp
+    activemq/commands/ReplayCommand.cpp
+    activemq/commands/Response.cpp
+    activemq/commands/SessionId.cpp
+    activemq/commands/SessionInfo.cpp
+    activemq/commands/ShutdownInfo.cpp
+    activemq/commands/SubscriptionInfo.cpp
+    activemq/commands/TransactionId.cpp
+    activemq/commands/TransactionInfo.cpp
+    activemq/commands/WireFormatInfo.cpp
+    activemq/commands/XATransactionId.cpp
+    activemq/core/ActiveMQAckHandler.cpp
+    activemq/core/ActiveMQConnection.cpp
+    activemq/core/ActiveMQConnectionFactory.cpp
+    activemq/core/ActiveMQConnectionMetaData.cpp
+    activemq/core/ActiveMQConstants.cpp
+    activemq/core/ActiveMQConsumer.cpp
+    activemq/core/ActiveMQDestinationEvent.cpp
+    activemq/core/ActiveMQDestinationSource.cpp
+    activemq/core/ActiveMQMessageAudit.cpp
+    activemq/core/ActiveMQProducer.cpp
+    activemq/core/ActiveMQQueueBrowser.cpp
+    activemq/core/ActiveMQSession.cpp
+    activemq/core/ActiveMQSessionExecutor.cpp
+    activemq/core/ActiveMQTransactionContext.cpp
+    activemq/core/ActiveMQXAConnection.cpp
+    activemq/core/ActiveMQXAConnectionFactory.cpp
+    activemq/core/ActiveMQXASession.cpp
+    activemq/core/AdvisoryConsumer.cpp
+    activemq/core/ConnectionAudit.cpp
+    activemq/core/DispatchData.cpp
+    activemq/core/Dispatcher.cpp
+    activemq/core/FifoMessageDispatchChannel.cpp
+    activemq/core/MessageDispatchChannel.cpp
+    activemq/core/PrefetchPolicy.cpp
+    activemq/core/RedeliveryPolicy.cpp
+    activemq/core/SimplePriorityMessageDispatchChannel.cpp
+    activemq/core/Synchronization.cpp
+    activemq/core/kernels/ActiveMQConsumerKernel.cpp
+    activemq/core/kernels/ActiveMQProducerKernel.cpp
+    activemq/core/kernels/ActiveMQSessionKernel.cpp
+    activemq/core/kernels/ActiveMQXASessionKernel.cpp
+    activemq/core/policies/DefaultPrefetchPolicy.cpp
+    activemq/core/policies/DefaultRedeliveryPolicy.cpp
+    activemq/exceptions/ActiveMQException.cpp
+    activemq/exceptions/BrokerException.cpp
+    activemq/exceptions/ConnectionFailedException.cpp
+    activemq/io/LoggingInputStream.cpp
+    activemq/io/LoggingOutputStream.cpp
+    activemq/library/ActiveMQCPP.cpp
+    activemq/state/CommandVisitor.cpp
+    activemq/state/CommandVisitorAdapter.cpp
+    activemq/state/ConnectionState.cpp
+    activemq/state/ConnectionStateTracker.cpp
+    activemq/state/ConsumerState.cpp
+    activemq/state/ProducerState.cpp
+    activemq/state/SessionState.cpp
+    activemq/state/Tracked.cpp
+    activemq/state/TransactionState.cpp
+    activemq/threads/CompositeTask.cpp
+    activemq/threads/CompositeTaskRunner.cpp
+    activemq/threads/DedicatedTaskRunner.cpp
+    activemq/threads/Scheduler.cpp
+    activemq/threads/SchedulerTimerTask.cpp
+    activemq/threads/Task.cpp
+    activemq/threads/TaskRunner.cpp
+    activemq/transport/AbstractTransportFactory.cpp
+    activemq/transport/CompositeTransport.cpp
+    activemq/transport/DefaultTransportListener.cpp
+    activemq/transport/FutureResponse.cpp
+    activemq/transport/IOTransport.cpp
+    activemq/transport/ResponseCallback.cpp
+    activemq/transport/Transport.cpp
+    activemq/transport/TransportFilter.cpp
+    activemq/transport/TransportRegistry.cpp
+    activemq/transport/correlator/ResponseCorrelator.cpp
+    activemq/transport/discovery/AbstractDiscoveryAgent.cpp
+    activemq/transport/discovery/AbstractDiscoveryAgentFactory.cpp
+    activemq/transport/discovery/DiscoveredBrokerData.cpp
+    activemq/transport/discovery/DiscoveryAgent.cpp
+    activemq/transport/discovery/DiscoveryAgentFactory.cpp
+    activemq/transport/discovery/DiscoveryAgentRegistry.cpp
+    activemq/transport/discovery/DiscoveryListener.cpp
+    activemq/transport/discovery/DiscoveryTransport.cpp
+    activemq/transport/discovery/DiscoveryTransportFactory.cpp
+    activemq/transport/discovery/http/HttpDiscoveryAgent.cpp
+    activemq/transport/discovery/http/HttpDiscoveryAgentFactory.cpp
+    activemq/transport/failover/BackupTransport.cpp
+    activemq/transport/failover/BackupTransportPool.cpp
+    activemq/transport/failover/CloseTransportsTask.cpp
+    activemq/transport/failover/FailoverTransport.cpp
+    activemq/transport/failover/FailoverTransportFactory.cpp
+    activemq/transport/failover/FailoverTransportListener.cpp
+    activemq/transport/failover/URIPool.cpp
+    activemq/transport/inactivity/InactivityMonitor.cpp
+    activemq/transport/inactivity/ReadChecker.cpp
+    activemq/transport/inactivity/WriteChecker.cpp
+    activemq/transport/logging/LoggingTransport.cpp
+    activemq/transport/mock/InternalCommandListener.cpp
+    activemq/transport/mock/MockTransport.cpp
+    activemq/transport/mock/MockTransportFactory.cpp
+    activemq/transport/mock/ResponseBuilder.cpp
+    activemq/transport/tcp/SslTransport.cpp
+    activemq/transport/tcp/SslTransportFactory.cpp
+    activemq/transport/tcp/TcpTransport.cpp
+    activemq/transport/tcp/TcpTransportFactory.cpp
+    activemq/util/ActiveMQMessageTransformation.cpp
+    activemq/util/ActiveMQProperties.cpp
+    activemq/util/AdvisorySupport.cpp
+    activemq/util/CMSExceptionSupport.cpp
+    activemq/util/CompositeData.cpp
+    activemq/util/IdGenerator.cpp
+    activemq/util/LongSequenceGenerator.cpp
+    activemq/util/MarshallingSupport.cpp
+    activemq/util/MemoryUsage.cpp
+    activemq/util/PrimitiveList.cpp
+    activemq/util/PrimitiveMap.cpp
+    activemq/util/PrimitiveValueConverter.cpp
+    activemq/util/PrimitiveValueNode.cpp
+    activemq/util/Service.cpp
+    activemq/util/ServiceListener.cpp
+    activemq/util/ServiceStopper.cpp
+    activemq/util/ServiceSupport.cpp
+    activemq/util/Suspendable.cpp
+    activemq/util/URISupport.cpp
+    activemq/util/Usage.cpp
+    activemq/wireformat/MarshalAware.cpp
+    activemq/wireformat/WireFormat.cpp
+    activemq/wireformat/WireFormatFactory.cpp
+    activemq/wireformat/WireFormatNegotiator.cpp
+    activemq/wireformat/WireFormatRegistry.cpp
+    activemq/wireformat/openwire/OpenWireFormat.cpp
+    activemq/wireformat/openwire/OpenWireFormatFactory.cpp
+    activemq/wireformat/openwire/OpenWireFormatNegotiator.cpp
+    activemq/wireformat/openwire/OpenWireResponseBuilder.cpp
+    activemq/wireformat/openwire/marshal/BaseDataStreamMarshaller.cpp
+    activemq/wireformat/openwire/marshal/DataStreamMarshaller.cpp
+    activemq/wireformat/openwire/marshal/PrimitiveTypesMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ActiveMQBlobMessageMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ActiveMQBytesMessageMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ActiveMQDestinationMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ActiveMQMapMessageMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ActiveMQMessageMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ActiveMQObjectMessageMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ActiveMQQueueMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ActiveMQStreamMessageMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ActiveMQTempDestinationMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ActiveMQTempQueueMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ActiveMQTempTopicMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ActiveMQTextMessageMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ActiveMQTopicMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/BaseCommandMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/BrokerIdMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/BrokerInfoMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ConnectionControlMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ConnectionErrorMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ConnectionIdMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ConnectionInfoMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ConsumerControlMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ConsumerIdMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ConsumerInfoMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ControlCommandMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/DataArrayResponseMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/DataResponseMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/DestinationInfoMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/DiscoveryEventMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ExceptionResponseMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/FlushCommandMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/IntegerResponseMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/JournalQueueAckMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/JournalTopicAckMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/JournalTraceMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/JournalTransactionMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/KeepAliveInfoMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/LastPartialCommandMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/LocalTransactionIdMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/MarshallerFactory.cpp
+    activemq/wireformat/openwire/marshal/generated/MessageAckMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/MessageDispatchMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/MessageDispatchNotificationMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/MessageIdMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/MessageMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/MessagePullMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/NetworkBridgeFilterMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/PartialCommandMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ProducerAckMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ProducerIdMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ProducerInfoMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/RemoveInfoMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/RemoveSubscriptionInfoMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ReplayCommandMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ResponseMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/SessionIdMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/SessionInfoMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/ShutdownInfoMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/SubscriptionInfoMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/TransactionIdMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/TransactionInfoMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/WireFormatInfoMarshaller.cpp
+    activemq/wireformat/openwire/marshal/generated/XATransactionIdMarshaller.cpp
+    activemq/wireformat/openwire/utils/BooleanStream.cpp
+    activemq/wireformat/openwire/utils/HexTable.cpp
+    activemq/wireformat/openwire/utils/MessagePropertyInterceptor.cpp
+    activemq/wireformat/stomp/StompCommandConstants.cpp
+    activemq/wireformat/stomp/StompFrame.cpp
+    activemq/wireformat/stomp/StompHelper.cpp
+    activemq/wireformat/stomp/StompWireFormat.cpp
+    activemq/wireformat/stomp/StompWireFormatFactory.cpp
+    # cms sources
+    cms/AsyncCallback.cpp
+    cms/BytesMessage.cpp
+    cms/CMSException.cpp
+    cms/CMSProperties.cpp
+    cms/CMSSecurityException.cpp
+    cms/Closeable.cpp
+    cms/Connection.cpp
+    cms/ConnectionFactory.cpp
+    cms/ConnectionMetaData.cpp
+    cms/DeliveryMode.cpp
+    cms/Destination.cpp
+    cms/DestinationEvent.cpp
+    cms/DestinationListener.cpp
+    cms/DestinationSource.cpp
+    cms/EnhancedConnection.cpp
+    cms/ExceptionListener.cpp
+    cms/IllegalStateException.cpp
+    cms/InvalidClientIdException.cpp
+    cms/InvalidDestinationException.cpp
+    cms/InvalidSelectorException.cpp
+    cms/MapMessage.cpp
+    cms/Message.cpp
+    cms/MessageAvailableListener.cpp
+    cms/MessageConsumer.cpp
+    cms/MessageEOFException.cpp
+    cms/MessageEnumeration.cpp
+    cms/MessageFormatException.cpp
+    cms/MessageListener.cpp
+    cms/MessageNotReadableException.cpp
+    cms/MessageNotWriteableException.cpp
+    cms/MessageProducer.cpp
+    cms/MessageTransformer.cpp
+    cms/ObjectMessage.cpp
+    cms/Queue.cpp
+    cms/QueueBrowser.cpp
+    cms/ResourceAllocationException.cpp
+    cms/Session.cpp
+    cms/Startable.cpp
+    cms/Stoppable.cpp
+    cms/StreamMessage.cpp
+    cms/TemporaryQueue.cpp
+    cms/TemporaryTopic.cpp
+    cms/TextMessage.cpp
+    cms/Topic.cpp
+    cms/TransactionInProgressException.cpp
+    cms/TransactionRolledBackException.cpp
+    cms/UnsupportedOperationException.cpp
+    cms/XAConnection.cpp
+    cms/XAConnectionFactory.cpp
+    cms/XAException.cpp
+    cms/XAResource.cpp
+    cms/XASession.cpp
+    cms/Xid.cpp
+    # decaf sources
+    decaf/internal/DecafRuntime.cpp
+    decaf/internal/io/StandardErrorOutputStream.cpp
+    decaf/internal/io/StandardInputStream.cpp
+    decaf/internal/io/StandardOutputStream.cpp
+    decaf/internal/net/DefaultServerSocketFactory.cpp
+    decaf/internal/net/DefaultSocketFactory.cpp
+    decaf/internal/net/Network.cpp
+    decaf/internal/net/SocketFileDescriptor.cpp
+    decaf/internal/net/URIEncoderDecoder.cpp
+    decaf/internal/net/URIHelper.cpp
+    decaf/internal/net/URIType.cpp
+    decaf/internal/net/URLStreamHandlerManager.cpp
+    decaf/internal/net/URLType.cpp
+    decaf/internal/net/URLUtils.cpp
+    decaf/internal/net/file/FileHandler.cpp
+    decaf/internal/net/http/HttpHandler.cpp
+    decaf/internal/net/https/HttpsHandler.cpp
+    decaf/internal/net/ssl/DefaultSSLContext.cpp
+    decaf/internal/net/ssl/DefaultSSLServerSocketFactory.cpp
+    decaf/internal/net/ssl/DefaultSSLSocketFactory.cpp
+    decaf/internal/net/ssl/openssl/OpenSSLContextSpi.cpp
+    decaf/internal/net/ssl/openssl/OpenSSLParameters.cpp
+    decaf/internal/net/ssl/openssl/OpenSSLServerSocket.cpp
+    decaf/internal/net/ssl/openssl/OpenSSLServerSocketFactory.cpp
+    decaf/internal/net/ssl/openssl/OpenSSLSocket.cpp
+    decaf/internal/net/ssl/openssl/OpenSSLSocketException.cpp
+    decaf/internal/net/ssl/openssl/OpenSSLSocketFactory.cpp
+    decaf/internal/net/ssl/openssl/OpenSSLSocketInputStream.cpp
+    decaf/internal/net/ssl/openssl/OpenSSLSocketOutputStream.cpp
+    decaf/internal/net/tcp/IoContextManager.cpp
+    decaf/internal/net/tcp/TcpSocket.cpp
+    decaf/internal/net/tcp/TcpSocketInputStream.cpp
+    decaf/internal/net/tcp/TcpSocketOutputStream.cpp
+    decaf/internal/nio/BufferFactory.cpp
+    decaf/internal/nio/ByteArrayBuffer.cpp
+    decaf/internal/nio/CharArrayBuffer.cpp
+    decaf/internal/nio/DoubleArrayBuffer.cpp
+    decaf/internal/nio/FloatArrayBuffer.cpp
+    decaf/internal/nio/IntArrayBuffer.cpp
+    decaf/internal/nio/LongArrayBuffer.cpp
+    decaf/internal/nio/ShortArrayBuffer.cpp
+    decaf/internal/security/Engine.cpp
+    decaf/internal/security/SecurityRuntime.cpp
+    decaf/internal/security/ServiceRegistry.cpp
+    decaf/internal/security/provider/DefaultMessageDigestProviderService.cpp
+    decaf/internal/security/provider/DefaultProvider.cpp
+    decaf/internal/security/provider/DefaultSecureRandomProviderService.cpp
+    decaf/internal/security/provider/crypto/MD4MessageDigestSpi.cpp
+    decaf/internal/security/provider/crypto/MD5MessageDigestSpi.cpp
+    decaf/internal/security/provider/crypto/SHA1MessageDigestSpi.cpp
+    decaf/internal/util/ByteArrayAdapter.cpp
+    decaf/internal/util/GenericResource.cpp
+    decaf/internal/util/HexStringParser.cpp
+    decaf/internal/util/Resource.cpp
+    decaf/internal/util/ResourceLifecycleManager.cpp
+    decaf/internal/util/StringUtils.cpp
+    decaf/internal/util/TimerTaskHeap.cpp
+    decaf/internal/util/concurrent/ExecutorsSupport.cpp
+    decaf/internal/util/concurrent/SynchronizableImpl.cpp
+    decaf/internal/util/concurrent/ThreadLocalImpl.cpp
+    decaf/internal/util/concurrent/Threading.cpp
+    decaf/io/BlockingByteArrayInputStream.cpp
+    decaf/io/BufferedInputStream.cpp
+    decaf/io/BufferedOutputStream.cpp
+    decaf/io/ByteArrayInputStream.cpp
+    decaf/io/ByteArrayOutputStream.cpp
+    decaf/io/Closeable.cpp
+    decaf/io/DataInput.cpp
+    decaf/io/DataInputStream.cpp
+    decaf/io/DataOutput.cpp
+    decaf/io/DataOutputStream.cpp
+    decaf/io/EOFException.cpp
+    decaf/io/FileDescriptor.cpp
+    decaf/io/FilterInputStream.cpp
+    decaf/io/FilterOutputStream.cpp
+    decaf/io/Flushable.cpp
+    decaf/io/IOException.cpp
+    decaf/io/InputStream.cpp
+    decaf/io/InputStreamReader.cpp
+    decaf/io/InterruptedIOException.cpp
+    decaf/io/OutputStream.cpp
+    decaf/io/OutputStreamWriter.cpp
+    decaf/io/PushbackInputStream.cpp
+    decaf/io/Reader.cpp
+    decaf/io/UTFDataFormatException.cpp
+    decaf/io/UnsupportedEncodingException.cpp
+    decaf/io/Writer.cpp
+    decaf/lang/AbstractStringBuilder.cpp
+    decaf/lang/Appendable.cpp
+    decaf/lang/Boolean.cpp
+    decaf/lang/Byte.cpp
+    decaf/lang/CharSequence.cpp
+    decaf/lang/Character.cpp
+    decaf/lang/Comparable.cpp
+    decaf/lang/Double.cpp
+    decaf/lang/Exception.cpp
+    decaf/lang/Float.cpp
+    decaf/lang/Integer.cpp
+    decaf/lang/Iterable.cpp
+    decaf/lang/Long.cpp
+    decaf/lang/Math.cpp
+    decaf/lang/Number.cpp
+    decaf/lang/Readable.cpp
+    decaf/lang/Runnable.cpp
+    decaf/lang/Runtime.cpp
+    decaf/lang/Short.cpp
+    decaf/lang/String.cpp
+    decaf/lang/StringBuffer.cpp
+    decaf/lang/StringBuilder.cpp
+    decaf/lang/System.cpp
+    decaf/lang/Thread.cpp
+    decaf/lang/ThreadGroup.cpp
+    decaf/lang/ThreadLocal.cpp
+    decaf/lang/Throwable.cpp
+    decaf/lang/Types.cpp
+    decaf/lang/exceptions/ArrayIndexOutOfBoundsException.cpp
+    decaf/lang/exceptions/ClassCastException.cpp
+    decaf/lang/exceptions/CloneNotSupportedException.cpp
+    decaf/lang/exceptions/IllegalArgumentException.cpp
+    decaf/lang/exceptions/IllegalMonitorStateException.cpp
+    decaf/lang/exceptions/IllegalStateException.cpp
+    decaf/lang/exceptions/IllegalThreadStateException.cpp
+    decaf/lang/exceptions/IndexOutOfBoundsException.cpp
+    decaf/lang/exceptions/InterruptedException.cpp
+    decaf/lang/exceptions/InvalidStateException.cpp
+    decaf/lang/exceptions/NegativeArraySizeException.cpp
+    decaf/lang/exceptions/NullPointerException.cpp
+    decaf/lang/exceptions/NumberFormatException.cpp
+    decaf/lang/exceptions/OutOfMemoryError.cpp
+    decaf/lang/exceptions/RuntimeException.cpp
+    decaf/lang/exceptions/SecurityException.cpp
+    decaf/lang/exceptions/StringIndexOutOfBoundsException.cpp
+    decaf/lang/exceptions/UnsupportedOperationException.cpp
+    decaf/net/BindException.cpp
+    decaf/net/ConnectException.cpp
+    decaf/net/ContentHandlerFactory.cpp
+    decaf/net/DatagramPacket.cpp
+    decaf/net/FileNameMap.cpp
+    decaf/net/HttpRetryException.cpp
+    decaf/net/HttpURLConnection.cpp
+    decaf/net/Inet4Address.cpp
+    decaf/net/Inet6Address.cpp
+    decaf/net/InetAddress.cpp
+    decaf/net/InetSocketAddress.cpp
+    decaf/net/MalformedURLException.cpp
+    decaf/net/NoRouteToHostException.cpp
+    decaf/net/PortUnreachableException.cpp
+    decaf/net/ProtocolException.cpp
+    decaf/net/Proxy.cpp
+    decaf/net/ServerSocket.cpp
+    decaf/net/ServerSocketFactory.cpp
+    decaf/net/Socket.cpp
+    decaf/net/SocketAddress.cpp
+    decaf/net/SocketError.cpp
+    decaf/net/SocketException.cpp
+    decaf/net/SocketFactory.cpp
+    decaf/net/SocketImpl.cpp
+    decaf/net/SocketImplFactory.cpp
+    decaf/net/SocketOptions.cpp
+    decaf/net/SocketTimeoutException.cpp
+    decaf/net/URI.cpp
+    decaf/net/URISyntaxException.cpp
+    decaf/net/URL.cpp
+    decaf/net/URLConnection.cpp
+    decaf/net/URLDecoder.cpp
+    decaf/net/URLEncoder.cpp
+    decaf/net/URLStreamHandler.cpp
+    decaf/net/URLStreamHandlerFactory.cpp
+    decaf/net/UnknownHostException.cpp
+    decaf/net/UnknownServiceException.cpp
+    decaf/net/ssl/SSLContext.cpp
+    decaf/net/ssl/SSLContextSpi.cpp
+    decaf/net/ssl/SSLParameters.cpp
+    decaf/net/ssl/SSLServerSocket.cpp
+    decaf/net/ssl/SSLServerSocketFactory.cpp
+    decaf/net/ssl/SSLSocket.cpp
+    decaf/net/ssl/SSLSocketFactory.cpp
+    decaf/nio/Buffer.cpp
+    decaf/nio/BufferOverflowException.cpp
+    decaf/nio/BufferUnderflowException.cpp
+    decaf/nio/ByteBuffer.cpp
+    decaf/nio/CharBuffer.cpp
+    decaf/nio/DoubleBuffer.cpp
+    decaf/nio/FloatBuffer.cpp
+    decaf/nio/IntBuffer.cpp
+    decaf/nio/InvalidMarkException.cpp
+    decaf/nio/LongBuffer.cpp
+    decaf/nio/ReadOnlyBufferException.cpp
+    decaf/nio/ShortBuffer.cpp
+    decaf/security/DigestException.cpp
+    decaf/security/GeneralSecurityException.cpp
+    decaf/security/InvalidKeyException.cpp
+    decaf/security/Key.cpp
+    decaf/security/KeyException.cpp
+    decaf/security/KeyManagementException.cpp
+    decaf/security/MessageDigest.cpp
+    decaf/security/MessageDigestSpi.cpp
+    decaf/security/NoSuchAlgorithmException.cpp
+    decaf/security/NoSuchProviderException.cpp
+    decaf/security/Principal.cpp
+    decaf/security/Provider.cpp
+    decaf/security/ProviderException.cpp
+    decaf/security/ProviderService.cpp
+    decaf/security/PublicKey.cpp
+    decaf/security/SecureRandom.cpp
+    decaf/security/SecureRandomSpi.cpp
+    decaf/security/Security.cpp
+    decaf/security/SecuritySpi.cpp
+    decaf/security/SignatureException.cpp
+    decaf/security/auth/x500/X500Principal.cpp
+    decaf/security/cert/Certificate.cpp
+    decaf/security/cert/CertificateEncodingException.cpp
+    decaf/security/cert/CertificateException.cpp
+    decaf/security/cert/CertificateExpiredException.cpp
+    decaf/security/cert/CertificateNotYetValidException.cpp
+    decaf/security/cert/CertificateParsingException.cpp
+    decaf/security/cert/X509Certificate.cpp
+    decaf/util/AbstractCollection.cpp
+    decaf/util/AbstractList.cpp
+    decaf/util/AbstractMap.cpp
+    decaf/util/AbstractQueue.cpp
+    decaf/util/AbstractSequentialList.cpp
+    decaf/util/AbstractSet.cpp
+    decaf/util/ArrayList.cpp
+    decaf/util/Arrays.cpp
+    decaf/util/BitSet.cpp
+    decaf/util/Collection.cpp
+    decaf/util/Collections.cpp
+    decaf/util/Comparator.cpp
+    decaf/util/ConcurrentModificationException.cpp
+    decaf/util/Date.cpp
+    decaf/util/Deque.cpp
+    decaf/util/HashCode.cpp
+    decaf/util/HashMap.cpp
+    decaf/util/HashSet.cpp
+    decaf/util/Iterator.cpp
+    decaf/util/LRUCache.cpp
+    decaf/util/LinkedHashMap.cpp
+    decaf/util/LinkedHashSet.cpp
+    decaf/util/LinkedList.cpp
+    decaf/util/List.cpp
+    decaf/util/ListIterator.cpp
+    decaf/util/Map.cpp
+    decaf/util/MapEntry.cpp
+    decaf/util/NoSuchElementException.cpp
+    decaf/util/PriorityQueue.cpp
+    decaf/util/Properties.cpp
+    decaf/util/Queue.cpp
+    decaf/util/Random.cpp
+    decaf/util/Set.cpp
+    decaf/util/StlList.cpp
+    decaf/util/StlMap.cpp
+    decaf/util/StlQueue.cpp
+    decaf/util/StlSet.cpp
+    decaf/util/StringTokenizer.cpp
+    decaf/util/Timer.cpp
+    decaf/util/TimerTask.cpp
+    decaf/util/UUID.cpp
+    decaf/util/comparators/Equals.cpp
+    decaf/util/comparators/Less.cpp
+    decaf/util/concurrent/AbstractExecutorService.cpp
+    decaf/util/concurrent/BlockingQueue.cpp
+    decaf/util/concurrent/BrokenBarrierException.cpp
+    decaf/util/concurrent/Callable.cpp
+    decaf/util/concurrent/CancellationException.cpp
+    decaf/util/concurrent/ConcurrentHashMap.cpp
+    decaf/util/concurrent/ConcurrentMap.cpp
+    decaf/util/concurrent/ConcurrentStlMap.cpp
+    decaf/util/concurrent/CopyOnWriteArrayList.cpp
+    decaf/util/concurrent/CopyOnWriteArraySet.cpp
+    decaf/util/concurrent/CountDownLatch.cpp
+    decaf/util/concurrent/Delayed.cpp
+    decaf/util/concurrent/ExecutionException.cpp
+    decaf/util/concurrent/Executor.cpp
+    decaf/util/concurrent/ExecutorService.cpp
+    decaf/util/concurrent/Executors.cpp
+    decaf/util/concurrent/Future.cpp
+    decaf/util/concurrent/FutureTask.cpp
+    decaf/util/concurrent/LinkedBlockingQueue.cpp
+    decaf/util/concurrent/Lock.cpp
+    decaf/util/concurrent/Mutex.cpp
+    decaf/util/concurrent/RejectedExecutionException.cpp
+    decaf/util/concurrent/RejectedExecutionHandler.cpp
+    decaf/util/concurrent/RunnableFuture.cpp
+    decaf/util/concurrent/Semaphore.cpp
+    decaf/util/concurrent/Synchronizable.cpp
+    decaf/util/concurrent/SynchronousQueue.cpp
+    decaf/util/concurrent/ThreadFactory.cpp
+    decaf/util/concurrent/ThreadPoolExecutor.cpp
+    decaf/util/concurrent/TimeUnit.cpp
+    decaf/util/concurrent/TimeoutException.cpp
+    decaf/util/concurrent/atomic/AtomicBoolean.cpp
+    decaf/util/concurrent/atomic/AtomicInteger.cpp
+    decaf/util/concurrent/atomic/AtomicRefCounter.cpp
+    decaf/util/concurrent/atomic/AtomicReference.cpp
+    decaf/util/concurrent/locks/AbstractOwnableSynchronizer.cpp
+    decaf/util/concurrent/locks/AbstractQueuedSynchronizer.cpp
+    decaf/util/concurrent/locks/Condition.cpp
+    decaf/util/concurrent/locks/Lock.cpp
+    decaf/util/concurrent/locks/LockSupport.cpp
+    decaf/util/concurrent/locks/ReadWriteLock.cpp
+    decaf/util/concurrent/locks/ReentrantLock.cpp
+    decaf/util/concurrent/locks/ReentrantReadWriteLock.cpp
+    decaf/util/logging/ConsoleHandler.cpp
+    decaf/util/logging/ErrorManager.cpp
+    decaf/util/logging/Formatter.cpp
+    decaf/util/logging/Handler.cpp
+    decaf/util/logging/Level.cpp
+    decaf/util/logging/LogManager.cpp
+    decaf/util/logging/LogRecord.cpp
+    decaf/util/logging/LogWriter.cpp
+    decaf/util/logging/Logger.cpp
+    decaf/util/logging/LoggerHierarchy.cpp
+    decaf/util/logging/SimpleFormatter.cpp
+    decaf/util/logging/SimpleLogger.cpp
+    decaf/util/logging/StreamHandler.cpp
+    decaf/util/logging/XMLFormatter.cpp
+    decaf/util/zip/Adler32.cpp
+    decaf/util/zip/CRC32.cpp
+    decaf/util/zip/CheckedInputStream.cpp
+    decaf/util/zip/CheckedOutputStream.cpp
+    decaf/util/zip/Checksum.cpp
+    decaf/util/zip/DataFormatException.cpp
+    decaf/util/zip/Deflater.cpp
+    decaf/util/zip/DeflaterOutputStream.cpp
+    decaf/util/zip/Inflater.cpp
+    decaf/util/zip/InflaterInputStream.cpp
+    decaf/util/zip/ZipException.cpp
+)
+
+# Platform-specific sources for decaf
+# Note: PlatformThread.cpp and Atomics.cpp are cross-platform C++11 implementations
+# SecureRandomImpl has separate Windows and Unix versions
+list(APPEND ACTIVEMQ_CPP_SOURCES
+    decaf/internal/util/concurrent/Atomics.cpp
+    decaf/internal/util/concurrent/PlatformThread.cpp
+)
+
+if(WIN32)
+    # Add Windows-specific sources
+    list(APPEND ACTIVEMQ_CPP_SOURCES
+        decaf/internal/security/windows/SecureRandomImpl.cpp
+    )
+else()
+    # Add Unix-specific sources
+    list(APPEND ACTIVEMQ_CPP_SOURCES
+        decaf/internal/security/unix/SecureRandomImpl.cpp
+    )
+endif()
+
+# Build the single combined library
+if(AMQCPP_SHARED_LIB)
+  add_library(activemq-cpp SHARED ${ACTIVEMQ_CPP_SOURCES})
+else()
+  add_library(activemq-cpp STATIC ${ACTIVEMQ_CPP_SOURCES})
+endif()
+
+# Create alias for namespaced usage
+add_library(neoactivemq-cpp::activemq-cpp ALIAS activemq-cpp)
+
+target_include_directories(activemq-cpp
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+# OpenSSL support
+if(OpenSSL_FOUND)
+  target_compile_definitions(activemq-cpp PUBLIC HAVE_OPENSSL)
+  target_link_libraries(activemq-cpp PUBLIC OpenSSL::SSL OpenSSL::Crypto)
+endif()
+
+# Link zlib for compression support
+target_link_libraries(activemq-cpp PUBLIC ZLIB::ZLIB)
+
+# Link ASIO
+target_link_libraries(activemq-cpp PUBLIC asio::asio)
+
+set_target_properties(activemq-cpp PROPERTIES
+  POSITION_INDEPENDENT_CODE ON
+)
+
+# Windows-specific settings
+if(WIN32)
+  if(AMQCPP_SHARED_LIB)
+    set_target_properties(activemq-cpp PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+  endif()
+  target_link_libraries(activemq-cpp PRIVATE ws2_32)
+  target_compile_definitions(activemq-cpp PRIVATE _WIN32_WINNT=0x0601)
+endif()
+
+# Ensure C++ threading is available on all platforms
+find_package(Threads REQUIRED)
+target_link_libraries(activemq-cpp PRIVATE Threads::Threads)
+
+# Ensure POSIX threading macros are defined on non-Windows platforms for compatibility
+if(NOT WIN32)
+  # Define numeric macro so headers using `#if HAVE_PTHREAD_H` work correctly
+  target_compile_definitions(activemq-cpp PUBLIC HAVE_PTHREAD_H=1)
+endif()

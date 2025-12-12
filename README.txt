@@ -1,221 +1,259 @@
 --------------------------------------------------------------------------
-ActiveMQ CPP Library
+NeoActiveMQ CPP Library
 --------------------------------------------------------------------------
 
-ActiveMQ CPP is a messaging library that can use multiple protocols to
-talk to a MOM (e.g. ActiveMQ).
+NeoActiveMQ CPP is a modernized C++17 messaging library that can use
+multiple protocols to talk to a MOM (e.g. ActiveMQ). This is a fork of
+Apache ActiveMQ CPP with updated build system and modern C++ standards.
 
-1 Dependencies
+1 Prerequisites
 --------------------------------------------------------------------------
 
-There are several dependencies that need to be met in order to build and
-install ActiveMQ-CPP on a Unix type system, the short list is shown below,
-read the sections that follow for more detailed information.  On Windows
-you will not need the Auto Tools since the library is built using Microsft's
-Visual Studio product.
+1.1 Required Tools
+--------------------------------------------------------------------------
 
-Tool        Recommended Version
+Tool           Recommended Version
 -------------------------------
-autoconf    >= 2.60
-automake    >= 1.10
-libtool     >= 1.5.24
-CPPUnit     >= 1.10.2*
-libuuid     >= ?*
-openssl     >= 1.0.2
+CMake          >= 3.15
+vcpkg          latest
+C++ Compiler   C++17 support required
+  - MSVC       >= 2019 (Windows)
+  - GCC        >= 7.0 (Linux)
+  - Clang      >= 5.0 (macOS/Linux)
 
-* Requires that the Development package also be installed.
-
-1.1 libuuid
+1.2 Automatic Dependency Management
 --------------------------------------------------------------------------
 
-The build requires the *libuuid* library that is part of the e2fsprogs
-package and is available from http://e2fsprogs.sourceforge.net/ which is
-not always installed by default.
+This project uses vcpkg for dependency management. All dependencies are
+automatically downloaded and built during the CMake configuration phase.
+No manual installation is required.
 
-On Fedora, type the following:
+Dependencies managed by vcpkg:
+  - OpenSSL     (cryptography)
+  - asio        (async I/O)
+  - CppUnit     (testing)
+  - zlib        (compression)
 
-  sudo yum install e2fsprogs-devel
-
-On Debian/Ubuntu, type the following:
-
-  sudo apt-get install uuid-dev
-
-1.2 CppUnit
+2 Building with CMake Presets
 --------------------------------------------------------------------------
 
-The package contains a complete set of CppUnit tests.  In order for you to
-build an run the tests, you will need to download and install the CppUnit
-suite.  See http://cppunit.sourceforge.net/cppunit-wiki
+This project uses CMake presets for simplified configuration and building.
+The build system automatically manages all dependencies through vcpkg.
 
-On Fedora, type the following:
-
-  sudo yum install cppunit cppunit-devel
-
-On Debian/Ubuntu, type the following:
-
-  sudo apt-get install libcppunit-dev
-
-Make sure that the paths to the installed CppUnit library and includes are
-visible in your current shell before you try building the tests.
-
-Windows users will need to build the CppUnit library using the CPPUnit
-MSVC project files. A discussion of the build process can be found
-on the CPPUnit wiki under:
-
-http://cppunit.sourceforge.net/cppunit-wiki/BuildingCppUnit1
-
-This covers both MSVC along with many other platforms and tool suites.
-The included Visual Studio projects are configured with the assumption
-that you will configure Visual Studio with the locations of the Platform
-SDK and the CPPUnit libraries and headers.
-
-1.3 GNU Build System (for building on Unix/Linux/OS X)
+2.1 Available Presets
 --------------------------------------------------------------------------
 
-To Generate the ./configure script use to create the Makefiles, you need
-the following software installed:
+To see all available presets:
 
-Tool        Recommended Version
--------------------------------
-autoconf    >= 2.60
-automake    >= 1.10
-libtool     >= 1.5.24
+  cmake --list-presets
 
-On Debian/Ubuntu, multiple versions of autoconf and automake are available
-in separate packages. If you have multiple versions of autoconf or automake
-installed on your system, you may have to configure the versions to use
-using /usr/sbin/update-alternatives.
+Common presets:
+  - x86-windows-debug-test      (Windows 32-bit Debug with tests)
+  - x86-windows-release         (Windows 32-bit Release)
+  - x64-windows-debug-test      (Windows 64-bit Debug with tests)
+  - x64-windows-release         (Windows 64-bit Release)
+  - x64-linux-debug-test        (Linux 64-bit Debug with tests)
+  - x64-linux-release           (Linux 64-bit Release)
 
-2 Building on Unix/Linux/OS X
+2.2 Quick Start - Windows
 --------------------------------------------------------------------------
 
-This assumes you have all of the project dependencies installed.  We're
-now ready to create the configure script.  To do this, run:
+1. Configure the project:
 
-  activemq-cpp/legacy-autotools/autogen.sh
+     cmake --preset x86-windows-debug-test
 
-This should be run the first time and any time you change configure.ac or
-any of the Makefile.am files (these legacy files were moved into
-`activemq-cpp/legacy-autotools/` during cleanup).
+   This will:
+   - Download and build all dependencies via vcpkg
+   - Configure the build with tests enabled
+   - Generate build files in output/build/x86-windows-debug-test/
 
-    -----------------------------------------------------------------------
-    |MacOS X Note:                                                        |
-    | Make sure to set the LIBTOOLIZE environment variable to point to    |
-    | /usr/bin/glibtoolize for the build to complete successfully. Below  |
-    | is an example:                                                      |
-    |                                                                     |
-    | $ export LIBTOOLIZE=/usr/bin/glibtoolize                            |
-    |                                                                     |
-    | If you do not use this environment variable you will encounter an   |
-    | error stating:                                                      |
-    |                                                                     |
-    | Can't exec "libtoolize": No such file or directory at               |
-    | /opt/local/share/autoconf/Autom4te/FileUtils.pm line 290...         |
-    -----------------------------------------------------------------------
+2. Build the project:
 
-    -----------------------------------------------------------------------
-    |Solaris 10 Note:  CppUnit might not build until you correct the file |
-    |  libstdc++.la to contain the correct data, see this discussion:     |
-    |  http://forum.sun.com/jive/thread.jspa?threadID=73150               |
-    |  Also you must pass --enable-shared=no for Solaris GCC builds       |
-    |  For Solaris builds using the Sun Compiler you must set the env     |
-    |  values CC and CXX to point to the cc and CC commands respectively. |
-    -----------------------------------------------------------------------
+     cmake --build --preset x86-windows-debug-test
 
-The configure script will customize the way the software is built and
-installed into your system along with detecting the available libraries
-that have been installed.  To use the default configuration just run:
+   The build output will be in:
+   - Libraries: output/build/<preset-name>/lib/
+   - Executables: output/build/<preset-name>/bin/
+   - Tests: output/build/<preset-name>/bin/
 
-  ./configure
-
-For more help on how to customize the build configuration, run:
-
-  ./configure --help
-
-Once the configure script has run successfully, you are ready to build.
-Run:
-
-  make
-
-This will build all of the core ActiveMQ CPP source code.  To build and
-install the code into the system directories, run:
-
-  make install
-
-You will have to become the superuser in order to be able to install the
-files.
-
-3 Doxygen
+2.3 Quick Start - Linux/macOS
 --------------------------------------------------------------------------
 
-To generate the Doxygen documentation for the project, just run:
+1. Configure the project:
 
-  make doxygen-run
+     cmake --preset x64-linux-debug-test
 
-4 Running Tests
+2. Build the project:
+
+     cmake --build --preset x64-linux-debug-test
+
+2.4 Installation
 --------------------------------------------------------------------------
 
-4.1 Unit Tests
---------------------------------------------------------------------------
-In order to build and run the suite of unit tests, run:
+To install the library to the system:
 
-  make check
+  cmake --install output/build/<preset-name> --prefix /usr/local
+
+Or on Windows with administrator privileges:
+
+  cmake --install output/build/<preset-name> --prefix "C:/Program Files/neoactivemq-cpp"
+
+This installs:
+  - Headers to <prefix>/include/
+  - Libraries to <prefix>/lib/
+  - CMake config files to <prefix>/lib/cmake/neoactivemq-cpp/
+
+3 Running Tests
+--------------------------------------------------------------------------
+
+3.1 Unit Tests
+--------------------------------------------------------------------------
+
+The test executable is built automatically when using a preset with "-test"
+in the name (e.g., x86-windows-debug-test).
+
+To run the unit tests:
+
+  Windows:
+    .\output\build\x86-windows-debug-test\bin\neoactivemq-test.exe
+
+  Linux/macOS:
+    ./output/build/x64-linux-debug-test/bin/neoactivemq-test
 
 This will verify that the library is functioning correctly on the target
-platform. In addition, it will generate the integration tests binary.
+platform.
 
-4.2 Integration Tests
+3.2 Integration Tests
 --------------------------------------------------------------------------
-The library also contains a set of tests that are run against a real AMQ
-broker.  These allow you to validate this distribution of ActiveMQ CPP
-against your broker.  Running these without a broker will result in failed
-tests.  The tests currently hard-code the broker url to be
-tcp://localhost:61613 for Stomp and tcp://localhost:61616 for Openwire.
 
-The integration tests are built via "make check".  To run them, first
-start a broker and then
+The library also contains tests that run against a real ActiveMQ broker.
+These validate the distribution against your broker. Running without a
+broker will result in failed tests.
 
-  cd src/test-integration
-  ./activemq-test-integration
+The tests currently connect to:
+  - Stomp:    tcp://localhost:61613
+  - Openwire: tcp://localhost:61616
 
-This will take quite some time to complete, so be patient.  It is recommended
-that you restart the broker between successive runs of the integration tests.
+To run integration tests:
 
-5 Example
+1. Start an ActiveMQ broker
+2. Run the integration test executable:
+
+   Windows:
+     .\output\build\x86-windows-debug-test\bin\neoactivemq-integration-test.exe
+
+   Linux/macOS:
+     ./output/build/x64-linux-debug-test/bin/neoactivemq-integration-test
+
+Note: This takes considerable time. It's recommended to restart the broker
+between successive test runs.
+
+4 Examples
 --------------------------------------------------------------------------
-There are example applications that ship with the distribution in
-src/examples.   The examples are compiled by default with the "make"
-command on Unix systems.  Only one sample is included in the Visual Studio
-projects supplied, the others can be easily added by examining the settings
-of the one supplied.
 
-6 Notes for Windows users
+Example applications are located in activemq-cpp/src/examples/ and are
+built automatically.
+
+After building, examples are located in:
+  output/build/<preset-name>/bin/examples/
+
+Example executables follow the naming pattern:
+  example_<directory>_<MainFile>
+
+For instance:
+  - example_advisories_AdvisoryConsumerMain
+  - example_cmstemplate_CMSTemplateReceiverMain
+  - example_producers_SimpleProducerMain
+
+5 Using in Your Project
 --------------------------------------------------------------------------
-We do not support using the GNU compiler on Windows, using the Cygwin package
-or the MinGW platform, several issues with sockets and threading were found to
-exist when trying to use these solutions.
 
-However we do support using the MSVC compiler on Windows.
+5.1 With CMake
+--------------------------------------------------------------------------
 
-There are a couple or things that you will need to setup to ensure that
-the MSVC compile succeeds.
+After installation, use find_package in your CMakeLists.txt:
 
-* When linking your application to the DLL version of the ActiveMQ-CPP library
-  you must link your app the the same runtime version that the DLL is linked to,
-  otherwise your application will cause heap corruption when you delete objects
-  that are created in the ActiveMQ-CPP DLL's heap.
+  find_package(neoactivemq-cpp REQUIRED)
 
-* You need to download and install the Platform SDK if you don't have it
-  installed already.  On machines where you intend to use the built libraries
-  and executable you will also need to install the MS Redistributable for the
-  version of Visual Studio which you used to build the library.
+  add_executable(myapp main.cpp)
+  target_link_libraries(myapp PRIVATE neoactivemq-cpp::activemq-cpp)
 
-* Ensure that the path to you MSVC install is set in the PATH env variable.
-  You can test this by typing cl.exe at the command line, if you get an
-  error complaining that its not found, then you'll need to fix your PATH.
+5.2 Build Options
+--------------------------------------------------------------------------
 
-* The Project files reference the CPPUnit libraries for the Integration and
-  Unit tests builds. In order for these to build correctly you must
-  either configure the global settings in Visual Studio for include and library
-  folders or add new settings to each of the projects in the solution to point
-  to these locations.
+The following CMake options can be configured:
+
+  -DBUILD_TESTS=ON/OFF          Build test executables (default: ON for -test presets)
+  -DBUILD_EXAMPLES=ON/OFF       Build example applications (default: ON)
+  -DAMQCPP_SHARED_LIB=ON/OFF    Build as shared library (default: OFF, builds static)
+
+To customize a preset, pass options during configuration:
+
+  cmake --preset x86-windows-debug-test -DBUILD_EXAMPLES=OFF
+
+6 Project Structure
+--------------------------------------------------------------------------
+
+Key directories:
+  activemq-cpp/src/main/        Main library source code
+    activemq/                   ActiveMQ protocol implementation
+    cms/                        CMS (Common Messaging System) API
+    decaf/                      Foundation library (I/O, threading, etc.)
+  activemq-cpp/src/test/        Unit tests
+  activemq-cpp/src/test-integration/  Integration tests
+  activemq-cpp/src/examples/    Example applications
+  cmake/                        CMake configuration files
+  output/build/                 Build output directory (created by CMake)
+
+7 Notes for Windows Users
+--------------------------------------------------------------------------
+
+* Visual Studio 2019 or later is required for C++17 support
+* No need to manually install dependencies - vcpkg handles everything
+* The Platform SDK is included with Visual Studio 2019+
+* When linking applications:
+  - Static library (default): No special considerations
+  - Shared library: Ensure runtime library matches (MD vs MT flags)
+
+8 Notes for Linux/macOS Users
+--------------------------------------------------------------------------
+
+* GCC 7+ or Clang 5+ required for C++17 support
+* vcpkg automatically downloads and builds all dependencies
+* No need for manual apt-get or yum package installations
+* For system-wide installation, use sudo with cmake --install
+
+9 Troubleshooting
+--------------------------------------------------------------------------
+
+9.1 CMake Configuration Fails
+--------------------------------------------------------------------------
+
+If CMake can't find the compiler:
+  - Ensure Visual Studio is installed (Windows)
+  - Ensure GCC/Clang is in PATH (Linux/macOS)
+  - Try running from Visual Studio Developer Command Prompt (Windows)
+
+9.2 Build Fails
+--------------------------------------------------------------------------
+
+If build fails with missing dependencies:
+  - Delete output/build/<preset-name> and reconfigure
+  - vcpkg will re-download dependencies
+
+9.3 Preset Not Found
+--------------------------------------------------------------------------
+
+If preset is not recognized:
+  - Ensure you're in the project root directory
+  - Check CMakePresets.json exists
+  - Update CMake to version 3.15 or later
+
+10 Legacy Build System
+--------------------------------------------------------------------------
+
+The original autotools-based build system has been replaced with CMake.
+Legacy files are preserved in activemq-cpp/legacy-autotools/ for reference
+but are no longer maintained or supported.
+
+For the modern build system, always use CMake with presets as documented above.

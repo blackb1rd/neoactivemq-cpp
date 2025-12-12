@@ -1,5 +1,14 @@
 cmake_minimum_required(VERSION 3.15)
-project(neoactivemq-cpp LANGUAGES C CXX)
+
+# Read version from vcpkg.json
+file(READ "${CMAKE_SOURCE_DIR}/vcpkg.json" VCPKG_JSON)
+string(JSON PROJECT_VERSION GET "${VCPKG_JSON}" "version-string")
+
+if(NOT PROJECT_VERSION)
+    message(FATAL_ERROR "Failed to extract version from vcpkg.json")
+endif()
+
+project(neoactivemq-cpp VERSION ${PROJECT_VERSION} LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -98,16 +107,13 @@ endif()
 
 # Build component libraries in `src/main` and tests/examples under `src`
 
-# Add component subdirectories if present (paths are relative to project root)
-add_subdirectory(activemq-cpp/src/main/decaf)
-add_subdirectory(activemq-cpp/src/main/activemq)
-add_subdirectory(activemq-cpp/src/main/cms)
+# Add the main library (consolidated build from activemq-cpp/src/main)
+add_subdirectory(activemq-cpp/src/main)
 
-# Create a single unified INTERFACE library that bundles all components
+# Create a single unified INTERFACE library that bundles the main library
 # This allows users to simply: target_link_libraries(myapp PRIVATE neoactivemq-cpp::neoactivemq-cpp)
-# The component libraries (activemq_cms, activemq_core, decaf) are the actual libraries
 add_library(neoactivemq-cpp INTERFACE)
-target_link_libraries(neoactivemq-cpp INTERFACE activemq_cms activemq_core decaf)
+target_link_libraries(neoactivemq-cpp INTERFACE activemq-cpp)
 add_library(neoactivemq-cpp::neoactivemq-cpp ALIAS neoactivemq-cpp)
 
 add_subdirectory(activemq-cpp/src/examples)
@@ -241,8 +247,8 @@ endif()
 # Installation rules
 include(GNUInstallDirs)
 
-# Install libraries
-install(TARGETS neoactivemq-cpp decaf activemq_core activemq_cms
+# Install libraries (both the actual library and the interface wrapper)
+install(TARGETS activemq-cpp neoactivemq-cpp
 	EXPORT neoactivemq-cpp-targets
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -263,7 +269,7 @@ include(CMakePackageConfigHelpers)
 
 # Generate the config file that includes the exports
 configure_package_config_file(
-	${CMAKE_CURRENT_SOURCE_DIR}/neoactivemq-cpp-config.cmake
+	${CMAKE_CURRENT_SOURCE_DIR}/cmake/neoactivemq-cpp-config.cmake
 	${CMAKE_CURRENT_BINARY_DIR}/neoactivemq-cpp-config.cmake
 	INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/neoactivemq-cpp
 )
@@ -271,7 +277,7 @@ configure_package_config_file(
 # Generate the version file for the config file
 write_basic_package_version_file(
 	${CMAKE_CURRENT_BINARY_DIR}/neoactivemq-cpp-config-version.cmake
-	VERSION 1.0.0
+	VERSION ${PROJECT_VERSION}
 	COMPATIBILITY SameMajorVersion
 )
 

@@ -13,17 +13,20 @@ project(neoactivemq-cpp VERSION ${PROJECT_VERSION} LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Enable compiler caching if available (ccache or sccache)
-# Prefer sccache if both are available
-find_program(SCCACHE_PROGRAM sccache)
-find_program(CCACHE_PROGRAM ccache)
+# Enable compiler caching if available (ccache or sccache) - only when not building as a vcpkg port
+# vcpkg manages its own build caching
+if(NOT VCPKG_TOOLCHAIN)
+    # Prefer sccache if both are available
+    find_program(SCCACHE_PROGRAM sccache)
+    find_program(CCACHE_PROGRAM ccache)
 
-if(SCCACHE_PROGRAM)
-    set(CACHE_PROGRAM ${SCCACHE_PROGRAM})
-    set(CACHE_NAME "sccache")
-elseif(CCACHE_PROGRAM)
-    set(CACHE_PROGRAM ${CCACHE_PROGRAM})
-    set(CACHE_NAME "ccache")
+    if(SCCACHE_PROGRAM)
+        set(CACHE_PROGRAM ${SCCACHE_PROGRAM})
+        set(CACHE_NAME "sccache")
+    elseif(CCACHE_PROGRAM)
+        set(CACHE_PROGRAM ${CCACHE_PROGRAM})
+        set(CACHE_NAME "ccache")
+    endif()
 endif()
 
 if(CACHE_PROGRAM)

@@ -54,15 +54,15 @@ endif()
 
 # Platform-specific debug flags
 if(MSVC)
-    # Windows/MSVC: Use /Z7 for debug builds (embedded in .obj, avoids PDB locking with parallel builds)
-    # Use /Zi for release builds (separate .pdb file for production debugging)
-    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT $<$<CONFIG:Debug>:Z7>$<$<CONFIG:Release>:Zi>)
-    set(CMAKE_CXX_FLAGS_DEBUG "/Od")
-    set(CMAKE_CXX_FLAGS_RELEASE "/O2")
+    # Only set debug information format when not building as a vcpkg port
+    # vcpkg manages its own build configuration
+    if(NOT VCPKG_TOOLCHAIN)
+        # Windows/MSVC: Use /Z7 for debug builds (embedded in .obj, avoids PDB locking with parallel builds)
+        # Use /Zi for release builds (separate .pdb file for production debugging)
+        set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT $<$<CONFIG:Debug>:Z7>$<$<CONFIG:Release>:Zi>)
+    endif()
+    # Note: CMake already sets /Od for Debug and /O2 for Release by default
 else()
-    # GCC/Clang (Linux, macOS, MinGW): Use -g3 for detailed debug info, -O0 for no optimization
-    set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0")
-
     # -rdynamic is Linux-specific (exports symbols for backtraces)
 	set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-rdynamic")
 endif()

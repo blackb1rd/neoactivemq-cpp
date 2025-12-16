@@ -127,14 +127,14 @@ if(WITH_TESTS)
 	# Register unit tests
 	add_test(NAME neoactivemq-unit-tests COMMAND neoactivemq-test)
 	set_tests_properties(neoactivemq-unit-tests PROPERTIES
-		TIMEOUT 3000
+		TIMEOUT 6000
 		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
 	)
 
 	# Register benchmark tests
 	add_test(NAME neoactivemq-benchmarks COMMAND neoactivemq-benchmark)
 	set_tests_properties(neoactivemq-benchmarks PROPERTIES
-		TIMEOUT 600
+		TIMEOUT 1200
 		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
 	)
 

@@ -111,12 +111,8 @@ bool Date::operator<(const Date& value) const {
 ////////////////////////////////////////////////////////////////////////////////
 std::string Date::toString() const {
 
-    std::cout << "[DEBUG Date::toString] ========== Entry ==========" << std::endl;
-    std::cout << "[DEBUG Date::toString] this->time = " << this->time << std::endl;
-
     // Convert milliseconds to time_t
     time_t seconds = this->time / 1000;
-    std::cout << "[DEBUG Date::toString] seconds = " << seconds << std::endl;
 
     // Save the original timezone environment
     const char* originalTz = std::getenv("TZ");
@@ -126,118 +122,60 @@ std::string Date::toString() const {
         savedTz = originalTz;
     }
 
-    std::cout << "[DEBUG Date::toString] Original TZ at entry: "
-              << (originalTz ? originalTz : "NULL") << std::endl;
-    std::cout << "[DEBUG Date::toString] hadOriginalTz: " << hadOriginalTz << std::endl;
-
     // Check if TZ environment variable is set
     const char* tzEnv = std::getenv("TZ");
-    std::cout << "[DEBUG Date::toString] tzEnv: " << (tzEnv ? tzEnv : "NULL") << std::endl;
     std::string originalTzValue;  // Store the original TZ value for later use
     struct tm* timeInfo = nullptr;
 
     if (tzEnv && strlen(tzEnv) > 0) {
         originalTzValue = std::string(tzEnv);  // Store the original value
-        std::cout << "[DEBUG Date::toString] TZ is set, originalTzValue = '" << originalTzValue << "'" << std::endl;
 
         // Set the timezone environment variable to affect localtime()
 #ifdef _WIN32
-        std::cout << "[DEBUG Date::toString] Platform: Windows" << std::endl;
         // Windows timezone handling - convert IANA timezone names to Windows format
         std::string winTzFormat = convertToWindowsTimezone(tzEnv);
-        std::cout << "[DEBUG Date::toString] Converting '" << tzEnv << "' -> '" << winTzFormat << "'" << std::endl;
         _putenv_s("TZ", winTzFormat.c_str());
-        std::cout << "[DEBUG Date::toString] _putenv_s called with '" << winTzFormat << "'" << std::endl;
 #else
-        std::cout << "[DEBUG Date::toString] Platform: Unix/Linux" << std::endl;
         // POSIX systems can use IANA timezone names directly
         setenv("TZ", tzEnv, 1);
-        std::cout << "[DEBUG Date::toString] setenv called with '" << tzEnv << "'" << std::endl;
 #endif
-        std::cout << "[DEBUG Date::toString] Calling tzset()..." << std::endl;
         tzset(); // Apply timezone change
-        std::cout << "[DEBUG Date::toString] tzset() completed" << std::endl;
 
         // Convert using the new timezone
-        std::cout << "[DEBUG Date::toString] Calling localtime(&seconds)..." << std::endl;
-        std::cout << "[DEBUG Date::toString] Current TZ env = '" << (getenv("TZ") ? getenv("TZ") : "NULL") << "'" << std::endl;
         timeInfo = localtime(&seconds);
-        std::cout << "[DEBUG Date::toString] localtime returned" << std::endl;
 
-        if (timeInfo) {
-            std::cout << "[DEBUG Date::toString] tm_year=" << (timeInfo->tm_year + 1900)
-                      << " tm_mon=" << (timeInfo->tm_mon + 1)
-                      << " tm_mday=" << timeInfo->tm_mday
-                      << " tm_hour=" << timeInfo->tm_hour
-                      << " tm_min=" << timeInfo->tm_min
-                      << " tm_sec=" << timeInfo->tm_sec
-                      << " tm_isdst=" << timeInfo->tm_isdst << std::endl;
-
-            // Check what timezone offset localtime is actually using
-            std::cout << "[DEBUG Date::toString] Verifying: seconds=" << seconds
-                      << ", UTC would be " << (seconds % 86400) / 3600 << ":"
-                      << ((seconds % 86400) % 3600) / 60 << ":"
-                      << (seconds % 86400) % 60 << " of day" << std::endl;
-
-            // Calculate what the hour should be based on tm_isdst
-            // EDT is UTC-4, EST is UTC-5
-            std::cout << "[DEBUG Date::toString] tm_isdst=" << timeInfo->tm_isdst
-                      << " suggests offset of " << (timeInfo->tm_isdst > 0 ? "UTC-4 (EDT)" : "UTC-5 (EST)") << std::endl;
-        }
-
-        std::cout << "[DEBUG Date::toString] Restoring original TZ..." << std::endl;
+        // Restore original timezone
         if (hadOriginalTz) {
-            std::cout << "[DEBUG Date::toString] Restoring to: '" << savedTz << "'" << std::endl;
 #ifdef _WIN32
             _putenv_s("TZ", savedTz.c_str());
 #else
             setenv("TZ", savedTz.c_str(), 1);
 #endif
         } else {
-            std::cout << "[DEBUG Date::toString] Clearing TZ (was not originally set)" << std::endl;
 #ifdef _WIN32
             _putenv_s("TZ", "");
 #else
             unsetenv("TZ");
 #endif
         }
-        std::cout << "[DEBUG Date::toString] Calling tzset() to restore..." << std::endl;
         tzset(); // Restore timezone
-        std::cout << "[DEBUG Date::toString] tzset() restore completed" << std::endl;
 
     } else {
-        std::cout << "[DEBUG Date::toString] TZ not set, using system local time" << std::endl;
         // No timezone specified, use local time
         timeInfo = localtime(&seconds);
-        if (timeInfo) {
-            std::cout << "[DEBUG Date::toString] tm_year=" << (timeInfo->tm_year + 1900)
-                      << " tm_mon=" << (timeInfo->tm_mon + 1)
-                      << " tm_mday=" << timeInfo->tm_mday
-                      << " tm_hour=" << timeInfo->tm_hour
-                      << " tm_min=" << timeInfo->tm_min
-                      << " tm_sec=" << timeInfo->tm_sec
-                      << " tm_isdst=" << timeInfo->tm_isdst << std::endl;
-        }
     }
 
     if (!timeInfo) {
-        std::cout << "[DEBUG Date::toString] ERROR: timeInfo is NULL!" << std::endl;
         return "Invalid Date";
     }
-
-    std::cout << "[DEBUG Date::toString] Proceeding to format string..." << std::endl;
 
     // Format: dow mon dd hh:mm:ss zzz yyyy
     char buffer[100];
 #ifdef _WIN32
-    std::cout << "[DEBUG Date::toString] Platform: Windows formatting" << std::endl;
     // Windows has issues with %Z formatting for custom TZ values, so handle it manually
     if (!originalTzValue.empty()) {
-        std::cout << "[DEBUG Date::toString] Custom TZ, manually formatting with originalTzValue='"
-                  << originalTzValue << "'" << std::endl;
         char timeBuffer[80];
         strftime(timeBuffer, sizeof(timeBuffer), "%a %b %d %H:%M:%S", timeInfo);
-        std::cout << "[DEBUG Date::toString] strftime produced: '" << timeBuffer << "'" << std::endl;
 
         // Determine timezone abbreviation manually for Windows
         std::string tzAbbr = "???";
@@ -276,11 +214,9 @@ std::string Date::toString() const {
 
         if (originalTzValue == "America/New_York") {
             bool isDST = isUSDST();
-            std::cout << "[DEBUG Date::toString] America/New_York - isUSDST()=" << isDST << std::endl;
             tzAbbr = isDST ? "EDT" : "EST";
         } else if (originalTzValue == "America/Chicago") {
             bool isDST = isUSDST();
-            std::cout << "[DEBUG Date::toString] America/Chicago - isUSDST()=" << isDST << std::endl;
             tzAbbr = isDST ? "CDT" : "CST";
         } else if (originalTzValue == "America/Denver") {
             tzAbbr = isUSDST() ? "MDT" : "MST";
@@ -349,27 +285,18 @@ std::string Date::toString() const {
             tzAbbr = isAEDT ? "AEDT" : "AEST";
         }
 
-        std::cout << "[DEBUG Date::toString] Determined timezone abbreviation: '" << tzAbbr << "'" << std::endl;
         char yearBuffer[10];
         strftime(yearBuffer, sizeof(yearBuffer), "%Y", timeInfo);
-        std::cout << "[DEBUG Date::toString] Year: '" << yearBuffer << "'" << std::endl;
         snprintf(buffer, sizeof(buffer), "%s %s %s", timeBuffer, tzAbbr.c_str(), yearBuffer);
-        std::cout << "[DEBUG Date::toString] Final buffer: '" << buffer << "'" << std::endl;
     } else {
-        std::cout << "[DEBUG Date::toString] Using system timezone with strftime" << std::endl;
         // Use system timezone
         strftime(buffer, sizeof(buffer), "%a %b %d %H:%M:%S %Z %Y", timeInfo);
-        std::cout << "[DEBUG Date::toString] strftime produced: '" << buffer << "'" << std::endl;
     }
 #else
-    std::cout << "[DEBUG Date::toString] Platform: Unix/Linux formatting with strftime" << std::endl;
     strftime(buffer, sizeof(buffer), "%a %b %d %H:%M:%S %Z %Y", timeInfo);
-    std::cout << "[DEBUG Date::toString] strftime produced: '" << buffer << "'" << std::endl;
 #endif
 
     std::string result(buffer);
-    std::cout << "[DEBUG Date::toString] Returning: '" << result << "'" << std::endl;
-    std::cout << "[DEBUG Date::toString] ========== Exit ==========" << std::endl;
     return result;
 }
 

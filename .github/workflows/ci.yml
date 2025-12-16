@@ -42,7 +42,7 @@ jobs:
         max-size: 500M
 
     - name: Cache vcpkg packages
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg
@@ -114,7 +114,7 @@ jobs:
         max-size: 500M
 
     - name: Cache vcpkg packages
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg
@@ -161,7 +161,7 @@ jobs:
 
     - name: Cache vcpkg installed packages
       id: cache-vcpkg
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           .cache/vcpkg/installed
@@ -239,7 +239,7 @@ jobs:
 
     - name: Cache vcpkg installed packages
       id: cache-vcpkg
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           .cache/vcpkg/installed

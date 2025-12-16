@@ -27,8 +27,8 @@ const int XAResource::TMNOFLAGS = 0;
 const int XAResource::TMONEPHASE = 0x40000000;
 const int XAResource::TMRESUME = 0x8000000;
 const int XAResource::TMSTARTRSCAN = 0x1000000;
-const int XAResource::TMSUCCESS = 0x4000000;
-const int XAResource::TMSUSPEND = 0x2000000;
+CMS_API const int XAResource::TMSUCCESS = 0x4000000;
+CMS_API const int XAResource::TMSUSPEND = 0x2000000;
 const int XAResource::XA_RDONLY = 3;
 const int XAResource::XA_OK = 0;
 

@@ -38,7 +38,7 @@ namespace activemq {
 namespace commands {
 
     template<typename T>
-    class AMQCPP_API ActiveMQMessageTemplate: public T, public Message {
+    class ActiveMQMessageTemplate: public T, public Message {
     private:
 
         std::unique_ptr<wireformat::openwire::utils::MessagePropertyInterceptor> propertiesInterceptor;

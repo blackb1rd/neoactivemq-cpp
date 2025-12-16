@@ -52,7 +52,7 @@ namespace lang {
         /** Constant for Positive Infinity */
         static const double POSITIVE_INFINITY;
 
-        /** Constant for Negative Infinitiy */
+        /** Constant for Negative Infinity */
         static const double NEGATIVE_INFINITY;
 
     public:

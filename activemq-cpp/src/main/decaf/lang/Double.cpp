@@ -28,12 +28,12 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-const int Double::SIZE = 64;
-const double Double::MAX_VALUE = 1.7976931348623157e+308;
-const double Double::MIN_VALUE = 5e-324;
-const double Double::NaN = std::numeric_limits<double>::quiet_NaN();
-const double Double::POSITIVE_INFINITY = std::numeric_limits<double>::infinity();
-const double Double::NEGATIVE_INFINITY = -std::numeric_limits<double>::infinity();
+DECAF_API const int Double::SIZE = 64;
+DECAF_API const double Double::MAX_VALUE = 1.7976931348623157e+308;
+DECAF_API const double Double::MIN_VALUE = 5e-324;
+DECAF_API const double Double::NaN = std::numeric_limits<double>::quiet_NaN();
+DECAF_API const double Double::POSITIVE_INFINITY = std::numeric_limits<double>::infinity();
+DECAF_API const double Double::NEGATIVE_INFINITY = -std::numeric_limits<double>::infinity();
 
 const long long Double::DOUBLE_SIGN_MASK = 0x8000000000000000LL;
 const long long Double::DOUBLE_EXPONENT_MASK = 0x7FF0000000000000LL;

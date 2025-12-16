@@ -279,6 +279,18 @@ target_include_directories(neoactivemq-test PRIVATE
 # Add /bigobj flag for MSVC to handle large object files with many sections
 if(MSVC)
   target_compile_options(neoactivemq-test PRIVATE /bigobj)
+  # Allow duplicate symbols - templates instantiated in both DLL and test exe
+  target_link_options(neoactivemq-test PRIVATE /FORCE:MULTIPLE)
+endif()
+
+# Define DLL import macros when linking against shared library
+# This is required to import static const members from the DLL
+if(AMQCPP_SHARED_LIB)
+  target_compile_definitions(neoactivemq-test PRIVATE
+    DECAF_DLL
+    CMS_DLL
+    AMQCPP_DLL
+  )
 endif()
 
 target_link_libraries(neoactivemq-test PRIVATE neoactivemq-cpp CppUnit)

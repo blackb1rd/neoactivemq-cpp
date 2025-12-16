@@ -22,9 +22,9 @@
 namespace cms {
 
 ////////////////////////////////////////////////////////////////////////////////
-const int Message::DEFAULT_DELIVERY_MODE = cms::DeliveryMode::PERSISTENT;
-const int Message::DEFAULT_MSG_PRIORITY = 4;
-const long long Message::DEFAULT_TIME_TO_LIVE = 0;
+CMS_API const int Message::DEFAULT_DELIVERY_MODE = cms::DeliveryMode::PERSISTENT;
+CMS_API const int Message::DEFAULT_MSG_PRIORITY = 4;
+CMS_API const long long Message::DEFAULT_TIME_TO_LIVE = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 Message::~Message() {

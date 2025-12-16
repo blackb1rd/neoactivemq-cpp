@@ -44,7 +44,7 @@ namespace util {
      * to insert them, but we expect this usage to be rare.
      */
     template <typename E>
-    class DECAF_API List : public virtual decaf::util::Collection<E> {
+    class List : public virtual decaf::util::Collection<E> {
     public:
 
         // Un-hide any methods from Collection that the declarations in this interface hid.

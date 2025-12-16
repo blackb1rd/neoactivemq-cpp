@@ -730,6 +730,15 @@ set_target_properties(neoactivemq-cpp PROPERTIES
 if(WIN32)
   if(AMQCPP_SHARED_LIB)
     set_target_properties(neoactivemq-cpp PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+    # Define export macros for DLL build
+    target_compile_definitions(neoactivemq-cpp PRIVATE
+      DECAF_EXPORTS
+      CMS_EXPORTS
+      AMQCPP_EXPORTS
+      DECAF_DLL
+      CMS_DLL
+      AMQCPP_DLL
+    )
   endif()
   target_link_libraries(neoactivemq-cpp PRIVATE ws2_32)
   target_compile_definitions(neoactivemq-cpp PRIVATE _WIN32_WINNT=0x0601)

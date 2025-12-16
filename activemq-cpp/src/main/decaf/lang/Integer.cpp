@@ -29,9 +29,9 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-const int Integer::SIZE = 32;
-const int Integer::MAX_VALUE = (int)0x7FFFFFFF;
-const int Integer::MIN_VALUE = (int)0x80000000;
+DECAF_API const int Integer::SIZE = 32;
+DECAF_API const int Integer::MAX_VALUE = (int)0x7FFFFFFF;
+DECAF_API const int Integer::MIN_VALUE = (int)0x80000000;
 
 ////////////////////////////////////////////////////////////////////////////////
 Integer::Integer(int value) : value(value) {

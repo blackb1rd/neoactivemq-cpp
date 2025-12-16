@@ -39,3 +39,10 @@ cmake --list-presets
 - **ALWAYS** use `cmake --preset <preset-name>` for configuration
 - **ALWAYS** use `cmake --build --preset <preset-name>` for building
 - The build output is in `output/build/<preset-name>/`
+
+## Safety Rules
+
+- **DO NOT** perform `git checkout` or switch branches without explicit user confirmation
+- **DO NOT** delete large files or entire directories without explicit user confirmation
+- **DO NOT** run destructive git operations (reset, rebase, force push) without user approval
+- **ALWAYS** ask before making changes that could result in data loss

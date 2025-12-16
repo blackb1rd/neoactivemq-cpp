@@ -27,12 +27,12 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-const int Float::SIZE = 32;
-const float Float::MAX_VALUE = 3.40282346638528860e+38f;
-const float Float::MIN_VALUE = 1.40129846432481707e-45f;
-const float Float::NaN = std::numeric_limits<float>::quiet_NaN();
-const float Float::POSITIVE_INFINITY = std::numeric_limits<float>::infinity();
-const float Float::NEGATIVE_INFINITY = -std::numeric_limits<float>::infinity();
+DECAF_API const int Float::SIZE = 32;
+DECAF_API const float Float::MAX_VALUE = 3.40282346638528860e+38f;
+DECAF_API const float Float::MIN_VALUE = 1.40129846432481707e-45f;
+DECAF_API const float Float::NaN = std::numeric_limits<float>::quiet_NaN();
+DECAF_API const float Float::POSITIVE_INFINITY = std::numeric_limits<float>::infinity();
+DECAF_API const float Float::NEGATIVE_INFINITY = -std::numeric_limits<float>::infinity();
 
 const unsigned int Float::SINGLE_EXPONENT_MASK = 0x7F800000;
 const unsigned int Float::SINGLE_MANTISSA_MASK = 0x007FFFFF;

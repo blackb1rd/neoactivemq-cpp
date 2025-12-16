@@ -30,7 +30,7 @@ namespace lang {
      * comparison method.
      */
     template< typename T >
-    class DECAF_API Comparable {
+    class Comparable {
     public:
 
         virtual ~Comparable() {}

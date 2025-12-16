@@ -155,12 +155,12 @@ namespace zip {
 const int Deflater::BEST_COMPRESSION = 9;
 const int Deflater::BEST_SPEED = 1;
 const int Deflater::NO_COMPRESSION = 0;
-const int Deflater::DEFAULT_COMPRESSION = -1;
+DECAF_API const int Deflater::DEFAULT_COMPRESSION = -1;
 
-const int Deflater::DEFAULT_STRATEGY = 0;
-const int Deflater::DEFLATED = 0;
-const int Deflater::FILTERED = 1;
-const int Deflater::HUFFMAN_ONLY = 2;
+DECAF_API const int Deflater::DEFAULT_STRATEGY = 0;
+DECAF_API const int Deflater::DEFLATED = 0;
+DECAF_API const int Deflater::FILTERED = 1;
+DECAF_API const int Deflater::HUFFMAN_ONLY = 2;
 
 ////////////////////////////////////////////////////////////////////////////////
 Deflater::Deflater(int level, bool nowrap) : data(new DeflaterData()) {

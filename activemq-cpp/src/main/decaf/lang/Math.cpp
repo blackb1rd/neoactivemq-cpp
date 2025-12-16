@@ -30,8 +30,8 @@ using namespace decaf::lang;
 #include <cstdlib>
 
 ////////////////////////////////////////////////////////////////////////////////
-const double Math::E = 2.718281828459045;
-const double Math::PI = 3.141592653589793;
+DECAF_API const double Math::E = 2.718281828459045;
+DECAF_API const double Math::PI = 3.141592653589793;
 
 ////////////////////////////////////////////////////////////////////////////////
 float Math::abs( float value ) {

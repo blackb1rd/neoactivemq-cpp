@@ -27,13 +27,13 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-const TimeUnit TimeUnit::NANOSECONDS( 0, "NANOSECONDS" );
-const TimeUnit TimeUnit::MICROSECONDS( 1, "MICROSECONDS" );
-const TimeUnit TimeUnit::MILLISECONDS( 2, "MILLISECONDS" );
-const TimeUnit TimeUnit::SECONDS( 3, "SECONDS" );
-const TimeUnit TimeUnit::MINUTES( 4, "MINUTES" );
-const TimeUnit TimeUnit::HOURS( 5, "HOURS" );
-const TimeUnit TimeUnit::DAYS( 6, "DAYS" );
+DECAF_API const TimeUnit TimeUnit::NANOSECONDS( 0, "NANOSECONDS" );
+DECAF_API const TimeUnit TimeUnit::MICROSECONDS( 1, "MICROSECONDS" );
+DECAF_API const TimeUnit TimeUnit::MILLISECONDS( 2, "MILLISECONDS" );
+DECAF_API const TimeUnit TimeUnit::SECONDS( 3, "SECONDS" );
+DECAF_API const TimeUnit TimeUnit::MINUTES( 4, "MINUTES" );
+DECAF_API const TimeUnit TimeUnit::HOURS( 5, "HOURS" );
+DECAF_API const TimeUnit TimeUnit::DAYS( 6, "DAYS" );
 
 ////////////////////////////////////////////////////////////////////////////////
 const TimeUnit* const TimeUnit::values[] = {

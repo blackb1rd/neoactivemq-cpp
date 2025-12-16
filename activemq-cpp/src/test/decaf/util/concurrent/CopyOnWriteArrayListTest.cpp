@@ -962,22 +962,26 @@ void CopyOnWriteArrayListTest::testRetainAll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+// Test-specific class for CopyOnWriteArrayList testing
+// Must have external linkage to work with DLL-exported templates
+class CopyOnWriteArrayListTestTarget {
+private:
 
-    class Target {
-    private:
+    int counter;
 
-        int counter;
+public:
 
-    public:
+    CopyOnWriteArrayListTestTarget() : counter(0) {
+    }
 
-        Target() : counter(0) {
-        }
+    void increment() {
+        this->counter++;
+    }
+};
 
-        void increment() {
-            this->counter++;
-        }
-    };
+namespace copyonwritearraylisttest {
+
+    typedef CopyOnWriteArrayListTestTarget Target;
 
     class AddRemoveItemRunnable : public Runnable {
     private:
@@ -1035,10 +1039,14 @@ namespace {
         }
     };
 
-}
+}  // namespace copyonwritearraylisttest
 
 ////////////////////////////////////////////////////////////////////////////////
 void CopyOnWriteArrayListTest::testConcurrentRandomAddRemoveAndIterate() {
+
+    using copyonwritearraylisttest::Target;
+    using copyonwritearraylisttest::AddRemoveItemRunnable;
+    using copyonwritearraylisttest::IterateAndExecuteMethodRunnable;
 
     ThreadPoolExecutor executor(50, Integer::MAX_VALUE, 60LL, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>());
     CopyOnWriteArrayList<Pointer<Target> > list;

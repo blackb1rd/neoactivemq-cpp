@@ -25,9 +25,9 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-const int Short::SIZE = 16;
-const short Short::MAX_VALUE = (short)0x7FFF;
-const short Short::MIN_VALUE = (short)0x8000;
+DECAF_API const int Short::SIZE = 16;
+DECAF_API const short Short::MAX_VALUE = (short)0x7FFF;
+DECAF_API const short Short::MIN_VALUE = (short)0x8000;
 
 ////////////////////////////////////////////////////////////////////////////////
 Short::Short(short value) : value(value) {

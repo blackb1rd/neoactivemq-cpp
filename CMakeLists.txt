@@ -81,7 +81,7 @@ find_package(ZLIB REQUIRED)
 # Options
 option(AMQCPP_BUILD_EXAMPLES "Build example programs" ON)
 option(WITH_TESTS "Build all tests (unit, benchmark, integration)" OFF)
-option(AMQCPP_SHARED_LIB "Build shared library instead of static" OFF)
+option(AMQCPP_SHARED_LIB "Build shared library instead of static" ON)
 
 # Option to enable/disable SSL support. When ON, OpenSSL is required.
 option(AMQCPP_USE_SSL "Enable OpenSSL support (required when ON)" ON)

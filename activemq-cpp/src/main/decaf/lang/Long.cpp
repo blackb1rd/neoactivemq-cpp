@@ -23,9 +23,9 @@ using namespace decaf;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-const int Long::SIZE = 64;
-const long long Long::MAX_VALUE = (long long) 0x7FFFFFFFFFFFFFFFLL;
-const long long Long::MIN_VALUE = (long long) 0x8000000000000000LL;
+DECAF_API const int Long::SIZE = 64;
+DECAF_API const long long Long::MAX_VALUE = (long long) 0x7FFFFFFFFFFFFFFFLL;
+DECAF_API const long long Long::MIN_VALUE = (long long) 0x8000000000000000LL;
 
 ////////////////////////////////////////////////////////////////////////////////
 Long::Long(long long value) : value(value) {

@@ -65,7 +65,7 @@ foreach(_src IN LISTS EXAMPLE_SRCS)
 
     add_executable(${_target} ${_exe_sources})
     target_include_directories(${_target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../main)
-    target_link_libraries(${_target} PRIVATE activemq-cpp)
+    target_link_libraries(${_target} PRIVATE neoactivemq-cpp)
 
     # Set output directory for examples
     set_target_properties(${_target} PROPERTIES

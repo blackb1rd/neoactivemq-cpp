@@ -281,4 +281,4 @@ if(MSVC)
   target_compile_options(neoactivemq-test PRIVATE /bigobj)
 endif()
 
-target_link_libraries(neoactivemq-test PRIVATE activemq-cpp CppUnit)
+target_link_libraries(neoactivemq-test PRIVATE neoactivemq-cpp CppUnit)

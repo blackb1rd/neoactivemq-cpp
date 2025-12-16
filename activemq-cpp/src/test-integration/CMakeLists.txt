@@ -110,7 +110,7 @@ if(MSVC)
 endif()
 
 # Link to the consolidated library and CppUnit
-target_link_libraries(neoactivemq-integration-test PRIVATE activemq-cpp CppUnit)
+target_link_libraries(neoactivemq-integration-test PRIVATE neoactivemq-cpp CppUnit)
 
 # Note: Integration tests are NOT registered with CTest by default because they
 # require a running ActiveMQ broker. To run integration tests manually:

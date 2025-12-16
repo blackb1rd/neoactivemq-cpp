@@ -110,11 +110,8 @@ endif()
 # Add the main library (consolidated build from activemq-cpp/src/main)
 add_subdirectory(activemq-cpp/src/main)
 
-# Create a single unified INTERFACE library that bundles the main library
-# This allows users to simply: target_link_libraries(myapp PRIVATE neoactivemq-cpp::neoactivemq-cpp)
-add_library(neoactivemq-cpp INTERFACE)
-target_link_libraries(neoactivemq-cpp INTERFACE activemq-cpp)
-add_library(neoactivemq-cpp::neoactivemq-cpp ALIAS neoactivemq-cpp)
+# The main library target is now named neoactivemq-cpp (defined in activemq-cpp/src/main/CMakeLists.txt)
+# The alias neoactivemq-cpp::neoactivemq-cpp is already created there
 
 add_subdirectory(activemq-cpp/src/examples)
 
@@ -247,8 +244,8 @@ endif()
 # Installation rules
 include(GNUInstallDirs)
 
-# Install libraries (both the actual library and the interface wrapper)
-install(TARGETS activemq-cpp neoactivemq-cpp
+# Install library
+install(TARGETS neoactivemq-cpp
 	EXPORT neoactivemq-cpp-targets
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

@@ -696,15 +696,15 @@ endif()
 
 # Build the single combined library
 if(AMQCPP_SHARED_LIB)
-  add_library(activemq-cpp SHARED ${ACTIVEMQ_CPP_SOURCES})
+  add_library(neoactivemq-cpp SHARED ${ACTIVEMQ_CPP_SOURCES})
 else()
-  add_library(activemq-cpp STATIC ${ACTIVEMQ_CPP_SOURCES})
+  add_library(neoactivemq-cpp STATIC ${ACTIVEMQ_CPP_SOURCES})
 endif()
 
 # Create alias for namespaced usage
-add_library(neoactivemq-cpp::activemq-cpp ALIAS activemq-cpp)
+add_library(neoactivemq-cpp::neoactivemq-cpp ALIAS neoactivemq-cpp)
 
-target_include_directories(activemq-cpp
+target_include_directories(neoactivemq-cpp
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
@@ -712,35 +712,35 @@ target_include_directories(activemq-cpp
 
 # OpenSSL support
 if(OpenSSL_FOUND)
-  target_compile_definitions(activemq-cpp PUBLIC HAVE_OPENSSL)
-  target_link_libraries(activemq-cpp PUBLIC OpenSSL::SSL OpenSSL::Crypto)
+  target_compile_definitions(neoactivemq-cpp PUBLIC HAVE_OPENSSL)
+  target_link_libraries(neoactivemq-cpp PUBLIC OpenSSL::SSL OpenSSL::Crypto)
 endif()
 
 # Link zlib for compression support
-target_link_libraries(activemq-cpp PUBLIC ZLIB::ZLIB)
+target_link_libraries(neoactivemq-cpp PUBLIC ZLIB::ZLIB)
 
 # Link ASIO
-target_link_libraries(activemq-cpp PUBLIC asio::asio)
+target_link_libraries(neoactivemq-cpp PUBLIC asio::asio)
 
-set_target_properties(activemq-cpp PROPERTIES
+set_target_properties(neoactivemq-cpp PROPERTIES
   POSITION_INDEPENDENT_CODE ON
 )
 
 # Windows-specific settings
 if(WIN32)
   if(AMQCPP_SHARED_LIB)
-    set_target_properties(activemq-cpp PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+    set_target_properties(neoactivemq-cpp PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
   endif()
-  target_link_libraries(activemq-cpp PRIVATE ws2_32)
-  target_compile_definitions(activemq-cpp PRIVATE _WIN32_WINNT=0x0601)
+  target_link_libraries(neoactivemq-cpp PRIVATE ws2_32)
+  target_compile_definitions(neoactivemq-cpp PRIVATE _WIN32_WINNT=0x0601)
 endif()
 
 # Ensure C++ threading is available on all platforms
 find_package(Threads REQUIRED)
-target_link_libraries(activemq-cpp PRIVATE Threads::Threads)
+target_link_libraries(neoactivemq-cpp PRIVATE Threads::Threads)
 
 # Ensure POSIX threading macros are defined on non-Windows platforms for compatibility
 if(NOT WIN32)
   # Define numeric macro so headers using `#if HAVE_PTHREAD_H` work correctly
-  target_compile_definitions(activemq-cpp PUBLIC HAVE_PTHREAD_H=1)
+  target_compile_definitions(neoactivemq-cpp PUBLIC HAVE_PTHREAD_H=1)
 endif()

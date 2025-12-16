@@ -52,4 +52,4 @@ if(MSVC)
 endif()
 
 # Link to the consolidated library and CppUnit
-target_link_libraries(neoactivemq-benchmark PRIVATE activemq-cpp CppUnit)
+target_link_libraries(neoactivemq-benchmark PRIVATE neoactivemq-cpp CppUnit)

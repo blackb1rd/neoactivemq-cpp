@@ -1066,8 +1066,9 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker1ComesOnline
     Pointer<MockBrokerService> broker2(new MockBrokerService(61009));
 
     // Both brokers offline initially
+    // Use longer reconnect delay and more attempts to ensure broker has time to start
     std::string uri = "failover://(tcp://localhost:61008,"
-                                  "tcp://localhost:61009)?randomize=false&startupMaxReconnectAttempts=50&initialReconnectDelay=50&useExponentialBackOff=false";
+                                  "tcp://localhost:61009)?randomize=false&startupMaxReconnectAttempts=100&initialReconnectDelay=50&maxReconnectDelay=50&useExponentialBackOff=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1093,7 +1094,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker1ComesOnline
 
     // Poll for connection using isConnected()
     int count = 0;
-    while (!failover->isConnected() && count++ < 50) {
+    while (!failover->isConnected() && count++ < 100) {
         Thread::sleep(100);
     }
     CPPUNIT_ASSERT_MESSAGE("Failed to connect to broker1", failover->isConnected() == true);

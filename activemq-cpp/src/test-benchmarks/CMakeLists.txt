@@ -53,9 +53,10 @@ if(MSVC)
   target_link_options(neoactivemq-benchmark PRIVATE /FORCE:MULTIPLE)
 endif()
 
-# Define DLL import macros when linking against shared library
+# Define DLL import macros when linking against shared library on Windows
 # This is required to import static const members from the DLL
-if(AMQCPP_SHARED_LIB)
+# On Linux/Unix, symbol visibility is handled differently (no __declspec needed)
+if(AMQCPP_SHARED_LIB AND WIN32)
   target_compile_definitions(neoactivemq-benchmark PRIVATE
     DECAF_DLL
     CMS_DLL

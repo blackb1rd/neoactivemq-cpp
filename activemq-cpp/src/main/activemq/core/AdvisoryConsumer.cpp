@@ -68,7 +68,7 @@ AdvisoryConsumer::AdvisoryConsumer(ActiveMQConnection* connection, Pointer<comma
         Pointer<ActiveMQDestination>(AdvisorySupport::getTempDestinationCompositeAdvisoryTopic()));
     this->config->info->setPrefetchSize(1000);
     this->config->info->setNoLocal(true);
-    this->config->info->setDispatchAsync(true);
+    this->config->info->setDispatchAsync(connection->isAdvisoryConsumerDispatchAsync());
 
     this->config->hashCode = consumerId->getHashCode();
 

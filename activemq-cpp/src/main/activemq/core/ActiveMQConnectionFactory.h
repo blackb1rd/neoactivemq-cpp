@@ -293,6 +293,34 @@ namespace core {
         void setDispatchAsync(bool value);
 
         /**
+         * @return true if the connection is manageable by the broker.
+         */
+        bool isManageable() const;
+
+        /**
+         * Sets whether the connection is manageable by the broker. When true, the broker
+         * can send management commands to the connection. Default is true.
+         *
+         * @param value
+         *        true if the connection should be manageable by the broker.
+         */
+        void setManageable(bool value);
+
+        /**
+         * @return true if the advisory consumer uses async dispatch. Default is true.
+         */
+        bool isAdvisoryConsumerDispatchAsync() const;
+
+        /**
+         * Sets whether the advisory consumer should use async dispatch.
+         * Set to false to match C# client behavior.
+         *
+         * @param value
+         *        true for async dispatch (default), false for sync dispatch.
+         */
+        void setAdvisoryConsumerDispatchAsync(bool value);
+
+        /**
          * Gets if the Connection should always send things Synchronously.
          *
          * @return true if sends should always be Synchronous.

@@ -183,6 +183,7 @@ namespace core {
         bool transactedIndividualAck;
         bool nonBlockingRedelivery;
         bool alwaysSessionAsync;
+        bool manageable;
         int compressionLevel;
         unsigned int sendTimeout;
         unsigned int connectResponseTimeout;
@@ -194,6 +195,7 @@ namespace core {
         long long optimizedAckScheduledAckInterval;
         long long consumerFailoverRedeliveryWaitPeriod;
         bool consumerExpiryCheckEnabled;
+        bool advisoryConsumerDispatchAsync;
 
         std::unique_ptr<PrefetchPolicy> defaultPrefetchPolicy;
         std::unique_ptr<RedeliveryPolicy> defaultRedeliveryPolicy;
@@ -254,6 +256,7 @@ namespace core {
                              transactedIndividualAck(false),
                              nonBlockingRedelivery(false),
                              alwaysSessionAsync(true),
+                             manageable(true),
                              compressionLevel(-1),
                              sendTimeout(0),
                              connectResponseTimeout(0),
@@ -265,6 +268,7 @@ namespace core {
                              optimizedAckScheduledAckInterval(0),
                              consumerFailoverRedeliveryWaitPeriod(0),
                              consumerExpiryCheckEnabled(true),
+                             advisoryConsumerDispatchAsync(true),
                              defaultPrefetchPolicy(nullptr),
                              defaultRedeliveryPolicy(nullptr),
                              exceptionListener(NULL),
@@ -497,7 +501,7 @@ ActiveMQConnection::ActiveMQConnection(const Pointer<transport::Transport> trans
     transport->setTransportListener(this);
 
     // Set the initial state of the ConnectionInfo
-    configuration->connectionInfo->setManageable(true);
+    configuration->connectionInfo->setManageable(configuration->manageable);
     configuration->connectionInfo->setFaultTolerant(transport->isFaultTolerant());
 
     configuration->connectionAudit.setCheckForDuplicates(transport->isFaultTolerant());
@@ -1533,6 +1537,26 @@ bool ActiveMQConnection::isDispatchAsync() const {
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQConnection::setDispatchAsync(bool value) {
     this->config->dispatchAsync = value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool ActiveMQConnection::isManageable() const {
+    return this->config->manageable;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ActiveMQConnection::setManageable(bool value) {
+    this->config->manageable = value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool ActiveMQConnection::isAdvisoryConsumerDispatchAsync() const {
+    return this->config->advisoryConsumerDispatchAsync;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ActiveMQConnection::setAdvisoryConsumerDispatchAsync(bool value) {
+    this->config->advisoryConsumerDispatchAsync = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

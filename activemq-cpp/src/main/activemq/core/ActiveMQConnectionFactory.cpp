@@ -90,6 +90,7 @@ namespace core{
         bool transactedIndividualAck;
         bool nonBlockingRedelivery;
         bool alwaysSessionAsync;
+        bool manageable;
         int compressionLevel;
         unsigned int sendTimeout;
         unsigned int connectResponseTimeout;
@@ -101,6 +102,7 @@ namespace core{
         long long optimizedAckScheduledAckInterval;
         long long consumerFailoverRedeliveryWaitPeriod;
         bool consumerExpiryCheckEnabled;
+        bool advisoryConsumerDispatchAsync;
 
         cms::ExceptionListener* defaultListener;
         cms::MessageTransformer* defaultTransformer;
@@ -127,6 +129,7 @@ namespace core{
                             transactedIndividualAck(false),
                             nonBlockingRedelivery(false),
                             alwaysSessionAsync(true),
+                            manageable(true),
                             compressionLevel(-1),
                             sendTimeout(0),
                             connectResponseTimeout(0),
@@ -138,6 +141,7 @@ namespace core{
                             optimizedAckScheduledAckInterval(0),
                             consumerFailoverRedeliveryWaitPeriod(0),
                             consumerExpiryCheckEnabled(true),
+                            advisoryConsumerDispatchAsync(true),
                             defaultListener(NULL),
                             defaultTransformer(NULL),
                             defaultPrefetchPolicy(new DefaultPrefetchPolicy()),
@@ -187,6 +191,12 @@ namespace core{
             this->dispatchAsync = Boolean::parseBoolean(
                 properties->getProperty(core::ActiveMQConstants::toString(
                     core::ActiveMQConstants::CONNECTION_DISPATCHASYNC), Boolean::toString(dispatchAsync)));
+            this->manageable = Boolean::parseBoolean(
+                properties->getProperty(core::ActiveMQConstants::toString(
+                    core::ActiveMQConstants::CONNECTION_MANAGEABLE), Boolean::toString(manageable)));
+            this->advisoryConsumerDispatchAsync = Boolean::parseBoolean(
+                properties->getProperty(core::ActiveMQConstants::toString(
+                    core::ActiveMQConstants::CONNECTION_ADVISORYCONSUMERDISPATCHASYNC), Boolean::toString(advisoryConsumerDispatchAsync)));
             this->producerWindowSize = Integer::parseInt(
                 properties->getProperty(core::ActiveMQConstants::toString(
                     core::ActiveMQConstants::CONNECTION_PRODUCERWINDOWSIZE), Integer::toString(producerWindowSize)));
@@ -401,6 +411,8 @@ void ActiveMQConnectionFactory::configureConnection(ActiveMQConnection* connecti
     connection->setUsername(this->settings->username);
     connection->setPassword(this->settings->password);
     connection->setDispatchAsync(this->settings->dispatchAsync);
+    connection->setManageable(this->settings->manageable);
+    connection->setAdvisoryConsumerDispatchAsync(this->settings->advisoryConsumerDispatchAsync);
     connection->setAlwaysSyncSend(this->settings->alwaysSyncSend);
     connection->setUseAsyncSend(this->settings->useAsyncSend);
     connection->setUseCompression(this->settings->useCompression);
@@ -532,6 +544,26 @@ bool ActiveMQConnectionFactory::isDispatchAsync() const {
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQConnectionFactory::setDispatchAsync(bool value) {
     this->settings->dispatchAsync = value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool ActiveMQConnectionFactory::isManageable() const {
+    return this->settings->manageable;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ActiveMQConnectionFactory::setManageable(bool value) {
+    this->settings->manageable = value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool ActiveMQConnectionFactory::isAdvisoryConsumerDispatchAsync() const {
+    return this->settings->advisoryConsumerDispatchAsync;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ActiveMQConnectionFactory::setAdvisoryConsumerDispatchAsync(bool value) {
+    this->settings->advisoryConsumerDispatchAsync = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

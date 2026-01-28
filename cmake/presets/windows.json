@@ -114,6 +114,68 @@
         "vcpkg-x64-windows",
         "release"
       ]
+    },
+    {
+      "name": "x64-windows-debug-static",
+      "inherits": [
+        "x64",
+        "windows",
+        "vcpkg-x64-windows",
+        "debug",
+        "static"
+      ]
+    },
+    {
+      "name": "x64-windows-release-static",
+      "inherits": [
+        "x64",
+        "windows",
+        "vcpkg-x64-windows",
+        "release",
+        "static"
+      ]
+    },
+    {
+      "name": "x64-windows-debug-no-ssl",
+      "inherits": [
+        "x64",
+        "windows",
+        "vcpkg-x64-windows",
+        "debug",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "x64-windows-release-no-ssl",
+      "inherits": [
+        "x64",
+        "windows",
+        "vcpkg-x64-windows",
+        "release",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "x64-windows-debug-static-no-ssl",
+      "inherits": [
+        "x64",
+        "windows",
+        "vcpkg-x64-windows",
+        "debug",
+        "static",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "x64-windows-release-static-no-ssl",
+      "inherits": [
+        "x64",
+        "windows",
+        "vcpkg-x64-windows",
+        "release",
+        "static",
+        "no-ssl"
+      ]
     }
   ],
   "buildPresets": [
@@ -148,6 +210,30 @@
     {
       "name": "x64-windows-release-test",
       "configurePreset": "x64-windows-release-test"
+    },
+    {
+      "name": "x64-windows-debug-static",
+      "configurePreset": "x64-windows-debug-static"
+    },
+    {
+      "name": "x64-windows-release-static",
+      "configurePreset": "x64-windows-release-static"
+    },
+    {
+      "name": "x64-windows-debug-no-ssl",
+      "configurePreset": "x64-windows-debug-no-ssl"
+    },
+    {
+      "name": "x64-windows-release-no-ssl",
+      "configurePreset": "x64-windows-release-no-ssl"
+    },
+    {
+      "name": "x64-windows-debug-static-no-ssl",
+      "configurePreset": "x64-windows-debug-static-no-ssl"
+    },
+    {
+      "name": "x64-windows-release-static-no-ssl",
+      "configurePreset": "x64-windows-release-static-no-ssl"
     }
   ],
   "testPresets": [

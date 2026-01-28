@@ -78,7 +78,11 @@ Pointer<MessageDispatch> FifoMessageDispatchChannel::dequeue(long long timeout) 
             return Pointer<MessageDispatch>();
         }
 
-        return channel.pop();
+        // Use pollFirst instead of pop to avoid NoSuchElementException
+        Pointer<MessageDispatch> result;
+        if (channel.pollFirst(result)) {
+            return result;
+        }
     }
 
     return Pointer<MessageDispatch>();
@@ -90,7 +94,12 @@ Pointer<MessageDispatch> FifoMessageDispatchChannel::dequeueNoWait() {
         if (closed || !running || channel.isEmpty()) {
             return Pointer<MessageDispatch>();
         }
-        return channel.pop();
+
+        // Use pollFirst instead of pop to avoid NoSuchElementException
+        Pointer<MessageDispatch> result;
+        if (channel.pollFirst(result)) {
+            return result;
+        }
     }
 
     return Pointer<MessageDispatch>();
@@ -102,7 +111,12 @@ Pointer<MessageDispatch> FifoMessageDispatchChannel::peek() const {
         if (closed || !running || channel.isEmpty()) {
             return Pointer<MessageDispatch>();
         }
-        return channel.getFirst();
+
+        // Use peekFirst instead of getFirst to avoid NoSuchElementException
+        Pointer<MessageDispatch> result;
+        if (channel.peekFirst(result)) {
+            return result;
+        }
     }
 
     return Pointer<MessageDispatch>();

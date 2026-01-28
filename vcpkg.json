@@ -1,7 +1,7 @@
 {
   "name": "neoactivemq-cpp",
-  "version-string": "1.1.0",
-  "description": "vcpkg manifest for building activemq-cpp with recommended deps",
+  "version-string": "1.1.2",
+  "description": "C++ client library for Apache ActiveMQ messaging broker with support for OpenWire protocol",
   "dependencies": [
     "openssl",
     "asio",

@@ -3,9 +3,21 @@
   "version-string": "1.1.2",
   "description": "C++ client library for Apache ActiveMQ messaging broker with support for OpenWire protocol",
   "dependencies": [
-    "openssl",
     "asio",
-    "cppunit",
     "zlib"
-  ]
+  ],
+  "features": {
+    "ssl": {
+      "description": "Enable SSL/TLS support via OpenSSL",
+      "dependencies": [
+        "openssl"
+      ]
+    },
+    "tests": {
+      "description": "Build tests (unit, benchmark, integration)",
+      "dependencies": [
+        "cppunit"
+      ]
+    }
+  }
 }

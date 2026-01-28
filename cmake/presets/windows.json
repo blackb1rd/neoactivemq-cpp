@@ -176,6 +176,28 @@
         "static",
         "no-ssl"
       ]
+    },
+    {
+      "name": "x64-windows-debug-no-ssl-test",
+      "inherits": [
+        "x64",
+        "windows",
+        "test-no-ssl",
+        "vcpkg-x64-windows",
+        "debug",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "x64-windows-release-no-ssl-test",
+      "inherits": [
+        "x64",
+        "windows",
+        "test-no-ssl",
+        "vcpkg-x64-windows",
+        "release",
+        "no-ssl"
+      ]
     }
   ],
   "buildPresets": [
@@ -234,6 +256,14 @@
     {
       "name": "x64-windows-release-static-no-ssl",
       "configurePreset": "x64-windows-release-static-no-ssl"
+    },
+    {
+      "name": "x64-windows-debug-no-ssl-test",
+      "configurePreset": "x64-windows-debug-no-ssl-test"
+    },
+    {
+      "name": "x64-windows-release-no-ssl-test",
+      "configurePreset": "x64-windows-release-no-ssl-test"
     }
   ],
   "testPresets": [
@@ -263,6 +293,16 @@
       "name": "x64-windows-release-test",
       "inherits": "windows-test",
       "configurePreset": "x64-windows-release-test"
+    },
+    {
+      "name": "x64-windows-debug-no-ssl-test",
+      "inherits": "windows-test",
+      "configurePreset": "x64-windows-debug-no-ssl-test"
+    },
+    {
+      "name": "x64-windows-release-no-ssl-test",
+      "inherits": "windows-test",
+      "configurePreset": "x64-windows-release-no-ssl-test"
     }
   ],
   "workflowPresets": [
@@ -383,6 +423,40 @@
         {
           "type": "test",
           "name": "x64-windows-release-test"
+        }
+      ]
+    },
+    {
+      "name": "x64-windows-debug-no-ssl-test",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "x64-windows-debug-no-ssl-test"
+        },
+        {
+          "type": "build",
+          "name": "x64-windows-debug-no-ssl-test"
+        },
+        {
+          "type": "test",
+          "name": "x64-windows-debug-no-ssl-test"
+        }
+      ]
+    },
+    {
+      "name": "x64-windows-release-no-ssl-test",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "x64-windows-release-no-ssl-test"
+        },
+        {
+          "type": "build",
+          "name": "x64-windows-release-no-ssl-test"
+        },
+        {
+          "type": "test",
+          "name": "x64-windows-release-no-ssl-test"
         }
       ]
     }

@@ -36,7 +36,16 @@
       "name": "test",
       "hidden": true,
       "cacheVariables": {
-        "WITH_TESTS": true
+        "WITH_TESTS": true,
+        "VCPKG_MANIFEST_FEATURES": "tests;ssl"
+      }
+    },
+    {
+      "name": "test-no-ssl",
+      "hidden": true,
+      "cacheVariables": {
+        "WITH_TESTS": true,
+        "VCPKG_MANIFEST_FEATURES": "tests"
       }
     },
     {

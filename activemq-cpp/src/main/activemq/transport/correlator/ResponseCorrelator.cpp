@@ -62,9 +62,12 @@ namespace {
 
         ~ResponseFinalizer() {
             synchronized(mutex){
-                try {
-                    map->remove(commandId);
-                } catch (...) {}
+                // Only remove if the key still exists to avoid NoSuchElementException
+                if (map->containsKey(commandId)) {
+                    try {
+                        map->remove(commandId);
+                    } catch (...) {}
+                }
             }
         }
     };
@@ -170,7 +173,13 @@ Pointer<FutureResponse> ResponseCorrelator::asyncRequest(const Pointer<Command> 
             next->oneway(command);
         } catch (Exception &ex) {
             // We have to ensure this gets cleaned out otherwise we can consume memory over time.
-            this->impl->requestMap.remove(command->getCommandId());
+            synchronized(&this->impl->mapMutex) {
+                if (this->impl->requestMap.containsKey(command->getCommandId())) {
+                    try {
+                        this->impl->requestMap.remove(command->getCommandId());
+                    } catch (...) {}
+                }
+            }
             throw;
         }
 

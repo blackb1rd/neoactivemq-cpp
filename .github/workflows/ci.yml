@@ -20,8 +20,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { preset: x64-linux-debug-test, build_type: Debug }
-          - { preset: x64-linux-release-test, build_type: Release }
+          - { preset: x64-linux-debug-test, build_type: Debug, ssl: true }
+          - { preset: x64-linux-release-test, build_type: Release, ssl: true }
+          - { preset: x64-linux-debug-no-ssl-test, build_type: Debug, ssl: false }
+          - { preset: x64-linux-release-no-ssl-test, build_type: Release, ssl: false }
 
     steps:
     - name: Checkout code
@@ -150,10 +152,12 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { preset: x86-windows-debug-test, build_type: Debug, arch: amd64_x86 }
-          - { preset: x86-windows-release-test, build_type: Release, arch: amd64_x86 }
-          - { preset: x64-windows-debug-test, build_type: Debug, arch: amd64 }
-          - { preset: x64-windows-release-test, build_type: Release, arch: amd64 }
+          - { preset: x86-windows-debug-test, build_type: Debug, arch: amd64_x86, ssl: true }
+          - { preset: x86-windows-release-test, build_type: Release, arch: amd64_x86, ssl: true }
+          - { preset: x64-windows-debug-test, build_type: Debug, arch: amd64, ssl: true }
+          - { preset: x64-windows-release-test, build_type: Release, arch: amd64, ssl: true }
+          - { preset: x64-windows-debug-no-ssl-test, build_type: Debug, arch: amd64, ssl: false }
+          - { preset: x64-windows-release-no-ssl-test, build_type: Release, arch: amd64, ssl: false }
 
     steps:
     - name: Checkout code

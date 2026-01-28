@@ -135,6 +135,28 @@
         "static",
         "no-ssl"
       ]
+    },
+    {
+      "name": "x64-linux-debug-no-ssl-test",
+      "inherits": [
+        "x64",
+        "linux",
+        "test-no-ssl",
+        "vcpkg-x64-linux",
+        "debug",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "x64-linux-release-no-ssl-test",
+      "inherits": [
+        "x64",
+        "linux",
+        "test-no-ssl",
+        "vcpkg-x64-linux",
+        "release",
+        "no-ssl"
+      ]
     }
   ],
   "buildPresets": [
@@ -177,6 +199,14 @@
     {
       "name": "x64-linux-release-static-no-ssl",
       "configurePreset": "x64-linux-release-static-no-ssl"
+    },
+    {
+      "name": "x64-linux-debug-no-ssl-test",
+      "configurePreset": "x64-linux-debug-no-ssl-test"
+    },
+    {
+      "name": "x64-linux-release-no-ssl-test",
+      "configurePreset": "x64-linux-release-no-ssl-test"
     }
   ],
   "testPresets": [
@@ -199,6 +229,16 @@
       "name": "x64-linux-release-test",
       "inherits": "linux-test",
       "configurePreset": "x64-linux-release-test"
+    },
+    {
+      "name": "x64-linux-debug-no-ssl-test",
+      "inherits": "linux-test",
+      "configurePreset": "x64-linux-debug-no-ssl-test"
+    },
+    {
+      "name": "x64-linux-release-no-ssl-test",
+      "inherits": "linux-test",
+      "configurePreset": "x64-linux-release-no-ssl-test"
     }
   ],
   "packagePresets": [
@@ -284,6 +324,40 @@
         {
           "type": "test",
           "name": "x64-linux-release-test"
+        }
+      ]
+    },
+    {
+      "name": "x64-linux-debug-no-ssl-test",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "x64-linux-debug-no-ssl-test"
+        },
+        {
+          "type": "build",
+          "name": "x64-linux-debug-no-ssl-test"
+        },
+        {
+          "type": "test",
+          "name": "x64-linux-debug-no-ssl-test"
+        }
+      ]
+    },
+    {
+      "name": "x64-linux-release-no-ssl-test",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "x64-linux-release-no-ssl-test"
+        },
+        {
+          "type": "build",
+          "name": "x64-linux-release-no-ssl-test"
+        },
+        {
+          "type": "test",
+          "name": "x64-linux-release-no-ssl-test"
         }
       ]
     }

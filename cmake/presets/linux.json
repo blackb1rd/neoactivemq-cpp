@@ -73,6 +73,68 @@
         "vcpkg-x64-linux",
         "release"
       ]
+    },
+    {
+      "name": "x64-linux-debug-static",
+      "inherits": [
+        "x64",
+        "linux",
+        "vcpkg-x64-linux",
+        "debug",
+        "static"
+      ]
+    },
+    {
+      "name": "x64-linux-release-static",
+      "inherits": [
+        "x64",
+        "linux",
+        "vcpkg-x64-linux",
+        "release",
+        "static"
+      ]
+    },
+    {
+      "name": "x64-linux-debug-no-ssl",
+      "inherits": [
+        "x64",
+        "linux",
+        "vcpkg-x64-linux",
+        "debug",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "x64-linux-release-no-ssl",
+      "inherits": [
+        "x64",
+        "linux",
+        "vcpkg-x64-linux",
+        "release",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "x64-linux-debug-static-no-ssl",
+      "inherits": [
+        "x64",
+        "linux",
+        "vcpkg-x64-linux",
+        "debug",
+        "static",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "x64-linux-release-static-no-ssl",
+      "inherits": [
+        "x64",
+        "linux",
+        "vcpkg-x64-linux",
+        "release",
+        "static",
+        "no-ssl"
+      ]
     }
   ],
   "buildPresets": [
@@ -91,6 +153,30 @@
     {
       "name": "x64-linux-release-test",
       "configurePreset": "x64-linux-release-test"
+    },
+    {
+      "name": "x64-linux-debug-static",
+      "configurePreset": "x64-linux-debug-static"
+    },
+    {
+      "name": "x64-linux-release-static",
+      "configurePreset": "x64-linux-release-static"
+    },
+    {
+      "name": "x64-linux-debug-no-ssl",
+      "configurePreset": "x64-linux-debug-no-ssl"
+    },
+    {
+      "name": "x64-linux-release-no-ssl",
+      "configurePreset": "x64-linux-release-no-ssl"
+    },
+    {
+      "name": "x64-linux-debug-static-no-ssl",
+      "configurePreset": "x64-linux-debug-static-no-ssl"
+    },
+    {
+      "name": "x64-linux-release-static-no-ssl",
+      "configurePreset": "x64-linux-release-static-no-ssl"
     }
   ],
   "testPresets": [

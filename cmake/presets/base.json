@@ -68,6 +68,20 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
+    },
+    {
+      "name": "static",
+      "hidden": true,
+      "cacheVariables": {
+        "AMQCPP_SHARED_LIB": false
+      }
+    },
+    {
+      "name": "no-ssl",
+      "hidden": true,
+      "cacheVariables": {
+        "AMQCPP_USE_SSL": false
+      }
     }
   ]
 }

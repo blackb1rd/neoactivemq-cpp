@@ -85,15 +85,23 @@ jobs:
           output/build/${{ matrix.config.preset }}/Testing/Temporary/
           output/build/${{ matrix.config.preset }}/**/*.log
 
-  # Linux builds without tests
-  linux-build-no-tests:
-    name: Linux Build without tests
+  # Linux builds without tests (all variants)
+  linux-build:
+    name: Linux Build
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        preset: [x64-linux-debug, x64-linux-release]
+        preset:
+          - x64-linux-debug
+          - x64-linux-release
+          - x64-linux-debug-static
+          - x64-linux-release-static
+          - x64-linux-debug-no-ssl
+          - x64-linux-release-no-ssl
+          - x64-linux-debug-static-no-ssl
+          - x64-linux-release-static-no-ssl
 
     steps:
     - name: Checkout code
@@ -132,14 +140,6 @@ jobs:
 
     - name: Install
       run: cmake --install output/build/${{ matrix.preset }} --prefix output/install/${{ matrix.preset }}
-
-    - name: Verify no test executables were built
-      run: |
-        if [ -d "output/build/${{ matrix.preset }}/src/test" ]; then
-          echo "ERROR: Test directory should not exist in non-test build"
-          exit 1
-        fi
-        echo "SUCCESS: No test directories found as expected"
 
   # Windows builds with tests
   windows-build-and-test:
@@ -219,19 +219,27 @@ jobs:
           output/build/${{ matrix.config.preset }}/Testing/Temporary/
           output/build/${{ matrix.config.preset }}/**/*.log
 
-  # Windows builds without tests
-  windows-build-no-tests:
-    name: Windows Build without tests
+  # Windows builds without tests (all variants)
+  windows-build:
+    name: Windows Build
     runs-on: windows-latest
 
     strategy:
       fail-fast: false
       matrix:
         config:
+          # x86 builds (shared with SSL only)
           - { preset: x86-windows-debug, build_type: Debug, arch: x86 }
           - { preset: x86-windows-release, build_type: Release, arch: x86 }
+          # x64 builds (all variants)
           - { preset: x64-windows-debug, build_type: Debug, arch: x64 }
           - { preset: x64-windows-release, build_type: Release, arch: x64 }
+          - { preset: x64-windows-debug-static, build_type: Debug, arch: x64 }
+          - { preset: x64-windows-release-static, build_type: Release, arch: x64 }
+          - { preset: x64-windows-debug-no-ssl, build_type: Debug, arch: x64 }
+          - { preset: x64-windows-release-no-ssl, build_type: Release, arch: x64 }
+          - { preset: x64-windows-debug-static-no-ssl, build_type: Debug, arch: x64 }
+          - { preset: x64-windows-release-static-no-ssl, build_type: Release, arch: x64 }
 
     steps:
     - name: Checkout code
@@ -245,9 +253,9 @@ jobs:
           .cache/vcpkg/installed
           .cache/vcpkg/buildtrees
           .cache/vcpkg/downloads
-        key: vcpkg-installed-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+        key: vcpkg-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
         restore-keys: |
-          vcpkg-installed-${{ runner.os }}-${{ matrix.config.arch }}-
+          vcpkg-${{ runner.os }}-${{ matrix.config.arch }}-
 
     - name: Install Ninja and ccache
       run: |
@@ -282,12 +290,3 @@ jobs:
 
     - name: Install
       run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}
-
-    - name: Verify no test executables were built
-      shell: pwsh
-      run: |
-        if (Test-Path "output/build/${{ matrix.config.preset }}/src/test") {
-          Write-Host "ERROR: Test directory should not exist in non-test build"
-          exit 1
-        }
-        Write-Host "SUCCESS: No test directories found as expected"

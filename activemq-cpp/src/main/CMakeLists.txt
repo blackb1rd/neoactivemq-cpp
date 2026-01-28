@@ -183,8 +183,6 @@ set(ACTIVEMQ_CPP_SOURCES
     activemq/transport/mock/MockTransport.cpp
     activemq/transport/mock/MockTransportFactory.cpp
     activemq/transport/mock/ResponseBuilder.cpp
-    activemq/transport/tcp/SslTransport.cpp
-    activemq/transport/tcp/SslTransportFactory.cpp
     activemq/transport/tcp/TcpTransport.cpp
     activemq/transport/tcp/TcpTransportFactory.cpp
     activemq/util/ActiveMQMessageTransformation.cpp
@@ -361,18 +359,6 @@ set(ACTIVEMQ_CPP_SOURCES
     decaf/internal/net/file/FileHandler.cpp
     decaf/internal/net/http/HttpHandler.cpp
     decaf/internal/net/https/HttpsHandler.cpp
-    decaf/internal/net/ssl/DefaultSSLContext.cpp
-    decaf/internal/net/ssl/DefaultSSLServerSocketFactory.cpp
-    decaf/internal/net/ssl/DefaultSSLSocketFactory.cpp
-    decaf/internal/net/ssl/openssl/OpenSSLContextSpi.cpp
-    decaf/internal/net/ssl/openssl/OpenSSLParameters.cpp
-    decaf/internal/net/ssl/openssl/OpenSSLServerSocket.cpp
-    decaf/internal/net/ssl/openssl/OpenSSLServerSocketFactory.cpp
-    decaf/internal/net/ssl/openssl/OpenSSLSocket.cpp
-    decaf/internal/net/ssl/openssl/OpenSSLSocketException.cpp
-    decaf/internal/net/ssl/openssl/OpenSSLSocketFactory.cpp
-    decaf/internal/net/ssl/openssl/OpenSSLSocketInputStream.cpp
-    decaf/internal/net/ssl/openssl/OpenSSLSocketOutputStream.cpp
     decaf/internal/net/tcp/IoContextManager.cpp
     decaf/internal/net/tcp/TcpSocket.cpp
     decaf/internal/net/tcp/TcpSocketInputStream.cpp
@@ -514,13 +500,6 @@ set(ACTIVEMQ_CPP_SOURCES
     decaf/net/URLStreamHandlerFactory.cpp
     decaf/net/UnknownHostException.cpp
     decaf/net/UnknownServiceException.cpp
-    decaf/net/ssl/SSLContext.cpp
-    decaf/net/ssl/SSLContextSpi.cpp
-    decaf/net/ssl/SSLParameters.cpp
-    decaf/net/ssl/SSLServerSocket.cpp
-    decaf/net/ssl/SSLServerSocketFactory.cpp
-    decaf/net/ssl/SSLSocket.cpp
-    decaf/net/ssl/SSLSocketFactory.cpp
     decaf/nio/Buffer.cpp
     decaf/nio/BufferOverflowException.cpp
     decaf/nio/BufferUnderflowException.cpp
@@ -691,6 +670,36 @@ else()
     # Add Unix-specific sources
     list(APPEND ACTIVEMQ_CPP_SOURCES
         decaf/internal/security/unix/SecureRandomImpl.cpp
+    )
+endif()
+
+# SSL/TLS support - conditionally add SSL sources when OpenSSL is available
+if(OpenSSL_FOUND)
+    list(APPEND ACTIVEMQ_CPP_SOURCES
+        # activemq SSL transport
+        activemq/transport/tcp/SslTransport.cpp
+        activemq/transport/tcp/SslTransportFactory.cpp
+        # decaf SSL internal implementation (OpenSSL-specific)
+        decaf/internal/net/ssl/DefaultSSLContext.cpp
+        decaf/internal/net/ssl/DefaultSSLServerSocketFactory.cpp
+        decaf/internal/net/ssl/DefaultSSLSocketFactory.cpp
+        decaf/internal/net/ssl/openssl/OpenSSLContextSpi.cpp
+        decaf/internal/net/ssl/openssl/OpenSSLParameters.cpp
+        decaf/internal/net/ssl/openssl/OpenSSLServerSocket.cpp
+        decaf/internal/net/ssl/openssl/OpenSSLServerSocketFactory.cpp
+        decaf/internal/net/ssl/openssl/OpenSSLSocket.cpp
+        decaf/internal/net/ssl/openssl/OpenSSLSocketException.cpp
+        decaf/internal/net/ssl/openssl/OpenSSLSocketFactory.cpp
+        decaf/internal/net/ssl/openssl/OpenSSLSocketInputStream.cpp
+        decaf/internal/net/ssl/openssl/OpenSSLSocketOutputStream.cpp
+        # decaf SSL API (abstract classes)
+        decaf/net/ssl/SSLContext.cpp
+        decaf/net/ssl/SSLContextSpi.cpp
+        decaf/net/ssl/SSLParameters.cpp
+        decaf/net/ssl/SSLServerSocket.cpp
+        decaf/net/ssl/SSLServerSocketFactory.cpp
+        decaf/net/ssl/SSLSocket.cpp
+        decaf/net/ssl/SSLSocketFactory.cpp
     )
 endif()
 

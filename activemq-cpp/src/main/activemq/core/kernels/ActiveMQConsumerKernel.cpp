@@ -1213,10 +1213,25 @@ void ActiveMQConsumerKernel::beforeMessageIsConsumed(Pointer<MessageDispatch> di
         }
 
         if (this->session->isTransacted()) {
-            if (this->internal->transactedIndividualAck) {
-                immediateIndividualTransactedAck(dispatch);
+            // Check if this message was previously delivered and is now being redelivered
+            // This is important for durable consumers that reconnect
+            if (this->internal->redeliveryExpectedInCurrentTransaction(dispatch, true)) {
+                // Message is being redelivered in the current transaction
+                // Send immediate acknowledgement to broker
+                if (this->internal->transactedIndividualAck) {
+                    immediateIndividualTransactedAck(dispatch);
+                } else {
+                    // Send DeliveredAck for redelivered message
+                    Pointer<MessageAck> ack(new MessageAck(dispatch, ActiveMQConstants::ACK_TYPE_DELIVERED, 1));
+                    this->session->sendAck(ack);
+                }
             } else {
-                ackLater(dispatch, ActiveMQConstants::ACK_TYPE_DELIVERED);
+                // Normal first-time delivery in transaction
+                if (this->internal->transactedIndividualAck) {
+                    immediateIndividualTransactedAck(dispatch);
+                } else {
+                    ackLater(dispatch, ActiveMQConstants::ACK_TYPE_DELIVERED);
+                }
             }
         }
     }

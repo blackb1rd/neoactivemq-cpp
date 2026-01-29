@@ -5,13 +5,11 @@
 #
 #   docker-compose up -d
 #
-# Or using the helper script:
-#   ./start-activemq-docker.sh
-#
 # Or manually with docker run:
 #   docker run -d --rm --name activemq-test \
 #     -p 61616:61616 -p 61613:61613 -p 8161:8161 \
-#     apache/activemq-classic:5.18.7
+#     -e ACTIVEMQ_MIN_MEMORY=512 -e ACTIVEMQ_MAX_MEMORY=2048 \
+#     rmohr/activemq:5.15.9
 #
 # To stop the broker after testing:
 #   docker-compose down

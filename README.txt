@@ -136,7 +136,16 @@ The tests currently connect to:
 
 To run integration tests:
 
-1. Start an ActiveMQ broker
+1. Start an ActiveMQ broker using Docker:
+
+   docker-compose up -d
+
+   Or manually:
+     docker run -d --rm --name activemq-test \
+       -p 61616:61616 -p 61613:61613 -p 8161:8161 \
+       -e ACTIVEMQ_MIN_MEMORY=512 -e ACTIVEMQ_MAX_MEMORY=2048 \
+       rmohr/activemq:5.15.9
+
 2. Run the integration test executable:
 
    Windows:
@@ -144,6 +153,11 @@ To run integration tests:
 
    Linux/macOS:
      ./output/build/x64-linux-debug-test/bin/neoactivemq-integration-test
+
+3. Stop the broker when done:
+
+   docker-compose down
+   # OR: docker stop activemq-test
 
 Note: This takes considerable time. It's recommended to restart the broker
 between successive test runs.

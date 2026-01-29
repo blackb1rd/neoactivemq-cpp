@@ -1,26 +1,27 @@
 services:
   activemq:
-    image: apache/activemq-classic:${ACTIVEMQ_VERSION:-5.18.7}
+    image: rmohr/activemq:${ACTIVEMQ_VERSION:-5.15.9}
     container_name: activemq-test
     ports:
       - "61616:61616"  # OpenWire
       - "61613:61613"  # STOMP
       - "8161:8161"    # Web Console
     environment:
-      - ACTIVEMQ_OPTS=-Xms512m -Xmx2g
+      - ACTIVEMQ_MIN_MEMORY=512
+      - ACTIVEMQ_MAX_MEMORY=2048
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8161/admin"]
+      test: ["CMD", "curl", "-f", "http://localhost:8161/"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
     restart: unless-stopped
 
-  # Alternative: ActiveMQ Classic 6.x for compatibility testing
-  # Uncomment and use 'docker compose up activemq6' to test with 6.x
-  # activemq6:
-  #   image: apache/activemq-classic:6.2.0
-  #   container_name: activemq-test-6
+  # Alternative: Apache ActiveMQ Classic (newer versions) for compatibility testing
+  # Uncomment and use 'docker compose up activemq-apache' to test with Apache's official image
+  # activemq-apache:
+  #   image: apache/activemq-classic:5.18.7
+  #   container_name: activemq-test-apache
   #   ports:
   #     - "61616:61616"
   #     - "61613:61613"
@@ -33,3 +34,4 @@ services:
   #     timeout: 5s
   #     retries: 5
   #     start_period: 30s
+  #   restart: unless-stopped

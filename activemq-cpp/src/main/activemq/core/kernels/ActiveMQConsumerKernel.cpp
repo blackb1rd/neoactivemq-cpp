@@ -1213,25 +1213,10 @@ void ActiveMQConsumerKernel::beforeMessageIsConsumed(Pointer<MessageDispatch> di
         }
 
         if (this->session->isTransacted()) {
-            // Check if this message was previously delivered and is now being redelivered
-            // This is important for durable consumers that reconnect
-            if (this->internal->redeliveryExpectedInCurrentTransaction(dispatch, true)) {
-                // Message is being redelivered in the current transaction
-                // Send immediate acknowledgement to broker
-                if (this->internal->transactedIndividualAck) {
-                    immediateIndividualTransactedAck(dispatch);
-                } else {
-                    // Send DeliveredAck for redelivered message
-                    Pointer<MessageAck> ack(new MessageAck(dispatch, ActiveMQConstants::ACK_TYPE_DELIVERED, 1));
-                    this->session->sendAck(ack);
-                }
+            if (this->internal->transactedIndividualAck) {
+                immediateIndividualTransactedAck(dispatch);
             } else {
-                // Normal first-time delivery in transaction
-                if (this->internal->transactedIndividualAck) {
-                    immediateIndividualTransactedAck(dispatch);
-                } else {
-                    ackLater(dispatch, ActiveMQConstants::ACK_TYPE_DELIVERED);
-                }
+                ackLater(dispatch, ActiveMQConstants::ACK_TYPE_DELIVERED);
             }
         }
     }
@@ -1670,8 +1655,10 @@ void ActiveMQConsumerKernel::dispatch(const Pointer<MessageDispatch>& dispatch) 
                                 }
                             }
                         } else {
+                            // No listener or channel not running yet - queue for later processing
                             if (!this->internal->unconsumedMessages->isRunning()) {
-                                // delayed redelivery, ensure it can be re delivered
+                                // Delayed redelivery, ensure it can be re delivered
+                                // Matches C# NMS OpenWire behavior (MessageConsumer.cs:893-896)
                                 session->getConnection()->rollbackDuplicate(this, dispatch->getMessage());
                             }
                             this->internal->unconsumedMessages->enqueue(dispatch);

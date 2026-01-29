@@ -140,7 +140,7 @@ To run integration tests:
 
    docker-compose up -d
 
-   Or manually:
+   Or manually (adjust version to match .env if needed):
      docker run -d --rm --name activemq-test \
        -p 61616:61616 -p 61613:61613 -p 8161:8161 \
        -e ACTIVEMQ_MIN_MEMORY=512 -e ACTIVEMQ_MAX_MEMORY=2048 \

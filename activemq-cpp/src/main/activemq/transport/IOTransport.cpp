@@ -157,7 +157,7 @@ namespace transport {
 
         // Properties - try to access but don't fail if corrupted
         try {
-            AMQ_LOG_DEBUG("IOTransport", "logMessageDispatchDetails() accessing properties for message id=" 
+            AMQ_LOG_DEBUG("IOTransport", "logMessageDispatchDetails() accessing properties for message id="
                           << (msgId != NULL ? msgId->toString() : "NULL"));
             const PrimitiveMap& props = message->getMessageProperties();
             if (!props.isEmpty()) {
@@ -173,7 +173,7 @@ namespace transport {
                         oss << "  " << key << ": <binary or complex type>\n";
                     }
                 }
-                AMQ_LOG_DEBUG("IOTransport", "logMessageDispatchDetails() properties accessed successfully, count=" 
+                AMQ_LOG_DEBUG("IOTransport", "logMessageDispatchDetails() properties accessed successfully, count="
                               << props.size());
             } else {
                 AMQ_LOG_DEBUG("IOTransport", "logMessageDispatchDetails() message has no properties");

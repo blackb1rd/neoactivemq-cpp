@@ -31,12 +31,12 @@ if(NOT VERSION_FROM_GIT)
 
     # Check if vcpkg.json has placeholder version (0.0.0 means "use git tag")
     if(PROJECT_VERSION STREQUAL "0.0.0")
-        message(FATAL_ERROR
-            "No git tag found and vcpkg.json has placeholder version 0.0.0.\n"
-            "Please create a git tag (e.g., 'git tag v1.2.0') or set a real version in vcpkg.json.")
+        # Use development version when no git tag and placeholder in vcpkg.json
+        set(PROJECT_VERSION "0.0.0")
+        message(STATUS "Version: ${PROJECT_VERSION} (development build - no git tag found)")
+    else()
+        message(STATUS "Version from vcpkg.json: ${PROJECT_VERSION}")
     endif()
-
-    message(STATUS "Version from vcpkg.json: ${PROJECT_VERSION}")
 endif()
 
 if(NOT PROJECT_VERSION)

@@ -68,7 +68,7 @@ jobs:
         sleep 10
 
     - name: Run tests
-      run: ctest --preset ${{ matrix.config.preset }} --output-on-failure --verbose
+      run: ctest --preset ${{ matrix.config.preset }} --output-on-failure -V
       continue-on-error: false
 
     - name: Install
@@ -208,7 +208,7 @@ jobs:
 
     - name: Run unit tests and benchmarks (no Docker on Windows CI)
       run: |
-        ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -E "integration" --output-on-failure --verbose
+        ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -E "integration" --output-on-failure -V
       continue-on-error: false
 
     - name: Install

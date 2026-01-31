@@ -109,6 +109,54 @@
             "console": "integratedTerminal"
         },
         {
+            "name": "Debug ActiveMQSessionTest",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
+            "args": [
+                "-test",
+                "activemq::core::ActiveMQSessionTest",
+                "-timeout",
+                "30"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug ActiveMQSessionTest::testAutoAcking",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
+            "args": [
+                "-test",
+                "activemq::core::ActiveMQSessionTest::testAutoAcking",
+                "-timeout",
+                "30"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug All Core Tests",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
+            "args": [
+                "-test",
+                "activemq::core",
+                "-timeout",
+                "60"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Debug Corrupted Message Tests",
             "type": "cppvsdbg",
             "request": "launch",

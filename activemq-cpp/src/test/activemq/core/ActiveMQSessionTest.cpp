@@ -705,13 +705,21 @@ void ActiveMQSessionTest::setUp() {
         // Get a pointer to the Mock Transport for Message injection.
         dTransport = dynamic_cast<transport::mock::MockTransport*>(
             connection->getTransport().narrow(typeid(transport::mock::MockTransport)));
+        
         CPPUNIT_ASSERT(dTransport != NULL);
 
         connection->setExceptionListener(&exListener);
         connection->start();
+    } catch (cms::CMSException& ex) {
+        std::cerr << "CMSException in setUp(): " << ex.getMessage() << std::endl;
+        std::cerr << "Stack trace: " << ex.getStackTraceString() << std::endl;
+        CPPUNIT_FAIL("setUp() threw CMSException");
+    } catch (std::exception& ex) {
+        std::cerr << "std::exception in setUp(): " << ex.what() << std::endl;
+        CPPUNIT_FAIL("setUp() threw std::exception");
     } catch (...) {
-        bool exceptionThrown = false;
-        CPPUNIT_ASSERT(exceptionThrown);
+        std::cerr << "Unknown exception in setUp()" << std::endl;
+        CPPUNIT_FAIL("setUp() threw unknown exception");
     }
 }
 

@@ -18,6 +18,7 @@
 #include "TcpSocket.h"
 #include "IoContextManager.h"
 
+#include <activemq/util/AMQLog.h>
 #include <decaf/internal/net/SocketFileDescriptor.h>
 #include <decaf/internal/net/tcp/TcpSocketInputStream.h>
 #include <decaf/internal/net/tcp/TcpSocketOutputStream.h>
@@ -612,7 +613,10 @@ void TcpSocket::close() {
 
     try {
 
+        AMQ_LOG_DEBUG("TcpSocket", "close() called");
+
         if (this->impl->closed.compareAndSet(false, true)) {
+            AMQ_LOG_DEBUG("TcpSocket", "close() performing actual close");
             bool wasConnected = this->impl->connected;
             this->impl->connected = false;
 
@@ -946,6 +950,7 @@ int TcpSocket::read(unsigned char* buffer, int size, int offset, int length) {
         std::size_t bytesRead = 0;
 
         if (this->impl->soTimeout > 0) {
+            AMQ_LOG_DEBUG("TcpSocket", "read() async with timeout=" << this->impl->soTimeout << " length=" << length);
             // Async read with timeout
             // Use shared_ptr for synchronization state to prevent use-after-free if lambda executes after timeout
             struct ReadState {
@@ -961,6 +966,7 @@ int TcpSocket::read(unsigned char* buffer, int size, int offset, int length) {
             this->impl->socket->async_read_some(
                 asio::buffer(buffer + offset, length),
                 [state](const asio::error_code& error, std::size_t bytes) {
+                    AMQ_LOG_DEBUG("TcpSocket", "async_read_some callback: error=" << error.message() << " bytes=" << bytes);
                     {
                         std::lock_guard<std::mutex> lock(state->mutex);
                         state->error = error;
@@ -975,6 +981,7 @@ int TcpSocket::read(unsigned char* buffer, int size, int offset, int length) {
             std::unique_lock<std::mutex> lock(state->mutex);
             if (!state->cv.wait_for(lock, std::chrono::milliseconds(this->impl->soTimeout),
                                    [&state]{ return state->complete; })) {
+                AMQ_LOG_DEBUG("TcpSocket", "read() TIMEOUT after " << this->impl->soTimeout << "ms, cancelling");
                 // Timeout - cancel operation but don't wait for completion
                 // The lambda will still execute but state will be kept alive by shared_ptr
                 this->impl->socket->cancel();
@@ -999,13 +1006,23 @@ int TcpSocket::read(unsigned char* buffer, int size, int offset, int length) {
                 throw SocketTimeoutException(__FILE__, __LINE__, "Read timed out");
             }
         } else {
-            // Blocking read
+            AMQ_LOG_DEBUG("TcpSocket", "read() blocking length=" << length);
+            // Blocking read - read_some() blocks until SOME data is available (not necessarily all requested)
+            // This matches the behavior of APR's apr_socket_recv() in the original Apache ActiveMQ-CPP
             bytesRead = this->impl->socket->read_some(
                 asio::buffer(buffer + offset, length), ec);
+            AMQ_LOG_DEBUG("TcpSocket", "read() blocking complete bytes=" << bytesRead
+                          << " error=" << ec.message() << " requested=" << length);
+
+            // Warn if we got 0 bytes without EOF - this shouldn't normally happen with blocking reads
+            if (bytesRead == 0 && !ec) {
+                AMQ_LOG_DEBUG("TcpSocket", "WARNING: read_some returned 0 bytes with no error");
+            }
         }
 
         // Check for EOF - only if we got the eof error code
         if (ec == asio::error::eof) {
+            AMQ_LOG_DEBUG("TcpSocket", "read() detected EOF, bytesRead=" << bytesRead);
             if (!isClosed()) {
                 this->impl->inputShutdown = true;
                 return -1;
@@ -1017,6 +1034,8 @@ int TcpSocket::read(unsigned char* buffer, int size, int offset, int length) {
         }
 
         if (ec && ec != asio::error::eof) {
+            AMQ_LOG_ERROR("TcpSocket", "read() error: " << ec.message()
+                          << " (code=" << ec.value() << ", category=" << ec.category().name() << ")");
             throw IOException(__FILE__, __LINE__,
                 "Socket Read Error - %s", ec.message().c_str());
         }
@@ -1065,6 +1084,8 @@ void TcpSocket::write(const unsigned char* buffer, int size, int offset, int len
 
         asio::error_code ec;
 
+        AMQ_LOG_DEBUG("TcpSocket", "write() length=" << length);
+
         // Write all data
         std::size_t totalWritten = 0;
         while (totalWritten < static_cast<std::size_t>(length) && !isClosed()) {
@@ -1072,6 +1093,8 @@ void TcpSocket::write(const unsigned char* buffer, int size, int offset, int len
                 asio::buffer(buffer + offset + totalWritten, length - totalWritten), ec);
 
             if (ec || isClosed()) {
+                AMQ_LOG_ERROR("TcpSocket", "write() FAILED totalWritten=" << totalWritten
+                              << " error=" << ec.message() << " closed=" << isClosed());
                 throw IOException(__FILE__, __LINE__,
                     "TcpSocketOutputStream::write - %s",
                     ec ? ec.message().c_str() : "Socket closed");
@@ -1079,6 +1102,8 @@ void TcpSocket::write(const unsigned char* buffer, int size, int offset, int len
 
             totalWritten += written;
         }
+
+        AMQ_LOG_DEBUG("TcpSocket", "write() complete totalWritten=" << totalWritten);
     }
     DECAF_CATCH_RETHROW(IOException)
     DECAF_CATCH_RETHROW(NullPointerException)

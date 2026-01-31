@@ -1,14 +1,60 @@
 cmake_minimum_required(VERSION 3.15)
 
-# Read version from vcpkg.json
-file(READ "${CMAKE_SOURCE_DIR}/vcpkg.json" VCPKG_JSON)
-string(JSON PROJECT_VERSION GET "${VCPKG_JSON}" "version-string")
+# Try to get version from git tag first, fall back to vcpkg.json
+# This allows the build to use git tags (e.g., v1.2.0) when available
+find_package(Git QUIET)
+set(VERSION_FROM_GIT FALSE)
+
+if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+    # Try to get version from git describe (looks for tags like v1.2.3 or 1.2.3)
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe --tags --match "v[0-9]*" --abbrev=0
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_TAG
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+        RESULT_VARIABLE GIT_RESULT
+    )
+
+    if(GIT_RESULT EQUAL 0 AND GIT_TAG)
+        # Remove 'v' prefix if present (v1.2.3 -> 1.2.3)
+        string(REGEX REPLACE "^v" "" PROJECT_VERSION "${GIT_TAG}")
+        set(VERSION_FROM_GIT TRUE)
+        message(STATUS "Version from git tag: ${PROJECT_VERSION}")
+    endif()
+endif()
+
+if(NOT VERSION_FROM_GIT)
+    # Fall back to vcpkg.json
+    file(READ "${CMAKE_SOURCE_DIR}/vcpkg.json" VCPKG_JSON)
+    string(JSON PROJECT_VERSION GET "${VCPKG_JSON}" "version-string")
+
+    # Check if vcpkg.json has placeholder version (0.0.0 means "use git tag")
+    if(PROJECT_VERSION STREQUAL "0.0.0")
+        message(FATAL_ERROR
+            "No git tag found and vcpkg.json has placeholder version 0.0.0.\n"
+            "Please create a git tag (e.g., 'git tag v1.2.0') or set a real version in vcpkg.json.")
+    endif()
+
+    message(STATUS "Version from vcpkg.json: ${PROJECT_VERSION}")
+endif()
 
 if(NOT PROJECT_VERSION)
-    message(FATAL_ERROR "Failed to extract version from vcpkg.json")
+    message(FATAL_ERROR "Failed to determine project version from git tag or vcpkg.json")
 endif()
 
 project(neoactivemq-cpp VERSION ${PROJECT_VERSION} LANGUAGES C CXX)
+
+# Configure version header - extract version components for the header
+if(NOT DEFINED PROJECT_VERSION_PATCH)
+    set(PROJECT_VERSION_PATCH 0)
+endif()
+
+configure_file(
+    ${CMAKE_SOURCE_DIR}/activemq-cpp/src/main/activemq/util/Version.h.in
+    ${CMAKE_BINARY_DIR}/generated/activemq/util/Version.h
+    @ONLY
+)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -263,6 +309,13 @@ install(DIRECTORY
 	${CMAKE_SOURCE_DIR}/activemq-cpp/src/main/decaf
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 	FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
+)
+
+# Install generated headers (Version.h)
+install(DIRECTORY
+	${CMAKE_BINARY_DIR}/generated/activemq
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+	FILES_MATCHING PATTERN "*.h"
 )
 
 # Install CMake config files for find_package() support

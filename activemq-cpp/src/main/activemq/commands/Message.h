@@ -104,6 +104,9 @@ namespace commands{
         // Command's marshaledProperties vector.
         activemq::util::PrimitiveMap properties;
 
+        // Indicates if properties have been lazily unmarshaled from marshalledProperties
+        mutable bool propertiesUnmarshaled;
+
         // Indicates if the Message Properties are Read Only
         bool readOnlyProperties;
 
@@ -120,6 +123,13 @@ namespace commands{
 
         Message(const Message&);
         Message& operator= (const Message&);
+
+        /**
+         * Lazily unmarshal properties from marshalledProperties byte array.
+         * Called automatically when getProperties() is accessed.
+         * @throws IOException if unmarshaling fails (corrupted properties)
+         */
+        void ensurePropertiesUnmarshaled() const;
 
     public:
 
@@ -231,12 +241,18 @@ namespace commands{
          * Gets a reference to the Message's Properties object, allows the derived
          * classes to get and set their own specific properties.
          *
+         * Lazy unmarshals properties from marshalledProperties on first access (C# behavior).
+         * May throw IOException if properties are corrupted.
+         *
          * @return a reference to the Primitive Map that holds message properties.
+         * @throws IOException if property unmarshaling fails (corrupted data)
          */
         util::PrimitiveMap& getMessageProperties() {
+            ensurePropertiesUnmarshaled();
             return this->properties;
         }
         const util::PrimitiveMap& getMessageProperties() const {
+            ensurePropertiesUnmarshaled();
             return this->properties;
         }
 

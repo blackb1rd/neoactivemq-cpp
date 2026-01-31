@@ -22,6 +22,7 @@
 #include <activemq/state/CommandVisitor.h>
 #include <activemq/wireformat/openwire/marshal/BaseDataStreamMarshaller.h>
 #include <activemq/wireformat/openwire/marshal/PrimitiveTypesMarshaller.h>
+#include <activemq/util/AMQLog.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
 
@@ -46,9 +47,9 @@ using namespace decaf::lang::exceptions;
 Message::Message() :
     BaseCommand(), producerId(NULL), destination(NULL), transactionId(NULL), originalDestination(NULL), messageId(NULL), originalTransactionId(NULL), 
       groupID(""), groupSequence(0), correlationId(""), persistent(false), expiration(0), priority(0), replyTo(NULL), timestamp(0), 
-      type(""), content(), marshalledProperties(), dataStructure(NULL), targetConsumerId(NULL), compressed(false), redeliveryCounter(0), 
-      brokerPath(), arrival(0), userID(""), recievedByDFBridge(false), droppable(false), cluster(), brokerInTime(0), brokerOutTime(0), 
-      jMSXGroupFirstForConsumer(false), ackHandler(NULL), properties(), readOnlyProperties(false), readOnlyBody(false), connection(NULL) {
+      type(""), content(), marshalledProperties(), dataStructure(NULL), targetConsumerId(NULL), compressed(false), redeliveryCounter(0),
+      brokerPath(), arrival(0), userID(""), recievedByDFBridge(false), droppable(false), cluster(), brokerInTime(0), brokerOutTime(0),
+      jMSXGroupFirstForConsumer(false), ackHandler(NULL), properties(), propertiesUnmarshaled(false), readOnlyProperties(false), readOnlyBody(false), connection(NULL) {
 
 }
 
@@ -116,6 +117,7 @@ void Message::copyDataStructure(const DataStructure* src) {
     this->setBrokerOutTime(srcPtr->getBrokerOutTime());
     this->setJMSXGroupFirstForConsumer(srcPtr->isJMSXGroupFirstForConsumer());
     this->properties.copy(srcPtr->properties);
+    this->propertiesUnmarshaled = srcPtr->propertiesUnmarshaled;
     this->setAckHandler(srcPtr->getAckHandler());
     this->setReadOnlyBody(srcPtr->isReadOnlyBody());
     this->setReadOnlyProperties(srcPtr->isReadOnlyProperties());
@@ -887,11 +889,35 @@ void Message::beforeMarshal(wireformat::WireFormat* wireFormat AMQCPP_UNUSED) {
 ////////////////////////////////////////////////////////////////////////////////
 void Message::afterUnmarshal(wireformat::WireFormat* wireFormat AMQCPP_UNUSED) {
 
-    try {
-        wireformat::openwire::marshal::PrimitiveTypesMarshaller::unmarshal(
-            &properties, marshalledProperties);
+    // Skip eager property unmarshaling - properties will be lazily unmarshaled
+    // when first accessed via getMessageProperties() (matches C# client behavior)
+    // This allows detection of property corruption during consumer processing
+    // rather than during wire unmarshaling, enabling redelivery mechanism
+    propertiesUnmarshaled = false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Message::ensurePropertiesUnmarshaled() const {
+
+    if (propertiesUnmarshaled) {
+        return;  // Already unmarshaled
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
+
+    try {
+        // Unmarshal properties from byte array (lazy unmarshaling - C# behavior)
+        // If this fails (corrupted properties), exception propagates to consumer code
+        // Consumer will catch it, rollback transaction, and trigger redelivery
+        wireformat::openwire::marshal::PrimitiveTypesMarshaller::unmarshal(
+            const_cast<activemq::util::PrimitiveMap*>(&properties),
+            const_cast<std::vector<unsigned char>&>(marshalledProperties));
+        propertiesUnmarshaled = true;
+    } catch (decaf::io::IOException& e) {
+        AMQ_LOG_ERROR("Message", "ensurePropertiesUnmarshaled(): Failed to unmarshal properties (corrupted) for message id="
+                      << (messageId != NULL ? messageId->toString() : "NULL")
+                      << ", marshalledProperties.size=" << marshalledProperties.size()
+                      << ", exception=" << e.getMessage());
+        throw;
+    }
     AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception, decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }

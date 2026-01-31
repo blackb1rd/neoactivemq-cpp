@@ -714,6 +714,36 @@ namespace core {
          */
         void setConsumerExpiryCheckEnabled(bool consumerExpiryCheckEnabled);
 
+        /**
+         * @return true if automatic reconnection is enabled for non-failover URIs.
+         */
+        bool isAutoReconnect() const;
+
+        /**
+         * Configures whether automatic reconnection should be enabled for non-failover URIs.
+         * When enabled, a non-failover URI (e.g., tcp://host:61616) will automatically be
+         * wrapped with failover transport to enable automatic reconnection on connection loss.
+         *
+         * @param autoReconnect
+         *      True to enable automatic reconnection (default true).
+         */
+        void setAutoReconnect(bool autoReconnect);
+
+        /**
+         * @return the maximum number of reconnection attempts (default 20).
+         */
+        int getMaxReconnectAttempts() const;
+
+        /**
+         * Sets the maximum number of reconnection attempts before giving up.
+         * This applies to both autoReconnect and failover transport.
+         * Set to -1 for unlimited attempts (not recommended for production).
+         *
+         * @param maxReconnectAttempts
+         *      Maximum reconnection attempts (default 20).
+         */
+        void setMaxReconnectAttempts(int maxReconnectAttempts);
+
     public:
 
         /**

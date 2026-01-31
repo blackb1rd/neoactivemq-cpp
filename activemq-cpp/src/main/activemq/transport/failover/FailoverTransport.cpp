@@ -18,6 +18,7 @@
 #include "FailoverTransport.h"
 
 #include <atomic>
+#include <activemq/util/AMQLog.h>
 #include <activemq/commands/ConnectionControl.h>
 #include <activemq/commands/ShutdownInfo.h>
 #include <activemq/commands/RemoveInfo.h>
@@ -126,14 +127,14 @@ namespace failover {
             closed(false),
             connected(false),
             started(false),
-            timeout(INFINITE_WAIT),
+            timeout(30000),  // 30 second timeout instead of infinite to avoid hanging
             initialReconnectDelay(DEFAULT_INITIAL_RECONNECT_DELAY),
             maxReconnectDelay(1000*30),
             backOffMultiplier(2),
             useExponentialBackOff(true),
             initialized(false),
-            maxReconnectAttempts(INFINITE_WAIT),
-            startupMaxReconnectAttempts(INFINITE_WAIT),
+            maxReconnectAttempts(20),
+            startupMaxReconnectAttempts(20),
             connectFailures(0),
             reconnectDelay(DEFAULT_INITIAL_RECONNECT_DELAY),
             trackMessages(false),
@@ -528,6 +529,7 @@ void FailoverTransport::oneway(const Pointer<Command> command) {
                     } catch (IOException& e) {
 
                         e.setMark(__FILE__, __LINE__);
+                        AMQ_LOG_DEBUG("FailoverTransport", "oneway() send failed for cmdId=" << command->getCommandId() << ": " << e.getMessage());
 
                         // If the command was not tracked.. we will retry in this method
                         if (tracked == NULL && this->impl->canReconnect()) {
@@ -594,6 +596,7 @@ void FailoverTransport::start() {
                 return;
             }
 
+            AMQ_LOG_INFO("FailoverTransport", "Starting failover transport");
             this->impl->started = true;
 
             if (this->impl->backupsEnabled || this->impl->priorityBackup) {
@@ -645,6 +648,7 @@ void FailoverTransport::close() {
                 return;
             }
 
+            AMQ_LOG_INFO("FailoverTransport", "Closing failover transport");
             this->impl->started = false;
             this->impl->closed = true;
             this->impl->connected.store(false, std::memory_order_release);
@@ -706,6 +710,8 @@ void FailoverTransport::restoreTransport(const Pointer<Transport> transport, boo
 
     try {
 
+        AMQ_LOG_DEBUG("FailoverTransport", "Restoring transport state, alreadyStarted=" << alreadyStarted);
+
         // Only start the transport if it hasn't been started already.
         // Backup transports are pre-started, so we skip the start() call for them.
         if (!alreadyStarted) {
@@ -718,6 +724,7 @@ void FailoverTransport::restoreTransport(const Pointer<Transport> transport, boo
         transport->oneway(cc);
 
         stateTracker.restore(transport);
+        AMQ_LOG_DEBUG("FailoverTransport", "Transport state restored successfully");
 
         decaf::util::StlMap<int, Pointer<Command> > commands;
         synchronized(&this->impl->requestMap) {
@@ -742,6 +749,8 @@ void FailoverTransport::handleTransportFailure(const decaf::lang::Exception& err
         // let the close do the work
         return;
     }
+
+    AMQ_LOG_ERROR("FailoverTransport", "Transport failure detected: " << error.getMessage());
 
     synchronized(&this->impl->reconnectMutex) {
 
@@ -922,6 +931,7 @@ bool FailoverTransport::iterate() {
             Pointer<URIPool> connectList = this->impl->getConnectList();
 
             if (connectList->isEmpty() && !impl->backups->isEnabled()) {
+                AMQ_LOG_ERROR("FailoverTransport", "No URIs available for reconnect");
                 failure.reset(new IOException(__FILE__, __LINE__, "No URIs available for reconnect."));
             } else {
 
@@ -1037,6 +1047,7 @@ bool FailoverTransport::iterate() {
                         this->impl->connectedTransport = transport;
                         this->impl->reconnectMutex.notifyAll();
                         this->impl->connectFailures = 0;
+                        AMQ_LOG_INFO("FailoverTransport", "Successfully connected to " << uri.toString());
 
                         if (isPriorityBackup()) {
                             this->impl->connectedToPrioirty = connectList->getPriorityURI().equals(uri) ||
@@ -1078,6 +1089,7 @@ bool FailoverTransport::iterate() {
 
                     } catch (Exception& e) {
                         e.setMark(__FILE__, __LINE__);
+                        AMQ_LOG_DEBUG("FailoverTransport", "Connection attempt to " << uri.toString() << " failed: " << e.getMessage());
                         if (transport != NULL) {
                             if (this->impl->disposedListener != NULL) {
                                 transport->setTransportListener(this->impl->disposedListener.get());
@@ -1114,6 +1126,8 @@ bool FailoverTransport::iterate() {
         int reconnectAttempts = this->impl->calculateReconnectAttemptLimit();
 
         if (reconnectAttempts >= 0 && ++this->impl->connectFailures >= reconnectAttempts) {
+            AMQ_LOG_ERROR("FailoverTransport", "Max reconnect attempts (" << reconnectAttempts
+                << ") reached, failures=" << this->impl->connectFailures);
             this->impl->connectionFailure = failure;
 
             // If this was a first connection failure and we've exhausted startupMaxReconnectAttempts,

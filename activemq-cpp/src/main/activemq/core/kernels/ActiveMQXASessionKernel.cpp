@@ -19,6 +19,7 @@
 
 #include <cms/TransactionInProgressException.h>
 #include <activemq/core/ActiveMQTransactionContext.h>
+#include <activemq/util/AMQLog.h>
 
 using namespace activemq;
 using namespace activemq::core;
@@ -31,15 +32,19 @@ ActiveMQXASessionKernel::ActiveMQXASessionKernel(ActiveMQConnection* connection,
                                                  const Pointer<commands::SessionId>& sessionId,
                                                  const decaf::util::Properties& properties ) :
     ActiveMQSessionKernel(connection, sessionId, cms::Session::AUTO_ACKNOWLEDGE, properties) {
+    AMQ_LOG_DEBUG("ActiveMQXASessionKernel", "XA session created: sessionId=" << sessionId->toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQXASessionKernel::~ActiveMQXASessionKernel() {
+    AMQ_LOG_DEBUG("ActiveMQXASessionKernel", "XA session destructor called");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool ActiveMQXASessionKernel::isTransacted() const {
-    return this->transaction->isInXATransaction();
+    bool inTransaction = this->transaction->isInXATransaction();
+    AMQ_LOG_DEBUG("ActiveMQXASessionKernel", "isTransacted(): " << (inTransaction ? "true" : "false"));
+    return inTransaction;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,11 +61,13 @@ void ActiveMQXASessionKernel::doStartTransaction() {
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQXASessionKernel::commit() {
+    AMQ_LOG_ERROR("ActiveMQXASessionKernel", "commit(): Cannot commit inside an XASession");
     throw cms::TransactionInProgressException("Cannot commit inside an XASession");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQXASessionKernel::rollback() {
+    AMQ_LOG_ERROR("ActiveMQXASessionKernel", "rollback(): Cannot rollback inside an XASession");
     throw cms::TransactionInProgressException("Cannot rollback inside an XASession");
 }
 

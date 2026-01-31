@@ -24,6 +24,7 @@
 #include <activemq/util/CMSExceptionSupport.h>
 #include <activemq/util/ActiveMQProperties.h>
 #include <activemq/util/ActiveMQMessageTransformation.h>
+#include <activemq/util/AMQLog.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/InvalidStateException.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
@@ -86,10 +87,15 @@ ActiveMQProducerKernel::ActiveMQProducerKernel(ActiveMQSessionKernel* session,
     if (session->getConnection()->getProtocolVersion() >= 3 && session->getConnection()->getProducerWindowSize() > 0) {
         this->memoryUsage.reset(new MemoryUsage(session->getConnection()->getProducerWindowSize()));
     }
+
+    AMQ_LOG_DEBUG("ActiveMQProducerKernel", "Producer created: producerId=" << producerId->toString()
+                  << ", destination=" << (destination != NULL ? destination->getPhysicalName() : "NULL"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQProducerKernel::~ActiveMQProducerKernel() {
+    AMQ_LOG_DEBUG("ActiveMQProducerKernel", "Producer destructor called: producerId="
+                  << (producerInfo != NULL ? producerInfo->getProducerId()->toString() : "NULL"));
     try {
         close();
     }
@@ -102,6 +108,8 @@ void ActiveMQProducerKernel::close() {
     try {
 
         if (!this->isClosed()) {
+            AMQ_LOG_INFO("ActiveMQProducerKernel", "Closing producer: producerId="
+                         << producerInfo->getProducerId()->toString());
 
             dispose();
 
@@ -264,9 +272,16 @@ void ActiveMQProducerKernel::send(const cms::Destination* destination, cms::Mess
             try {
                 this->memoryUsage->waitForSpace();
             } catch (InterruptedException& e) {
+                AMQ_LOG_ERROR("ActiveMQProducerKernel", "send(): Thread interrupted while waiting for memory space");
                 throw cms::CMSException("Send aborted due to thread interrupt.");
             }
         }
+
+        AMQ_LOG_DEBUG("ActiveMQProducerKernel", "send(): Sending message to destination="
+                      << dest->getPhysicalName()
+                      << ", deliveryMode=" << deliveryMode
+                      << ", priority=" << priority
+                      << ", timeToLive=" << timeToLive);
 
         this->session->send(this, dest, outbound, deliveryMode, priority, timeToLive,
                             this->memoryUsage.get(), this->sendTimeout, onComplete);
@@ -278,6 +293,8 @@ void ActiveMQProducerKernel::send(const cms::Destination* destination, cms::Mess
 void ActiveMQProducerKernel::onProducerAck(const commands::ProducerAck& ack) {
 
     try{
+        AMQ_LOG_DEBUG("ActiveMQProducerKernel", "onProducerAck(): Received ack, size="
+                      << ack.getSize() << ", producerId=" << ack.getProducerId()->toString());
 
         if (this->memoryUsage.get() != NULL) {
             this->memoryUsage->decreaseUsage(ack.getSize());

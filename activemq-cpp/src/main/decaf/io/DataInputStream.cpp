@@ -17,6 +17,7 @@
 
 #include <decaf/io/DataInputStream.h>
 
+#include <activemq/util/AMQLog.h>
 #include <decaf/io/PushbackInputStream.h>
 #include <cstring>
 
@@ -165,6 +166,8 @@ float DataInputStream::readFloat() {
 long long DataInputStream::readLong() {
 
     try {
+        AMQ_LOG_DEBUG("DataInputStream", "readLong() called");
+
         unsigned long long value = 0;
         readAllData(buffer, sizeof(long long));
 
@@ -483,16 +486,20 @@ void DataInputStream::readAllData(unsigned char* buffer, int length) {
             try {
                 int count = inputStream->read(buffer, length, n, length - n);
                 if (count == -1) {
+                    // Log EOF condition with context
+                    AMQ_LOG_DEBUG("DataInputStream", "EOF reading " << length << " bytes (read " << n << " so far)");
                     throw EOFException(__FILE__, __LINE__, "DataInputStream::readLong - Reached EOF");
                 }
                 n += count;
             } catch (EOFException&) {
                 throw;
-            } catch (IOException&) {
+            } catch (IOException& ex) {
+                AMQ_LOG_ERROR("DataInputStream", "IOException: " << ex.getMessage());
                 throw;
             } catch (...) {
                 // Catch Windows structured exceptions that occur when socket is closed
                 // Convert to proper IOException for clean error handling
+                AMQ_LOG_ERROR("DataInputStream", "Unknown exception during read");
                 throw IOException(__FILE__, __LINE__, "DataInputStream::readAllData - Socket closed during read");
             }
         } while (n < length);

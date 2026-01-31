@@ -103,6 +103,8 @@ namespace core{
         long long consumerFailoverRedeliveryWaitPeriod;
         bool consumerExpiryCheckEnabled;
         bool advisoryConsumerDispatchAsync;
+        bool autoReconnect;
+        int maxReconnectAttempts;
 
         cms::ExceptionListener* defaultListener;
         cms::MessageTransformer* defaultTransformer;
@@ -142,6 +144,8 @@ namespace core{
                             consumerFailoverRedeliveryWaitPeriod(0),
                             consumerExpiryCheckEnabled(true),
                             advisoryConsumerDispatchAsync(true),
+                            autoReconnect(true),
+                            maxReconnectAttempts(20),
                             defaultListener(NULL),
                             defaultTransformer(NULL),
                             defaultPrefetchPolicy(new DefaultPrefetchPolicy()),
@@ -239,6 +243,10 @@ namespace core{
                 properties->getProperty("connection.alwaysSessionAsync", Boolean::toString(alwaysSessionAsync)));
             this->consumerExpiryCheckEnabled = Boolean::parseBoolean(
                 properties->getProperty("connection.consumerExpiryCheckEnabled", Boolean::toString(consumerExpiryCheckEnabled)));
+            this->autoReconnect = Boolean::parseBoolean(
+                properties->getProperty("connection.autoReconnect", Boolean::toString(autoReconnect)));
+            this->maxReconnectAttempts = Integer::parseInt(
+                properties->getProperty("connection.maxReconnectAttempts", Integer::toString(maxReconnectAttempts)));
 
             this->defaultPrefetchPolicy->configure(*properties);
             this->defaultRedeliveryPolicy->configure(*properties);
@@ -346,8 +354,19 @@ cms::Connection* ActiveMQConnectionFactory::doCreateConnection(const decaf::net:
                 this->settings->clientId = clientId;
             }
 
+            // Determine the actual URI to use for transport creation
+            URI actualUri = uri;
+
+            // If autoReconnect is enabled and not already using failover, wrap with failover
+            if (this->settings->autoReconnect && uri.getScheme() != "failover") {
+                std::string failoverUri = "failover:(" + uri.toString() + ")?maxReconnectAttempts=" +
+                    Integer::toString(this->settings->maxReconnectAttempts) +
+                    "&startupMaxReconnectAttempts=" + Integer::toString(this->settings->maxReconnectAttempts);
+                actualUri = URI(failoverUri);
+            }
+
             // Use the TransportBuilder to get our Transport
-            transport = TransportRegistry::getInstance().findFactory(uri.getScheme())->create(uri);
+            transport = TransportRegistry::getInstance().findFactory(actualUri.getScheme())->create(actualUri);
 
             if (transport == NULL) {
                 throw ActiveMQException(__FILE__, __LINE__, "ActiveMQConnectionFactory::createConnection - "
@@ -809,4 +828,28 @@ bool ActiveMQConnectionFactory::isConsumerExpiryCheckEnabled() {
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQConnectionFactory::setConsumerExpiryCheckEnabled(bool consumerExpiryCheckEnabled) {
     this->settings->consumerExpiryCheckEnabled = consumerExpiryCheckEnabled;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool ActiveMQConnectionFactory::isAutoReconnect() const {
+    return this->settings->autoReconnect;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ActiveMQConnectionFactory::setAutoReconnect(bool autoReconnect) {
+    this->settings->autoReconnect = autoReconnect;
+    this->settings->properties->setProperty("connection.autoReconnect",
+        decaf::lang::Boolean::toString(autoReconnect));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+int ActiveMQConnectionFactory::getMaxReconnectAttempts() const {
+    return this->settings->maxReconnectAttempts;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ActiveMQConnectionFactory::setMaxReconnectAttempts(int maxReconnectAttempts) {
+    this->settings->maxReconnectAttempts = maxReconnectAttempts;
+    this->settings->properties->setProperty("connection.maxReconnectAttempts",
+        decaf::lang::Integer::toString(maxReconnectAttempts));
 }

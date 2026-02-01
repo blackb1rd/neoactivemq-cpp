@@ -117,19 +117,15 @@ void Message::copyDataStructure(const DataStructure* src) {
     this->setBrokerOutTime(srcPtr->getBrokerOutTime());
     this->setJMSXGroupFirstForConsumer(srcPtr->isJMSXGroupFirstForConsumer());
 
-    // Handle property copying for lazy unmarshaling:
-    // - marshalledProperties already copied via setMarshalledProperties() above
-    // - Copy properties map only if source has them in memory
-    // - Preserve lazy unmarshaling for messages that haven't accessed properties yet
-    if (srcPtr->propertiesUnmarshaled || !srcPtr->properties.isEmpty()) {
-        // Source has properties in memory - copy them
-        this->properties.copy(srcPtr->properties);
-        this->propertiesUnmarshaled = true;
-    } else {
-        // Source hasn't unmarshaled yet - destination will lazily unmarshal
-        // from marshalledProperties when first accessed
-        this->propertiesUnmarshaled = false;
-    }
+    // Always unmarshal properties before copying to ensure cloned messages
+    // have properties in memory. This is critical because:
+    // 1. Cloned messages (e.g., for DLQ) will be marshaled before sending
+    // 2. beforeMarshal() clears marshalledProperties and re-marshals from properties map
+    // 3. If properties map is empty, marshalledProperties stays empty
+    // 4. Later unmarshal will fail to restore properties -> "Key does not exist in map"
+    srcPtr->ensurePropertiesUnmarshaled();
+    this->properties.copy(srcPtr->properties);
+    this->propertiesUnmarshaled = true;
     this->setAckHandler(srcPtr->getAckHandler());
     this->setReadOnlyBody(srcPtr->isReadOnlyBody());
     this->setReadOnlyProperties(srcPtr->isReadOnlyProperties());

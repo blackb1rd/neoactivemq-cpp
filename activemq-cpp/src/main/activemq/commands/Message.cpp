@@ -117,18 +117,11 @@ void Message::copyDataStructure(const DataStructure* src) {
     this->setBrokerOutTime(srcPtr->getBrokerOutTime());
     this->setJMSXGroupFirstForConsumer(srcPtr->isJMSXGroupFirstForConsumer());
 
-    // Copy marshalled properties and unmarshaled state
-    // Do NOT call ensurePropertiesUnmarshaled() here as it would unmarshal
-    // during every clone operation, causing significant performance overhead
-    // Properties will be lazily unmarshaled when first accessed
-    this->marshalledProperties = srcPtr->marshalledProperties;
+    // Ensure source properties are unmarshaled before copying
+    // This prevents cloned messages from having empty property maps
+    srcPtr->ensurePropertiesUnmarshaled();
+    this->properties.copy(srcPtr->properties);
     this->propertiesUnmarshaled = srcPtr->propertiesUnmarshaled;
-
-    // Only copy the properties map if source has already unmarshaled them
-    // If properties haven't been unmarshaled yet, we just copy the marshalled bytes above
-    if (srcPtr->propertiesUnmarshaled) {
-        this->properties.copy(srcPtr->properties);
-    }
     this->setAckHandler(srcPtr->getAckHandler());
     this->setReadOnlyBody(srcPtr->isReadOnlyBody());
     this->setReadOnlyProperties(srcPtr->isReadOnlyProperties());

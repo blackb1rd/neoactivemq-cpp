@@ -45,8 +45,8 @@ using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 Message::Message() :
-    BaseCommand(), producerId(NULL), destination(NULL), transactionId(NULL), originalDestination(NULL), messageId(NULL), originalTransactionId(NULL), 
-      groupID(""), groupSequence(0), correlationId(""), persistent(false), expiration(0), priority(0), replyTo(NULL), timestamp(0), 
+    BaseCommand(), producerId(NULL), destination(NULL), transactionId(NULL), originalDestination(NULL), messageId(NULL), originalTransactionId(NULL),
+      groupID(""), groupSequence(0), correlationId(""), persistent(false), expiration(0), priority(0), replyTo(NULL), timestamp(0),
       type(""), content(), marshalledProperties(), dataStructure(NULL), targetConsumerId(NULL), compressed(false), redeliveryCounter(0),
       brokerPath(), arrival(0), userID(""), recievedByDFBridge(false), droppable(false), cluster(), brokerInTime(0), brokerOutTime(0),
       jMSXGroupFirstForConsumer(false), ackHandler(NULL), properties(), propertiesUnmarshaled(false), readOnlyProperties(false), readOnlyBody(false), connection(NULL) {
@@ -116,12 +116,19 @@ void Message::copyDataStructure(const DataStructure* src) {
     this->setBrokerInTime(srcPtr->getBrokerInTime());
     this->setBrokerOutTime(srcPtr->getBrokerOutTime());
     this->setJMSXGroupFirstForConsumer(srcPtr->isJMSXGroupFirstForConsumer());
-    
-    // Ensure source properties are unmarshaled before copying
-    // This prevents cloned messages from having empty property maps
-    srcPtr->ensurePropertiesUnmarshaled();
-    this->properties.copy(srcPtr->properties);
+
+    // Copy marshalled properties and unmarshaled state
+    // Do NOT call ensurePropertiesUnmarshaled() here as it would unmarshal
+    // during every clone operation, causing significant performance overhead
+    // Properties will be lazily unmarshaled when first accessed
+    this->marshalledProperties = srcPtr->marshalledProperties;
     this->propertiesUnmarshaled = srcPtr->propertiesUnmarshaled;
+
+    // Only copy the properties map if source has already unmarshaled them
+    // If properties haven't been unmarshaled yet, we just copy the marshalled bytes above
+    if (srcPtr->propertiesUnmarshaled) {
+        this->properties.copy(srcPtr->properties);
+    }
     this->setAckHandler(srcPtr->getAckHandler());
     this->setReadOnlyBody(srcPtr->isReadOnlyBody());
     this->setReadOnlyProperties(srcPtr->isReadOnlyProperties());
@@ -905,6 +912,13 @@ void Message::ensurePropertiesUnmarshaled() const {
 
     if (propertiesUnmarshaled) {
         return;  // Already unmarshaled
+    }
+
+    // Skip unmarshaling if there are no marshalled properties
+    // This avoids unnecessary processing for messages without properties
+    if (marshalledProperties.empty()) {
+        propertiesUnmarshaled = true;
+        return;
     }
 
     try {

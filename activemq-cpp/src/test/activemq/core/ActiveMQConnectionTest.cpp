@@ -229,7 +229,7 @@ void ActiveMQConnectionTest::testExceptionInOnException() {
         MyExceptionListener exListener;
         std::unique_ptr<ActiveMQConnectionFactory> factory(
             new ActiveMQConnectionFactory("mock://mock"));
-        
+
         std::unique_ptr<cms::Connection> connection(factory->createConnection());
 
         connection->setExceptionListener(&exListener);

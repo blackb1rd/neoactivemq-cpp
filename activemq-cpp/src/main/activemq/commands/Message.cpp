@@ -116,6 +116,10 @@ void Message::copyDataStructure(const DataStructure* src) {
     this->setBrokerInTime(srcPtr->getBrokerInTime());
     this->setBrokerOutTime(srcPtr->getBrokerOutTime());
     this->setJMSXGroupFirstForConsumer(srcPtr->isJMSXGroupFirstForConsumer());
+    
+    // Ensure source properties are unmarshaled before copying
+    // This prevents cloned messages from having empty property maps
+    srcPtr->ensurePropertiesUnmarshaled();
     this->properties.copy(srcPtr->properties);
     this->propertiesUnmarshaled = srcPtr->propertiesUnmarshaled;
     this->setAckHandler(srcPtr->getAckHandler());

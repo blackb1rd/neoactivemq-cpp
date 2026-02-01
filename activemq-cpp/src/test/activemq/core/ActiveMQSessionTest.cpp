@@ -705,7 +705,7 @@ void ActiveMQSessionTest::setUp() {
         // Get a pointer to the Mock Transport for Message injection.
         dTransport = dynamic_cast<transport::mock::MockTransport*>(
             connection->getTransport().narrow(typeid(transport::mock::MockTransport)));
-        
+
         CPPUNIT_ASSERT(dTransport != NULL);
 
         connection->setExceptionListener(&exListener);

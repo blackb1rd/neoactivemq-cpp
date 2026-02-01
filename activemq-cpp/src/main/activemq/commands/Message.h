@@ -128,14 +128,20 @@ namespace commands{
         Message(const Message&);
         Message& operator= (const Message&);
 
+    public:
+
         /**
          * Lazily unmarshal properties from marshalledProperties byte array.
-         * Called automatically when getProperties() is accessed.
+         * This must be called before accessing properties on received messages
+         * to ensure properties are available. If the properties are corrupted,
+         * this method throws an IOException which allows consumer code to
+         * handle the error (e.g., trigger redelivery).
+         *
+         * Thread-safe: uses double-checked locking pattern.
+         *
          * @throws IOException if unmarshaling fails (corrupted properties)
          */
         void ensurePropertiesUnmarshaled() const;
-
-    public:
 
         Message();
 
@@ -245,24 +251,18 @@ namespace commands{
          * Gets a reference to the Message's Properties object, allows the derived
          * classes to get and set their own specific properties.
          *
-         * Lazy unmarshals properties on first access if there are marshalled properties.
-         * If properties are corrupted, throws IOException when accessed.
+         * NOTE: This method does NOT trigger lazy unmarshaling. For consumer-facing
+         * code that needs to access properties from received messages, call
+         * ensurePropertiesUnmarshaled() first to trigger lazy unmarshaling.
+         * This separation prevents deadlocks when getMessageProperties() is called
+         * from internal code paths while holding other locks.
          *
          * @return a reference to the Primitive Map that holds message properties.
-         * @throws IOException if property unmarshaling fails (corrupted data)
          */
         util::PrimitiveMap& getMessageProperties() {
-            // Only unmarshal if we have marshalled bytes and haven't unmarshaled yet
-            if (!propertiesUnmarshaled && !marshalledProperties.empty()) {
-                ensurePropertiesUnmarshaled();
-            }
             return this->properties;
         }
         const util::PrimitiveMap& getMessageProperties() const {
-            // Only unmarshal if we have marshalled bytes and haven't unmarshaled yet
-            if (!propertiesUnmarshaled && !marshalledProperties.empty()) {
-                ensurePropertiesUnmarshaled();
-            }
             return this->properties;
         }
 

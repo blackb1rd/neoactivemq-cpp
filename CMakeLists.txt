@@ -6,21 +6,37 @@ find_package(Git QUIET)
 set(VERSION_FROM_GIT FALSE)
 
 if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
-    # Try to get version from git describe (looks for tags like v1.2.3 or 1.2.3)
+    # Check if working directory is dirty (has uncommitted changes)
     execute_process(
-        COMMAND ${GIT_EXECUTABLE} describe --tags --match "v[0-9]*" --abbrev=0
+        COMMAND ${GIT_EXECUTABLE} status --porcelain
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE GIT_TAG
+        OUTPUT_VARIABLE GIT_STATUS
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET
-        RESULT_VARIABLE GIT_RESULT
     )
 
-    if(GIT_RESULT EQUAL 0 AND GIT_TAG)
-        # Remove 'v' prefix if present (v1.2.3 -> 1.2.3)
-        string(REGEX REPLACE "^v" "" PROJECT_VERSION "${GIT_TAG}")
+    if(GIT_STATUS)
+        # Working directory is dirty - use development version
+        set(PROJECT_VERSION "0.0.0")
         set(VERSION_FROM_GIT TRUE)
-        message(STATUS "Version from git tag: ${PROJECT_VERSION}")
+        message(STATUS "Version: ${PROJECT_VERSION} (dirty working directory - uncommitted changes)")
+    else()
+        # Try to get version from git describe (looks for tags like v1.2.3 or 1.2.3)
+        execute_process(
+            COMMAND ${GIT_EXECUTABLE} describe --tags --match "v[0-9]*" --abbrev=0
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            OUTPUT_VARIABLE GIT_TAG
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+            RESULT_VARIABLE GIT_RESULT
+        )
+
+        if(GIT_RESULT EQUAL 0 AND GIT_TAG)
+            # Remove 'v' prefix if present (v1.2.3 -> 1.2.3)
+            string(REGEX REPLACE "^v" "" PROJECT_VERSION "${GIT_TAG}")
+            set(VERSION_FROM_GIT TRUE)
+            message(STATUS "Version from git tag: ${PROJECT_VERSION}")
+        endif()
     endif()
 endif()
 

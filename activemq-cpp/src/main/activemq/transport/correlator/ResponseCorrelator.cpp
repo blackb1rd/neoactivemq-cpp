@@ -233,18 +233,10 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command) {
         // Wait to be notified of the response via the futureResponse object.
         Pointer<commands::Response> response;
 
-        // Send the request - must check for prior error again right before sending
-        // to handle race where transport fails between map insertion and send
-        synchronized(&this->impl->mapMutex) {
-            if (this->impl->priorError != NULL) {
-                AMQ_LOG_ERROR("ResponseCorrelator", "PRIOR ERROR before send cmdId=" << command->getCommandId()
-                    << " error=" << this->impl->priorError->getMessage());
-                throw IOException(__FILE__, __LINE__, this->impl->priorError->getMessage().c_str());
-            }
-            AMQ_LOG_DEBUG("ResponseCorrelator", "sending cmdId=" << command->getCommandId());
-            next->oneway(command);
-            AMQ_LOG_DEBUG("ResponseCorrelator", "sent cmdId=" << command->getCommandId());
-        }
+        // Send the request.
+        AMQ_LOG_DEBUG("ResponseCorrelator", "sending cmdId=" << command->getCommandId());
+        next->oneway(command);
+        AMQ_LOG_DEBUG("ResponseCorrelator", "sent cmdId=" << command->getCommandId());
 
         // Get the response.
         response = futureResponse->getResponse();
@@ -293,14 +285,8 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command, un
         // Wait to be notified of the response via the futureResponse object.
         Pointer<commands::Response> response;
 
-        // Send the request - must check for prior error again right before sending
-        // to handle race where transport fails between map insertion and send
-        synchronized(&this->impl->mapMutex) {
-            if (this->impl->priorError != NULL) {
-                throw IOException(__FILE__, __LINE__, this->impl->priorError->getMessage().c_str());
-            }
-            next->oneway(command);
-        }
+        // Send the request.
+        next->oneway(command);
 
         // Get the response.
         response = futureResponse->getResponse(timeout);

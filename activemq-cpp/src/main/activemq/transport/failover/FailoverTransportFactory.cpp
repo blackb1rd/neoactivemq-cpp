@@ -86,9 +86,9 @@ Pointer<Transport> FailoverTransportFactory::doCreateComposite(const decaf::net:
         transport->setUseExponentialBackOff(
             Boolean::parseBoolean(topLvlProperties.getProperty("useExponentialBackOff", "true")));
         transport->setMaxReconnectAttempts(
-            Integer::parseInt(topLvlProperties.getProperty("maxReconnectAttempts", "5")));
+            Integer::parseInt(topLvlProperties.getProperty("maxReconnectAttempts", "20")));
         transport->setStartupMaxReconnectAttempts(
-            Integer::parseInt(topLvlProperties.getProperty("startupMaxReconnectAttempts", "5")));
+            Integer::parseInt(topLvlProperties.getProperty("startupMaxReconnectAttempts", "20")));
         transport->setRandomize(
             Boolean::parseBoolean(topLvlProperties.getProperty("randomize", "true")));
         transport->setBackup(

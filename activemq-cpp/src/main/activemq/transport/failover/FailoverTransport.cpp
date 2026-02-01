@@ -38,7 +38,9 @@
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/Integer.h>
+#include <decaf/lang/Long.h>
 #include <decaf/lang/exceptions/IllegalThreadStateException.h>
+#include <activemq/util/URISupport.h>
 
 using namespace std;
 using namespace activemq;
@@ -48,6 +50,7 @@ using namespace activemq::exceptions;
 using namespace activemq::threads;
 using namespace activemq::transport;
 using namespace activemq::transport::failover;
+using namespace activemq::util;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::net;
@@ -1199,7 +1202,7 @@ bool FailoverTransport::iterate() {
         int reconnectAttempts = this->impl->calculateReconnectAttemptLimit();
 
         // Check if ALL URIs have exceeded their per-URI max reconnect attempts
-        // maxReconnectAttempts is now per-host, not global - only fail when ALL hosts are exhausted
+        // maxReconnectAttempts is per-host, not global - only fail when ALL hosts are exhausted
         Pointer<URIPool> checkList = this->impl->getConnectList();
         bool allExhausted = reconnectAttempts >= 0 &&
                            this->impl->allUrisExhausted(checkList->getURIList(), reconnectAttempts);
@@ -1269,7 +1272,20 @@ Pointer<Transport> FailoverTransport::createTransport(const URI& location) const
             throw new IOException(__FILE__, __LINE__, "Invalid URI specified, no valid Factory Found.");
         }
 
-        Pointer<Transport> transport(factory->createComposite(location));
+        // Apply failover timeout as soConnectTimeout if not already specified in the URI
+        URI transportUri = location;
+        if (this->impl->timeout > 0) {
+            Properties params = URISupport::parseParameters(location);
+            if (!params.hasProperty("soConnectTimeout")) {
+                Properties newParams;
+                newParams.setProperty("soConnectTimeout", Long::toString(this->impl->timeout));
+                transportUri = URISupport::applyParameters(location, newParams);
+                AMQ_LOG_DEBUG("FailoverTransport", "Applied connection timeout " << this->impl->timeout
+                    << "ms to " << transportUri.toString());
+            }
+        }
+
+        Pointer<Transport> transport(factory->createComposite(transportUri));
 
         return transport;
     }

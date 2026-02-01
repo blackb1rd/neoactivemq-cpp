@@ -123,6 +123,7 @@ namespace tcp {
 
 ////////////////////////////////////////////////////////////////////////////////
 TcpSocket::TcpSocket() : impl(new TcpSocketImpl) {
+    AMQ_LOG_DEBUG("TcpSocket", "TcpSocket() constructor completed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -159,24 +160,29 @@ TcpSocket::~TcpSocket() {
 void TcpSocket::create() {
 
     try {
+        AMQ_LOG_DEBUG("TcpSocket", "create() called");
 
         if (this->impl->socket != nullptr) {
             throw IOException(__FILE__, __LINE__, "The System level socket has already been created.");
         }
 
         // Create the Asio TCP socket
+        AMQ_LOG_DEBUG("TcpSocket", "create() creating ASIO socket");
         this->impl->socket = std::make_unique<asio::ip::tcp::socket>(this->impl->ioContext);
 
         // Open the socket so that socket options can be set before connect/bind
+        AMQ_LOG_DEBUG("TcpSocket", "create() opening socket for IPv4");
         asio::error_code ec;
         this->impl->socket->open(asio::ip::tcp::v4(), ec);
         if (ec) {
+            AMQ_LOG_ERROR("TcpSocket", "create() failed to open socket: " << ec.message());
             throw IOException(__FILE__, __LINE__, "Failed to open socket: %s", ec.message().c_str());
         }
 
         // Initialize the Socket's FileDescriptor with the native handle
         auto nativeHandle = this->impl->socket->native_handle();
         this->fd = new SocketFileDescriptor(static_cast<long>(nativeHandle));
+        AMQ_LOG_DEBUG("TcpSocket", "create() completed, handle=" << nativeHandle);
     }
     DECAF_CATCH_RETHROW(decaf::io::IOException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, decaf::io::IOException)
@@ -386,29 +392,38 @@ void TcpSocket::bind(const std::string& ipaddress, int port) {
 void TcpSocket::connect(const std::string& hostname, int port, int timeout) {
 
     try {
+        AMQ_LOG_DEBUG("TcpSocket", "connect() hostname=" << hostname << " port=" << port << " timeout=" << timeout);
 
         if (port < 0 || port > 65535) {
             throw IllegalArgumentException(__FILE__, __LINE__, "Given port is out of range: %d", port);
         }
 
         if (this->impl->socket == nullptr) {
+            AMQ_LOG_ERROR("TcpSocket", "connect() socket is nullptr");
             throw IOException(__FILE__, __LINE__, "The socket was not yet created.");
         }
+
+        AMQ_LOG_DEBUG("TcpSocket", "connect() socket exists, is_open=" << this->impl->socket->is_open());
 
         asio::error_code ec;
 
         // Resolve the hostname
+        AMQ_LOG_DEBUG("TcpSocket", "connect() resolving hostname...");
         asio::ip::tcp::resolver resolver(this->impl->ioContext);
         auto endpoints = resolver.resolve(hostname, std::to_string(port), ec);
 
         if (ec) {
+            AMQ_LOG_ERROR("TcpSocket", "connect() resolve failed: " << ec.message());
             throw SocketException(__FILE__, __LINE__,
                 "Failed to resolve hostname: %s", ec.message().c_str());
         }
 
+        AMQ_LOG_DEBUG("TcpSocket", "connect() resolved, endpoint count=" << std::distance(endpoints.begin(), endpoints.end()));
+
         bool connectSucceeded = false;
 
         if (timeout > 0) {
+            AMQ_LOG_DEBUG("TcpSocket", "connect() using async connect with timeout=" << timeout);
             // Async connect with timeout
             // Use shared_ptr for state to prevent use-after-free
             struct ConnectState {
@@ -420,8 +435,11 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout) {
             };
             auto state = std::make_shared<ConnectState>();
 
+            AMQ_LOG_DEBUG("TcpSocket", "connect() calling async_connect...");
             asio::async_connect(*this->impl->socket, endpoints,
-                [state](const asio::error_code& error, const asio::ip::tcp::endpoint&) {
+                [state](const asio::error_code& error, const asio::ip::tcp::endpoint& ep) {
+                    AMQ_LOG_DEBUG("TcpSocket", "async_connect callback: error=" << error.message()
+                                  << " endpoint=" << ep.address().to_string() << ":" << ep.port());
                     {
                         std::lock_guard<std::mutex> lock(state->mutex);
                         state->error = error;
@@ -430,6 +448,7 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout) {
                     state->cv.notify_one();
                 }
             );
+            AMQ_LOG_DEBUG("TcpSocket", "connect() async_connect initiated, waiting...");
 
             // Wait with timeout, checking for close() periodically
             std::unique_lock<std::mutex> lock(state->mutex);
@@ -455,12 +474,15 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout) {
             }
 
             if (state->error) {
+                AMQ_LOG_DEBUG("TcpSocket", "connect() async connect failed: " << state->error.message());
                 throw SocketException(__FILE__, __LINE__,
                     "Connect failed: %s", state->error.message().c_str());
             }
 
+            AMQ_LOG_DEBUG("TcpSocket", "connect() async connect succeeded!");
             connectSucceeded = true;
         } else {
+            AMQ_LOG_DEBUG("TcpSocket", "connect() using blocking async connect (no timeout)");
             // Blocking connect (but still check for close() periodically)
             // Use shared_ptr for state to prevent use-after-free
             struct ConnectState {
@@ -507,13 +529,18 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout) {
         }
 
         if (connectSucceeded) {
+            AMQ_LOG_DEBUG("TcpSocket", "connect() storing endpoints and marking connected");
             this->impl->remoteEndpoint = this->impl->socket->remote_endpoint();
             this->impl->localEndpoint = this->impl->socket->local_endpoint();
             this->port = port;
             this->impl->connected = true;
+            AMQ_LOG_DEBUG("TcpSocket", "connect() complete - connected to "
+                          << this->impl->remoteEndpoint.address().to_string()
+                          << ":" << this->impl->remoteEndpoint.port());
         }
 
     } catch (IOException& ex) {
+        AMQ_LOG_ERROR("TcpSocket", "connect() IOException: " << ex.getMessage());
         ex.setMark(__FILE__, __LINE__);
         try {
             close();
@@ -521,6 +548,7 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout) {
         }
         throw;
     } catch (IllegalArgumentException& ex) {
+        AMQ_LOG_ERROR("TcpSocket", "connect() IllegalArgumentException: " << ex.getMessage());
         ex.setMark(__FILE__, __LINE__);
         try {
             close();
@@ -528,12 +556,21 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout) {
         }
         throw;
     } catch (Exception& ex) {
+        AMQ_LOG_ERROR("TcpSocket", "connect() decaf::Exception: " << ex.getMessage());
         try {
             close();
         } catch (lang::Exception& cx) { /* Absorb */
         }
         throw SocketException(ex.clone());
+    } catch (std::exception& ex) {
+        AMQ_LOG_ERROR("TcpSocket", "connect() std::exception: " << ex.what());
+        try {
+            close();
+        } catch (lang::Exception& cx) { /* Absorb */
+        }
+        throw SocketException(__FILE__, __LINE__, "TcpSocket::connect() - std::exception: %s", ex.what());
     } catch (...) {
+        AMQ_LOG_ERROR("TcpSocket", "connect() UNKNOWN EXCEPTION caught in catch(...)");
         try {
             close();
         } catch (lang::Exception& cx) { /* Absorb */

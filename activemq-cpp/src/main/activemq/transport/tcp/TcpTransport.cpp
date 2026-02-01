@@ -64,7 +64,7 @@ namespace tcp {
         std::unique_ptr<decaf::io::DataOutputStream> dataOutputStream;
         std::atomic<bool> isClosing;
 
-        const decaf::net::URI& location;
+        decaf::net::URI location;
 
         int outputBufferSize;
         int inputBufferSize;
@@ -161,11 +161,16 @@ void TcpTransport::doClose() {
 void TcpTransport::connect() {
 
     try {
+        AMQ_LOG_DEBUG("TcpTransport", "connect() starting");
 
+        AMQ_LOG_DEBUG("TcpTransport", "connect() creating socket");
         impl->socket.reset(this->createSocket());
+        AMQ_LOG_DEBUG("TcpTransport", "connect() socket created");
 
         // Set all Socket Options from the URI options.
+        AMQ_LOG_DEBUG("TcpTransport", "connect() configuring socket");
         this->configureSocket(impl->socket.get());
+        AMQ_LOG_DEBUG("TcpTransport", "connect() socket configured");
 
         URI uri = this->impl->location;
 

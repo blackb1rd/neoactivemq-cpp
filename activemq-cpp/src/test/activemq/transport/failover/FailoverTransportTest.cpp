@@ -17,6 +17,7 @@
 
 #include "FailoverTransportTest.h"
 
+#include <activemq/util/AMQLog.h>
 #include <activemq/transport/failover/FailoverTransportFactory.h>
 #include <activemq/transport/failover/FailoverTransport.h>
 #include <activemq/transport/mock/MockTransport.h>
@@ -948,8 +949,9 @@ void FailoverTransportTest::testFailoverNoRandomizeBroker1OnlyOnline() {
     broker1->start();
     broker1->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61004,"
-                                  "tcp://localhost:61005)?randomize=false";
+    // Use 127.0.0.1 instead of localhost to force IPv4 (MockBrokerService binds to 0.0.0.0)
+    std::string uri = "failover://(tcp://127.0.0.1:61004,"
+                                  "tcp://127.0.0.1:61005)?randomize=false&maxReconnectAttempts=-1";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1226,8 +1228,9 @@ void FailoverTransportTest::testFailoverWithRandomizeBroker1OnlyOnline() {
     broker1->start();
     broker1->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61014,"
-                                  "tcp://localhost:61015)";
+    // Use 127.0.0.1 instead of localhost to force IPv4 (MockBrokerService binds to 0.0.0.0)
+    std::string uri = "failover://(tcp://127.0.0.1:61014,"
+                                  "tcp://127.0.0.1:61015)";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;

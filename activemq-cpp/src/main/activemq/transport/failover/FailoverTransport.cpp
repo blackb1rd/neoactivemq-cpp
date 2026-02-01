@@ -107,6 +107,7 @@ namespace failover {
         mutable Mutex listenerMutex;
 
         StlMap<int, Pointer<Command> > requestMap;
+        StlMap<std::string, int> uriFailureCounts;  // Per-URI failure tracking
 
         Pointer<URIPool> uris;
         Pointer<URIPool> priorityUris;
@@ -173,6 +174,62 @@ namespace failover {
 
             this->taskRunner->addTask(parent);
             this->taskRunner->addTask(this->closeTask.get());
+        }
+
+        /**
+         * Increment the failure count for a specific URI.
+         */
+        void incrementUriFailureCount(const decaf::net::URI& uri) {
+            std::string uriStr = uri.toString();
+            if (uriFailureCounts.containsKey(uriStr)) {
+                uriFailureCounts.put(uriStr, uriFailureCounts.get(uriStr) + 1);
+            } else {
+                uriFailureCounts.put(uriStr, 1);
+            }
+        }
+
+        /**
+         * Get the failure count for a specific URI.
+         */
+        int getUriFailureCount(const decaf::net::URI& uri) const {
+            std::string uriStr = uri.toString();
+            if (uriFailureCounts.containsKey(uriStr)) {
+                return uriFailureCounts.get(uriStr);
+            }
+            return 0;
+        }
+
+        /**
+         * Check if a URI has exceeded its max reconnect attempts.
+         * Returns true if the URI should be skipped.
+         */
+        bool isUriExhausted(const decaf::net::URI& uri, int maxAttempts) const {
+            if (maxAttempts < 0) {
+                return false;  // Infinite retries
+            }
+            return getUriFailureCount(uri) >= maxAttempts;
+        }
+
+        /**
+         * Check if all URIs in a list have exceeded their max reconnect attempts.
+         */
+        bool allUrisExhausted(const decaf::util::List<decaf::net::URI>& uriList, int maxAttempts) const {
+            if (maxAttempts < 0) {
+                return false;  // Infinite retries
+            }
+            for (int i = 0; i < uriList.size(); i++) {
+                if (!isUriExhausted(uriList.get(i), maxAttempts)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /**
+         * Reset all per-URI failure counts (called on successful connection).
+         */
+        void resetAllUriFailureCounts() {
+            uriFailureCounts.clear();
         }
 
         bool isPriority(const decaf::net::URI& uri) {
@@ -1009,6 +1066,15 @@ bool FailoverTransport::iterate() {
                                 break;
                             }
 
+                            // Skip this URI if it has exceeded its per-host max reconnect attempts
+                            int reconnectAttempts = this->impl->calculateReconnectAttemptLimit();
+                            if (this->impl->isUriExhausted(uri, reconnectAttempts)) {
+                                AMQ_LOG_DEBUG("FailoverTransport", "Skipping exhausted URI: " << uri.toString()
+                                    << " (failures: " << this->impl->getUriFailureCount(uri) << ")");
+                                failures.add(uri);  // Add back to failures so it returns to pool
+                                continue;  // Try next URI
+                            }
+
                             transport = createTransport(uri);
                             // Mark this transport as the one being connected so close()
                             // can cancel it if requested concurrently.
@@ -1047,6 +1113,7 @@ bool FailoverTransport::iterate() {
                         this->impl->connectedTransport = transport;
                         this->impl->reconnectMutex.notifyAll();
                         this->impl->connectFailures = 0;
+                        this->impl->resetAllUriFailureCounts();  // Reset per-URI failure counts on success
                         AMQ_LOG_INFO("FailoverTransport", "Successfully connected to " << uri.toString());
 
                         if (isPriorityBackup()) {
@@ -1115,6 +1182,12 @@ bool FailoverTransport::iterate() {
 
                         failures.add(uri);
                         failure.reset(e.clone());
+
+                        // Track per-URI failure count
+                        this->impl->incrementUriFailureCount(uri);
+                        int uriAttempts = this->impl->getUriFailureCount(uri);
+                        AMQ_LOG_DEBUG("FailoverTransport", "URI " << uri.toString()
+                            << " failure count: " << uriAttempts);
                     }
                 }
 
@@ -1125,9 +1198,18 @@ bool FailoverTransport::iterate() {
 
         int reconnectAttempts = this->impl->calculateReconnectAttemptLimit();
 
-        if (reconnectAttempts >= 0 && ++this->impl->connectFailures >= reconnectAttempts) {
-            AMQ_LOG_ERROR("FailoverTransport", "Max reconnect attempts (" << reconnectAttempts
-                << ") reached, failures=" << this->impl->connectFailures);
+        // Check if ALL URIs have exceeded their per-URI max reconnect attempts
+        // maxReconnectAttempts is now per-host, not global - only fail when ALL hosts are exhausted
+        Pointer<URIPool> checkList = this->impl->getConnectList();
+        bool allExhausted = reconnectAttempts >= 0 &&
+                           this->impl->allUrisExhausted(checkList->getURIList(), reconnectAttempts);
+
+        // Also increment global counter for backwards compatibility
+        ++this->impl->connectFailures;
+
+        if (allExhausted) {
+            AMQ_LOG_ERROR("FailoverTransport", "All URIs have exceeded max reconnect attempts ("
+                << reconnectAttempts << ") per host");
             this->impl->connectionFailure = failure;
 
             // If this was a first connection failure and we've exhausted startupMaxReconnectAttempts,
@@ -1136,6 +1218,7 @@ bool FailoverTransport::iterate() {
             if (this->impl->firstConnection) {
                 this->impl->firstConnection = false;
                 this->impl->connectFailures = 0;  // Reset counter for subsequent reconnection attempts with maxReconnectAttempts
+                this->impl->resetAllUriFailureCounts();  // Reset per-URI counts for new phase
                 this->impl->resetReconnectDelay();  // Reset delay back to initial value
             }
 

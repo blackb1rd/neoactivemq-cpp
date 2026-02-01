@@ -949,7 +949,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBroker1OnlyOnline() {
     broker1->waitUntilStarted();
 
     std::string uri = "failover://(tcp://localhost:61004,"
-                                  "tcp://localhost:61005)?randomize=false&maxReconnectAttempts=-1";
+                                  "tcp://localhost:61005)?randomize=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1227,7 +1227,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBroker1OnlyOnline() {
     broker1->waitUntilStarted();
 
     std::string uri = "failover://(tcp://localhost:61014,"
-                                  "tcp://localhost:61015)?maxReconnectAttempts=-1";
+                                  "tcp://localhost:61015)";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;

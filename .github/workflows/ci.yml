@@ -262,6 +262,10 @@ jobs:
       shell: bash
       run: echo "ACTIONS_CACHE_URL=${ACTIONS_CACHE_URL}" >> $GITHUB_ENV && echo "ACTIONS_RUNTIME_TOKEN=${ACTIONS_RUNTIME_TOKEN}" >> $GITHUB_ENV
 
+    - name: Create vcpkg cache directories
+      shell: bash
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg"
+
     - name: Configure CMake
       run: cmake --preset ${{ matrix.config.preset }}
 
@@ -392,6 +396,10 @@ jobs:
     - name: Export GitHub Actions cache environment variable
       shell: bash
       run: echo "ACTIONS_CACHE_URL=${ACTIONS_CACHE_URL}" >> $GITHUB_ENV && echo "ACTIONS_RUNTIME_TOKEN=${ACTIONS_RUNTIME_TOKEN}" >> $GITHUB_ENV
+
+    - name: Create vcpkg cache directories
+      shell: bash
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg"
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.config.preset }}

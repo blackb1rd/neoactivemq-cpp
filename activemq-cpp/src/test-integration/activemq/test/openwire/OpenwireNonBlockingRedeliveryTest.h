@@ -28,14 +28,13 @@ namespace openwire {
     class OpenwireNonBlockingRedeliveryTest : public CMSTestFixture {
 
         CPPUNIT_TEST_SUITE( OpenwireNonBlockingRedeliveryTest );
-        // TODO - Improve the tests.
-//        CPPUNIT_TEST( testConsumerMessagesAreNotOrdered );
-//        CPPUNIT_TEST( testMessageDeleiveredWhenNonBlockingEnabled );
-//        CPPUNIT_TEST( testMessageDeleiveredWhenNonBlockingEnabled );
-//        CPPUNIT_TEST( testMessageDeleiveryDoesntStop );
-//        CPPUNIT_TEST( testNonBlockingMessageDeleiveryIsDelayed );
-//        CPPUNIT_TEST( testNonBlockingMessageDeleiveryWithRollbacks );
-//        CPPUNIT_TEST( testNonBlockingMessageDeleiveryWithAllRolledBack );
+        CPPUNIT_TEST( testConsumerMessagesAreNotOrdered );
+        CPPUNIT_TEST( testMessageDeleiveredWhenNonBlockingEnabled );
+        CPPUNIT_TEST( testMessageRedeliveriesAreInOrder );
+        CPPUNIT_TEST( testMessageDeleiveryDoesntStop );
+        CPPUNIT_TEST( testNonBlockingMessageDeleiveryIsDelayed );
+        CPPUNIT_TEST( testNonBlockingMessageDeleiveryWithRollbacks );
+        CPPUNIT_TEST( testNonBlockingMessageDeleiveryWithAllRolledBack );
         CPPUNIT_TEST_SUITE_END();
 
     public:

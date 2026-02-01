@@ -75,7 +75,21 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-find_package(asio CONFIG REQUIRED)
+# Try to find asio via CONFIG mode first (vcpkg), then fallback to system headers
+find_package(asio CONFIG QUIET)
+if(NOT asio_FOUND)
+    # Fallback: Check for system-installed asio headers
+    find_path(ASIO_INCLUDE_DIR asio.hpp)
+    if(ASIO_INCLUDE_DIR)
+        message(STATUS "Found system asio at: ${ASIO_INCLUDE_DIR}")
+        add_library(asio::asio INTERFACE IMPORTED)
+        set_target_properties(asio::asio PROPERTIES
+            INTERFACE_INCLUDE_DIRECTORIES "${ASIO_INCLUDE_DIR}"
+        )
+    else()
+        message(FATAL_ERROR "Could not find asio. Install libasio-dev or use vcpkg.")
+    endif()
+endif()
 find_package(ZLIB REQUIRED)
 
 # Options
@@ -120,7 +134,37 @@ add_subdirectory(activemq-cpp/src/main)
 add_subdirectory(activemq-cpp/src/examples)
 
 if(WITH_TESTS)
-    find_package(CppUnit CONFIG REQUIRED)
+    # Try to find CppUnit via CONFIG mode first (vcpkg), then fallback to pkg-config/system
+    find_package(CppUnit CONFIG QUIET)
+    if(NOT CppUnit_FOUND)
+        # Fallback: Check for system-installed cppunit
+        find_package(PkgConfig QUIET)
+        if(PkgConfig_FOUND)
+            pkg_check_modules(CPPUNIT QUIET cppunit)
+        endif()
+        if(CPPUNIT_FOUND)
+            message(STATUS "Found system CppUnit via pkg-config")
+            add_library(CppUnit INTERFACE IMPORTED)
+            set_target_properties(CppUnit PROPERTIES
+                INTERFACE_INCLUDE_DIRECTORIES "${CPPUNIT_INCLUDE_DIRS}"
+                INTERFACE_LINK_LIBRARIES "${CPPUNIT_LIBRARIES}"
+            )
+        else()
+            # Last resort: try manual detection
+            find_path(CPPUNIT_INCLUDE_DIR cppunit/TestCase.h)
+            find_library(CPPUNIT_LIBRARY cppunit)
+            if(CPPUNIT_INCLUDE_DIR AND CPPUNIT_LIBRARY)
+                message(STATUS "Found system CppUnit: ${CPPUNIT_LIBRARY}")
+                add_library(CppUnit INTERFACE IMPORTED)
+                set_target_properties(CppUnit PROPERTIES
+                    INTERFACE_INCLUDE_DIRECTORIES "${CPPUNIT_INCLUDE_DIR}"
+                    INTERFACE_LINK_LIBRARIES "${CPPUNIT_LIBRARY}"
+                )
+            else()
+                message(FATAL_ERROR "Could not find CppUnit. Install libcppunit-dev or use vcpkg.")
+            endif()
+        endif()
+    endif()
 	add_subdirectory(activemq-cpp/src/test)
 	add_subdirectory(activemq-cpp/src/test-benchmarks)
 	add_subdirectory(activemq-cpp/src/test-integration)

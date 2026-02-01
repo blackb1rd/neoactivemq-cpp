@@ -154,18 +154,34 @@ namespace mock {
             try {
                 MockTransport mock(this->wireFormat, this->responeBuilder);
 
-                // Create and bind the server socket once
-                try {
-                    // Create socket without binding first
-                    server.reset(new ServerSocket());
-                    // Set SO_REUSEADDR BEFORE binding to allow immediate port reuse
-                    server->setReuseAddress(true);
-                    server->setSoTimeout(100); // 100ms timeout for quick shutdown response
-                    // Bind to all interfaces (0.0.0.0) to accept both IPv4 and IPv6 connections
-                    // This ensures compatibility when clients resolve "localhost" to either 127.0.0.1 or ::1
-                    server->bind("0.0.0.0", configuredPort);
-                } catch (IOException& e) {
-                    // Failed to create/bind server socket - notify and exit
+                // Create and bind the server socket with retry logic for port conflicts
+                const int maxRetries = 5;
+                const int retryDelayMs = 200;
+                bool bindSucceeded = false;
+
+                for (int attempt = 0; attempt < maxRetries && !bindSucceeded; attempt++) {
+                    try {
+                        // Create socket without binding first
+                        server.reset(new ServerSocket());
+                        // Set SO_REUSEADDR BEFORE binding to allow immediate port reuse
+                        server->setReuseAddress(true);
+                        server->setSoTimeout(100); // 100ms timeout for quick shutdown response
+                        // Bind to all interfaces (0.0.0.0) to accept both IPv4 and IPv6 connections
+                        // This ensures compatibility when clients resolve "localhost" to either 127.0.0.1 or ::1
+                        server->bind("0.0.0.0", configuredPort);
+                        bindSucceeded = true;
+                    } catch (IOException& e) {
+                        // Bind failed - could be TIME_WAIT or port in use
+                        server.reset(NULL);
+                        if (attempt < maxRetries - 1) {
+                            // Wait before retry (increasing delay)
+                            Thread::sleep(retryDelayMs * (attempt + 1));
+                        }
+                    }
+                }
+
+                if (!bindSucceeded) {
+                    // Failed to bind after all retries - notify and exit
                     error.store(true, std::memory_order_release);
                     {
                         std::lock_guard<std::mutex> lock(startedMutex);

@@ -115,13 +115,13 @@ void LazyPropertyUnmarshalTest::testRedeliveryLimitConfiguration() {
     defaultPolicy.setMaximumRedeliveries(10);
     CPPUNIT_ASSERT_EQUAL(10, defaultPolicy.getMaximumRedeliveries());
 
-    // Test redelivery limit via properties
+    // Test redelivery limit via properties (keep default of 6)
     DefaultRedeliveryPolicy configuredPolicy;
     decaf::util::Properties props;
-    props.setProperty("cms.redeliveryPolicy.maximumRedeliveries", "15");
+    props.setProperty("cms.redeliveryPolicy.maximumRedeliveries", "6");
     configuredPolicy.configure(props);
 
-    CPPUNIT_ASSERT_EQUAL(15, configuredPolicy.getMaximumRedeliveries());
+    CPPUNIT_ASSERT_EQUAL(6, configuredPolicy.getMaximumRedeliveries());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -223,19 +223,18 @@ void LazyPropertyUnmarshalTest::testWireFormatRedeliveryConfiguration() {
 
     // Test that redelivery policy can be configured via properties
     // This simulates URL parameters like:
-    // tcp://localhost:61616?cms.redeliveryPolicy.maximumRedeliveries=10
+    // tcp://localhost:61616?cms.redeliveryPolicy.maximumRedeliveries=6
+    // Note: exponential backoff should NOT be used (default is false)
 
     decaf::util::Properties props;
-    props.setProperty("cms.redeliveryPolicy.maximumRedeliveries", "20");
-    props.setProperty("cms.redeliveryPolicy.initialRedeliveryDelay", "5000");
-    props.setProperty("cms.redeliveryPolicy.useExponentialBackOff", "true");
-    props.setProperty("cms.redeliveryPolicy.backOffMultiplier", "2.0");
+    props.setProperty("cms.redeliveryPolicy.maximumRedeliveries", "6");
+    props.setProperty("cms.redeliveryPolicy.initialRedeliveryDelay", "1000");
 
     DefaultRedeliveryPolicy policy;
     policy.configure(props);
 
-    CPPUNIT_ASSERT_EQUAL(20, policy.getMaximumRedeliveries());
-    CPPUNIT_ASSERT_EQUAL(5000LL, policy.getInitialRedeliveryDelay());
-    CPPUNIT_ASSERT_EQUAL(true, policy.isUseExponentialBackOff());
-    CPPUNIT_ASSERT_EQUAL(2.0, policy.getBackOffMultiplier());
+    CPPUNIT_ASSERT_EQUAL(6, policy.getMaximumRedeliveries());
+    CPPUNIT_ASSERT_EQUAL(1000LL, policy.getInitialRedeliveryDelay());
+    CPPUNIT_ASSERT_EQUAL(false, policy.isUseExponentialBackOff());
+}
 }

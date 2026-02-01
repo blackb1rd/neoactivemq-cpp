@@ -23,6 +23,7 @@
 #include <activemq/commands/MessageId.h>
 #include <activemq/commands/ConsumerId.h>
 #include <activemq/commands/ActiveMQQueue.h>
+#include <activemq/util/PrimitiveMap.h>
 #include <activemq/wireformat/openwire/marshal/PrimitiveTypesMarshaller.h>
 #include <activemq/core/kernels/ActiveMQConsumerKernel.h>
 #include <activemq/core/policies/DefaultRedeliveryPolicy.h>

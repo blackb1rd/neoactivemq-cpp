@@ -17,6 +17,10 @@
 
 #include "DefaultRedeliveryPolicy.h"
 
+#include <decaf/lang/Boolean.h>
+#include <decaf/lang/Double.h>
+#include <decaf/lang/Integer.h>
+#include <decaf/lang/Long.h>
 #include <decaf/lang/Math.h>
 #include <decaf/util/Random.h>
 
@@ -95,4 +99,43 @@ RedeliveryPolicy* DefaultRedeliveryPolicy::clone() const {
     copy->maximumRedeliveryDelay = this->maximumRedeliveryDelay;
 
     return copy;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void DefaultRedeliveryPolicy::configure(const decaf::util::Properties& properties) {
+    
+    if (properties.hasProperty("cms.redeliveryPolicy.maximumRedeliveries")) {
+        std::string value = properties.getProperty("cms.redeliveryPolicy.maximumRedeliveries");
+        setMaximumRedeliveries(Integer::parseInt(value));
+    }
+    
+    if (properties.hasProperty("cms.redeliveryPolicy.initialRedeliveryDelay")) {
+        std::string value = properties.getProperty("cms.redeliveryPolicy.initialRedeliveryDelay");
+        setInitialRedeliveryDelay(Long::parseLong(value));
+    }
+    
+    if (properties.hasProperty("cms.redeliveryPolicy.useExponentialBackOff")) {
+        std::string value = properties.getProperty("cms.redeliveryPolicy.useExponentialBackOff");
+        setUseExponentialBackOff(Boolean::parseBoolean(value));
+    }
+    
+    if (properties.hasProperty("cms.redeliveryPolicy.backOffMultiplier")) {
+        std::string value = properties.getProperty("cms.redeliveryPolicy.backOffMultiplier");
+        setBackOffMultiplier(Double::parseDouble(value));
+    }
+    
+    if (properties.hasProperty("cms.redeliveryPolicy.useCollisionAvoidance")) {
+        std::string value = properties.getProperty("cms.redeliveryPolicy.useCollisionAvoidance");
+        setUseCollisionAvoidance(Boolean::parseBoolean(value));
+    }
+    
+    if (properties.hasProperty("cms.redeliveryPolicy.redeliveryDelay")) {
+        std::string value = properties.getProperty("cms.redeliveryPolicy.redeliveryDelay");
+        setRedeliveryDelay(Long::parseLong(value));
+    }
+    
+    if (properties.hasProperty("cms.redeliveryPolicy.maximumRedeliveryDelay")) {
+        std::string value = properties.getProperty("cms.redeliveryPolicy.maximumRedeliveryDelay");
+        setMaximumRedeliveryDelay(Long::parseLong(value));
+    }
 }

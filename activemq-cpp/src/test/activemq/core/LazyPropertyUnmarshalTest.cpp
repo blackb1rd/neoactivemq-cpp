@@ -37,6 +37,8 @@ using namespace activemq::wireformat::openwire::marshal;
 using namespace decaf::io;
 using namespace decaf::lang;
 
+CPPUNIT_TEST_SUITE_REGISTRATION( LazyPropertyUnmarshalTest );
+
 ////////////////////////////////////////////////////////////////////////////////
 LazyPropertyUnmarshalTest::LazyPropertyUnmarshalTest() {
 }

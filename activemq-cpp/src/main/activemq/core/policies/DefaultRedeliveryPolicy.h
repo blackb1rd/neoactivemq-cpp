@@ -21,6 +21,7 @@
 #include <activemq/util/Config.h>
 
 #include <activemq/core/RedeliveryPolicy.h>
+#include <decaf/util/Properties.h>
 
 namespace activemq {
 namespace core {
@@ -112,6 +113,19 @@ namespace policies {
         virtual long long getNextRedeliveryDelay(long long previousDelay);
 
         virtual RedeliveryPolicy* clone() const;
+
+        /**
+         * Configure the redelivery policy from properties.
+         * Supported properties:
+         * - cms.redeliveryPolicy.maximumRedeliveries
+         * - cms.redeliveryPolicy.initialRedeliveryDelay
+         * - cms.redeliveryPolicy.useExponentialBackOff
+         * - cms.redeliveryPolicy.backOffMultiplier
+         * - cms.redeliveryPolicy.useCollisionAvoidance
+         * - cms.redeliveryPolicy.redeliveryDelay
+         * - cms.redeliveryPolicy.maximumRedeliveryDelay
+         */
+        void configure(const decaf::util::Properties& properties);
 
     };
 

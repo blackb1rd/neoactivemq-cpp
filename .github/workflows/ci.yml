@@ -3,8 +3,18 @@ name: CI
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
   workflow_dispatch:
 
 env:
@@ -227,18 +237,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Cache vcpkg installed packages
-      id: cache-vcpkg
-      uses: actions/cache@v5
-      with:
-        path: |
-          .cache/vcpkg/installed
-          .cache/vcpkg/buildtrees
-          .cache/vcpkg/downloads
-        key: vcpkg-installed-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
-        restore-keys: |
-          vcpkg-installed-${{ runner.os }}-${{ matrix.config.arch }}-
-
     - name: Install Ninja and ccache
       run: |
         choco install ninja -y
@@ -305,18 +303,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
-
-    - name: Cache vcpkg installed packages
-      id: cache-vcpkg
-      uses: actions/cache@v5
-      with:
-        path: |
-          .cache/vcpkg/installed
-          .cache/vcpkg/buildtrees
-          .cache/vcpkg/downloads
-        key: vcpkg-installed-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
-        restore-keys: |
-          vcpkg-installed-${{ runner.os }}-${{ matrix.config.arch }}-
 
     - name: Install Ninja
       run: choco install ninja -y

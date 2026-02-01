@@ -35,6 +35,7 @@
 #include <activemq/util/Config.h>
 #include <activemq/util/PrimitiveMap.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/util/concurrent/Mutex.h>
 #include <string>
 #include <vector>
 
@@ -106,6 +107,9 @@ namespace commands{
 
         // Indicates if properties have been lazily unmarshaled from marshalledProperties
         mutable bool propertiesUnmarshaled;
+
+        // Mutex to protect thread-safe lazy unmarshaling of properties
+        mutable decaf::util::concurrent::Mutex propertiesUnmarshalMutex;
 
         // Indicates if the Message Properties are Read Only
         bool readOnlyProperties;

@@ -909,33 +909,41 @@ void Message::afterUnmarshal(wireformat::WireFormat* wireFormat AMQCPP_UNUSED) {
 ////////////////////////////////////////////////////////////////////////////////
 void Message::ensurePropertiesUnmarshaled() const {
 
+    // Fast path: already unmarshaled (no lock needed)
     if (propertiesUnmarshaled) {
-        return;  // Already unmarshaled
-    }
-
-    // Skip unmarshaling if there are no marshalled properties
-    // This avoids unnecessary processing for messages without properties
-    if (marshalledProperties.empty()) {
-        propertiesUnmarshaled = true;
         return;
     }
 
-    try {
-        // Unmarshal properties from byte array (lazy unmarshaling - C# behavior)
-        // If this fails (corrupted properties), exception propagates to consumer code
-        // Consumer will catch it, rollback transaction, and trigger redelivery
-        wireformat::openwire::marshal::PrimitiveTypesMarshaller::unmarshal(
-            const_cast<activemq::util::PrimitiveMap*>(&properties),
-            const_cast<std::vector<unsigned char>&>(marshalledProperties));
-        propertiesUnmarshaled = true;
-    } catch (decaf::io::IOException& e) {
-        AMQ_LOG_ERROR("Message", "ensurePropertiesUnmarshaled(): Failed to unmarshal properties (corrupted) for message id="
-                      << (messageId != NULL ? messageId->toString() : "NULL")
-                      << ", marshalledProperties.size=" << marshalledProperties.size()
-                      << ", exception=" << e.getMessage());
-        throw;
+    // Thread-safe lazy unmarshaling with double-checked locking
+    synchronized(&propertiesUnmarshalMutex) {
+        // Check again inside lock (another thread may have unmarshaled)
+        if (propertiesUnmarshaled) {
+            return;
+        }
+
+        // Skip unmarshaling if there are no marshalled properties
+        if (marshalledProperties.empty()) {
+            propertiesUnmarshaled = true;
+            return;
+        }
+
+        try {
+            // Unmarshal properties from byte array (lazy unmarshaling)
+            // If this fails (corrupted properties), exception propagates to consumer code
+            // Consumer will catch it, rollback transaction, and trigger redelivery
+            wireformat::openwire::marshal::PrimitiveTypesMarshaller::unmarshal(
+                const_cast<activemq::util::PrimitiveMap*>(&properties),
+                const_cast<std::vector<unsigned char>&>(marshalledProperties));
+            propertiesUnmarshaled = true;
+        } catch (decaf::io::IOException& e) {
+            AMQ_LOG_ERROR("Message", "ensurePropertiesUnmarshaled(): Failed to unmarshal properties (corrupted) for message id="
+                          << (messageId != NULL ? messageId->toString() : "NULL")
+                          << ", marshalledProperties.size=" << marshalledProperties.size()
+                          << ", exception=" << e.getMessage());
+            throw;
+        }
+        AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception, decaf::io::IOException)
+        AMQ_CATCHALL_THROW(decaf::io::IOException)
     }
-    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 

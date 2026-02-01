@@ -40,6 +40,47 @@ cmake --list-presets
 - **ALWAYS** use `cmake --build --preset <preset-name>` for building
 - The build output is in `output/build/<preset-name>/`
 
+## Coding Guidelines
+
+### Avoid Static Storage
+
+- **DO NOT** use `static` or `static thread_local` for storing state
+- **PREFER** instance members over static variables
+- **REASON**: Static variables introduce global state, make testing harder, and can cause initialization order issues
+
+**Why avoid static:**
+- Creates hidden global state that's hard to track
+- Makes unit testing difficult (state persists between tests)
+- Can cause issues in DLLs and across compilation units
+- Thread-local static still has lifetime and initialization concerns
+- Harder to reason about object lifecycle
+
+**Alternative approaches:**
+- Store state as instance members in the appropriate class
+- Pass data through function parameters
+- Use dependency injection for shared resources
+
+**Example:**
+```cpp
+// BAD: Static thread-local storage
+inline int& getConnectionCounter() {
+    static thread_local int counter = 0;
+    return counter;
+}
+
+// GOOD: Instance member
+class Transport {
+    int connectionCounter;
+public:
+    int getConnectionCounter() const {
+        return connectionCounter;
+    }
+    void incrementCounter() {
+        connectionCounter++;
+    }
+};
+```
+
 ## Safety Rules
 
 - **DO NOT** perform `git checkout` or switch branches without explicit user confirmation

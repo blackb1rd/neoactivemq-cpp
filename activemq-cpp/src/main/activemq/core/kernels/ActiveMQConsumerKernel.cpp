@@ -34,6 +34,7 @@
 #include <activemq/util/CMSExceptionSupport.h>
 #include <activemq/util/ActiveMQProperties.h>
 #include <activemq/util/ActiveMQMessageTransformation.h>
+#include <activemq/util/AMQLog.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/commands/Message.h>
 #include <activemq/commands/MessageAck.h>
@@ -357,22 +358,67 @@ namespace kernels {
         }
 
         bool redeliveryExceeded(Pointer<MessageDispatch> dispatch) {
-            try {
-                return session->isTransacted() && redeliveryPolicy != NULL &&
-                       redeliveryPolicy->getMaximumRedeliveries() != RedeliveryPolicy::NO_MAXIMUM_REDELIVERIES &&
-                       dispatch->getRedeliveryCounter() > redeliveryPolicy->getMaximumRedeliveries() &&
-                        // redeliveryCounter > x expected after resend via brokerRedeliveryPlugin
-                       !dispatch->getMessage()->getMessageProperties().containsKey("redeliveryDelay");
-            } catch (Exception& ignored) {
+            AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "redeliveryExceeded(): Checking message id="
+                          << dispatch->getMessage()->getMessageId()->toString()
+                          << ", redeliveryCount=" << dispatch->getRedeliveryCounter());
+
+            // Check if redelivery policy exists and has a limit
+            if (redeliveryPolicy == NULL ||
+                redeliveryPolicy->getMaximumRedeliveries() == RedeliveryPolicy::NO_MAXIMUM_REDELIVERIES) {
+                AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "redeliveryExceeded(): No redelivery limit configured - returning false");
                 return false;
+            }
+
+            // Check if redelivery counter exceeds the limit
+            if (dispatch->getRedeliveryCounter() <= redeliveryPolicy->getMaximumRedeliveries()) {
+                AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "redeliveryExceeded(): Redelivery count "
+                              << dispatch->getRedeliveryCounter()
+                              << " <= max " << redeliveryPolicy->getMaximumRedeliveries()
+                              << " - returning false");
+                return false;
+            }
+
+            AMQ_LOG_INFO("ActiveMQConsumerKernel", "redeliveryExceeded(): Redelivery count "
+                         << dispatch->getRedeliveryCounter()
+                         << " > max " << redeliveryPolicy->getMaximumRedeliveries()
+                         << " - checking brokerRedeliveryPlugin");
+
+            // Redelivery counter exceeded - now check if brokerRedeliveryPlugin is in use
+            // If property access fails (corrupted), assume no redeliveryDelay and return true
+            try {
+                // redeliveryCounter > x expected after resend via brokerRedeliveryPlugin
+                // If "redeliveryDelay" property exists, broker will handle redelivery
+                bool hasRedeliveryDelay = dispatch->getMessage()->getMessageProperties().containsKey("redeliveryDelay");
+                bool exceeded = !hasRedeliveryDelay;
+                AMQ_LOG_INFO("ActiveMQConsumerKernel", "redeliveryExceeded(): hasRedeliveryDelay="
+                             << hasRedeliveryDelay << ", exceeded=" << exceeded);
+                return exceeded;
+            } catch (Exception& ignored) {
+                // Property access failed (likely corrupted) - redelivery IS exceeded
+                // Send POISON_ACK immediately for corrupted messages
+                AMQ_LOG_ERROR("ActiveMQConsumerKernel", "redeliveryExceeded(): Property access failed for message id="
+                              << dispatch->getMessage()->getMessageId()->toString()
+                              << ", redeliveryCount=" << dispatch->getRedeliveryCounter()
+                              << ", exception=" << ignored.getMessage()
+                              << " - treating as exceeded, will send POISON_ACK");
+                return true;
             }
         }
 
         void posionAck(Pointer<MessageDispatch> dispatch, const std::string& cause) {
+            AMQ_LOG_ERROR("ActiveMQConsumerKernel", "posionAck(): Sending POISON_ACK for message id="
+                          << dispatch->getMessage()->getMessageId()->toString()
+                          << ", redeliveryCount=" << dispatch->getRedeliveryCounter()
+                          << ", cause=" << cause
+                          << " - message will be moved to DLQ");
             Pointer<MessageAck> poisonAck(new MessageAck(dispatch, ActiveMQConstants::ACK_TYPE_POISON, 1));
             poisonAck->setFirstMessageId(dispatch->getMessage()->getMessageId());
             poisonAck->setPoisonCause(createBrokerError(cause));
+            AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "posionAck(): Sending ack to broker, ackType=POISON, messageId="
+                          << dispatch->getMessage()->getMessageId()->toString());
             session->sendAck(poisonAck);
+            AMQ_LOG_INFO("ActiveMQConsumerKernel", "posionAck(): POISON_ACK sent successfully for message id="
+                         << dispatch->getMessage()->getMessageId()->toString());
         }
 
         Pointer<BrokerError> createBrokerError(const std::string& message) {
@@ -818,10 +864,16 @@ ActiveMQConsumerKernel::ActiveMQConsumerKernel(ActiveMQSessionKernel* session,
         throw IllegalArgumentException(
             __FILE__, __LINE__, "Cannot create a consumer with a negative prefetch");
     }
+
+    AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "Consumer created: consumerId=" << id->toString()
+                  << ", destination=" << destination->getPhysicalName()
+                  << ", prefetch=" << prefetch);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQConsumerKernel::~ActiveMQConsumerKernel() {
+    AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "Consumer destructor called: consumerId="
+                  << (consumerInfo != NULL ? consumerInfo->getConsumerId()->toString() : "NULL"));
     try {
         this->close();
     }
@@ -861,6 +913,8 @@ void ActiveMQConsumerKernel::close() {
 
     try {
         if (!this->isClosed()) {
+            AMQ_LOG_INFO("ActiveMQConsumerKernel", "Closing consumer: consumerId="
+                         << consumerInfo->getConsumerId()->toString());
 
             if (!this->internal->deliveredMessages.isEmpty() &&
                 this->session->getTransactionContext() != NULL &&
@@ -1081,8 +1135,12 @@ cms::Message* ActiveMQConsumerKernel::receive() {
         // Wait for the next message.
         Pointer<MessageDispatch> message = dequeue(-1);
         if (message == NULL) {
+            AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "receive(): No message available");
             return NULL;
         }
+
+        AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "receive(): Got message id="
+                      << message->getMessage()->getMessageId()->toString());
 
         beforeMessageIsConsumed(message);
         afterMessageIsConsumed(message, false);
@@ -1119,6 +1177,9 @@ cms::Message* ActiveMQConsumerKernel::receive(int timeout) {
         if (message == NULL) {
             return NULL;
         }
+
+        AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "receive(timeout): Got message id="
+                      << message->getMessage()->getMessageId()->toString());
 
         beforeMessageIsConsumed(message);
         afterMessageIsConsumed(message, false);
@@ -1556,6 +1617,20 @@ void ActiveMQConsumerKernel::rollback() {
                 this->internal->deliveredCounter -= (int) internal->deliveredMessages.size();
                 this->internal->deliveredMessages.clear();
 
+                // Restart consumer to continue processing remaining messages
+                // Without this, the consumer remains stopped after max redeliveries exceeded
+                if (!this->internal->unconsumedMessages->isClosed()) {
+                    if (this->internal->nonBlockingRedelivery) {
+                        // For non-blocking mode, just ensure the queue is started
+                        if (!this->internal->unconsumedMessages->isRunning()) {
+                            this->internal->unconsumedMessages->start();
+                        }
+                    } else {
+                        // For blocking mode, restart the consumer
+                        start();
+                    }
+                }
+
             } else {
 
                 // only redelivery_ack after first delivery
@@ -1616,24 +1691,46 @@ void ActiveMQConsumerKernel::rollback() {
 void ActiveMQConsumerKernel::dispatch(const Pointer<MessageDispatch>& dispatch) {
 
     try {
+        AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "dispatch(): Dispatching message id="
+                      << dispatch->getMessage()->getMessageId()->toString()
+                      << ", consumerId=" << consumerInfo->getConsumerId()->toString());
 
+        AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "dispatch(): Calling clearMessagesInProgress()");
         clearMessagesInProgress();
+        AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "dispatch(): Calling clearDeliveredList()");
         clearDeliveredList();
+        AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "dispatch(): Clear methods completed");
 
         synchronized(this->internal->unconsumedMessages.get()) {
 
+            AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "dispatch(): Acquired unconsumedMessages lock");
+
             if (!this->internal->unconsumedMessages->isClosed()) {
+
+                AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "dispatch(): UnconsumedMessages is not closed");
 
                 if (this->consumerInfo->isBrowser() || !session->getConnection()->isDuplicate(this, dispatch->getMessage())) {
 
+                    AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "dispatch(): Not a duplicate message");
+
                     synchronized(&this->internal->listenerMutex) {
+
+                        AMQ_LOG_DEBUG("ActiveMQConsumerKernel", "dispatch(): Acquired listener lock, listener="
+                                      << (this->internal->listener != NULL ? "SET" : "NULL")
+                                      << ", running=" << (this->internal->unconsumedMessages->isRunning() ? "true" : "false"));
 
                         if (this->internal->listener != NULL && this->internal->unconsumedMessages->isRunning()) {
                             if (this->internal->redeliveryExceeded(dispatch)) {
+                                AMQ_LOG_ERROR("ActiveMQConsumerKernel", "dispatch(): Redelivery limit exceeded for message id="
+                                              << dispatch->getMessage()->getMessageId()->toString()
+                                              << ", redeliveryCount=" << dispatch->getRedeliveryCounter()
+                                              << ", limit=" << internal->redeliveryPolicy->getMaximumRedeliveries()
+                                              << " - sending to DLQ");
                                 internal->posionAck(dispatch,
                                                     "dispatch to " + getConsumerId()->toString() +
                                                     " exceeds redelivery policy limit:" +
                                                     Integer::toString(internal->redeliveryPolicy->getMaximumRedeliveries()));
+                                AMQ_LOG_INFO("ActiveMQConsumerKernel", "dispatch(): Message sent to DLQ, continuing with next message");
                                 return;
                             }
                             Pointer<cms::Message> message = createCMSMessage(dispatch);
@@ -1644,7 +1741,26 @@ void ActiveMQConsumerKernel::dispatch(const Pointer<MessageDispatch>& dispatch) 
                                     this->internal->listener->onMessage(message.get());
                                 }
                                 afterMessageIsConsumed(dispatch, expired);
+                            } catch (decaf::io::IOException& e) {
+                                // Lazy property unmarshaling failed (corrupted properties) - C# client behavior
+                                // Property corruption detected during consumer processing rather than wire unmarshaling
+                                // Trigger rollback to schedule redelivery, after 6 attempts POISON_ACK is sent
+                                AMQ_LOG_ERROR("ActiveMQConsumerKernel", "dispatch(): Property unmarshal failed (corrupted) for message id="
+                                              << dispatch->getMessage()->getMessageId()->toString()
+                                              << ", exception=" << e.getMessage()
+                                              << ", redeliveryCount=" << dispatch->getRedeliveryCounter());
+                                dispatch->setRollbackCause(e);
+                                if (isAutoAcknowledgeBatch() || isAutoAcknowledgeEach() || session->isIndividualAcknowledge()) {
+                                    // Schedule redelivery and possible DLQ processing
+                                    rollback();
+                                } else {
+                                    // Transacted or Client ack: Deliver the next message.
+                                    afterMessageIsConsumed(dispatch, false);
+                                }
                             } catch (RuntimeException& e) {
+                                AMQ_LOG_ERROR("ActiveMQConsumerKernel", "dispatch(): Exception in message listener for message id="
+                                              << dispatch->getMessage()->getMessageId()->toString()
+                                              << ", exception=" << e.getMessage());
                                 dispatch->setRollbackCause(e);
                                 if (isAutoAcknowledgeBatch() || isAutoAcknowledgeEach() || session->isIndividualAcknowledge()) {
                                     // Schedule redelivery and possible DLQ processing

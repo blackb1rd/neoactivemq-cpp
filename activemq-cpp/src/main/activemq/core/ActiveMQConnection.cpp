@@ -19,6 +19,7 @@
 
 #include <cms/Session.h>
 
+#include <activemq/util/AMQLog.h>
 #include <activemq/core/ActiveMQSession.h>
 #include <activemq/core/ActiveMQConstants.h>
 #include <activemq/core/ActiveMQConnectionMetaData.h>
@@ -86,6 +87,7 @@ using namespace activemq::threads;
 using namespace activemq::transport;
 using namespace activemq::transport::failover;
 using namespace activemq::wireformat::openwire;
+using activemq::util::AMQLogger;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::util;
@@ -416,12 +418,15 @@ namespace core {
                 // will destroy it when it closes.
                 Exception* error = ex.release();
 
+                AMQ_LOG_DEBUG("OnExceptionRunnable", "handling exception: " << error->getMessage());
+
                 // Mark this Connection as having a Failed transport.
                 this->connection->setFirstFailureError(error);
 
                 Pointer<Transport> transport = this->config->transport;
                 if (transport != NULL) {
                     try {
+                        AMQ_LOG_DEBUG("OnExceptionRunnable", "stopping transport");
                         transport->stop();
                     } catch(...) {
                     }
@@ -430,6 +435,7 @@ namespace core {
                 this->config->brokerInfoReceived->countDown();
 
                 // Clean up the Connection resources.
+                AMQ_LOG_DEBUG("OnExceptionRunnable", "cleaning up connection");
                 this->connection->cleanup();
 
                 synchronized(&this->config->transportListeners) {
@@ -507,12 +513,15 @@ ActiveMQConnection::ActiveMQConnection(const Pointer<transport::Transport> trans
     configuration->connectionAudit.setCheckForDuplicates(transport->isFaultTolerant());
 
     this->config = configuration.release();
+
+    AMQ_LOG_INFO("ActiveMQConnection", "Connection created, brokerURL=" << this->config->brokerURL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQConnection::~ActiveMQConnection() {
 
     try {
+        AMQ_LOG_DEBUG("ActiveMQConnection", "Destroying connection");
         this->close();
     }
     AMQ_CATCHALL_NOTHROW()
@@ -693,6 +702,8 @@ void ActiveMQConnection::close() {
             return;
         }
 
+        AMQ_LOG_INFO("ActiveMQConnection", "Closing connection, clientId=" << this->config->connectionInfo->getClientId());
+
         Exception ex;
         bool hasException = false;
 
@@ -804,6 +815,8 @@ void ActiveMQConnection::close() {
         this->started.set(false);
         this->closed.set(true);
 
+        AMQ_LOG_INFO("ActiveMQConnection", "Connection closed");
+
         if (hasException) {
             throw ex;
         }
@@ -861,6 +874,8 @@ void ActiveMQConnection::start() {
 
     try {
 
+        AMQ_LOG_INFO("ActiveMQConnection", "Starting connection, clientId=" << this->config->connectionInfo->getClientId());
+
         checkClosedOrFailed();
         ensureConnectionInfoSent();
 
@@ -891,6 +906,8 @@ void ActiveMQConnection::start() {
 void ActiveMQConnection::stop() {
 
     try {
+
+        AMQ_LOG_INFO("ActiveMQConnection", "Stopping connection, clientId=" << this->config->connectionInfo->getClientId());
 
         checkClosedOrFailed();
 
@@ -1261,6 +1278,8 @@ void ActiveMQConnection::transportResumed() {
 void ActiveMQConnection::oneway(Pointer<Command> command) {
 
     try {
+        AMQ_LOG_DEBUG("ActiveMQConnection", "oneway() cmdId=" << command->getCommandId()
+            << " type=" << AMQLogger::commandTypeName(command->getDataStructureType()));
         checkClosedOrFailed();
         this->config->transport->oneway(command);
     }
@@ -1275,14 +1294,32 @@ Pointer<Response> ActiveMQConnection::syncRequest(Pointer<Command> command, unsi
 
     try {
 
+        AMQ_LOG_DEBUG("ActiveMQConnection", "syncRequest() cmdId=" << command->getCommandId()
+                      << " type=" << AMQLogger::commandTypeName(command->getDataStructureType())
+                      << " timeout=" << timeout);
+
         checkClosedOrFailed();
 
         Pointer<Response> response;
 
-        if (timeout == 0) {
-            response = this->config->transport->request(command);
-        } else {
-            response = this->config->transport->request(command, timeout);
+        try {
+            if (timeout == 0) {
+                response = this->config->transport->request(command);
+            } else {
+                response = this->config->transport->request(command, timeout);
+            }
+            AMQ_LOG_DEBUG("ActiveMQConnection", "syncRequest() received response correlationId="
+                          << response->getCorrelationId() << " type=" << AMQLogger::commandTypeName(response->getDataStructureType()));
+        } catch (IOException& ex) {
+            AMQ_LOG_ERROR("ActiveMQConnection", "syncRequest() IOException: " << ex.getMessage());
+            // Re-check if transport failed during the request
+            // This handles the race condition where transport fails between checkClosedOrFailed() and request()
+            if (this->transportFailed.get()) {
+                if (this->config->firstFailureError != NULL) {
+                    throw ConnectionFailedException(*this->config->firstFailureError);
+                }
+            }
+            throw;
         }
 
         commands::ExceptionResponse* exceptionResponse = dynamic_cast<ExceptionResponse*>(response.get());

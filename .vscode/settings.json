@@ -108,5 +108,8 @@
         "xtr1common": "cpp",
         "xtree": "cpp",
         "xutility": "cpp"
-    }
+    },
+    "cmake.buildDirectory": "${workspaceFolder}/output/build/${buildPreset}",
+    "neoactivemq.buildPreset": "x86-windows-debug-test",
+    "neoactivemq.buildPresetNonTest": "x86-windows-debug"
 }

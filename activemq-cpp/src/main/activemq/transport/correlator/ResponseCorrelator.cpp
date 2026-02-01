@@ -22,16 +22,19 @@
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
 #include <decaf/util/HashMap.h>
+#include <decaf/util/logging/LoggerDefines.h>
 
 #include <activemq/commands/Response.h>
 #include <activemq/commands/ExceptionResponse.h>
 #include <activemq/transport/FutureResponse.h>
+#include <activemq/util/AMQLog.h>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::transport;
 using namespace activemq::transport::correlator;
 using namespace activemq::exceptions;
+using activemq::util::AMQLogger;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
@@ -192,7 +195,6 @@ Pointer<FutureResponse> ResponseCorrelator::asyncRequest(const Pointer<Command> 
     AMQ_CATCHALL_THROW(IOException)
 }
 
-////////////////////////////////////////////////////////////////////////////////
 Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command) {
 
     try {
@@ -202,6 +204,9 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command) {
         command->setCommandId(this->impl->nextCommandId.getAndIncrement());
         command->setResponseRequired(true);
 
+        AMQ_LOG_DEBUG("ResponseCorrelator", "request() cmdId=" << command->getCommandId()
+            << " type=" << AMQLogger::commandTypeName(command->getDataStructureType()));
+
         // Add a future response object to the map indexed by this command id.
         Pointer<FutureResponse> futureResponse(new FutureResponse());
         Pointer<Exception> priorError;
@@ -210,6 +215,11 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command) {
             priorError = this->impl->priorError;
             if (priorError == NULL) {
                 this->impl->requestMap.put((unsigned int) command->getCommandId(), futureResponse);
+                AMQ_LOG_DEBUG("ResponseCorrelator", "added to map cmdId=" << command->getCommandId()
+                    << " mapSize=" << this->impl->requestMap.size());
+            } else {
+                AMQ_LOG_ERROR("ResponseCorrelator", "PRIOR ERROR EXISTS cmdId=" << command->getCommandId()
+                    << " error=" << priorError->getMessage());
             }
         }
 
@@ -223,8 +233,18 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command) {
         // Wait to be notified of the response via the futureResponse object.
         Pointer<commands::Response> response;
 
-        // Send the request.
-        next->oneway(command);
+        // Send the request - must check for prior error again right before sending
+        // to handle race where transport fails between map insertion and send
+        synchronized(&this->impl->mapMutex) {
+            if (this->impl->priorError != NULL) {
+                AMQ_LOG_ERROR("ResponseCorrelator", "PRIOR ERROR before send cmdId=" << command->getCommandId()
+                    << " error=" << this->impl->priorError->getMessage());
+                throw IOException(__FILE__, __LINE__, this->impl->priorError->getMessage().c_str());
+            }
+            AMQ_LOG_DEBUG("ResponseCorrelator", "sending cmdId=" << command->getCommandId());
+            next->oneway(command);
+            AMQ_LOG_DEBUG("ResponseCorrelator", "sent cmdId=" << command->getCommandId());
+        }
 
         // Get the response.
         response = futureResponse->getResponse();
@@ -243,7 +263,6 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command) {
     AMQ_CATCHALL_THROW(IOException)
 }
 
-////////////////////////////////////////////////////////////////////////////////
 Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command, unsigned int timeout) {
 
     try {
@@ -274,8 +293,14 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command, un
         // Wait to be notified of the response via the futureResponse object.
         Pointer<commands::Response> response;
 
-        // Send the request.
-        next->oneway(command);
+        // Send the request - must check for prior error again right before sending
+        // to handle race where transport fails between map insertion and send
+        synchronized(&this->impl->mapMutex) {
+            if (this->impl->priorError != NULL) {
+                throw IOException(__FILE__, __LINE__, this->impl->priorError->getMessage().c_str());
+            }
+            next->oneway(command);
+        }
 
         // Get the response.
         response = futureResponse->getResponse(timeout);
@@ -297,6 +322,11 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command, un
 ////////////////////////////////////////////////////////////////////////////////
 void ResponseCorrelator::onCommand(const Pointer<Command> command) {
 
+    // Log all incoming commands from broker
+    AMQ_LOG_DEBUG("ResponseCorrelator", "onCommand() received cmdId=" << command->getCommandId()
+        << " type=" << AMQLogger::commandTypeName(command->getDataStructureType())
+        << " isResponse=" << command->isResponse());
+
     // Let's see if the incoming command is a response, if not we just pass it along
     // and allow outstanding requests to keep waiting without stalling control commands.
     if (!command->isResponse()) {
@@ -305,6 +335,7 @@ void ResponseCorrelator::onCommand(const Pointer<Command> command) {
     }
 
     Pointer<Response> response = command.dynamicCast<Response>();
+    AMQ_LOG_DEBUG("ResponseCorrelator", "onCommand() response correlationId=" << response->getCorrelationId());
 
     // It is a response - let's correlate ...
     synchronized(&this->impl->mapMutex) {
@@ -312,7 +343,10 @@ void ResponseCorrelator::onCommand(const Pointer<Command> command) {
         Pointer<FutureResponse> futureResponse;
         try {
             futureResponse = this->impl->requestMap.remove(response->getCorrelationId());
+            AMQ_LOG_DEBUG("ResponseCorrelator", "found and removed from map correlationId=" << response->getCorrelationId()
+                << " mapSize=" << this->impl->requestMap.size());
         } catch (NoSuchElementException& ex) {
+            AMQ_LOG_DEBUG("ResponseCorrelator", "NOT FOUND in map correlationId=" << response->getCorrelationId());
             return;
         }
 
@@ -340,28 +374,38 @@ void ResponseCorrelator::onException(const decaf::lang::Exception& ex) {
 ////////////////////////////////////////////////////////////////////////////////
 void ResponseCorrelator::dispose(Pointer<Exception> error) {
 
-    ArrayList<Pointer<FutureResponse> > requests;
+    AMQ_LOG_DEBUG("ResponseCorrelator", "dispose() called error=" << error->getMessage());
+
+    HashMap<unsigned int, Pointer<FutureResponse> > requestsCopy;
     synchronized(&this->impl->mapMutex) {
         if (this->impl->priorError == NULL) {
+            AMQ_LOG_DEBUG("ResponseCorrelator", "dispose() clearing map, size=" << this->impl->requestMap.size());
             this->impl->priorError = error;
-            requests.ensureCapacity((int)this->impl->requestMap.size());
-            requests.copy(this->impl->requestMap.values());
+            // Copy the map to preserve correlation IDs
+            requestsCopy.copy(this->impl->requestMap);
             this->impl->requestMap.clear();
+        } else {
+            AMQ_LOG_DEBUG("ResponseCorrelator", "dispose() ALREADY HAD PRIOR ERROR");
         }
     }
 
-    if (!requests.isEmpty()) {
+    if (!requestsCopy.isEmpty()) {
         Pointer<commands::BrokerError> exception(new commands::BrokerError);
         exception->setExceptionClass("java.io.IOException");
         exception->setMessage(error->getMessage());
 
-        Pointer<commands::ExceptionResponse> errorResponse(new commands::ExceptionResponse);
-        errorResponse->setException(exception);
-
-        Pointer<Iterator<Pointer<FutureResponse> > > iter(requests.iterator());
+        // Create individual ExceptionResponse for each pending request with correct correlation ID
+        Pointer<Iterator<unsigned int> > iter(requestsCopy.keySet().iterator());
         while (iter->hasNext()) {
-            Pointer<FutureResponse> response = iter->next();
-            response->setResponse(errorResponse);
+            unsigned int correlationId = iter->next();
+            Pointer<FutureResponse> futureResponse = requestsCopy.get(correlationId);
+
+            // Create a unique ExceptionResponse for this request with the correct correlation ID
+            Pointer<commands::ExceptionResponse> errorResponse(new commands::ExceptionResponse);
+            errorResponse->setCorrelationId(correlationId);
+            errorResponse->setException(exception);
+
+            futureResponse->setResponse(errorResponse);
         }
     }
 }

@@ -76,6 +76,7 @@ void MessageMarshaller::tightUnmarshal(OpenWireFormat* wireFormat, DataStructure
         info->setType(tightUnmarshalString(dataIn, bs));
         info->setContent(tightUnmarshalByteArray(dataIn, bs));
         info->setMarshalledProperties(tightUnmarshalByteArray(dataIn, bs));
+
         info->setDataStructure(Pointer<DataStructure>(dynamic_cast<DataStructure* >(
             tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
         info->setTargetConsumerId(Pointer<ConsumerId>(dynamic_cast<ConsumerId* >(

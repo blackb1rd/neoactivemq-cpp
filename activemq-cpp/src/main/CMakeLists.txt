@@ -188,6 +188,7 @@ set(ACTIVEMQ_CPP_SOURCES
     activemq/util/ActiveMQMessageTransformation.cpp
     activemq/util/ActiveMQProperties.cpp
     activemq/util/AdvisorySupport.cpp
+    activemq/util/AMQLog.cpp
     activemq/util/CMSExceptionSupport.cpp
     activemq/util/CompositeData.cpp
     activemq/util/IdGenerator.cpp
@@ -716,6 +717,7 @@ add_library(neoactivemq-cpp::neoactivemq-cpp ALIAS neoactivemq-cpp)
 target_include_directories(neoactivemq-cpp
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/generated>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
@@ -724,6 +726,11 @@ if(OpenSSL_FOUND)
   target_compile_definitions(neoactivemq-cpp PUBLIC HAVE_OPENSSL)
   target_link_libraries(neoactivemq-cpp PUBLIC OpenSSL::SSL OpenSSL::Crypto)
 endif()
+
+# Note: skipCorruptedMessages is now a runtime option (default: false)
+# Enable via: wireFormat->setSkipCorruptedMessages(true)
+# Or via connection URL: ?wireFormat.skipCorruptedMessages=true
+message(STATUS "neoactivemq-cpp: skipCorruptedMessages available as runtime option (default: false)")
 
 # Link zlib for compression support
 target_link_libraries(neoactivemq-cpp PUBLIC ZLIB::ZLIB)

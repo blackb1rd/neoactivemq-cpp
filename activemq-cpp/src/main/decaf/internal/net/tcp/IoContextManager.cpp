@@ -17,6 +17,8 @@
 
 #include "IoContextManager.h"
 
+#include <activemq/util/AMQLog.h>
+
 using namespace decaf::internal::net::tcp;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,6 +60,7 @@ void IoContextManager::start(size_t threadCount) {
 
     // Use atomic load inside the lock for final check
     if (started.load(std::memory_order_relaxed)) {
+        AMQ_LOG_DEBUG("IoContextManager", "start() already started, returning");
         return;  // Already started
     }
 
@@ -73,6 +76,8 @@ void IoContextManager::start(size_t threadCount) {
         }
     }
 
+    AMQ_LOG_DEBUG("IoContextManager", "starting with " << threadCount << " worker threads...");
+
     // Create work_guard to keep threads alive
     // This is necessary because async operations + condition variables require
     // threads to stay alive to process completions
@@ -81,15 +86,20 @@ void IoContextManager::start(size_t threadCount) {
 
     // Start worker threads
     for (size_t i = 0; i < threadCount; ++i) {
-        std::thread worker([this]() {
+        std::thread worker([this, i]() {
+            AMQ_LOG_DEBUG("IoContextManager", "worker thread " << i << " started");
             try {
                 ioContext.run();
-            } catch (...) {}
+            } catch (...) {
+                AMQ_LOG_ERROR("IoContextManager", "worker thread " << i << " caught exception");
+            }
+            AMQ_LOG_DEBUG("IoContextManager", "worker thread " << i << " exiting");
         });
         worker.detach();
     }
 
     started.store(true, std::memory_order_release);
+    AMQ_LOG_DEBUG("IoContextManager", "start() complete, " << threadCount << " threads running");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

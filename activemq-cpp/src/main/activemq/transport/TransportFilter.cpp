@@ -21,6 +21,7 @@
 #include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 
 #include <activemq/wireformat/WireFormat.h>
+#include <activemq/util/AMQLog.h>
 
 using namespace activemq;
 using namespace activemq::transport;
@@ -101,6 +102,8 @@ void TransportFilter::onException(const decaf::lang::Exception& ex) {
         return;
     }
 
+    AMQ_LOG_ERROR("TransportFilter", "Exception received: " << ex.getMessage());
+
     if (this->listener != NULL) {
         try {
             this->listener->onException(ex);
@@ -116,6 +119,8 @@ void TransportFilter::transportInterrupted() {
         return;
     }
 
+    AMQ_LOG_INFO("TransportFilter", "Transport interrupted");
+
     try {
         if (this->listener != NULL) {
             this->listener->transportInterrupted();
@@ -130,6 +135,8 @@ void TransportFilter::transportResumed() {
     if (!this->impl->started.get() || this->impl->closed.get()) {
         return;
     }
+
+    AMQ_LOG_INFO("TransportFilter", "Transport resumed");
 
     try {
         if (this->listener != NULL) {

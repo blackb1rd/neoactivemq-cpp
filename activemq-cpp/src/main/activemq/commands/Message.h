@@ -35,6 +35,7 @@
 #include <activemq/util/Config.h>
 #include <activemq/util/PrimitiveMap.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/util/concurrent/Mutex.h>
 #include <string>
 #include <vector>
 
@@ -104,6 +105,12 @@ namespace commands{
         // Command's marshaledProperties vector.
         activemq::util::PrimitiveMap properties;
 
+        // Indicates if properties have been lazily unmarshaled from marshalledProperties
+        mutable bool propertiesUnmarshaled;
+
+        // Mutex to protect thread-safe lazy unmarshaling of properties
+        mutable decaf::util::concurrent::Mutex propertiesUnmarshalMutex;
+
         // Indicates if the Message Properties are Read Only
         bool readOnlyProperties;
 
@@ -120,6 +127,13 @@ namespace commands{
 
         Message(const Message&);
         Message& operator= (const Message&);
+
+        /**
+         * Lazily unmarshal properties from marshalledProperties byte array.
+         * Called automatically when getProperties() is accessed.
+         * @throws IOException if unmarshaling fails (corrupted properties)
+         */
+        void ensurePropertiesUnmarshaled() const;
 
     public:
 
@@ -231,12 +245,18 @@ namespace commands{
          * Gets a reference to the Message's Properties object, allows the derived
          * classes to get and set their own specific properties.
          *
+         * Lazy unmarshals properties on first access. If properties are corrupted,
+         * throws IOException when accessed (enabling consumer-level error handling).
+         *
          * @return a reference to the Primitive Map that holds message properties.
+         * @throws IOException if property unmarshaling fails (corrupted data)
          */
         util::PrimitiveMap& getMessageProperties() {
+            ensurePropertiesUnmarshaled();
             return this->properties;
         }
         const util::PrimitiveMap& getMessageProperties() const {
+            ensurePropertiesUnmarshaled();
             return this->properties;
         }
 

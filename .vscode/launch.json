@@ -5,7 +5,7 @@
             "name": "Debug All Tests",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/neoactivemq-test.exe",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -16,8 +16,9 @@
             "name": "Debug Failover Tests",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/neoactivemq-test.exe",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
             "args": [
+                "-test",
                 "activemq::transport::failover::FailoverTransportTest"
             ],
             "stopAtEntry": false,
@@ -29,7 +30,7 @@
             "name": "Debug Specific Test",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/neoactivemq-test.exe",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
             "args": [
                 "-test",
                 "activemq::transport::failover::FailoverTransportTest::testFailoverNoRandomizeBothOnline"
@@ -64,7 +65,7 @@
             "name": "Debug Example",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/examples/producer.exe",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/examples/producer.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -75,7 +76,7 @@
             "name": "Debug Benchmark",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/neoactivemq-benchmark.exe",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-benchmark.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -86,7 +87,7 @@
             "name": "Debug Integration Test",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/neoactivemq-integration-test.exe",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-integration-test.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -97,13 +98,162 @@
             "name": "Debug Current Test File",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/output/build/x86-windows-debug-test/bin/neoactivemq-test.exe",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
             "args": [
+                "-test",
                 "${input:testName}"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug ActiveMQSessionTest",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
+            "args": [
+                "-test",
+                "activemq::core::ActiveMQSessionTest",
+                "-timeout",
+                "30"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug ActiveMQSessionTest::testAutoAcking",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
+            "args": [
+                "-test",
+                "activemq::core::ActiveMQSessionTest::testAutoAcking",
+                "-timeout",
+                "30"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug All Core Tests",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
+            "args": [
+                "-test",
+                "activemq::core",
+                "-timeout",
+                "60"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug Corrupted Message Tests",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
+            "args": [
+                "-test",
+                "activemq::transport::CorruptedMessageTest"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Run Corrupted Message Tests (No Debug)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
+            "args": [
+                "-test",
+                "activemq::transport::CorruptedMessageTest"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug EOF Tests Only",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
+            "args": [
+                "-test",
+                "activemq::transport::CorruptedMessageTest::testEOFDuring*"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug Consumer Type Tests Only",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
+            "args": [
+                "-test",
+                "activemq::transport::CorruptedMessageTest::testCorruptedMessage*Consumer*"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug Specific Corrupted Message Test",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
+            "args": [
+                "-test",
+                "${input:corruptedTestName}"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug Tests (Select Preset)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${input:buildPreset}/bin/neoactivemq-test.exe",
+            "args": [
+                "-test",
+                "${input:testName}"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug Example (Select Preset)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${input:buildPresetNonTest}/bin/examples/example_bo-store-test_BoStoreSubscriberMain.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "${workspaceFolder}/output/build/${input:buildPresetNonTest}/bin;${env:PATH}"
+                }
+            ],
             "console": "integratedTerminal"
         }
     ],
@@ -113,6 +263,58 @@
             "type": "promptString",
             "description": "Enter the test name (e.g., activemq::transport::failover::FailoverTransportTest::testMethod)",
             "default": ""
+        },
+        {
+            "id": "buildPreset",
+            "type": "pickString",
+            "description": "Select build preset",
+            "options": [
+                "x86-windows-debug-test",
+                "x86-windows-release-test",
+                "x64-windows-debug-test",
+                "x64-windows-release-test",
+                "x64-windows-debug-no-ssl-test",
+                "x64-windows-release-no-ssl-test"
+            ],
+            "default": "${config:neoactivemq.buildPreset}"
+        },
+        {
+            "id": "buildPresetNonTest",
+            "type": "pickString",
+            "description": "Select build preset (non-test)",
+            "options": [
+                "x86-windows-debug",
+                "x86-windows-release",
+                "x64-windows-debug",
+                "x64-windows-release",
+                "x64-windows-debug-no-ssl",
+                "x64-windows-release-no-ssl"
+            ],
+            "default": "${config:neoactivemq.buildPresetNonTest}"
+        },
+        {
+            "id": "corruptedTestName",
+            "type": "pickString",
+            "description": "Select a Corrupted Message test to run",
+            "options": [
+                "activemq::transport::CorruptedMessageTest::testCorruptedFirstMessage",
+                "activemq::transport::CorruptedMessageTest::testCorruptedMessageBetweenValidMessages",
+                "activemq::transport::CorruptedMessageTest::testContinueAfterCorruptedMessage",
+                "activemq::transport::CorruptedMessageTest::testMultipleCorruptedMessages",
+                "activemq::transport::CorruptedMessageTest::testCorruptedMessageWithoutMessageId",
+                "activemq::transport::CorruptedMessageTest::testMaxConsecutiveErrors",
+                "activemq::transport::CorruptedMessageTest::testPoisonAckSent",
+                "activemq::transport::CorruptedMessageTest::testStreamResyncAfterSingleCorruption",
+                "activemq::transport::CorruptedMessageTest::testCorruptedMessageDuringFailover",
+                "activemq::transport::CorruptedMessageTest::testCorruptionInDifferentMessageParts",
+                "activemq::transport::CorruptedMessageTest::testCorruptedMessageNonDurableConsumer",
+                "activemq::transport::CorruptedMessageTest::testCorruptedMessageDurableTopicSubscriber",
+                "activemq::transport::CorruptedMessageTest::testPoisonAckForDurableSubscriber",
+                "activemq::transport::CorruptedMessageTest::testEOFDuringMessageIdRead",
+                "activemq::transport::CorruptedMessageTest::testEOFDuringPropertiesRead",
+                "activemq::transport::CorruptedMessageTest::testEOFDuringBodyRead"
+            ],
+            "default": "activemq::transport::CorruptedMessageTest::testEOFDuringPropertiesRead"
         }
     ]
 }

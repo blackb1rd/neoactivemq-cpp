@@ -1,6 +1,6 @@
 {
   "name": "neoactivemq-cpp",
-  "version-string": "1.1.2",
+  "version-string": "0.0.0",
   "description": "C++ client library for Apache ActiveMQ messaging broker with support for OpenWire protocol",
   "dependencies": [
     "asio",

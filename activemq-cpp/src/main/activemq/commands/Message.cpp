@@ -117,11 +117,19 @@ void Message::copyDataStructure(const DataStructure* src) {
     this->setBrokerOutTime(srcPtr->getBrokerOutTime());
     this->setJMSXGroupFirstForConsumer(srcPtr->isJMSXGroupFirstForConsumer());
 
-    // Ensure source properties are unmarshaled before copying
-    // This prevents cloned messages from having empty property maps
-    srcPtr->ensurePropertiesUnmarshaled();
-    this->properties.copy(srcPtr->properties);
-    this->propertiesUnmarshaled = srcPtr->propertiesUnmarshaled;
+    // Handle property copying for lazy unmarshaling:
+    // - marshalledProperties already copied via setMarshalledProperties() above
+    // - Copy properties map only if source has them in memory
+    // - Preserve lazy unmarshaling for messages that haven't accessed properties yet
+    if (srcPtr->propertiesUnmarshaled || !srcPtr->properties.isEmpty()) {
+        // Source has properties in memory - copy them
+        this->properties.copy(srcPtr->properties);
+        this->propertiesUnmarshaled = true;
+    } else {
+        // Source hasn't unmarshaled yet - destination will lazily unmarshal
+        // from marshalledProperties when first accessed
+        this->propertiesUnmarshaled = false;
+    }
     this->setAckHandler(srcPtr->getAckHandler());
     this->setReadOnlyBody(srcPtr->isReadOnlyBody());
     this->setReadOnlyProperties(srcPtr->isReadOnlyProperties());
@@ -892,11 +900,9 @@ void Message::beforeMarshal(wireformat::WireFormat* wireFormat AMQCPP_UNUSED) {
 
 ////////////////////////////////////////////////////////////////////////////////
 void Message::afterUnmarshal(wireformat::WireFormat* wireFormat AMQCPP_UNUSED) {
-
-    // Skip eager property unmarshaling - properties will be lazily unmarshaled
-    // when first accessed via getMessageProperties() (matches C# client behavior)
-    // This allows detection of property corruption during consumer processing
-    // rather than during wire unmarshaling, enabling redelivery mechanism
+    // Lazy unmarshaling: defer property unmarshaling until first access
+    // This allows corrupted properties to be detected when consumer accesses them,
+    // enabling proper exception handling and redelivery mechanisms
     propertiesUnmarshaled = false;
 }
 

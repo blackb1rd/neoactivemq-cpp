@@ -241,8 +241,8 @@ namespace commands{
          * Gets a reference to the Message's Properties object, allows the derived
          * classes to get and set their own specific properties.
          *
-         * Lazy unmarshals properties from marshalledProperties on first access (C# behavior).
-         * May throw IOException if properties are corrupted.
+         * Lazy unmarshals properties on first access. If properties are corrupted,
+         * throws IOException when accessed (enabling consumer-level error handling).
          *
          * @return a reference to the Primitive Map that holds message properties.
          * @throws IOException if property unmarshaling fails (corrupted data)

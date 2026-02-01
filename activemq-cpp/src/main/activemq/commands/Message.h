@@ -245,18 +245,24 @@ namespace commands{
          * Gets a reference to the Message's Properties object, allows the derived
          * classes to get and set their own specific properties.
          *
-         * Lazy unmarshals properties on first access. If properties are corrupted,
-         * throws IOException when accessed (enabling consumer-level error handling).
+         * Lazy unmarshals properties on first access if there are marshalled properties.
+         * If properties are corrupted, throws IOException when accessed.
          *
          * @return a reference to the Primitive Map that holds message properties.
          * @throws IOException if property unmarshaling fails (corrupted data)
          */
         util::PrimitiveMap& getMessageProperties() {
-            ensurePropertiesUnmarshaled();
+            // Only unmarshal if we have marshalled bytes and haven't unmarshaled yet
+            if (!propertiesUnmarshaled && !marshalledProperties.empty()) {
+                ensurePropertiesUnmarshaled();
+            }
             return this->properties;
         }
         const util::PrimitiveMap& getMessageProperties() const {
-            ensurePropertiesUnmarshaled();
+            // Only unmarshal if we have marshalled bytes and haven't unmarshaled yet
+            if (!propertiesUnmarshaled && !marshalledProperties.empty()) {
+                ensurePropertiesUnmarshaled();
+            }
             return this->properties;
         }
 

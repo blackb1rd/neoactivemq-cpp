@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug All Tests",
+            "name": "Debug Unit Tests (ALL)",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-test.exe",
@@ -84,11 +84,43 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Debug Integration Test",
+            "name": "Debug Integration Test (All)",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-integration-test.exe",
             "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug Integration Test (Skip Slow Tests)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-integration-test.exe",
+            "args": [
+                "-exclude",
+                "activemq::test::openwire::OpenwireAdvisoryTest::testConcurrentTempDestCreation|activemq::test::openwire::OpenwireSimpleTest::testWithZeroConsumerPrefetchWithInFlightExpiration|activemq::test::openwire::OpenwireXATransactionsTest::testSendReceiveTransactedBatches",
+                "-timeout",
+                "120"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug Integration Test (Specific)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-integration-test.exe",
+            "args": [
+                "-test",
+                "${input:integrationTestName}",
+                "-timeout",
+                "60"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -255,6 +287,54 @@
                 }
             ],
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug OpenwireTempDestinationTest (All)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-integration-test.exe",
+            "args": [
+                "-test",
+                "activemq::test::openwire::OpenwireTempDestinationTest",
+                "-timeout",
+                "60"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug OpenwireTempDestinationTest::testTmpQueueWorksUnderLoad",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-integration-test.exe",
+            "args": [
+                "-test",
+                "activemq::test::openwire::OpenwireTempDestinationTest::testTmpQueueWorksUnderLoad",
+                "-timeout",
+                "60"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug OpenWireMessageListenerRedeliveryTest (All)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/build/${config:neoactivemq.buildPreset}/bin/neoactivemq-integration-test.exe",
+            "args": [
+                "-test",
+                "activemq::test::openwire::OpenWireMessageListenerRedeliveryTest",
+                "-timeout",
+                "60"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "integratedTerminal"
         }
     ],
     "inputs": [
@@ -263,6 +343,12 @@
             "type": "promptString",
             "description": "Enter the test name (e.g., activemq::transport::failover::FailoverTransportTest::testMethod)",
             "default": ""
+        },
+        {
+            "id": "integrationTestName",
+            "type": "promptString",
+            "description": "Enter the integration test name (e.g., activemq::test::openwire::OpenwireTempDestinationTest::testBasics)",
+            "default": "activemq::test::openwire::"
         },
         {
             "id": "buildPreset",

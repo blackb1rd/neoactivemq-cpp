@@ -17,8 +17,27 @@
 #include "AMQLog.h"
 #include <activemq/util/Version.h>
 
+#include <algorithm>
+#include <cstring>
 #include <iomanip>
 #include <cctype>
+
+#ifdef _WIN32
+// Prevent Windows min/max macros from interfering with (std::min)/(std::max)
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+// Undefine Windows macros that conflict with our enum values
+#ifdef ERROR
+#undef ERROR
+#endif
+#ifdef DEBUG
+#undef DEBUG
+#endif
+#else
+#include <unistd.h>
+#endif
 
 namespace activemq {
 namespace util {
@@ -26,6 +45,34 @@ namespace util {
 // Initialize static members - default to NONE (no logging)
 std::atomic<AMQLogLevel> AMQLogger::currentLevel(AMQLogLevel::NONE);
 std::function<void(AMQLogLevel, const std::string&)> AMQLogger::customHandler = nullptr;
+
+// Flight Recorder static members
+std::vector<AMQLogger::FlightRecorderEntry> AMQLogger::flightRecorderBuffer;
+std::atomic<uint64_t> AMQLogger::flightRecorderWriteIndex{0};
+std::atomic<uint64_t> AMQLogger::flightRecorderTotalCount{0};
+std::atomic<bool> AMQLogger::flightRecorderEnabled{false};
+std::mutex AMQLogger::flightRecorderDumpMutex;
+std::chrono::steady_clock::time_point AMQLogger::flightRecorderStartTime;
+
+namespace {
+    std::size_t getSystemMemory() {
+#ifdef _WIN32
+        MEMORYSTATUSEX status;
+        status.dwLength = sizeof(status);
+        if (GlobalMemoryStatusEx(&status)) {
+            return static_cast<std::size_t>(status.ullTotalPhys);
+        }
+        return 1024ULL * 1024ULL * 1024ULL;  // Default 1GB if query fails
+#else
+        long pages = sysconf(_SC_PHYS_PAGES);
+        long pageSize = sysconf(_SC_PAGE_SIZE);
+        if (pages > 0 && pageSize > 0) {
+            return static_cast<std::size_t>(pages) * static_cast<std::size_t>(pageSize);
+        }
+        return 1024ULL * 1024ULL * 1024ULL;  // Default 1GB if query fails
+#endif
+    }
+}
 
 void AMQLogger::setLevel(AMQLogLevel level) {
     currentLevel.store(level, std::memory_order_relaxed);
@@ -48,6 +95,9 @@ void AMQLogger::clearOutputHandler() {
 }
 
 void AMQLogger::log(AMQLogLevel level, const char* component, const std::string& message) {
+    // Record to Flight Recorder first (always, if enabled)
+    recordToFlightRecorder(level, component, message.c_str());
+
     // Build formatted message
     std::ostringstream oss;
 
@@ -211,6 +261,166 @@ void AMQLogger::logProtocolFeatures(const char* component,
         << ", maxInactivityDurationInitialDelay=" << maxInactivityDurationInitialDelay << "ms";
 
     log(AMQLogLevel::INFO, component, oss.str());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Flight Recorder Implementation
+////////////////////////////////////////////////////////////////////////////////
+
+void AMQLogger::initializeFlightRecorder(double memoryPercent,
+                                         std::size_t minEntries,
+                                         std::size_t maxEntries) {
+    if (flightRecorderEnabled.exchange(true)) {
+        return;  // Already initialized
+    }
+
+    std::size_t systemMemory = getSystemMemory();
+    std::size_t allocBytes = static_cast<std::size_t>(systemMemory * memoryPercent);
+    std::size_t entrySize = sizeof(FlightRecorderEntry);
+    std::size_t numEntries = allocBytes / entrySize;
+
+    // Clamp to min/max
+    numEntries = (std::max)(minEntries, (std::min)(maxEntries, numEntries));
+
+    flightRecorderBuffer.resize(numEntries);
+    flightRecorderWriteIndex.store(0);
+    flightRecorderTotalCount.store(0);
+    flightRecorderStartTime = std::chrono::steady_clock::now();
+}
+
+void AMQLogger::shutdownFlightRecorder() {
+    if (!flightRecorderEnabled.exchange(false)) {
+        return;  // Not initialized
+    }
+
+    std::lock_guard<std::mutex> lock(flightRecorderDumpMutex);
+    flightRecorderBuffer.clear();
+    flightRecorderBuffer.shrink_to_fit();
+    flightRecorderWriteIndex.store(0);
+    flightRecorderTotalCount.store(0);
+}
+
+bool AMQLogger::isFlightRecorderEnabled() {
+    return flightRecorderEnabled.load(std::memory_order_relaxed);
+}
+
+void AMQLogger::recordToFlightRecorder(AMQLogLevel level, const char* component, const char* message) {
+    if (!flightRecorderEnabled.load(std::memory_order_relaxed)) {
+        return;
+    }
+
+    std::size_t cap = flightRecorderBuffer.size();
+    if (cap == 0) {
+        return;
+    }
+
+    // Get next write slot (lock-free)
+    uint64_t idx = flightRecorderWriteIndex.fetch_add(1, std::memory_order_relaxed);
+    flightRecorderTotalCount.fetch_add(1, std::memory_order_relaxed);
+
+    FlightRecorderEntry& entry = flightRecorderBuffer[idx % cap];
+    entry.timestamp = std::chrono::steady_clock::now();
+    entry.threadId = std::this_thread::get_id();
+    entry.level = level;
+
+    // Copy component (truncate if needed)
+    std::size_t compLen = std::strlen(component);
+    std::size_t copyLen = (std::min)(compLen, sizeof(entry.component) - 1);
+    std::memcpy(entry.component, component, copyLen);
+    entry.component[copyLen] = '\0';
+
+    // Copy message (truncate if needed)
+    std::size_t msgLen = std::strlen(message);
+    copyLen = (std::min)(msgLen, sizeof(entry.message) - 1);
+    std::memcpy(entry.message, message, copyLen);
+    entry.message[copyLen] = '\0';
+}
+
+void AMQLogger::dumpFlightRecorder(std::ostream& out, std::size_t maxEntries) {
+    dumpFlightRecorder([&out](const FlightRecorderEntry& entry) {
+        auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(
+            entry.timestamp - flightRecorderStartTime).count();
+
+        out << "[" << std::setw(12) << elapsed << "us] "
+            << "[" << levelToString(entry.level) << "] "
+            << "[T:" << std::hash<std::thread::id>{}(entry.threadId) << "] "
+            << "[" << entry.component << "] "
+            << entry.message << "\n";
+    }, maxEntries);
+}
+
+void AMQLogger::dumpFlightRecorder(std::function<void(const FlightRecorderEntry&)> callback,
+                                   std::size_t maxEntries) {
+    if (!flightRecorderEnabled.load(std::memory_order_acquire)) {
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(flightRecorderDumpMutex);
+
+    std::size_t cap = flightRecorderBuffer.size();
+    if (cap == 0) {
+        return;
+    }
+
+    uint64_t total = flightRecorderTotalCount.load(std::memory_order_acquire);
+    uint64_t currentIdx = flightRecorderWriteIndex.load(std::memory_order_acquire);
+
+    // Calculate how many valid entries we have
+    std::size_t validEntries = static_cast<std::size_t>((std::min)(total, static_cast<uint64_t>(cap)));
+
+    if (maxEntries > 0 && maxEntries < validEntries) {
+        validEntries = maxEntries;
+    }
+
+    if (validEntries == 0) {
+        return;
+    }
+
+    // Start from oldest entry
+    uint64_t startIdx;
+    if (total <= cap) {
+        startIdx = 0;
+    } else {
+        startIdx = currentIdx - validEntries;
+    }
+
+    // Output in chronological order
+    for (std::size_t i = 0; i < validEntries; ++i) {
+        std::size_t bufIdx = static_cast<std::size_t>((startIdx + i) % cap);
+        callback(flightRecorderBuffer[bufIdx]);
+    }
+}
+
+void AMQLogger::clearFlightRecorder() {
+    if (!flightRecorderEnabled.load(std::memory_order_relaxed)) {
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(flightRecorderDumpMutex);
+    flightRecorderWriteIndex.store(0, std::memory_order_release);
+    flightRecorderTotalCount.store(0, std::memory_order_release);
+    flightRecorderStartTime = std::chrono::steady_clock::now();
+}
+
+std::size_t AMQLogger::flightRecorderSize() {
+    if (!flightRecorderEnabled.load(std::memory_order_relaxed)) {
+        return 0;
+    }
+
+    uint64_t total = flightRecorderTotalCount.load(std::memory_order_relaxed);
+    std::size_t cap = flightRecorderBuffer.size();
+    return static_cast<std::size_t>((std::min)(total, static_cast<uint64_t>(cap)));
+}
+
+std::size_t AMQLogger::flightRecorderCapacity() {
+    if (!flightRecorderEnabled.load(std::memory_order_relaxed)) {
+        return 0;
+    }
+    return flightRecorderBuffer.size();
+}
+
+uint64_t AMQLogger::flightRecorderTotalRecorded() {
+    return flightRecorderTotalCount.load(std::memory_order_relaxed);
 }
 
 } // namespace util

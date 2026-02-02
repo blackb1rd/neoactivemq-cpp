@@ -19,12 +19,15 @@
 
 #include <activemq/util/Config.h>
 #include <atomic>
-#include <sstream>
-#include <iostream>
+#include <cstdint>
 #include <functional>
+#include <iostream>
+#include <mutex>
+#include <sstream>
+#include <string>
 #include <thread>
 #include <chrono>
-#include <string>
+#include <vector>
 
 // Undefine Windows macros that conflict with our enum values
 #ifdef ERROR
@@ -49,25 +52,51 @@ enum class AMQLogLevel : int {
 };
 
 /**
- * Lightweight logger for ActiveMQ C++ client.
+ * Lightweight logger for ActiveMQ C++ client with Flight Recorder support.
  *
  * Design principles:
  * - Zero overhead when level is NONE (level check before string construction)
  * - Thread-safe via atomic log level
  * - Uses std::ostringstream instead of fprintf
  * - Simple API - no complex configuration
+ * - Flight Recorder: circular buffer stores recent log entries for debugging
  *
  * Usage:
  *   AMQLogger::setLevel(AMQLogLevel::DEBUG);
+ *   AMQLogger::initializeFlightRecorder(0.005);  // 0.5% of system memory
  *   AMQ_LOG_DEBUG("IOTransport", "Processing command id=" << cmdId);
+ *   // On error: AMQLogger::dumpFlightRecorder(std::cerr);
  */
 class AMQCPP_API AMQLogger {
+public:
+    /**
+     * Flight Recorder entry - stores a single log event.
+     * Size is 256 bytes for cache line alignment.
+     */
+    struct FlightRecorderEntry {
+        std::chrono::steady_clock::time_point timestamp;
+        std::thread::id threadId;
+        AMQLogLevel level;
+        char component[31];
+        char message[201];
+
+        FlightRecorderEntry() : timestamp(), threadId(), level(AMQLogLevel::NONE), component{0}, message{0} {}
+    };
+
 private:
     // Atomic log level for thread-safe runtime configuration
     static std::atomic<AMQLogLevel> currentLevel;
 
     // Optional custom output handler (for testing or file logging)
     static std::function<void(AMQLogLevel, const std::string&)> customHandler;
+
+    // Flight Recorder circular buffer
+    static std::vector<FlightRecorderEntry> flightRecorderBuffer;
+    static std::atomic<uint64_t> flightRecorderWriteIndex;
+    static std::atomic<uint64_t> flightRecorderTotalCount;
+    static std::atomic<bool> flightRecorderEnabled;
+    static std::mutex flightRecorderDumpMutex;
+    static std::chrono::steady_clock::time_point flightRecorderStartTime;
 
 public:
     /**
@@ -171,6 +200,75 @@ public:
                                     bool tightEncodingEnabled,
                                     long long maxInactivityDuration,
                                     long long maxInactivityDurationInitialDelay);
+
+    // =========================================================================
+    // Flight Recorder API
+    // =========================================================================
+
+    /**
+     * Initialize the Flight Recorder with a percentage of system memory.
+     * The Flight Recorder stores log entries in a circular buffer for later
+     * analysis when debugging intermittent issues.
+     *
+     * @param memoryPercent Percentage of system memory to use (e.g., 0.005 for 0.5%)
+     * @param minEntries Minimum number of entries (default 1024)
+     * @param maxEntries Maximum number of entries (default 1M)
+     */
+    static void initializeFlightRecorder(double memoryPercent = 0.005,
+                                         std::size_t minEntries = 1024,
+                                         std::size_t maxEntries = 1048576);
+
+    /**
+     * Shutdown the Flight Recorder and release memory.
+     */
+    static void shutdownFlightRecorder();
+
+    /**
+     * Check if the Flight Recorder is enabled.
+     */
+    static bool isFlightRecorderEnabled();
+
+    /**
+     * Dump all recorded events to an output stream.
+     * Events are output in chronological order.
+     * @param out The output stream
+     * @param maxEntries Maximum entries to dump (0 = all)
+     */
+    static void dumpFlightRecorder(std::ostream& out, std::size_t maxEntries = 0);
+
+    /**
+     * Dump all recorded events to a callback function.
+     * @param callback Function called for each entry
+     * @param maxEntries Maximum entries to dump (0 = all)
+     */
+    static void dumpFlightRecorder(std::function<void(const FlightRecorderEntry&)> callback,
+                                   std::size_t maxEntries = 0);
+
+    /**
+     * Clear all recorded events.
+     */
+    static void clearFlightRecorder();
+
+    /**
+     * Get the number of entries currently in the Flight Recorder buffer.
+     */
+    static std::size_t flightRecorderSize();
+
+    /**
+     * Get the capacity of the Flight Recorder buffer.
+     */
+    static std::size_t flightRecorderCapacity();
+
+    /**
+     * Get the total number of events recorded (including overwritten).
+     */
+    static uint64_t flightRecorderTotalRecorded();
+
+private:
+    /**
+     * Internal: Record to Flight Recorder buffer.
+     */
+    static void recordToFlightRecorder(AMQLogLevel level, const char* component, const char* message);
 };
 
 } // namespace util

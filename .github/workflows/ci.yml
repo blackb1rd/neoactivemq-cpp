@@ -264,7 +264,19 @@ jobs:
 
     - name: Create vcpkg cache directories
       shell: bash
-      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg"
+      run: |
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg"
+        mkdir -p "$VCPKG_INSTALLATION_ROOT/downloads"
+
+    - name: Cache vcpkg packages
+      uses: actions/cache@v5
+      with:
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg
+          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
+        key: vcpkg-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-${{ runner.os }}-${{ matrix.config.arch }}-
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.config.preset }}
@@ -399,7 +411,19 @@ jobs:
 
     - name: Create vcpkg cache directories
       shell: bash
-      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg"
+      run: |
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg"
+        mkdir -p "$VCPKG_INSTALLATION_ROOT/downloads"
+
+    - name: Cache vcpkg packages
+      uses: actions/cache@v5
+      with:
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg
+          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
+        key: vcpkg-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-${{ runner.os }}-${{ matrix.config.arch }}-
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.config.preset }}

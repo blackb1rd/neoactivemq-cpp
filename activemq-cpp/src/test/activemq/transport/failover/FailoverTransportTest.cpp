@@ -124,7 +124,7 @@ public:
 void FailoverTransportTest::testTransportCreateFailOnCreate() {
 
     std::string uri =
-            "failover://(mock://localhost:61616?failOnCreate=true)?useExponentialBackOff=false&maxReconnectAttempts=3&initialReconnectDelay=100";
+            "failover://(mock://localhost:61616?failOnCreate=true)?useExponentialBackOff=false&maxReconnectAttempts=3&startupMaxReconnectAttempts=3&initialReconnectDelay=100";
 
     FailToConnectListener listener;
     FailoverTransportFactory factory;
@@ -138,6 +138,7 @@ void FailoverTransportTest::testTransportCreateFailOnCreate() {
 
     CPPUNIT_ASSERT(failover != NULL);
     CPPUNIT_ASSERT(failover->getMaxReconnectAttempts() == 3);
+    CPPUNIT_ASSERT(failover->getStartupMaxReconnectAttempts() == 3);
 
     transport->start();
 
@@ -153,7 +154,7 @@ void FailoverTransportTest::testTransportCreateFailOnCreate() {
 void FailoverTransportTest::testTransportCreateFailOnCreateSendMessage() {
 
     std::string uri =
-            "failover://(mock://localhost:61616?failOnCreate=true)?useExponentialBackOff=false&maxReconnectAttempts=3&initialReconnectDelay=100";
+            "failover://(mock://localhost:61616?failOnCreate=true)?useExponentialBackOff=false&maxReconnectAttempts=3&startupMaxReconnectAttempts=3&initialReconnectDelay=100";
 
     Pointer<ActiveMQMessage> message(new ActiveMQMessage());
 
@@ -169,6 +170,7 @@ void FailoverTransportTest::testTransportCreateFailOnCreateSendMessage() {
 
     CPPUNIT_ASSERT(failover != NULL);
     CPPUNIT_ASSERT(failover->getMaxReconnectAttempts() == 3);
+    CPPUNIT_ASSERT(failover->getStartupMaxReconnectAttempts() == 3);
 
     transport->start();
 

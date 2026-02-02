@@ -128,7 +128,7 @@ jobs:
       run: cmake --preset ${{ matrix.config.preset }}
 
     - name: Download build artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: linux-build-${{ matrix.config.preset }}
         path: output/build/${{ matrix.config.preset }}/
@@ -339,7 +339,7 @@ jobs:
       run: cmake --preset ${{ matrix.config.preset }}
 
     - name: Download build artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: windows-build-${{ matrix.config.preset }}
         path: output/build/${{ matrix.config.preset }}/

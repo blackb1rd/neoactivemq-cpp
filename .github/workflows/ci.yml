@@ -145,13 +145,7 @@ jobs:
         sleep 10
 
     - name: Run ${{ matrix.test_type.name }} tests
-      run: |
-        echo "::stop-commands::stop-token"
-        ctest --preset ${{ matrix.config.preset }} -R "${{ matrix.test_type.ctest_name }}" --output-on-failure -V --timeout ${{ matrix.test_type.timeout }}
-        TEST_EXIT_CODE=$?
-        echo "::stop-token::"
-        exit $TEST_EXIT_CODE
-      continue-on-error: false
+      run: ctest --preset ${{ matrix.config.preset }} -R "${{ matrix.test_type.ctest_name }}" --output-on-failure --timeout ${{ matrix.test_type.timeout }}
 
     - name: Stop ActiveMQ
       if: always() && matrix.test_type.needs_activemq
@@ -351,14 +345,7 @@ jobs:
         path: output/build/${{ matrix.config.preset }}/
 
     - name: Run ${{ matrix.test_type.name }} tests
-      shell: bash
-      run: |
-        echo "::stop-commands::stop-token"
-        ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -R "${{ matrix.test_type.ctest_name }}" --output-on-failure -V --timeout ${{ matrix.test_type.timeout }}
-        TEST_EXIT_CODE=$?
-        echo "::stop-token::"
-        exit $TEST_EXIT_CODE
-      continue-on-error: false
+      run: ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -R "${{ matrix.test_type.ctest_name }}" --output-on-failure --timeout ${{ matrix.test_type.timeout }}
 
     - name: Upload test results
       if: failure()

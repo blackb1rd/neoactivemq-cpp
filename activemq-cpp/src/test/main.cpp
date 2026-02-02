@@ -118,6 +118,10 @@ int main( int argc, char **argv ) {
     activemq::util::AMQLogger::initializeFlightRecorder(0.005);
     // Enable DEBUG level logging to record entries to flight recorder
     activemq::util::AMQLogger::setLevel(activemq::util::AMQLogLevel::DEBUG);
+    // Suppress console output during tests (Flight Recorder still captures all entries)
+    activemq::util::AMQLogger::setOutputHandler([](activemq::util::AMQLogLevel, const std::string&) {
+        // No-op: suppress console output, flight recorder still captures entries
+    });
 
     bool wasSuccessful = false;
     int iterations = 1;

@@ -69,6 +69,9 @@ namespace marshal {
         // Indicates when we are in the doUnmarshal call
         decaf::util::concurrent::atomic::AtomicBoolean receiving;
 
+        // Current transport being used for unmarshal (for partial storage access)
+        const activemq::transport::Transport* currentTransport;
+
         // WireFormat Data
         int version;
         bool stackTraceEnabled;
@@ -357,6 +360,14 @@ namespace marshal {
             this->maxInactivityDurationInitialDelay = value;
         }
 
+        /**
+         * Gets the current transport being used for unmarshaling
+         * @return the current transport, or nullptr if not unmarshaling
+         */
+        const activemq::transport::Transport* getCurrentTransport() const {
+            return currentTransport;
+        }
+
     protected:
 
         /**
@@ -365,6 +376,8 @@ namespace marshal {
          * ownership of this object.  This method can return null if the type
          * of the object to unmarshal is NULL, empty data.
          *
+         * @param transport
+         *      The Transport that is unmarshaling (used for partial storage access)
          * @param dis
          *      The DataInputStream to read from.
          *
@@ -372,7 +385,8 @@ namespace marshal {
          *
          * @throws IOException if an error occurs during the unmarshal.
          */
-        commands::DataStructure* doUnmarshal(decaf::io::DataInputStream* dis);
+        commands::DataStructure* doUnmarshal(const activemq::transport::Transport* transport,
+                                             decaf::io::DataInputStream* dis);
 
         /**
          * Cleans up all registered Marshallers and empties the dataMarshallers

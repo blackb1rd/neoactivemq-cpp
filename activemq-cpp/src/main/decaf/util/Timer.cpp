@@ -24,6 +24,7 @@
 #include <decaf/internal/util/TimerTaskHeap.h>
 #include <decaf/internal/util/concurrent/SynchronizableImpl.h>
 #include <decaf/lang/exceptions/InterruptedException.h>
+#include <activemq/util/AMQLog.h>
 
 using namespace decaf;
 using namespace decaf::util;
@@ -63,6 +64,7 @@ namespace util {
          * object.
          */
         virtual void run() {
+            AMQ_LOG_DEBUG("Timer", "run() timer thread started");
 
             while (true) {
 
@@ -70,14 +72,17 @@ namespace util {
                 synchronized(this) {
 
                     if (cancelled) {
+                        AMQ_LOG_DEBUG("Timer", "run() timer thread exiting - cancelled");
                         return;
                     }
 
                     if (heap.isEmpty()) {
                         // no tasks scheduled -- sleep until any task appear
+                        AMQ_LOG_DEBUG("Timer", "run() heap empty, entering indefinite wait");
                         try {
                             this->wait();
                         } catch (InterruptedException& e) {}
+                        AMQ_LOG_DEBUG("Timer", "run() woke from indefinite wait, heap.size=" << heap.size());
                         continue;
                     }
 
@@ -88,6 +93,7 @@ namespace util {
 
                     synchronized(&(task->lock)) {
                         if (task->cancelled) {
+                            AMQ_LOG_DEBUG("Timer", "run() removing cancelled task from heap pos 0");
                             heap.remove(0);
                             continue;
                         }
@@ -97,11 +103,13 @@ namespace util {
                     }
 
                     if (timeToSleep > 0) {
+                        AMQ_LOG_DEBUG("Timer", "run() entering timed wait for " << timeToSleep << "ms, heap.size=" << heap.size());
                         task.reset(NULL);
                         try {
                             this->wait(timeToSleep);
                         } catch (InterruptedException& e) {
                         }
+                        AMQ_LOG_DEBUG("Timer", "run() woke from timed wait, heap.size=" << heap.size());
                         continue;
                     }
 
@@ -114,9 +122,11 @@ namespace util {
 
                         if (heap.peek()->when != task->when) {
                             pos = heap.find(task);
+                            AMQ_LOG_DEBUG("Timer", "run() task moved in heap, new pos=" << pos);
                         }
 
                         if (task->cancelled) {
+                            AMQ_LOG_DEBUG("Timer", "run() task cancelled while preparing to run");
                             heap.remove(heap.find(task));
                             continue;
                         }
@@ -152,37 +162,61 @@ namespace util {
 
                 // run the task, suppress all exceptions, we can't deal with them.
                 if (task != NULL && !task->cancelled) {
+                    AMQ_LOG_DEBUG("Timer", "run() executing task");
                     try {
                         task->run();
                     } catch(...) {
+                        AMQ_LOG_DEBUG("Timer", "run() task threw exception (suppressed)");
                     }
+                    AMQ_LOG_DEBUG("Timer", "run() task execution complete");
                 }
             }
         }
 
         void insertTask(const Pointer<TimerTask>& task) {
             // callers are synchronized
+            AMQ_LOG_DEBUG("Timer", "insertTask() adding task, heap.size before=" << heap.size());
             heap.insert(task);
+            AMQ_LOG_DEBUG("Timer", "insertTask() notifying timer thread, heap.size after=" << heap.size());
             this->notify();
         }
 
         void cancel() {
+            AMQ_LOG_DEBUG("Timer", "cancel() called");
             synchronized(this) {
+                AMQ_LOG_DEBUG("Timer", "cancel() acquired lock, setting cancelled=true, heap.size=" << heap.size());
                 cancelled = true;
                 heap.reset();
+                AMQ_LOG_DEBUG("Timer", "cancel() notifying timer thread");
                 this->notify();
             }
+            AMQ_LOG_DEBUG("Timer", "cancel() completed");
         }
 
         int purge() {
+            AMQ_LOG_DEBUG("Timer", "purge() called");
             std::size_t result = 0;
             synchronized(this) {
+                std::size_t heapSizeBefore = heap.size();
+                AMQ_LOG_DEBUG("Timer", "purge() acquired lock, heap.size=" << heapSizeBefore);
+
                 if (heap.isEmpty()) {
+                    AMQ_LOG_DEBUG("Timer", "purge() heap empty, returning 0");
                     return 0;
                 }
 
                 result = heap.deleteIfCancelled();
+
+                if (result > 0) {
+                    AMQ_LOG_DEBUG("Timer", "purge() removed " << result << " cancelled tasks from heap (before=" << heapSizeBefore << ", after=" << heap.size() << "), notifying timer thread");
+                    AMQ_LOG_DEBUG("Timer", "purge() removed " << result << " tasks (before=" << heapSizeBefore << ", after=" << heap.size() << "), notifying");
+                }
+                // Always notify to wake up timer thread in case it's waiting
+                // This fixes a race condition where the timer thread could be stuck
+                // in wait() if purge() modifies the heap structure
+                this->notify();
             }
+            AMQ_LOG_DEBUG("Timer", "purge() completed, removed " << result << " tasks");
 
             return (int)result;
         }

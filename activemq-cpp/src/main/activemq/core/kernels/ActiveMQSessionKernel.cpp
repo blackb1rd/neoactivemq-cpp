@@ -17,6 +17,7 @@
 
 #include "ActiveMQSessionKernel.h"
 
+#include <activemq/util/AMQLog.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/core/ActiveMQConstants.h>
 #include <activemq/core/ActiveMQConnection.h>
@@ -236,6 +237,9 @@ ActiveMQSessionKernel::ActiveMQSessionKernel(ActiveMQConnection* connection,
     // Use the Connection's Scheduler.
     this->config->scheduler = this->connection->getScheduler();
 
+    AMQ_LOG_INFO("SessionKernel", "Session created, sessionId=" << id->toString()
+                 << " ackMode=" << (int)ackMode);
+
     // If the connection is already started, start the session.
     if (this->connection->isStarted()) {
         try {
@@ -303,6 +307,7 @@ void ActiveMQSessionKernel::close() {
 void ActiveMQSessionKernel::doClose() {
 
     try {
+        AMQ_LOG_INFO("SessionKernel", "Closing session, sessionId=" << this->sessionInfo->getSessionId()->toString());
         dispose();
 
         // Remove this session from the Broker.
@@ -429,8 +434,12 @@ void ActiveMQSessionKernel::commit() {
                 __FILE__, __LINE__, "ActiveMQSessionKernel::commit - This Session is not Transacted");
         }
 
+        AMQ_LOG_DEBUG("SessionKernel", "Committing transaction, sessionId=" << this->sessionInfo->getSessionId()->toString());
+
         // Commit the Transaction
         this->transaction->commit();
+
+        AMQ_LOG_INFO("SessionKernel", "Transaction committed, sessionId=" << this->sessionInfo->getSessionId()->toString());
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
@@ -447,8 +456,12 @@ void ActiveMQSessionKernel::rollback() {
                 __FILE__, __LINE__, "ActiveMQSessionKernel::rollback - This Session is not Transacted");
         }
 
+        AMQ_LOG_DEBUG("SessionKernel", "Rolling back transaction, sessionId=" << this->sessionInfo->getSessionId()->toString());
+
         // Roll back the Transaction
         this->transaction->rollback();
+
+        AMQ_LOG_INFO("SessionKernel", "Transaction rolled back, sessionId=" << this->sessionInfo->getSessionId()->toString());
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
@@ -463,6 +476,8 @@ void ActiveMQSessionKernel::recover() {
         if (isTransacted()) {
             throw cms::IllegalStateException("This session is transacted");
         }
+
+        AMQ_LOG_INFO("SessionKernel", "Recovering session, sessionId=" << this->sessionInfo->getSessionId()->toString());
 
         this->config->consumerLock.readLock().lock();
         try {
@@ -592,7 +607,12 @@ cms::MessageConsumer* ActiveMQSessionKernel::createConsumer(const cms::Destinati
 
         try{
             this->addConsumer(consumer);
+            AMQ_LOG_DEBUG("SessionKernel", "createConsumer() sending ConsumerInfo cmdId="
+                          << consumer->getConsumerInfo()->getCommandId()
+                          << " dest=" << dest->getPhysicalName()
+                          << " selector=" << selector);
             this->connection->syncRequest(consumer->getConsumerInfo());
+            AMQ_LOG_DEBUG("SessionKernel", "createConsumer() syncRequest completed successfully");
         } catch (Exception& ex) {
             this->removeConsumer(consumer);
             throw;
@@ -636,7 +656,13 @@ cms::MessageConsumer* ActiveMQSessionKernel::createDurableConsumer(const cms::To
 
         try {
             this->addConsumer(consumer);
+            AMQ_LOG_DEBUG("SessionKernel", "createDurableConsumer() sending ConsumerInfo cmdId="
+                          << consumer->getConsumerInfo()->getCommandId()
+                          << " dest=" << dest->getPhysicalName()
+                          << " sub=" << name
+                          << " selector=" << selector);
             this->connection->syncRequest(consumer->getConsumerInfo());
+            AMQ_LOG_DEBUG("SessionKernel", "createDurableConsumer() syncRequest completed successfully");
         } catch (Exception& ex) {
             this->removeConsumer(consumer);
             throw;
@@ -686,7 +712,11 @@ cms::MessageProducer* ActiveMQSessionKernel::createProducer(const cms::Destinati
 
         try {
             this->addProducer(producer);
+            AMQ_LOG_DEBUG("SessionKernel", "createProducer() sending ProducerInfo cmdId="
+                          << producer->getProducerInfo()->getCommandId()
+                          << " dest=" << (dest != NULL ? dest->getPhysicalName() : "<null>"));
             this->connection->syncRequest(producer->getProducerInfo());
+            AMQ_LOG_DEBUG("SessionKernel", "createProducer() syncRequest completed successfully");
         } catch (Exception& ex) {
             this->removeProducer(producer);
             throw;
@@ -991,6 +1021,11 @@ void ActiveMQSessionKernel::send(kernels::ActiveMQProducerKernel* producer, Poin
             amqMessage->onSend();
             amqMessage->setProducerId(producerId);
 
+            AMQ_LOG_DEBUG("SessionKernel", "Sending message, msgId=" << id->toString()
+                          << " dest=" << destination->getPhysicalName()
+                          << " persistent=" << amqMessage->isPersistent()
+                          << " priority=" << (int)amqMessage->getPriority());
+
             if (onComplete == NULL && sendTimeout <= 0 && !amqMessage->isResponseRequired() && !this->connection->isAlwaysSyncSend() &&
                 (!amqMessage->isPersistent() || this->connection->isUseAsyncSend() || amqMessage->getTransactionId() != NULL)) {
 
@@ -1045,6 +1080,8 @@ void ActiveMQSessionKernel::unsubscribe(const std::string& name) {
 
         this->checkClosed();
 
+        AMQ_LOG_INFO("SessionKernel", "Unsubscribing durable subscription, name=" << name);
+
         Pointer<RemoveSubscriptionInfo> rsi(new RemoveSubscriptionInfo());
 
         rsi->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
@@ -1053,6 +1090,8 @@ void ActiveMQSessionKernel::unsubscribe(const std::string& name) {
 
         // Send the message to the broker.
         this->connection->syncRequest(rsi);
+
+        AMQ_LOG_INFO("SessionKernel", "Durable subscription unsubscribed, name=" << name);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
@@ -1061,6 +1100,7 @@ void ActiveMQSessionKernel::unsubscribe(const std::string& name) {
 void ActiveMQSessionKernel::dispatch(const Pointer<MessageDispatch>& dispatch) {
 
     if (this->executor.get() != NULL) {
+        AMQ_LOG_DEBUG("SessionKernel", "Dispatching message to session executor, cmdId=" << dispatch->getCommandId());
         this->executor->execute(dispatch);
     }
 }

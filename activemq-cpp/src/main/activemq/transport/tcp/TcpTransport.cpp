@@ -19,6 +19,7 @@
 
 #include <activemq/transport/IOTransport.h>
 #include <activemq/transport/TransportFactory.h>
+#include <activemq/util/AMQLog.h>
 
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
@@ -63,7 +64,7 @@ namespace tcp {
         std::unique_ptr<decaf::io::DataOutputStream> dataOutputStream;
         std::atomic<bool> isClosing;
 
-        const decaf::net::URI& location;
+        decaf::net::URI location;
 
         int outputBufferSize;
         int inputBufferSize;
@@ -140,6 +141,7 @@ void TcpTransport::afterNextIsStopped() {
 ////////////////////////////////////////////////////////////////////////////////
 void TcpTransport::doClose() {
     try {
+        AMQ_LOG_DEBUG("TcpTransport", "Closing TCP transport");
         // Set atomic flag first to signal closing state
         impl->isClosing.store(true, std::memory_order_release);
 
@@ -147,6 +149,7 @@ void TcpTransport::doClose() {
         std::shared_ptr<decaf::net::Socket> localSocket = impl->socket;
         if (localSocket.get() != NULL) {
             localSocket->close();
+            AMQ_LOG_DEBUG("TcpTransport", "Socket closed");
         }
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -158,11 +161,16 @@ void TcpTransport::doClose() {
 void TcpTransport::connect() {
 
     try {
+        AMQ_LOG_DEBUG("TcpTransport", "connect() starting");
 
+        AMQ_LOG_DEBUG("TcpTransport", "connect() creating socket");
         impl->socket.reset(this->createSocket());
+        AMQ_LOG_DEBUG("TcpTransport", "connect() socket created");
 
         // Set all Socket Options from the URI options.
+        AMQ_LOG_DEBUG("TcpTransport", "connect() configuring socket");
         this->configureSocket(impl->socket.get());
+        AMQ_LOG_DEBUG("TcpTransport", "connect() socket configured");
 
         URI uri = this->impl->location;
 
@@ -176,7 +184,9 @@ void TcpTransport::connect() {
         string host = uri.getHost();
         int port = uri.getPort();
 
-        impl->socket->connect(host, port, impl->connectTimeout);        // Cast it to an IO transport so we can wire up the socket
+        AMQ_LOG_INFO("TcpTransport", "Connecting to " << host << ":" << port << " (timeout=" << impl->connectTimeout << "ms)");
+        impl->socket->connect(host, port, impl->connectTimeout);
+        AMQ_LOG_INFO("TcpTransport", "Connected to " << host << ":" << port);        // Cast it to an IO transport so we can wire up the socket
         // input and output streams.
         IOTransport* ioTransport = dynamic_cast<IOTransport*>(next.get());
         if (ioTransport == NULL) {

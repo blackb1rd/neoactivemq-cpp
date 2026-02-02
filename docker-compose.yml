@@ -3,11 +3,11 @@ services:
     image: apache/activemq-classic:${ACTIVEMQ_VERSION:-5.18.7}
     container_name: activemq-test
     ports:
-      - "61616:61616"  # OpenWire
-      - "61613:61613"  # STOMP
-      - "8161:8161"    # Web Console
+      - "127.0.0.1:61616:61616"  # OpenWire (localhost only)
+      - "127.0.0.1:61613:61613"  # STOMP (localhost only)
+      - "127.0.0.1:8161:8161"    # Web Console (localhost only)
     environment:
-      - ACTIVEMQ_OPTS=-Xms512m -Xmx2g
+      - ACTIVEMQ_OPTS=-Xms512m -Xmx2g -Djetty.host=0.0.0.0
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8161/admin"]
       interval: 10s
@@ -22,11 +22,11 @@ services:
   #   image: apache/activemq-classic:6.2.0
   #   container_name: activemq-test-6
   #   ports:
-  #     - "61616:61616"
-  #     - "61613:61613"
-  #     - "8161:8161"
+  #     - "127.0.0.1:61616:61616"
+  #     - "127.0.0.1:61613:61613"
+  #     - "127.0.0.1:8161:8161"
   #   environment:
-  #     - ACTIVEMQ_OPTS=-Xms512m -Xmx2g
+  #     - ACTIVEMQ_OPTS=-Xms512m -Xmx2g -Djetty.host=0.0.0.0
   #   healthcheck:
   #     test: ["CMD", "curl", "-f", "http://localhost:8161/admin"]
   #     interval: 10s

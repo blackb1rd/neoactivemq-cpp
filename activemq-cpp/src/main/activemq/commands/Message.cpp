@@ -22,6 +22,7 @@
 #include <activemq/state/CommandVisitor.h>
 #include <activemq/wireformat/openwire/marshal/BaseDataStreamMarshaller.h>
 #include <activemq/wireformat/openwire/marshal/PrimitiveTypesMarshaller.h>
+#include <activemq/util/AMQLog.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
 
@@ -44,11 +45,11 @@ using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 Message::Message() :
-    BaseCommand(), producerId(NULL), destination(NULL), transactionId(NULL), originalDestination(NULL), messageId(NULL), originalTransactionId(NULL), 
-      groupID(""), groupSequence(0), correlationId(""), persistent(false), expiration(0), priority(0), replyTo(NULL), timestamp(0), 
-      type(""), content(), marshalledProperties(), dataStructure(NULL), targetConsumerId(NULL), compressed(false), redeliveryCounter(0), 
-      brokerPath(), arrival(0), userID(""), recievedByDFBridge(false), droppable(false), cluster(), brokerInTime(0), brokerOutTime(0), 
-      jMSXGroupFirstForConsumer(false), ackHandler(NULL), properties(), readOnlyProperties(false), readOnlyBody(false), connection(NULL) {
+    BaseCommand(), producerId(NULL), destination(NULL), transactionId(NULL), originalDestination(NULL), messageId(NULL), originalTransactionId(NULL),
+      groupID(""), groupSequence(0), correlationId(""), persistent(false), expiration(0), priority(0), replyTo(NULL), timestamp(0),
+      type(""), content(), marshalledProperties(), dataStructure(NULL), targetConsumerId(NULL), compressed(false), redeliveryCounter(0),
+      brokerPath(), arrival(0), userID(""), recievedByDFBridge(false), droppable(false), cluster(), brokerInTime(0), brokerOutTime(0),
+      jMSXGroupFirstForConsumer(false), ackHandler(NULL), properties(), propertiesUnmarshaled(false), readOnlyProperties(false), readOnlyBody(false), connection(NULL) {
 
 }
 
@@ -115,7 +116,16 @@ void Message::copyDataStructure(const DataStructure* src) {
     this->setBrokerInTime(srcPtr->getBrokerInTime());
     this->setBrokerOutTime(srcPtr->getBrokerOutTime());
     this->setJMSXGroupFirstForConsumer(srcPtr->isJMSXGroupFirstForConsumer());
+
+    // Always unmarshal properties before copying to ensure cloned messages
+    // have properties in memory. This is critical because:
+    // 1. Cloned messages (e.g., for DLQ) will be marshaled before sending
+    // 2. beforeMarshal() clears marshalledProperties and re-marshals from properties map
+    // 3. If properties map is empty, marshalledProperties stays empty
+    // 4. Later unmarshal will fail to restore properties -> "Key does not exist in map"
+    srcPtr->ensurePropertiesUnmarshaled();
     this->properties.copy(srcPtr->properties);
+    this->propertiesUnmarshaled = true;
     this->setAckHandler(srcPtr->getAckHandler());
     this->setReadOnlyBody(srcPtr->isReadOnlyBody());
     this->setReadOnlyProperties(srcPtr->isReadOnlyProperties());
@@ -886,13 +896,50 @@ void Message::beforeMarshal(wireformat::WireFormat* wireFormat AMQCPP_UNUSED) {
 
 ////////////////////////////////////////////////////////////////////////////////
 void Message::afterUnmarshal(wireformat::WireFormat* wireFormat AMQCPP_UNUSED) {
+    // Lazy unmarshaling: defer property unmarshaling until first access
+    // This allows corrupted properties to be detected when consumer accesses them,
+    // enabling proper exception handling and redelivery mechanisms
+    propertiesUnmarshaled = false;
+}
 
-    try {
-        wireformat::openwire::marshal::PrimitiveTypesMarshaller::unmarshal(
-            &properties, marshalledProperties);
+////////////////////////////////////////////////////////////////////////////////
+void Message::ensurePropertiesUnmarshaled() const {
+
+    // Fast path: already unmarshaled (no lock needed)
+    if (propertiesUnmarshaled) {
+        return;
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+
+    // Thread-safe lazy unmarshaling with double-checked locking
+    synchronized(&propertiesUnmarshalMutex) {
+        // Check again inside lock (another thread may have unmarshaled)
+        if (propertiesUnmarshaled) {
+            return;
+        }
+
+        // Skip unmarshaling if there are no marshalled properties
+        if (marshalledProperties.empty()) {
+            propertiesUnmarshaled = true;
+            return;
+        }
+
+        try {
+            // Unmarshal properties from byte array (lazy unmarshaling)
+            // If this fails (corrupted properties), exception propagates to consumer code
+            // Consumer will catch it, rollback transaction, and trigger redelivery
+            wireformat::openwire::marshal::PrimitiveTypesMarshaller::unmarshal(
+                const_cast<activemq::util::PrimitiveMap*>(&properties),
+                const_cast<std::vector<unsigned char>&>(marshalledProperties));
+            propertiesUnmarshaled = true;
+        } catch (decaf::io::IOException& e) {
+            AMQ_LOG_ERROR("Message", "ensurePropertiesUnmarshaled(): Failed to unmarshal properties (corrupted) for message id="
+                          << (messageId != NULL ? messageId->toString() : "NULL")
+                          << ", marshalledProperties.size=" << marshalledProperties.size()
+                          << ", exception=" << e.getMessage());
+            throw;
+        }
+        AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception, decaf::io::IOException)
+        AMQ_CATCHALL_THROW(decaf::io::IOException)
+    }
 }
 

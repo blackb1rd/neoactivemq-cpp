@@ -35,6 +35,7 @@
 #include <activemq/util/Config.h>
 #include <activemq/util/PrimitiveMap.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/util/concurrent/Mutex.h>
 #include <string>
 #include <vector>
 
@@ -104,6 +105,12 @@ namespace commands{
         // Command's marshaledProperties vector.
         activemq::util::PrimitiveMap properties;
 
+        // Indicates if properties have been lazily unmarshaled from marshalledProperties
+        mutable bool propertiesUnmarshaled;
+
+        // Mutex to protect thread-safe lazy unmarshaling of properties
+        mutable decaf::util::concurrent::Mutex propertiesUnmarshalMutex;
+
         // Indicates if the Message Properties are Read Only
         bool readOnlyProperties;
 
@@ -122,6 +129,19 @@ namespace commands{
         Message& operator= (const Message&);
 
     public:
+
+        /**
+         * Lazily unmarshal properties from marshalledProperties byte array.
+         * This must be called before accessing properties on received messages
+         * to ensure properties are available. If the properties are corrupted,
+         * this method throws an IOException which allows consumer code to
+         * handle the error (e.g., trigger redelivery).
+         *
+         * Thread-safe: uses double-checked locking pattern.
+         *
+         * @throws IOException if unmarshaling fails (corrupted properties)
+         */
+        void ensurePropertiesUnmarshaled() const;
 
         Message();
 
@@ -230,6 +250,12 @@ namespace commands{
         /**
          * Gets a reference to the Message's Properties object, allows the derived
          * classes to get and set their own specific properties.
+         *
+         * NOTE: This method does NOT trigger lazy unmarshaling. For consumer-facing
+         * code that needs to access properties from received messages, call
+         * ensurePropertiesUnmarshaled() first to trigger lazy unmarshaling.
+         * This separation prevents deadlocks when getMessageProperties() is called
+         * from internal code paths while holding other locks.
          *
          * @return a reference to the Primitive Map that holds message properties.
          */

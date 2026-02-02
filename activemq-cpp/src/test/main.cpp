@@ -26,6 +26,7 @@
 #include <util/teamcity/TeamCityProgressListener.h>
 #include <util/StackTrace.h>
 #include <activemq/util/Config.h>
+#include <activemq/util/AMQLog.h>
 #include <activemq/library/ActiveMQCPP.h>
 #include <iostream>
 #include <fstream>
@@ -112,6 +113,15 @@ int main( int argc, char **argv ) {
     test::util::initializeStackTrace();
 
     activemq::library::ActiveMQCPP::initializeLibrary();
+
+    // Initialize Flight Recorder with 0.5% of system memory for debugging
+    activemq::util::AMQLogger::initializeFlightRecorder(0.005);
+    // Enable DEBUG level logging to record entries to flight recorder
+    activemq::util::AMQLogger::setLevel(activemq::util::AMQLogLevel::DEBUG);
+    // Suppress console output during tests (Flight Recorder still captures all entries)
+    activemq::util::AMQLogger::setOutputHandler([](activemq::util::AMQLogLevel, const std::string&) {
+        // No-op: suppress console output, flight recorder still captures entries
+    });
 
     bool wasSuccessful = false;
     int iterations = 1;
@@ -222,6 +232,12 @@ int main( int argc, char **argv ) {
                 std::cerr << std::endl << "ERROR: Test execution timed out after "
                           << timeoutSeconds << " seconds" << std::endl;
 
+                // Dump Flight Recorder log entries for debugging
+                std::cerr << std::endl << "=== Flight Recorder Dump (last "
+                          << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+                activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
+                std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
+
                 // Dump stack traces of all threads before terminating
                 testRunner.dumpStackTrace();
 
@@ -235,17 +251,31 @@ int main( int argc, char **argv ) {
 
             wasSuccessful = testRunner.getResult();
 
-            // If tests failed (but didn't timeout), dump stack traces
+            // If tests failed (but didn't timeout), dump flight recorder and stack traces
             if( !wasSuccessful ) {
                 std::cerr << std::endl << "ERROR: Test execution failed" << std::endl;
+
+                // Dump Flight Recorder log entries for debugging
+                std::cerr << std::endl << "=== Flight Recorder Dump (last "
+                          << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+                activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
+                std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
+
                 testRunner.dumpStackTrace();
             }
         } else {
             wasSuccessful = runner.run( testPath, false );
 
-            // If tests failed, dump stack traces
+            // If tests failed, dump flight recorder and stack traces
             if( !wasSuccessful ) {
                 std::cerr << std::endl << "ERROR: Test execution failed" << std::endl;
+
+                // Dump Flight Recorder log entries for debugging
+                std::cerr << std::endl << "=== Flight Recorder Dump (last "
+                          << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+                activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
+                std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
+
                 test::util::dumpAllThreadStackTraces();
             }
         }
@@ -260,6 +290,9 @@ int main( int argc, char **argv ) {
             break;
         }
     }
+
+    // Shutdown Flight Recorder
+    activemq::util::AMQLogger::shutdownFlightRecorder();
 
     activemq::library::ActiveMQCPP::shutdownLibrary();
 

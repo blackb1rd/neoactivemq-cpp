@@ -31,6 +31,7 @@ set(TEST_SRCS
   activemq/core/ActiveMQSessionTest.cpp
   activemq/core/ConnectionAuditTest.cpp
   activemq/core/FifoMessageDispatchChannelTest.cpp
+  activemq/core/LazyPropertyUnmarshalTest.cpp
   activemq/core/SimplePriorityMessageDispatchChannelTest.cpp
   activemq/exceptions/ActiveMQExceptionTest.cpp
   activemq/mock/MockBrokerService.cpp
@@ -43,6 +44,7 @@ set(TEST_SRCS
   activemq/threads/CompositeTaskRunnerTest.cpp
   activemq/threads/DedicatedTaskRunnerTest.cpp
   activemq/threads/SchedulerTest.cpp
+  activemq/transport/CorruptedMessageTest.cpp
   activemq/transport/IOTransportTest.cpp
   activemq/transport/TransportRegistryTest.cpp
   activemq/transport/correlator/ResponseCorrelatorTest.cpp

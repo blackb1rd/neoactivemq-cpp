@@ -18,6 +18,7 @@
 #include "FailoverTransport.h"
 
 #include <atomic>
+#include <activemq/util/AMQLog.h>
 #include <activemq/commands/ConnectionControl.h>
 #include <activemq/commands/ShutdownInfo.h>
 #include <activemq/commands/RemoveInfo.h>
@@ -37,7 +38,9 @@
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/Integer.h>
+#include <decaf/lang/Long.h>
 #include <decaf/lang/exceptions/IllegalThreadStateException.h>
+#include <activemq/util/URISupport.h>
 
 using namespace std;
 using namespace activemq;
@@ -47,6 +50,7 @@ using namespace activemq::exceptions;
 using namespace activemq::threads;
 using namespace activemq::transport;
 using namespace activemq::transport::failover;
+using namespace activemq::util;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::net;
@@ -106,6 +110,7 @@ namespace failover {
         mutable Mutex listenerMutex;
 
         StlMap<int, Pointer<Command> > requestMap;
+        StlMap<std::string, int> uriFailureCounts;  // Per-URI failure tracking
 
         Pointer<URIPool> uris;
         Pointer<URIPool> priorityUris;
@@ -126,14 +131,14 @@ namespace failover {
             closed(false),
             connected(false),
             started(false),
-            timeout(INFINITE_WAIT),
+            timeout(30000),  // 30 second timeout instead of infinite to avoid hanging
             initialReconnectDelay(DEFAULT_INITIAL_RECONNECT_DELAY),
             maxReconnectDelay(1000*30),
             backOffMultiplier(2),
             useExponentialBackOff(true),
             initialized(false),
-            maxReconnectAttempts(INFINITE_WAIT),
-            startupMaxReconnectAttempts(INFINITE_WAIT),
+            maxReconnectAttempts(20),
+            startupMaxReconnectAttempts(20),
             connectFailures(0),
             reconnectDelay(DEFAULT_INITIAL_RECONNECT_DELAY),
             trackMessages(false),
@@ -172,6 +177,62 @@ namespace failover {
 
             this->taskRunner->addTask(parent);
             this->taskRunner->addTask(this->closeTask.get());
+        }
+
+        /**
+         * Increment the failure count for a specific URI.
+         */
+        void incrementUriFailureCount(const decaf::net::URI& uri) {
+            std::string uriStr = uri.toString();
+            if (uriFailureCounts.containsKey(uriStr)) {
+                uriFailureCounts.put(uriStr, uriFailureCounts.get(uriStr) + 1);
+            } else {
+                uriFailureCounts.put(uriStr, 1);
+            }
+        }
+
+        /**
+         * Get the failure count for a specific URI.
+         */
+        int getUriFailureCount(const decaf::net::URI& uri) const {
+            std::string uriStr = uri.toString();
+            if (uriFailureCounts.containsKey(uriStr)) {
+                return uriFailureCounts.get(uriStr);
+            }
+            return 0;
+        }
+
+        /**
+         * Check if a URI has exceeded its max reconnect attempts.
+         * Returns true if the URI should be skipped.
+         */
+        bool isUriExhausted(const decaf::net::URI& uri, int maxAttempts) const {
+            if (maxAttempts < 0) {
+                return false;  // Infinite retries
+            }
+            return getUriFailureCount(uri) >= maxAttempts;
+        }
+
+        /**
+         * Check if all URIs in a list have exceeded their max reconnect attempts.
+         */
+        bool allUrisExhausted(const decaf::util::List<decaf::net::URI>& uriList, int maxAttempts) const {
+            if (maxAttempts < 0) {
+                return false;  // Infinite retries
+            }
+            for (int i = 0; i < uriList.size(); i++) {
+                if (!isUriExhausted(uriList.get(i), maxAttempts)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /**
+         * Reset all per-URI failure counts (called on successful connection).
+         */
+        void resetAllUriFailureCounts() {
+            uriFailureCounts.clear();
         }
 
         bool isPriority(const decaf::net::URI& uri) {
@@ -528,6 +589,7 @@ void FailoverTransport::oneway(const Pointer<Command> command) {
                     } catch (IOException& e) {
 
                         e.setMark(__FILE__, __LINE__);
+                        AMQ_LOG_DEBUG("FailoverTransport", "oneway() send failed for cmdId=" << command->getCommandId() << ": " << e.getMessage());
 
                         // If the command was not tracked.. we will retry in this method
                         if (tracked == NULL && this->impl->canReconnect()) {
@@ -594,6 +656,7 @@ void FailoverTransport::start() {
                 return;
             }
 
+            AMQ_LOG_INFO("FailoverTransport", "Starting failover transport");
             this->impl->started = true;
 
             if (this->impl->backupsEnabled || this->impl->priorityBackup) {
@@ -645,6 +708,7 @@ void FailoverTransport::close() {
                 return;
             }
 
+            AMQ_LOG_INFO("FailoverTransport", "Closing failover transport");
             this->impl->started = false;
             this->impl->closed = true;
             this->impl->connected.store(false, std::memory_order_release);
@@ -706,6 +770,8 @@ void FailoverTransport::restoreTransport(const Pointer<Transport> transport, boo
 
     try {
 
+        AMQ_LOG_DEBUG("FailoverTransport", "Restoring transport state, alreadyStarted=" << alreadyStarted);
+
         // Only start the transport if it hasn't been started already.
         // Backup transports are pre-started, so we skip the start() call for them.
         if (!alreadyStarted) {
@@ -718,6 +784,7 @@ void FailoverTransport::restoreTransport(const Pointer<Transport> transport, boo
         transport->oneway(cc);
 
         stateTracker.restore(transport);
+        AMQ_LOG_DEBUG("FailoverTransport", "Transport state restored successfully");
 
         decaf::util::StlMap<int, Pointer<Command> > commands;
         synchronized(&this->impl->requestMap) {
@@ -742,6 +809,8 @@ void FailoverTransport::handleTransportFailure(const decaf::lang::Exception& err
         // let the close do the work
         return;
     }
+
+    AMQ_LOG_ERROR("FailoverTransport", "Transport failure detected: " << error.getMessage());
 
     synchronized(&this->impl->reconnectMutex) {
 
@@ -922,6 +991,7 @@ bool FailoverTransport::iterate() {
             Pointer<URIPool> connectList = this->impl->getConnectList();
 
             if (connectList->isEmpty() && !impl->backups->isEnabled()) {
+                AMQ_LOG_ERROR("FailoverTransport", "No URIs available for reconnect");
                 failure.reset(new IOException(__FILE__, __LINE__, "No URIs available for reconnect."));
             } else {
 
@@ -999,6 +1069,15 @@ bool FailoverTransport::iterate() {
                                 break;
                             }
 
+                            // Skip this URI if it has exceeded its per-host max reconnect attempts
+                            int reconnectAttempts = this->impl->calculateReconnectAttemptLimit();
+                            if (this->impl->isUriExhausted(uri, reconnectAttempts)) {
+                                AMQ_LOG_DEBUG("FailoverTransport", "Skipping exhausted URI: " << uri.toString()
+                                    << " (failures: " << this->impl->getUriFailureCount(uri) << ")");
+                                failures.add(uri);  // Add back to failures so it returns to pool
+                                continue;  // Try next URI
+                            }
+
                             transport = createTransport(uri);
                             // Mark this transport as the one being connected so close()
                             // can cancel it if requested concurrently.
@@ -1037,6 +1116,8 @@ bool FailoverTransport::iterate() {
                         this->impl->connectedTransport = transport;
                         this->impl->reconnectMutex.notifyAll();
                         this->impl->connectFailures = 0;
+                        this->impl->resetAllUriFailureCounts();  // Reset per-URI failure counts on success
+                        AMQ_LOG_INFO("FailoverTransport", "Successfully connected to " << uri.toString());
 
                         if (isPriorityBackup()) {
                             this->impl->connectedToPrioirty = connectList->getPriorityURI().equals(uri) ||
@@ -1078,6 +1159,7 @@ bool FailoverTransport::iterate() {
 
                     } catch (Exception& e) {
                         e.setMark(__FILE__, __LINE__);
+                        AMQ_LOG_DEBUG("FailoverTransport", "Connection attempt to " << uri.toString() << " failed: " << e.getMessage());
                         if (transport != NULL) {
                             if (this->impl->disposedListener != NULL) {
                                 transport->setTransportListener(this->impl->disposedListener.get());
@@ -1103,6 +1185,12 @@ bool FailoverTransport::iterate() {
 
                         failures.add(uri);
                         failure.reset(e.clone());
+
+                        // Track per-URI failure count
+                        this->impl->incrementUriFailureCount(uri);
+                        int uriAttempts = this->impl->getUriFailureCount(uri);
+                        AMQ_LOG_DEBUG("FailoverTransport", "URI " << uri.toString()
+                            << " failure count: " << uriAttempts);
                     }
                 }
 
@@ -1113,7 +1201,18 @@ bool FailoverTransport::iterate() {
 
         int reconnectAttempts = this->impl->calculateReconnectAttemptLimit();
 
-        if (reconnectAttempts >= 0 && ++this->impl->connectFailures >= reconnectAttempts) {
+        // Check if ALL URIs have exceeded their per-URI max reconnect attempts
+        // maxReconnectAttempts is per-host, not global - only fail when ALL hosts are exhausted
+        Pointer<URIPool> checkList = this->impl->getConnectList();
+        bool allExhausted = reconnectAttempts >= 0 &&
+                           this->impl->allUrisExhausted(checkList->getURIList(), reconnectAttempts);
+
+        // Also increment global counter for backwards compatibility
+        ++this->impl->connectFailures;
+
+        if (allExhausted) {
+            AMQ_LOG_ERROR("FailoverTransport", "All URIs have exceeded max reconnect attempts ("
+                << reconnectAttempts << ") per host");
             this->impl->connectionFailure = failure;
 
             // If this was a first connection failure and we've exhausted startupMaxReconnectAttempts,
@@ -1122,6 +1221,7 @@ bool FailoverTransport::iterate() {
             if (this->impl->firstConnection) {
                 this->impl->firstConnection = false;
                 this->impl->connectFailures = 0;  // Reset counter for subsequent reconnection attempts with maxReconnectAttempts
+                this->impl->resetAllUriFailureCounts();  // Reset per-URI counts for new phase
                 this->impl->resetReconnectDelay();  // Reset delay back to initial value
             }
 
@@ -1172,7 +1272,20 @@ Pointer<Transport> FailoverTransport::createTransport(const URI& location) const
             throw new IOException(__FILE__, __LINE__, "Invalid URI specified, no valid Factory Found.");
         }
 
-        Pointer<Transport> transport(factory->createComposite(location));
+        // Apply failover timeout as soConnectTimeout if not already specified in the URI
+        URI transportUri = location;
+        if (this->impl->timeout > 0) {
+            Properties params = URISupport::parseParameters(location);
+            if (!params.hasProperty("soConnectTimeout")) {
+                Properties newParams;
+                newParams.setProperty("soConnectTimeout", Long::toString(this->impl->timeout));
+                transportUri = URISupport::applyParameters(location, newParams);
+                AMQ_LOG_DEBUG("FailoverTransport", "Applied connection timeout " << this->impl->timeout
+                    << "ms to " << transportUri.toString());
+            }
+        }
+
+        Pointer<Transport> transport(factory->createComposite(transportUri));
 
         return transport;
     }

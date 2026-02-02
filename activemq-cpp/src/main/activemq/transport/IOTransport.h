@@ -32,11 +32,18 @@
 #include <decaf/util/logging/LoggerDefines.h>
 
 namespace activemq {
+namespace commands {
+    class Message;
+}
+}
+
+namespace activemq {
 namespace transport {
 
     using decaf::lang::Pointer;
     using activemq::commands::Command;
     using activemq::commands::Response;
+    using activemq::commands::Message;
 
     class IOTransportImpl;
 
@@ -78,6 +85,15 @@ namespace transport {
          *      The exception to send to any registered listener.
          */
         void fire(decaf::lang::Exception& ex);
+
+        /**
+         * Log detailed message information for MessageDispatch
+         * Helper function to log message details when INFO logging is enabled
+         *
+         * @param command
+         *      The command to log (should be a MessageDispatch)
+         */
+        void logMessageDispatchDetails(const Pointer<Command>& command);
 
         /**
          * Notify the command listener.

@@ -18,6 +18,8 @@
 #include "OpenWireFormat.h"
 
 #include <decaf/lang/Boolean.h>
+#include <activemq/util/AMQLog.h>
+#include <activemq/transport/IOTransport.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
 #include <decaf/util/UUID.h>
@@ -28,6 +30,7 @@
 #include <activemq/wireformat/MarshalAware.h>
 #include <activemq/commands/WireFormatInfo.h>
 #include <activemq/commands/DataStructure.h>
+#include <activemq/commands/Message.h>
 #include <activemq/wireformat/openwire/marshal/DataStreamMarshaller.h>
 #include <activemq/wireformat/openwire/marshal/generated/MarshallerFactory.h>
 #include <activemq/exceptions/ActiveMQException.h>
@@ -45,9 +48,7 @@ using namespace activemq::wireformat::openwire::utils;
 using namespace decaf::io;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
-
-////////////////////////////////////////////////////////////////////////////////
+using namespace decaf::lang::exceptions;////////////////////////////////////////////////////////////////////////////////
 const unsigned char OpenWireFormat::NULL_TYPE = 0;
 const int OpenWireFormat::DEFAULT_VERSION = 1;
 const int OpenWireFormat::MAX_SUPPORTED_VERSION = 11;
@@ -55,7 +56,7 @@ const int OpenWireFormat::MAX_SUPPORTED_VERSION = 11;
 ////////////////////////////////////////////////////////////////////////////////
 OpenWireFormat::OpenWireFormat(const decaf::util::Properties& properties) :
     properties(properties), preferedWireFormatInfo(), dataMarshallers(256),
-    id(UUID::randomUUID().toString()), receiving(), version(0), stackTraceEnabled(true),
+    id(UUID::randomUUID().toString()), receiving(), currentTransport(nullptr), version(0), stackTraceEnabled(true),
     tcpNoDelayEnabled(true), cacheEnabled(true), cacheSize(1024), tightEncodingEnabled(false),
     sizePrefixDisabled(false), maxInactivityDuration(30000), maxInactivityDurationInitialDelay(10000) {
 
@@ -148,6 +149,11 @@ void OpenWireFormat::marshal(const Pointer<commands::Command> command, const act
 
         if (command != NULL) {
 
+            AMQ_LOG_DEBUG("OpenWireFormat", "marshal() SEND cmdId=" << command->getCommandId()
+                << " type=" << (int)command->getDataStructureType()
+                << " responseRequired=" << command->isResponseRequired()
+                << " toString=" << command->toString());
+
             DataStructure* dataStructure = dynamic_cast<DataStructure*>(command.get());
 
             unsigned char type = dataStructure->getDataStructureType();
@@ -214,7 +220,7 @@ void OpenWireFormat::marshal(const Pointer<commands::Command> command, const act
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<commands::Command> OpenWireFormat::unmarshal(const activemq::transport::Transport* transport AMQCPP_UNUSED, decaf::io::DataInputStream* dis) {
+Pointer<commands::Command> OpenWireFormat::unmarshal(const activemq::transport::Transport* transport, decaf::io::DataInputStream* dis) {
 
     try {
 
@@ -222,12 +228,14 @@ Pointer<commands::Command> OpenWireFormat::unmarshal(const activemq::transport::
             throw decaf::io::IOException(__FILE__, __LINE__, "DataInputStream passed is NULL");
         }
 
+        AMQ_LOG_DEBUG("OpenWireFormat", "unmarshal() start");
+
         if (!sizePrefixDisabled) {
             dis->readInt();
         }
 
         // Get the unmarshalled DataStructure
-        Pointer<DataStructure> data(doUnmarshal(dis));
+        Pointer<DataStructure> data(doUnmarshal(transport, dis));
 
         if (data == NULL) {
             throw IOException(__FILE__, __LINE__, "OpenWireFormat::doUnmarshal - "
@@ -239,6 +247,11 @@ Pointer<commands::Command> OpenWireFormat::unmarshal(const activemq::transport::
         // throw an ClassCastException.
         Pointer<Command> command = data.dynamicCast<Command>();
 
+        AMQ_LOG_DEBUG("OpenWireFormat", "unmarshal() RECV cmdId=" << command->getCommandId()
+                      << " type=" << (int)command->getDataStructureType()
+                      << " isResponse=" << command->isResponse()
+                      << " toString=" << command->toString());
+
         return command;
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -248,14 +261,22 @@ Pointer<commands::Command> OpenWireFormat::unmarshal(const activemq::transport::
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-commands::DataStructure* OpenWireFormat::doUnmarshal(DataInputStream* dis) {
+commands::DataStructure* OpenWireFormat::doUnmarshal(const activemq::transport::Transport* transport,
+                                                     DataInputStream* dis) {
 
     try {
+
+        // Store current transport for access by marshallers
+        this->currentTransport = transport;
+
+        // Cast transport to IOTransport for partial storage access
+        IOTransport* ioTransport = const_cast<IOTransport*>(dynamic_cast<const IOTransport*>(transport));
 
         class Finally {
         private:
 
             decaf::util::concurrent::atomic::AtomicBoolean* state;
+            const activemq::transport::Transport** transportPtr;
 
         private:
 
@@ -264,18 +285,25 @@ commands::DataStructure* OpenWireFormat::doUnmarshal(DataInputStream* dis) {
 
         public:
 
-            Finally(decaf::util::concurrent::atomic::AtomicBoolean* state) : state(state) {
+            Finally(decaf::util::concurrent::atomic::AtomicBoolean* state,
+                   const activemq::transport::Transport** transportPtr)
+                : state(state), transportPtr(transportPtr) {
                 state->set(true);
             }
 
             ~Finally() {
                 state->set(false);
+                if (transportPtr != nullptr) {
+                    *transportPtr = nullptr;
+                }
             }
         }
 
-        finalizer(&(this->receiving));
+        finalizer(&(this->receiving), &(this->currentTransport));
 
         unsigned char dataType = dis->readByte();
+
+        AMQ_LOG_DEBUG("OpenWireFormat", "doUnmarshal() read dataType=" << (int)dataType);
 
         if (dataType != NULL_TYPE) {
 
@@ -284,6 +312,8 @@ commands::DataStructure* OpenWireFormat::doUnmarshal(DataInputStream* dis) {
             if (dsm == NULL) {
                 throw IOException(__FILE__, __LINE__, (string("OpenWireFormat::marshal - Unknown data type: ") + Integer::toString(dataType)).c_str());
             }
+
+            AMQ_LOG_DEBUG("OpenWireFormat", "doUnmarshal() creating object for dataType=" << (int)dataType);
 
             // Ask the DataStreamMarshaller to create a new instance of its
             // command so that we can fill in its data.
@@ -406,6 +436,7 @@ DataStructure* OpenWireFormat::tightUnmarshalNestedObject(DataInputStream* dis, 
 
                 BooleanStream bs2;
                 bs2.unmarshal(dis);
+
                 dsm->tightUnmarshal(this, data.get(), dis, &bs2);
             } else {
                 dsm->tightUnmarshal(this, data.get(), dis, bs);
@@ -494,4 +525,9 @@ void OpenWireFormat::renegotiateWireFormat(const WireFormatInfo& info) {
     this->cacheSize = min(info.getCacheSize(), preferedWireFormatInfo->getCacheSize());
     this->maxInactivityDuration = min(info.getMaxInactivityDuration(), preferedWireFormatInfo->getMaxInactivityDuration());
     this->maxInactivityDurationInitialDelay = min(info.getMaxInactivityDurationInitalDelay(), preferedWireFormatInfo->getMaxInactivityDurationInitalDelay());
+
+    AMQ_LOG_INFO("OpenWireFormat", "Wire format negotiated: version=" << this->version
+        << " cacheEnabled=" << this->cacheEnabled
+        << " tightEncoding=" << this->tightEncodingEnabled
+        << " maxInactivityDuration=" << this->maxInactivityDuration << "ms");
 }

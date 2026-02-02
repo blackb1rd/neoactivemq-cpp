@@ -24,6 +24,7 @@
 #include <activemq/threads/CompositeTaskRunner.h>
 #include <activemq/commands/WireFormatInfo.h>
 #include <activemq/commands/KeepAliveInfo.h>
+#include <activemq/util/AMQLog.h>
 
 #include <decaf/util/Timer.h>
 #include <decaf/util/concurrent/atomic/AtomicBoolean.h>
@@ -395,6 +396,7 @@ void InactivityMonitor::readCheck() {
     }
 
     if (!this->members->commandReceived.get()) {
+        AMQ_LOG_ERROR("InactivityMonitor", "Read check failed - no commands received within timeout, triggering failure");
         // Set the failed state on our async Read Failure Task and wakeup its runner.
         this->members->asyncReadTask->setFailed(true);
         this->members->asyncTasks->wakeup();
@@ -411,7 +413,7 @@ void InactivityMonitor::writeCheck() {
     }
 
     if (!this->members->commandSent.get()) {
-
+        AMQ_LOG_DEBUG("InactivityMonitor", "Sending keep-alive (no commands sent within write check interval)");
         this->members->asyncWriteTask->setWrite(true);
         this->members->asyncTasks->wakeup();
     }
@@ -457,6 +459,9 @@ void InactivityMonitor::startMonitorThreads() {
             this->members->readCheckerTask.reset(new ReadChecker(this));
             this->members->writeCheckTime = this->members->readCheckTime > 3 ? this->members->readCheckTime / 3 : this->members->readCheckTime;
 
+            AMQ_LOG_INFO("InactivityMonitor", "Starting monitor threads, readCheckTime=" << this->members->readCheckTime
+                << "ms, writeCheckTime=" << this->members->writeCheckTime << "ms, initialDelay=" << this->members->initialDelayTime << "ms");
+
             this->members->writeCheckTimer.scheduleAtFixedRate(this->members->writeCheckerTask, this->members->initialDelayTime, this->members->writeCheckTime);
             this->members->readCheckTimer.scheduleAtFixedRate(this->members->readCheckerTask, this->members->initialDelayTime, this->members->readCheckTime);
         }
@@ -467,6 +472,7 @@ void InactivityMonitor::startMonitorThreads() {
 void InactivityMonitor::stopMonitorThreads() {
 
     if (this->members->monitorStarted.compareAndSet(true, false)) {
+        AMQ_LOG_DEBUG("InactivityMonitor", "Stopping monitor threads");
 
         synchronized(&this->members->monitor) {
 

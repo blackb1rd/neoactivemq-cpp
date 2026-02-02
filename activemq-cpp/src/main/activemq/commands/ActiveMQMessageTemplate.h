@@ -98,6 +98,8 @@ namespace commands {
 
         virtual void clearProperties() {
             try {
+                // Ensure properties are unmarshaled before clearing
+                this->ensurePropertiesUnmarshaled();
                 this->getMessageProperties().clear();
                 this->setReadOnlyProperties(false);
             }
@@ -106,6 +108,8 @@ namespace commands {
 
         virtual std::vector<std::string> getPropertyNames() const {
             try {
+                // Ensure properties are unmarshaled before accessing
+                this->ensurePropertiesUnmarshaled();
                 return getMessageProperties().keySet().toArray();
             }
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
@@ -113,6 +117,8 @@ namespace commands {
 
         virtual bool propertyExists(const std::string& name) const {
             try {
+                // Ensure properties are unmarshaled before checking
+                this->ensurePropertiesUnmarshaled();
                 return getMessageProperties().containsKey(name);
             }
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
@@ -120,6 +126,8 @@ namespace commands {
 
         virtual cms::Message::ValueType getPropertyValueType(const std::string& name) const {
             try {
+                // Ensure properties are unmarshaled before accessing
+                this->ensurePropertiesUnmarshaled();
                 util::PrimitiveValueNode::PrimitiveType type = this->getMessageProperties().getValueType(name);
 
                 // Just map the values that are actually allowed in Message Properties, the others
@@ -159,6 +167,8 @@ namespace commands {
 
         virtual bool getBooleanProperty(const std::string& name) const {
             try {
+                // Ensure properties are unmarshaled before accessing (lazy unmarshal for corrupted message detection)
+                this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getBooleanProperty(name);
             } catch (decaf::lang::exceptions::UnsupportedOperationException& ex) {
                 throw activemq::util::CMSExceptionSupport::createMessageFormatException(ex);
@@ -168,6 +178,8 @@ namespace commands {
 
         virtual unsigned char getByteProperty(const std::string& name) const {
             try {
+                // Ensure properties are unmarshaled before accessing (lazy unmarshal for corrupted message detection)
+                this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getByteProperty(name);
             } catch (decaf::lang::exceptions::UnsupportedOperationException& ex) {
                 throw activemq::util::CMSExceptionSupport::createMessageFormatException(ex);
@@ -176,8 +188,9 @@ namespace commands {
         }
 
         virtual double getDoubleProperty(const std::string& name) const {
-
             try {
+                // Ensure properties are unmarshaled before accessing (lazy unmarshal for corrupted message detection)
+                this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getDoubleProperty(name);
             } catch (decaf::lang::exceptions::UnsupportedOperationException& ex) {
                 throw activemq::util::CMSExceptionSupport::createMessageFormatException(ex);
@@ -186,8 +199,9 @@ namespace commands {
         }
 
         virtual float getFloatProperty(const std::string& name) const {
-
             try {
+                // Ensure properties are unmarshaled before accessing (lazy unmarshal for corrupted message detection)
+                this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getFloatProperty(name);
             } catch (decaf::lang::exceptions::UnsupportedOperationException& ex) {
                 throw activemq::util::CMSExceptionSupport::createMessageFormatException(ex);
@@ -196,8 +210,9 @@ namespace commands {
         }
 
         virtual int getIntProperty(const std::string& name) const {
-
             try {
+                // Ensure properties are unmarshaled before accessing (lazy unmarshal for corrupted message detection)
+                this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getIntProperty(name);
             } catch (decaf::lang::exceptions::UnsupportedOperationException& ex) {
                 throw activemq::util::CMSExceptionSupport::createMessageFormatException(ex);
@@ -206,8 +221,9 @@ namespace commands {
         }
 
         virtual long long getLongProperty(const std::string& name) const {
-
             try {
+                // Ensure properties are unmarshaled before accessing (lazy unmarshal for corrupted message detection)
+                this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getLongProperty(name);
             } catch (decaf::lang::exceptions::UnsupportedOperationException& ex) {
                 throw activemq::util::CMSExceptionSupport::createMessageFormatException(ex);
@@ -216,8 +232,9 @@ namespace commands {
         }
 
         virtual short getShortProperty(const std::string& name) const {
-
             try {
+                // Ensure properties are unmarshaled before accessing (lazy unmarshal for corrupted message detection)
+                this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getShortProperty(name);
             } catch (decaf::lang::exceptions::UnsupportedOperationException& ex) {
                 throw activemq::util::CMSExceptionSupport::createMessageFormatException(ex);
@@ -226,8 +243,9 @@ namespace commands {
         }
 
         virtual std::string getStringProperty(const std::string& name) const {
-
             try {
+                // Ensure properties are unmarshaled before accessing (lazy unmarshal for corrupted message detection)
+                this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getStringProperty(name);
             } catch (decaf::lang::exceptions::UnsupportedOperationException& ex) {
                 throw activemq::util::CMSExceptionSupport::createMessageFormatException(ex);
@@ -243,6 +261,8 @@ namespace commands {
 
             failIfReadOnlyProperties();
             try {
+                // Ensure properties are unmarshaled before modifying
+                this->ensurePropertiesUnmarshaled();
                 this->propertiesInterceptor->setBooleanProperty(name, value);
             }
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
@@ -256,6 +276,8 @@ namespace commands {
 
             failIfReadOnlyProperties();
             try {
+                // Ensure properties are unmarshaled before modifying
+                this->ensurePropertiesUnmarshaled();
                 this->propertiesInterceptor->setByteProperty(name, value);
             }
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
@@ -269,6 +291,8 @@ namespace commands {
 
             failIfReadOnlyProperties();
             try {
+                // Ensure properties are unmarshaled before modifying
+                this->ensurePropertiesUnmarshaled();
                 this->propertiesInterceptor->setDoubleProperty(name, value);
             }
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
@@ -282,6 +306,8 @@ namespace commands {
 
             failIfReadOnlyProperties();
             try {
+                // Ensure properties are unmarshaled before modifying
+                this->ensurePropertiesUnmarshaled();
                 this->propertiesInterceptor->setFloatProperty(name, value);
             }
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
@@ -295,6 +321,8 @@ namespace commands {
 
             failIfReadOnlyProperties();
             try {
+                // Ensure properties are unmarshaled before modifying
+                this->ensurePropertiesUnmarshaled();
                 this->propertiesInterceptor->setIntProperty(name, value);
             }
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
@@ -308,6 +336,8 @@ namespace commands {
 
             failIfReadOnlyProperties();
             try {
+                // Ensure properties are unmarshaled before modifying
+                this->ensurePropertiesUnmarshaled();
                 this->propertiesInterceptor->setLongProperty(name, value);
             }
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
@@ -321,6 +351,8 @@ namespace commands {
 
             failIfReadOnlyProperties();
             try {
+                // Ensure properties are unmarshaled before modifying
+                this->ensurePropertiesUnmarshaled();
                 this->propertiesInterceptor->setShortProperty(name, value);
             }
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
@@ -334,6 +366,8 @@ namespace commands {
 
             failIfReadOnlyProperties();
             try {
+                // Ensure properties are unmarshaled before modifying
+                this->ensurePropertiesUnmarshaled();
                 this->propertiesInterceptor->setStringProperty(name, value);
             }
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()

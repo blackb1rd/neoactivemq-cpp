@@ -17,6 +17,7 @@
 
 #include "FailoverTransportTest.h"
 
+#include <activemq/util/AMQLog.h>
 #include <activemq/transport/failover/FailoverTransportFactory.h>
 #include <activemq/transport/failover/FailoverTransport.h>
 #include <activemq/transport/mock/MockTransport.h>
@@ -123,7 +124,7 @@ public:
 void FailoverTransportTest::testTransportCreateFailOnCreate() {
 
     std::string uri =
-            "failover://(mock://localhost:61616?failOnCreate=true)?useExponentialBackOff=false&maxReconnectAttempts=3&initialReconnectDelay=100";
+            "failover://(mock://localhost:61616?failOnCreate=true)?useExponentialBackOff=false&maxReconnectAttempts=3&startupMaxReconnectAttempts=3&initialReconnectDelay=100";
 
     FailToConnectListener listener;
     FailoverTransportFactory factory;
@@ -137,6 +138,7 @@ void FailoverTransportTest::testTransportCreateFailOnCreate() {
 
     CPPUNIT_ASSERT(failover != NULL);
     CPPUNIT_ASSERT(failover->getMaxReconnectAttempts() == 3);
+    CPPUNIT_ASSERT(failover->getStartupMaxReconnectAttempts() == 3);
 
     transport->start();
 
@@ -152,7 +154,7 @@ void FailoverTransportTest::testTransportCreateFailOnCreate() {
 void FailoverTransportTest::testTransportCreateFailOnCreateSendMessage() {
 
     std::string uri =
-            "failover://(mock://localhost:61616?failOnCreate=true)?useExponentialBackOff=false&maxReconnectAttempts=3&initialReconnectDelay=100";
+            "failover://(mock://localhost:61616?failOnCreate=true)?useExponentialBackOff=false&maxReconnectAttempts=3&startupMaxReconnectAttempts=3&initialReconnectDelay=100";
 
     Pointer<ActiveMQMessage> message(new ActiveMQMessage());
 
@@ -168,6 +170,7 @@ void FailoverTransportTest::testTransportCreateFailOnCreateSendMessage() {
 
     CPPUNIT_ASSERT(failover != NULL);
     CPPUNIT_ASSERT(failover->getMaxReconnectAttempts() == 3);
+    CPPUNIT_ASSERT(failover->getStartupMaxReconnectAttempts() == 3);
 
     transport->start();
 
@@ -948,8 +951,9 @@ void FailoverTransportTest::testFailoverNoRandomizeBroker1OnlyOnline() {
     broker1->start();
     broker1->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61004,"
-                                  "tcp://localhost:61005)?randomize=false";
+    // Use 127.0.0.1 instead of localhost to force IPv4 (MockBrokerService binds to 0.0.0.0)
+    std::string uri = "failover://(tcp://127.0.0.1:61004,"
+                                  "tcp://127.0.0.1:61005)?randomize=false&maxReconnectAttempts=-1";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1226,8 +1230,9 @@ void FailoverTransportTest::testFailoverWithRandomizeBroker1OnlyOnline() {
     broker1->start();
     broker1->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61014,"
-                                  "tcp://localhost:61015)";
+    // Use 127.0.0.1 instead of localhost to force IPv4 (MockBrokerService binds to 0.0.0.0)
+    std::string uri = "failover://(tcp://127.0.0.1:61014,"
+                                  "tcp://127.0.0.1:61015)";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;

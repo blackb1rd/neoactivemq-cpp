@@ -1070,9 +1070,10 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker1ComesOnline
     Pointer<MockBrokerService> broker2(new MockBrokerService(61009));
 
     // Both brokers offline initially
+    // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
     // Use longer reconnect delay and more attempts to ensure broker has time to start
-    std::string uri = "failover://(tcp://localhost:61008,"
-                                  "tcp://localhost:61009)?randomize=false&startupMaxReconnectAttempts=100&initialReconnectDelay=50&maxReconnectDelay=50&useExponentialBackOff=false";
+    std::string uri = "failover://(tcp://127.0.0.1:61008,"
+                                  "tcp://127.0.0.1:61009)?randomize=false&startupMaxReconnectAttempts=100&initialReconnectDelay=50&maxReconnectDelay=50&useExponentialBackOff=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1117,9 +1118,10 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker2ComesOnline
     Pointer<MockBrokerService> broker2(new MockBrokerService(61011));
 
     // Both brokers offline initially
+    // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
     // Use longer reconnect delay and more attempts to ensure broker has time to start
-    std::string uri = "failover://(tcp://localhost:61010,"
-                                  "tcp://localhost:61011)?randomize=false&startupMaxReconnectAttempts=100&initialReconnectDelay=50&maxReconnectDelay=50&useExponentialBackOff=false";
+    std::string uri = "failover://(tcp://127.0.0.1:61010,"
+                                  "tcp://127.0.0.1:61011)?randomize=false&startupMaxReconnectAttempts=100&initialReconnectDelay=50&maxReconnectDelay=50&useExponentialBackOff=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1347,8 +1349,9 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker1ComesOnli
     Pointer<MockBrokerService> broker2(new MockBrokerService(61019));
 
     // Both brokers offline initially
-    std::string uri = "failover://(tcp://localhost:61018,"
-                                  "tcp://localhost:61019)?startupMaxReconnectAttempts=50&initialReconnectDelay=50&useExponentialBackOff=false";
+    // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
+    std::string uri = "failover://(tcp://127.0.0.1:61018,"
+                                  "tcp://127.0.0.1:61019)?startupMaxReconnectAttempts=50&initialReconnectDelay=50&useExponentialBackOff=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1392,8 +1395,9 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker2ComesOnli
     Pointer<MockBrokerService> broker2(new MockBrokerService(61021));
 
     // Both brokers offline initially
-    std::string uri = "failover://(tcp://localhost:61020,"
-                                  "tcp://localhost:61021)?startupMaxReconnectAttempts=50&initialReconnectDelay=50&useExponentialBackOff=false";
+    // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
+    std::string uri = "failover://(tcp://127.0.0.1:61020,"
+                                  "tcp://127.0.0.1:61021)?startupMaxReconnectAttempts=50&initialReconnectDelay=50&useExponentialBackOff=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;

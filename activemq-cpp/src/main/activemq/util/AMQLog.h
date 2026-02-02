@@ -97,6 +97,7 @@ private:
     static std::atomic<bool> flightRecorderEnabled;
     static std::mutex flightRecorderDumpMutex;
     static std::chrono::steady_clock::time_point flightRecorderStartTime;
+    static std::chrono::system_clock::time_point flightRecorderWallClockStart;
 
 public:
     /**

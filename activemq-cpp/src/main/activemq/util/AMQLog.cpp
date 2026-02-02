@@ -53,6 +53,7 @@ std::atomic<uint64_t> AMQLogger::flightRecorderTotalCount{0};
 std::atomic<bool> AMQLogger::flightRecorderEnabled{false};
 std::mutex AMQLogger::flightRecorderDumpMutex;
 std::chrono::steady_clock::time_point AMQLogger::flightRecorderStartTime;
+std::chrono::system_clock::time_point AMQLogger::flightRecorderWallClockStart;
 
 namespace {
     std::size_t getSystemMemory() {
@@ -286,6 +287,7 @@ void AMQLogger::initializeFlightRecorder(double memoryPercent,
     flightRecorderWriteIndex.store(0);
     flightRecorderTotalCount.store(0);
     flightRecorderStartTime = std::chrono::steady_clock::now();
+    flightRecorderWallClockStart = std::chrono::system_clock::now();
 }
 
 void AMQLogger::shutdownFlightRecorder() {
@@ -340,6 +342,24 @@ void AMQLogger::dumpFlightRecorder(std::ostream& out, std::size_t maxEntries) {
     dumpFlightRecorder([&out](const FlightRecorderEntry& entry) {
         auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(
             entry.timestamp - flightRecorderStartTime).count();
+
+        // Calculate wall-clock time for this entry
+        auto wallClockTime = flightRecorderWallClockStart +
+            std::chrono::duration_cast<std::chrono::system_clock::duration>(
+                entry.timestamp - flightRecorderStartTime);
+        auto time_t_val = std::chrono::system_clock::to_time_t(wallClockTime);
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+            wallClockTime.time_since_epoch()) % 1000;
+
+        // Format wall-clock timestamp
+#ifdef _WIN32
+        struct tm timeinfo;
+        localtime_s(&timeinfo, &time_t_val);
+        out << std::put_time(&timeinfo, "%H:%M:%S");
+#else
+        out << std::put_time(std::localtime(&time_t_val), "%H:%M:%S");
+#endif
+        out << "." << std::setfill('0') << std::setw(3) << ms.count() << " ";
 
         out << "[" << std::setw(12) << elapsed << "us] "
             << "[" << levelToString(entry.level) << "] "
@@ -400,6 +420,7 @@ void AMQLogger::clearFlightRecorder() {
     flightRecorderWriteIndex.store(0, std::memory_order_release);
     flightRecorderTotalCount.store(0, std::memory_order_release);
     flightRecorderStartTime = std::chrono::steady_clock::now();
+    flightRecorderWallClockStart = std::chrono::system_clock::now();
 }
 
 std::size_t AMQLogger::flightRecorderSize() {

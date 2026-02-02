@@ -978,6 +978,10 @@ bool FailoverTransport::iterate() {
 
     Pointer<Exception> failure;
 
+    AMQ_LOG_DEBUG("FailoverTransport", "iterate() called, firstConnection=" << this->impl->firstConnection
+        << ", connectFailures=" << this->impl->connectFailures
+        << ", closed=" << this->impl->closed);
+
     synchronized(&this->impl->reconnectMutex) {
 
         if (this->impl->isClosedOrFailed()) {
@@ -985,6 +989,8 @@ bool FailoverTransport::iterate() {
         }
 
         if (this->impl->isConnectionStateValid() || this->impl->isClosedOrFailed()) {
+            AMQ_LOG_DEBUG("FailoverTransport", "iterate() returning false - connectionValid=" << this->impl->isConnectionStateValid()
+                << ", closedOrFailed=" << this->impl->isClosedOrFailed());
             return false;
         } else {
 
@@ -1088,6 +1094,8 @@ bool FailoverTransport::iterate() {
 
                         // Only start the transport if it's not already started (i.e., not from backup pool)
                         if (!transportAlreadyStarted) {
+                            AMQ_LOG_DEBUG("FailoverTransport", "Attempting connection to " << uri.toString()
+                                << " (attempt " << (this->impl->getUriFailureCount(uri) + 1) << ")");
                             transport->start();
                         }
 
@@ -1148,6 +1156,7 @@ bool FailoverTransport::iterate() {
                         this->impl->connected.store(true, std::memory_order_release);
                         // Memory barrier to ensure connected state is visible
                         std::atomic_thread_fence(std::memory_order_seq_cst);
+                        AMQ_LOG_DEBUG("FailoverTransport", "Connection established, connected=true");
 
                         synchronized(&this->impl->listenerMutex) {
                             if (this->impl->transportListener != NULL) {
@@ -1219,6 +1228,7 @@ bool FailoverTransport::iterate() {
             // transition to using maxReconnectAttempts for future attempts
             bool wasFirstConnection = this->impl->firstConnection;
             if (this->impl->firstConnection) {
+                AMQ_LOG_INFO("FailoverTransport", "Transitioning from startup phase to reconnection phase");
                 this->impl->firstConnection = false;
                 this->impl->connectFailures = 0;  // Reset counter for subsequent reconnection attempts with maxReconnectAttempts
                 this->impl->resetAllUriFailureCounts();  // Reset per-URI counts for new phase

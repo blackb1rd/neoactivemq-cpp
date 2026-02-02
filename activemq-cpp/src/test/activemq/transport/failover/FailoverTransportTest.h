@@ -73,8 +73,8 @@ namespace failover {
         //CPPUNIT_TEST( testConnectsToPriorityOnceStarted );
         //CPPUNIT_TEST( testPriorityBackupRapidSwitchingOnRestore );
         CPPUNIT_TEST( testSimpleBrokerRestart );
-        // CPPUNIT_TEST( testBrokerRestartWithProperSync );
-        //CPPUNIT_TEST( testFuzzyBrokerAvailability );
+        CPPUNIT_TEST( testBrokerRestartWithProperSync );
+        CPPUNIT_TEST( testFuzzyBrokerAvailability );
         //CPPUNIT_TEST( testConnectsToPriorityAfterInitialBackupFails );
         CPPUNIT_TEST_SUITE_END();
 

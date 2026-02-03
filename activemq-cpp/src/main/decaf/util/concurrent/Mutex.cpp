@@ -23,7 +23,6 @@
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/lang/exceptions/IllegalMonitorStateException.h>
-#include <activemq/util/AMQLog.h>
 
 #include <mutex>
 #include <condition_variable>
@@ -210,18 +209,14 @@ void Mutex::wait( long long millisecs, int nanos ) {
 
     try {
         if (millisecs == 0 && nanos == 0) {
-            // Indefinite wait - wait for notification with periodic interruption checks.
-            // Use a short timeout to allow checking for interrupts and notifications.
-            // Unlike Java, we don't distinguish between spurious wakeups and real notifications -
-            // the caller should always re-check their condition after wait() returns.
-            AMQ_LOG_DEBUG("Mutex", "wait() indefinite - entering wait loop, mutex=" << this->properties->name);
+            // Indefinite wait - use polling to check for interruption periodically
+            // We use wait_for with a timeout so we can check for interruption
             while (true) {
-                // Wait for up to 100ms, then check for interruption/notification
+                // Wait for up to 100ms, then check for interruption
                 std::cv_status status = this->properties->condition.wait_for(lock, std::chrono::milliseconds(100));
 
                 // Check if thread was interrupted
                 if (Thread::interrupted()) {
-                    AMQ_LOG_DEBUG("Mutex", "wait() indefinite - interrupted, mutex=" << this->properties->name);
                     // Release unique_lock ownership WITHOUT unlocking the mutex
                     lock.release();
                     // Restore the CustomReentrantLock state
@@ -232,87 +227,32 @@ void Mutex::wait( long long millisecs, int nanos ) {
                 }
 
                 // Check if a notifyAll() was called - all threads can proceed
-                bool notifyAllFlag = this->properties->notifyAll.load(std::memory_order_acquire);
-                if (notifyAllFlag) {
-                    AMQ_LOG_DEBUG("Mutex", "wait() indefinite - woke due to notifyAll flag, mutex=" << this->properties->name);
+                if (this->properties->notifyAll.load(std::memory_order_acquire)) {
                     break;
                 }
 
                 // Check if a notify() was called (pending notification to consume)
-                int pending = this->properties->pendingNotifications.load(std::memory_order_acquire);
-                if (pending > 0) {
-                    // Atomically try to consume one notification
-                    if (this->properties->pendingNotifications.compare_exchange_strong(
-                            pending, pending - 1, std::memory_order_acq_rel)) {
-                        AMQ_LOG_DEBUG("Mutex", "wait() indefinite - consumed pending notification, remaining=" << (pending - 1) << ", mutex=" << this->properties->name);
-                        break;
+                // Only the thread that successfully decrements can proceed
+                if (status == std::cv_status::no_timeout) {
+                    // We were actually woken by notify_one() or notify_all()
+                    // Try to consume a pending notification
+                    int pending = this->properties->pendingNotifications.load(std::memory_order_acquire);
+                    if (pending > 0) {
+                        // Atomically try to consume one notification
+                        if (this->properties->pendingNotifications.compare_exchange_strong(
+                                pending, pending - 1, std::memory_order_acq_rel)) {
+                            break;
+                        }
                     }
                 }
-
-                // If we were woken up (not just timeout), treat it as a spurious wakeup
-                // and return to let the caller re-check their condition.
-                // This matches Java semantics where wait() can return spuriously.
-                if (status == std::cv_status::no_timeout) {
-                    // Got woken by notify_one() or notify_all() but missed the counter/flag
-                    // Return anyway to avoid potential lost wakeups
-                    AMQ_LOG_DEBUG("Mutex", "wait() indefinite - spurious wakeup (no_timeout but no notification), mutex=" << this->properties->name);
-                    break;
-                }
-                // Otherwise, continue waiting (timeout for interruption check)
+                // Otherwise, continue waiting (spurious wakeup or timeout for interruption check)
             }
-            AMQ_LOG_DEBUG("Mutex", "wait() indefinite - exiting wait loop, mutex=" << this->properties->name);
         } else {
-            // Timed wait - wait for the specified duration but check for notifications periodically
-            AMQ_LOG_DEBUG("Mutex", "wait() timed - entering wait for " << millisecs << "ms, mutex=" << this->properties->name);
-            auto deadline = std::chrono::steady_clock::now() +
-                            std::chrono::milliseconds(millisecs) +
-                            std::chrono::nanoseconds(nanos);
-            const auto checkInterval = std::chrono::milliseconds(100);
-
-            while (std::chrono::steady_clock::now() < deadline) {
-                // Wait for up to 100ms at a time to allow checking for notifications
-                auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(
-                    deadline - std::chrono::steady_clock::now());
-
-                if (remaining.count() <= 0) {
-                    break;  // Deadline reached
-                }
-
-                auto waitTime = (remaining < checkInterval) ? remaining : checkInterval;
-                std::cv_status status = this->properties->condition.wait_for(lock, waitTime);
-
-                // Check if thread was interrupted
-                if (Thread::interrupted()) {
-                    AMQ_LOG_DEBUG("Mutex", "wait() timed - interrupted, mutex=" << this->properties->name);
-                    lock.release();
-                    this->properties->reentrantLock.adoptLock(savedRecursionCount);
-                    handle->state.store(savedState, std::memory_order_release);
-                    throw InterruptedException(__FILE__, __LINE__, "Thread interrupted during timed wait");
-                }
-
-                // Check if notifyAll() was called
-                if (this->properties->notifyAll.load(std::memory_order_acquire)) {
-                    AMQ_LOG_DEBUG("Mutex", "wait() timed - woke due to notifyAll flag, mutex=" << this->properties->name);
-                    break;
-                }
-
-                // Check if notify() was called
-                int pending = this->properties->pendingNotifications.load(std::memory_order_acquire);
-                if (pending > 0) {
-                    if (this->properties->pendingNotifications.compare_exchange_strong(
-                            pending, pending - 1, std::memory_order_acq_rel)) {
-                        AMQ_LOG_DEBUG("Mutex", "wait() timed - consumed pending notification, mutex=" << this->properties->name);
-                        break;
-                    }
-                }
-
-                // If we got a real wakeup (not timeout), return to let caller check condition
-                if (status == std::cv_status::no_timeout) {
-                    AMQ_LOG_DEBUG("Mutex", "wait() timed - spurious wakeup, mutex=" << this->properties->name);
-                    break;
-                }
-            }
-            AMQ_LOG_DEBUG("Mutex", "wait() timed - exiting wait, mutex=" << this->properties->name);
+            // Timed wait - just wait for the specified duration
+            // For timed waits, we don't need to check the notification counter since
+            // the caller expects the wait to return after the timeout regardless
+            auto duration = std::chrono::milliseconds(millisecs) + std::chrono::nanoseconds(nanos);
+            this->properties->condition.wait_for(lock, duration);
         }
 
         // After wait returns, unique_lock has the mutex locked.
@@ -348,8 +288,7 @@ void Mutex::notify() {
         throw IllegalMonitorStateException(__FILE__, __LINE__, "Thread does not own the mutex");
     }
     // Add one pending notification that will be consumed by exactly one waiting thread
-    int newCount = this->properties->pendingNotifications.fetch_add(1, std::memory_order_release) + 1;
-    AMQ_LOG_DEBUG("Mutex", "notify() called, pendingNotifications=" << newCount << ", mutex=" << this->properties->name);
+    this->properties->pendingNotifications.fetch_add(1, std::memory_order_release);
     this->properties->condition.notify_one();
 }
 
@@ -359,8 +298,6 @@ void Mutex::notifyAll() {
         throw IllegalMonitorStateException(__FILE__, __LINE__, "Thread does not own the mutex");
     }
     // Set the notifyAll flag to allow all waiting threads to proceed
-    AMQ_LOG_DEBUG("Mutex", "notifyAll() called, setting notifyAll flag=true, mutex=" << this->properties->name);
     this->properties->notifyAll.store(true, std::memory_order_release);
     this->properties->condition.notify_all();
-    AMQ_LOG_DEBUG("Mutex", "notifyAll() completed, mutex=" << this->properties->name);
 }

@@ -142,6 +142,12 @@ if(MSVC)
         # Windows/MSVC: Use /Z7 (embedded debug info in .obj files) for all builds
         # This avoids PDB locking issues with parallel builds and works better with sccache
         set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug,Release>:Embedded>")
+
+        # Remove default /Zi flags to avoid "overriding /Zi with /Z7" warning (D9025)
+        foreach(flag_var CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELWITHDEBINFO
+                         CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_RELWITHDEBINFO)
+            string(REGEX REPLACE "/Z[iI]" "" ${flag_var} "${${flag_var}}")
+        endforeach()
     endif()
     # Note: CMake already sets /Od for Debug and /O2 for Release by default
 else()

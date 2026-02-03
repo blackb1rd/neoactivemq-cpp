@@ -336,22 +336,25 @@ void ResponseCorrelator::onCommand(const Pointer<Command> command) {
 
             // Check if it's an ExceptionResponse - these should always be propagated
             // even if we don't have the original request, as they indicate broker-level errors
-            Pointer<commands::ExceptionResponse> exResponse = response.dynamicCast<commands::ExceptionResponse>();
-            if (exResponse != NULL && exResponse->getException() != NULL) {
-                AMQ_LOG_ERROR("ResponseCorrelator", "ExceptionResponse not in map but propagating - "
-                    << exResponse->getException()->getMessage());
+            // Note: Must check type first because dynamicCast throws ClassCastException on failure
+            if (response->getDataStructureType() == commands::ExceptionResponse::ID_EXCEPTIONRESPONSE) {
+                Pointer<commands::ExceptionResponse> exResponse = response.dynamicCast<commands::ExceptionResponse>();
+                if (exResponse->getException() != NULL) {
+                    AMQ_LOG_ERROR("ResponseCorrelator", "ExceptionResponse not in map but propagating - "
+                        << exResponse->getException()->getMessage());
 
-                // Propagate the exception to the transport listener
-                // This ensures broker errors are not silently discarded during reconnection
-                if (this->impl->priorError == NULL) {
-                    this->impl->priorError.reset(new IOException(
-                        __FILE__, __LINE__,
-                        exResponse->getException()->getMessage().c_str()));
+                    // Propagate the exception to the transport listener
+                    // This ensures broker errors are not silently discarded during reconnection
+                    if (this->impl->priorError == NULL) {
+                        this->impl->priorError.reset(new IOException(
+                            __FILE__, __LINE__,
+                            exResponse->getException()->getMessage().c_str()));
+                    }
+
+                    // Also propagate as a command so upper layers can handle it
+                    TransportFilter::onCommand(command);
+                    return;
                 }
-
-                // Also propagate as a command so upper layers can handle it
-                TransportFilter::onCommand(command);
-                return;
             }
             return;
         }

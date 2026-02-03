@@ -20,7 +20,6 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/threads/SchedulerTimerTask.h>
 #include <activemq/util/ServiceStopper.h>
-#include <activemq/util/AMQLog.h>
 
 #include <decaf/lang/Pointer.h>
 #include <decaf/util/Timer.h>
@@ -137,11 +136,6 @@ void Scheduler::doStop(ServiceStopper* stopper AMQCPP_UNUSED) {
     synchronized(&mutex) {
         if (this->timer != NULL) {
             this->timer->cancel();
-            // Wait for the timer thread to terminate (10 second timeout)
-            // This prevents hanging during cleanup
-            if (!this->timer->awaitTermination(10000, decaf::util::concurrent::TimeUnit::MILLISECONDS)) {
-                AMQ_LOG_WARN("Scheduler", "Timer thread did not terminate within timeout");
-            }
         }
     }
 }

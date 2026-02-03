@@ -232,17 +232,21 @@ void Mutex::wait( long long millisecs, int nanos ) {
                 }
 
                 // Check if a notify() was called (pending notification to consume)
-                // Only the thread that successfully decrements can proceed
-                if (status == std::cv_status::no_timeout) {
-                    // We were actually woken by notify_one() or notify_all()
-                    // Try to consume a pending notification
-                    int pending = this->properties->pendingNotifications.load(std::memory_order_acquire);
-                    if (pending > 0) {
-                        // Atomically try to consume one notification
-                        if (this->properties->pendingNotifications.compare_exchange_strong(
-                                pending, pending - 1, std::memory_order_acq_rel)) {
-                            break;
-                        }
+                // IMPORTANT: Always check pendingNotifications, not just when woken.
+                // This prevents lost notifications in the race condition where:
+                // 1. wait_for times out (status = timeout)
+                // 2. Thread returns from wait_for, about to loop back
+                // 3. Another thread calls notify() at this moment
+                // 4. notify_one() wakes no one (this thread wasn't waiting yet)
+                // 5. This thread re-enters wait_for, misses the notification
+                // By always checking pendingNotifications, we catch notifications
+                // that arrived between wait_for returning and re-entering.
+                int pending = this->properties->pendingNotifications.load(std::memory_order_acquire);
+                if (pending > 0) {
+                    // Atomically try to consume one notification
+                    if (this->properties->pendingNotifications.compare_exchange_strong(
+                            pending, pending - 1, std::memory_order_acq_rel)) {
+                        break;
                     }
                 }
                 // Otherwise, continue waiting (spurious wakeup or timeout for interruption check)

@@ -85,10 +85,18 @@ Pointer<Transport> FailoverTransportFactory::doCreateComposite(const decaf::net:
             Long::parseLong(topLvlProperties.getProperty("maxReconnectDelay", "30000")));
         transport->setUseExponentialBackOff(
             Boolean::parseBoolean(topLvlProperties.getProperty("useExponentialBackOff", "true")));
-        transport->setMaxReconnectAttempts(
-            Integer::parseInt(topLvlProperties.getProperty("maxReconnectAttempts", "20")));
-        transport->setStartupMaxReconnectAttempts(
-            Integer::parseInt(topLvlProperties.getProperty("startupMaxReconnectAttempts", "20")));
+        int maxReconnectAttempts = Integer::parseInt(topLvlProperties.getProperty("maxReconnectAttempts", "20"));
+        transport->setMaxReconnectAttempts(maxReconnectAttempts);
+
+        // Default startupMaxReconnectAttempts to maxReconnectAttempts if not explicitly set
+        std::string startupMaxStr = topLvlProperties.getProperty("startupMaxReconnectAttempts", "");
+        int startupMaxReconnectAttempts;
+        if (startupMaxStr.empty()) {
+            startupMaxReconnectAttempts = maxReconnectAttempts;
+        } else {
+            startupMaxReconnectAttempts = Integer::parseInt(startupMaxStr);
+        }
+        transport->setStartupMaxReconnectAttempts(startupMaxReconnectAttempts);
         transport->setRandomize(
             Boolean::parseBoolean(topLvlProperties.getProperty("randomize", "true")));
         transport->setBackup(

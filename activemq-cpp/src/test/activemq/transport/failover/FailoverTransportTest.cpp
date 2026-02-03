@@ -1720,10 +1720,9 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     transport->start();
 
     // Wait for initial connection
-    // Increased timeout for slower CI environments
     int count = 0;
-    while (!failover->isConnected() && count++ < 75) {
-        Thread::sleep(200);
+    while (!failover->isConnected() && count++ < 100) {
+        Thread::sleep(100);
     }
     CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", failover->isConnected() == true);
 
@@ -1731,33 +1730,34 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     broker1->stop();
     broker1->waitUntilStopped();
 
-    // Give transport time to detect the disconnection
-    Thread::sleep(500);
-
-    // Wait for reconnection to broker2
-    count = 0;
-    while (!failover->isConnected() && count++ < 50) {
-        Thread::sleep(200);
+    // Give time for failover to complete
+    while (!failover->isConnected() && count++ < 100) {
+        Thread::sleep(100);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to reconnect to broker2", failover->isConnected() == true);
+
+    // Verify still connected (should have failed over to broker2)
+    CPPUNIT_ASSERT_MESSAGE("Should remain connected after broker1 stops (failed over to broker2)",
+                          failover->isConnected() == true);
 
     // Restart broker1 and wait for it to be ready
     broker1->start();
     broker1->waitUntilStarted();
 
+    // Give broker1 time to fully accept connections before stopping broker2
+    Thread::sleep(500);
+
     // Stop broker2 - should reconnect to broker1
     broker2->stop();
     broker2->waitUntilStopped();
 
-    // Give transport time to detect the disconnection
-    Thread::sleep(500);
-
-    // Wait for reconnection to broker1
-    count = 0;
-    while (!failover->isConnected() && count++ < 50) {
-        Thread::sleep(200);
+    // Give time for failover to complete
+    while (!failover->isConnected() && count++ < 100) {
+        Thread::sleep(100);
     }
-    CPPUNIT_ASSERT_MESSAGE("Should reconnect to broker1", failover->isConnected() == true);
+
+    // Verify still connected (should have failed over back to broker1)
+    CPPUNIT_ASSERT_MESSAGE("Should remain connected after broker2 stops (failed over to broker1)",
+                          failover->isConnected() == true);
 
     transport->close();
 

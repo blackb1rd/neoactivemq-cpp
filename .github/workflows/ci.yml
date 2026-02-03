@@ -42,16 +42,13 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build ccache
+        sudo apt-get install -y ninja-build
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Setup ccache
-      uses: hendrikmuhs/ccache-action@v1.2
-      with:
-        key: ${{ runner.os }}-${{ matrix.config.preset }}
-        max-size: 500M
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
 
     - name: Cache vcpkg packages
       uses: actions/cache@v5
@@ -66,9 +63,13 @@ jobs:
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.config.preset }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
 
     - name: Build
       run: cmake --build --preset ${{ matrix.config.preset }} -j $(nproc)
+      env:
+        SCCACHE_GHA_ENABLED: "true"
 
     - name: Install
       run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }}
@@ -185,16 +186,13 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build ccache
+        sudo apt-get install -y ninja-build
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Setup ccache
-      uses: hendrikmuhs/ccache-action@v1.2
-      with:
-        key: ${{ runner.os }}-${{ matrix.preset }}
-        max-size: 500M
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
 
     - name: Cache vcpkg packages
       uses: actions/cache@v5
@@ -209,9 +207,13 @@ jobs:
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.preset }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
 
     - name: Build
       run: cmake --build --preset ${{ matrix.preset }} -j $(nproc)
+      env:
+        SCCACHE_GHA_ENABLED: "true"
 
     - name: Install
       run: cmake --install output/build/${{ matrix.preset }} --prefix output/install/${{ matrix.preset }}
@@ -236,17 +238,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install Ninja and ccache
-      run: |
-        choco install ninja -y
-        choco install ccache -y
+    - name: Install Ninja
+      run: choco install ninja -y
 
-    - name: Setup ccache
-      uses: hendrikmuhs/ccache-action@v1.2
-      with:
-        key: ${{ runner.os }}-${{ matrix.config.preset }}
-        max-size: 500M
-        variant: sccache
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
 
     - name: Setup MSVC Developer Command Prompt
       uses: ilammy/msvc-dev-cmd@v1
@@ -279,9 +275,13 @@ jobs:
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.config.preset }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
 
     - name: Build
       run: cmake --build --preset ${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
 
     - name: Install
       run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}
@@ -382,17 +382,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install Ninja and ccache
-      run: |
-        choco install ninja -y
-        choco install ccache -y
+    - name: Install Ninja
+      run: choco install ninja -y
 
-    - name: Setup ccache
-      uses: hendrikmuhs/ccache-action@v1.2
-      with:
-        key: ${{ runner.os }}-${{ matrix.config.preset }}
-        max-size: 500M
-        variant: sccache
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
 
     - name: Setup MSVC Developer Command Prompt
       uses: ilammy/msvc-dev-cmd@v1
@@ -425,9 +419,13 @@ jobs:
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.config.preset }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
 
     - name: Build
       run: cmake --build --preset ${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
 
     - name: Install
       run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}

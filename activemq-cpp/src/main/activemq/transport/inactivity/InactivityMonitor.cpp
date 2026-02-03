@@ -225,6 +225,15 @@ InactivityMonitor::~InactivityMonitor() {
     }
     AMQ_CATCHALL_NOTHROW()
 
+    // Always cancel the timers before destruction, even if monitorStarted was false.
+    // The timers' threads start running when Timer is constructed, so they must be
+    // cancelled regardless of whether startMonitorThreads() was called.
+    try {
+        this->members->readCheckTimer.cancel();
+        this->members->writeCheckTimer.cancel();
+    }
+    AMQ_CATCHALL_NOTHROW()
+
     try {
         delete this->members;
     }
@@ -486,5 +495,19 @@ void InactivityMonitor::stopMonitorThreads() {
 
             this->members->asyncTasks->shutdown();
         }
+
+        // Wait for timer threads to terminate outside the synchronized block to avoid deadlock
+        // Use a reasonable timeout (10 seconds) to prevent indefinite blocking
+        AMQ_LOG_DEBUG("InactivityMonitor", "Waiting for timer threads to terminate");
+        bool readTimerDone = this->members->readCheckTimer.awaitTermination(10000, TimeUnit::MILLISECONDS);
+        bool writeTimerDone = this->members->writeCheckTimer.awaitTermination(10000, TimeUnit::MILLISECONDS);
+
+        if (!readTimerDone) {
+            AMQ_LOG_WARN("InactivityMonitor", "Read check timer did not terminate within timeout");
+        }
+        if (!writeTimerDone) {
+            AMQ_LOG_WARN("InactivityMonitor", "Write check timer did not terminate within timeout");
+        }
+        AMQ_LOG_DEBUG("InactivityMonitor", "Timer threads terminated");
     }
 }

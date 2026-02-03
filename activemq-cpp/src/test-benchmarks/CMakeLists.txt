@@ -5,9 +5,6 @@ set(BENCHMARK_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/testRegistry.cpp
 
-  # Shared utility support (from src/util directory)
-  ${CMAKE_CURRENT_SOURCE_DIR}/../util/StackTrace.cpp
-
   # Benchmark utilities
   benchmark/PerformanceTimer.cpp
 

@@ -24,8 +24,8 @@
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/TestResult.h>
 #include <util/teamcity/TeamCityProgressListener.h>
-#include <util/StackTrace.h>
 #include <activemq/util/Config.h>
+#include <activemq/util/AMQLog.h>
 #include <activemq/library/ActiveMQCPP.h>
 #include <decaf/lang/Runtime.h>
 #include <decaf/lang/Integer.h>
@@ -40,85 +40,104 @@
 #include <condition_variable>
 #include <stdexcept>
 
-class IntegrationTestRunner {
+// Watchdog listener that monitors per-test-case timeout
+class WatchdogTestListener : public CppUnit::TestListener {
 private:
-    CppUnit::TextUi::TestRunner* runner;
-    std::string testPath;
-    std::atomic<bool> wasSuccessful;
-    std::atomic<bool> completed;
-    std::thread thread;
+    long long testTimeoutSeconds;
+    std::atomic<bool> testRunning;
+    std::atomic<bool> shutdownRequested;
+    std::string currentTestName;
+    std::chrono::steady_clock::time_point testStartTime;
+    std::thread watchdogThread;
     std::mutex mutex;
     std::condition_variable cv;
 
+    void watchdogLoop() {
+        while (!shutdownRequested.load()) {
+            std::unique_lock<std::mutex> lock(mutex);
+
+            // Wait for either shutdown or check interval (1 second)
+            cv.wait_for(lock, std::chrono::seconds(1), [this]() {
+                return shutdownRequested.load();
+            });
+
+            if (shutdownRequested.load()) {
+                break;
+            }
+
+            if (testRunning.load()) {
+                auto elapsed = std::chrono::steady_clock::now() - testStartTime;
+                auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
+
+                if (elapsedSeconds >= testTimeoutSeconds) {
+                    std::cerr << std::endl << "ERROR: Test case timed out after "
+                              << elapsedSeconds << " seconds: " << currentTestName << std::endl;
+
+                    // Dump Flight Recorder log entries for debugging
+                    std::cerr << std::endl << "=== Flight Recorder Dump (last "
+                              << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+                    activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
+                    std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
+
+                    std::cerr << "Forcibly terminating process due to test timeout..." << std::endl;
+                    std::_Exit(-1);
+                }
+            }
+        }
+    }
+
 public:
-    IntegrationTestRunner(CppUnit::TextUi::TestRunner* r, const std::string& path)
-        : runner(r), testPath(path), wasSuccessful(false), completed(false) {
+    WatchdogTestListener(long long timeoutSeconds)
+        : testTimeoutSeconds(timeoutSeconds)
+        , testRunning(false)
+        , shutdownRequested(false) {
+        watchdogThread = std::thread(&WatchdogTestListener::watchdogLoop, this);
     }
 
-    void start() {
-        thread = std::thread([this]() {
-            try {
-                bool result = runner->run(testPath, false);
-                wasSuccessful.store(result);
-            } catch (...) {
-                wasSuccessful.store(false);
-            }
-            completed.store(true);
-            cv.notify_all();
-        });
+    ~WatchdogTestListener() {
+        shutdown();
     }
 
-    bool waitFor(long long timeoutMillis) {
-        if (timeoutMillis <= 0) {
-            if (thread.joinable()) {
-                thread.join();
-            }
-            return completed.load();
+    void shutdown() {
+        shutdownRequested.store(true);
+        cv.notify_all();
+        if (watchdogThread.joinable()) {
+            watchdogThread.join();
         }
-
-        std::unique_lock<std::mutex> lock(mutex);
-        auto timeout = std::chrono::milliseconds(timeoutMillis);
-
-        if (cv.wait_for(lock, timeout, [this]() { return completed.load(); })) {
-            if (thread.joinable()) {
-                thread.join();
-            }
-            return true;
-        }
-
-        return false; // Timeout occurred
     }
 
-    bool getResult() const {
-        return wasSuccessful.load();
+    void startTest(CppUnit::Test* test) override {
+        std::lock_guard<std::mutex> lock(mutex);
+        currentTestName = test->getName();
+        testStartTime = std::chrono::steady_clock::now();
+        // Clear Flight Recorder to isolate logs for this test
+        activemq::util::AMQLogger::clearFlightRecorder();
+        testRunning.store(true);
     }
 
-    bool isCompleted() const {
-        return completed.load();
-    }
-
-    void dumpStackTrace() {
-        test::util::dumpAllThreadStackTraces();
-    }
-
-    ~IntegrationTestRunner() {
-        if (thread.joinable()) {
-            thread.detach();
-        }
+    void endTest(CppUnit::Test* /*test*/) override {
+        std::lock_guard<std::mutex> lock(mutex);
+        testRunning.store(false);
     }
 };
 
 int main( int argc, char **argv ) {
 
-    test::util::initializeStackTrace();
-
     activemq::library::ActiveMQCPP::initializeLibrary();
+
+    // Initialize Flight Recorder with 0.5% of system memory for debugging
+    activemq::util::AMQLogger::initializeFlightRecorder(0.005);
+    // Enable DEBUG level logging to record entries to flight recorder
+    activemq::util::AMQLogger::setLevel(activemq::util::AMQLogLevel::DEBUG);
+    // Enable record-only mode: skip formatting overhead, only record to flight recorder
+    // Logs will be formatted and printed only on failure/timeout (lazy formatting)
+    activemq::util::AMQLogger::setRecordOnlyMode(true);
 
     bool wasSuccessful = false;
     std::ofstream outputFile;
     bool useXMLOutputter = false;
     std::string testPath = "";
-    long long timeoutSeconds = 0; // 0 means no timeout
+    long long testTimeoutSeconds = 300; // Per-test timeout: 5 minutes default
     std::unique_ptr<CppUnit::TestListener> listener( new CppUnit::BriefTestProgressListener );
 
     if( argc > 1 ) {
@@ -142,14 +161,14 @@ int main( int argc, char **argv ) {
                     return -1;
                 }
                 testPath = argv[++i];
-            } else if( arg == "-timeout" ) {
+            } else if( arg == "-test-timeout" ) {
                 if( ( i + 1 ) >= argc ) {
-                    std::cout << "-timeout requires a timeout value in seconds" << std::endl;
+                    std::cout << "-test-timeout requires a timeout value in seconds" << std::endl;
                     return -1;
                 }
                 try {
-                    timeoutSeconds = std::stoll( argv[++i] );
-                    if( timeoutSeconds < 0 ) {
+                    testTimeoutSeconds = std::stoll( argv[++i] );
+                    if( testTimeoutSeconds < 0 ) {
                         std::cout << "Timeout value must be positive" << std::endl;
                         return -1;
                     }
@@ -162,7 +181,7 @@ int main( int argc, char **argv ) {
                 std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
                 std::cout << "Options:" << std::endl;
                 std::cout << "  -test <name>       Run specific test or test suite" << std::endl;
-                std::cout << "  -timeout <sec>     Set test timeout in seconds (0 = no timeout)" << std::endl;
+                std::cout << "  -test-timeout <s>  Per-test timeout in seconds (default: 300)" << std::endl;
                 std::cout << "  -teamcity          Use TeamCity progress listener" << std::endl;
                 std::cout << "  -quiet             Suppress test progress output" << std::endl;
                 std::cout << "  -xml <file>        Output results in XML format" << std::endl;
@@ -184,6 +203,13 @@ int main( int argc, char **argv ) {
             runner.eventManager().addListener( listener.get() );
         }
 
+        // Add watchdog listener for per-test timeout (0 = disabled)
+        std::unique_ptr<WatchdogTestListener> watchdog;
+        if( testTimeoutSeconds > 0 ) {
+            watchdog.reset( new WatchdogTestListener( testTimeoutSeconds ) );
+            runner.eventManager().addListener( watchdog.get() );
+        }
+
         // Specify XML output and inform the test runner of this format.  The TestRunner
         // will delete the passed XmlOutputter for us.
         if( useXMLOutputter ) {
@@ -193,47 +219,30 @@ int main( int argc, char **argv ) {
             runner.setOutputter( new CppUnit::CompilerOutputter( &runner.result(), std::cerr ) );
         }
 
-        if( timeoutSeconds > 0 ) {
-            IntegrationTestRunner testRunner(&runner, testPath);
-            testRunner.start();
+        wasSuccessful = runner.run( testPath, false );
 
-            bool completed = testRunner.waitFor(timeoutSeconds * 1000);
+        // Shutdown watchdog before checking results
+        if( watchdog ) {
+            watchdog->shutdown();
+        }
 
-            if( !completed ) {
-                std::cerr << std::endl << "ERROR: Test execution timed out after "
-                          << timeoutSeconds << " seconds" << std::endl;
+        // If tests failed, dump flight recorder
+        if( !wasSuccessful ) {
+            std::cerr << std::endl << "ERROR: Test execution failed" << std::endl;
 
-                // Dump stack traces of all threads before terminating
-                testRunner.dumpStackTrace();
-
-                std::cerr << "Forcibly terminating process due to timeout..." << std::endl;
-                if( useXMLOutputter ) {
-                    outputFile.close();
-                }
-                // Force exit since we can't safely stop the test thread
-                std::_Exit(-1);
-            }
-
-            wasSuccessful = testRunner.getResult();
-
-            // If tests failed (but didn't timeout), dump stack traces
-            if( !wasSuccessful ) {
-                std::cerr << std::endl << "ERROR: Test execution failed" << std::endl;
-                testRunner.dumpStackTrace();
-            }
-        } else {
-            wasSuccessful = runner.run( testPath, false );
-
-            // If tests failed, dump stack traces
-            if( !wasSuccessful ) {
-                std::cerr << std::endl << "ERROR: Test execution failed" << std::endl;
-                test::util::dumpAllThreadStackTraces();
-            }
+            // Dump Flight Recorder log entries for debugging
+            std::cerr << std::endl << "=== Flight Recorder Dump (last "
+                      << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+            activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
+            std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
         }
 
         if( useXMLOutputter ) {
             outputFile.close();
         }
+
+        // Shutdown Flight Recorder
+        activemq::util::AMQLogger::shutdownFlightRecorder();
 
         activemq::library::ActiveMQCPP::shutdownLibrary();
 
@@ -244,7 +253,16 @@ int main( int argc, char **argv ) {
         std::cout << "- AN ERROR HAS OCCURED:                -" << std::endl;
         std::cout << "- Do you have a Broker Running?        -" << std::endl;
         std::cout << "----------------------------------------" << std::endl;
-        test::util::dumpAllThreadStackTraces();
+
+        // Dump Flight Recorder log entries for debugging
+        std::cerr << std::endl << "=== Flight Recorder Dump (last "
+                  << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+        activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
+        std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
+
+        // Shutdown Flight Recorder
+        activemq::util::AMQLogger::shutdownFlightRecorder();
+
         activemq::library::ActiveMQCPP::shutdownLibrary();
     }
 

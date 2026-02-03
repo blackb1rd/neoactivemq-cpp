@@ -166,8 +166,6 @@ float DataInputStream::readFloat() {
 long long DataInputStream::readLong() {
 
     try {
-        AMQ_LOG_DEBUG("DataInputStream", "readLong() called");
-
         unsigned long long value = 0;
         readAllData(buffer, sizeof(long long));
 
@@ -486,8 +484,6 @@ void DataInputStream::readAllData(unsigned char* buffer, int length) {
             try {
                 int count = inputStream->read(buffer, length, n, length - n);
                 if (count == -1) {
-                    // Log EOF condition with context
-                    AMQ_LOG_DEBUG("DataInputStream", "EOF reading " << length << " bytes (read " << n << " so far)");
                     throw EOFException(__FILE__, __LINE__, "DataInputStream::readLong - Reached EOF");
                 }
                 n += count;

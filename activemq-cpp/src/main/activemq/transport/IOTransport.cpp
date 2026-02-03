@@ -247,11 +247,24 @@ namespace transport {
         AtomicBoolean closed;
         AtomicBoolean started;
 
-        IOTransportImpl() : wireFormat(), listener(NULL), inputStream(NULL), outputStream(NULL), thread(), closed(false) {
+        IOTransportImpl() :
+            wireFormat(),
+            listener(NULL),
+            inputStream(NULL),
+            outputStream(NULL),
+            thread(),
+            closed(false),
+            started(false) {
         }
 
         IOTransportImpl(const Pointer<WireFormat> wireFormat) :
-            wireFormat(wireFormat), listener(NULL), inputStream(NULL), outputStream(NULL), thread(), closed(false) {
+            wireFormat(wireFormat),
+            listener(NULL),
+            inputStream(NULL),
+            outputStream(NULL),
+            thread(),
+            closed(false),
+            started(false) {
         }
     };
 
@@ -309,9 +322,6 @@ void IOTransport::fire(const Pointer<Command> command) {
             return;
         }
 
-        AMQ_LOG_DEBUG("IOTransport", "fire(Command) delivering cmdId=" << command->getCommandId()
-                      << " type=" << AMQLogger::commandTypeName(command->getDataStructureType()));
-
         // Log detailed message information for MessageDispatch commands
         if (command->isMessageDispatch()) {
             this->logMessageDispatchDetails(command);
@@ -326,10 +336,6 @@ void IOTransport::fire(const Pointer<Command> command) {
 void IOTransport::oneway(const Pointer<Command> command) {
 
     try {
-
-        AMQ_LOG_DEBUG("IOTransport", "oneway() cmdId=" << command->getCommandId()
-                      << " type=" << AMQLogger::commandTypeName(command->getDataStructureType())
-                      << " closed=" << impl->closed.get());
 
         if (impl->closed.get()) {
             throw IOException(__FILE__, __LINE__, "IOTransport::oneway() - transport is closed!");
@@ -351,12 +357,9 @@ void IOTransport::oneway(const Pointer<Command> command) {
         }
 
         synchronized(impl->outputStream) {
-            AMQ_LOG_DEBUG("IOTransport", "oneway() marshaling cmdId=" << command->getCommandId() << "...");
             // Write the command to the output stream.
             this->impl->wireFormat->marshal(command, this, this->impl->outputStream);
-            AMQ_LOG_DEBUG("IOTransport", "oneway() flushing cmdId=" << command->getCommandId() << "...");
             this->impl->outputStream->flush();
-            AMQ_LOG_DEBUG("IOTransport", "oneway() complete cmdId=" << command->getCommandId());
         }
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -481,41 +484,96 @@ void IOTransport::run() {
 
         AMQ_LOG_DEBUG("IOTransport", "run() started, waiting for commands...");
 
+        // Main message processing loop with internal error handling
         while (this->impl->started.get() && !this->impl->closed.get()) {
 
-            AMQ_LOG_DEBUG("IOTransport", "run() calling unmarshal()...");
+            try {
 
-            // Read the next command from the input stream.
-            // Unmarshaling errors (corrupted message headers) close the connection.
-            // Lazy property unmarshaling means property corruption is detected during
-            // consumer processing and triggers redelivery (see ActiveMQConsumerKernel).
-            Pointer<Command> command(impl->wireFormat->unmarshal(this, this->impl->inputStream));
+                // Read the next command from the input stream.
+                // Unmarshaling errors (corrupted message headers) close the connection.
+                // Lazy property unmarshaling means property corruption is detected during
+                // consumer processing and triggers redelivery (see ActiveMQConsumerKernel).
+                Pointer<Command> command(impl->wireFormat->unmarshal(this, this->impl->inputStream));
 
-            AMQ_LOG_DEBUG("IOTransport", "run() unmarshal complete, cmdId=" << command->getCommandId()
-                          << " type=" << AMQLogger::commandTypeName(command->getDataStructureType()));
+                // Notify the listener.
+                fire(command);
 
-            // Notify the listener.
-            fire(command);
+            } catch (decaf::io::EOFException& ex) {
+                // EOF means connection closed - this is fatal, propagate up
+                AMQ_LOG_ERROR("IOTransport", "run() caught EOFException (connection closed): " << ex.getMessage());
+                ex.setMark(__FILE__, __LINE__);
+                fire(ex);
+                break;  // Exit the loop, connection is dead
+
+            } catch (decaf::io::IOException& ex) {
+                // IO errors indicate connection problems - propagate to FailoverTransport
+                AMQ_LOG_ERROR("IOTransport", "run() caught IOException: " << ex.getMessage());
+
+                // Check if this is an SSL/TLS error - these are always fatal and require full reconnection
+                std::string errorMsg = ex.getMessage();
+                if (errorMsg.find("OpenSSL") != std::string::npos ||
+                    errorMsg.find("SSL") != std::string::npos ||
+                    errorMsg.find("TLS") != std::string::npos) {
+                    AMQ_LOG_ERROR("IOTransport", "run() SSL/TLS error detected - fatal, propagating to FailoverTransport");
+                }
+
+                ex.setMark(__FILE__, __LINE__);
+                fire(ex);
+                break;  // All IO errors require connection reestablishment
+            } catch (exceptions::ActiveMQException& ex) {
+                // ActiveMQ exceptions are typically fatal protocol errors
+                AMQ_LOG_ERROR("IOTransport", "run() caught ActiveMQException: " << ex.getMessage());
+                ex.setMark(__FILE__, __LINE__);
+                fire(ex);
+                break;  // Fatal error, exit
+
+            } catch (decaf::lang::Exception& ex) {
+                // Other decaf exceptions indicate connection or protocol problems
+                AMQ_LOG_ERROR("IOTransport", "run() caught Exception: " << ex.getMessage());
+
+                // Check if this is an SSL/TLS error - these are always fatal
+                std::string errorMsg = ex.getMessage();
+                if (errorMsg.find("OpenSSL") != std::string::npos ||
+                    errorMsg.find("SSL") != std::string::npos ||
+                    errorMsg.find("TLS") != std::string::npos) {
+                    AMQ_LOG_ERROR("IOTransport", "run() SSL/TLS error detected - fatal, propagating to FailoverTransport");
+                }
+
+                ex.setMark(__FILE__, __LINE__);
+                fire(ex);
+                break;  // Propagate to FailoverTransport for reconnection
+
+            } catch (...) {
+                // Unknown exception - treat as fatal
+                AMQ_LOG_ERROR("IOTransport", "run() caught unknown exception");
+                exceptions::ActiveMQException ex(__FILE__, __LINE__, "IOTransport::run - caught unknown exception");
+                LOGDECAF_WARN(logger, ex.getStackTraceString());
+                fire(ex);
+                break;  // Fatal error, exit
+            }
         }
 
         AMQ_LOG_DEBUG("IOTransport", "run() exiting normally (started=" << this->impl->started.get()
                       << " closed=" << this->impl->closed.get() << ")");
 
     } catch (exceptions::ActiveMQException& ex) {
-        AMQ_LOG_ERROR("IOTransport", "run() caught ActiveMQException: " << ex.getMessage());
+        // Outer catch for startup/teardown errors
+        AMQ_LOG_ERROR("IOTransport", "run() outer catch: " << ex.getMessage());
         ex.setMark(__FILE__, __LINE__);
         fire(ex);
     } catch (decaf::lang::Exception& ex) {
-        AMQ_LOG_ERROR("IOTransport", "run() caught Exception: " << ex.getMessage());
+        AMQ_LOG_ERROR("IOTransport", "run() outer catch: " << ex.getMessage());
         exceptions::ActiveMQException exl(ex);
         exl.setMark(__FILE__, __LINE__);
         fire(exl);
     } catch (...) {
-        AMQ_LOG_ERROR("IOTransport", "run() caught unknown exception");
+        AMQ_LOG_ERROR("IOTransport", "run() outer catch: unknown exception");
         exceptions::ActiveMQException ex(__FILE__, __LINE__, "IOTransport::run - caught unknown exception");
-        LOGDECAF_WARN(logger, ex.getStackTraceString());
         fire(ex);
     }
+
+    AMQ_LOG_DEBUG("IOTransport", "run() thread terminated (started=" << this->impl->started.get()
+                  << " closed=" << this->impl->closed.get() << ")");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

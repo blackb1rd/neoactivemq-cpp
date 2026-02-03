@@ -21,6 +21,7 @@
 #include <cstring>
 #include <iomanip>
 #include <cctype>
+#include <unordered_map>
 
 #ifdef _WIN32
 // Prevent Windows min/max macros from interfering with (std::min)/(std::max)
@@ -43,8 +44,20 @@ namespace activemq {
 namespace util {
 
 // Initialize static members - default to NONE (no logging)
-std::atomic<AMQLogLevel> AMQLogger::currentLevel(AMQLogLevel::NONE);
+// Lock-free AND thread-safe: std::atomic with relaxed ordering
+std::atomic<AMQLogLevel> AMQLogger::currentLevel{AMQLogLevel::NONE};
+std::atomic<bool> AMQLogger::recordOnlyMode{false};
 std::function<void(AMQLogLevel, const std::string&)> AMQLogger::customHandler = nullptr;
+
+// Per-connection logging static members
+std::mutex AMQLogger::contextHandlersMutex;
+std::unordered_map<std::string, std::function<void(AMQLogLevel, const std::string&)>> AMQLogger::contextHandlers;
+
+// Function to access thread-local context (avoids DLL export issues)
+std::string& AMQLogger::getCurrentLogContextImpl() {
+    static thread_local std::string currentLogContext;
+    return currentLogContext;
+}
 
 // Flight Recorder static members
 std::vector<AMQLogger::FlightRecorderEntry> AMQLogger::flightRecorderBuffer;
@@ -52,7 +65,9 @@ std::atomic<uint64_t> AMQLogger::flightRecorderWriteIndex{0};
 std::atomic<uint64_t> AMQLogger::flightRecorderTotalCount{0};
 std::atomic<bool> AMQLogger::flightRecorderEnabled{false};
 std::mutex AMQLogger::flightRecorderDumpMutex;
-std::chrono::steady_clock::time_point AMQLogger::flightRecorderStartTime;
+// RDTSC calibration data
+uint64_t AMQLogger::flightRecorderStartTicks{0};
+double AMQLogger::flightRecorderTicksPerMicrosecond{1.0};
 std::chrono::system_clock::time_point AMQLogger::flightRecorderWallClockStart;
 
 namespace {
@@ -95,9 +110,22 @@ void AMQLogger::clearOutputHandler() {
     customHandler = nullptr;
 }
 
+void AMQLogger::setRecordOnlyMode(bool enabled) {
+    recordOnlyMode.store(enabled, std::memory_order_relaxed);
+}
+
+bool AMQLogger::isRecordOnlyMode() {
+    return recordOnlyMode.load(std::memory_order_relaxed);
+}
+
 void AMQLogger::log(AMQLogLevel level, const char* component, const std::string& message) {
     // Record to Flight Recorder first (always, if enabled)
     recordToFlightRecorder(level, component, message.c_str());
+
+    // In record-only mode, skip expensive formatting - just record to flight recorder
+    if (recordOnlyMode.load(std::memory_order_relaxed)) {
+        return;
+    }
 
     // Build formatted message
     std::ostringstream oss;
@@ -131,7 +159,18 @@ void AMQLogger::log(AMQLogLevel level, const char* component, const std::string&
 
     std::string formattedMsg = oss.str();
 
-    // Output
+    // Check for context-specific handler first
+    std::string& currentLogContext = getCurrentLogContextImpl();
+    if (!currentLogContext.empty()) {
+        std::lock_guard<std::mutex> lock(contextHandlersMutex);
+        auto it = contextHandlers.find(currentLogContext);
+        if (it != contextHandlers.end() && it->second) {
+            it->second(level, formattedMsg);
+            return;
+        }
+    }
+
+    // Fall back to global handler or std::cout
     if (customHandler) {
         customHandler(level, formattedMsg);
     } else {
@@ -149,6 +188,7 @@ AMQLogLevel AMQLogger::parseLevel(const std::string& levelStr) {
 
     if (lower == "debug") return AMQLogLevel::DEBUG;
     if (lower == "info") return AMQLogLevel::INFO;
+    if (lower == "warn") return AMQLogLevel::WARN;
     if (lower == "error") return AMQLogLevel::ERROR;
     return AMQLogLevel::NONE;
 }
@@ -286,7 +326,31 @@ void AMQLogger::initializeFlightRecorder(double memoryPercent,
     flightRecorderBuffer.resize(numEntries);
     flightRecorderWriteIndex.store(0);
     flightRecorderTotalCount.store(0);
-    flightRecorderStartTime = std::chrono::steady_clock::now();
+
+    // Calibrate RDTSC: measure ticks per microsecond
+    // Use a quick calibration (~1ms sleep)
+    uint64_t startTicks = rdtsc();
+    auto startChrono = std::chrono::steady_clock::now();
+
+#ifdef _WIN32
+    Sleep(1);  // 1ms
+#else
+    usleep(1000);  // 1ms
+#endif
+
+    uint64_t endTicks = rdtsc();
+    auto endChrono = std::chrono::steady_clock::now();
+
+    auto elapsedUs = std::chrono::duration_cast<std::chrono::microseconds>(
+        endChrono - startChrono).count();
+    if (elapsedUs > 0) {
+        flightRecorderTicksPerMicrosecond = static_cast<double>(endTicks - startTicks) / elapsedUs;
+    } else {
+        // Fallback: assume ~3GHz CPU
+        flightRecorderTicksPerMicrosecond = 3000.0;
+    }
+
+    flightRecorderStartTicks = rdtsc();
     flightRecorderWallClockStart = std::chrono::system_clock::now();
 }
 
@@ -321,7 +385,7 @@ void AMQLogger::recordToFlightRecorder(AMQLogLevel level, const char* component,
     flightRecorderTotalCount.fetch_add(1, std::memory_order_relaxed);
 
     FlightRecorderEntry& entry = flightRecorderBuffer[idx % cap];
-    entry.timestamp = std::chrono::steady_clock::now();
+    entry.timestampTicks = rdtsc();  // RDTSC is ~20 cycles vs ~100+ for chrono
     entry.threadId = std::this_thread::get_id();
     entry.level = level;
 
@@ -340,13 +404,12 @@ void AMQLogger::recordToFlightRecorder(AMQLogLevel level, const char* component,
 
 void AMQLogger::dumpFlightRecorder(std::ostream& out, std::size_t maxEntries) {
     dumpFlightRecorder([&out](const FlightRecorderEntry& entry) {
-        auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(
-            entry.timestamp - flightRecorderStartTime).count();
+        // Convert RDTSC ticks to microseconds
+        int64_t ticksElapsed = static_cast<int64_t>(entry.timestampTicks - flightRecorderStartTicks);
+        int64_t elapsedUs = static_cast<int64_t>(ticksElapsed / flightRecorderTicksPerMicrosecond);
 
         // Calculate wall-clock time for this entry
-        auto wallClockTime = flightRecorderWallClockStart +
-            std::chrono::duration_cast<std::chrono::system_clock::duration>(
-                entry.timestamp - flightRecorderStartTime);
+        auto wallClockTime = flightRecorderWallClockStart + std::chrono::microseconds(elapsedUs);
         auto time_t_val = std::chrono::system_clock::to_time_t(wallClockTime);
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
             wallClockTime.time_since_epoch()) % 1000;
@@ -361,7 +424,7 @@ void AMQLogger::dumpFlightRecorder(std::ostream& out, std::size_t maxEntries) {
 #endif
         out << "." << std::setfill('0') << std::setw(3) << ms.count() << " ";
 
-        out << "[" << std::setw(12) << elapsed << "us] "
+        out << "[" << std::setw(12) << elapsedUs << "us] "
             << "[" << levelToString(entry.level) << "] "
             << "[T:" << std::hash<std::thread::id>{}(entry.threadId) << "] "
             << "[" << entry.component << "] "
@@ -419,7 +482,7 @@ void AMQLogger::clearFlightRecorder() {
     std::lock_guard<std::mutex> lock(flightRecorderDumpMutex);
     flightRecorderWriteIndex.store(0, std::memory_order_release);
     flightRecorderTotalCount.store(0, std::memory_order_release);
-    flightRecorderStartTime = std::chrono::steady_clock::now();
+    flightRecorderStartTicks = rdtsc();
     flightRecorderWallClockStart = std::chrono::system_clock::now();
 }
 
@@ -442,6 +505,42 @@ std::size_t AMQLogger::flightRecorderCapacity() {
 
 uint64_t AMQLogger::flightRecorderTotalRecorded() {
     return flightRecorderTotalCount.load(std::memory_order_relaxed);
+}
+
+double AMQLogger::getTicksPerMicrosecond() {
+    return flightRecorderTicksPerMicrosecond;
+}
+
+uint64_t AMQLogger::getStartTicks() {
+    return flightRecorderStartTicks;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void AMQLogger::setContextOutputHandler(const std::string& context,
+                                       std::function<void(AMQLogLevel, const std::string&)> handler) {
+    std::lock_guard<std::mutex> lock(contextHandlersMutex);
+    contextHandlers[context] = handler;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void AMQLogger::clearContextOutputHandler(const std::string& context) {
+    std::lock_guard<std::mutex> lock(contextHandlersMutex);
+    contextHandlers.erase(context);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void AMQLogger::setLogContext(const std::string& context) {
+    getCurrentLogContextImpl() = context;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void AMQLogger::clearLogContext() {
+    getCurrentLogContextImpl().clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string AMQLogger::getLogContext() {
+    return getCurrentLogContextImpl();
 }
 
 } // namespace util

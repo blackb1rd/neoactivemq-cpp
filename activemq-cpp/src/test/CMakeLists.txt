@@ -4,7 +4,6 @@ set(TEST_SRCS
   # Top level launcher / registry
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/testRegistry.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/../util/StackTrace.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/util/teamcity/TeamCityProgressListener.cpp
 
   activemq/cmsutil/CmsAccessorTest.cpp
@@ -56,6 +55,7 @@ set(TEST_SRCS
   activemq/transport/inactivity/InactivityMonitorTest.cpp
   activemq/transport/mock/MockTransportFactoryTest.cpp
   activemq/transport/tcp/TcpTransportTest.cpp
+  activemq/transport/tcp/SingleBrokerReconnectTest.cpp
   activemq/transport/tcp/SslTransportTest.cpp
   activemq/util/ActiveMQMessageTransformationTest.cpp
   activemq/util/AdvisorySupportTest.cpp

@@ -23,8 +23,9 @@
 #include <cppunit/XmlOutputter.h>
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/TestResult.h>
+#include <cppunit/Test.h>
+#include <cppunit/TestFailure.h>
 #include <util/teamcity/TeamCityProgressListener.h>
-#include <util/StackTrace.h>
 #include <activemq/util/Config.h>
 #include <activemq/util/AMQLog.h>
 #include <activemq/library/ActiveMQCPP.h>
@@ -40,6 +41,84 @@
 #include <stdexcept>
 #include <vector>
 
+// Custom test listener that logs each test start/end and enforces per-test timeout
+class VerboseTestListener : public CppUnit::TestListener {
+private:
+    std::string currentTest;
+    std::chrono::steady_clock::time_point startTime;
+    long long perTestTimeoutSeconds;
+    std::atomic<bool> watchdogActive;
+    std::thread watchdogThread;
+    std::mutex watchdogMutex;
+    std::condition_variable watchdogCV;
+
+    void startWatchdog() {
+        if (perTestTimeoutSeconds <= 0) return;
+
+        watchdogActive.store(true);
+        watchdogThread = std::thread([this]() {
+            std::unique_lock<std::mutex> lock(watchdogMutex);
+            auto timeout = std::chrono::seconds(perTestTimeoutSeconds);
+
+            if (!watchdogCV.wait_for(lock, timeout, [this]() { return !watchdogActive.load(); })) {
+                // Timeout occurred for this test
+                std::cerr << std::endl << std::endl
+                          << "FATAL: Per-test timeout (" << perTestTimeoutSeconds
+                          << "s) exceeded for test: " << currentTest << std::endl;
+
+                // Dump Flight Recorder
+                std::cerr << std::endl << "=== Flight Recorder Dump (last "
+                          << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+                activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
+                std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
+
+                std::cerr << "Forcibly terminating process due to per-test timeout..." << std::endl;
+                std::_Exit(-1);
+            }
+        });
+    }
+
+    void stopWatchdog() {
+        if (perTestTimeoutSeconds <= 0) return;
+
+        watchdogActive.store(false);
+        watchdogCV.notify_all();
+        if (watchdogThread.joinable()) {
+            watchdogThread.join();
+        }
+    }
+
+public:
+    VerboseTestListener(long long perTestTimeout = 300) // Default 5 minutes per test
+        : perTestTimeoutSeconds(perTestTimeout), watchdogActive(false) {
+    }
+
+    ~VerboseTestListener() {
+        stopWatchdog();
+    }
+
+    void startTest(CppUnit::Test* test) override {
+        currentTest = test->getName();
+        startTime = std::chrono::steady_clock::now();
+        // Clear Flight Recorder to isolate logs for this test
+        activemq::util::AMQLogger::clearFlightRecorder();
+        startWatchdog();
+    }
+
+    void endTest(CppUnit::Test* test) override {
+        stopWatchdog();
+        currentTest.clear();
+    }
+
+    void addFailure(const CppUnit::TestFailure& failure) override {
+        // CppUnit will handle failure reporting
+    }
+
+    std::string getCurrentTest() const {
+        return currentTest;
+    }
+};
+
 class TestRunner {
 private:
     CppUnit::TextUi::TestRunner* runner;
@@ -49,10 +128,11 @@ private:
     std::thread thread;
     std::mutex mutex;
     std::condition_variable cv;
+    VerboseTestListener* verboseListener; // Track verbose listener
 
 public:
-    TestRunner(CppUnit::TextUi::TestRunner* r, const std::string& path)
-        : runner(r), testPath(path), wasSuccessful(false), completed(false) {
+    TestRunner(CppUnit::TextUi::TestRunner* r, const std::string& path, VerboseTestListener* vl = nullptr)
+        : runner(r), testPath(path), wasSuccessful(false), completed(false), verboseListener(vl) {
     }
 
     void start() {
@@ -86,6 +166,16 @@ public:
             return true;
         }
 
+        // Timeout occurred - report which test was running
+        if (verboseListener) {
+            std::string currentTest = verboseListener->getCurrentTest();
+            if (!currentTest.empty()) {
+                std::cerr << std::endl << std::endl
+                          << "ERROR: Timeout occurred while running test: " << currentTest
+                          << std::endl;
+            }
+        }
+
         return false; // Timeout occurred
     }
 
@@ -97,10 +187,6 @@ public:
         return completed.load();
     }
 
-    void dumpStackTrace() {
-        test::util::dumpAllThreadStackTraces();
-    }
-
     ~TestRunner() {
         if (thread.joinable()) {
             thread.detach();
@@ -110,27 +196,26 @@ public:
 
 int main( int argc, char **argv ) {
 
-    test::util::initializeStackTrace();
-
     activemq::library::ActiveMQCPP::initializeLibrary();
 
     // Initialize Flight Recorder with 0.5% of system memory for debugging
     activemq::util::AMQLogger::initializeFlightRecorder(0.005);
     // Enable DEBUG level logging to record entries to flight recorder
     activemq::util::AMQLogger::setLevel(activemq::util::AMQLogLevel::DEBUG);
-    // Suppress console output during tests (Flight Recorder still captures all entries)
-    activemq::util::AMQLogger::setOutputHandler([](activemq::util::AMQLogLevel, const std::string&) {
-        // No-op: suppress console output, flight recorder still captures entries
-    });
+    // Enable record-only mode: skip formatting overhead, only record to flight recorder
+    // Logs will be formatted and printed only on failure/timeout (lazy formatting)
+    activemq::util::AMQLogger::setRecordOnlyMode(true);
 
     bool wasSuccessful = false;
     int iterations = 1;
     std::ofstream outputFile;
     bool useXMLOutputter = false;
     std::string testPath = "";
-    long long timeoutSeconds = 0; // 0 means no timeout
+    long long timeoutSeconds = 2400; // Default 40 minute global timeout (unit tests normally finish in 30 min)
+    long long perTestTimeoutSeconds = 300; // Default 5 minute per-test timeout
     bool failFast = false;
     std::unique_ptr<CppUnit::TestListener> listener( new CppUnit::BriefTestProgressListener );
+    std::unique_ptr<VerboseTestListener> verboseListener; // Will be created after parsing per-test timeout
 
     if( argc > 1 ) {
         for( int i = 1; i < argc; ++i ) {
@@ -181,20 +266,37 @@ int main( int argc, char **argv ) {
                               << argv[i] << std::endl;
                     return -1;
                 }
+            } else if( arg == "-per-test-timeout" ) {
+                if( ( i + 1 ) >= argc ) {
+                    std::cout << "-per-test-timeout requires a timeout value in seconds" << std::endl;
+                    return -1;
+                }
+                try {
+                    perTestTimeoutSeconds = std::stoll( argv[++i] );
+                    if( perTestTimeoutSeconds < 0 ) {
+                        std::cout << "Per-test timeout value must be positive" << std::endl;
+                        return -1;
+                    }
+                } catch( std::exception& ex ) {
+                    std::cout << "Invalid per-test timeout value specified on command line: "
+                              << argv[i] << std::endl;
+                    return -1;
+                }
             } else if( arg == "-failfast" ) {
                 failFast = true;
             } else if( arg == "-help" || arg == "--help" || arg == "-h" ) {
                 std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
                 std::cout << "Options:" << std::endl;
-                std::cout << "  -runs <count>      Run tests multiple times" << std::endl;
-                std::cout << "  -test <name>       Run specific test or test suite" << std::endl;
-                std::cout << "                     Examples: -test decaf::lang::MathTest" << std::endl;
-                std::cout << "                               -test decaf::lang::MathTest::test_absD" << std::endl;
-                std::cout << "  -timeout <sec>     Set test timeout in seconds (0 = no timeout)" << std::endl;
-                std::cout << "  -failfast          Stop test execution on first failure" << std::endl;
-                std::cout << "  -teamcity          Use TeamCity progress listener" << std::endl;
-                std::cout << "  -quiet             Suppress test progress output" << std::endl;
-                std::cout << "  -xml <file>        Output results in XML format" << std::endl;
+                std::cout << "  -runs <count>           Run tests multiple times" << std::endl;
+                std::cout << "  -test <name>            Run specific test or test suite" << std::endl;
+                std::cout << "                          Examples: -test decaf::lang::MathTest" << std::endl;
+                std::cout << "                                    -test decaf::lang::MathTest::test_absD" << std::endl;
+                std::cout << "  -timeout <sec>          Set global test suite timeout in seconds (default: 2400 = 40 min, 0 = no timeout)" << std::endl;
+                std::cout << "  -per-test-timeout <sec> Set maximum time per individual test (default: 300 = 5 min, 0 = no timeout)" << std::endl;
+                std::cout << "  -failfast               Stop test execution on first failure" << std::endl;
+                std::cout << "  -teamcity               Use TeamCity progress listener" << std::endl;
+                std::cout << "  -quiet                  Suppress test progress output" << std::endl;
+                std::cout << "  -xml <file>             Output results in XML format" << std::endl;
                 std::cout << "  -help, --help, -h  Show this help message" << std::endl;
                 activemq::library::ActiveMQCPP::shutdownLibrary();
                 return 0;
@@ -202,11 +304,17 @@ int main( int argc, char **argv ) {
         }
     }
 
+    // Create the verbose listener now that we've parsed command-line arguments
+    verboseListener.reset(new VerboseTestListener(perTestTimeoutSeconds));
+
     for( int i = 0; i < iterations; ++i ) {
 
         CppUnit::TextUi::TestRunner runner;
         CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
         runner.addTest( registry.makeTest() );
+
+        // Always add the verbose listener to track which test is running
+        runner.eventManager().addListener( verboseListener.get() );
 
         // Shows a message as each test starts
         if( listener.get() != NULL ) {
@@ -223,7 +331,7 @@ int main( int argc, char **argv ) {
         }
 
         if( timeoutSeconds > 0 ) {
-            TestRunner testRunner(&runner, testPath);
+            TestRunner testRunner(&runner, testPath, verboseListener.get());
             testRunner.start();
 
             bool completed = testRunner.waitFor(timeoutSeconds * 1000);
@@ -238,9 +346,6 @@ int main( int argc, char **argv ) {
                 activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
                 std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
 
-                // Dump stack traces of all threads before terminating
-                testRunner.dumpStackTrace();
-
                 std::cerr << "Forcibly terminating process due to timeout..." << std::endl;
                 if( useXMLOutputter ) {
                     outputFile.close();
@@ -251,7 +356,7 @@ int main( int argc, char **argv ) {
 
             wasSuccessful = testRunner.getResult();
 
-            // If tests failed (but didn't timeout), dump flight recorder and stack traces
+            // If tests failed (but didn't timeout), dump flight recorder
             if( !wasSuccessful ) {
                 std::cerr << std::endl << "ERROR: Test execution failed" << std::endl;
 
@@ -260,13 +365,11 @@ int main( int argc, char **argv ) {
                           << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
                 activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
                 std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
-
-                testRunner.dumpStackTrace();
             }
         } else {
             wasSuccessful = runner.run( testPath, false );
 
-            // If tests failed, dump flight recorder and stack traces
+            // If tests failed, dump flight recorder
             if( !wasSuccessful ) {
                 std::cerr << std::endl << "ERROR: Test execution failed" << std::endl;
 
@@ -275,8 +378,6 @@ int main( int argc, char **argv ) {
                           << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
                 activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
                 std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
-
-                test::util::dumpAllThreadStackTraces();
             }
         }
 

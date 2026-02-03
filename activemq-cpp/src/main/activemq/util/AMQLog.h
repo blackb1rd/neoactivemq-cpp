@@ -28,6 +28,14 @@
 #include <thread>
 #include <chrono>
 #include <vector>
+#include <unordered_map>
+
+// RDTSC intrinsics for fast timestamps
+#if defined(_MSC_VER)
+#include <intrin.h>
+#elif defined(__x86_64__) || defined(__i386__)
+#include <x86intrin.h>
+#endif
 
 // Undefine Windows macros that conflict with our enum values
 #ifdef ERROR
@@ -41,14 +49,39 @@ namespace activemq {
 namespace util {
 
 /**
+ * Read CPU timestamp counter - extremely fast (~20 cycles).
+ * Returns a monotonically increasing counter (ticks since CPU reset).
+ * Use for relative timing only; convert to time using measured frequency.
+ */
+inline uint64_t rdtsc() {
+#if defined(_MSC_VER)
+    // MSVC intrinsic
+    return __rdtsc();
+#elif defined(__x86_64__) || defined(__i386__)
+    // GCC/Clang x86
+    return __rdtsc();
+#elif defined(__aarch64__)
+    // ARM64: use CNTVCT_EL0 (virtual counter)
+    uint64_t val;
+    __asm__ __volatile__("mrs %0, cntvct_el0" : "=r"(val));
+    return val;
+#else
+    // Fallback to chrono (slower but portable)
+    return static_cast<uint64_t>(
+        std::chrono::steady_clock::now().time_since_epoch().count());
+#endif
+}
+
+/**
  * Simple logging levels for ActiveMQ C++ client.
- * Ordered by verbosity: NONE < ERROR < INFO < DEBUG
+ * Ordered by verbosity: NONE < ERROR < WARN < INFO < DEBUG
  */
 enum class AMQLogLevel : int {
     NONE  = 0,   // No logging (default, zero overhead)
     ERROR = 1,   // Error messages only
-    INFO  = 2,   // Informational messages
-    DEBUG = 3    // Detailed debug messages
+    WARN  = 2,   // Warning messages
+    INFO  = 3,   // Informational messages
+    DEBUG = 4    // Detailed debug messages
 };
 
 /**
@@ -71,24 +104,36 @@ class AMQCPP_API AMQLogger {
 public:
     /**
      * Flight Recorder entry - stores a single log event.
-     * Size is 256 bytes for cache line alignment.
+     * Uses RDTSC ticks for fastest possible timestamping.
      */
     struct FlightRecorderEntry {
-        std::chrono::steady_clock::time_point timestamp;
+        uint64_t timestampTicks;  // RDTSC ticks (convert using ticksPerMicrosecond)
         std::thread::id threadId;
         AMQLogLevel level;
         char component[31];
         char message[201];
 
-        FlightRecorderEntry() : timestamp(), threadId(), level(AMQLogLevel::NONE), component{0}, message{0} {}
+        FlightRecorderEntry() : timestampTicks(0), threadId(), level(AMQLogLevel::NONE), component{0}, message{0} {}
     };
 
 private:
-    // Atomic log level for thread-safe runtime configuration
+    // Lock-free AND thread-safe log level using std::atomic with relaxed ordering
+    // On x86, memory_order_relaxed compiles to plain MOV instructions (zero lock overhead)
     static std::atomic<AMQLogLevel> currentLevel;
+
+    // Record-only mode: skip expensive formatting in log(), only record to flight recorder
+    // This is lock-free (relaxed atomic) for maximum performance
+    static std::atomic<bool> recordOnlyMode;
 
     // Optional custom output handler (for testing or file logging)
     static std::function<void(AMQLogLevel, const std::string&)> customHandler;
+
+    // Per-connection logging support
+    static std::mutex contextHandlersMutex;
+    static std::unordered_map<std::string, std::function<void(AMQLogLevel, const std::string&)>> contextHandlers;
+
+    // Helper to get thread-local context (avoids DLL export issues with thread_local static)
+    static std::string& getCurrentLogContextImpl();
 
     // Flight Recorder circular buffer
     static std::vector<FlightRecorderEntry> flightRecorderBuffer;
@@ -96,7 +141,9 @@ private:
     static std::atomic<uint64_t> flightRecorderTotalCount;
     static std::atomic<bool> flightRecorderEnabled;
     static std::mutex flightRecorderDumpMutex;
-    static std::chrono::steady_clock::time_point flightRecorderStartTime;
+    // RDTSC calibration data
+    static uint64_t flightRecorderStartTicks;           // RDTSC value at initialization
+    static double flightRecorderTicksPerMicrosecond;    // For converting ticks to time
     static std::chrono::system_clock::time_point flightRecorderWallClockStart;
 
 public:
@@ -132,6 +179,67 @@ public:
     static void clearOutputHandler();
 
     /**
+     * Enable/disable record-only mode for maximum performance.
+     * When enabled, log() only records to flight recorder - no formatting overhead.
+     * This is ideal for tests where you only need logs on failure.
+     * @param enabled true to enable record-only mode (default: false)
+     */
+    static void setRecordOnlyMode(bool enabled);
+
+    /**
+     * Check if record-only mode is enabled.
+     * @return true if record-only mode is enabled
+     */
+    static bool isRecordOnlyMode();
+
+    /**
+     * Set a context-specific output handler for a connection/broker.
+     * This allows different log files for different connections.
+     *
+     * Example usage:
+     *   // For connection to broker1
+     *   AMQLogger::setContextOutputHandler("broker1", [](AMQLogLevel level, const std::string& msg) {
+     *       std::ofstream logFile("broker1.log", std::ios::app);
+     *       logFile << msg << std::endl;
+     *   });
+     *
+     *   // Set context before operations
+     *   AMQLogger::setLogContext("broker1");
+     *   // ... your connection code ...
+     *   AMQLogger::clearLogContext();
+     *
+     * @param context The context identifier (e.g., broker URL, connection ID)
+     * @param handler Function that receives level and formatted message for this context
+     */
+    static void setContextOutputHandler(const std::string& context,
+                                       std::function<void(AMQLogLevel, const std::string&)> handler);
+
+    /**
+     * Remove a context-specific output handler.
+     * @param context The context identifier to remove
+     */
+    static void clearContextOutputHandler(const std::string& context);
+
+    /**
+     * Set the current thread's logging context.
+     * Logs from this thread will use the context-specific handler if configured.
+     * @param context The context identifier (e.g., broker URL, connection ID)
+     */
+    static void setLogContext(const std::string& context);
+
+    /**
+     * Clear the current thread's logging context.
+     * Logs will revert to using the global handler or std::cerr.
+     */
+    static void clearLogContext();
+
+    /**
+     * Get the current thread's logging context.
+     * @return The current context identifier, or empty string if none set
+     */
+    static std::string getLogContext();
+
+    /**
      * Internal: Write a log message. Use macros instead of calling directly.
      */
     static void log(AMQLogLevel level, const char* component, const std::string& message);
@@ -142,6 +250,7 @@ public:
     static const char* levelToString(AMQLogLevel level) {
         switch (level) {
             case AMQLogLevel::ERROR: return "ERROR";
+            case AMQLogLevel::WARN:  return "WARN";
             case AMQLogLevel::INFO:  return "INFO";
             case AMQLogLevel::DEBUG: return "DEBUG";
             default: return "NONE";
@@ -265,6 +374,16 @@ public:
      */
     static uint64_t flightRecorderTotalRecorded();
 
+    /**
+     * Get the RDTSC ticks per microsecond (for time conversion).
+     */
+    static double getTicksPerMicrosecond();
+
+    /**
+     * Get the RDTSC start ticks value (for relative time calculation).
+     */
+    static uint64_t getStartTicks();
+
 private:
     /**
      * Internal: Record to Flight Recorder buffer.
@@ -291,6 +410,20 @@ private:
             std::ostringstream _amq_oss; \
             _amq_oss << message; \
             activemq::util::AMQLogger::log(activemq::util::AMQLogLevel::DEBUG, \
+                component, _amq_oss.str()); \
+        } \
+    } while (0)
+
+/**
+ * Log at WARN level.
+ * Usage: AMQ_LOG_WARN("Component", "Warning: " << details);
+ */
+#define AMQ_LOG_WARN(component, message) \
+    do { \
+        if (activemq::util::AMQLogger::isEnabled(activemq::util::AMQLogLevel::WARN)) { \
+            std::ostringstream _amq_oss; \
+            _amq_oss << message; \
+            activemq::util::AMQLogger::log(activemq::util::AMQLogLevel::WARN, \
                 component, _amq_oss.str()); \
         } \
     } while (0)
@@ -335,6 +468,12 @@ private:
  */
 #define AMQ_LOG_INFO_ENABLED() \
     activemq::util::AMQLogger::isEnabled(activemq::util::AMQLogLevel::INFO)
+
+/**
+ * Check if WARN logging is enabled.
+ */
+#define AMQ_LOG_WARN_ENABLED() \
+    activemq::util::AMQLogger::isEnabled(activemq::util::AMQLogLevel::WARN)
 
 /**
  * Check if ERROR logging is enabled.

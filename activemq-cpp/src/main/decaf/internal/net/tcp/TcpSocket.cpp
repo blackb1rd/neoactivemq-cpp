@@ -1043,13 +1043,10 @@ int TcpSocket::read(unsigned char* buffer, int size, int offset, int length) {
                 throw SocketTimeoutException(__FILE__, __LINE__, "Read timed out");
             }
         } else {
-            AMQ_LOG_DEBUG("TcpSocket", "read() blocking length=" << length);
             // Blocking read - read_some() blocks until SOME data is available (not necessarily all requested)
             // This matches the behavior of APR's apr_socket_recv() in the original Apache ActiveMQ-CPP
             bytesRead = this->impl->socket->read_some(
                 asio::buffer(buffer + offset, length), ec);
-            AMQ_LOG_DEBUG("TcpSocket", "read() blocking complete bytes=" << bytesRead
-                          << " error=" << ec.message() << " requested=" << length);
 
             // Warn if we got 0 bytes without EOF - this shouldn't normally happen with blocking reads
             if (bytesRead == 0 && !ec) {
@@ -1121,8 +1118,6 @@ void TcpSocket::write(const unsigned char* buffer, int size, int offset, int len
 
         asio::error_code ec;
 
-        AMQ_LOG_DEBUG("TcpSocket", "write() length=" << length);
-
         // Write all data
         std::size_t totalWritten = 0;
         while (totalWritten < static_cast<std::size_t>(length) && !isClosed()) {
@@ -1139,8 +1134,6 @@ void TcpSocket::write(const unsigned char* buffer, int size, int offset, int len
 
             totalWritten += written;
         }
-
-        AMQ_LOG_DEBUG("TcpSocket", "write() complete totalWritten=" << totalWritten);
     }
     DECAF_CATCH_RETHROW(IOException)
     DECAF_CATCH_RETHROW(NullPointerException)

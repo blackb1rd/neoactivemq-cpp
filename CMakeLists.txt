@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.15)
 
+# Enable MSVC debug information format control (requires CMake 3.25+)
+# This allows CMAKE_MSVC_DEBUG_INFORMATION_FORMAT to work properly
+# Without this, /Z7 (embedded debug info) won't be applied and parallel builds
+# with sccache will fail due to PDB file locking conflicts
+if(POLICY CMP0141)
+    cmake_policy(SET CMP0141 NEW)
+endif()
+
 # Try to get version from git tag first, fall back to vcpkg.json
 # This allows the build to use git tags (e.g., v1.2.0) when available
 find_package(Git QUIET)
@@ -75,9 +83,15 @@ configure_file(
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Enable compiler caching if available (ccache or sccache) - only when not building as a vcpkg port
-# vcpkg manages its own build caching
-if(NOT VCPKG_TOOLCHAIN)
+# Option to enable compiler cache (ccache/sccache)
+# Default OFF - vcpkg and other build systems manage their own compiler cache
+option(AMQCPP_WITH_CCACHE "Enable compiler cache (ccache/sccache) for faster rebuilds" OFF)
+
+# Enable compiler caching if available (ccache or sccache)
+# Only when:
+# - Explicitly enabled via AMQCPP_WITH_CCACHE
+# - Compiler launcher is not already configured by user or build system
+if(AMQCPP_WITH_CCACHE AND NOT CMAKE_C_COMPILER_LAUNCHER)
     # Prefer sccache if both are available
     find_program(SCCACHE_PROGRAM sccache)
     find_program(CCACHE_PROGRAM ccache)
@@ -101,14 +115,17 @@ if(CACHE_PROGRAM)
         ERROR_QUIET
     )
     if(CACHE_TEST_RESULT EQUAL 0)
-        # Only enable cache for Debug builds
-        # Release builds use /Zi which requires proper PDB handling
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-            set(CMAKE_C_COMPILER_LAUNCHER "${CACHE_PROGRAM}")
-            set(CMAKE_CXX_COMPILER_LAUNCHER "${CACHE_PROGRAM}")
-            message(STATUS "${CACHE_NAME} enabled for Debug builds")
-        else()
-            message(STATUS "${CACHE_NAME} found but disabled for Release builds (requires /Zi)")
+        set(CMAKE_C_COMPILER_LAUNCHER "${CACHE_PROGRAM}")
+        set(CMAKE_CXX_COMPILER_LAUNCHER "${CACHE_PROGRAM}")
+        message(STATUS "${CACHE_NAME} enabled for compiler caching")
+        # Set cache directory for local builds only
+        # In CI, sccache-action manages the cache via SCCACHE_GHA_ENABLED
+        if(NOT DEFINED ENV{SCCACHE_GHA_ENABLED} AND NOT DEFINED ENV{CI})
+            if(CACHE_NAME STREQUAL "sccache")
+                set(ENV{SCCACHE_DIR} "${CMAKE_SOURCE_DIR}/.cache/sccache")
+            elseif(CACHE_NAME STREQUAL "ccache")
+                set(ENV{CCACHE_DIR} "${CMAKE_SOURCE_DIR}/.cache/ccache")
+            endif()
         endif()
     else()
         message(STATUS "${CACHE_NAME} found but not working - builds will proceed without caching")
@@ -119,12 +136,18 @@ endif()
 
 # Platform-specific debug flags
 if(MSVC)
-    # Only set debug information format when not building as a vcpkg port
-    # vcpkg manages its own build configuration
-    if(NOT VCPKG_TOOLCHAIN)
-        # Windows/MSVC: Use /Z7 for debug builds (embedded in .obj, avoids PDB locking with parallel builds)
-        # Use /Zi for release builds (separate .pdb file for production debugging)
-        set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT $<$<CONFIG:Debug>:Z7>$<$<CONFIG:Release>:Zi>)
+    # Only set debug information format when using compiler cache
+    # This avoids PDB locking issues with parallel builds
+    if(AMQCPP_WITH_CCACHE)
+        # Windows/MSVC: Use /Z7 (embedded debug info in .obj files) for all builds
+        # This avoids PDB locking issues with parallel builds and works better with sccache
+        set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug,Release>:Embedded>")
+
+        # Remove default /Zi flags to avoid "overriding /Zi with /Z7" warning (D9025)
+        foreach(flag_var CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELWITHDEBINFO
+                         CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_RELWITHDEBINFO)
+            string(REGEX REPLACE "/Z[iI]" "" ${flag_var} "${${flag_var}}")
+        endforeach()
     endif()
     # Note: CMake already sets /Od for Debug and /O2 for Release by default
 else()
@@ -142,7 +165,7 @@ find_package(ZLIB REQUIRED)
 
 # Options
 option(AMQCPP_BUILD_EXAMPLES "Build example programs" ON)
-option(WITH_TESTS "Build all tests (unit, benchmark, integration)" OFF)
+option(AMQCPP_BUILD_TESTS "Build all tests (unit, benchmark, integration)" OFF)
 option(AMQCPP_SHARED_LIB "Build shared library instead of static" ON)
 
 # Option to enable/disable SSL support. When ON, OpenSSL is required.
@@ -181,7 +204,7 @@ add_subdirectory(activemq-cpp/src/main)
 
 add_subdirectory(activemq-cpp/src/examples)
 
-if(WITH_TESTS)
+if(AMQCPP_BUILD_TESTS)
     find_package(CppUnit CONFIG REQUIRED)
 	add_subdirectory(activemq-cpp/src/test)
 	add_subdirectory(activemq-cpp/src/test-benchmarks)
@@ -198,9 +221,9 @@ if(WITH_TESTS)
 	)
 
 	# Register benchmark tests
+	# Per-test timeout of 300s (5 min) is the default, watchdog dumps flight recorder on hang
 	add_test(NAME neoactivemq-benchmarks COMMAND neoactivemq-benchmark)
 	set_tests_properties(neoactivemq-benchmarks PROPERTIES
-		TIMEOUT 1200
 		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
 	)
 
@@ -226,9 +249,9 @@ if(WITH_TESTS)
 	)
 
 	# The actual integration tests
+	# Per-test timeout of 300s (5 min) is the default, watchdog dumps flight recorder on hang
 	add_test(NAME neoactivemq-integration-tests COMMAND neoactivemq-integration-test)
 	set_tests_properties(neoactivemq-integration-tests PROPERTIES
-		TIMEOUT 1200
 		LABELS "integration"
 		FIXTURES_REQUIRED IntegrationFixture
 		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"

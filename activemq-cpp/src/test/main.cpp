@@ -100,6 +100,8 @@ public:
     void startTest(CppUnit::Test* test) override {
         currentTest = test->getName();
         startTime = std::chrono::steady_clock::now();
+        // Clear Flight Recorder to isolate logs for this test
+        activemq::util::AMQLogger::clearFlightRecorder();
         startWatchdog();
     }
 

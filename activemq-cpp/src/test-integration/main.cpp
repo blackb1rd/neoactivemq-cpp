@@ -110,6 +110,8 @@ public:
         std::lock_guard<std::mutex> lock(mutex);
         currentTestName = test->getName();
         testStartTime = std::chrono::steady_clock::now();
+        // Clear Flight Recorder to isolate logs for this test
+        activemq::util::AMQLogger::clearFlightRecorder();
         testRunning.store(true);
     }
 

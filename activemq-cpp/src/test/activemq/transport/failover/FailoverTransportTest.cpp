@@ -1753,7 +1753,7 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
 
     // Verify still connected (should have failed over back to broker1)
     CPPUNIT_ASSERT_MESSAGE("Should remain connected after broker2 stops (failed over to broker1)", 
-                          failover->isConnected() == true)
+                          failover->isConnected() == true);
 
     transport->close();
 

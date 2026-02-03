@@ -16,7 +16,7 @@
       "cacheVariables": {
         "AMQCPP_WITH_CCACHE": true,
         "CMAKE_COLOR_DIAGNOSTICS": "ON",
-        "CMAKE_COMPILE_WARNING_AS_ERROR": "OFF",
+        "CMAKE_COMPILE_WARNING_AS_ERROR": "ON",
         "CMAKE_CXX_EXTENSIONS": "OFF",
         "CMAKE_CXX_STANDARD": "17",
         "CMAKE_CXX_STANDARD_REQUIRED": "ON",

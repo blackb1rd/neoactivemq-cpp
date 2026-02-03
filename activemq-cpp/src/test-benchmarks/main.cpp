@@ -37,67 +37,82 @@
 #include <condition_variable>
 #include <stdexcept>
 
-class BenchmarkRunner {
+// Watchdog listener that monitors per-test-case timeout
+class WatchdogTestListener : public CppUnit::TestListener {
 private:
-    CppUnit::TextUi::TestRunner* runner;
-    std::string testPath;
-    std::atomic<bool> wasSuccessful;
-    std::atomic<bool> completed;
-    std::thread thread;
+    long long testTimeoutSeconds;
+    std::atomic<bool> testRunning;
+    std::atomic<bool> shutdownRequested;
+    std::string currentTestName;
+    std::chrono::steady_clock::time_point testStartTime;
+    std::thread watchdogThread;
     std::mutex mutex;
     std::condition_variable cv;
 
+    void watchdogLoop() {
+        while (!shutdownRequested.load()) {
+            std::unique_lock<std::mutex> lock(mutex);
+
+            // Wait for either shutdown or check interval (1 second)
+            cv.wait_for(lock, std::chrono::seconds(1), [this]() {
+                return shutdownRequested.load();
+            });
+
+            if (shutdownRequested.load()) {
+                break;
+            }
+
+            if (testRunning.load()) {
+                auto elapsed = std::chrono::steady_clock::now() - testStartTime;
+                auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
+
+                if (elapsedSeconds >= testTimeoutSeconds) {
+                    std::cerr << std::endl << "ERROR: Benchmark timed out after "
+                              << elapsedSeconds << " seconds: " << currentTestName << std::endl;
+
+                    // Dump Flight Recorder log entries for debugging
+                    std::cerr << std::endl << "=== Flight Recorder Dump (last "
+                              << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+                    activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
+                    std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
+
+                    std::cerr << "Forcibly terminating process due to benchmark timeout..." << std::endl;
+                    std::_Exit(-1);
+                }
+            }
+        }
+    }
+
 public:
-    BenchmarkRunner(CppUnit::TextUi::TestRunner* r, const std::string& path)
-        : runner(r), testPath(path), wasSuccessful(false), completed(false) {
+    WatchdogTestListener(long long timeoutSeconds)
+        : testTimeoutSeconds(timeoutSeconds)
+        , testRunning(false)
+        , shutdownRequested(false) {
+        watchdogThread = std::thread(&WatchdogTestListener::watchdogLoop, this);
     }
 
-    void start() {
-        thread = std::thread([this]() {
-            try {
-                bool result = runner->run(testPath, false);
-                wasSuccessful.store(result);
-            } catch (...) {
-                wasSuccessful.store(false);
-            }
-            completed.store(true);
-            cv.notify_all();
-        });
+    ~WatchdogTestListener() {
+        shutdown();
     }
 
-    bool waitFor(long long timeoutMillis) {
-        if (timeoutMillis <= 0) {
-            if (thread.joinable()) {
-                thread.join();
-            }
-            return completed.load();
+    void shutdown() {
+        shutdownRequested.store(true);
+        cv.notify_all();
+        if (watchdogThread.joinable()) {
+            watchdogThread.join();
         }
-
-        std::unique_lock<std::mutex> lock(mutex);
-        auto timeout = std::chrono::milliseconds(timeoutMillis);
-
-        if (cv.wait_for(lock, timeout, [this]() { return completed.load(); })) {
-            if (thread.joinable()) {
-                thread.join();
-            }
-            return true;
-        }
-
-        return false; // Timeout occurred
     }
 
-    bool getResult() const {
-        return wasSuccessful.load();
+    void startTest(CppUnit::Test* test) override {
+        std::lock_guard<std::mutex> lock(mutex);
+        currentTestName = test->getName();
+        testStartTime = std::chrono::steady_clock::now();
+        testRunning.store(true);
     }
 
-    bool isCompleted() const {
-        return completed.load();
-    }
-
-    ~BenchmarkRunner() {
-        if (thread.joinable()) {
-            thread.detach();
-        }
+    void endTest(CppUnit::Test* /*test*/) override {
+        std::lock_guard<std::mutex> lock(mutex);
+        testRunning.store(false);
     }
 };
 
@@ -118,7 +133,7 @@ int main( int argc, char **argv ) {
     std::ofstream outputFile;
     bool useXMLOutputter = false;
     std::string testPath = "";
-    long long timeoutSeconds = 0; // 0 means no timeout
+    long long testTimeoutSeconds = 300; // Per-test timeout: 5 minutes default
     std::unique_ptr<CppUnit::TestListener> listener( new CppUnit::BriefTestProgressListener );
 
     if( argc > 1 ) {
@@ -140,14 +155,14 @@ int main( int argc, char **argv ) {
                     return -1;
                 }
                 testPath = argv[++i];
-            } else if( arg == "-timeout" ) {
+            } else if( arg == "-test-timeout" ) {
                 if( ( i + 1 ) >= argc ) {
-                    std::cout << "-timeout requires a timeout value in seconds" << std::endl;
+                    std::cout << "-test-timeout requires a timeout value in seconds" << std::endl;
                     return -1;
                 }
                 try {
-                    timeoutSeconds = std::stoll( argv[++i] );
-                    if( timeoutSeconds < 0 ) {
+                    testTimeoutSeconds = std::stoll( argv[++i] );
+                    if( testTimeoutSeconds < 0 ) {
                         std::cout << "Timeout value must be positive" << std::endl;
                         return -1;
                     }
@@ -160,7 +175,7 @@ int main( int argc, char **argv ) {
                 std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
                 std::cout << "Options:" << std::endl;
                 std::cout << "  -test <name>       Run specific benchmark or suite" << std::endl;
-                std::cout << "  -timeout <sec>     Set benchmark timeout in seconds (0 = no timeout)" << std::endl;
+                std::cout << "  -test-timeout <s>  Per-test timeout in seconds (default: 300)" << std::endl;
                 std::cout << "  -quiet             Suppress progress output" << std::endl;
                 std::cout << "  -xml <file>        Output results in XML format" << std::endl;
                 std::cout << "  -help, --help, -h  Show this help message" << std::endl;
@@ -180,6 +195,13 @@ int main( int argc, char **argv ) {
         runner.eventManager().addListener( listener.get() );
     }
 
+    // Add watchdog listener for per-test timeout (0 = disabled)
+    std::unique_ptr<WatchdogTestListener> watchdog;
+    if( testTimeoutSeconds > 0 ) {
+        watchdog.reset( new WatchdogTestListener( testTimeoutSeconds ) );
+        runner.eventManager().addListener( watchdog.get() );
+    }
+
     // Specify XML output and inform the test runner of this format.
     if( useXMLOutputter ) {
         runner.setOutputter( new CppUnit::XmlOutputter( &runner.result(), outputFile ) );
@@ -192,33 +214,15 @@ int main( int argc, char **argv ) {
     std::cout << "Starting the Benchmarks:" << std::endl;
     std::cout << "-----------------------------------------------------\n";
 
-    if( timeoutSeconds > 0 ) {
-        BenchmarkRunner benchmarkRunner(&runner, testPath);
-        benchmarkRunner.start();
+    try {
+        wasSuccessful = runner.run( testPath, false );
 
-        bool completed = benchmarkRunner.waitFor(timeoutSeconds * 1000);
-
-        if( !completed ) {
-            std::cerr << std::endl << "ERROR: Benchmark execution timed out after "
-                      << timeoutSeconds << " seconds" << std::endl;
-
-            // Dump Flight Recorder log entries for debugging
-            std::cerr << std::endl << "=== Flight Recorder Dump (last "
-                      << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
-            activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
-            std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
-
-            std::cerr << "Forcibly terminating process due to timeout..." << std::endl;
-            if( useXMLOutputter ) {
-                outputFile.close();
-            }
-            // Force exit since we can't safely stop the benchmark thread
-            std::_Exit(-1);
+        // Shutdown watchdog before checking results
+        if( watchdog ) {
+            watchdog->shutdown();
         }
 
-        wasSuccessful = benchmarkRunner.getResult();
-
-        // If benchmarks failed (but didn't timeout), dump flight recorder
+        // If benchmarks failed, dump flight recorder
         if( !wasSuccessful ) {
             std::cerr << std::endl << "ERROR: Benchmark execution failed" << std::endl;
 
@@ -228,31 +232,21 @@ int main( int argc, char **argv ) {
             activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
             std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
         }
-    } else {
-        try {
-            wasSuccessful = runner.run( testPath, false );
-
-            // If benchmarks failed, dump flight recorder
-            if( !wasSuccessful ) {
-                std::cerr << std::endl << "ERROR: Benchmark execution failed" << std::endl;
-
-                // Dump Flight Recorder log entries for debugging
-                std::cerr << std::endl << "=== Flight Recorder Dump (last "
-                          << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
-                activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
-                std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
-            }
-        } catch(...) {
-            std::cout << "----------------------------------------" << std::endl;
-            std::cout << "- AN ERROR HAS OCCURED:                -" << std::endl;
-            std::cout << "----------------------------------------" << std::endl;
-
-            // Dump Flight Recorder log entries for debugging
-            std::cerr << std::endl << "=== Flight Recorder Dump (last "
-                      << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
-            activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
-            std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
+    } catch(...) {
+        // Shutdown watchdog on exception
+        if( watchdog ) {
+            watchdog->shutdown();
         }
+
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "- AN ERROR HAS OCCURED:                -" << std::endl;
+        std::cout << "----------------------------------------" << std::endl;
+
+        // Dump Flight Recorder log entries for debugging
+        std::cerr << std::endl << "=== Flight Recorder Dump (last "
+                  << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+        activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
+        std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
     }
 
     std::cout << "-----------------------------------------------------\n";

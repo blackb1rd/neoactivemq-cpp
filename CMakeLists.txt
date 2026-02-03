@@ -221,9 +221,9 @@ if(AMQCPP_BUILD_TESTS)
 	)
 
 	# Register benchmark tests
+	# Per-test timeout of 300s (5 min) is the default, watchdog dumps flight recorder on hang
 	add_test(NAME neoactivemq-benchmarks COMMAND neoactivemq-benchmark)
 	set_tests_properties(neoactivemq-benchmarks PROPERTIES
-		TIMEOUT 1200
 		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
 	)
 
@@ -249,9 +249,9 @@ if(AMQCPP_BUILD_TESTS)
 	)
 
 	# The actual integration tests
+	# Per-test timeout of 300s (5 min) is the default, watchdog dumps flight recorder on hang
 	add_test(NAME neoactivemq-integration-tests COMMAND neoactivemq-integration-test)
 	set_tests_properties(neoactivemq-integration-tests PROPERTIES
-		TIMEOUT 1200
 		LABELS "integration"
 		FIXTURES_REQUIRED IntegrationFixture
 		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"

@@ -1083,8 +1083,9 @@ bool FailoverTransport::iterate() {
                             }
 
                             // Skip this URI if it has exceeded its per-host max reconnect attempts
+                            // (Only check exhaustion for reconnection attempts, not the first connection)
                             int reconnectAttempts = this->impl->calculateReconnectAttemptLimit();
-                            if (this->impl->isUriExhausted(uri, reconnectAttempts)) {
+                            if (!this->impl->firstConnection && this->impl->isUriExhausted(uri, reconnectAttempts)) {
                                 AMQ_LOG_DEBUG("FailoverTransport", "Skipping exhausted URI: " << uri.toString()
                                     << " (failures: " << this->impl->getUriFailureCount(uri) << ")");
                                 failures.add(uri);  // Add back to failures so it returns to pool

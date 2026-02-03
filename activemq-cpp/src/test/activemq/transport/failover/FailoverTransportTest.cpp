@@ -1720,10 +1720,9 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     transport->start();
 
     // Wait for initial connection
-    // Increased timeout for slower CI environments
     int count = 0;
-    while (!failover->isConnected() && count++ < 75) {
-        Thread::sleep(200);
+    while (!failover->isConnected() && count++ < 100) {
+        Thread::sleep(100);
     }
     CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", failover->isConnected() == true);
 
@@ -1731,13 +1730,17 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     broker1->stop();
     broker1->waitUntilStopped();
 
-    // Give transport time to detect the disconnection
-    Thread::sleep(500);
-
-    // Wait for reconnection to broker2
+    // Wait for disconnection to be detected (isConnected becomes false)
     count = 0;
-    while (!failover->isConnected() && count++ < 50) {
-        Thread::sleep(200);
+    while (failover->isConnected() && count++ < 100) {
+        Thread::sleep(100);
+    }
+    CPPUNIT_ASSERT_MESSAGE("Failed to detect disconnection from broker1", failover->isConnected() == false);
+
+    // Wait for reconnection to broker2 (isConnected becomes true)
+    count = 0;
+    while (!failover->isConnected() && count++ < 100) {
+        Thread::sleep(100);
     }
     CPPUNIT_ASSERT_MESSAGE("Failed to reconnect to broker2", failover->isConnected() == true);
 
@@ -1745,17 +1748,24 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     broker1->start();
     broker1->waitUntilStarted();
 
+    // Give broker1 time to fully accept connections before stopping broker2
+    Thread::sleep(500);
+
     // Stop broker2 - should reconnect to broker1
     broker2->stop();
     broker2->waitUntilStopped();
 
-    // Give transport time to detect the disconnection
-    Thread::sleep(500);
-
-    // Wait for reconnection to broker1
+    // Wait for disconnection to be detected (isConnected becomes false)
     count = 0;
-    while (!failover->isConnected() && count++ < 50) {
-        Thread::sleep(200);
+    while (failover->isConnected() && count++ < 100) {
+        Thread::sleep(100);
+    }
+    CPPUNIT_ASSERT_MESSAGE("Failed to detect disconnection from broker2", failover->isConnected() == false);
+
+    // Wait for reconnection to broker1 (isConnected becomes true)
+    count = 0;
+    while (!failover->isConnected() && count++ < 100) {
+        Thread::sleep(100);
     }
     CPPUNIT_ASSERT_MESSAGE("Should reconnect to broker1", failover->isConnected() == true);
 

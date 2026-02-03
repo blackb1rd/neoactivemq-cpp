@@ -844,6 +844,8 @@ void FailoverTransport::handleTransportFailure(const decaf::lang::Exception& err
             this->impl->uris->addURI(failedUri);
             this->impl->connectedTransportURI.reset(NULL);
             this->impl->connected.store(false, std::memory_order_release);
+            // Memory barrier to ensure connected state is immediately visible to other threads
+            std::atomic_thread_fence(std::memory_order_seq_cst);
             this->impl->connectedToPrioirty = false;
 
             // Place the State Tracker into a reconnection state.

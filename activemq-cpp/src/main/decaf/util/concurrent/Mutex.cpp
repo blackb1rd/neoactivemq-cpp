@@ -55,14 +55,14 @@ namespace concurrent {
 
     public:
 
-        MutexProperties() : pendingNotifications(0), notifyAll(false) {
+        MutexProperties() : pendingNotifications(0), notifyAllGeneration(0) {
             std::string idStr = Integer::toString(++id);
             this->name.reserve(DEFAULT_NAME_PREFIX.length() + idStr.length());
             this->name.append(DEFAULT_NAME_PREFIX);
             this->name.append(idStr);
         }
 
-        MutexProperties(const std::string& name) : pendingNotifications(0), notifyAll(false), name(name) {
+        MutexProperties(const std::string& name) : pendingNotifications(0), notifyAllGeneration(0), name(name) {
             if (this->name.empty()) {
                 std::string idStr = Integer::toString(++id);
                 this->name.reserve(DEFAULT_NAME_PREFIX.length() + idStr.length());
@@ -74,7 +74,7 @@ namespace concurrent {
         CustomReentrantLock reentrantLock; // Recursive lock implementation
         std::condition_variable condition;  // Standard condition variable for use with unique_lock<mutex>
         std::atomic<int> pendingNotifications; // Number of pending notify() calls (consumed by waiters)
-        std::atomic<bool> notifyAll;           // Flag for notifyAll() - wakes all waiters
+        std::atomic<unsigned int> notifyAllGeneration; // Generation counter for notifyAll() - incremented each call
         std::string name;
 
         static unsigned int id;
@@ -211,6 +211,10 @@ void Mutex::wait( long long millisecs, int nanos ) {
         if (millisecs == 0 && nanos == 0) {
             // Indefinite wait - use polling to check for interruption periodically
             // We use wait_for with a timeout so we can check for interruption
+
+            // Record the notifyAll generation before waiting. If it changes, a notifyAll() was called.
+            unsigned int initialGeneration = this->properties->notifyAllGeneration.load(std::memory_order_acquire);
+
             while (true) {
                 // Wait for up to 100ms, then check for interruption
                 std::cv_status status = this->properties->condition.wait_for(lock, std::chrono::milliseconds(100));
@@ -226,8 +230,8 @@ void Mutex::wait( long long millisecs, int nanos ) {
                     throw InterruptedException(__FILE__, __LINE__, "Thread interrupted during wait");
                 }
 
-                // Check if a notifyAll() was called - all threads can proceed
-                if (this->properties->notifyAll.load(std::memory_order_acquire)) {
+                // Check if a notifyAll() was called - generation will have changed
+                if (this->properties->notifyAllGeneration.load(std::memory_order_acquire) != initialGeneration) {
                     break;
                 }
 
@@ -301,7 +305,10 @@ void Mutex::notifyAll() {
     if (!this->properties->reentrantLock.isHeldByCurrentThread()) {
         throw IllegalMonitorStateException(__FILE__, __LINE__, "Thread does not own the mutex");
     }
-    // Set the notifyAll flag to allow all waiting threads to proceed
-    this->properties->notifyAll.store(true, std::memory_order_release);
+    // Increment the generation counter to signal all waiting threads.
+    // Each waiting thread records the generation when entering wait() and checks
+    // if it changed - this ensures only threads that were waiting at the time of
+    // notifyAll() are woken, not threads that call wait() later.
+    this->properties->notifyAllGeneration.fetch_add(1, std::memory_order_release);
     this->properties->condition.notify_all();
 }

@@ -1167,12 +1167,11 @@ cms::Message* ActiveMQConsumerKernel::receive(int timeout) {
         this->sendPullRequest(timeout);
 
         // Get the next available message, if there is one.
-        Pointer<MessageDispatch> message;
-        if (internal->info->getPrefetchSize() == 0) {
-            message = dequeue(-1);  // Broker will signal if no message.
-        } else {
-            message = dequeue(timeout);
-        }
+        // Always respect the timeout on the client side, regardless of prefetch size.
+        // With prefetch=0, the broker should respond to the pull request, but we must
+        // not block indefinitely if it doesn't - the caller expects receive(timeout) to
+        // return within the specified timeout.
+        Pointer<MessageDispatch> message = dequeue(timeout);
 
         if (message == NULL) {
             return NULL;
@@ -1203,12 +1202,10 @@ cms::Message* ActiveMQConsumerKernel::receiveNoWait() {
         this->sendPullRequest(-1);
 
         // Get the next available message, if there is one.
-        Pointer<MessageDispatch> message;
-        if (internal->info->getPrefetchSize() == 0) {
-            message = dequeue(-1);  // Broker will signal if no message.
-        } else {
-            message = dequeue(0);
-        }
+        // Use dequeue(0) for no-wait regardless of prefetch size.
+        // With prefetch=0, the broker should respond immediately to the pull request,
+        // but we must not block indefinitely - receiveNoWait() must return immediately.
+        Pointer<MessageDispatch> message = dequeue(0);
 
         if (message == NULL) {
             return NULL;

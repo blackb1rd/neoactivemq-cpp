@@ -112,6 +112,9 @@ CPPUNIT_TEST_SUITE_REGISTRATION( activemq::transport::failover::FailoverTranspor
 #include <activemq/transport/tcp/TcpTransportTest.h>
 CPPUNIT_TEST_SUITE_REGISTRATION( activemq::transport::tcp::TcpTransportTest );
 
+#include <activemq/transport/tcp/SingleBrokerReconnectTest.h>
+CPPUNIT_TEST_SUITE_REGISTRATION( activemq::transport::tcp::SingleBrokerReconnectTest );
+
 #include <activemq/transport/tcp/SslTransportTest.h>
 CPPUNIT_TEST_SUITE_REGISTRATION( activemq::transport::tcp::SslTransportTest );
 

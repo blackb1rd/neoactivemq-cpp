@@ -28,7 +28,6 @@
         "uninitialized": false
       },
       "environment": {
-        "CCACHE_DIR": "${sourceDir}/.cache/ccache/",
         "VCPKG_DOWNLOADS": "${sourceDir}/.cache/vcpkg/downloads"
       }
     },

@@ -21,6 +21,8 @@
 #include <openssl/err.h>
 #endif
 
+#include <activemq/util/AMQLog.h>
+
 using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::net;
@@ -83,7 +85,11 @@ OpenSSLSocketException::OpenSSLSocketException( const char* file, const int line
 : SocketException() {
 
     // Get from the OpenSSL error Stack.
-    this->setMessage( this->getErrorString().c_str() );
+    std::string errorMsg = this->getErrorString();
+    this->setMessage( errorMsg.c_str() );
+
+    // Log the full OpenSSL error details
+    AMQ_LOG_ERROR("OpenSSLSocketException", "OpenSSL error at " << file << ":" << lineNumber << " - " << errorMsg);
 
     // Set the first mark for this exception.
     setMark( file, lineNumber );

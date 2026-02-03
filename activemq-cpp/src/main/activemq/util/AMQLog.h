@@ -28,6 +28,7 @@
 #include <thread>
 #include <chrono>
 #include <vector>
+#include <unordered_map>
 
 // Undefine Windows macros that conflict with our enum values
 #ifdef ERROR
@@ -42,13 +43,14 @@ namespace util {
 
 /**
  * Simple logging levels for ActiveMQ C++ client.
- * Ordered by verbosity: NONE < ERROR < INFO < DEBUG
+ * Ordered by verbosity: NONE < ERROR < WARN < INFO < DEBUG
  */
 enum class AMQLogLevel : int {
     NONE  = 0,   // No logging (default, zero overhead)
     ERROR = 1,   // Error messages only
-    INFO  = 2,   // Informational messages
-    DEBUG = 3    // Detailed debug messages
+    WARN  = 2,   // Warning messages
+    INFO  = 3,   // Informational messages
+    DEBUG = 4    // Detailed debug messages
 };
 
 /**
@@ -89,6 +91,13 @@ private:
 
     // Optional custom output handler (for testing or file logging)
     static std::function<void(AMQLogLevel, const std::string&)> customHandler;
+
+    // Per-connection logging support
+    static std::mutex contextHandlersMutex;
+    static std::unordered_map<std::string, std::function<void(AMQLogLevel, const std::string&)>> contextHandlers;
+
+    // Helper to get thread-local context (avoids DLL export issues with thread_local static)
+    static std::string& getCurrentLogContextImpl();
 
     // Flight Recorder circular buffer
     static std::vector<FlightRecorderEntry> flightRecorderBuffer;
@@ -132,6 +141,53 @@ public:
     static void clearOutputHandler();
 
     /**
+     * Set a context-specific output handler for a connection/broker.
+     * This allows different log files for different connections.
+     *
+     * Example usage:
+     *   // For connection to broker1
+     *   AMQLogger::setContextOutputHandler("broker1", [](AMQLogLevel level, const std::string& msg) {
+     *       std::ofstream logFile("broker1.log", std::ios::app);
+     *       logFile << msg << std::endl;
+     *   });
+     *
+     *   // Set context before operations
+     *   AMQLogger::setLogContext("broker1");
+     *   // ... your connection code ...
+     *   AMQLogger::clearLogContext();
+     *
+     * @param context The context identifier (e.g., broker URL, connection ID)
+     * @param handler Function that receives level and formatted message for this context
+     */
+    static void setContextOutputHandler(const std::string& context,
+                                       std::function<void(AMQLogLevel, const std::string&)> handler);
+
+    /**
+     * Remove a context-specific output handler.
+     * @param context The context identifier to remove
+     */
+    static void clearContextOutputHandler(const std::string& context);
+
+    /**
+     * Set the current thread's logging context.
+     * Logs from this thread will use the context-specific handler if configured.
+     * @param context The context identifier (e.g., broker URL, connection ID)
+     */
+    static void setLogContext(const std::string& context);
+
+    /**
+     * Clear the current thread's logging context.
+     * Logs will revert to using the global handler or std::cerr.
+     */
+    static void clearLogContext();
+
+    /**
+     * Get the current thread's logging context.
+     * @return The current context identifier, or empty string if none set
+     */
+    static std::string getLogContext();
+
+    /**
      * Internal: Write a log message. Use macros instead of calling directly.
      */
     static void log(AMQLogLevel level, const char* component, const std::string& message);
@@ -142,6 +198,7 @@ public:
     static const char* levelToString(AMQLogLevel level) {
         switch (level) {
             case AMQLogLevel::ERROR: return "ERROR";
+            case AMQLogLevel::WARN:  return "WARN";
             case AMQLogLevel::INFO:  return "INFO";
             case AMQLogLevel::DEBUG: return "DEBUG";
             default: return "NONE";
@@ -296,6 +353,20 @@ private:
     } while (0)
 
 /**
+ * Log at WARN level.
+ * Usage: AMQ_LOG_WARN("Component", "Warning: " << details);
+ */
+#define AMQ_LOG_WARN(component, message) \
+    do { \
+        if (activemq::util::AMQLogger::isEnabled(activemq::util::AMQLogLevel::WARN)) { \
+            std::ostringstream _amq_oss; \
+            _amq_oss << message; \
+            activemq::util::AMQLogger::log(activemq::util::AMQLogLevel::WARN, \
+                component, _amq_oss.str()); \
+        } \
+    } while (0)
+
+/**
  * Log at INFO level.
  * Usage: AMQ_LOG_INFO("Component", "Message " << variable);
  */
@@ -335,6 +406,12 @@ private:
  */
 #define AMQ_LOG_INFO_ENABLED() \
     activemq::util::AMQLogger::isEnabled(activemq::util::AMQLogLevel::INFO)
+
+/**
+ * Check if WARN logging is enabled.
+ */
+#define AMQ_LOG_WARN_ENABLED() \
+    activemq::util::AMQLogger::isEnabled(activemq::util::AMQLogLevel::WARN)
 
 /**
  * Check if ERROR logging is enabled.

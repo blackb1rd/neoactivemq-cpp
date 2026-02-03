@@ -30,6 +30,13 @@ BackupTransport::BackupTransport(BackupTransportPool* parent) :
 
 ////////////////////////////////////////////////////////////////////////////////
 BackupTransport::~BackupTransport() {
+    try {
+        if (this->transport != NULL) {
+            this->transport->close();
+        }
+    } catch (...) {
+        // Suppress exceptions in destructor
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

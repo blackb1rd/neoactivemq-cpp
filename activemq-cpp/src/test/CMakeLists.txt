@@ -56,6 +56,7 @@ set(TEST_SRCS
   activemq/transport/inactivity/InactivityMonitorTest.cpp
   activemq/transport/mock/MockTransportFactoryTest.cpp
   activemq/transport/tcp/TcpTransportTest.cpp
+  activemq/transport/tcp/SingleBrokerReconnectTest.cpp
   activemq/transport/tcp/SslTransportTest.cpp
   activemq/util/ActiveMQMessageTransformationTest.cpp
   activemq/util/AdvisorySupportTest.cpp

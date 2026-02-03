@@ -76,13 +76,24 @@ namespace util {
                         return;
                     }
 
-                    if (heap.isEmpty()) {
-                        // no tasks scheduled -- sleep until any task appear
+                    while (heap.isEmpty() && !cancelled) {
+                        // no tasks scheduled -- sleep until any task appear or cancellation
                         AMQ_LOG_DEBUG("Timer", "run() heap empty, entering indefinite wait");
                         try {
                             this->wait();
                         } catch (InterruptedException& e) {}
-                        AMQ_LOG_DEBUG("Timer", "run() woke from indefinite wait, heap.size=" << heap.size());
+                        AMQ_LOG_DEBUG("Timer", "run() woke from indefinite wait, heap.size=" << heap.size() << ", cancelled=" << cancelled);
+                    }
+
+                    // Check cancelled again after waking up
+                    if (cancelled) {
+                        AMQ_LOG_DEBUG("Timer", "run() timer thread exiting - cancelled after wait");
+                        return;
+                    }
+
+                    if (heap.isEmpty()) {
+                        // Spurious wakeup with empty heap, continue loop
+                        AMQ_LOG_DEBUG("Timer", "run() spurious wakeup with empty heap");
                         continue;
                     }
 
@@ -109,7 +120,12 @@ namespace util {
                             this->wait(timeToSleep);
                         } catch (InterruptedException& e) {
                         }
-                        AMQ_LOG_DEBUG("Timer", "run() woke from timed wait, heap.size=" << heap.size());
+                        AMQ_LOG_DEBUG("Timer", "run() woke from timed wait, heap.size=" << heap.size() << ", cancelled=" << cancelled);
+                        // Check if cancelled while waiting
+                        if (cancelled) {
+                            AMQ_LOG_DEBUG("Timer", "run() timer thread exiting - cancelled during timed wait");
+                            return;
+                        }
                         continue;
                     }
 
@@ -187,8 +203,12 @@ namespace util {
                 AMQ_LOG_DEBUG("Timer", "cancel() acquired lock, setting cancelled=true, heap.size=" << heap.size());
                 cancelled = true;
                 heap.reset();
-                AMQ_LOG_DEBUG("Timer", "cancel() notifying timer thread");
-                this->notify();
+                AMQ_LOG_DEBUG("Timer", "cancel() notifying timer thread (notifyAll)");
+                // Use notifyAll() to ensure the timer thread wakes up.
+                // notify() uses a pending notification counter which can be missed
+                // in certain race conditions. notifyAll() sets a flag that is
+                // always checked regardless of the wait_for() return status.
+                this->notifyAll();
             }
             AMQ_LOG_DEBUG("Timer", "cancel() completed");
         }
@@ -267,7 +287,7 @@ bool Timer::awaitTermination(long long timeout, const TimeUnit& unit) {
 
     this->internal->join(unit.toMillis(timeout));
 
-    return this->internal->isAlive();
+    return !this->internal->isAlive();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

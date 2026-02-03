@@ -330,6 +330,7 @@ namespace failover {
 
                 // Hand off to the close task so it gets done in a different thread.
                 this->closeTask->add(transport);
+                this->taskRunner->wakeup();
 
                 if (this->connectedTransportURI != NULL) {
                     this->uris->addURI(*this->connectedTransportURI);
@@ -732,6 +733,11 @@ void FailoverTransport::close() {
             this->impl->sleepMutex.notifyAll();
         }
 
+        // Notify listenerMutex to wake up any thread waiting for transport listener
+        synchronized( &this->impl->listenerMutex ) {
+            this->impl->listenerMutex.notifyAll();
+        }
+
         // Close the transport BEFORE calling shutdown to interrupt any blocking operations
         if (transportToStop != NULL) {
             transportToStop->close();
@@ -829,6 +835,7 @@ void FailoverTransport::handleTransportFailure(const decaf::lang::Exception& err
 
             // Hand off to the close task so it gets done in a different thread.
             this->impl->closeTask->add(transport);
+            this->impl->taskRunner->wakeup();
 
             bool reconnectOk = this->impl->canReconnect();
             URI failedUri = *this->impl->connectedTransportURI;
@@ -869,7 +876,7 @@ void FailoverTransport::handleConnectionControl(const Pointer<Command> control) 
         std::string reconnectStr = ctrlCommand->getReconnectTo();
         if (!reconnectStr.empty()) {
 
-            std::remove(reconnectStr.begin(), reconnectStr.end(), ' ');
+            reconnectStr.erase(std::remove(reconnectStr.begin(), reconnectStr.end(), ' '), reconnectStr.end());
 
             if (reconnectStr.length() > 0) {
                 try {
@@ -892,7 +899,7 @@ void FailoverTransport::processNewTransports(bool rebalance, std::string newTran
 
     if (!newTransports.empty()) {
 
-        std::remove(newTransports.begin(), newTransports.end(), ' ');
+        newTransports.erase(std::remove(newTransports.begin(), newTransports.end(), ' '), newTransports.end());
 
         if (newTransports.length() > 0 && isUpdateURIsSupported()) {
 
@@ -1249,13 +1256,18 @@ bool FailoverTransport::iterate() {
             this->impl->propagateFailureToExceptionListener();
 
             // Clear failure after propagating to allow continued reconnection
-            if (wasFirstConnection) {
+            // Only if we're transitioning to a different reconnect limit
+            bool transitioningToDifferentLimit = wasFirstConnection &&
+                this->impl->startupMaxReconnectAttempts != this->impl->maxReconnectAttempts;
+
+            if (transitioningToDifferentLimit) {
                 this->impl->connectionFailure.reset(NULL);
             }
 
-            // If this was the first connection exhaustion, continue trying with maxReconnectAttempts
+            // If this was the first connection exhaustion AND we're transitioning to a different limit,
+            // continue trying with maxReconnectAttempts
             // Otherwise, we've truly exhausted all reconnection attempts
-            if (!wasFirstConnection) {
+            if (!wasFirstConnection || !transitioningToDifferentLimit) {
                 return false;
             }
             // For first connection transition, immediately retry without delay

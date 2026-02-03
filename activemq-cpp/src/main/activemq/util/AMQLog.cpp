@@ -21,6 +21,7 @@
 #include <cstring>
 #include <iomanip>
 #include <cctype>
+#include <unordered_map>
 
 #ifdef _WIN32
 // Prevent Windows min/max macros from interfering with (std::min)/(std::max)
@@ -45,6 +46,16 @@ namespace util {
 // Initialize static members - default to NONE (no logging)
 std::atomic<AMQLogLevel> AMQLogger::currentLevel(AMQLogLevel::NONE);
 std::function<void(AMQLogLevel, const std::string&)> AMQLogger::customHandler = nullptr;
+
+// Per-connection logging static members
+std::mutex AMQLogger::contextHandlersMutex;
+std::unordered_map<std::string, std::function<void(AMQLogLevel, const std::string&)>> AMQLogger::contextHandlers;
+
+// Function to access thread-local context (avoids DLL export issues)
+std::string& AMQLogger::getCurrentLogContextImpl() {
+    static thread_local std::string currentLogContext;
+    return currentLogContext;
+}
 
 // Flight Recorder static members
 std::vector<AMQLogger::FlightRecorderEntry> AMQLogger::flightRecorderBuffer;
@@ -131,7 +142,18 @@ void AMQLogger::log(AMQLogLevel level, const char* component, const std::string&
 
     std::string formattedMsg = oss.str();
 
-    // Output
+    // Check for context-specific handler first
+    std::string& currentLogContext = getCurrentLogContextImpl();
+    if (!currentLogContext.empty()) {
+        std::lock_guard<std::mutex> lock(contextHandlersMutex);
+        auto it = contextHandlers.find(currentLogContext);
+        if (it != contextHandlers.end() && it->second) {
+            it->second(level, formattedMsg);
+            return;
+        }
+    }
+
+    // Fall back to global handler or std::cout
     if (customHandler) {
         customHandler(level, formattedMsg);
     } else {
@@ -149,6 +171,7 @@ AMQLogLevel AMQLogger::parseLevel(const std::string& levelStr) {
 
     if (lower == "debug") return AMQLogLevel::DEBUG;
     if (lower == "info") return AMQLogLevel::INFO;
+    if (lower == "warn") return AMQLogLevel::WARN;
     if (lower == "error") return AMQLogLevel::ERROR;
     return AMQLogLevel::NONE;
 }
@@ -442,6 +465,34 @@ std::size_t AMQLogger::flightRecorderCapacity() {
 
 uint64_t AMQLogger::flightRecorderTotalRecorded() {
     return flightRecorderTotalCount.load(std::memory_order_relaxed);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void AMQLogger::setContextOutputHandler(const std::string& context,
+                                       std::function<void(AMQLogLevel, const std::string&)> handler) {
+    std::lock_guard<std::mutex> lock(contextHandlersMutex);
+    contextHandlers[context] = handler;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void AMQLogger::clearContextOutputHandler(const std::string& context) {
+    std::lock_guard<std::mutex> lock(contextHandlersMutex);
+    contextHandlers.erase(context);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void AMQLogger::setLogContext(const std::string& context) {
+    getCurrentLogContextImpl() = context;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void AMQLogger::clearLogContext() {
+    getCurrentLogContextImpl().clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string AMQLogger::getLogContext() {
+    return getCurrentLogContextImpl();
 }
 
 } // namespace util

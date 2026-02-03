@@ -38,6 +38,7 @@
 #include <decaf/internal/net/ssl/openssl/OpenSSLSocketInputStream.h>
 #include <decaf/internal/net/ssl/openssl/OpenSSLSocketOutputStream.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <activemq/util/AMQLog.h>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -506,15 +507,18 @@ int OpenSSLSocket::read(unsigned char* buffer, int size, int offset, int length)
         // Read data from the socket.
         int result = SSL_read(this->parameters->getSSL(), buffer + offset, length);
 
-        switch (SSL_get_error(this->parameters->getSSL(), result)) {
+        int sslError = SSL_get_error(this->parameters->getSSL(), result);
+        switch (sslError) {
         case SSL_ERROR_NONE:
             return result;
         case SSL_ERROR_ZERO_RETURN:
+            AMQ_LOG_DEBUG("OpenSSLSocket", "SSL_read returned SSL_ERROR_ZERO_RETURN, shutting down input");
             if (!isClosed()) {
                 this->shutdownInput();
                 return -1;
             }
         default:
+            AMQ_LOG_ERROR("OpenSSLSocket", "SSL_read failed: result=" << result << " sslError=" << sslError);
             throw OpenSSLSocketException(__FILE__, __LINE__);
         }
 #else
@@ -573,14 +577,17 @@ void OpenSSLSocket::write(const unsigned char* buffer, int size, int offset, int
 
             int written = SSL_write(this->parameters->getSSL(), buffer + offset, remaining);
 
-            switch (SSL_get_error(this->parameters->getSSL(), written)) {
+            int sslError = SSL_get_error(this->parameters->getSSL(), written);
+            switch (sslError) {
             case SSL_ERROR_NONE:
                 offset += written;
                 remaining -= written;
                 break;
             case SSL_ERROR_ZERO_RETURN:
+                AMQ_LOG_ERROR("OpenSSLSocket", "SSL_write SSL_ERROR_ZERO_RETURN: connection broken unexpectedly");
                 throw SocketException(__FILE__, __LINE__, "The connection was broken unexpectedly.");
             default:
+                AMQ_LOG_ERROR("OpenSSLSocket", "SSL_write failed: written=" << written << " sslError=" << sslError << " remaining=" << remaining);
                 throw OpenSSLSocketException(__FILE__, __LINE__);
             }
         }

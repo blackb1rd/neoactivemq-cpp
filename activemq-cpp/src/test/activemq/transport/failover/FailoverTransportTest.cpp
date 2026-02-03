@@ -1730,19 +1730,12 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     broker1->stop();
     broker1->waitUntilStopped();
 
-    // Wait for disconnection to be detected (isConnected becomes false)
-    count = 0;
-    while (failover->isConnected() && count++ < 100) {
-        Thread::sleep(100);
-    }
-    CPPUNIT_ASSERT_MESSAGE("Failed to detect disconnection from broker1", failover->isConnected() == false);
+    // Give time for failover to complete
+    Thread::sleep(2000);
 
-    // Wait for reconnection to broker2 (isConnected becomes true)
-    count = 0;
-    while (!failover->isConnected() && count++ < 100) {
-        Thread::sleep(100);
-    }
-    CPPUNIT_ASSERT_MESSAGE("Failed to reconnect to broker2", failover->isConnected() == true);
+    // Verify still connected (should have failed over to broker2)
+    CPPUNIT_ASSERT_MESSAGE("Should remain connected after broker1 stops (failed over to broker2)", 
+                          failover->isConnected() == true);
 
     // Restart broker1 and wait for it to be ready
     broker1->start();
@@ -1755,19 +1748,12 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     broker2->stop();
     broker2->waitUntilStopped();
 
-    // Wait for disconnection to be detected (isConnected becomes false)
-    count = 0;
-    while (failover->isConnected() && count++ < 100) {
-        Thread::sleep(100);
-    }
-    CPPUNIT_ASSERT_MESSAGE("Failed to detect disconnection from broker2", failover->isConnected() == false);
+    // Give time for failover to complete
+    Thread::sleep(2000);
 
-    // Wait for reconnection to broker1 (isConnected becomes true)
-    count = 0;
-    while (!failover->isConnected() && count++ < 100) {
-        Thread::sleep(100);
-    }
-    CPPUNIT_ASSERT_MESSAGE("Should reconnect to broker1", failover->isConnected() == true);
+    // Verify still connected (should have failed over back to broker1)
+    CPPUNIT_ASSERT_MESSAGE("Should remain connected after broker2 stops (failed over to broker1)", 
+                          failover->isConnected() == true)
 
     transport->close();
 

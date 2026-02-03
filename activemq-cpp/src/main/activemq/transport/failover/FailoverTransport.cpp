@@ -67,33 +67,6 @@ namespace activemq {
 namespace transport {
 namespace failover {
 
-    /**
-     * Tracks the state of each broker URI
-     */
-    struct BrokerState {
-        BrokerStatus status;
-        int failureCount;
-        long long lastAttemptTime;
-        long long lastSuccessTime;
-        std::string lastError;
-
-        BrokerState() :
-            status(BrokerStatus::AVAILABLE),
-            failureCount(0),
-            lastAttemptTime(0),
-            lastSuccessTime(0),
-            lastError("") {}
-
-        // Equality operator for StlMap::containsValue
-        bool operator==(const BrokerState& other) const {
-            return status == other.status &&
-                   failureCount == other.failureCount &&
-                   lastAttemptTime == other.lastAttemptTime &&
-                   lastSuccessTime == other.lastSuccessTime &&
-                   lastError == other.lastError;
-        }
-    };
-
     class FailoverTransportImpl {
     private:
 

@@ -149,11 +149,6 @@ void OpenWireFormat::marshal(const Pointer<commands::Command> command, const act
 
         if (command != NULL) {
 
-            AMQ_LOG_DEBUG("OpenWireFormat", "marshal() SEND cmdId=" << command->getCommandId()
-                << " type=" << (int)command->getDataStructureType()
-                << " responseRequired=" << command->isResponseRequired()
-                << " toString=" << command->toString());
-
             DataStructure* dataStructure = dynamic_cast<DataStructure*>(command.get());
 
             unsigned char type = dataStructure->getDataStructureType();
@@ -228,8 +223,6 @@ Pointer<commands::Command> OpenWireFormat::unmarshal(const activemq::transport::
             throw decaf::io::IOException(__FILE__, __LINE__, "DataInputStream passed is NULL");
         }
 
-        AMQ_LOG_DEBUG("OpenWireFormat", "unmarshal() start");
-
         if (!sizePrefixDisabled) {
             dis->readInt();
         }
@@ -246,11 +239,6 @@ Pointer<commands::Command> OpenWireFormat::unmarshal(const activemq::transport::
         // that is a commands::Command type, if its not then the cast will
         // throw an ClassCastException.
         Pointer<Command> command = data.dynamicCast<Command>();
-
-        AMQ_LOG_DEBUG("OpenWireFormat", "unmarshal() RECV cmdId=" << command->getCommandId()
-                      << " type=" << (int)command->getDataStructureType()
-                      << " isResponse=" << command->isResponse()
-                      << " toString=" << command->toString());
 
         return command;
     }
@@ -303,8 +291,6 @@ commands::DataStructure* OpenWireFormat::doUnmarshal(const activemq::transport::
 
         unsigned char dataType = dis->readByte();
 
-        AMQ_LOG_DEBUG("OpenWireFormat", "doUnmarshal() read dataType=" << (int)dataType);
-
         if (dataType != NULL_TYPE) {
 
             DataStreamMarshaller* dsm = dynamic_cast<DataStreamMarshaller*>(dataMarshallers[dataType & 0xFF]);
@@ -312,8 +298,6 @@ commands::DataStructure* OpenWireFormat::doUnmarshal(const activemq::transport::
             if (dsm == NULL) {
                 throw IOException(__FILE__, __LINE__, (string("OpenWireFormat::marshal - Unknown data type: ") + Integer::toString(dataType)).c_str());
             }
-
-            AMQ_LOG_DEBUG("OpenWireFormat", "doUnmarshal() creating object for dataType=" << (int)dataType);
 
             // Ask the DataStreamMarshaller to create a new instance of its
             // command so that we can fill in its data.

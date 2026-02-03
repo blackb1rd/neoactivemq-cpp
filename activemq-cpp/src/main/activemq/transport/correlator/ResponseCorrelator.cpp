@@ -234,9 +234,7 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command) {
         Pointer<commands::Response> response;
 
         // Send the request.
-        AMQ_LOG_DEBUG("ResponseCorrelator", "sending cmdId=" << command->getCommandId());
         next->oneway(command);
-        AMQ_LOG_DEBUG("ResponseCorrelator", "sent cmdId=" << command->getCommandId());
 
         // Get the response.
         response = futureResponse->getResponse();

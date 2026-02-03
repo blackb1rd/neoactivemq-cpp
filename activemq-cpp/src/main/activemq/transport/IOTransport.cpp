@@ -322,9 +322,6 @@ void IOTransport::fire(const Pointer<Command> command) {
             return;
         }
 
-        AMQ_LOG_DEBUG("IOTransport", "fire(Command) delivering cmdId=" << command->getCommandId()
-                      << " type=" << AMQLogger::commandTypeName(command->getDataStructureType()));
-
         // Log detailed message information for MessageDispatch commands
         if (command->isMessageDispatch()) {
             this->logMessageDispatchDetails(command);
@@ -339,10 +336,6 @@ void IOTransport::fire(const Pointer<Command> command) {
 void IOTransport::oneway(const Pointer<Command> command) {
 
     try {
-
-        AMQ_LOG_DEBUG("IOTransport", "oneway() cmdId=" << command->getCommandId()
-                      << " type=" << AMQLogger::commandTypeName(command->getDataStructureType())
-                      << " closed=" << impl->closed.get());
 
         if (impl->closed.get()) {
             throw IOException(__FILE__, __LINE__, "IOTransport::oneway() - transport is closed!");
@@ -364,12 +357,9 @@ void IOTransport::oneway(const Pointer<Command> command) {
         }
 
         synchronized(impl->outputStream) {
-            AMQ_LOG_DEBUG("IOTransport", "oneway() marshaling cmdId=" << command->getCommandId() << "...");
             // Write the command to the output stream.
             this->impl->wireFormat->marshal(command, this, this->impl->outputStream);
-            AMQ_LOG_DEBUG("IOTransport", "oneway() flushing cmdId=" << command->getCommandId() << "...");
             this->impl->outputStream->flush();
-            AMQ_LOG_DEBUG("IOTransport", "oneway() complete cmdId=" << command->getCommandId());
         }
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -498,16 +488,12 @@ void IOTransport::run() {
         while (this->impl->started.get() && !this->impl->closed.get()) {
 
             try {
-                AMQ_LOG_DEBUG("IOTransport", "run() calling unmarshal()...");
 
                 // Read the next command from the input stream.
                 // Unmarshaling errors (corrupted message headers) close the connection.
                 // Lazy property unmarshaling means property corruption is detected during
                 // consumer processing and triggers redelivery (see ActiveMQConsumerKernel).
                 Pointer<Command> command(impl->wireFormat->unmarshal(this, this->impl->inputStream));
-
-                AMQ_LOG_DEBUG("IOTransport", "run() unmarshal complete, cmdId=" << command->getCommandId()
-                              << " type=" << AMQLogger::commandTypeName(command->getDataStructureType()));
 
                 // Notify the listener.
                 fire(command);

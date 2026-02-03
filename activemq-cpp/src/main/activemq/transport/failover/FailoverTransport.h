@@ -19,7 +19,7 @@
 #define _ACTIVE_TRANSPORT_FAILOVER_FAILOVERTRANSPORT_H_
 
 #include <activemq/util/Config.h>
-
+#include <activemq/transport/failover/BrokerStateInfo.h>
 #include <activemq/commands/Command.h>
 #include <activemq/commands/ConnectionId.h>
 #include <activemq/threads/TaskRunner.h>
@@ -239,6 +239,12 @@ namespace failover {
         void setConnectionInterruptProcessingComplete(const Pointer<commands::ConnectionId> connectionId);
 
         bool isConnectedToPriority() const;
+
+        /**
+         * Get current state of all brokers.
+         * @return vector of BrokerStateInfo objects with current state of each broker
+         */
+        std::vector<BrokerStateInfo> getBrokerStates() const;
 
     protected:
 

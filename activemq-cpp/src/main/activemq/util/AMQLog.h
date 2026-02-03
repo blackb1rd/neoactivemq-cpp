@@ -125,6 +125,9 @@ private:
     // This is lock-free (relaxed atomic) for maximum performance
     static std::atomic<bool> recordOnlyMode;
 
+    // Optional custom output handler (for testing or file logging)
+    static std::function<void(AMQLogLevel, const std::string&)> customHandler;
+
     // Per-connection logging support
     static std::mutex contextHandlersMutex;
     static std::unordered_map<std::string, std::function<void(AMQLogLevel, const std::string&)>> contextHandlers;
@@ -162,6 +165,61 @@ public:
      * @return true if the level is enabled
      */
     static bool isEnabled(AMQLogLevel level);
+
+    /**
+     * Enable/disable record-only mode for maximum performance.
+     * When enabled, log() only records to flight recorder - no formatting overhead.
+     * This is ideal for tests where you only need logs on failure.
+     * @param enabled true to enable record-only mode (default: false)
+     */
+    static void setRecordOnlyMode(bool enabled);
+
+    /**
+     * Check if record-only mode is enabled.
+     * @return true if record-only mode is enabled
+     */
+    static bool isRecordOnlyMode();
+
+    /**
+     * Set a context-specific output handler for a connection/broker.
+     * This allows different log files for different connections.
+     *
+     * Example usage:
+     *   // For connection to broker1
+     *   AMQLogger::setContextOutputHandler("broker1", [](AMQLogLevel level, const std::string& msg) {
+     *       std::ofstream logFile("broker1.log", std::ios::app);
+     *       logFile << msg << std::endl;
+     *   });
+     *
+     *   // Set context before operations
+     *   AMQLogger::setLogContext("broker1");
+     *   // ... your connection code ...
+     *   AMQLogger::clearLogContext();
+     *
+     * @param context The context identifier (e.g., broker URL, connection ID)
+     * @param handler Function that receives level and formatted message for this context
+     */
+    static void setContextOutputHandler(const std::string& context,
+                                       std::function<void(AMQLogLevel, const std::string&)> handler);
+
+    /**
+     * Remove a context-specific output handler.
+     * @param context The context identifier to remove
+     */
+    static void clearContextOutputHandler(const std::string& context);
+
+    /**
+     * Set the current thread's logging context.
+     * Logs from this thread will use the context-specific handler if configured.
+     * @param context The context identifier (e.g., broker URL, connection ID)
+     */
+    static void setLogContext(const std::string& context);
+
+    /**
+     * Clear the current thread's logging context.
+     * Logs will revert to using the global handler or std::cerr.
+     */
+    static void clearOutputHandler();
 
     /**
      * Enable/disable record-only mode for maximum performance.

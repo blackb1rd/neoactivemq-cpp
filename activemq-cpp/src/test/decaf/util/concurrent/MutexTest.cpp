@@ -346,11 +346,11 @@ void MutexTest::testNotify() {
             }
         }
 
-        synchronized( &started ){
+        synchronized( &completed ){
             int count = 0;
 
             while( count < ( numThreads ) ) {
-                started.wait( 1000 );
+                completed.wait( 1000 );
                 count++;
             }
         }

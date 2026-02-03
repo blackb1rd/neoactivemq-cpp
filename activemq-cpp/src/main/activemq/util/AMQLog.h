@@ -30,6 +30,13 @@
 #include <vector>
 #include <unordered_map>
 
+// RDTSC intrinsics for fast timestamps
+#if defined(_MSC_VER)
+#include <intrin.h>
+#elif defined(__x86_64__) || defined(__i386__)
+#include <x86intrin.h>
+#endif
+
 // Undefine Windows macros that conflict with our enum values
 #ifdef ERROR
 #undef ERROR
@@ -40,6 +47,30 @@
 
 namespace activemq {
 namespace util {
+
+/**
+ * Read CPU timestamp counter - extremely fast (~20 cycles).
+ * Returns a monotonically increasing counter (ticks since CPU reset).
+ * Use for relative timing only; convert to time using measured frequency.
+ */
+inline uint64_t rdtsc() {
+#if defined(_MSC_VER)
+    // MSVC intrinsic
+    return __rdtsc();
+#elif defined(__x86_64__) || defined(__i386__)
+    // GCC/Clang x86
+    return __rdtsc();
+#elif defined(__aarch64__)
+    // ARM64: use CNTVCT_EL0 (virtual counter)
+    uint64_t val;
+    __asm__ __volatile__("mrs %0, cntvct_el0" : "=r"(val));
+    return val;
+#else
+    // Fallback to chrono (slower but portable)
+    return static_cast<uint64_t>(
+        std::chrono::steady_clock::now().time_since_epoch().count());
+#endif
+}
 
 /**
  * Simple logging levels for ActiveMQ C++ client.
@@ -73,16 +104,16 @@ class AMQCPP_API AMQLogger {
 public:
     /**
      * Flight Recorder entry - stores a single log event.
-     * Size is 256 bytes for cache line alignment.
+     * Uses RDTSC ticks for fastest possible timestamping.
      */
     struct FlightRecorderEntry {
-        std::chrono::steady_clock::time_point timestamp;
+        uint64_t timestampTicks;  // RDTSC ticks (convert using ticksPerMicrosecond)
         std::thread::id threadId;
         AMQLogLevel level;
         char component[31];
         char message[201];
 
-        FlightRecorderEntry() : timestamp(), threadId(), level(AMQLogLevel::NONE), component{0}, message{0} {}
+        FlightRecorderEntry() : timestampTicks(0), threadId(), level(AMQLogLevel::NONE), component{0}, message{0} {}
     };
 
 private:
@@ -110,7 +141,9 @@ private:
     static std::atomic<uint64_t> flightRecorderTotalCount;
     static std::atomic<bool> flightRecorderEnabled;
     static std::mutex flightRecorderDumpMutex;
-    static std::chrono::steady_clock::time_point flightRecorderStartTime;
+    // RDTSC calibration data
+    static uint64_t flightRecorderStartTicks;           // RDTSC value at initialization
+    static double flightRecorderTicksPerMicrosecond;    // For converting ticks to time
     static std::chrono::system_clock::time_point flightRecorderWallClockStart;
 
 public:
@@ -340,6 +373,16 @@ public:
      * Get the total number of events recorded (including overwritten).
      */
     static uint64_t flightRecorderTotalRecorded();
+
+    /**
+     * Get the RDTSC ticks per microsecond (for time conversion).
+     */
+    static double getTicksPerMicrosecond();
+
+    /**
+     * Get the RDTSC start ticks value (for relative time calculation).
+     */
+    static uint64_t getStartTicks();
 
 private:
     /**

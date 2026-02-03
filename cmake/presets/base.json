@@ -14,6 +14,7 @@
       "installDir": "${sourceDir}/output/install/${presetName}",
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
+        "AMQCPP_WITH_CCACHE": true,
         "CMAKE_COLOR_DIAGNOSTICS": "ON",
         "CMAKE_COMPILE_WARNING_AS_ERROR": "OFF",
         "CMAKE_CXX_EXTENSIONS": "OFF",
@@ -35,7 +36,7 @@
       "name": "test",
       "hidden": true,
       "cacheVariables": {
-        "WITH_TESTS": true,
+        "AMQCPP_BUILD_TESTS": true,
         "VCPKG_MANIFEST_FEATURES": "tests;ssl"
       }
     },
@@ -43,7 +44,7 @@
       "name": "test-no-ssl",
       "hidden": true,
       "cacheVariables": {
-        "WITH_TESTS": true,
+        "AMQCPP_BUILD_TESTS": true,
         "VCPKG_MANIFEST_FEATURES": "tests"
       }
     },

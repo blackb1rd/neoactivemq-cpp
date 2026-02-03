@@ -83,15 +83,15 @@ configure_file(
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Option for vcpkg portfile to skip compiler cache and custom build settings
-# Used to let vcpkg manage its own compiler cache and debug format configuration
-option(AMQCPP_SKIP_COMPILER_CACHE "Skip compiler cache and custom debug format setup (for vcpkg port builds)" OFF)
+# Option to enable compiler cache (ccache/sccache)
+# Default OFF - vcpkg and other build systems manage their own compiler cache
+option(AMQCPP_WITH_CCACHE "Enable compiler cache (ccache/sccache) for faster rebuilds" OFF)
 
 # Enable compiler caching if available (ccache or sccache)
-# Skip when:
-# - Explicitly disabled via AMQCPP_SKIP_COMPILER_CACHE (used by vcpkg portfile)
-# - Compiler launcher is already configured by user or build system
-if(NOT AMQCPP_SKIP_COMPILER_CACHE AND NOT CMAKE_C_COMPILER_LAUNCHER)
+# Only when:
+# - Explicitly enabled via AMQCPP_WITH_CCACHE
+# - Compiler launcher is not already configured by user or build system
+if(AMQCPP_WITH_CCACHE AND NOT CMAKE_C_COMPILER_LAUNCHER)
     # Prefer sccache if both are available
     find_program(SCCACHE_PROGRAM sccache)
     find_program(CCACHE_PROGRAM ccache)
@@ -136,9 +136,9 @@ endif()
 
 # Platform-specific debug flags
 if(MSVC)
-    # Only set debug information format when not building as a vcpkg port
-    # vcpkg manages its own build configuration
-    if(NOT AMQCPP_SKIP_COMPILER_CACHE)
+    # Only set debug information format when using compiler cache
+    # This avoids PDB locking issues with parallel builds
+    if(AMQCPP_WITH_CCACHE)
         # Windows/MSVC: Use /Z7 (embedded debug info in .obj files) for all builds
         # This avoids PDB locking issues with parallel builds and works better with sccache
         set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug,Release>:Embedded>")
@@ -165,7 +165,7 @@ find_package(ZLIB REQUIRED)
 
 # Options
 option(AMQCPP_BUILD_EXAMPLES "Build example programs" ON)
-option(WITH_TESTS "Build all tests (unit, benchmark, integration)" OFF)
+option(AMQCPP_BUILD_TESTS "Build all tests (unit, benchmark, integration)" OFF)
 option(AMQCPP_SHARED_LIB "Build shared library instead of static" ON)
 
 # Option to enable/disable SSL support. When ON, OpenSSL is required.
@@ -204,7 +204,7 @@ add_subdirectory(activemq-cpp/src/main)
 
 add_subdirectory(activemq-cpp/src/examples)
 
-if(WITH_TESTS)
+if(AMQCPP_BUILD_TESTS)
     find_package(CppUnit CONFIG REQUIRED)
 	add_subdirectory(activemq-cpp/src/test)
 	add_subdirectory(activemq-cpp/src/test-benchmarks)

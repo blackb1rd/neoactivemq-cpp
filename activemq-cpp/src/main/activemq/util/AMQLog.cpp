@@ -44,7 +44,9 @@ namespace activemq {
 namespace util {
 
 // Initialize static members - default to NONE (no logging)
-std::atomic<AMQLogLevel> AMQLogger::currentLevel(AMQLogLevel::NONE);
+// Lock-free AND thread-safe: std::atomic with relaxed ordering
+std::atomic<AMQLogLevel> AMQLogger::currentLevel{AMQLogLevel::NONE};
+std::atomic<bool> AMQLogger::recordOnlyMode{false};
 std::function<void(AMQLogLevel, const std::string&)> AMQLogger::customHandler = nullptr;
 
 // Per-connection logging static members
@@ -106,9 +108,22 @@ void AMQLogger::clearOutputHandler() {
     customHandler = nullptr;
 }
 
+void AMQLogger::setRecordOnlyMode(bool enabled) {
+    recordOnlyMode.store(enabled, std::memory_order_relaxed);
+}
+
+bool AMQLogger::isRecordOnlyMode() {
+    return recordOnlyMode.load(std::memory_order_relaxed);
+}
+
 void AMQLogger::log(AMQLogLevel level, const char* component, const std::string& message) {
     // Record to Flight Recorder first (always, if enabled)
     recordToFlightRecorder(level, component, message.c_str());
+
+    // In record-only mode, skip expensive formatting - just record to flight recorder
+    if (recordOnlyMode.load(std::memory_order_relaxed)) {
+        return;
+    }
 
     // Build formatted message
     std::ostringstream oss;

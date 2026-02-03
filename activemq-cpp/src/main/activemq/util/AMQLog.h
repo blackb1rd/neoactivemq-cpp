@@ -86,8 +86,13 @@ public:
     };
 
 private:
-    // Atomic log level for thread-safe runtime configuration
+    // Lock-free AND thread-safe log level using std::atomic with relaxed ordering
+    // On x86, memory_order_relaxed compiles to plain MOV instructions (zero lock overhead)
     static std::atomic<AMQLogLevel> currentLevel;
+
+    // Record-only mode: skip expensive formatting in log(), only record to flight recorder
+    // This is lock-free (relaxed atomic) for maximum performance
+    static std::atomic<bool> recordOnlyMode;
 
     // Optional custom output handler (for testing or file logging)
     static std::function<void(AMQLogLevel, const std::string&)> customHandler;
@@ -139,6 +144,20 @@ public:
      * Clear the custom output handler, reverting to std::cerr.
      */
     static void clearOutputHandler();
+
+    /**
+     * Enable/disable record-only mode for maximum performance.
+     * When enabled, log() only records to flight recorder - no formatting overhead.
+     * This is ideal for tests where you only need logs on failure.
+     * @param enabled true to enable record-only mode (default: false)
+     */
+    static void setRecordOnlyMode(bool enabled);
+
+    /**
+     * Check if record-only mode is enabled.
+     * @return true if record-only mode is enabled
+     */
+    static bool isRecordOnlyMode();
 
     /**
      * Set a context-specific output handler for a connection/broker.

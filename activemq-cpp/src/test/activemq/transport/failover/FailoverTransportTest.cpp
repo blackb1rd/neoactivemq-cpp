@@ -1731,7 +1731,9 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     broker1->waitUntilStopped();
 
     // Give time for failover to complete
-    Thread::sleep(2000);
+    while (!failover->isConnected() && count++ < 100) {
+        Thread::sleep(100);
+    }
 
     // Verify still connected (should have failed over to broker2)
     CPPUNIT_ASSERT_MESSAGE("Should remain connected after broker1 stops (failed over to broker2)",
@@ -1749,7 +1751,9 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     broker2->waitUntilStopped();
 
     // Give time for failover to complete
-    Thread::sleep(2000);
+    while (!failover->isConnected() && count++ < 100) {
+        Thread::sleep(100);
+    }
 
     // Verify still connected (should have failed over back to broker1)
     CPPUNIT_ASSERT_MESSAGE("Should remain connected after broker2 stops (failed over to broker1)",

@@ -1734,7 +1734,7 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     Thread::sleep(2000);
 
     // Verify still connected (should have failed over to broker2)
-    CPPUNIT_ASSERT_MESSAGE("Should remain connected after broker1 stops (failed over to broker2)", 
+    CPPUNIT_ASSERT_MESSAGE("Should remain connected after broker1 stops (failed over to broker2)",
                           failover->isConnected() == true);
 
     // Restart broker1 and wait for it to be ready
@@ -1752,7 +1752,7 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     Thread::sleep(2000);
 
     // Verify still connected (should have failed over back to broker1)
-    CPPUNIT_ASSERT_MESSAGE("Should remain connected after broker2 stops (failed over to broker1)", 
+    CPPUNIT_ASSERT_MESSAGE("Should remain connected after broker2 stops (failed over to broker1)",
                           failover->isConnected() == true);
 
     transport->close();

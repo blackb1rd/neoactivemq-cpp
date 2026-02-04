@@ -55,6 +55,7 @@ namespace openwire {
         CPPUNIT_TEST(testHighVolumeDualConnectionListeners);
         CPPUNIT_TEST(testHighVolumeConcurrentProducerConsumer);
         CPPUNIT_TEST(testHighVolumeWithBrokerInterruption);
+        CPPUNIT_TEST(testDurableTopicTransactedConcurrentServers);
         CPPUNIT_TEST_SUITE_END();
 
     public:
@@ -94,6 +95,13 @@ namespace openwire {
          */
         void testHighVolumeWithBrokerInterruption();
 
+        /**
+         * Test durable topic consumer with SESSION_TRANSACTED (commit per message),
+         * persistent delivery mode, concurrent consumption from 2 servers
+         * with different topics (~20k messages)
+         */
+        void testDurableTopicTransactedConcurrentServers();
+
     protected:
 
         std::string getFailoverURL() const {
@@ -115,8 +123,14 @@ namespace openwire {
         // Number of messages for high-volume tests
         static constexpr int HIGH_VOLUME_MESSAGE_COUNT = 10000;
 
+        // Number of messages for durable topic transacted test
+        static constexpr int DURABLE_TOPIC_MESSAGE_COUNT = 20000;
+
         // Timeout for receiving all messages (in milliseconds)
         static constexpr int HIGH_VOLUME_TIMEOUT_MS = 120000;  // 2 minutes
+
+        // Timeout for durable topic transacted test (longer due to per-message commit)
+        static constexpr int DURABLE_TOPIC_TIMEOUT_MS = 300000;  // 5 minutes
 
     private:
 

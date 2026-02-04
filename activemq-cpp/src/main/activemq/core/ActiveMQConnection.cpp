@@ -191,6 +191,7 @@ namespace core {
         unsigned int connectResponseTimeout;
         unsigned int closeTimeout;
         unsigned int producerWindowSize;
+        unsigned int requestTimeout;
         int auditDepth;
         int auditMaximumProducerNumber;
         long long optimizeAcknowledgeTimeOut;
@@ -264,6 +265,7 @@ namespace core {
                              connectResponseTimeout(0),
                              closeTimeout(15000),
                              producerWindowSize(0),
+                             requestTimeout(60000),
                              auditDepth(ActiveMQMessageAudit::DEFAULT_WINDOW_SIZE),
                              auditMaximumProducerNumber(ActiveMQMessageAudit::MAXIMUM_PRODUCER_COUNT),
                              optimizeAcknowledgeTimeOut(300),
@@ -1669,6 +1671,16 @@ unsigned int ActiveMQConnection::getCloseTimeout() const {
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQConnection::setCloseTimeout(unsigned int timeout) {
     this->config->closeTimeout = timeout;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+unsigned int ActiveMQConnection::getRequestTimeout() const {
+    return this->config->requestTimeout;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ActiveMQConnection::setRequestTimeout(unsigned int timeout) {
+    this->config->requestTimeout = timeout;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

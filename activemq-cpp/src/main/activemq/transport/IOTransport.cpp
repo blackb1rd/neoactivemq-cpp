@@ -25,15 +25,12 @@
 #include <activemq/wireformat/openwire/OpenWireFormat.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/Config.h>
-#include <activemq/commands/MessageAck.h>
+#include <activemq/commands/Command.h>
 #include <activemq/commands/MessageDispatch.h>
-#include <activemq/commands/ActiveMQTextMessage.h>
-#include <activemq/core/ActiveMQConstants.h>
-#include <decaf/util/Iterator.h>
+#include <activemq/commands/Message.h>
+#include <activemq/commands/MessageId.h>
+#include <activemq/commands/ActiveMQDestination.h>
 #include <typeinfo>
-#include <iomanip>
-#include <ctime>
-#include <memory>
 
 using namespace activemq;
 using namespace activemq::transport;
@@ -58,175 +55,20 @@ namespace activemq {
 namespace transport {
 
     void IOTransport::logMessageDispatchDetails(const Pointer<Command>& command) {
-        using namespace activemq::commands;
-        using namespace activemq::util;
-
-        if (!AMQ_LOG_INFO_ENABLED()) {
-            return;
-        }
-
-        MessageDispatch* dispatch = dynamic_cast<MessageDispatch*>(command.get());
-        if (dispatch == NULL) {
-            return;
-        }
-
-        const Pointer<Message>& message = dispatch->getMessage();
-        if (message == NULL) {
-            AMQ_LOG_INFO("MessageReceived", "MessageDispatch with no message content");
-            return;
-        }
-
         try {
-            std::ostringstream oss;
-            oss << "\n========== MESSAGE RECEIVED ==========\n";
-
-            // Message ID
-            const Pointer<MessageId>& msgId = message->getMessageId();
-            oss << "Message ID: " << (msgId != NULL ? msgId->toString() : "") << "\n";
-
-            // Correlation ID
-            oss << "Correlation ID: " << message->getCorrelationId() << "\n";
-
-            // Timestamp - format as readable date/time
-            long long timestamp = message->getTimestamp();
-            if (timestamp > 0) {
-                time_t seconds = static_cast<time_t>(timestamp / 1000);
-                struct tm timeinfo;
-#ifdef _WIN32
-                localtime_s(&timeinfo, &seconds);
-#else
-                localtime_r(&seconds, &timeinfo);
-#endif
-                char timebuf[64];
-                strftime(timebuf, sizeof(timebuf), "%d/%m/%Y %I:%M:%S %p", &timeinfo);
-                oss << "Timestamp: " << timebuf << "\n";
-            } else {
-                oss << "Timestamp: \n";
-            }
-
-            // Type
-            oss << "Type: " << message->getType() << "\n";
-
-            // Destination
+            MessageDispatch* dispatch = dynamic_cast<MessageDispatch*>(command.get());
+            if (dispatch == NULL) return;
+            const Pointer<Message>& msg = dispatch->getMessage();
+            if (msg == NULL) return;
+            const Pointer<MessageId>& msgId = msg->getMessageId();
             const Pointer<ActiveMQDestination>& dest = dispatch->getDestination();
-            oss << "Destination: " << (dest != NULL ? dest->toString() : "") << "\n";
-
-            // Delivery Mode
-            oss << "Delivery Mode: " << (message->isPersistent() ? "Persistent" : "Non-Persistent") << "\n";
-
-            // Priority
-            unsigned char priority = message->getPriority();
-            std::string priorityStr;
-            if (priority <= 3) priorityStr = "Low";
-            else if (priority == 4) priorityStr = "BelowNormal";
-            else if (priority == 5) priorityStr = "Normal";
-            else if (priority <= 7) priorityStr = "AboveNormal";
-            else priorityStr = "High";
-            oss << "Priority: " << priorityStr << " (" << (int)priority << ")\n";
-
-            // Redelivered
-            oss << "Redelivered: " << (dispatch->getRedeliveryCounter() > 0 ? "True" : "False") << "\n";
-
-            // AMQ-specific fields
-            oss << "[AMQ] Command ID: " << command->getCommandId() << "\n";
-
-            const Pointer<ProducerId>& prodId = message->getProducerId();
-            oss << "[AMQ] Producer ID: " << (prodId != NULL ? prodId->toString() : "") << "\n";
-
-            if (msgId != NULL) {
-                oss << "[AMQ] Message Counter: " << msgId->getProducerSequenceId() << "\n";
-            }
-
-            oss << "[AMQ] Expiration: " << message->getExpiration() << "\n";
-
-            // Group ID and Sequence
-            oss << "[AMQ] Group ID: " << message->getGroupID() << "\n";
-            oss << "[AMQ] Group Seq: " << message->getGroupSequence() << "\n";
-
-            // Broker Path
-            const std::vector<Pointer<BrokerId>>& brokerPath = message->getBrokerPath();
-            if (!brokerPath.empty()) {
-                oss << "[AMQ] Broker Path: ";
-                for (size_t i = 0; i < brokerPath.size(); ++i) {
-                    if (i > 0) oss << ",";
-                    if (brokerPath[i] != NULL) {
-                        oss << brokerPath[i]->getValue();
-                    }
-                }
-                oss << "\n";
-            }
-
-            // Properties - try to access but don't fail if corrupted
-            try {
-                AMQ_LOG_DEBUG("IOTransport", "logMessageDispatchDetails() accessing properties for message id="
-                              << (msgId != NULL ? msgId->toString() : "NULL"));
-                const PrimitiveMap& props = message->getMessageProperties();
-                if (!props.isEmpty()) {
-                    oss << "Properties:\n";
-                    std::unique_ptr<decaf::util::Iterator<std::string>> keyIter(props.keySet().iterator());
-                    while (keyIter->hasNext()) {
-                        std::string key = keyIter->next();
-                        try {
-                            // Get value as string representation
-                            oss << "  " << key << ": " << props.getString(key) << "\n";
-                        } catch (...) {
-                            // If getString fails, try to get the type
-                            oss << "  " << key << ": <binary or complex type>\n";
-                        }
-                    }
-                    AMQ_LOG_DEBUG("IOTransport", "logMessageDispatchDetails() properties accessed successfully, count="
-                                  << props.size());
-                } else {
-                    AMQ_LOG_DEBUG("IOTransport", "logMessageDispatchDetails() message has no properties");
-                }
-            } catch (const decaf::io::IOException& e) {
-                // Properties are corrupted - log error but continue with message delivery
-                AMQ_LOG_ERROR("IOTransport", "logMessageDispatchDetails() Failed to unmarshal properties (corrupted) for message id="
-                              << (msgId != NULL ? msgId->toString() : "NULL")
-                              << ", exception=" << e.getMessage()
-                              << " - message will still be delivered to consumer");
-                oss << "Properties: <CORRUPTED - " << e.getMessage() << ">\n";
-            } catch (const Exception& e) {
-                AMQ_LOG_ERROR("IOTransport", "logMessageDispatchDetails() Exception accessing properties for message id="
-                              << (msgId != NULL ? msgId->toString() : "NULL")
-                              << ", exception=" << e.getMessage());
-                oss << "Properties: <ERROR - " << e.getMessage() << ">\n";
-            } catch (...) {
-                AMQ_LOG_ERROR("IOTransport", "logMessageDispatchDetails() Unknown exception accessing properties for message id="
-                              << (msgId != NULL ? msgId->toString() : "NULL"));
-                oss << "Properties: <ERROR accessing properties>\n";
-            }
-
-            // Text content for TextMessage
-            ActiveMQTextMessage* textMsg = dynamic_cast<ActiveMQTextMessage*>(message.get());
-            if (textMsg != NULL) {
-                try {
-                    std::string text = textMsg->getText();
-                    oss << "Text Length: " << text.length() << " chars, " << text.size() << " bytes\n";
-                    // Truncate very long messages for logging
-                    if (text.length() > 1000) {
-                        oss << "Text: " << text.substr(0, 1000) << "...[truncated]\n";
-                    } else {
-                        oss << "Text: " << text << "\n";
-                    }
-                } catch (...) {
-                    oss << "Text: <error reading text>\n";
-                }
-            } else {
-                // For non-text messages, show content size
-                const std::vector<unsigned char>& content = message->getContent();
-                if (!content.empty()) {
-                    oss << "Content Size: " << content.size() << " bytes\n";
-                }
-            }
-
-            oss << "=======================================";
-
-            AMQ_LOG_INFO("MessageReceived", oss.str());
-        } catch (const Exception& e) {
-            AMQ_LOG_ERROR("IOTransport", "logMessageDispatchDetails() Exception while logging message details: " << e.getMessage());
+            AMQ_LOG_INFO("MessageReceived", "Message ID: " << (msgId != NULL ? msgId->toString() : "")
+                << " Correlation ID: " << msg->getCorrelationId()
+                << " Timestamp: " << msg->getTimestamp()
+                << " Type: " << msg->getType()
+                << " Destination: " << (dest != NULL ? dest->toString() : ""));
         } catch (...) {
-            AMQ_LOG_ERROR("IOTransport", "logMessageDispatchDetails() Unknown exception while logging message details");
+            // Silently ignore logging errors
         }
     }
 

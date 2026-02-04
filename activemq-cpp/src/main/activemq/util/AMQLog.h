@@ -152,31 +152,30 @@ public:
     static void setLevel(AMQLogLevel level);
 
     /**
+     * Set log level for a specific connection/context.
+     * @param context The context identifier (e.g., connection name, broker URL)
+     * @param level The log level for this context
+     */
+    static void setLevel(const std::string& context, AMQLogLevel level);
+
+    /**
      * Get the default/global log level.
      * @return The current default log level
      */
     static AMQLogLevel getLevel();
 
     /**
-     * Set log level for a specific context (broker/connection).
-     * Each context can have its own log level, overriding the default.
-     * @param context The context identifier (e.g., broker URL)
-     * @param level The log level for this context
-     */
-    static void setContextLevel(const std::string& context, AMQLogLevel level);
-
-    /**
-     * Get log level for a specific context.
+     * Get log level for a specific connection/context.
      * @param context The context identifier
      * @return The log level for this context, or default level if not set
      */
-    static AMQLogLevel getContextLevel(const std::string& context);
+    static AMQLogLevel getLevel(const std::string& context);
 
     /**
      * Clear log level for a specific context (reverts to default).
      * @param context The context identifier
      */
-    static void clearContextLevel(const std::string& context);
+    static void clearLevel(const std::string& context);
 
     /**
      * Get the effective log level for the current thread's context.

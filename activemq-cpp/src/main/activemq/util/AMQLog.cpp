@@ -97,12 +97,12 @@ AMQLogLevel AMQLogger::getLevel() {
     return defaultLevel.load(std::memory_order_relaxed);
 }
 
-void AMQLogger::setContextLevel(const std::string& context, AMQLogLevel level) {
+void AMQLogger::setLevel(const std::string& context, AMQLogLevel level) {
     std::lock_guard<std::mutex> lock(contextMutex);
     contextLevels[context] = level;
 }
 
-AMQLogLevel AMQLogger::getContextLevel(const std::string& context) {
+AMQLogLevel AMQLogger::getLevel(const std::string& context) {
     std::lock_guard<std::mutex> lock(contextMutex);
     auto it = contextLevels.find(context);
     if (it != contextLevels.end()) {
@@ -111,7 +111,7 @@ AMQLogLevel AMQLogger::getContextLevel(const std::string& context) {
     return defaultLevel.load(std::memory_order_relaxed);
 }
 
-void AMQLogger::clearContextLevel(const std::string& context) {
+void AMQLogger::clearLevel(const std::string& context) {
     std::lock_guard<std::mutex> lock(contextMutex);
     contextLevels.erase(context);
 }

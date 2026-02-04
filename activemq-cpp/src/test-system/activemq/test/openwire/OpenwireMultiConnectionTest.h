@@ -59,6 +59,7 @@ namespace openwire {
         CPPUNIT_TEST(testConcurrentMessagingOnMultipleConnections);
         CPPUNIT_TEST(testConnectionIsolation);
         CPPUNIT_TEST(testFailoverConnectionWithIndependentBroker);
+        CPPUNIT_TEST(testDurableTopicWithSelectorConcurrentServers);
         CPPUNIT_TEST_SUITE_END();
 
     public:
@@ -98,6 +99,13 @@ namespace openwire {
          * Test failover connection behavior while independent broker connection is active
          */
         void testFailoverConnectionWithIndependentBroker();
+
+        /**
+         * Test durable topic consumer with SESSION_TRANSACTED (commit per message),
+         * PERSISTENT delivery mode, message selector, concurrent consumption from
+         * 2 servers with different topics (~5k messages per server)
+         */
+        void testDurableTopicWithSelectorConcurrentServers();
 
     protected:
 

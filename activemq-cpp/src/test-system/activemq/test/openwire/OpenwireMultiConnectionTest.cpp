@@ -27,11 +27,14 @@
 
 #include <cms/TextMessage.h>
 #include <cms/Queue.h>
+#include <cms/Topic.h>
 #include <cms/ExceptionListener.h>
 
 #include <atomic>
 #include <thread>
 #include <vector>
+#include <chrono>
+#include <iostream>
 
 using namespace std;
 using namespace cms;
@@ -65,6 +68,81 @@ namespace {
 
         int getMessagesReceived() const { return messagesReceived.load(); }
     };
+
+    /**
+     * Transacted message listener that commits after each message
+     */
+    class TransactedSelectorListener : public cms::MessageListener {
+    private:
+        std::atomic<int> messagesReceived;
+        CountDownLatch* completionLatch;
+        int expectedMessages;
+        cms::Session* session;
+        std::atomic<bool> errorOccurred;
+        std::string lastError;
+
+    public:
+        TransactedSelectorListener(int expectedCount, CountDownLatch* latch, cms::Session* txSession)
+            : messagesReceived(0)
+            , completionLatch(latch)
+            , expectedMessages(expectedCount)
+            , session(txSession)
+            , errorOccurred(false)
+            , lastError() {}
+
+        void onMessage(const cms::Message* message) override {
+            try {
+                // Commit the transaction for this message
+                if (session != nullptr) {
+                    session->commit();
+                }
+
+                int count = messagesReceived.fetch_add(1) + 1;
+
+                // Check if we've received all messages
+                if (count >= expectedMessages && completionLatch != nullptr) {
+                    completionLatch->countDown();
+                }
+            } catch (const std::exception& e) {
+                errorOccurred.store(true);
+                lastError = e.what();
+                // Rollback on error
+                if (session != nullptr) {
+                    try {
+                        session->rollback();
+                    } catch (...) {}
+                }
+            }
+        }
+
+        int getMessagesReceived() const { return messagesReceived.load(); }
+        bool hasError() const { return errorOccurred.load(); }
+        std::string getLastError() const { return lastError; }
+    };
+
+    /**
+     * Exception listener that tracks connection errors
+     */
+    class MultiConnExceptionListener : public cms::ExceptionListener {
+    private:
+        std::atomic<int> exceptionCount;
+        std::string lastException;
+
+    public:
+        MultiConnExceptionListener() : exceptionCount(0), lastException() {}
+
+        void onException(const cms::CMSException& ex) override {
+            exceptionCount++;
+            lastException = ex.getMessage();
+        }
+
+        int getExceptionCount() const { return exceptionCount.load(); }
+        std::string getLastException() const { return lastException; }
+    };
+
+    // Constants for durable topic test
+    constexpr int DURABLE_SELECTOR_MESSAGE_COUNT = 5000;
+    constexpr int DURABLE_SELECTOR_TIMEOUT_MS = 300000;  // 5 minutes
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -445,6 +523,201 @@ void OpenwireMultiConnectionTest::testFailoverConnectionWithIndependentBroker() 
     failoverProducer->close();
     directProducer->close();
     directConsumer->close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void OpenwireMultiConnectionTest::testDurableTopicWithSelectorConcurrentServers() {
+    // Test durable topic consumer with SESSION_TRANSACTED, persistent delivery,
+    // message selector, concurrent consumption from 2 servers with different topics
+
+    const std::string clientId1 = "SelectorClient1_" + UUID::randomUUID().toString();
+    const std::string clientId2 = "SelectorClient2_" + UUID::randomUUID().toString();
+    const std::string subscriptionName1 = "SelectorSub1";
+    const std::string subscriptionName2 = "SelectorSub2";
+    const std::string selectorProperty = "priority";
+    const std::string selectorValue = "high";
+    const std::string selector = selectorProperty + " = '" + selectorValue + "'";
+
+    // Setup failover connection with client ID for durable subscription
+    std::unique_ptr<ActiveMQConnectionFactory> failoverFactory(
+        new ActiveMQConnectionFactory(getFailoverURL()));
+    failoverConnection.reset(failoverFactory->createConnection());
+    failoverConnection->setClientID(clientId1);
+
+    MultiConnExceptionListener failoverExceptionListener;
+    failoverConnection->setExceptionListener(&failoverExceptionListener);
+    failoverConnection->start();
+
+    // Create SESSION_TRANSACTED session for failover
+    failoverSession.reset(failoverConnection->createSession(Session::SESSION_TRANSACTED));
+
+    // Setup direct connection to broker3 with client ID
+    std::unique_ptr<ActiveMQConnectionFactory> directFactory(
+        new ActiveMQConnectionFactory(getBroker3URL()));
+    directConnection.reset(directFactory->createConnection());
+    directConnection->setClientID(clientId2);
+
+    MultiConnExceptionListener directExceptionListener;
+    directConnection->setExceptionListener(&directExceptionListener);
+    directConnection->start();
+
+    // Create SESSION_TRANSACTED session for direct
+    directSession.reset(directConnection->createSession(Session::SESSION_TRANSACTED));
+
+    // Create different topics for each server
+    std::string topicName1 = "durable.selector.topic1." + UUID::randomUUID().toString();
+    std::string topicName2 = "durable.selector.topic2." + UUID::randomUUID().toString();
+
+    std::unique_ptr<Topic> failoverTopic(failoverSession->createTopic(topicName1));
+    std::unique_ptr<Topic> directTopic(directSession->createTopic(topicName2));
+
+    // Setup producers with PERSISTENT delivery mode
+    std::unique_ptr<MessageProducer> failoverProducer(failoverSession->createProducer(failoverTopic.get()));
+    std::unique_ptr<MessageProducer> directProducer(directSession->createProducer(directTopic.get()));
+    failoverProducer->setDeliveryMode(DeliveryMode::PERSISTENT);
+    directProducer->setDeliveryMode(DeliveryMode::PERSISTENT);
+
+    // Setup durable topic consumers WITH message selector
+    std::unique_ptr<MessageConsumer> failoverConsumer(
+        failoverSession->createDurableConsumer(failoverTopic.get(), subscriptionName1, selector, false));
+    std::unique_ptr<MessageConsumer> directConsumer(
+        directSession->createDurableConsumer(directTopic.get(), subscriptionName2, selector, false));
+
+    // Setup latches for completion tracking
+    CountDownLatch failoverLatch(1);
+    CountDownLatch directLatch(1);
+
+    // Setup transacted listeners that commit per message
+    TransactedSelectorListener failoverListener(DURABLE_SELECTOR_MESSAGE_COUNT, &failoverLatch, failoverSession.get());
+    TransactedSelectorListener directListener(DURABLE_SELECTOR_MESSAGE_COUNT, &directLatch, directSession.get());
+
+    failoverConsumer->setMessageListener(&failoverListener);
+    directConsumer->setMessageListener(&directListener);
+
+    auto startTime = std::chrono::steady_clock::now();
+
+    std::cout << "Starting durable topic with selector test: " << DURABLE_SELECTOR_MESSAGE_COUNT
+              << " messages per server, selector: " << selector << std::endl;
+
+    // Send messages concurrently to both servers
+    // Send 2x messages (half matching selector, half not) to verify selector works
+    std::atomic<int> failoverSent(0);
+    std::atomic<int> directSent(0);
+    std::atomic<bool> failoverSendError(false);
+    std::atomic<bool> directSendError(false);
+
+    std::thread failoverSender([&]() {
+        try {
+            for (int i = 0; i < DURABLE_SELECTOR_MESSAGE_COUNT * 2; i++) {
+                std::unique_ptr<TextMessage> msg(
+                    failoverSession->createTextMessage("Selector topic1 msg " + std::to_string(i)));
+
+                // Set selector property - alternate between matching and non-matching
+                if (i % 2 == 0) {
+                    msg->setStringProperty(selectorProperty, selectorValue);  // Matches selector
+                } else {
+                    msg->setStringProperty(selectorProperty, "low");  // Does not match
+                }
+
+                failoverProducer->send(msg.get());
+                failoverSession->commit();  // Commit after each send
+                failoverSent++;
+
+                if ((i + 1) % 2000 == 0) {
+                    std::cout << "Failover: sent " << (i + 1) << " messages" << std::endl;
+                }
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Failover sender error: " << e.what() << std::endl;
+            failoverSendError.store(true);
+        }
+    });
+
+    std::thread directSender([&]() {
+        try {
+            for (int i = 0; i < DURABLE_SELECTOR_MESSAGE_COUNT * 2; i++) {
+                std::unique_ptr<TextMessage> msg(
+                    directSession->createTextMessage("Selector topic2 msg " + std::to_string(i)));
+
+                // Set selector property - alternate between matching and non-matching
+                if (i % 2 == 0) {
+                    msg->setStringProperty(selectorProperty, selectorValue);  // Matches selector
+                } else {
+                    msg->setStringProperty(selectorProperty, "low");  // Does not match
+                }
+
+                directProducer->send(msg.get());
+                directSession->commit();  // Commit after each send
+                directSent++;
+
+                if ((i + 1) % 2000 == 0) {
+                    std::cout << "Direct: sent " << (i + 1) << " messages" << std::endl;
+                }
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Direct sender error: " << e.what() << std::endl;
+            directSendError.store(true);
+        }
+    });
+
+    failoverSender.join();
+    directSender.join();
+
+    auto sendTime = std::chrono::steady_clock::now();
+    auto sendDuration = std::chrono::duration_cast<std::chrono::milliseconds>(sendTime - startTime);
+    std::cout << "All messages sent in " << sendDuration.count() << "ms" << std::endl;
+    std::cout << "Failover sent: " << failoverSent.load() << ", Direct sent: " << directSent.load() << std::endl;
+
+    // Wait for both listeners to complete
+    bool failoverCompleted = failoverLatch.await(DURABLE_SELECTOR_TIMEOUT_MS);
+    bool directCompleted = directLatch.await(DURABLE_SELECTOR_TIMEOUT_MS);
+
+    auto endTime = std::chrono::steady_clock::now();
+    auto totalDuration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+
+    std::cout << "Durable topic selector test completed in " << totalDuration.count() << "ms" << std::endl;
+    std::cout << "Failover received: " << failoverListener.getMessagesReceived()
+              << " (expected: " << DURABLE_SELECTOR_MESSAGE_COUNT << ")"
+              << ", errors: " << (failoverListener.hasError() ? failoverListener.getLastError() : "none") << std::endl;
+    std::cout << "Direct received: " << directListener.getMessagesReceived()
+              << " (expected: " << DURABLE_SELECTOR_MESSAGE_COUNT << ")"
+              << ", errors: " << (directListener.hasError() ? directListener.getLastError() : "none") << std::endl;
+    std::cout << "Failover connection exceptions: " << failoverExceptionListener.getExceptionCount() << std::endl;
+    std::cout << "Direct connection exceptions: " << directExceptionListener.getExceptionCount() << std::endl;
+
+    // Assertions
+    CPPUNIT_ASSERT_MESSAGE("Failover sender should not have errors", !failoverSendError.load());
+    CPPUNIT_ASSERT_MESSAGE("Direct sender should not have errors", !directSendError.load());
+    CPPUNIT_ASSERT_MESSAGE("Failover listener should not have errors", !failoverListener.hasError());
+    CPPUNIT_ASSERT_MESSAGE("Direct listener should not have errors", !directListener.hasError());
+    CPPUNIT_ASSERT_MESSAGE("Failover should complete within timeout", failoverCompleted);
+    CPPUNIT_ASSERT_MESSAGE("Direct should complete within timeout", directCompleted);
+
+    // Should receive only messages matching selector (half of total sent)
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failover should receive only matching messages",
+                                  DURABLE_SELECTOR_MESSAGE_COUNT, failoverListener.getMessagesReceived());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Direct should receive only matching messages",
+                                  DURABLE_SELECTOR_MESSAGE_COUNT, directListener.getMessagesReceived());
+
+    // Verify total messages received across both servers
+    int totalReceived = failoverListener.getMessagesReceived() + directListener.getMessagesReceived();
+    int expectedTotal = DURABLE_SELECTOR_MESSAGE_COUNT * 2;
+    std::cout << "Total messages received: " << totalReceived << " (expected: " << expectedTotal << ")" << std::endl;
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Total messages should match expected",
+                                  expectedTotal, totalReceived);
+
+    // Cleanup
+    failoverConsumer->setMessageListener(nullptr);
+    directConsumer->setMessageListener(nullptr);
+
+    failoverConsumer->close();
+    directConsumer->close();
+    failoverProducer->close();
+    directProducer->close();
+
+    // Unsubscribe durable subscriptions
+    failoverSession->unsubscribe(subscriptionName1);
+    directSession->unsubscribe(subscriptionName2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

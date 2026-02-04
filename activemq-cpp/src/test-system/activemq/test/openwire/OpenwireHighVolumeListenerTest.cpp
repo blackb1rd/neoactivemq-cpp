@@ -779,5 +779,335 @@ void OpenwireHighVolumeListenerTest::testDurableTopicTransactedConcurrentServers
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void OpenwireHighVolumeListenerTest::testMultiTopicDurableTransactedWithSelector() {
+    // Test multi-topic durable consumer with:
+    // - Multiple connections (2 servers: failover + broker3)
+    // - Multiple topics per server (each with separate session)
+    // - SESSION_TRANSACTED with per-message commit
+    // - Persistent delivery mode
+    // - Message selectors
+    // - 2000 messages per topic, ~20KB message size
+    // - Separate sessions for producers and consumers per topic
+
+    const std::string testUuid = UUID::randomUUID().toString();
+    const std::string selectorProperty = "messageType";
+    const std::string selectorValue = "important";
+    const std::string selector = selectorProperty + " = '" + selectorValue + "'";
+
+    // Generate ~20KB message content
+    std::string largeMessageContent;
+    largeMessageContent.reserve(MULTI_TOPIC_MESSAGE_SIZE);
+    for (int i = 0; i < MULTI_TOPIC_MESSAGE_SIZE; i++) {
+        largeMessageContent += static_cast<char>('A' + (i % 26));
+    }
+
+    std::cout << "Starting multi-topic durable transacted test with selector..." << std::endl;
+    std::cout << "  Servers: 2 (failover + broker3)" << std::endl;
+    std::cout << "  Topics per server: " << TOPICS_PER_SERVER << std::endl;
+    std::cout << "  Messages per topic: " << MULTI_TOPIC_MESSAGE_COUNT << std::endl;
+    std::cout << "  Message size: " << MULTI_TOPIC_MESSAGE_SIZE << " bytes (~20KB)" << std::endl;
+    std::cout << "  Selector: " << selector << std::endl;
+
+    // ============ Server 1: Failover Connection ============
+    std::unique_ptr<ActiveMQConnectionFactory> failoverFactory(
+        new ActiveMQConnectionFactory(getFailoverURL()));
+    const std::string failoverClientId = "MultiTopicClient1_" + testUuid;
+    failoverConnection.reset(failoverFactory->createConnection());
+    failoverConnection->setClientID(failoverClientId);
+
+    TestExceptionListener failoverExceptionListener;
+    failoverConnection->setExceptionListener(&failoverExceptionListener);
+    failoverConnection->start();
+
+    // ============ Server 2: Direct Connection to Broker3 ============
+    std::unique_ptr<ActiveMQConnectionFactory> directFactory(
+        new ActiveMQConnectionFactory(getBroker3URL()));
+    const std::string directClientId = "MultiTopicClient2_" + testUuid;
+    directConnection.reset(directFactory->createConnection());
+    directConnection->setClientID(directClientId);
+
+    TestExceptionListener directExceptionListener;
+    directConnection->setExceptionListener(&directExceptionListener);
+    directConnection->start();
+
+    // ============ Create separate sessions for each topic ============
+    // Failover: producer sessions (one per topic)
+    std::vector<std::unique_ptr<Session>> failoverProducerSessions;
+    // Failover: consumer sessions (one per topic)
+    std::vector<std::unique_ptr<Session>> failoverConsumerSessions;
+    // Direct: producer sessions (one per topic)
+    std::vector<std::unique_ptr<Session>> directProducerSessions;
+    // Direct: consumer sessions (one per topic)
+    std::vector<std::unique_ptr<Session>> directConsumerSessions;
+
+    // Topics
+    std::vector<std::unique_ptr<Topic>> failoverTopics;
+    std::vector<std::unique_ptr<Topic>> directTopics;
+
+    // Producers
+    std::vector<std::unique_ptr<MessageProducer>> failoverProducers;
+    std::vector<std::unique_ptr<MessageProducer>> directProducers;
+
+    // Consumers
+    std::vector<std::unique_ptr<MessageConsumer>> failoverConsumers;
+    std::vector<std::unique_ptr<MessageConsumer>> directConsumers;
+
+    // Create sessions, topics, producers, and consumers for each topic
+    for (int t = 0; t < TOPICS_PER_SERVER; t++) {
+        // Failover sessions
+        failoverProducerSessions.push_back(
+            std::unique_ptr<Session>(failoverConnection->createSession(Session::SESSION_TRANSACTED)));
+        failoverConsumerSessions.push_back(
+            std::unique_ptr<Session>(failoverConnection->createSession(Session::SESSION_TRANSACTED)));
+
+        // Direct sessions
+        directProducerSessions.push_back(
+            std::unique_ptr<Session>(directConnection->createSession(Session::SESSION_TRANSACTED)));
+        directConsumerSessions.push_back(
+            std::unique_ptr<Session>(directConnection->createSession(Session::SESSION_TRANSACTED)));
+
+        // Failover topic
+        std::string failoverTopicName = "multi.topic.failover." + std::to_string(t) + "." + testUuid;
+        failoverTopics.push_back(
+            std::unique_ptr<Topic>(failoverProducerSessions[t]->createTopic(failoverTopicName)));
+
+        // Direct topic
+        std::string directTopicName = "multi.topic.direct." + std::to_string(t) + "." + testUuid;
+        directTopics.push_back(
+            std::unique_ptr<Topic>(directProducerSessions[t]->createTopic(directTopicName)));
+
+        // Failover producer with PERSISTENT delivery
+        failoverProducers.push_back(
+            std::unique_ptr<MessageProducer>(failoverProducerSessions[t]->createProducer(failoverTopics[t].get())));
+        failoverProducers[t]->setDeliveryMode(DeliveryMode::PERSISTENT);
+
+        // Direct producer with PERSISTENT delivery
+        directProducers.push_back(
+            std::unique_ptr<MessageProducer>(directProducerSessions[t]->createProducer(directTopics[t].get())));
+        directProducers[t]->setDeliveryMode(DeliveryMode::PERSISTENT);
+
+        // Failover durable consumer with selector
+        std::string failoverSubName = "MultiSub1_" + std::to_string(t);
+        failoverConsumers.push_back(
+            std::unique_ptr<MessageConsumer>(failoverConsumerSessions[t]->createDurableConsumer(
+                failoverTopics[t].get(), failoverSubName, selector, false)));
+
+        // Direct durable consumer with selector
+        std::string directSubName = "MultiSub2_" + std::to_string(t);
+        directConsumers.push_back(
+            std::unique_ptr<MessageConsumer>(directConsumerSessions[t]->createDurableConsumer(
+                directTopics[t].get(), directSubName, selector, false)));
+    }
+
+    // ============ Setup listeners ============
+    std::vector<CountDownLatch> failoverLatches;
+    std::vector<CountDownLatch> directLatches;
+    std::vector<std::unique_ptr<TransactedMessageListener>> failoverListeners;
+    std::vector<std::unique_ptr<TransactedMessageListener>> directListeners;
+
+    for (int t = 0; t < TOPICS_PER_SERVER; t++) {
+        failoverLatches.emplace_back(1);
+        directLatches.emplace_back(1);
+
+        failoverListeners.push_back(std::make_unique<TransactedMessageListener>(
+            MULTI_TOPIC_MESSAGE_COUNT, &failoverLatches[t], failoverConsumerSessions[t].get()));
+        directListeners.push_back(std::make_unique<TransactedMessageListener>(
+            MULTI_TOPIC_MESSAGE_COUNT, &directLatches[t], directConsumerSessions[t].get()));
+
+        failoverConsumers[t]->setMessageListener(failoverListeners[t].get());
+        directConsumers[t]->setMessageListener(directListeners[t].get());
+    }
+
+    // ============ Send messages ============
+    auto startTime = std::chrono::steady_clock::now();
+
+    std::atomic<int> totalFailoverSent(0);
+    std::atomic<int> totalDirectSent(0);
+    std::atomic<bool> sendError(false);
+
+    std::vector<std::thread> senderThreads;
+
+    // Create sender threads for failover topics
+    for (int t = 0; t < TOPICS_PER_SERVER; t++) {
+        senderThreads.emplace_back([&, t]() {
+            try {
+                for (int i = 0; i < MULTI_TOPIC_MESSAGE_COUNT * 2; i++) {  // Send 2x (half match selector)
+                    std::unique_ptr<TextMessage> msg(
+                        failoverProducerSessions[t]->createTextMessage(
+                            largeMessageContent + " - Failover Topic" + std::to_string(t) + " Msg" + std::to_string(i)));
+
+                    // Alternate selector property value
+                    if (i % 2 == 0) {
+                        msg->setStringProperty(selectorProperty, selectorValue);  // Matches
+                    } else {
+                        msg->setStringProperty(selectorProperty, "normal");  // Does not match
+                    }
+                    msg->setIntProperty("topicIndex", t);
+                    msg->setIntProperty("messageIndex", i);
+
+                    failoverProducers[t]->send(msg.get());
+                    failoverProducerSessions[t]->commit();
+                    totalFailoverSent++;
+
+                    if ((i + 1) % 500 == 0) {
+                        std::cout << "Failover Topic " << t << ": sent " << (i + 1) << " messages" << std::endl;
+                    }
+                }
+            } catch (const std::exception& e) {
+                std::cerr << "Failover Topic " << t << " sender error: " << e.what() << std::endl;
+                sendError.store(true);
+            }
+        });
+    }
+
+    // Create sender threads for direct topics
+    for (int t = 0; t < TOPICS_PER_SERVER; t++) {
+        senderThreads.emplace_back([&, t]() {
+            try {
+                for (int i = 0; i < MULTI_TOPIC_MESSAGE_COUNT * 2; i++) {  // Send 2x (half match selector)
+                    std::unique_ptr<TextMessage> msg(
+                        directProducerSessions[t]->createTextMessage(
+                            largeMessageContent + " - Direct Topic" + std::to_string(t) + " Msg" + std::to_string(i)));
+
+                    // Alternate selector property value
+                    if (i % 2 == 0) {
+                        msg->setStringProperty(selectorProperty, selectorValue);  // Matches
+                    } else {
+                        msg->setStringProperty(selectorProperty, "normal");  // Does not match
+                    }
+                    msg->setIntProperty("topicIndex", t);
+                    msg->setIntProperty("messageIndex", i);
+
+                    directProducers[t]->send(msg.get());
+                    directProducerSessions[t]->commit();
+                    totalDirectSent++;
+
+                    if ((i + 1) % 500 == 0) {
+                        std::cout << "Direct Topic " << t << ": sent " << (i + 1) << " messages" << std::endl;
+                    }
+                }
+            } catch (const std::exception& e) {
+                std::cerr << "Direct Topic " << t << " sender error: " << e.what() << std::endl;
+                sendError.store(true);
+            }
+        });
+    }
+
+    // Wait for all senders to complete
+    for (auto& thread : senderThreads) {
+        thread.join();
+    }
+
+    auto sendTime = std::chrono::steady_clock::now();
+    auto sendDuration = std::chrono::duration_cast<std::chrono::milliseconds>(sendTime - startTime);
+    std::cout << "All messages sent in " << sendDuration.count() << "ms" << std::endl;
+    std::cout << "Total failover sent: " << totalFailoverSent.load()
+              << ", Total direct sent: " << totalDirectSent.load() << std::endl;
+
+    // ============ Wait for all listeners to complete ============
+    bool allCompleted = true;
+    for (int t = 0; t < TOPICS_PER_SERVER; t++) {
+        if (!failoverLatches[t].await(MULTI_TOPIC_TIMEOUT_MS)) {
+            std::cout << "Failover Topic " << t << " did not complete within timeout" << std::endl;
+            allCompleted = false;
+        }
+        if (!directLatches[t].await(MULTI_TOPIC_TIMEOUT_MS)) {
+            std::cout << "Direct Topic " << t << " did not complete within timeout" << std::endl;
+            allCompleted = false;
+        }
+    }
+
+    auto endTime = std::chrono::steady_clock::now();
+    auto totalDuration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+
+    // ============ Report results ============
+    std::cout << "Multi-topic durable transacted test completed in " << totalDuration.count() << "ms" << std::endl;
+
+    int totalFailoverReceived = 0;
+    int totalDirectReceived = 0;
+
+    for (int t = 0; t < TOPICS_PER_SERVER; t++) {
+        std::cout << "Failover Topic " << t << " received: " << failoverListeners[t]->getMessagesReceived()
+                  << " (expected: " << MULTI_TOPIC_MESSAGE_COUNT << ")"
+                  << ", errors: " << (failoverListeners[t]->hasError() ? failoverListeners[t]->getLastError() : "none")
+                  << std::endl;
+        std::cout << "Direct Topic " << t << " received: " << directListeners[t]->getMessagesReceived()
+                  << " (expected: " << MULTI_TOPIC_MESSAGE_COUNT << ")"
+                  << ", errors: " << (directListeners[t]->hasError() ? directListeners[t]->getLastError() : "none")
+                  << std::endl;
+
+        totalFailoverReceived += failoverListeners[t]->getMessagesReceived();
+        totalDirectReceived += directListeners[t]->getMessagesReceived();
+    }
+
+    std::cout << "Total failover received: " << totalFailoverReceived
+              << " (expected: " << (MULTI_TOPIC_MESSAGE_COUNT * TOPICS_PER_SERVER) << ")" << std::endl;
+    std::cout << "Total direct received: " << totalDirectReceived
+              << " (expected: " << (MULTI_TOPIC_MESSAGE_COUNT * TOPICS_PER_SERVER) << ")" << std::endl;
+    std::cout << "Failover connection exceptions: " << failoverExceptionListener.getExceptionCount() << std::endl;
+    std::cout << "Direct connection exceptions: " << directExceptionListener.getExceptionCount() << std::endl;
+
+    // ============ Assertions ============
+    CPPUNIT_ASSERT_MESSAGE("No send errors should occur", !sendError.load());
+    CPPUNIT_ASSERT_MESSAGE("All listeners should complete within timeout", allCompleted);
+
+    for (int t = 0; t < TOPICS_PER_SERVER; t++) {
+        CPPUNIT_ASSERT_MESSAGE(
+            "Failover Topic " + std::to_string(t) + " listener should not have errors",
+            !failoverListeners[t]->hasError());
+        CPPUNIT_ASSERT_MESSAGE(
+            "Direct Topic " + std::to_string(t) + " listener should not have errors",
+            !directListeners[t]->hasError());
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(
+            "Failover Topic " + std::to_string(t) + " should receive all matching messages",
+            MULTI_TOPIC_MESSAGE_COUNT, failoverListeners[t]->getMessagesReceived());
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(
+            "Direct Topic " + std::to_string(t) + " should receive all matching messages",
+            MULTI_TOPIC_MESSAGE_COUNT, directListeners[t]->getMessagesReceived());
+    }
+
+    int expectedTotalPerServer = MULTI_TOPIC_MESSAGE_COUNT * TOPICS_PER_SERVER;
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Total failover messages should match",
+                                  expectedTotalPerServer, totalFailoverReceived);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Total direct messages should match",
+                                  expectedTotalPerServer, totalDirectReceived);
+
+    // ============ Cleanup ============
+    // Remove listeners
+    for (int t = 0; t < TOPICS_PER_SERVER; t++) {
+        failoverConsumers[t]->setMessageListener(nullptr);
+        directConsumers[t]->setMessageListener(nullptr);
+    }
+
+    // Close consumers and producers
+    for (int t = 0; t < TOPICS_PER_SERVER; t++) {
+        failoverConsumers[t]->close();
+        directConsumers[t]->close();
+        failoverProducers[t]->close();
+        directProducers[t]->close();
+    }
+
+    // Close all sessions
+    for (int t = 0; t < TOPICS_PER_SERVER; t++) {
+        failoverProducerSessions[t]->close();
+        failoverConsumerSessions[t]->close();
+        directProducerSessions[t]->close();
+        directConsumerSessions[t]->close();
+    }
+
+    // Unsubscribe durable subscriptions
+    std::unique_ptr<Session> failoverCleanupSession(failoverConnection->createSession(Session::AUTO_ACKNOWLEDGE));
+    std::unique_ptr<Session> directCleanupSession(directConnection->createSession(Session::AUTO_ACKNOWLEDGE));
+
+    for (int t = 0; t < TOPICS_PER_SERVER; t++) {
+        failoverCleanupSession->unsubscribe("MultiSub1_" + std::to_string(t));
+        directCleanupSession->unsubscribe("MultiSub2_" + std::to_string(t));
+    }
+
+    failoverCleanupSession->close();
+    directCleanupSession->close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Register the test suite
 CPPUNIT_TEST_SUITE_REGISTRATION(OpenwireHighVolumeListenerTest);

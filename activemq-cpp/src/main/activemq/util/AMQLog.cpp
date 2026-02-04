@@ -47,7 +47,6 @@ namespace util {
 // Lock-free AND thread-safe: std::atomic with relaxed ordering
 std::atomic<AMQLogLevel> AMQLogger::currentLevel{AMQLogLevel::NONE};
 std::atomic<bool> AMQLogger::recordOnlyMode{false};
-std::function<void(AMQLogLevel, const std::string&)> AMQLogger::customHandler = nullptr;
 
 // Per-connection logging static members
 std::mutex AMQLogger::contextHandlersMutex;
@@ -100,14 +99,6 @@ AMQLogLevel AMQLogger::getLevel() {
 
 bool AMQLogger::isEnabled(AMQLogLevel level) {
     return static_cast<int>(level) <= static_cast<int>(currentLevel.load(std::memory_order_relaxed));
-}
-
-void AMQLogger::setOutputHandler(std::function<void(AMQLogLevel, const std::string&)> handler) {
-    customHandler = handler;
-}
-
-void AMQLogger::clearOutputHandler() {
-    customHandler = nullptr;
 }
 
 void AMQLogger::setRecordOnlyMode(bool enabled) {
@@ -170,13 +161,8 @@ void AMQLogger::log(AMQLogLevel level, const char* component, const std::string&
         }
     }
 
-    // Fall back to global handler or std::cout
-    if (customHandler) {
-        customHandler(level, formattedMsg);
-    } else {
-        // Use cout to appear alongside application logs
-        std::cout << formattedMsg << std::endl;
-    }
+    // Fall back to std::cout
+    std::cout << formattedMsg << std::endl;
 }
 
 AMQLogLevel AMQLogger::parseLevel(const std::string& levelStr) {

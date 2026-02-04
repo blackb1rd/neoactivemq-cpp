@@ -125,9 +125,6 @@ private:
     // This is lock-free (relaxed atomic) for maximum performance
     static std::atomic<bool> recordOnlyMode;
 
-    // Optional custom output handler (for testing or file logging)
-    static std::function<void(AMQLogLevel, const std::string&)> customHandler;
-
     // Per-connection logging support
     static std::mutex contextHandlersMutex;
     static std::unordered_map<std::string, std::function<void(AMQLogLevel, const std::string&)>> contextHandlers;
@@ -165,18 +162,6 @@ public:
      * @return true if the level is enabled
      */
     static bool isEnabled(AMQLogLevel level);
-
-    /**
-     * Set a custom output handler (optional).
-     * If not set, logs go to std::cerr.
-     * @param handler Function that receives level and formatted message
-     */
-    static void setOutputHandler(std::function<void(AMQLogLevel, const std::string&)> handler);
-
-    /**
-     * Clear the custom output handler, reverting to std::cerr.
-     */
-    static void clearOutputHandler();
 
     /**
      * Enable/disable record-only mode for maximum performance.

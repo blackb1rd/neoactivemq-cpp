@@ -60,6 +60,7 @@ namespace kernels {
         mutable decaf::util::concurrent::Mutex mutex;
         mutable decaf::util::concurrent::Mutex wait;
         decaf::util::concurrent::atomic::AtomicBoolean browseDone;
+        decaf::util::concurrent::atomic::AtomicBoolean browserValid;
 
         mutable Pointer<activemq::core::kernels::ActiveMQConsumerKernel> browser;
 

@@ -20,6 +20,7 @@
 #include <activemq/commands/DataStructure.h>
 #include <activemq/commands/WireFormatInfo.h>
 #include <activemq/transport/IOTransport.h>
+#include <activemq/util/AMQLog.h>
 
 using namespace std;
 using namespace activemq;
@@ -29,6 +30,7 @@ using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using namespace activemq::transport;
 using namespace activemq::commands;
+using activemq::util::AMQLogger;
 using namespace decaf::util::concurrent;
 using namespace decaf::io;
 using namespace decaf::lang;
@@ -61,11 +63,17 @@ void OpenWireFormatNegotiator::oneway(const Pointer<Command> command) {
 
         checkClosed();
 
+        AMQ_LOG_DEBUG("OpenWireFormatNegotiator", "oneway() waiting for negotiation cmdId="
+                      << command->getCommandId() << " type=" << AMQLogger::commandTypeName(command->getDataStructureType()));
+
         if (!readyCountDownLatch.await(negotiationTimeout)) {
             throw IOException(__FILE__, __LINE__, "OpenWireFormatNegotiator::oneway"
                     "Wire format negotiation timeout: peer did not "
                     "send his wire format.");
         }
+
+        AMQ_LOG_DEBUG("OpenWireFormatNegotiator", "oneway() negotiation complete, sending cmdId="
+                      << command->getCommandId() << " type=" << AMQLogger::commandTypeName(command->getDataStructureType()));
 
         next->oneway(command);
     }
@@ -131,10 +139,14 @@ void OpenWireFormatNegotiator::onCommand(const Pointer<Command> command) {
                         "Remote wire format magic is invalid");
             }
 
+            AMQ_LOG_DEBUG("OpenWireFormatNegotiator", "onCommand() received WireFormatInfo, waiting for wireInfoSentDownLatch");
             wireInfoSentDownLatch.await(negotiationTimeout);
+            AMQ_LOG_DEBUG("OpenWireFormatNegotiator", "onCommand() wireInfoSentDownLatch done, renegotiating");
             openWireFormat->renegotiateWireFormat(*info);
+            AMQ_LOG_DEBUG("OpenWireFormatNegotiator", "onCommand() renegotiation done, counting down readyCountDownLatch");
             readyCountDownLatch.countDown();
         } catch (exceptions::ActiveMQException& ex) {
+            AMQ_LOG_ERROR("OpenWireFormatNegotiator", "onCommand() exception during WireFormatInfo processing: " << ex.getMessage());
             readyCountDownLatch.countDown();
             TransportFilter::onCommand(command);
         }

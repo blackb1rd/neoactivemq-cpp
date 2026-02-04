@@ -26,11 +26,32 @@ const unsigned int IntegrationCommon::defaultMsgCount = 200;
 bool IntegrationCommon::debug = false;
 
 ////////////////////////////////////////////////////////////////////////////////
-IntegrationCommon::IntegrationCommon() : urlCommon(), stompURL(), openwireURL() {
+IntegrationCommon::IntegrationCommon()
+    : urlCommon()
+    , stompURL()
+    , openwireURL()
+    , openwireURL1()
+    , openwireURL2()
+    , openwireURL3()
+    , failoverURL() {
 
     this->urlCommon = "tcp://localhost:";
     this->stompURL = this->urlCommon + "61613?wireFormat=stomp";
     this->openwireURL = this->urlCommon + "61616?transport.trace=false";
+
+    // Multi-broker URLs for failover testing
+    // These require: docker compose --profile failover up
+    this->openwireURL1 = this->urlCommon + "61617?transport.trace=false";
+    this->openwireURL2 = this->urlCommon + "61618?transport.trace=false";
+    this->openwireURL3 = this->urlCommon + "61619?transport.trace=false";
+
+    // Failover URL connecting to broker 1 and broker 2
+    this->failoverURL = "failover:(tcp://localhost:61617,tcp://localhost:61618)"
+                        "?randomize=false"
+                        "&initialReconnectDelay=100"
+                        "&maxReconnectDelay=5000"
+                        "&maxReconnectAttempts=-1"
+                        "&transport.trace=false";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

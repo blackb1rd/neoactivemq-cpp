@@ -13,6 +13,11 @@
 #     -p 61616:61616 -p 61613:61613 -p 8161:8161 \
 #     apache/activemq-classic:5.18.7
 #
+# NOTE: Failover, multi-connection, and high-volume tests have been moved to
+# test-system directory. Run those with:
+#   docker compose --profile failover up -d
+#   ./neoactivemq-system-test
+#
 # To stop the broker after testing:
 #   docker-compose down
 #   # OR: docker stop activemq-test
@@ -76,6 +81,8 @@ set(INTEGRATION_TEST_SRCS
   activemq/test/openwire/OpenwireTransactionTest.cpp
   activemq/test/openwire/OpenwireVirtualTopicTest.cpp
   activemq/test/openwire/OpenwireXATransactionsTest.cpp
+  # Additional OpenWire protocol specification tests
+  activemq/test/openwire/OpenwireMessageSelectorTest.cpp
 
   # STOMP protocol tests
   activemq/test/stomp/StompAdvisoryTest.cpp

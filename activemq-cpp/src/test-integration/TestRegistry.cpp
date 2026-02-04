@@ -42,6 +42,8 @@
 #include "activemq/test/openwire/OpenwireSlowListenerTest.h"
 #include "activemq/test/openwire/OpenwireVirtualTopicTest.h"
 #include "activemq/test/openwire/OpenwireXATransactionsTest.h"
+// Additional OpenWire protocol specification tests
+#include "activemq/test/openwire/OpenwireMessageSelectorTest.h"
 #include "activemq/test/stomp/StompAdvisoryTest.h"
 #include "activemq/test/stomp/StompAsyncSenderTest.h"
 #include "activemq/test/stomp/StompBulkMessageTest.h"
@@ -83,6 +85,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireTempDestinati
 CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireTransactionTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireVirtualTopicTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireXATransactionsTest );
+// Additional OpenWire protocol specification tests
+CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireMessageSelectorTest );
 
 // Stomp Tests
 //CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::stomp::StompAdvisoryTest );

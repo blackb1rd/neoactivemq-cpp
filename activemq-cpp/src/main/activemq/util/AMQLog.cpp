@@ -44,6 +44,7 @@ namespace activemq {
 namespace util {
 
 // Initialize static members
+std::atomic<AMQLogLevel> AMQLogger::defaultLevel{AMQLogLevel::NONE};
 std::atomic<bool> AMQLogger::recordOnlyMode{false};
 
 // Per-context (broker) logging static members
@@ -88,6 +89,14 @@ namespace {
     }
 }
 
+void AMQLogger::setLevel(AMQLogLevel level) {
+    defaultLevel.store(level, std::memory_order_relaxed);
+}
+
+AMQLogLevel AMQLogger::getLevel() {
+    return defaultLevel.load(std::memory_order_relaxed);
+}
+
 void AMQLogger::setContextLevel(const std::string& context, AMQLogLevel level) {
     std::lock_guard<std::mutex> lock(contextMutex);
     contextLevels[context] = level;
@@ -99,7 +108,7 @@ AMQLogLevel AMQLogger::getContextLevel(const std::string& context) {
     if (it != contextLevels.end()) {
         return it->second;
     }
-    return AMQLogLevel::NONE;
+    return defaultLevel.load(std::memory_order_relaxed);
 }
 
 void AMQLogger::clearContextLevel(const std::string& context) {
@@ -116,7 +125,8 @@ AMQLogLevel AMQLogger::getEffectiveLevel() {
             return it->second;
         }
     }
-    return AMQLogLevel::NONE;
+    // Fall back to default/global level
+    return defaultLevel.load(std::memory_order_relaxed);
 }
 
 bool AMQLogger::isEnabled(AMQLogLevel level) {

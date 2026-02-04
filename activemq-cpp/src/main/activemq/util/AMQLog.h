@@ -117,6 +117,9 @@ public:
     };
 
 private:
+    // Default/global log level - used when no context is set or context has no specific level
+    static std::atomic<AMQLogLevel> defaultLevel;
+
     // Record-only mode: skip expensive formatting in log(), only record to flight recorder
     // This is lock-free (relaxed atomic) for maximum performance
     static std::atomic<bool> recordOnlyMode;
@@ -141,6 +144,19 @@ private:
     static std::chrono::system_clock::time_point flightRecorderWallClockStart;
 
 public:
+    /**
+     * Set the default/global log level.
+     * This level is used when no context is set or when the context has no specific level.
+     * @param level The log level (default: NONE)
+     */
+    static void setLevel(AMQLogLevel level);
+
+    /**
+     * Get the default/global log level.
+     * @return The current default log level
+     */
+    static AMQLogLevel getLevel();
+
     /**
      * Set log level for a specific context (broker/connection).
      * Each context can have its own log level, overriding the default.

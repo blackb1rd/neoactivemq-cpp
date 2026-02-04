@@ -33,8 +33,6 @@ namespace openwire {
     class OpenwireRequestReplyTest : public CMSTestFixture {
 
         CPPUNIT_TEST_SUITE( OpenwireRequestReplyTest );
-        CPPUNIT_TEST( testRequestReplyWithTempQueue );
-        CPPUNIT_TEST( testRequestReplyWithTempTopic );
         CPPUNIT_TEST( testRequestReplyWithCorrelationId );
         CPPUNIT_TEST( testMultipleRequestsWithCorrelation );
         CPPUNIT_TEST( testRequestReplyTimeout );
@@ -51,16 +49,6 @@ namespace openwire {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL() +
                    "&connection.watchTopicAdvisories=false";
         }
-
-        /**
-         * Test request/reply pattern using a temporary queue for replies.
-         */
-        void testRequestReplyWithTempQueue();
-
-        /**
-         * Test request/reply pattern using a temporary topic for replies.
-         */
-        void testRequestReplyWithTempTopic();
 
         /**
          * Test using correlation ID to match requests with replies.

@@ -209,6 +209,7 @@ if(AMQCPP_BUILD_TESTS)
 	add_subdirectory(activemq-cpp/src/test)
 	add_subdirectory(activemq-cpp/src/test-benchmarks)
 	add_subdirectory(activemq-cpp/src/test-integration)
+	add_subdirectory(activemq-cpp/src/test-system)
 
 	# Enable CTest and register the test executables
 	enable_testing()
@@ -328,6 +329,88 @@ if(AMQCPP_BUILD_TESTS)
 	message(STATUS "  cmake --build --preset <preset> --target docker-down       # Stop ActiveMQ")
 	message(STATUS "  cmake --build --preset <preset> --target docker-logs       # View logs")
 	message(STATUS "  cmake --build --preset <preset> --target integration-full  # Full workflow")
+
+	# =========================================================================
+	# System Tests (failover, multi-connection, high-volume)
+	# Requires: docker compose --profile failover up
+	# =========================================================================
+
+	# Setup fixture: Start Docker with failover profile before system tests
+	add_test(NAME system-docker-start
+		COMMAND docker compose --profile failover up -d
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+	)
+	set_tests_properties(system-docker-start PROPERTIES
+		FIXTURES_SETUP SystemFixture
+		LABELS "system;fixture"
+	)
+
+	# Wait for all brokers to be ready
+	add_test(NAME system-docker-wait
+		COMMAND ${CMAKE_COMMAND} -E sleep 15
+	)
+	set_tests_properties(system-docker-wait PROPERTIES
+		FIXTURES_SETUP SystemFixture
+		DEPENDS system-docker-start
+		LABELS "system;fixture"
+	)
+
+	# The actual system tests (failover, multi-connection, high-volume)
+	# Per-test timeout of 600s (10 min) for high-volume tests
+	add_test(NAME neoactivemq-system-tests COMMAND neoactivemq-system-test)
+	set_tests_properties(neoactivemq-system-tests PROPERTIES
+		LABELS "system"
+		FIXTURES_REQUIRED SystemFixture
+		TIMEOUT 1800
+		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
+	)
+
+	# Cleanup fixture: Stop Docker with failover profile after system tests
+	add_test(NAME system-docker-stop
+		COMMAND docker compose --profile failover down
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+	)
+	set_tests_properties(system-docker-stop PROPERTIES
+		FIXTURES_CLEANUP SystemFixture
+		LABELS "system;fixture"
+	)
+
+	# Target: Start all brokers with failover profile
+	add_custom_target(docker-failover-up
+		COMMAND docker compose --profile failover up -d
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		COMMENT "Starting all ActiveMQ brokers (failover profile)..."
+	)
+
+	# Target: Stop all brokers with failover profile
+	add_custom_target(docker-failover-down
+		COMMAND docker compose --profile failover down
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		COMMENT "Stopping all ActiveMQ brokers..."
+	)
+
+	# Convenience target: Build system tests
+	add_custom_target(system-tests
+		DEPENDS neoactivemq-system-test
+		COMMENT "System tests built. Start brokers with: cmake --build . --target docker-failover-up"
+	)
+
+	# Full system test workflow target
+	add_custom_target(system-full
+		COMMAND docker compose --profile failover up -d
+		COMMAND ${CMAKE_COMMAND} -E sleep 15
+		COMMAND ${CMAKE_COMMAND} -E echo "Running system tests..."
+		COMMAND $<TARGET_FILE:neoactivemq-system-test>
+		COMMAND docker compose --profile failover down
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		DEPENDS neoactivemq-system-test
+		COMMENT "Full system test workflow (start all brokers, test, stop brokers)..."
+	)
+
+	message(STATUS "System test Docker targets available:")
+	message(STATUS "  cmake --build --preset <preset> --target docker-failover-up   # Start all brokers")
+	message(STATUS "  cmake --build --preset <preset> --target docker-failover-down # Stop all brokers")
+	message(STATUS "  cmake --build --preset <preset> --target system-full          # Full workflow")
 endif()
 
 # Installation rules

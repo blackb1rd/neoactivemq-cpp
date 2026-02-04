@@ -1,7 +1,8 @@
 services:
   # Default single broker for basic integration tests
+  # Configure with: ACTIVEMQ_IMAGE=rmohr/activemq:5.15.9 docker compose up
   activemq:
-    image: apache/activemq-classic:${ACTIVEMQ_VERSION:-5.18.7}
+    image: ${ACTIVEMQ_IMAGE:-apache/activemq-classic:5.18.7}
     container_name: activemq-test
     ports:
       - "127.0.0.1:61616:61616"  # OpenWire (localhost only)
@@ -10,7 +11,7 @@ services:
     environment:
       - ACTIVEMQ_OPTS=-Xms512m -Xmx2g -Djetty.host=0.0.0.0
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8161/admin"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:8161/admin || curl -sf http://localhost:8161/"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -20,11 +21,19 @@ services:
   # ============================================================================
   # FAILOVER AND MULTI-CONNECTION TEST BROKERS
   # Use with: docker compose --profile failover up
+  #
+  # Supported ActiveMQ versions (set ACTIVEMQ_IMAGE env var):
+  #   - apache/activemq-classic:5.18.7 (default)
+  #   - apache/activemq-classic:6.2.0
+  #   - rmohr/activemq:5.15.9
+  #
+  # Example:
+  #   ACTIVEMQ_IMAGE=rmohr/activemq:5.15.9 docker compose --profile failover up -d
   # ============================================================================
 
   # Broker 1 for failover testing (primary)
   activemq1:
-    image: apache/activemq-classic:${ACTIVEMQ_VERSION:-5.18.7}
+    image: ${ACTIVEMQ_IMAGE:-apache/activemq-classic:5.18.7}
     container_name: activemq-failover-1
     profiles: ["failover"]
     ports:
@@ -34,7 +43,7 @@ services:
     environment:
       - ACTIVEMQ_OPTS=-Xms256m -Xmx1g -Djetty.host=0.0.0.0
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8161/admin"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:8161/admin || curl -sf http://localhost:8161/"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -43,7 +52,7 @@ services:
 
   # Broker 2 for failover testing (secondary)
   activemq2:
-    image: apache/activemq-classic:${ACTIVEMQ_VERSION:-5.18.7}
+    image: ${ACTIVEMQ_IMAGE:-apache/activemq-classic:5.18.7}
     container_name: activemq-failover-2
     profiles: ["failover"]
     ports:
@@ -53,7 +62,7 @@ services:
     environment:
       - ACTIVEMQ_OPTS=-Xms256m -Xmx1g -Djetty.host=0.0.0.0
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8161/admin"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:8161/admin || curl -sf http://localhost:8161/"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -62,7 +71,7 @@ services:
 
   # Broker 3 for multi-connection testing (independent broker)
   activemq3:
-    image: apache/activemq-classic:${ACTIVEMQ_VERSION:-5.18.7}
+    image: ${ACTIVEMQ_IMAGE:-apache/activemq-classic:5.18.7}
     container_name: activemq-multi-3
     profiles: ["failover"]
     ports:
@@ -72,27 +81,9 @@ services:
     environment:
       - ACTIVEMQ_OPTS=-Xms256m -Xmx1g -Djetty.host=0.0.0.0
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8161/admin"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:8161/admin || curl -sf http://localhost:8161/"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
     restart: unless-stopped
-
-  # Alternative: ActiveMQ Classic 6.x for compatibility testing
-  # Uncomment and use 'docker compose up activemq6' to test with 6.x
-  # activemq6:
-  #   image: apache/activemq-classic:6.2.0
-  #   container_name: activemq-test-6
-  #   ports:
-  #     - "127.0.0.1:61616:61616"
-  #     - "127.0.0.1:61613:61613"
-  #     - "127.0.0.1:8161:8161"
-  #   environment:
-  #     - ACTIVEMQ_OPTS=-Xms512m -Xmx2g -Djetty.host=0.0.0.0
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8161/admin"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #     start_period: 30s

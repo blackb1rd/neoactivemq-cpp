@@ -161,6 +161,96 @@ jobs:
           output/build/${{ matrix.config.preset }}/Testing/Temporary/
           output/build/${{ matrix.config.preset }}/**/*.log
 
+  # Linux system tests - run separately with multiple ActiveMQ versions
+  # Tests failover, multi-connection, and high-volume scenarios
+  linux-system-test:
+    name: Linux System Test
+    runs-on: ubuntu-latest
+    needs: linux-build-test
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Use release build for system tests (one config to avoid excessive combinations)
+        config:
+          - { preset: x64-linux-release-test, build_type: Release }
+        # Test with multiple ActiveMQ versions
+        activemq:
+          - { name: "AMQ-5.15", image: "rmohr/activemq:5.15.9" }
+          - { name: "AMQ-5.18", image: "apache/activemq-classic:5.18.7" }
+          - { name: "AMQ-6.2", image: "apache/activemq-classic:6.2.0" }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Cache vcpkg packages
+      uses: actions/cache@v5
+      with:
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg
+          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
+          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
+        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-${{ runner.os }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: linux-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Make test executables runnable
+      run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
+
+    - name: Start all brokers (${{ matrix.activemq.name }})
+      run: |
+        echo "Starting ActiveMQ brokers using image: ${{ matrix.activemq.image }}"
+        ACTIVEMQ_IMAGE=${{ matrix.activemq.image }} docker compose --profile failover up -d
+        echo "Waiting for all brokers to be ready..."
+        sleep 30
+
+    - name: Show broker status
+      run: docker compose --profile failover ps
+
+    - name: Run system tests (${{ matrix.activemq.name }})
+      run: ctest --preset ${{ matrix.config.preset }} -R "neoactivemq-system-tests" --output-on-failure --timeout 1800
+
+    - name: Show broker logs on failure
+      if: failure()
+      run: |
+        echo "=== activemq-failover-1 logs ==="
+        docker compose --profile failover logs activemq1 --tail 100 || true
+        echo "=== activemq-failover-2 logs ==="
+        docker compose --profile failover logs activemq2 --tail 100 || true
+        echo "=== activemq-multi-3 logs ==="
+        docker compose --profile failover logs activemq3 --tail 100 || true
+
+    - name: Stop all brokers
+      if: always()
+      run: docker compose --profile failover down
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-system-${{ matrix.activemq.name }}
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
   # Linux builds without tests (all variants)
   linux-build:
     name: Linux Build

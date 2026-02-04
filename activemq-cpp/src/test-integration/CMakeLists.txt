@@ -13,18 +13,10 @@
 #     -p 61616:61616 -p 61613:61613 -p 8161:8161 \
 #     apache/activemq-classic:5.18.7
 #
-# FAILOVER AND MULTI-CONNECTION TESTS:
-# For failover and multi-connection tests, start all brokers with:
+# NOTE: Failover, multi-connection, and high-volume tests have been moved to
+# test-system directory. Run those with:
 #   docker compose --profile failover up -d
-#
-# This starts:
-#   - activemq1: Failover primary on port 61617
-#   - activemq2: Failover secondary on port 61618
-#   - activemq3: Independent broker on port 61619
-#
-# Run specific failover tests with:
-#   ./neoactivemq-integration-test -test OpenwireFailoverIntegrationTest
-#   ./neoactivemq-integration-test -test OpenwireMultiConnectionTest
+#   ./neoactivemq-system-test
 #
 # To stop the broker after testing:
 #   docker-compose down
@@ -71,7 +63,6 @@ set(INTEGRATION_TEST_SRCS
   activemq/test/openwire/OpenwireDurableTest.cpp
   activemq/test/openwire/OpenwireEnhancedConnectionTest.cpp
   activemq/test/openwire/OpenwireExpirationTest.cpp
-  activemq/test/openwire/OpenwireFailoverIntegrationTest.cpp
   activemq/test/openwire/OpenwireIndividualAckTest.cpp
   activemq/test/openwire/OpenwireJmsMessageGroupsTest.cpp
   activemq/test/openwire/OpenwireJmsRecoverTest.cpp
@@ -79,7 +70,6 @@ set(INTEGRATION_TEST_SRCS
   activemq/test/openwire/OpenwireMessageCompressionTest.cpp
   activemq/test/openwire/OpenWireMessageListenerRedeliveryTest.cpp
   activemq/test/openwire/OpenwireMessagePriorityTest.cpp
-  activemq/test/openwire/OpenwireMultiConnectionTest.cpp
   activemq/test/openwire/OpenwireNonBlockingRedeliveryTest.cpp
   activemq/test/openwire/OpenwireOptimizedAckTest.cpp
   activemq/test/openwire/OpenwireQueueBrowserTest.cpp

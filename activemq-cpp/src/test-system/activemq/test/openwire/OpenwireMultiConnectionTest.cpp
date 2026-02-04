@@ -548,8 +548,10 @@ void OpenwireMultiConnectionTest::testDurableTopicWithSelectorConcurrentServers(
     failoverConnection->setExceptionListener(&failoverExceptionListener);
     failoverConnection->start();
 
-    // Create SESSION_TRANSACTED session for failover
-    failoverSession.reset(failoverConnection->createSession(Session::SESSION_TRANSACTED));
+    // Create separate SESSION_TRANSACTED sessions for producer and consumer to avoid concurrency issues
+    // CMS sessions are NOT thread-safe - producer and consumer must use different sessions
+    failoverSession.reset(failoverConnection->createSession(Session::SESSION_TRANSACTED));  // For consumer
+    std::unique_ptr<Session> failoverProducerSession(failoverConnection->createSession(Session::SESSION_TRANSACTED));  // For producer
 
     // Setup direct connection to broker3 with client ID
     std::unique_ptr<ActiveMQConnectionFactory> directFactory(
@@ -561,8 +563,9 @@ void OpenwireMultiConnectionTest::testDurableTopicWithSelectorConcurrentServers(
     directConnection->setExceptionListener(&directExceptionListener);
     directConnection->start();
 
-    // Create SESSION_TRANSACTED session for direct
-    directSession.reset(directConnection->createSession(Session::SESSION_TRANSACTED));
+    // Create separate SESSION_TRANSACTED sessions for producer and consumer to avoid concurrency issues
+    directSession.reset(directConnection->createSession(Session::SESSION_TRANSACTED));  // For consumer
+    std::unique_ptr<Session> directProducerSession(directConnection->createSession(Session::SESSION_TRANSACTED));  // For producer
 
     // Create different topics for each server
     std::string topicName1 = "durable.selector.topic1." + UUID::randomUUID().toString();
@@ -570,10 +573,13 @@ void OpenwireMultiConnectionTest::testDurableTopicWithSelectorConcurrentServers(
 
     std::unique_ptr<Topic> failoverTopic(failoverSession->createTopic(topicName1));
     std::unique_ptr<Topic> directTopic(directSession->createTopic(topicName2));
+    // Also create topic instances for producer sessions
+    std::unique_ptr<Topic> failoverProducerTopic(failoverProducerSession->createTopic(topicName1));
+    std::unique_ptr<Topic> directProducerTopic(directProducerSession->createTopic(topicName2));
 
-    // Setup producers with PERSISTENT delivery mode
-    std::unique_ptr<MessageProducer> failoverProducer(failoverSession->createProducer(failoverTopic.get()));
-    std::unique_ptr<MessageProducer> directProducer(directSession->createProducer(directTopic.get()));
+    // Setup producers with PERSISTENT delivery mode (using producer sessions)
+    std::unique_ptr<MessageProducer> failoverProducer(failoverProducerSession->createProducer(failoverProducerTopic.get()));
+    std::unique_ptr<MessageProducer> directProducer(directProducerSession->createProducer(directProducerTopic.get()));
     failoverProducer->setDeliveryMode(DeliveryMode::PERSISTENT);
     directProducer->setDeliveryMode(DeliveryMode::PERSISTENT);
 
@@ -610,7 +616,7 @@ void OpenwireMultiConnectionTest::testDurableTopicWithSelectorConcurrentServers(
         try {
             for (int i = 0; i < DURABLE_SELECTOR_MESSAGE_COUNT * 2; i++) {
                 std::unique_ptr<TextMessage> msg(
-                    failoverSession->createTextMessage("Selector topic1 msg " + std::to_string(i)));
+                    failoverProducerSession->createTextMessage("Selector topic1 msg " + std::to_string(i)));
 
                 // Set selector property - alternate between matching and non-matching
                 if (i % 2 == 0) {
@@ -620,7 +626,7 @@ void OpenwireMultiConnectionTest::testDurableTopicWithSelectorConcurrentServers(
                 }
 
                 failoverProducer->send(msg.get());
-                failoverSession->commit();  // Commit after each send
+                failoverProducerSession->commit();  // Commit after each send (using producer session)
                 failoverSent++;
 
                 if ((i + 1) % 2000 == 0) {
@@ -637,7 +643,7 @@ void OpenwireMultiConnectionTest::testDurableTopicWithSelectorConcurrentServers(
         try {
             for (int i = 0; i < DURABLE_SELECTOR_MESSAGE_COUNT * 2; i++) {
                 std::unique_ptr<TextMessage> msg(
-                    directSession->createTextMessage("Selector topic2 msg " + std::to_string(i)));
+                    directProducerSession->createTextMessage("Selector topic2 msg " + std::to_string(i)));
 
                 // Set selector property - alternate between matching and non-matching
                 if (i % 2 == 0) {
@@ -647,7 +653,7 @@ void OpenwireMultiConnectionTest::testDurableTopicWithSelectorConcurrentServers(
                 }
 
                 directProducer->send(msg.get());
-                directSession->commit();  // Commit after each send
+                directProducerSession->commit();  // Commit after each send (using producer session)
                 directSent++;
 
                 if ((i + 1) % 2000 == 0) {
@@ -714,6 +720,10 @@ void OpenwireMultiConnectionTest::testDurableTopicWithSelectorConcurrentServers(
     directConsumer->close();
     failoverProducer->close();
     directProducer->close();
+
+    // Close producer sessions
+    failoverProducerSession->close();
+    directProducerSession->close();
 
     // Unsubscribe durable subscriptions
     failoverSession->unsubscribe(subscriptionName1);

@@ -122,17 +122,22 @@ namespace {
 
         ConnectionFactory* factory;
         bool noErrors;
+        std::string errorMessage;
 
     public:
 
         ConnectionLoadThread(ConnectionFactory* factory) :
-            Thread(), factory(factory), noErrors(true) {
+            Thread(), factory(factory), noErrors(true), errorMessage() {
         }
 
         virtual ~ConnectionLoadThread() {}
 
         bool isNoErrors() const {
             return this->noErrors;
+        }
+
+        std::string getErrorMessage() const {
+            return this->errorMessage;
         }
 
         virtual void run() {
@@ -151,8 +156,15 @@ namespace {
                     TimeUnit::MILLISECONDS.sleep(20);
                     connection->close();
                 }
+            } catch (cms::CMSException& e) {
+                noErrors = false;
+                errorMessage = std::string("CMSException: ") + e.what();
+            } catch (std::exception& e) {
+                noErrors = false;
+                errorMessage = std::string("std::exception: ") + e.what();
             } catch(...) {
                 noErrors = false;
+                errorMessage = "Unknown exception";
             }
         }
     };
@@ -174,7 +186,7 @@ void OpenwireAdvisoryTest::testConcurrentTempDestCreation() {
     thread1.join();
     thread2.join();
 
-    CPPUNIT_ASSERT(thread1.isNoErrors());
-    CPPUNIT_ASSERT(thread2.isNoErrors());
+    CPPUNIT_ASSERT_MESSAGE(std::string("Thread1 error: ") + thread1.getErrorMessage(), thread1.isNoErrors());
+    CPPUNIT_ASSERT_MESSAGE(std::string("Thread2 error: ") + thread2.getErrorMessage(), thread2.isNoErrors());
 }
 

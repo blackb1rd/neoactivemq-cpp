@@ -740,6 +740,7 @@ target_link_libraries(neoactivemq-cpp PUBLIC asio::asio)
 
 set_target_properties(neoactivemq-cpp PROPERTIES
   POSITION_INDEPENDENT_CODE ON
+  OUTPUT_NAME "neoactivemq"
 )
 
 # Windows-specific settings

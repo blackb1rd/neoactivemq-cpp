@@ -207,14 +207,17 @@ namespace mock {
                         }
 
                         // Check if server socket is still valid before calling accept
+                        // Copy to local variable to prevent race condition with stop()
+                        Pointer<ServerSocket> localServer;
                         {
                             std::lock_guard<std::mutex> lock(socketMutex);
                             if (server.get() == NULL || done.load(std::memory_order_acquire)) {
                                 break;
                             }
+                            localServer = server;  // Keep server alive during accept
                         }
 
-                        socketPtr = server->accept();
+                        socketPtr = localServer->accept();
 
                         // Check done again after accept to avoid processing during shutdown
                         if (done.load(std::memory_order_acquire)) {

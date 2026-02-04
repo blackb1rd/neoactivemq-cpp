@@ -1703,7 +1703,7 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     broker2->waitUntilStarted();
 
     std::string uri = "failover://(tcp://localhost:61031,"
-                                  "tcp://localhost:61032)?maxReconnectDelay=1000";
+                                  "tcp://localhost:61032)?maxReconnectDelay=1000&timeout=2000";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;

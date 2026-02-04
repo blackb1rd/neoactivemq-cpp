@@ -534,7 +534,7 @@ void OpenwireMultiConnectionTest::testDurableTopicWithSelectorConcurrentServers(
     const std::string clientId2 = "SelectorClient2_" + UUID::randomUUID().toString();
     const std::string subscriptionName1 = "SelectorSub1";
     const std::string subscriptionName2 = "SelectorSub2";
-    const std::string selectorProperty = "priority";
+    const std::string selectorProperty = "msgPriority";
     const std::string selectorValue = "high";
     const std::string selector = selectorProperty + " = '" + selectorValue + "'";
 

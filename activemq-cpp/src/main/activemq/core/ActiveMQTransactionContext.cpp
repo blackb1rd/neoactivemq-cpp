@@ -62,6 +62,9 @@ namespace core{
 
     public:
 
+        // Mutex to protect transactionId access (fixes race condition)
+        mutable decaf::util::concurrent::Mutex mutex;
+
         // Tracks local transactions
         Pointer<commands::TransactionId> transactionId;
 
@@ -69,7 +72,7 @@ namespace core{
         Pointer<Xid> associatedXid;
         int beforeEndIndex;
 
-        TxContextData() : transactionId(), associatedXid(), beforeEndIndex() {
+        TxContextData() : mutex(), transactionId(), associatedXid(), beforeEndIndex() {
         }
 
     };
@@ -173,7 +176,10 @@ void ActiveMQTransactionContext::begin() {
             transactionInfo->setType(ActiveMQConstants::TRANSACTION_STATE_BEGIN);
 
             this->connection->oneway(transactionInfo);
-            this->context->transactionId = id.dynamicCast<TransactionId>();
+
+            synchronized(&this->context->mutex) {
+                this->context->transactionId = id.dynamicCast<TransactionId>();
+            }
         }
     }
     AMQ_CATCH_RETHROW(cms::CMSException)
@@ -201,11 +207,13 @@ void ActiveMQTransactionContext::commit() {
         if (isInTransaction()) {
             Pointer<TransactionInfo> info(new TransactionInfo());
             info->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
-            info->setTransactionId(this->context->transactionId);
             info->setType(ActiveMQConstants::TRANSACTION_STATE_COMMITONEPHASE);
 
-            // Before we send the command NULL the id in case of an exception.
-            this->context->transactionId.reset(NULL);
+            synchronized(&this->context->mutex) {
+                info->setTransactionId(this->context->transactionId);
+                // Before we send the command NULL the id in case of an exception.
+                this->context->transactionId.reset(NULL);
+            }
 
             try {
                 this->connection->syncRequest(info);
@@ -241,11 +249,14 @@ void ActiveMQTransactionContext::rollback() {
 
             Pointer<TransactionInfo> info(new TransactionInfo());
             info->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
-            info->setTransactionId(this->context->transactionId);
-            info->setType(ActiveMQConstants::TRANSACTION_STATE_ROLLBACK);
 
-            // Before we send the command NULL the id in case of an exception.
-            this->context->transactionId.reset(NULL);
+            synchronized(&this->context->mutex) {
+                info->setTransactionId(this->context->transactionId);
+                info->setType(ActiveMQConstants::TRANSACTION_STATE_ROLLBACK);
+
+                // Before we send the command NULL the id in case of an exception.
+                this->context->transactionId.reset(NULL);
+            }
 
             this->connection->syncRequest(info);
             this->afterRollback();
@@ -308,22 +319,37 @@ void ActiveMQTransactionContext::afterRollback() {
 
 ////////////////////////////////////////////////////////////////////////////////
 const Pointer<TransactionId>& ActiveMQTransactionContext::getTransactionId() const {
+    // Note: This method returns a reference - caller must ensure thread-safety.
+    // The transactionId should only be modified through begin/commit/rollback
+    // which are protected by the mutex.
     return this->context->transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool ActiveMQTransactionContext::isInTransaction() const {
-    return this->context->transactionId != NULL;
+    bool result = false;
+    synchronized(&this->context->mutex) {
+        result = this->context->transactionId != NULL;
+    }
+    return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool ActiveMQTransactionContext::isInLocalTransaction() const {
-    return this->context->transactionId != NULL && this->context->transactionId->isLocalTransactionId();
+    bool result = false;
+    synchronized(&this->context->mutex) {
+        result = this->context->transactionId != NULL && this->context->transactionId->isLocalTransactionId();
+    }
+    return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool ActiveMQTransactionContext::isInXATransaction() const {
-    return this->context->transactionId != NULL && this->context->transactionId->isXATransactionId();
+    bool result = false;
+    synchronized(&this->context->mutex) {
+        result = this->context->transactionId != NULL && this->context->transactionId->isXATransactionId();
+    }
+    return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -520,10 +546,12 @@ void ActiveMQTransactionContext::rollback(const Xid* xid) {
         throw XAException(XAException::XAER_PROTO);
     }
 
-    if (equals(this->context->associatedXid.get(), xid)) {
-        x = this->context->transactionId.dynamicCast<XATransactionId>();
-    } else {
-        x.reset(new XATransactionId(xid));
+    synchronized(&this->context->mutex) {
+        if (equals(this->context->associatedXid.get(), xid)) {
+            x = this->context->transactionId.dynamicCast<XATransactionId>();
+        } else {
+            x.reset(new XATransactionId(xid));
+        }
     }
 
     try {
@@ -604,10 +632,12 @@ void ActiveMQTransactionContext::forget(const Xid* xid) {
         throw XAException(XAException::XAER_PROTO);
     }
 
-    if (equals(this->context->associatedXid.get(), xid)) {
-        x = this->context->transactionId.dynamicCast<XATransactionId>();
-    } else {
-        x.reset(new XATransactionId(xid));
+    synchronized(&this->context->mutex) {
+        if (equals(this->context->associatedXid.get(), xid)) {
+            x = this->context->transactionId.dynamicCast<XATransactionId>();
+        } else {
+            x.reset(new XATransactionId(xid));
+        }
     }
 
     // Let the server know that the tx is rollback.
@@ -661,13 +691,16 @@ void ActiveMQTransactionContext::setXid(const Xid* xid) {
 
     if (xid != NULL) {
 
-        // Associate this new Xid with this Transaction as the root of the TX.
-        this->context->associatedXid.reset(xid->clone());
-        this->context->transactionId.reset(new XATransactionId(xid));
-
         Pointer<TransactionInfo> info(new TransactionInfo());
         info->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
-        info->setTransactionId(this->context->transactionId);
+
+        synchronized(&this->context->mutex) {
+            // Associate this new Xid with this Transaction as the root of the TX.
+            this->context->associatedXid.reset(xid->clone());
+            this->context->transactionId.reset(new XATransactionId(xid));
+            info->setTransactionId(this->context->transactionId);
+        }
+
         info->setType(ActiveMQConstants::TRANSACTION_STATE_BEGIN);
 
         try {
@@ -680,23 +713,28 @@ void ActiveMQTransactionContext::setXid(const Xid* xid) {
 
     } else {
 
-        if (this->context->transactionId != NULL) {
+        Pointer<TransactionInfo> info;
 
-            Pointer<TransactionInfo> info(new TransactionInfo());
-            info->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
-            info->setTransactionId(this->context->transactionId);
-            info->setType(ActiveMQConstants::TRANSACTION_STATE_END);
+        synchronized(&this->context->mutex) {
+            if (this->context->transactionId != NULL) {
+                info.reset(new TransactionInfo());
+                info->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
+                info->setTransactionId(this->context->transactionId);
+                info->setType(ActiveMQConstants::TRANSACTION_STATE_END);
+            }
 
+            // remove the association currently in place.
+            this->context->associatedXid.reset(NULL);
+            this->context->transactionId.reset(NULL);
+        }
+
+        if (info != NULL) {
             try {
                 this->connection->syncRequest(info);
             } catch (CMSException& e) {
                 throw toXAException(e);
             }
         }
-
-        // remove the association currently in place.
-        this->context->associatedXid.reset(NULL);
-        this->context->transactionId.reset(NULL);
     }
 }
 

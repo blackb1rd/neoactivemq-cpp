@@ -200,7 +200,7 @@ int main( int argc, char **argv ) {
 
     // Initialize Flight Recorder with 0.5% of system memory for debugging
     activemq::util::AMQLogger::initializeFlightRecorder(0.005);
-    // Enable DEBUG level logging to record entries to flight recorder
+    // Enable DEBUG level logging globally to record entries to flight recorder
     activemq::util::AMQLogger::setLevel(activemq::util::AMQLogLevel::DEBUG);
     // Enable record-only mode: skip formatting overhead, only record to flight recorder
     // Logs will be formatted and printed only on failure/timeout (lazy formatting)

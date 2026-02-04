@@ -43,14 +43,14 @@
 namespace activemq {
 namespace util {
 
-// Initialize static members - default to NONE (no logging)
-// Lock-free AND thread-safe: std::atomic with relaxed ordering
-std::atomic<AMQLogLevel> AMQLogger::currentLevel{AMQLogLevel::NONE};
+// Initialize static members
+std::atomic<AMQLogLevel> AMQLogger::defaultLevel{AMQLogLevel::NONE};
 std::atomic<bool> AMQLogger::recordOnlyMode{false};
 
-// Per-connection logging static members
-std::mutex AMQLogger::contextHandlersMutex;
+// Per-context (broker) logging static members
+std::mutex AMQLogger::contextMutex;
 std::unordered_map<std::string, std::function<void(AMQLogLevel, const std::string&)>> AMQLogger::contextHandlers;
+std::unordered_map<std::string, AMQLogLevel> AMQLogger::contextLevels;
 
 // Function to access thread-local context (avoids DLL export issues)
 std::string& AMQLogger::getCurrentLogContextImpl() {
@@ -90,15 +90,48 @@ namespace {
 }
 
 void AMQLogger::setLevel(AMQLogLevel level) {
-    currentLevel.store(level, std::memory_order_relaxed);
+    defaultLevel.store(level, std::memory_order_relaxed);
 }
 
 AMQLogLevel AMQLogger::getLevel() {
-    return currentLevel.load(std::memory_order_relaxed);
+    return defaultLevel.load(std::memory_order_relaxed);
+}
+
+void AMQLogger::setLevel(const std::string& context, AMQLogLevel level) {
+    std::lock_guard<std::mutex> lock(contextMutex);
+    contextLevels[context] = level;
+}
+
+AMQLogLevel AMQLogger::getLevel(const std::string& context) {
+    std::lock_guard<std::mutex> lock(contextMutex);
+    auto it = contextLevels.find(context);
+    if (it != contextLevels.end()) {
+        return it->second;
+    }
+    return defaultLevel.load(std::memory_order_relaxed);
+}
+
+void AMQLogger::clearLevel(const std::string& context) {
+    std::lock_guard<std::mutex> lock(contextMutex);
+    contextLevels.erase(context);
+}
+
+AMQLogLevel AMQLogger::getEffectiveLevel() {
+    std::string& currentContext = getCurrentLogContextImpl();
+    if (!currentContext.empty()) {
+        std::lock_guard<std::mutex> lock(contextMutex);
+        auto it = contextLevels.find(currentContext);
+        if (it != contextLevels.end()) {
+            return it->second;
+        }
+    }
+    // Fall back to default/global level
+    return defaultLevel.load(std::memory_order_relaxed);
 }
 
 bool AMQLogger::isEnabled(AMQLogLevel level) {
-    return static_cast<int>(level) <= static_cast<int>(currentLevel.load(std::memory_order_relaxed));
+    AMQLogLevel effectiveLevel = getEffectiveLevel();
+    return static_cast<int>(level) <= static_cast<int>(effectiveLevel);
 }
 
 void AMQLogger::setRecordOnlyMode(bool enabled) {
@@ -153,7 +186,7 @@ void AMQLogger::log(AMQLogLevel level, const char* component, const std::string&
     // Check for context-specific handler first
     std::string& currentLogContext = getCurrentLogContextImpl();
     if (!currentLogContext.empty()) {
-        std::lock_guard<std::mutex> lock(contextHandlersMutex);
+        std::lock_guard<std::mutex> lock(contextMutex);
         auto it = contextHandlers.find(currentLogContext);
         if (it != contextHandlers.end() && it->second) {
             it->second(level, formattedMsg);
@@ -504,13 +537,13 @@ uint64_t AMQLogger::getStartTicks() {
 ////////////////////////////////////////////////////////////////////////////////
 void AMQLogger::setContextOutputHandler(const std::string& context,
                                        std::function<void(AMQLogLevel, const std::string&)> handler) {
-    std::lock_guard<std::mutex> lock(contextHandlersMutex);
+    std::lock_guard<std::mutex> lock(contextMutex);
     contextHandlers[context] = handler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void AMQLogger::clearContextOutputHandler(const std::string& context) {
-    std::lock_guard<std::mutex> lock(contextHandlersMutex);
+    std::lock_guard<std::mutex> lock(contextMutex);
     contextHandlers.erase(context);
 }
 

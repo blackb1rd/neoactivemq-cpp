@@ -20,6 +20,7 @@
 #include <activemq/util/AMQLog.h>
 #include <activemq/transport/failover/FailoverTransportFactory.h>
 #include <activemq/transport/failover/FailoverTransport.h>
+#include <activemq/transport/failover/BrokerStateInfo.h>
 #include <activemq/transport/mock/MockTransport.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/commands/ActiveMQMessage.h>
@@ -1701,8 +1702,9 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     broker2->start();
     broker2->waitUntilStarted();
 
+    // Use aggressive retry settings for faster failover in tests
     std::string uri = "failover://(tcp://localhost:61031,"
-                                  "tcp://localhost:61032)?maxReconnectDelay=1000";
+                                  "tcp://localhost:61032)?maxReconnectDelay=500&initialReconnectDelay=100&timeout=30000";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1726,18 +1728,54 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     }
     CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", failover->isConnected() == true);
 
+    // Check initial broker states
+    std::vector<activemq::transport::failover::BrokerStateInfo> initialStates = failover->getBrokerStates();
+    CPPUNIT_ASSERT_MESSAGE("Should have at least one broker tracked", !initialStates.empty());
+
+    bool hasConnectedBroker = false;
+    for (const auto& state : initialStates) {
+        if (state.status == activemq::transport::failover::BrokerStatus::CONNECTED) {
+            hasConnectedBroker = true;
+            CPPUNIT_ASSERT_MESSAGE("Connected broker should have zero failures", state.failureCount == 0);
+            break;
+        }
+    }
+    CPPUNIT_ASSERT_MESSAGE("Should have one CONNECTED broker", hasConnectedBroker);
+
     // Stop broker1, should failover to broker2
     broker1->stop();
     broker1->waitUntilStopped();
 
-    // Give time for failover to complete
-    while (!failover->isConnected() && count++ < 100) {
+    // First, wait for disconnection to be detected (isConnected becomes false)
+    // This may take time depending on socket read timeout
+    count = 0;
+    while (failover->isConnected() && count++ < 200) {
+        Thread::sleep(100);
+    }
+
+    // Then, wait for failover to complete - poll for reconnection
+    // Give generous time for retry backoff and connection attempts
+    count = 0;
+    while (!failover->isConnected() && count++ < 300) {
         Thread::sleep(100);
     }
 
     // Verify still connected (should have failed over to broker2)
     CPPUNIT_ASSERT_MESSAGE("Should remain connected after broker1 stops (failed over to broker2)",
                           failover->isConnected() == true);
+
+    // Check broker states after failover from broker1 to broker2
+    std::vector<activemq::transport::failover::BrokerStateInfo> afterBroker1Stop = failover->getBrokerStates();
+    CPPUNIT_ASSERT_MESSAGE("Should have broker states tracked", !afterBroker1Stop.empty());
+
+    bool hasConnectedAfterFailover = false;
+    for (const auto& state : afterBroker1Stop) {
+        if (state.status == activemq::transport::failover::BrokerStatus::CONNECTED) {
+            hasConnectedAfterFailover = true;
+            break;
+        }
+    }
+    CPPUNIT_ASSERT_MESSAGE("Should have one CONNECTED broker after failover", hasConnectedAfterFailover);
 
     // Restart broker1 and wait for it to be ready
     broker1->start();
@@ -1750,14 +1788,36 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     broker2->stop();
     broker2->waitUntilStopped();
 
-    // Give time for failover to complete
-    while (!failover->isConnected() && count++ < 100) {
+    // First, wait for disconnection to be detected (isConnected becomes false)
+    // This may take time depending on socket read timeout
+    count = 0;
+    while (failover->isConnected() && count++ < 200) {
+        Thread::sleep(100);
+    }
+
+    // Then, wait for failover to complete - poll for reconnection
+    // Give generous time for retry backoff and connection attempts
+    count = 0;
+    while (!failover->isConnected() && count++ < 300) {
         Thread::sleep(100);
     }
 
     // Verify still connected (should have failed over back to broker1)
     CPPUNIT_ASSERT_MESSAGE("Should remain connected after broker2 stops (failed over to broker1)",
                           failover->isConnected() == true);
+
+    // Check final broker states - should show broker1 as CONNECTED
+    std::vector<activemq::transport::failover::BrokerStateInfo> finalStates = failover->getBrokerStates();
+    CPPUNIT_ASSERT_MESSAGE("Should have broker states", !finalStates.empty());
+
+    bool hasFinalConnectedBroker = false;
+    for (const auto& state : finalStates) {
+        if (state.status == activemq::transport::failover::BrokerStatus::CONNECTED) {
+            hasFinalConnectedBroker = true;
+            break;
+        }
+    }
+    CPPUNIT_ASSERT_MESSAGE("Should still have one CONNECTED broker at end", hasFinalConnectedBroker);
 
     transport->close();
 

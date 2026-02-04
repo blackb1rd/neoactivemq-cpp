@@ -18,7 +18,10 @@
 #include "FailoverTransport.h"
 
 #include <atomic>
+#include <sstream>
+#include <vector>
 #include <activemq/util/AMQLog.h>
+#include <activemq/transport/failover/BrokerStateInfo.h>
 #include <activemq/commands/ConnectionControl.h>
 #include <activemq/commands/ShutdownInfo.h>
 #include <activemq/commands/RemoveInfo.h>
@@ -110,7 +113,7 @@ namespace failover {
         mutable Mutex listenerMutex;
 
         StlMap<int, Pointer<Command> > requestMap;
-        StlMap<std::string, int> uriFailureCounts;  // Per-URI failure tracking
+        StlMap<std::string, BrokerState> brokerStates;  // Per-broker state tracking
 
         Pointer<URIPool> uris;
         Pointer<URIPool> priorityUris;
@@ -180,14 +183,63 @@ namespace failover {
         }
 
         /**
-         * Increment the failure count for a specific URI.
+         * Get or create broker state for a URI.
          */
-        void incrementUriFailureCount(const decaf::net::URI& uri) {
+        BrokerState& getBrokerState(const decaf::net::URI& uri) {
             std::string uriStr = uri.toString();
-            if (uriFailureCounts.containsKey(uriStr)) {
-                uriFailureCounts.put(uriStr, uriFailureCounts.get(uriStr) + 1);
+            if (!brokerStates.containsKey(uriStr)) {
+                brokerStates.put(uriStr, BrokerState());
+            }
+            return brokerStates.get(uriStr);
+        }
+
+        /**
+         * Get broker state (const version).
+         */
+        const BrokerState& getBrokerState(const decaf::net::URI& uri) const {
+            std::string uriStr = uri.toString();
+            if (brokerStates.containsKey(uriStr)) {
+                return brokerStates.get(uriStr);
+            }
+            static const BrokerState defaultState;
+            return defaultState;
+        }
+
+        /**
+         * Mark broker connection attempt started.
+         */
+        void markBrokerConnecting(const decaf::net::URI& uri) {
+            BrokerState& state = getBrokerState(uri);
+            state.status = BrokerStatus::CONNECTING;
+            state.lastAttemptTime = System::currentTimeMillis();
+        }
+
+        /**
+         * Mark broker connection succeeded.
+         */
+        void markBrokerConnected(const decaf::net::URI& uri) {
+            BrokerState& state = getBrokerState(uri);
+            state.status = BrokerStatus::CONNECTED;
+            state.failureCount = 0;
+            state.lastSuccessTime = System::currentTimeMillis();
+            state.lastError = "";
+        }
+
+        /**
+         * Mark broker connection failed.
+         */
+        void markBrokerFailed(const decaf::net::URI& uri, const std::string& error, int maxAttempts) {
+            BrokerState& state = getBrokerState(uri);
+            state.failureCount++;
+            state.lastError = error;
+
+            // Determine if broker should be marked as exhausted
+            if (maxAttempts >= 0 && state.failureCount >= maxAttempts) {
+                state.status = BrokerStatus::EXHAUSTED;
+                AMQ_LOG_WARN("FailoverTransport", "Broker " << uri.toString()
+                    << " marked as EXHAUSTED after " << state.failureCount << " failures");
             } else {
-                uriFailureCounts.put(uriStr, 1);
+                state.status = BrokerStatus::FAILED;
             }
         }
 
@@ -195,22 +247,18 @@ namespace failover {
          * Get the failure count for a specific URI.
          */
         int getUriFailureCount(const decaf::net::URI& uri) const {
-            std::string uriStr = uri.toString();
-            if (uriFailureCounts.containsKey(uriStr)) {
-                return uriFailureCounts.get(uriStr);
-            }
-            return 0;
+            return getBrokerState(uri).failureCount;
         }
 
         /**
          * Check if a URI has exceeded its max reconnect attempts.
-         * Returns true if the URI should be skipped.
          */
         bool isUriExhausted(const decaf::net::URI& uri, int maxAttempts) const {
             if (maxAttempts < 0) {
                 return false;  // Infinite retries
             }
-            return getUriFailureCount(uri) >= maxAttempts;
+            const BrokerState& state = getBrokerState(uri);
+            return state.status == BrokerStatus::EXHAUSTED || state.failureCount >= maxAttempts;
         }
 
         /**
@@ -229,10 +277,41 @@ namespace failover {
         }
 
         /**
-         * Reset all per-URI failure counts (called on successful connection).
+         * Reset all broker states (called on successful connection).
          */
         void resetAllUriFailureCounts() {
-            uriFailureCounts.clear();
+            // Reset all brokers to AVAILABLE state with zero failures
+            Pointer<Iterator<std::string>> iter(brokerStates.keySet().iterator());
+            while (iter->hasNext()) {
+                std::string key = iter->next();
+                BrokerState& state = brokerStates.get(key);
+                if (state.status != BrokerStatus::CONNECTED) {
+                    state.status = BrokerStatus::AVAILABLE;
+                    state.failureCount = 0;
+                }
+            }
+        }
+
+        /**
+         * Recover exhausted brokers after a cooldown period (5 minutes).
+         */
+        void recoverExhaustedBrokers() {
+            const long long RECOVERY_COOLDOWN = 300000;  // 5 minutes
+            long long now = System::currentTimeMillis();
+
+            Pointer<Iterator<std::string>> iter(brokerStates.keySet().iterator());
+            while (iter->hasNext()) {
+                std::string key = iter->next();
+                BrokerState& state = brokerStates.get(key);
+
+                if (state.status == BrokerStatus::EXHAUSTED &&
+                    (now - state.lastAttemptTime) > RECOVERY_COOLDOWN) {
+                    AMQ_LOG_INFO("FailoverTransport", "Recovering exhausted broker: " << key
+                        << " after cooldown period");
+                    state.status = BrokerStatus::AVAILABLE;
+                    state.failureCount = 0;
+                }
+            }
         }
 
         bool isPriority(const decaf::net::URI& uri) {
@@ -1003,6 +1082,9 @@ bool FailoverTransport::iterate() {
             return false;
         } else {
 
+            // Recover exhausted brokers after cooldown period
+            this->impl->recoverExhaustedBrokers();
+
             Pointer<URIPool> connectList = this->impl->getConnectList();
 
             if (connectList->isEmpty() && !impl->backups->isEnabled()) {
@@ -1098,6 +1180,8 @@ bool FailoverTransport::iterate() {
                             // Mark this transport as the one being connected so close()
                             // can cancel it if requested concurrently.
                             this->impl->connectingTransport = transport;
+                            // Mark broker state as CONNECTING
+                            this->impl->markBrokerConnecting(uri);
                         }
 
                         transport->setTransportListener(this->impl->myTransportListener.get());
@@ -1135,6 +1219,8 @@ bool FailoverTransport::iterate() {
                         this->impl->reconnectMutex.notifyAll();
                         this->impl->connectFailures = 0;
                         this->impl->resetAllUriFailureCounts();  // Reset per-URI failure counts on success
+                        // Mark broker as successfully CONNECTED
+                        this->impl->markBrokerConnected(uri);
                         AMQ_LOG_INFO("FailoverTransport", "Successfully connected to " << uri.toString());
 
                         if (isPriorityBackup()) {
@@ -1205,8 +1291,9 @@ bool FailoverTransport::iterate() {
                         failures.add(uri);
                         failure.reset(e.clone());
 
-                        // Track per-URI failure count
-                        this->impl->incrementUriFailureCount(uri);
+                        // Mark broker as FAILED with error details
+                        int reconnectAttempts = this->impl->calculateReconnectAttemptLimit();
+                        this->impl->markBrokerFailed(uri, e.getMessage(), reconnectAttempts);
                         int uriAttempts = this->impl->getUriFailureCount(uri);
                         AMQ_LOG_DEBUG("FailoverTransport", "URI " << uri.toString()
                             << " failure count: " << uriAttempts);
@@ -1329,9 +1416,8 @@ void FailoverTransport::setConnectionInterruptProcessingComplete(const Pointer<c
 
 ////////////////////////////////////////////////////////////////////////////////
 bool FailoverTransport::isConnected() const {
-    // Memory barrier to ensure we see the latest connected state
-    std::atomic_thread_fence(std::memory_order_acquire);
-    return this->impl->connected.load(std::memory_order_acquire);
+    // Use seq_cst to match the seq_cst fence used on the write side
+    return this->impl->connected.load(std::memory_order_seq_cst);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1608,4 +1694,29 @@ void FailoverTransport::setPriorityURIs(const std::string& priorityURIs AMQCPP_U
 ////////////////////////////////////////////////////////////////////////////////
 const List<URI>& FailoverTransport::getPriorityURIs() const {
     return this->impl->priorityUris->getURIList();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::vector<BrokerStateInfo> FailoverTransport::getBrokerStates() const {
+    std::vector<BrokerStateInfo> states;
+
+    synchronized(&this->impl->reconnectMutex) {
+        Pointer<Iterator<std::string>> iter(this->impl->brokerStates.keySet().iterator());
+
+        while (iter->hasNext()) {
+            std::string uriStr = iter->next();
+            const BrokerState& state = this->impl->brokerStates.get(uriStr);
+
+            states.push_back(BrokerStateInfo(
+                uriStr,
+                state.status,
+                state.failureCount,
+                state.lastAttemptTime,
+                state.lastSuccessTime,
+                state.lastError
+            ));
+        }
+    }
+
+    return states;
 }

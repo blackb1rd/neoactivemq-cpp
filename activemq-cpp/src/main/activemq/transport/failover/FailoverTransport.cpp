@@ -1416,9 +1416,8 @@ void FailoverTransport::setConnectionInterruptProcessingComplete(const Pointer<c
 
 ////////////////////////////////////////////////////////////////////////////////
 bool FailoverTransport::isConnected() const {
-    // Memory barrier to ensure we see the latest connected state
-    std::atomic_thread_fence(std::memory_order_acquire);
-    return this->impl->connected.load(std::memory_order_acquire);
+    // Use seq_cst to match the seq_cst fence used on the write side
+    return this->impl->connected.load(std::memory_order_seq_cst);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -740,6 +740,13 @@ void OpenwireHighVolumeListenerTest::testDurableTopicTransactedConcurrentServers
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Direct should receive all messages",
                                   DURABLE_TOPIC_MESSAGE_COUNT, directListener.getMessagesReceived());
 
+    // Verify total messages received across both servers
+    int totalReceived = failoverListener.getMessagesReceived() + directListener.getMessagesReceived();
+    int expectedTotal = DURABLE_TOPIC_MESSAGE_COUNT * 2;
+    std::cout << "Total messages received: " << totalReceived << " (expected: " << expectedTotal << ")" << std::endl;
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Total messages should match expected",
+                                  expectedTotal, totalReceived);
+
     // Cleanup
     failoverConsumer->setMessageListener(nullptr);
     directConsumer->setMessageListener(nullptr);

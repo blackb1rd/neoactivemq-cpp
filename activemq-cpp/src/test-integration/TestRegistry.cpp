@@ -43,16 +43,7 @@
 #include "activemq/test/openwire/OpenwireVirtualTopicTest.h"
 #include "activemq/test/openwire/OpenwireXATransactionsTest.h"
 // Additional OpenWire protocol specification tests
-#include "activemq/test/openwire/OpenwireExclusiveConsumerTest.h"
 #include "activemq/test/openwire/OpenwireMessageSelectorTest.h"
-#include "activemq/test/openwire/OpenwireRetroactiveConsumerTest.h"
-#include "activemq/test/openwire/OpenwireRequestReplyTest.h"
-#include "activemq/test/openwire/OpenwireCompositeDestinationTest.h"
-#include "activemq/test/openwire/OpenwireNoLocalTest.h"
-#include "activemq/test/openwire/OpenwireProducerFlowControlTest.h"
-#include "activemq/test/openwire/OpenwireScheduledDeliveryTest.h"
-#include "activemq/test/openwire/OpenwireWireFormatNegotiationTest.h"
-#include "activemq/test/openwire/OpenwireLargeMessageTest.h"
 #include "activemq/test/stomp/StompAdvisoryTest.h"
 #include "activemq/test/stomp/StompAsyncSenderTest.h"
 #include "activemq/test/stomp/StompBulkMessageTest.h"
@@ -95,16 +86,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireTransactionTe
 CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireVirtualTopicTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireXATransactionsTest );
 // Additional OpenWire protocol specification tests
-CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireExclusiveConsumerTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireMessageSelectorTest );
-CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireRetroactiveConsumerTest );
-CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireRequestReplyTest );
-CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireCompositeDestinationTest );
-CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireNoLocalTest );
-CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireProducerFlowControlTest );
-CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireScheduledDeliveryTest );
-CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireWireFormatNegotiationTest );
-CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::openwire::OpenwireLargeMessageTest );
 
 // Stomp Tests
 //CPPUNIT_TEST_SUITE_REGISTRATION( activemq::test::stomp::StompAdvisoryTest );

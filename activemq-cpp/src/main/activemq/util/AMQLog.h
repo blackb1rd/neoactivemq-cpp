@@ -117,17 +117,14 @@ public:
     };
 
 private:
-    // Lock-free AND thread-safe log level using std::atomic with relaxed ordering
-    // On x86, memory_order_relaxed compiles to plain MOV instructions (zero lock overhead)
-    static std::atomic<AMQLogLevel> currentLevel;
-
     // Record-only mode: skip expensive formatting in log(), only record to flight recorder
     // This is lock-free (relaxed atomic) for maximum performance
     static std::atomic<bool> recordOnlyMode;
 
-    // Per-connection logging support
-    static std::mutex contextHandlersMutex;
+    // Per-context (broker) logging support - both handlers and levels
+    static std::mutex contextMutex;
     static std::unordered_map<std::string, std::function<void(AMQLogLevel, const std::string&)>> contextHandlers;
+    static std::unordered_map<std::string, AMQLogLevel> contextLevels;
 
     // Helper to get thread-local context (avoids DLL export issues with thread_local static)
     static std::string& getCurrentLogContextImpl();
@@ -145,19 +142,35 @@ private:
 
 public:
     /**
-     * Set the global log level.
-     * @param level The new log level (default is NONE)
+     * Set log level for a specific context (broker/connection).
+     * Each context can have its own log level, overriding the default.
+     * @param context The context identifier (e.g., broker URL)
+     * @param level The log level for this context
      */
-    static void setLevel(AMQLogLevel level);
+    static void setContextLevel(const std::string& context, AMQLogLevel level);
 
     /**
-     * Get the current log level.
-     * @return The current log level
+     * Get log level for a specific context.
+     * @param context The context identifier
+     * @return The log level for this context, or default level if not set
      */
-    static AMQLogLevel getLevel();
+    static AMQLogLevel getContextLevel(const std::string& context);
 
     /**
-     * Check if a given level is enabled.
+     * Clear log level for a specific context (reverts to default).
+     * @param context The context identifier
+     */
+    static void clearContextLevel(const std::string& context);
+
+    /**
+     * Get the effective log level for the current thread's context.
+     * Returns context-specific level if set, otherwise default level.
+     * @return The effective log level
+     */
+    static AMQLogLevel getEffectiveLevel();
+
+    /**
+     * Check if a given level is enabled for the current thread's context.
      * @param level The level to check
      * @return true if the level is enabled
      */

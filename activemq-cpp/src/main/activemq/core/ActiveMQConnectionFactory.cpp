@@ -96,6 +96,7 @@ namespace core{
         unsigned int connectResponseTimeout;
         unsigned int closeTimeout;
         unsigned int producerWindowSize;
+        unsigned int requestTimeout;
         int auditDepth;
         int auditMaximumProducerNumber;
         long long optimizeAcknowledgeTimeOut;
@@ -135,6 +136,7 @@ namespace core{
                             connectResponseTimeout(0),
                             closeTimeout(15000),
                             producerWindowSize(0),
+                            requestTimeout(60000),
                             auditDepth(ActiveMQMessageAudit::DEFAULT_WINDOW_SIZE),
                             auditMaximumProducerNumber(ActiveMQMessageAudit::MAXIMUM_PRODUCER_COUNT),
                             optimizeAcknowledgeTimeOut(300),
@@ -209,6 +211,9 @@ namespace core{
             this->closeTimeout = decaf::lang::Integer::parseInt(
                 properties->getProperty(core::ActiveMQConstants::toString(
                     core::ActiveMQConstants::CONNECTION_CLOSETIMEOUT), Integer::toString(closeTimeout)));
+            this->requestTimeout = decaf::lang::Integer::parseInt(
+                properties->getProperty(core::ActiveMQConstants::toString(
+                    core::ActiveMQConstants::CONNECTION_REQUESTTIMEOUT), Integer::toString(requestTimeout)));
             this->clientId = properties->getProperty(
                 core::ActiveMQConstants::toString(core::ActiveMQConstants::PARAM_CLIENTID), clientId);
             this->username = properties->getProperty(
@@ -421,6 +426,7 @@ void ActiveMQConnectionFactory::configureConnection(ActiveMQConnection* connecti
     connection->setConnectResponseTimeout(this->settings->connectResponseTimeout);
     connection->setCloseTimeout(this->settings->closeTimeout);
     connection->setProducerWindowSize(this->settings->producerWindowSize);
+    connection->setRequestTimeout(this->settings->requestTimeout);
     connection->setPrefetchPolicy(this->settings->defaultPrefetchPolicy->clone());
     connection->setRedeliveryPolicy(this->settings->defaultRedeliveryPolicy->clone());
     connection->setMessagePrioritySupported(this->settings->messagePrioritySupported);
@@ -649,6 +655,16 @@ unsigned int ActiveMQConnectionFactory::getCloseTimeout() const {
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQConnectionFactory::setCloseTimeout(unsigned int timeout) {
     this->settings->closeTimeout = timeout;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+unsigned int ActiveMQConnectionFactory::getRequestTimeout() const {
+    return this->settings->requestTimeout;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ActiveMQConnectionFactory::setRequestTimeout(unsigned int timeout) {
+    this->settings->requestTimeout = timeout;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

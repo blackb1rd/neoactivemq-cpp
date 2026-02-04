@@ -157,6 +157,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION( activemq::util::URISupportTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( activemq::util::MemoryUsageTest );
 #include <activemq/util/MarshallingSupportTest.h>
 CPPUNIT_TEST_SUITE_REGISTRATION( activemq::util::MarshallingSupportTest );
+#include <activemq/util/AMQLogTest.h>
+CPPUNIT_TEST_SUITE_REGISTRATION( activemq::util::AMQLogTest );
 
 #include <activemq/threads/SchedulerTest.h>
 CPPUNIT_TEST_SUITE_REGISTRATION( activemq::threads::SchedulerTest );

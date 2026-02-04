@@ -142,59 +142,66 @@ bool AMQLogger::isRecordOnlyMode() {
     return recordOnlyMode.load(std::memory_order_relaxed);
 }
 
+namespace {
+    // Helper function to format a log message
+    std::string formatLogMessage(AMQLogLevel level, const char* component, const std::string& message) {
+        std::ostringstream oss;
+
+        // Timestamp
+        auto now = std::chrono::system_clock::now();
+        auto time_t_now = std::chrono::system_clock::to_time_t(now);
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+            now.time_since_epoch()) % 1000;
+
+#ifdef _WIN32
+        struct tm timeinfo;
+        localtime_s(&timeinfo, &time_t_now);
+        oss << std::put_time(&timeinfo, "%Y-%m-%d %H:%M:%S");
+#else
+        oss << std::put_time(std::localtime(&time_t_now), "%Y-%m-%d %H:%M:%S");
+#endif
+        oss << "." << std::setfill('0') << std::setw(3) << ms.count() << " ";
+
+        // Level
+        oss << "[" << AMQLogger::levelToString(level) << "] ";
+
+        // Thread ID (using hash for consistent formatting)
+        oss << "[T:" << std::hash<std::thread::id>{}(std::this_thread::get_id()) << "] ";
+
+        // Component
+        oss << "[" << component << "] ";
+
+        // Message
+        oss << message;
+
+        return oss.str();
+    }
+}
+
 void AMQLogger::log(AMQLogLevel level, const char* component, const std::string& message) {
     // Record to Flight Recorder first (always, if enabled)
     recordToFlightRecorder(level, component, message.c_str());
 
-    // In record-only mode, skip expensive formatting - just record to flight recorder
-    if (recordOnlyMode.load(std::memory_order_relaxed)) {
-        return;
-    }
-
-    // Build formatted message
-    std::ostringstream oss;
-
-    // Timestamp
-    auto now = std::chrono::system_clock::now();
-    auto time_t_now = std::chrono::system_clock::to_time_t(now);
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-        now.time_since_epoch()) % 1000;
-
-#ifdef _WIN32
-    struct tm timeinfo;
-    localtime_s(&timeinfo, &time_t_now);
-    oss << std::put_time(&timeinfo, "%Y-%m-%d %H:%M:%S");
-#else
-    oss << std::put_time(std::localtime(&time_t_now), "%Y-%m-%d %H:%M:%S");
-#endif
-    oss << "." << std::setfill('0') << std::setw(3) << ms.count() << " ";
-
-    // Level
-    oss << "[" << levelToString(level) << "] ";
-
-    // Thread ID (using hash for consistent formatting)
-    oss << "[T:" << std::hash<std::thread::id>{}(std::this_thread::get_id()) << "] ";
-
-    // Component
-    oss << "[" << component << "] ";
-
-    // Message
-    oss << message;
-
-    std::string formattedMsg = oss.str();
-
-    // Check for context-specific handler first
+    // Check for context-specific handler first - handlers are ALWAYS called if registered
     std::string& currentLogContext = getCurrentLogContextImpl();
     if (!currentLogContext.empty()) {
         std::lock_guard<std::mutex> lock(contextMutex);
         auto it = contextHandlers.find(currentLogContext);
         if (it != contextHandlers.end() && it->second) {
+            // Handler registered - format and call it regardless of recordOnlyMode
+            std::string formattedMsg = formatLogMessage(level, component, message);
             it->second(level, formattedMsg);
             return;
         }
     }
 
+    // No handler registered - respect recordOnlyMode for console output
+    if (recordOnlyMode.load(std::memory_order_relaxed)) {
+        return;
+    }
+
     // Fall back to std::cout
+    std::string formattedMsg = formatLogMessage(level, component, message);
     std::cout << formattedMsg << std::endl;
 }
 

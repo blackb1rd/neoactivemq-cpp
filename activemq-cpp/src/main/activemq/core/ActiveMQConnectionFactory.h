@@ -435,6 +435,20 @@ namespace core {
         void setCloseTimeout(unsigned int timeout);
 
         /**
+         * Gets the assigned request timeout for this Connector. This timeout is used
+         * for synchronous requests including transaction commit, prepare, and rollback.
+         * @return the request timeout configured in the connection uri (default 60000ms)
+         */
+        unsigned int getRequestTimeout() const;
+
+        /**
+         * Sets the request timeout to use when sending synchronous requests.
+         * This includes transaction operations like commit, prepare, and rollback.
+         * @param timeout - The time to wait for a response in milliseconds.
+         */
+        void setRequestTimeout(unsigned int timeout);
+
+        /**
          * Gets the configured producer window size for Producers that are created
          * from this connector.  This only applies if there is no send timeout and the
          * producer is able to send asynchronously.

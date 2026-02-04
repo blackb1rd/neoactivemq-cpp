@@ -67,6 +67,7 @@ set(TEST_SRCS
   activemq/util/PrimitiveMapTest.cpp
   activemq/util/PrimitiveValueConverterTest.cpp
   activemq/util/PrimitiveValueNodeTest.cpp
+  activemq/util/AMQLogTest.cpp
   activemq/util/URISupportTest.cpp
   activemq/wireformat/WireFormatRegistryTest.cpp
   activemq/wireformat/openwire/OpenWireFormatTest.cpp

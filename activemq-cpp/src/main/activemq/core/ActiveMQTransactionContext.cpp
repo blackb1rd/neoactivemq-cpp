@@ -216,7 +216,7 @@ void ActiveMQTransactionContext::commit() {
             }
 
             try {
-                this->connection->syncRequest(info);
+                this->connection->syncRequest(info, this->connection->getRequestTimeout());
                 this->afterCommit();
             } catch(cms::CMSException& ex) {
                 this->afterRollback();
@@ -258,7 +258,7 @@ void ActiveMQTransactionContext::rollback() {
                 this->context->transactionId.reset(NULL);
             }
 
-            this->connection->syncRequest(info);
+            this->connection->syncRequest(info, this->connection->getRequestTimeout());
             this->afterRollback();
         }
     }
@@ -374,7 +374,7 @@ int ActiveMQTransactionContext::recover(int flag AMQCPP_UNUSED, Xid** recovered)
         this->connection->checkClosedOrFailed();
         this->connection->ensureConnectionInfoSent();
 
-        Pointer<Response> response = this->connection->syncRequest(info);
+        Pointer<Response> response = this->connection->syncRequest(info, this->connection->getRequestTimeout());
         Pointer<DataArrayResponse> arrayResponse = response.dynamicCast<DataArrayResponse>();
 
         std::vector<Pointer<DataStructure> > array = arrayResponse->getData();
@@ -454,7 +454,7 @@ int ActiveMQTransactionContext::prepare(const Xid* xid) {
         info->setType(ActiveMQConstants::TRANSACTION_STATE_PREPARE);
 
         // Find out if the server wants to commit or rollback.
-        Pointer<Response> response = this->connection->syncRequest(info);
+        Pointer<Response> response = this->connection->syncRequest(info, this->connection->getRequestTimeout());
 
         Pointer<IntegerResponse> intResponse = response.dynamicCast<IntegerResponse>();
 
@@ -512,7 +512,7 @@ void ActiveMQTransactionContext::commit(const Xid* xid, bool onePhase) {
         info->setTransactionId(x);
         info->setType(onePhase ? ActiveMQConstants::TRANSACTION_STATE_COMMITONEPHASE : ActiveMQConstants::TRANSACTION_STATE_COMMITONEPHASE);
 
-        this->connection->syncRequest(info);
+        this->connection->syncRequest(info, this->connection->getRequestTimeout());
 
         this->afterCommit();
 
@@ -565,7 +565,7 @@ void ActiveMQTransactionContext::rollback(const Xid* xid) {
         info->setTransactionId(x);
         info->setType(ActiveMQConstants::TRANSACTION_STATE_ROLLBACK);
 
-        this->connection->syncRequest(info);
+        this->connection->syncRequest(info, this->connection->getRequestTimeout());
 
         this->afterRollback();
 
@@ -647,7 +647,7 @@ void ActiveMQTransactionContext::forget(const Xid* xid) {
     info->setType(ActiveMQConstants::TRANSACTION_STATE_FORGET);
 
     try {
-        this->connection->syncRequest(info);
+        this->connection->syncRequest(info, this->connection->getRequestTimeout());
     } catch (Exception& ex) {
         throw toXAException(ex);
     } catch (CMSException& e) {
@@ -730,7 +730,7 @@ void ActiveMQTransactionContext::setXid(const Xid* xid) {
 
         if (info != NULL) {
             try {
-                this->connection->syncRequest(info);
+                this->connection->syncRequest(info, this->connection->getRequestTimeout());
             } catch (CMSException& e) {
                 throw toXAException(e);
             }

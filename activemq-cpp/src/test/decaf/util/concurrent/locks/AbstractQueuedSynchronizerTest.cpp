@@ -1228,9 +1228,18 @@ void AbstractQueuedSynchronizerTest::testAwaitUninterruptibly() {
 
     try {
         t.start();
-        Thread::sleep(SHORT_DELAY_MS);
+        // Wait until thread is actually waiting on the condition to avoid
+        // race where we signal before the thread has started waiting
+        for (int i = 0; i < 100; i++) {
+            Thread::sleep(SHORT_DELAY_MS);
+            mutex.acquire(1);
+            bool hasWaiter = mutex.hasWaiters(c);
+            mutex.release(1);
+            if (hasWaiter) break;
+        }
         t.interrupt();
         mutex.acquire(1);
+        CPPUNIT_ASSERT(mutex.hasWaiters(c));
         c->signal();
         mutex.release(1);
         t.join(SHORT_DELAY_MS);

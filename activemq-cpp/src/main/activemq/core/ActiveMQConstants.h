@@ -97,6 +97,7 @@ namespace core {
             PARAM_PASSWORD,
             PARAM_CLIENTID,
             CONNECTION_CONNECTRESPONSETIMEOUT,
+            CONNECTION_REQUESTTIMEOUT,
             NUM_PARAMS
         };
 

@@ -81,6 +81,17 @@ set(INTEGRATION_TEST_SRCS
   activemq/test/openwire/OpenwireTransactionTest.cpp
   activemq/test/openwire/OpenwireVirtualTopicTest.cpp
   activemq/test/openwire/OpenwireXATransactionsTest.cpp
+  # Additional OpenWire protocol specification tests
+  activemq/test/openwire/OpenwireExclusiveConsumerTest.cpp
+  activemq/test/openwire/OpenwireMessageSelectorTest.cpp
+  activemq/test/openwire/OpenwireRetroactiveConsumerTest.cpp
+  activemq/test/openwire/OpenwireRequestReplyTest.cpp
+  activemq/test/openwire/OpenwireCompositeDestinationTest.cpp
+  activemq/test/openwire/OpenwireNoLocalTest.cpp
+  activemq/test/openwire/OpenwireProducerFlowControlTest.cpp
+  activemq/test/openwire/OpenwireScheduledDeliveryTest.cpp
+  activemq/test/openwire/OpenwireWireFormatNegotiationTest.cpp
+  activemq/test/openwire/OpenwireLargeMessageTest.cpp
 
   # STOMP protocol tests
   activemq/test/stomp/StompAdvisoryTest.cpp

@@ -207,6 +207,7 @@ void ActiveMQTransactionContext::commit() {
         if (isInTransaction()) {
             Pointer<TransactionInfo> info(new TransactionInfo());
             info->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
+            info->setType(ActiveMQConstants::TRANSACTION_STATE_COMMITONEPHASE);
 
             synchronized(&this->context->mutex) {
                 info->setTransactionId(this->context->transactionId);

@@ -113,10 +113,10 @@ namespace openwire {
         }
 
         // Number of messages for high-volume tests
-        static const int HIGH_VOLUME_MESSAGE_COUNT = 10000;
+        static constexpr int HIGH_VOLUME_MESSAGE_COUNT = 10000;
 
         // Timeout for receiving all messages (in milliseconds)
-        static const int HIGH_VOLUME_TIMEOUT_MS = 120000;  // 2 minutes
+        static constexpr int HIGH_VOLUME_TIMEOUT_MS = 120000;  // 2 minutes
 
     private:
 

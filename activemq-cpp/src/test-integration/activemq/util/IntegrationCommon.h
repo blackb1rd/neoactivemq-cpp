@@ -36,6 +36,38 @@ namespace util{
             return this->openwireURL;
         }
 
+        // Failover URLs for multi-broker testing
+        // Requires: docker compose --profile failover up
+
+        /**
+         * Returns the URL for broker 1 (port 61617)
+         */
+        virtual std::string getOpenwireURL1() const {
+            return this->openwireURL1;
+        }
+
+        /**
+         * Returns the URL for broker 2 (port 61618)
+         */
+        virtual std::string getOpenwireURL2() const {
+            return this->openwireURL2;
+        }
+
+        /**
+         * Returns the URL for broker 3 (port 61619) - independent broker
+         */
+        virtual std::string getOpenwireURL3() const {
+            return this->openwireURL3;
+        }
+
+        /**
+         * Returns a failover URL connecting to broker 1 and broker 2
+         * Format: failover:(tcp://localhost:61617,tcp://localhost:61618)?...
+         */
+        virtual std::string getFailoverURL() const {
+            return this->failoverURL;
+        }
+
     public:  // Statics
 
         static const int defaultDelay;
@@ -53,6 +85,12 @@ namespace util{
         std::string urlCommon;
         std::string stompURL;
         std::string openwireURL;
+
+        // Multi-broker URLs
+        std::string openwireURL1;
+        std::string openwireURL2;
+        std::string openwireURL3;
+        std::string failoverURL;
 
     };
 

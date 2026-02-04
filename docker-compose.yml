@@ -1,4 +1,5 @@
 services:
+  # Default single broker for basic integration tests
   activemq:
     image: apache/activemq-classic:${ACTIVEMQ_VERSION:-5.18.7}
     container_name: activemq-test
@@ -8,6 +9,68 @@ services:
       - "127.0.0.1:8161:8161"    # Web Console (localhost only)
     environment:
       - ACTIVEMQ_OPTS=-Xms512m -Xmx2g -Djetty.host=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8161/admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # ============================================================================
+  # FAILOVER AND MULTI-CONNECTION TEST BROKERS
+  # Use with: docker compose --profile failover up
+  # ============================================================================
+
+  # Broker 1 for failover testing (primary)
+  activemq1:
+    image: apache/activemq-classic:${ACTIVEMQ_VERSION:-5.18.7}
+    container_name: activemq-failover-1
+    profiles: ["failover"]
+    ports:
+      - "127.0.0.1:61617:61616"  # OpenWire on port 61617
+      - "127.0.0.1:61614:61613"  # STOMP on port 61614
+      - "127.0.0.1:8162:8161"    # Web Console on port 8162
+    environment:
+      - ACTIVEMQ_OPTS=-Xms256m -Xmx1g -Djetty.host=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8161/admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # Broker 2 for failover testing (secondary)
+  activemq2:
+    image: apache/activemq-classic:${ACTIVEMQ_VERSION:-5.18.7}
+    container_name: activemq-failover-2
+    profiles: ["failover"]
+    ports:
+      - "127.0.0.1:61618:61616"  # OpenWire on port 61618
+      - "127.0.0.1:61615:61613"  # STOMP on port 61615
+      - "127.0.0.1:8163:8161"    # Web Console on port 8163
+    environment:
+      - ACTIVEMQ_OPTS=-Xms256m -Xmx1g -Djetty.host=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8161/admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # Broker 3 for multi-connection testing (independent broker)
+  activemq3:
+    image: apache/activemq-classic:${ACTIVEMQ_VERSION:-5.18.7}
+    container_name: activemq-multi-3
+    profiles: ["failover"]
+    ports:
+      - "127.0.0.1:61619:61616"  # OpenWire on port 61619
+      - "127.0.0.1:61620:61613"  # STOMP on port 61620
+      - "127.0.0.1:8164:8161"    # Web Console on port 8164
+    environment:
+      - ACTIVEMQ_OPTS=-Xms256m -Xmx1g -Djetty.host=0.0.0.0
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8161/admin"]
       interval: 10s

@@ -75,6 +75,18 @@ namespace core{
         virtual void dispatch(const Pointer<MessageDispatch>& dispatched) {
 
             try{
+                // Check if parent is still valid before accessing it.
+                // The browserValid flag is set to false before the parent
+                // is destroyed, preventing use-after-free when session
+                // executor dispatches to a Browser whose parent is gone.
+                if (!this->parent->browserValid.get()) {
+                    // Parent is being destroyed, just dispatch to base class
+                    // if there's a message (ignore NULL browse-done marker)
+                    if (dispatched->getMessage() != NULL) {
+                        ActiveMQConsumerKernel::dispatch(dispatched);
+                    }
+                    return;
+                }
 
                 if (dispatched->getMessage() == NULL) {
                     this->parent->browseDone.set(true);
@@ -108,6 +120,7 @@ ActiveMQQueueBrowser::ActiveMQQueueBrowser(ActiveMQSessionKernel* session,
                                                                  mutex(),
                                                                  wait(),
                                                                  browseDone(),
+                                                                 browserValid(),
                                                                  browser(NULL) {
 
     if (session == NULL) {
@@ -250,6 +263,7 @@ void ActiveMQQueueBrowser::waitForMessageAvailable() {
 Pointer<ActiveMQConsumerKernel> ActiveMQQueueBrowser::createConsumer() {
 
     this->browseDone.set(false);
+    this->browserValid.set(true);
 
     int prefetch = this->session->getConnection()->getPrefetchPolicy()->getQueueBrowserPrefetch();
 
@@ -282,6 +296,11 @@ void ActiveMQQueueBrowser::destroyConsumer() {
         if (this->session->isTransacted()) {
             session->commit();
         }
+
+        // Mark the browser as invalid BEFORE calling stop/close.
+        // This prevents Browser::dispatch() from accessing parent members
+        // after the parent starts destruction, avoiding use-after-free.
+        this->browserValid.set(false);
 
         this->browser->stop();
         this->browser->close();

@@ -46,7 +46,10 @@ namespace openwire {
         virtual ~OpenwireRequestReplyTest();
 
         virtual std::string getBrokerURL() const {
-            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+            // Disable advisory consumers since this test doesn't need them
+            // and they can hang if the broker doesn't respond to the ConsumerInfo
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL() +
+                   "&connection.watchTopicAdvisories=false";
         }
 
         /**

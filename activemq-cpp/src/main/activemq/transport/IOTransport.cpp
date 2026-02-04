@@ -198,11 +198,16 @@ void IOTransport::oneway(const Pointer<Command> command) {
             throw IOException(__FILE__, __LINE__, "IOTransport::oneway() - invalid output stream");
         }
 
+        AMQ_LOG_DEBUG("IOTransport", "oneway() sending cmdId=" << command->getCommandId()
+                      << " type=" << AMQLogger::commandTypeName(command->getDataStructureType()));
+
         synchronized(impl->outputStream) {
             // Write the command to the output stream.
             this->impl->wireFormat->marshal(command, this, this->impl->outputStream);
             this->impl->outputStream->flush();
         }
+
+        AMQ_LOG_DEBUG("IOTransport", "oneway() sent cmdId=" << command->getCommandId());
     }
     AMQ_CATCH_RETHROW(IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)

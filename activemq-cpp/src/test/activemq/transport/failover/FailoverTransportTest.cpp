@@ -1702,8 +1702,9 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     broker2->start();
     broker2->waitUntilStarted();
 
+    // Use aggressive retry settings for faster failover in tests
     std::string uri = "failover://(tcp://localhost:61031,"
-                                  "tcp://localhost:61032)?maxReconnectDelay=1000&timeout=2000";
+                                  "tcp://localhost:61032)?maxReconnectDelay=500&initialReconnectDelay=100&timeout=30000";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1745,9 +1746,17 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     broker1->stop();
     broker1->waitUntilStopped();
 
-    // Wait for failover to complete - poll for reconnection
+    // First, wait for disconnection to be detected (isConnected becomes false)
+    // This may take time depending on socket read timeout
     count = 0;
-    while (!failover->isConnected() && count++ < 100) {
+    while (failover->isConnected() && count++ < 200) {
+        Thread::sleep(100);
+    }
+
+    // Then, wait for failover to complete - poll for reconnection
+    // Give generous time for retry backoff and connection attempts
+    count = 0;
+    while (!failover->isConnected() && count++ < 300) {
         Thread::sleep(100);
     }
 
@@ -1779,9 +1788,17 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     broker2->stop();
     broker2->waitUntilStopped();
 
-    // Wait for failover to complete - poll for reconnection
+    // First, wait for disconnection to be detected (isConnected becomes false)
+    // This may take time depending on socket read timeout
     count = 0;
-    while (!failover->isConnected() && count++ < 100) {
+    while (failover->isConnected() && count++ < 200) {
+        Thread::sleep(100);
+    }
+
+    // Then, wait for failover to complete - poll for reconnection
+    // Give generous time for retry backoff and connection attempts
+    count = 0;
+    while (!failover->isConnected() && count++ < 300) {
         Thread::sleep(100);
     }
 

@@ -594,6 +594,10 @@ void OpenwireHighVolumeListenerTest::testHighVolumeWithBrokerInterruption() {
 void OpenwireHighVolumeListenerTest::testDurableTopicTransactedConcurrentServers() {
     // Test durable topic consumer with SESSION_TRANSACTED, persistent delivery,
     // concurrent consumption from 2 servers with different topics
+    //
+    // IMPORTANT: JMS/CMS sessions are single-threaded resources. We must use
+    // separate sessions for producers and consumers since the producer thread
+    // and listener callback run concurrently and both call session->commit().
 
     const std::string clientId1 = "DurableClient1_" + UUID::randomUUID().toString();
     const std::string clientId2 = "DurableClient2_" + UUID::randomUUID().toString();
@@ -610,8 +614,10 @@ void OpenwireHighVolumeListenerTest::testDurableTopicTransactedConcurrentServers
     failoverConnection->setExceptionListener(&failoverExceptionListener);
     failoverConnection->start();
 
-    // Create SESSION_TRANSACTED session for failover
-    failoverSession.reset(failoverConnection->createSession(Session::SESSION_TRANSACTED));
+    // Create SEPARATE SESSION_TRANSACTED sessions for producer and consumer
+    // to avoid concurrent access issues (sessions are single-threaded)
+    std::unique_ptr<Session> failoverProducerSession(failoverConnection->createSession(Session::SESSION_TRANSACTED));
+    std::unique_ptr<Session> failoverConsumerSession(failoverConnection->createSession(Session::SESSION_TRANSACTED));
 
     // Setup direct connection to broker3 with client ID
     std::unique_ptr<ActiveMQConnectionFactory> directFactory(
@@ -623,35 +629,36 @@ void OpenwireHighVolumeListenerTest::testDurableTopicTransactedConcurrentServers
     directConnection->setExceptionListener(&directExceptionListener);
     directConnection->start();
 
-    // Create SESSION_TRANSACTED session for direct
-    directSession.reset(directConnection->createSession(Session::SESSION_TRANSACTED));
+    // Create SEPARATE SESSION_TRANSACTED sessions for producer and consumer
+    std::unique_ptr<Session> directProducerSession(directConnection->createSession(Session::SESSION_TRANSACTED));
+    std::unique_ptr<Session> directConsumerSession(directConnection->createSession(Session::SESSION_TRANSACTED));
 
     // Create different topics for each server
     std::string topicName1 = "durable.transacted.topic1." + UUID::randomUUID().toString();
     std::string topicName2 = "durable.transacted.topic2." + UUID::randomUUID().toString();
 
-    std::unique_ptr<Topic> failoverTopic(failoverSession->createTopic(topicName1));
-    std::unique_ptr<Topic> directTopic(directSession->createTopic(topicName2));
+    std::unique_ptr<Topic> failoverTopic(failoverProducerSession->createTopic(topicName1));
+    std::unique_ptr<Topic> directTopic(directProducerSession->createTopic(topicName2));
 
-    // Setup producers with PERSISTENT delivery mode
-    std::unique_ptr<MessageProducer> failoverProducer(failoverSession->createProducer(failoverTopic.get()));
-    std::unique_ptr<MessageProducer> directProducer(directSession->createProducer(directTopic.get()));
+    // Setup producers with PERSISTENT delivery mode (use producer sessions)
+    std::unique_ptr<MessageProducer> failoverProducer(failoverProducerSession->createProducer(failoverTopic.get()));
+    std::unique_ptr<MessageProducer> directProducer(directProducerSession->createProducer(directTopic.get()));
     failoverProducer->setDeliveryMode(DeliveryMode::PERSISTENT);
     directProducer->setDeliveryMode(DeliveryMode::PERSISTENT);
 
-    // Setup durable topic consumers
+    // Setup durable topic consumers (use consumer sessions)
     std::unique_ptr<MessageConsumer> failoverConsumer(
-        failoverSession->createDurableConsumer(failoverTopic.get(), subscriptionName1, "", false));
+        failoverConsumerSession->createDurableConsumer(failoverTopic.get(), subscriptionName1, "", false));
     std::unique_ptr<MessageConsumer> directConsumer(
-        directSession->createDurableConsumer(directTopic.get(), subscriptionName2, "", false));
+        directConsumerSession->createDurableConsumer(directTopic.get(), subscriptionName2, "", false));
 
     // Setup latches for completion tracking
     CountDownLatch failoverLatch(1);
     CountDownLatch directLatch(1);
 
-    // Setup transacted listeners that commit per message
-    TransactedMessageListener failoverListener(DURABLE_TOPIC_MESSAGE_COUNT, &failoverLatch, failoverSession.get());
-    TransactedMessageListener directListener(DURABLE_TOPIC_MESSAGE_COUNT, &directLatch, directSession.get());
+    // Setup transacted listeners that commit per message (use consumer sessions)
+    TransactedMessageListener failoverListener(DURABLE_TOPIC_MESSAGE_COUNT, &failoverLatch, failoverConsumerSession.get());
+    TransactedMessageListener directListener(DURABLE_TOPIC_MESSAGE_COUNT, &directLatch, directConsumerSession.get());
 
     failoverConsumer->setMessageListener(&failoverListener);
     directConsumer->setMessageListener(&directListener);
@@ -661,7 +668,7 @@ void OpenwireHighVolumeListenerTest::testDurableTopicTransactedConcurrentServers
     std::cout << "Starting durable topic transacted test with " << DURABLE_TOPIC_MESSAGE_COUNT
               << " messages per server..." << std::endl;
 
-    // Send messages concurrently to both servers
+    // Send messages concurrently to both servers (use producer sessions)
     std::atomic<int> failoverSent(0);
     std::atomic<int> directSent(0);
     std::atomic<bool> failoverSendError(false);
@@ -671,9 +678,9 @@ void OpenwireHighVolumeListenerTest::testDurableTopicTransactedConcurrentServers
         try {
             for (int i = 0; i < DURABLE_TOPIC_MESSAGE_COUNT; i++) {
                 std::unique_ptr<TextMessage> msg(
-                    failoverSession->createTextMessage("Durable topic1 msg " + std::to_string(i)));
+                    failoverProducerSession->createTextMessage("Durable topic1 msg " + std::to_string(i)));
                 failoverProducer->send(msg.get());
-                failoverSession->commit();  // Commit after each send
+                failoverProducerSession->commit();  // Commit after each send
                 failoverSent++;
 
                 if ((i + 1) % 5000 == 0) {
@@ -690,9 +697,9 @@ void OpenwireHighVolumeListenerTest::testDurableTopicTransactedConcurrentServers
         try {
             for (int i = 0; i < DURABLE_TOPIC_MESSAGE_COUNT; i++) {
                 std::unique_ptr<TextMessage> msg(
-                    directSession->createTextMessage("Durable topic2 msg " + std::to_string(i)));
+                    directProducerSession->createTextMessage("Durable topic2 msg " + std::to_string(i)));
                 directProducer->send(msg.get());
-                directSession->commit();  // Commit after each send
+                directProducerSession->commit();  // Commit after each send
                 directSent++;
 
                 if ((i + 1) % 5000 == 0) {
@@ -756,9 +763,19 @@ void OpenwireHighVolumeListenerTest::testDurableTopicTransactedConcurrentServers
     failoverProducer->close();
     directProducer->close();
 
-    // Unsubscribe durable subscriptions
-    failoverSession->unsubscribe(subscriptionName1);
-    directSession->unsubscribe(subscriptionName2);
+    // Close sessions
+    failoverProducerSession->close();
+    failoverConsumerSession->close();
+    directProducerSession->close();
+    directConsumerSession->close();
+
+    // Unsubscribe durable subscriptions (need to recreate a session for this)
+    std::unique_ptr<Session> failoverCleanupSession(failoverConnection->createSession(Session::AUTO_ACKNOWLEDGE));
+    std::unique_ptr<Session> directCleanupSession(directConnection->createSession(Session::AUTO_ACKNOWLEDGE));
+    failoverCleanupSession->unsubscribe(subscriptionName1);
+    directCleanupSession->unsubscribe(subscriptionName2);
+    failoverCleanupSession->close();
+    directCleanupSession->close();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

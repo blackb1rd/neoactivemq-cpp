@@ -106,8 +106,8 @@ void AMQLogger::setOutputHandler(std::function<void(AMQLogLevel, const std::stri
     customHandler = handler;
 }
 
-bool AMQLogger::isRecordOnlyMode() {
-    return recordOnlyMode.load(std::memory_order_relaxed);
+void AMQLogger::clearOutputHandler() {
+    customHandler = nullptr;
 }
 
 void AMQLogger::setRecordOnlyMode(bool enabled) {

@@ -900,19 +900,19 @@ void OpenwireHighVolumeListenerTest::testMultiTopicDurableTransactedWithSelector
     }
 
     // ============ Setup listeners ============
-    std::vector<CountDownLatch> failoverLatches;
-    std::vector<CountDownLatch> directLatches;
+    std::vector<std::unique_ptr<CountDownLatch>> failoverLatches;
+    std::vector<std::unique_ptr<CountDownLatch>> directLatches;
     std::vector<std::unique_ptr<TransactedMessageListener>> failoverListeners;
     std::vector<std::unique_ptr<TransactedMessageListener>> directListeners;
 
     for (int t = 0; t < TOPICS_PER_SERVER; t++) {
-        failoverLatches.emplace_back(1);
-        directLatches.emplace_back(1);
+        failoverLatches.push_back(std::make_unique<CountDownLatch>(1));
+        directLatches.push_back(std::make_unique<CountDownLatch>(1));
 
         failoverListeners.push_back(std::make_unique<TransactedMessageListener>(
-            MULTI_TOPIC_MESSAGE_COUNT, &failoverLatches[t], failoverConsumerSessions[t].get()));
+            MULTI_TOPIC_MESSAGE_COUNT, failoverLatches[t].get(), failoverConsumerSessions[t].get()));
         directListeners.push_back(std::make_unique<TransactedMessageListener>(
-            MULTI_TOPIC_MESSAGE_COUNT, &directLatches[t], directConsumerSessions[t].get()));
+            MULTI_TOPIC_MESSAGE_COUNT, directLatches[t].get(), directConsumerSessions[t].get()));
 
         failoverConsumers[t]->setMessageListener(failoverListeners[t].get());
         directConsumers[t]->setMessageListener(directListeners[t].get());
@@ -1007,11 +1007,11 @@ void OpenwireHighVolumeListenerTest::testMultiTopicDurableTransactedWithSelector
     // ============ Wait for all listeners to complete ============
     bool allCompleted = true;
     for (int t = 0; t < TOPICS_PER_SERVER; t++) {
-        if (!failoverLatches[t].await(MULTI_TOPIC_TIMEOUT_MS)) {
+        if (!failoverLatches[t]->await(MULTI_TOPIC_TIMEOUT_MS)) {
             std::cout << "Failover Topic " << t << " did not complete within timeout" << std::endl;
             allCompleted = false;
         }
-        if (!directLatches[t].await(MULTI_TOPIC_TIMEOUT_MS)) {
+        if (!directLatches[t]->await(MULTI_TOPIC_TIMEOUT_MS)) {
             std::cout << "Direct Topic " << t << " did not complete within timeout" << std::endl;
             allCompleted = false;
         }

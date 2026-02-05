@@ -988,16 +988,19 @@ void ActiveMQConsumerKernel::dispose() {
             if (session->isClientAcknowledge() || session->isIndividualAcknowledge()) {
                 if (!this->consumerInfo->isBrowser()) {
                     // roll back duplicates that aren't acknowledged
-                    ArrayList< Pointer<MessageDispatch> > tmp;
-                    synchronized(&this->internal->deliveredMessages) {
-                        tmp.copy(this->internal->deliveredMessages);
+                    // Only do this if the connection is still open
+                    if (!this->session->getConnection()->isClosed()) {
+                        ArrayList< Pointer<MessageDispatch> > tmp;
+                        synchronized(&this->internal->deliveredMessages) {
+                            tmp.copy(this->internal->deliveredMessages);
+                        }
+                        Pointer< Iterator<Pointer<MessageDispatch> > > iter(tmp.iterator());
+                        while (iter->hasNext()) {
+                            Pointer<MessageDispatch> msg = iter->next();
+                            this->session->getConnection()->rollbackDuplicate(this, msg->getMessage());
+                        }
+                        tmp.clear();
                     }
-                    Pointer< Iterator<Pointer<MessageDispatch> > > iter(tmp.iterator());
-                    while (iter->hasNext()) {
-                        Pointer<MessageDispatch> msg = iter->next();
-                        this->session->getConnection()->rollbackDuplicate(this, msg->getMessage());
-                    }
-                    tmp.clear();
                 }
             }
 

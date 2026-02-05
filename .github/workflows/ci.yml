@@ -17,14 +17,14 @@ on:
       - 'LICENSE'
   workflow_dispatch:
 
-env:
-  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
-
 jobs:
   # Linux build job (builds and uploads artifacts for test jobs)
   linux-build-test:
     name: Linux Build (Test)
     runs-on: ubuntu-latest
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
 
     strategy:
       fail-fast: false
@@ -50,16 +50,16 @@ jobs:
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.9
 
-    - name: Cache vcpkg packages
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: |
-          ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
-          vcpkg-${{ runner.os }}-
+          vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.config.preset }}
@@ -83,11 +83,14 @@ jobs:
           output/build/${{ matrix.config.preset }}/lib/
         retention-days: 1
 
-  # Linux test jobs (run in parallel after build)
-  linux-test:
-    name: Linux Test
+  # Linux unit test jobs (run in parallel after build)
+  linux-unit-test:
+    name: Linux Unit Test
     runs-on: ubuntu-latest
     needs: linux-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
 
     strategy:
       fail-fast: false
@@ -97,9 +100,6 @@ jobs:
           - { preset: x64-linux-release-test, build_type: Release, ssl: true }
           - { preset: x64-linux-debug-no-ssl-test, build_type: Debug, ssl: false }
           - { preset: x64-linux-release-no-ssl-test, build_type: Release, ssl: false }
-        test_type:
-          - { name: unit, ctest_name: "neoactivemq-unit-tests", needs_activemq: false, timeout: 300 }
-          - { name: benchmark, ctest_name: "neoactivemq-benchmarks", needs_activemq: false, timeout: 600 }
 
     steps:
     - name: Checkout code
@@ -113,16 +113,16 @@ jobs:
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Cache vcpkg packages
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: |
-          ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
-          vcpkg-${{ runner.os }}-
+          vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake (for CTest)
       run: cmake --preset ${{ matrix.config.preset }}
@@ -136,14 +136,79 @@ jobs:
     - name: Make test executables runnable
       run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
 
-    - name: Run ${{ matrix.test_type.name }} tests
-      run: ctest --preset ${{ matrix.config.preset }} -R "${{ matrix.test_type.ctest_name }}" --output-on-failure --timeout ${{ matrix.test_type.timeout }}
+    - name: Run unit tests
+      run: ctest --preset ${{ matrix.config.preset }} -R "neoactivemq-unit-tests" --output-on-failure --timeout 300
 
     - name: Upload test results
       if: failure()
       uses: actions/upload-artifact@v6
       with:
-        name: test-results-${{ matrix.config.preset }}-${{ matrix.test_type.name }}
+        name: test-results-${{ matrix.config.preset }}-unit
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # Linux benchmark jobs (run in parallel after build)
+  linux-benchmark:
+    name: Linux Benchmark
+    runs-on: ubuntu-latest
+    needs: linux-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x64-linux-debug-test, build_type: Debug, ssl: true }
+          - { preset: x64-linux-release-test, build_type: Release, ssl: true }
+          - { preset: x64-linux-debug-no-ssl-test, build_type: Debug, ssl: false }
+          - { preset: x64-linux-release-no-ssl-test, build_type: Release, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: linux-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Make test executables runnable
+      run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
+
+    - name: Run benchmarks
+      run: ctest --preset ${{ matrix.config.preset }} -R "neoactivemq-benchmarks" --output-on-failure --timeout 600
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-${{ matrix.config.preset }}-benchmark
         path: |
           output/build/${{ matrix.config.preset }}/Testing/Temporary/
           output/build/${{ matrix.config.preset }}/**/*.log
@@ -153,6 +218,9 @@ jobs:
     name: Linux Integration Test
     runs-on: ubuntu-latest
     needs: linux-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
 
     strategy:
       fail-fast: false
@@ -178,16 +246,16 @@ jobs:
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Cache vcpkg packages
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: |
-          ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
-          vcpkg-${{ runner.os }}-
+          vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake (for CTest)
       run: cmake --preset ${{ matrix.config.preset }}
@@ -241,6 +309,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: linux-build-test
 
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
     strategy:
       fail-fast: false
       matrix:
@@ -265,16 +336,16 @@ jobs:
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Cache vcpkg packages
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: |
-          ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
-          vcpkg-${{ runner.os }}-
+          vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake (for CTest)
       run: cmake --preset ${{ matrix.config.preset }}
@@ -329,6 +400,9 @@ jobs:
     name: Linux Build
     runs-on: ubuntu-latest
 
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
+
     strategy:
       fail-fast: false
       matrix:
@@ -357,16 +431,16 @@ jobs:
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.9
 
-    - name: Cache vcpkg packages
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: |
-          ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
-          vcpkg-${{ runner.os }}-
+          vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.preset }}
@@ -385,6 +459,9 @@ jobs:
   windows-build-test:
     name: Windows Build (Test)
     runs-on: windows-latest
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
 
     strategy:
       fail-fast: false
@@ -416,25 +493,17 @@ jobs:
       shell: bash
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Export GitHub Actions cache environment variable
+    - name: Create vcpkg binary cache directory
       shell: bash
-      run: echo "ACTIONS_CACHE_URL=${ACTIONS_CACHE_URL}" >> $GITHUB_ENV && echo "ACTIONS_RUNTIME_TOKEN=${ACTIONS_RUNTIME_TOKEN}" >> $GITHUB_ENV
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
 
-    - name: Create vcpkg cache directories
-      shell: bash
-      run: |
-        mkdir -p "${{ github.workspace }}/.cache/vcpkg"
-        mkdir -p "$VCPKG_INSTALLATION_ROOT/downloads"
-
-    - name: Cache vcpkg packages
+    - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: |
-          ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
-        key: vcpkg-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
-          vcpkg-${{ runner.os }}-${{ matrix.config.arch }}-
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.config.preset }}
@@ -458,11 +527,14 @@ jobs:
           output/build/${{ matrix.config.preset }}/lib/
         retention-days: 1
 
-  # Windows test jobs (run in parallel after build, no integration tests - no Docker on Windows CI)
-  windows-test:
-    name: Windows Test
+  # Windows unit test jobs (run in parallel after build, no integration tests - no Docker on Windows CI)
+  windows-unit-test:
+    name: Windows Unit Test
     runs-on: windows-latest
     needs: windows-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
 
     strategy:
       fail-fast: false
@@ -474,9 +546,6 @@ jobs:
           - { preset: x64-windows-release-test, build_type: Release, arch: amd64, ssl: true }
           - { preset: x64-windows-debug-no-ssl-test, build_type: Debug, arch: amd64, ssl: false }
           - { preset: x64-windows-release-no-ssl-test, build_type: Release, arch: amd64, ssl: false }
-        test_type:
-          - { name: unit, ctest_name: "neoactivemq-unit-tests", timeout: 300 }
-          - { name: benchmark, ctest_name: "neoactivemq-benchmarks", timeout: 600 }
 
     steps:
     - name: Checkout code
@@ -494,9 +563,17 @@ jobs:
       shell: bash
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Export GitHub Actions cache environment variable
+    - name: Create vcpkg binary cache directory
       shell: bash
-      run: echo "ACTIONS_CACHE_URL=${ACTIONS_CACHE_URL}" >> $GITHUB_ENV && echo "ACTIONS_RUNTIME_TOKEN=${ACTIONS_RUNTIME_TOKEN}" >> $GITHUB_ENV
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
 
     - name: Configure CMake (for CTest)
       run: cmake --preset ${{ matrix.config.preset }}
@@ -507,14 +584,83 @@ jobs:
         name: windows-build-${{ matrix.config.preset }}
         path: output/build/${{ matrix.config.preset }}/
 
-    - name: Run ${{ matrix.test_type.name }} tests
-      run: ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -R "${{ matrix.test_type.ctest_name }}" --output-on-failure --timeout ${{ matrix.test_type.timeout }}
+    - name: Run unit tests
+      run: ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -R "neoactivemq-unit-tests" --output-on-failure --timeout 300
 
     - name: Upload test results
       if: failure()
       uses: actions/upload-artifact@v6
       with:
-        name: test-results-${{ matrix.config.preset }}-${{ matrix.test_type.name }}
+        name: test-results-${{ matrix.config.preset }}-unit
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # Windows benchmark jobs (run in parallel after build)
+  windows-benchmark:
+    name: Windows Benchmark
+    runs-on: windows-latest
+    needs: windows-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x86-windows-debug-test, build_type: Debug, arch: amd64_x86, ssl: true }
+          - { preset: x86-windows-release-test, build_type: Release, arch: amd64_x86, ssl: true }
+          - { preset: x64-windows-debug-test, build_type: Debug, arch: amd64, ssl: true }
+          - { preset: x64-windows-release-test, build_type: Release, arch: amd64, ssl: true }
+          - { preset: x64-windows-debug-no-ssl-test, build_type: Debug, arch: amd64, ssl: false }
+          - { preset: x64-windows-release-no-ssl-test, build_type: Release, arch: amd64, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install Ninja
+      run: choco install ninja -y
+
+    - name: Setup MSVC Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.config.arch }}
+
+    - name: Set VCPKG_ROOT environment variable
+      shell: bash
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      shell: bash
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: windows-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Run benchmarks
+      run: ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -R "neoactivemq-benchmarks" --output-on-failure --timeout 600
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-${{ matrix.config.preset }}-benchmark
         path: |
           output/build/${{ matrix.config.preset }}/Testing/Temporary/
           output/build/${{ matrix.config.preset }}/**/*.log
@@ -523,6 +669,9 @@ jobs:
   windows-build:
     name: Windows Build
     runs-on: windows-latest
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
 
     strategy:
       fail-fast: false
@@ -560,25 +709,17 @@ jobs:
       shell: bash
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Export GitHub Actions cache environment variable
+    - name: Create vcpkg binary cache directory
       shell: bash
-      run: echo "ACTIONS_CACHE_URL=${ACTIONS_CACHE_URL}" >> $GITHUB_ENV && echo "ACTIONS_RUNTIME_TOKEN=${ACTIONS_RUNTIME_TOKEN}" >> $GITHUB_ENV
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
 
-    - name: Create vcpkg cache directories
-      shell: bash
-      run: |
-        mkdir -p "${{ github.workspace }}/.cache/vcpkg"
-        mkdir -p "$VCPKG_INSTALLATION_ROOT/downloads"
-
-    - name: Cache vcpkg packages
+    - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: |
-          ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
-        key: vcpkg-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
-          vcpkg-${{ runner.os }}-${{ matrix.config.arch }}-
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.config.preset }}

@@ -1305,11 +1305,21 @@ void ActiveMQSessionKernel::addConsumer(Pointer<ActiveMQConsumerKernel> consumer
 void ActiveMQSessionKernel::removeConsumer(Pointer<ActiveMQConsumerKernel> consumer) {
 
     try {
-        this->connection->removeDispatcher(consumer->getConsumerId());
+        bool connectionClosed = this->connection->isClosed();
+
+        // Only remove dispatcher if connection is still open
+        if (!connectionClosed) {
+            this->connection->removeDispatcher(consumer->getConsumerId());
+        }
+
         this->config->consumerLock.writeLock().lock();
         try {
             this->config->consumers.remove(consumer);
-            this->connection->removeAuditedDispatcher(consumer.get());
+            // Only remove audited dispatcher if connection is still open
+            // This prevents accessing destroyed ConnectionAudit.
+            if (!connectionClosed) {
+                this->connection->removeAuditedDispatcher(consumer.get());
+            }
             this->config->consumerLock.writeLock().unlock();
         } catch (Exception& ex) {
             this->config->consumerLock.writeLock().unlock();

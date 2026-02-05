@@ -24,6 +24,7 @@
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/TestResult.h>
 #include <util/teamcity/TeamCityProgressListener.h>
+#include <util/TestWatchdog.h>
 #include <activemq/util/Config.h>
 #include <activemq/util/AMQLog.h>
 #include <activemq/library/ActiveMQCPP.h>
@@ -33,93 +34,6 @@
 #include <fstream>
 #include <string>
 #include <memory>
-#include <thread>
-#include <atomic>
-#include <chrono>
-#include <mutex>
-#include <condition_variable>
-#include <stdexcept>
-
-// Watchdog listener that monitors per-test-case timeout
-class WatchdogTestListener : public CppUnit::TestListener {
-private:
-    long long testTimeoutSeconds;
-    std::atomic<bool> testRunning;
-    std::atomic<bool> shutdownRequested;
-    std::string currentTestName;
-    std::chrono::steady_clock::time_point testStartTime;
-    std::thread watchdogThread;
-    std::mutex mutex;
-    std::condition_variable cv;
-
-    void watchdogLoop() {
-        while (!shutdownRequested.load()) {
-            std::unique_lock<std::mutex> lock(mutex);
-
-            // Wait for either shutdown or check interval (1 second)
-            cv.wait_for(lock, std::chrono::seconds(1), [this]() {
-                return shutdownRequested.load();
-            });
-
-            if (shutdownRequested.load()) {
-                break;
-            }
-
-            if (testRunning.load()) {
-                auto elapsed = std::chrono::steady_clock::now() - testStartTime;
-                auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
-
-                if (elapsedSeconds >= testTimeoutSeconds) {
-                    std::cerr << std::endl << "ERROR: Test case timed out after "
-                              << elapsedSeconds << " seconds: " << currentTestName << std::endl;
-
-                    // Dump Flight Recorder log entries for debugging
-                    std::cerr << std::endl << "=== Flight Recorder Dump (last "
-                              << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
-                    activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
-                    std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
-
-                    std::cerr << "Forcibly terminating process due to test timeout..." << std::endl;
-                    std::_Exit(-1);
-                }
-            }
-        }
-    }
-
-public:
-    WatchdogTestListener(long long timeoutSeconds)
-        : testTimeoutSeconds(timeoutSeconds)
-        , testRunning(false)
-        , shutdownRequested(false) {
-        watchdogThread = std::thread(&WatchdogTestListener::watchdogLoop, this);
-    }
-
-    ~WatchdogTestListener() {
-        shutdown();
-    }
-
-    void shutdown() {
-        shutdownRequested.store(true);
-        cv.notify_all();
-        if (watchdogThread.joinable()) {
-            watchdogThread.join();
-        }
-    }
-
-    void startTest(CppUnit::Test* test) override {
-        std::lock_guard<std::mutex> lock(mutex);
-        currentTestName = test->getName();
-        testStartTime = std::chrono::steady_clock::now();
-        // Clear Flight Recorder to isolate logs for this test
-        activemq::util::AMQLogger::clearFlightRecorder();
-        testRunning.store(true);
-    }
-
-    void endTest(CppUnit::Test* /*test*/) override {
-        std::lock_guard<std::mutex> lock(mutex);
-        testRunning.store(false);
-    }
-};
 
 int main( int argc, char **argv ) {
 
@@ -204,9 +118,9 @@ int main( int argc, char **argv ) {
         }
 
         // Add watchdog listener for per-test timeout (0 = disabled)
-        std::unique_ptr<WatchdogTestListener> watchdog;
+        std::unique_ptr<test::util::TestWatchdog> watchdog;
         if( testTimeoutSeconds > 0 ) {
-            watchdog.reset( new WatchdogTestListener( testTimeoutSeconds ) );
+            watchdog.reset( new test::util::TestWatchdog( testTimeoutSeconds, true, "Integration test" ) );
             runner.eventManager().addListener( watchdog.get() );
         }
 

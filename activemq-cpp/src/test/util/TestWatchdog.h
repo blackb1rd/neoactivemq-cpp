@@ -1,0 +1,173 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef _TEST_UTIL_TESTWATCHDOG_H_
+#define _TEST_UTIL_TESTWATCHDOG_H_
+
+#include <cppunit/TestListener.h>
+#include <cppunit/Test.h>
+#include <activemq/util/AMQLog.h>
+
+#include <iostream>
+#include <string>
+#include <thread>
+#include <atomic>
+#include <chrono>
+#include <mutex>
+#include <condition_variable>
+
+namespace test {
+namespace util {
+
+/**
+ * A robust watchdog test listener that monitors per-test timeouts.
+ *
+ * This implementation uses a single polling thread that checks every second
+ * if any test has exceeded its timeout. This approach is more robust than
+ * creating/destroying threads per test, avoiding race conditions.
+ *
+ * Features:
+ * - Single watchdog thread for entire test suite (no per-test thread overhead)
+ * - Proper synchronization to avoid race conditions
+ * - Memory ordering for atomic operations
+ * - Flight Recorder dump on timeout for debugging
+ * - Optional Flight Recorder clearing per test for isolated logs
+ */
+class TestWatchdog : public CppUnit::TestListener {
+private:
+    long long testTimeoutSeconds;
+    std::atomic<bool> testRunning;
+    std::atomic<bool> shutdownRequested;
+    std::string currentTestName;
+    std::chrono::steady_clock::time_point testStartTime;
+    std::thread watchdogThread;
+    std::mutex mutex;
+    std::condition_variable cv;
+    bool clearFlightRecorderPerTest;
+    std::string timeoutLabel;  // "Test case", "Benchmark", etc.
+
+    void watchdogLoop() {
+        while (!shutdownRequested.load(std::memory_order_acquire)) {
+            std::unique_lock<std::mutex> lock(mutex);
+
+            // Wait for either shutdown or check interval (1 second)
+            cv.wait_for(lock, std::chrono::seconds(1), [this]() {
+                return shutdownRequested.load(std::memory_order_acquire);
+            });
+
+            if (shutdownRequested.load(std::memory_order_acquire)) {
+                break;
+            }
+
+            if (testRunning.load(std::memory_order_acquire)) {
+                // Copy values while holding lock to avoid race conditions
+                auto startTime = testStartTime;
+                std::string testName = currentTestName;
+                lock.unlock();  // Release lock before potentially slow operations
+
+                auto elapsed = std::chrono::steady_clock::now() - startTime;
+                auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
+
+                if (elapsedSeconds >= testTimeoutSeconds) {
+                    std::cerr << std::endl << "ERROR: " << timeoutLabel << " timed out after "
+                              << elapsedSeconds << " seconds: " << testName << std::endl;
+
+                    // Dump Flight Recorder log entries for debugging
+                    std::cerr << std::endl << "=== Flight Recorder Dump (last "
+                              << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+                    activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
+                    std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
+
+                    std::cerr << "Forcibly terminating process due to " << timeoutLabel << " timeout..." << std::endl;
+                    std::cerr.flush();
+                    std::_Exit(-1);
+                }
+            }
+        }
+    }
+
+public:
+    /**
+     * Construct a TestWatchdog listener.
+     *
+     * @param timeoutSeconds Maximum time in seconds for each test
+     * @param clearFlightRecorder If true, clears Flight Recorder at start of each test
+     * @param label Label for timeout messages (e.g., "Test case", "Benchmark")
+     */
+    TestWatchdog(long long timeoutSeconds,
+                 bool clearFlightRecorder = true,
+                 const std::string& label = "Test case")
+        : testTimeoutSeconds(timeoutSeconds)
+        , testRunning(false)
+        , shutdownRequested(false)
+        , clearFlightRecorderPerTest(clearFlightRecorder)
+        , timeoutLabel(label) {
+        watchdogThread = std::thread(&TestWatchdog::watchdogLoop, this);
+    }
+
+    ~TestWatchdog() {
+        shutdown();
+    }
+
+    /**
+     * Shutdown the watchdog thread. Safe to call multiple times.
+     */
+    void shutdown() {
+        bool expected = false;
+        if (!shutdownRequested.compare_exchange_strong(expected, true, std::memory_order_release)) {
+            return;  // Already shutdown
+        }
+
+        // Notify with proper synchronization
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+        }
+        cv.notify_all();
+
+        if (watchdogThread.joinable()) {
+            watchdogThread.join();
+        }
+    }
+
+    void startTest(CppUnit::Test* test) override {
+        std::lock_guard<std::mutex> lock(mutex);
+        currentTestName = test->getName();
+        testStartTime = std::chrono::steady_clock::now();
+        if (clearFlightRecorderPerTest) {
+            activemq::util::AMQLogger::clearFlightRecorder();
+        }
+        testRunning.store(true, std::memory_order_release);
+    }
+
+    void endTest(CppUnit::Test* /*test*/) override {
+        std::lock_guard<std::mutex> lock(mutex);
+        testRunning.store(false, std::memory_order_release);
+    }
+
+    /**
+     * Get the name of the currently running test (thread-safe).
+     */
+    std::string getCurrentTestName() const {
+        std::lock_guard<std::mutex> lock(const_cast<std::mutex&>(mutex));
+        return currentTestName;
+    }
+};
+
+}  // namespace util
+}  // namespace test
+
+#endif  // _TEST_UTIL_TESTWATCHDOG_H_

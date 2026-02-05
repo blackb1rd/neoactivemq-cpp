@@ -41,6 +41,8 @@ target_include_directories(neoactivemq-benchmark PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../main
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/..
+  # Include test directory for shared test utilities (TestWatchdog.h)
+  ${CMAKE_CURRENT_SOURCE_DIR}/../test
 )
 
 # Add /bigobj flag for MSVC to handle large object files with many sections

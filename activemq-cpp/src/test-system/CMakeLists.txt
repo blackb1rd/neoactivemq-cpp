@@ -56,6 +56,8 @@ target_include_directories(neoactivemq-system-test PRIVATE
   # Include test-integration for shared utilities
   ${TEST_INTEGRATION_DIR}
   ${TEST_INTEGRATION_DIR}/..
+  # Include test directory for shared test utilities (TestWatchdog.h)
+  ${CMAKE_CURRENT_SOURCE_DIR}/../test
 )
 
 # Add /bigobj flag for MSVC to handle large object files with many sections

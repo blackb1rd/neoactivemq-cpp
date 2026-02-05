@@ -26,6 +26,7 @@
 #include <cppunit/Test.h>
 #include <cppunit/TestFailure.h>
 #include <util/teamcity/TeamCityProgressListener.h>
+#include <util/TestWatchdog.h>
 #include <activemq/util/Config.h>
 #include <activemq/util/AMQLog.h>
 #include <activemq/library/ActiveMQCPP.h>
@@ -41,84 +42,6 @@
 #include <stdexcept>
 #include <vector>
 
-// Custom test listener that logs each test start/end and enforces per-test timeout
-class VerboseTestListener : public CppUnit::TestListener {
-private:
-    std::string currentTest;
-    std::chrono::steady_clock::time_point startTime;
-    long long perTestTimeoutSeconds;
-    std::atomic<bool> watchdogActive;
-    std::thread watchdogThread;
-    std::mutex watchdogMutex;
-    std::condition_variable watchdogCV;
-
-    void startWatchdog() {
-        if (perTestTimeoutSeconds <= 0) return;
-
-        watchdogActive.store(true);
-        watchdogThread = std::thread([this]() {
-            std::unique_lock<std::mutex> lock(watchdogMutex);
-            auto timeout = std::chrono::seconds(perTestTimeoutSeconds);
-
-            if (!watchdogCV.wait_for(lock, timeout, [this]() { return !watchdogActive.load(); })) {
-                // Timeout occurred for this test
-                std::cerr << std::endl << std::endl
-                          << "FATAL: Per-test timeout (" << perTestTimeoutSeconds
-                          << "s) exceeded for test: " << currentTest << std::endl;
-
-                // Dump Flight Recorder
-                std::cerr << std::endl << "=== Flight Recorder Dump (last "
-                          << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
-                activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
-                std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
-
-                std::cerr << "Forcibly terminating process due to per-test timeout..." << std::endl;
-                std::_Exit(-1);
-            }
-        });
-    }
-
-    void stopWatchdog() {
-        if (perTestTimeoutSeconds <= 0) return;
-
-        watchdogActive.store(false);
-        watchdogCV.notify_all();
-        if (watchdogThread.joinable()) {
-            watchdogThread.join();
-        }
-    }
-
-public:
-    VerboseTestListener(long long perTestTimeout = 300) // Default 5 minutes per test
-        : perTestTimeoutSeconds(perTestTimeout), watchdogActive(false) {
-    }
-
-    ~VerboseTestListener() {
-        stopWatchdog();
-    }
-
-    void startTest(CppUnit::Test* test) override {
-        currentTest = test->getName();
-        startTime = std::chrono::steady_clock::now();
-        // Clear Flight Recorder to isolate logs for this test
-        activemq::util::AMQLogger::clearFlightRecorder();
-        startWatchdog();
-    }
-
-    void endTest(CppUnit::Test* test) override {
-        stopWatchdog();
-        currentTest.clear();
-    }
-
-    void addFailure(const CppUnit::TestFailure& failure) override {
-        // CppUnit will handle failure reporting
-    }
-
-    std::string getCurrentTest() const {
-        return currentTest;
-    }
-};
-
 class TestRunner {
 private:
     CppUnit::TextUi::TestRunner* runner;
@@ -128,11 +51,11 @@ private:
     std::thread thread;
     std::mutex mutex;
     std::condition_variable cv;
-    VerboseTestListener* verboseListener; // Track verbose listener
+    test::util::TestWatchdog* watchdog; // Track watchdog listener
 
 public:
-    TestRunner(CppUnit::TextUi::TestRunner* r, const std::string& path, VerboseTestListener* vl = nullptr)
-        : runner(r), testPath(path), wasSuccessful(false), completed(false), verboseListener(vl) {
+    TestRunner(CppUnit::TextUi::TestRunner* r, const std::string& path, test::util::TestWatchdog* wd = nullptr)
+        : runner(r), testPath(path), wasSuccessful(false), completed(false), watchdog(wd) {
     }
 
     void start() {
@@ -167,8 +90,8 @@ public:
         }
 
         // Timeout occurred - report which test was running
-        if (verboseListener) {
-            std::string currentTest = verboseListener->getCurrentTest();
+        if (watchdog) {
+            std::string currentTest = watchdog->getCurrentTestName();
             if (!currentTest.empty()) {
                 std::cerr << std::endl << std::endl
                           << "ERROR: Timeout occurred while running test: " << currentTest
@@ -215,7 +138,7 @@ int main( int argc, char **argv ) {
     long long perTestTimeoutSeconds = 300; // Default 5 minute per-test timeout
     bool failFast = false;
     std::unique_ptr<CppUnit::TestListener> listener( new CppUnit::BriefTestProgressListener );
-    std::unique_ptr<VerboseTestListener> verboseListener; // Will be created after parsing per-test timeout
+    std::unique_ptr<test::util::TestWatchdog> watchdog; // Will be created after parsing per-test timeout
 
     if( argc > 1 ) {
         for( int i = 1; i < argc; ++i ) {
@@ -304,8 +227,10 @@ int main( int argc, char **argv ) {
         }
     }
 
-    // Create the verbose listener now that we've parsed command-line arguments
-    verboseListener.reset(new VerboseTestListener(perTestTimeoutSeconds));
+    // Create the watchdog listener now that we've parsed command-line arguments
+    if (perTestTimeoutSeconds > 0) {
+        watchdog.reset(new test::util::TestWatchdog(perTestTimeoutSeconds, true, "Test case"));
+    }
 
     for( int i = 0; i < iterations; ++i ) {
 
@@ -313,8 +238,10 @@ int main( int argc, char **argv ) {
         CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
         runner.addTest( registry.makeTest() );
 
-        // Always add the verbose listener to track which test is running
-        runner.eventManager().addListener( verboseListener.get() );
+        // Add the watchdog listener to track which test is running and enforce timeout
+        if (watchdog) {
+            runner.eventManager().addListener( watchdog.get() );
+        }
 
         // Shows a message as each test starts
         if( listener.get() != NULL ) {
@@ -331,7 +258,7 @@ int main( int argc, char **argv ) {
         }
 
         if( timeoutSeconds > 0 ) {
-            TestRunner testRunner(&runner, testPath, verboseListener.get());
+            TestRunner testRunner(&runner, testPath, watchdog.get());
             testRunner.start();
 
             bool completed = testRunner.waitFor(timeoutSeconds * 1000);

@@ -475,25 +475,12 @@ jobs:
       shell: bash
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Export GitHub Actions cache environment variable
-      shell: bash
-      run: echo "ACTIONS_CACHE_URL=${ACTIONS_CACHE_URL}" >> $GITHUB_ENV && echo "ACTIONS_RUNTIME_TOKEN=${ACTIONS_RUNTIME_TOKEN}" >> $GITHUB_ENV
-
-    - name: Create vcpkg cache directories
-      shell: bash
-      run: |
-        mkdir -p "${{ github.workspace }}/.cache/vcpkg"
-        mkdir -p "$VCPKG_INSTALLATION_ROOT/downloads"
-
-    - name: Cache vcpkg packages
-      uses: actions/cache@v5
+    - name: Export GitHub Actions cache environment variables
+      uses: actions/github-script@v7
       with:
-        path: |
-          ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
-        key: vcpkg-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
-        restore-keys: |
-          vcpkg-${{ runner.os }}-${{ matrix.config.arch }}-
+        script: |
+          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.config.preset }}
@@ -550,9 +537,12 @@ jobs:
       shell: bash
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Export GitHub Actions cache environment variable
-      shell: bash
-      run: echo "ACTIONS_CACHE_URL=${ACTIONS_CACHE_URL}" >> $GITHUB_ENV && echo "ACTIONS_RUNTIME_TOKEN=${ACTIONS_RUNTIME_TOKEN}" >> $GITHUB_ENV
+    - name: Export GitHub Actions cache environment variables
+      uses: actions/github-script@v7
+      with:
+        script: |
+          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
     - name: Configure CMake (for CTest)
       run: cmake --preset ${{ matrix.config.preset }}
@@ -608,9 +598,12 @@ jobs:
       shell: bash
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Export GitHub Actions cache environment variable
-      shell: bash
-      run: echo "ACTIONS_CACHE_URL=${ACTIONS_CACHE_URL}" >> $GITHUB_ENV && echo "ACTIONS_RUNTIME_TOKEN=${ACTIONS_RUNTIME_TOKEN}" >> $GITHUB_ENV
+    - name: Export GitHub Actions cache environment variables
+      uses: actions/github-script@v7
+      with:
+        script: |
+          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
     - name: Configure CMake (for CTest)
       run: cmake --preset ${{ matrix.config.preset }}
@@ -674,25 +667,12 @@ jobs:
       shell: bash
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Export GitHub Actions cache environment variable
-      shell: bash
-      run: echo "ACTIONS_CACHE_URL=${ACTIONS_CACHE_URL}" >> $GITHUB_ENV && echo "ACTIONS_RUNTIME_TOKEN=${ACTIONS_RUNTIME_TOKEN}" >> $GITHUB_ENV
-
-    - name: Create vcpkg cache directories
-      shell: bash
-      run: |
-        mkdir -p "${{ github.workspace }}/.cache/vcpkg"
-        mkdir -p "$VCPKG_INSTALLATION_ROOT/downloads"
-
-    - name: Cache vcpkg packages
-      uses: actions/cache@v5
+    - name: Export GitHub Actions cache environment variables
+      uses: actions/github-script@v7
       with:
-        path: |
-          ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
-        key: vcpkg-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
-        restore-keys: |
-          vcpkg-${{ runner.os }}-${{ matrix.config.arch }}-
+        script: |
+          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.config.preset }}

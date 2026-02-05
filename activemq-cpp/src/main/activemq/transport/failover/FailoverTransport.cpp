@@ -677,7 +677,9 @@ void FailoverTransport::oneway(const Pointer<Command> command) {
                             // since we will retry in this method.. take it out of the
                             // request map so that it is not sent 2 times on recovery
                             if (command->isResponseRequired()) {
-                                this->impl->requestMap.remove(command->getCommandId());
+                                synchronized(&this->impl->requestMap) {
+                                    this->impl->requestMap.remove(command->getCommandId());
+                                }
                             }
 
                             // re-throw the exception so it will handled by the outer catch
@@ -794,7 +796,9 @@ void FailoverTransport::close() {
             this->impl->connected.store(false, std::memory_order_release);
 
             this->impl->backups->setEnabled(false);
-            this->impl->requestMap.clear();
+            synchronized(&this->impl->requestMap) {
+                this->impl->requestMap.clear();
+            }
 
             if (this->impl->connectedTransport != NULL) {
                 transportToStop.swap(this->impl->connectedTransport);

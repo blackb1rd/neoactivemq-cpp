@@ -262,7 +262,7 @@ namespace core {
                              manageable(true),
                              compressionLevel(-1),
                              sendTimeout(0),
-                             connectResponseTimeout(0),
+                             connectResponseTimeout(60000),
                              closeTimeout(15000),
                              producerWindowSize(0),
                              requestTimeout(60000),
@@ -1305,11 +1305,9 @@ Pointer<Response> ActiveMQConnection::syncRequest(Pointer<Command> command, unsi
         Pointer<Response> response;
 
         try {
-            if (timeout == 0) {
-                response = this->config->transport->request(command);
-            } else {
-                response = this->config->transport->request(command, timeout);
-            }
+            // Use requestTimeout as default when timeout is 0 to prevent infinite waits
+            unsigned int effectiveTimeout = (timeout == 0) ? this->config->requestTimeout : timeout;
+            response = this->config->transport->request(command, effectiveTimeout);
             AMQ_LOG_DEBUG("ActiveMQConnection", "syncRequest() received response correlationId="
                           << response->getCorrelationId() << " type=" << AMQLogger::commandTypeName(response->getDataStructureType()));
         } catch (IOException& ex) {

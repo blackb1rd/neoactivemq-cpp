@@ -1305,6 +1305,12 @@ void ActiveMQSessionKernel::addConsumer(Pointer<ActiveMQConsumerKernel> consumer
 void ActiveMQSessionKernel::removeConsumer(Pointer<ActiveMQConsumerKernel> consumer) {
 
     try {
+        // If the connection is already closed, skip cleanup as it was already done
+        // during connection close. This prevents accessing destroyed ConnectionAudit.
+        if (this->connection->isClosed()) {
+            return;
+        }
+
         this->connection->removeDispatcher(consumer->getConsumerId());
         this->config->consumerLock.writeLock().lock();
         try {

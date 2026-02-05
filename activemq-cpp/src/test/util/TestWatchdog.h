@@ -36,12 +36,13 @@ namespace util {
 /**
  * A robust watchdog test listener that monitors per-test timeouts.
  *
- * This implementation uses a single polling thread that checks every second
+ * This implementation uses a single polling thread that periodically checks
  * if any test has exceeded its timeout. This approach is more robust than
  * creating/destroying threads per test, avoiding race conditions.
  *
  * Features:
  * - Single watchdog thread for entire test suite (no per-test thread overhead)
+ * - Configurable check interval (default 5 seconds, suitable for most use cases)
  * - Proper synchronization to avoid race conditions
  * - Memory ordering for atomic operations
  * - Flight Recorder dump on timeout for debugging
@@ -50,6 +51,7 @@ namespace util {
 class TestWatchdog : public CppUnit::TestListener {
 private:
     long long testTimeoutSeconds;
+    long long checkIntervalSeconds;
     std::atomic<bool> testRunning;
     std::atomic<bool> shutdownRequested;
     std::string currentTestName;
@@ -64,8 +66,8 @@ private:
         while (!shutdownRequested.load(std::memory_order_acquire)) {
             std::unique_lock<std::mutex> lock(mutex);
 
-            // Wait for either shutdown or check interval (1 second)
-            cv.wait_for(lock, std::chrono::seconds(1), [this]() {
+            // Wait for either shutdown or check interval
+            cv.wait_for(lock, std::chrono::seconds(checkIntervalSeconds), [this]() {
                 return shutdownRequested.load(std::memory_order_acquire);
             });
 
@@ -107,11 +109,14 @@ public:
      * @param timeoutSeconds Maximum time in seconds for each test
      * @param clearFlightRecorder If true, clears Flight Recorder at start of each test
      * @param label Label for timeout messages (e.g., "Test case", "Benchmark")
+     * @param checkInterval How often to check for timeout in seconds (default: 5)
      */
     TestWatchdog(long long timeoutSeconds,
                  bool clearFlightRecorder = true,
-                 const std::string& label = "Test case")
+                 const std::string& label = "Test case",
+                 long long checkInterval = 5)
         : testTimeoutSeconds(timeoutSeconds)
+        , checkIntervalSeconds(checkInterval)
         , testRunning(false)
         , shutdownRequested(false)
         , clearFlightRecorderPerTest(clearFlightRecorder)

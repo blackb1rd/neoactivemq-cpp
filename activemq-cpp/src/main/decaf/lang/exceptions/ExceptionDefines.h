@@ -18,6 +18,10 @@
 #ifndef _DECAF_LANG_EXCEPTIONS_EXCEPTIONDEFINES_H_
 #define _DECAF_LANG_EXCEPTIONS_EXCEPTIONDEFINES_H_
 
+#include <exception>
+#include <new>
+#include <string>
+
 /**
  * Macro for catching and rethrowing an exception of
  * a given type.
@@ -44,10 +48,28 @@
     }
 
 /**
+ * Catches std::exception to preserve the what() message before falling
+ * through to the catch-all.
+ * @param type the type of exception to be thrown.
+ */
+#define DECAF_CATCH_STD_EXCEPTION_THROW( type ) \
+    catch( std::bad_alloc& ba ){ \
+        type ex( __FILE__, __LINE__, \
+            (std::string("memory allocation failed: ") + ba.what()).c_str() ); \
+        throw ex; \
+    } \
+    catch( std::exception& stdex ){ \
+        type ex( __FILE__, __LINE__, \
+            (std::string("std::exception: ") + stdex.what()).c_str() ); \
+        throw ex; \
+    }
+
+/**
  * A catch-all that throws a known exception.
  * @param type the type of exception to be thrown.
  */
 #define DECAF_CATCHALL_THROW( type ) \
+    DECAF_CATCH_STD_EXCEPTION_THROW( type ) \
     catch( ... ){ \
         type ex( __FILE__, __LINE__, \
             "caught unknown exception" ); \

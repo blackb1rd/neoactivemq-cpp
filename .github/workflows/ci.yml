@@ -17,14 +17,14 @@ on:
       - 'LICENSE'
   workflow_dispatch:
 
-env:
-  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
-
 jobs:
   # Linux build job (builds and uploads artifacts for test jobs)
   linux-build-test:
     name: Linux Build (Test)
     runs-on: ubuntu-latest
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
 
     strategy:
       fail-fast: false
@@ -50,16 +50,16 @@ jobs:
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.9
 
-    - name: Cache vcpkg packages
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: |
-          ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
-          vcpkg-${{ runner.os }}-
+          vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.config.preset }}
@@ -89,6 +89,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: linux-build-test
 
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
     strategy:
       fail-fast: false
       matrix:
@@ -110,16 +113,16 @@ jobs:
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Cache vcpkg packages
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: |
-          ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
-          vcpkg-${{ runner.os }}-
+          vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake (for CTest)
       run: cmake --preset ${{ matrix.config.preset }}
@@ -151,6 +154,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: linux-build-test
 
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
     strategy:
       fail-fast: false
       matrix:
@@ -172,16 +178,16 @@ jobs:
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Cache vcpkg packages
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: |
-          ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
-          vcpkg-${{ runner.os }}-
+          vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake (for CTest)
       run: cmake --preset ${{ matrix.config.preset }}
@@ -213,6 +219,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: linux-build-test
 
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
     strategy:
       fail-fast: false
       matrix:
@@ -237,16 +246,16 @@ jobs:
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Cache vcpkg packages
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: |
-          ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
-          vcpkg-${{ runner.os }}-
+          vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake (for CTest)
       run: cmake --preset ${{ matrix.config.preset }}
@@ -300,6 +309,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: linux-build-test
 
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
     strategy:
       fail-fast: false
       matrix:
@@ -324,16 +336,16 @@ jobs:
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Cache vcpkg packages
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: |
-          ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
-          vcpkg-${{ runner.os }}-
+          vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake (for CTest)
       run: cmake --preset ${{ matrix.config.preset }}
@@ -388,6 +400,9 @@ jobs:
     name: Linux Build
     runs-on: ubuntu-latest
 
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
+
     strategy:
       fail-fast: false
       matrix:
@@ -416,16 +431,16 @@ jobs:
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.9
 
-    - name: Cache vcpkg packages
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: |
-          ${{ github.workspace }}/.cache/vcpkg
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/downloads
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/buildtrees
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
-          vcpkg-${{ runner.os }}-
+          vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.preset }}
@@ -444,6 +459,9 @@ jobs:
   windows-build-test:
     name: Windows Build (Test)
     runs-on: windows-latest
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
 
     strategy:
       fail-fast: false
@@ -475,12 +493,17 @@ jobs:
       shell: bash
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Export GitHub Actions cache environment variables
-      uses: actions/github-script@v7
+    - name: Create vcpkg binary cache directory
+      shell: bash
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
       with:
-        script: |
-          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.config.preset }}
@@ -510,6 +533,9 @@ jobs:
     runs-on: windows-latest
     needs: windows-build-test
 
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
     strategy:
       fail-fast: false
       matrix:
@@ -537,12 +563,17 @@ jobs:
       shell: bash
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Export GitHub Actions cache environment variables
-      uses: actions/github-script@v7
+    - name: Create vcpkg binary cache directory
+      shell: bash
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
       with:
-        script: |
-          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
 
     - name: Configure CMake (for CTest)
       run: cmake --preset ${{ matrix.config.preset }}
@@ -571,6 +602,9 @@ jobs:
     runs-on: windows-latest
     needs: windows-build-test
 
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
     strategy:
       fail-fast: false
       matrix:
@@ -598,12 +632,17 @@ jobs:
       shell: bash
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Export GitHub Actions cache environment variables
-      uses: actions/github-script@v7
+    - name: Create vcpkg binary cache directory
+      shell: bash
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
       with:
-        script: |
-          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
 
     - name: Configure CMake (for CTest)
       run: cmake --preset ${{ matrix.config.preset }}
@@ -630,6 +669,9 @@ jobs:
   windows-build:
     name: Windows Build
     runs-on: windows-latest
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
 
     strategy:
       fail-fast: false
@@ -667,12 +709,17 @@ jobs:
       shell: bash
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Export GitHub Actions cache environment variables
-      uses: actions/github-script@v7
+    - name: Create vcpkg binary cache directory
+      shell: bash
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
       with:
-        script: |
-          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.config.preset }}

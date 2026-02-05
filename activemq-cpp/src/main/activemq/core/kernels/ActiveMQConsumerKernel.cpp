@@ -101,6 +101,7 @@ namespace kernels {
         AtomicBoolean deliveringAcks;
         AtomicBoolean started;
         AtomicBoolean closeSyncRegistered;
+        AtomicBoolean disposing;
         Pointer<MessageDispatchChannel> unconsumedMessages;
         decaf::util::LinkedList< decaf::lang::Pointer<commands::MessageDispatch> > deliveredMessages;
         long long lastDeliveredSequenceId;
@@ -139,6 +140,7 @@ namespace kernels {
                                          deliveringAcks(),
                                          started(),
                                          closeSyncRegistered(),
+                                         disposing(),
                                          unconsumedMessages(),
                                          deliveredMessages(),
                                          lastDeliveredSequenceId(-1),
@@ -962,6 +964,11 @@ void ActiveMQConsumerKernel::doClose() {
 void ActiveMQConsumerKernel::dispose() {
 
     try {
+
+        // Use atomic compare-and-set to ensure only one thread disposes
+        if (!this->internal->disposing.compareAndSet(false, true)) {
+            return; // Another thread is already disposing
+        }
 
         if (!this->isClosed()) {
 

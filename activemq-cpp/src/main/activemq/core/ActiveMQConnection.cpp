@@ -2012,11 +2012,19 @@ bool ActiveMQConnection::isDuplicate(Dispatcher* dispatcher, Pointer<commands::M
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQConnection::removeAuditedDispatcher(Dispatcher* dispatcher) {
+    // Check if connection is closed/closing to avoid accessing destroyed config
+    if (this->closed.get() || this->closing.get()) {
+        return;
+    }
     this->config->connectionAudit.removeDispatcher(dispatcher);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQConnection::rollbackDuplicate(Dispatcher* dispatcher, Pointer<commands::Message> message) {
+    // Check if connection is closed/closing to avoid accessing destroyed config
+    if (this->closed.get() || this->closing.get()) {
+        return;
+    }
     this->config->connectionAudit.rollbackDuplicate(dispatcher, message);
 }
 

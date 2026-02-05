@@ -53,6 +53,8 @@ namespace core{
         // Own copy of validity flag - allows safe checking even after parent is destroyed.
         // This prevents use-after-free since we don't need to access parent to check validity.
         std::shared_ptr<AtomicBoolean> validityFlag;
+        // Own copy of dispatch mutex - allows safe locking even during parent destruction.
+        std::shared_ptr<Mutex> dispatchMutex;
 
     private:
 
@@ -68,10 +70,12 @@ namespace core{
                 int prefetch, int maxPendingMessageCount, bool noLocal,
                 bool browser, bool dispatchAsync,
                 cms::MessageListener* listener,
-                std::shared_ptr<AtomicBoolean> validityFlag) :
+                std::shared_ptr<AtomicBoolean> validityFlag,
+                std::shared_ptr<Mutex> dispatchMutex) :
             ActiveMQConsumerKernel(session, id, destination, name, selector, prefetch,
                                    maxPendingMessageCount, noLocal, browser, dispatchAsync,
-                                   listener), parent(parent), validityFlag(validityFlag) {
+                                   listener), parent(parent), validityFlag(validityFlag),
+                                   dispatchMutex(dispatchMutex) {
 
         }
 
@@ -80,25 +84,31 @@ namespace core{
         virtual void dispatch(const Pointer<MessageDispatch>& dispatched) {
 
             try{
-                // Check validity using our own copy of the shared flag.
-                // This is safe even if parent is destroyed because we hold
-                // our own shared_ptr to the AtomicBoolean.
-                if (!this->validityFlag->get()) {
-                    // Parent is being destroyed, just dispatch to base class
-                    // if there's a message (ignore NULL browse-done marker)
-                    if (dispatched->getMessage() != NULL) {
+                // Lock the dispatch mutex to synchronize with destroyConsumer().
+                // This ensures that if destroyConsumer() is running, we wait until
+                // it sets the validity flag before checking it. And if we're accessing
+                // parent, destroyConsumer() waits until we're done.
+                synchronized(this->dispatchMutex.get()) {
+                    // Check validity using our own copy of the shared flag.
+                    // This is safe even if parent is destroyed because we hold
+                    // our own shared_ptr to the AtomicBoolean.
+                    if (!this->validityFlag->get()) {
+                        // Parent is being destroyed, just dispatch to base class
+                        // if there's a message (ignore NULL browse-done marker)
+                        if (dispatched->getMessage() != NULL) {
+                            ActiveMQConsumerKernel::dispatch(dispatched);
+                        }
+                        return;
+                    }
+
+                    if (dispatched->getMessage() == NULL) {
+                        this->parent->browseDone.set(true);
+                    } else {
                         ActiveMQConsumerKernel::dispatch(dispatched);
                     }
-                    return;
-                }
 
-                if (dispatched->getMessage() == NULL) {
-                    this->parent->browseDone.set(true);
-                } else {
-                    ActiveMQConsumerKernel::dispatch(dispatched);
+                    this->parent->notifyMessageAvailable();
                 }
-
-                this->parent->notifyMessageAvailable();
             }
             AMQ_CATCH_RETHROW(ActiveMQException)
             AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
@@ -270,10 +280,12 @@ Pointer<ActiveMQConsumerKernel> ActiveMQQueueBrowser::createConsumer() {
     // Create a new shared validity flag for this browser instance.
     // Browser will hold its own copy, allowing safe validity checks even after parent destruction.
     this->browserValid = std::make_shared<AtomicBoolean>(true);
+    // Create a shared mutex for synchronizing dispatch with destroy.
+    this->dispatchMutex = std::make_shared<Mutex>();
 
     int prefetch = this->session->getConnection()->getPrefetchPolicy()->getQueueBrowserPrefetch();
 
-    Pointer<ActiveMQConsumerKernel> consumer(new Browser(this, session, consumerId, destination, "", selector, prefetch, 0, false, true, dispatchAsync, NULL, this->browserValid));
+    Pointer<ActiveMQConsumerKernel> consumer(new Browser(this, session, consumerId, destination, "", selector, prefetch, 0, false, true, dispatchAsync, NULL, this->browserValid, this->dispatchMutex));
 
     try {
         this->session->addConsumer(consumer);
@@ -303,10 +315,16 @@ void ActiveMQQueueBrowser::destroyConsumer() {
             session->commit();
         }
 
-        // Mark the browser as invalid BEFORE calling stop/close.
-        // This prevents Browser::dispatch() from accessing parent members
-        // after the parent starts destruction, avoiding use-after-free.
-        if (this->browserValid) {
+        // Lock the dispatch mutex before setting the validity flag.
+        // This ensures any in-flight dispatch() completes before we set the flag,
+        // and once we set the flag, dispatch() will see it and not access parent.
+        if (this->dispatchMutex) {
+            synchronized(this->dispatchMutex.get()) {
+                if (this->browserValid) {
+                    this->browserValid->set(false);
+                }
+            }
+        } else if (this->browserValid) {
             this->browserValid->set(false);
         }
 

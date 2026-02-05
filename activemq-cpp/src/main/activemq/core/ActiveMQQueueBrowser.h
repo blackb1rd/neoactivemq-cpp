@@ -65,6 +65,9 @@ namespace kernels {
         // this ActiveMQQueueBrowser instance is destroyed. The Browser holds its own
         // copy of this shared_ptr, so it can check the flag without accessing parent.
         std::shared_ptr<decaf::util::concurrent::atomic::AtomicBoolean> browserValid;
+        // Shared mutex for synchronizing dispatch with destroy. Browser holds its own
+        // copy to ensure safe locking even during parent destruction.
+        std::shared_ptr<decaf::util::concurrent::Mutex> dispatchMutex;
 
         mutable Pointer<activemq::core::kernels::ActiveMQConsumerKernel> browser;
 

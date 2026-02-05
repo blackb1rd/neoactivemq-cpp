@@ -398,6 +398,10 @@ void MockBrokerService::stop() {
 void MockBrokerService::waitUntilStarted() {
     if (impl->server.get() != NULL) {
         impl->server->waitUntilStarted();
+        // Save the actual port for restart support when using dynamic ports (port 0)
+        if (impl->configuredPort == 0) {
+            impl->configuredPort = impl->server->getLocalPort();
+        }
     }
 }
 

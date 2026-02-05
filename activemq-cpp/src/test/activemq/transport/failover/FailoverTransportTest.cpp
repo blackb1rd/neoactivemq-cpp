@@ -1226,16 +1226,28 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOnline() {
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testFailoverWithRandomizeBroker1OnlyOnline() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61014));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61015));
+    // Use dynamic ports (port 0) to avoid port conflicts
+    Pointer<MockBrokerService> broker1(new MockBrokerService());
+    Pointer<MockBrokerService> broker2(new MockBrokerService());
 
-    // Only broker1 online
+    // Start both brokers to get their dynamic ports
     broker1->start();
     broker1->waitUntilStarted();
+    broker2->start();
+    broker2->waitUntilStarted();
 
+    // Get the assigned ports
+    int port1 = broker1->getPort();
+    int port2 = broker2->getPort();
+
+    // Stop broker2 - only broker1 should be online initially
+    broker2->stop();
+    broker2->waitUntilStopped();
+
+    // Build URI with dynamic ports
     // Use 127.0.0.1 instead of localhost to force IPv4 (MockBrokerService binds to 0.0.0.0)
-    std::string uri = "failover://(tcp://127.0.0.1:61014,"
-                                  "tcp://127.0.0.1:61015)";
+    std::string uri = "failover://(tcp://127.0.0.1:" + Integer::toString(port1) + ","
+                                  "tcp://127.0.0.1:" + Integer::toString(port2) + ")";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1286,15 +1298,27 @@ void FailoverTransportTest::testFailoverWithRandomizeBroker1OnlyOnline() {
 ////////////////////////////////////////////////////////////////////////////////
 void FailoverTransportTest::testFailoverWithRandomizeBroker2OnlyOnline() {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61016));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61017));
+    // Use dynamic ports (port 0) to avoid port conflicts
+    Pointer<MockBrokerService> broker1(new MockBrokerService());
+    Pointer<MockBrokerService> broker2(new MockBrokerService());
 
-    // Only broker2 online
+    // Start both brokers to get their dynamic ports
+    broker1->start();
+    broker1->waitUntilStarted();
     broker2->start();
     broker2->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61016,"
-                                  "tcp://localhost:61017)";
+    // Get the assigned ports
+    int port1 = broker1->getPort();
+    int port2 = broker2->getPort();
+
+    // Stop broker1 - only broker2 should be online initially
+    broker1->stop();
+    broker1->waitUntilStopped();
+
+    // Build URI with dynamic ports
+    std::string uri = "failover://(tcp://127.0.0.1:" + Integer::toString(port1) + ","
+                                  "tcp://127.0.0.1:" + Integer::toString(port2) + ")";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;

@@ -17,6 +17,7 @@
 
 #include "ActiveMQQueueBrowser.h"
 
+#include <memory>
 #include <cms/MessageListener.h>
 #include <activemq/commands/ConsumerId.h>
 #include <activemq/commands/ActiveMQDestination.h>
@@ -49,6 +50,9 @@ namespace core{
     public:
 
         ActiveMQQueueBrowser* parent;
+        // Own copy of validity flag - allows safe checking even after parent is destroyed.
+        // This prevents use-after-free since we don't need to access parent to check validity.
+        std::shared_ptr<AtomicBoolean> validityFlag;
 
     private:
 
@@ -63,10 +67,11 @@ namespace core{
                 const std::string& name, const std::string& selector,
                 int prefetch, int maxPendingMessageCount, bool noLocal,
                 bool browser, bool dispatchAsync,
-                cms::MessageListener* listener) :
+                cms::MessageListener* listener,
+                std::shared_ptr<AtomicBoolean> validityFlag) :
             ActiveMQConsumerKernel(session, id, destination, name, selector, prefetch,
                                    maxPendingMessageCount, noLocal, browser, dispatchAsync,
-                                   listener), parent(parent) {
+                                   listener), parent(parent), validityFlag(validityFlag) {
 
         }
 
@@ -75,11 +80,10 @@ namespace core{
         virtual void dispatch(const Pointer<MessageDispatch>& dispatched) {
 
             try{
-                // Check if parent is still valid before accessing it.
-                // The browserValid flag is set to false before the parent
-                // is destroyed, preventing use-after-free when session
-                // executor dispatches to a Browser whose parent is gone.
-                if (!this->parent->browserValid.get()) {
+                // Check validity using our own copy of the shared flag.
+                // This is safe even if parent is destroyed because we hold
+                // our own shared_ptr to the AtomicBoolean.
+                if (!this->validityFlag->get()) {
                     // Parent is being destroyed, just dispatch to base class
                     // if there's a message (ignore NULL browse-done marker)
                     if (dispatched->getMessage() != NULL) {
@@ -263,11 +267,13 @@ void ActiveMQQueueBrowser::waitForMessageAvailable() {
 Pointer<ActiveMQConsumerKernel> ActiveMQQueueBrowser::createConsumer() {
 
     this->browseDone.set(false);
-    this->browserValid.set(true);
+    // Create a new shared validity flag for this browser instance.
+    // Browser will hold its own copy, allowing safe validity checks even after parent destruction.
+    this->browserValid = std::make_shared<AtomicBoolean>(true);
 
     int prefetch = this->session->getConnection()->getPrefetchPolicy()->getQueueBrowserPrefetch();
 
-    Pointer<ActiveMQConsumerKernel> consumer(new Browser(this, session, consumerId, destination, "", selector, prefetch, 0, false, true, dispatchAsync, NULL));
+    Pointer<ActiveMQConsumerKernel> consumer(new Browser(this, session, consumerId, destination, "", selector, prefetch, 0, false, true, dispatchAsync, NULL, this->browserValid));
 
     try {
         this->session->addConsumer(consumer);
@@ -300,7 +306,9 @@ void ActiveMQQueueBrowser::destroyConsumer() {
         // Mark the browser as invalid BEFORE calling stop/close.
         // This prevents Browser::dispatch() from accessing parent members
         // after the parent starts destruction, avoiding use-after-free.
-        this->browserValid.set(false);
+        if (this->browserValid) {
+            this->browserValid->set(false);
+        }
 
         this->browser->stop();
         this->browser->close();

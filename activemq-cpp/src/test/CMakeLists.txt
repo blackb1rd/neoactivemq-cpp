@@ -303,6 +303,7 @@ target_link_libraries(neoactivemq-test PRIVATE neoactivemq-cpp GTest::gtest)
 include(GoogleTest)
 gtest_discover_tests(neoactivemq-test
   TEST_PREFIX "unit/"
+  DISCOVERY_MODE PRE_TEST
   DISCOVERY_TIMEOUT 120
   PROPERTIES
     TIMEOUT 300

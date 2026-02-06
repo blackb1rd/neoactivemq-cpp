@@ -70,6 +70,7 @@ target_link_libraries(neoactivemq-benchmark PRIVATE neoactivemq-cpp GTest::gtest
 include(GoogleTest)
 gtest_discover_tests(neoactivemq-benchmark
   TEST_PREFIX "benchmark/"
+  DISCOVERY_MODE PRE_TEST
   DISCOVERY_TIMEOUT 60
   PROPERTIES
     ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"

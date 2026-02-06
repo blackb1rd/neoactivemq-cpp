@@ -85,6 +85,7 @@ target_link_libraries(neoactivemq-system-test PRIVATE neoactivemq-cpp GTest::gte
 include(GoogleTest)
 gtest_discover_tests(neoactivemq-system-test
   TEST_PREFIX "system/"
+  DISCOVERY_MODE PRE_TEST
   DISCOVERY_TIMEOUT 120
   PROPERTIES
     LABELS "system"

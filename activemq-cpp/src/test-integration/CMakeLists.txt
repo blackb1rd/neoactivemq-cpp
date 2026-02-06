@@ -139,6 +139,7 @@ target_link_libraries(neoactivemq-integration-test PRIVATE neoactivemq-cpp GTest
 include(GoogleTest)
 gtest_discover_tests(neoactivemq-integration-test
   TEST_PREFIX "integration/"
+  DISCOVERY_MODE PRE_TEST
   DISCOVERY_TIMEOUT 120
   PROPERTIES
     LABELS "integration"

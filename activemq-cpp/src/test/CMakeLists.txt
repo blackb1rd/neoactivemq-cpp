@@ -299,12 +299,12 @@ endif()
 
 target_link_libraries(neoactivemq-test PRIVATE neoactivemq-cpp GTest::gtest)
 
-# Discover individual GTest cases for CTest/VSCode Test Explorer
-include(GoogleTest)
-gtest_discover_tests(neoactivemq-test
+include(StaticTestDiscovery)
+static_discover_tests(neoactivemq-test
   TEST_PREFIX "unit/"
-  DISCOVERY_MODE PRE_TEST
-  DISCOVERY_TIMEOUT 120
+  SOURCES
+    testRegistry.cpp
+    activemq/transport/CorruptedMessageTest.cpp
   PROPERTIES
     TIMEOUT 300
     ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"

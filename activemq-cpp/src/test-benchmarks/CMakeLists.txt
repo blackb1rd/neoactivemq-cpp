@@ -66,12 +66,10 @@ endif()
 # Link to the consolidated library and Google Test
 target_link_libraries(neoactivemq-benchmark PRIVATE neoactivemq-cpp GTest::gtest)
 
-# Discover individual GTest cases for CTest/VSCode Test Explorer
-include(GoogleTest)
-gtest_discover_tests(neoactivemq-benchmark
+include(StaticTestDiscovery)
+static_discover_tests(neoactivemq-benchmark
   TEST_PREFIX "benchmark/"
-  DISCOVERY_MODE PRE_TEST
-  DISCOVERY_TIMEOUT 60
+  SOURCES testRegistry.cpp
   PROPERTIES
     ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
 )

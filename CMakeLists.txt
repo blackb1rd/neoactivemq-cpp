@@ -207,8 +207,7 @@ add_subdirectory(activemq-cpp/src/examples)
 if(AMQCPP_BUILD_TESTS)
     find_package(GTest CONFIG REQUIRED)
 
-	# Enable CTest before add_subdirectory so gtest_discover_tests works
-	# in subdirectories (generates CTestTestfile.cmake for each)
+	list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 	enable_testing()
 
 	add_subdirectory(activemq-cpp/src/test)

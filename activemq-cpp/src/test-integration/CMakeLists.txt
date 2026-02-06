@@ -133,14 +133,10 @@ endif()
 # Link to the consolidated library and Google Test
 target_link_libraries(neoactivemq-integration-test PRIVATE neoactivemq-cpp GTest::gtest)
 
-# Discover individual GTest cases for CTest/VSCode Test Explorer
-# Note: These tests require a running ActiveMQ broker (Docker fixtures
-# are defined in the top-level CMakeLists.txt via IntegrationFixture)
-include(GoogleTest)
-gtest_discover_tests(neoactivemq-integration-test
+include(StaticTestDiscovery)
+static_discover_tests(neoactivemq-integration-test
   TEST_PREFIX "integration/"
-  DISCOVERY_MODE PRE_TEST
-  DISCOVERY_TIMEOUT 120
+  SOURCES TestRegistry.cpp
   PROPERTIES
     LABELS "integration"
     FIXTURES_REQUIRED IntegrationFixture

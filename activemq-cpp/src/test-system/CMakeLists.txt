@@ -79,14 +79,13 @@ endif()
 # Link to the consolidated library and Google Test
 target_link_libraries(neoactivemq-system-test PRIVATE neoactivemq-cpp GTest::gtest)
 
-# Discover individual GTest cases for CTest/VSCode Test Explorer
-# Note: These tests require multiple running ActiveMQ brokers (Docker fixtures
-# are defined in the top-level CMakeLists.txt via SystemFixture)
-include(GoogleTest)
-gtest_discover_tests(neoactivemq-system-test
+include(StaticTestDiscovery)
+static_discover_tests(neoactivemq-system-test
   TEST_PREFIX "system/"
-  DISCOVERY_MODE PRE_TEST
-  DISCOVERY_TIMEOUT 120
+  SOURCES
+    activemq/test/openwire/OpenwireFailoverIntegrationTest.cpp
+    activemq/test/openwire/OpenwireHighVolumeListenerTest.cpp
+    activemq/test/openwire/OpenwireMultiConnectionTest.cpp
   PROPERTIES
     LABELS "system"
     FIXTURES_REQUIRED SystemFixture

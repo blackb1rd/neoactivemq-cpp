@@ -70,15 +70,15 @@ void OpenWireRedeliveryPolicyTest::testGetNext() {
     policy.setUseExponentialBackOff(true);
 
     long long delay = policy.getNextRedeliveryDelay(0);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Incorrect delay for cycle 1", 500LL, delay);
+    ASSERT_EQ(500LL, delay) << ("Incorrect delay for cycle 1");
     delay = policy.getNextRedeliveryDelay(delay);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Incorrect delay for cycle 2", 500L*2LL, delay);
+    ASSERT_EQ(500L*2LL, delay) << ("Incorrect delay for cycle 2");
     delay = policy.getNextRedeliveryDelay(delay);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Incorrect delay for cycle 3", 500L*4LL, delay);
+    ASSERT_EQ(500L*4LL, delay) << ("Incorrect delay for cycle 3");
 
     policy.setUseExponentialBackOff(false);
     delay = policy.getNextRedeliveryDelay(delay);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Incorrect delay for cycle 4", 500LL, delay);
+    ASSERT_EQ(500LL, delay) << ("Incorrect delay for cycle 4");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,11 +88,11 @@ void OpenWireRedeliveryPolicyTest::testGetNextWithInitialDelay() {
     policy.setInitialRedeliveryDelay(500);
 
     long long delay = policy.getNextRedeliveryDelay(500);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Incorrect delay for cycle 1", 1000LL, delay);
+    ASSERT_EQ(1000LL, delay) << ("Incorrect delay for cycle 1");
     delay = policy.getNextRedeliveryDelay(delay);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Incorrect delay for cycle 2", 1000LL, delay);
+    ASSERT_EQ(1000LL, delay) << ("Incorrect delay for cycle 2");
     delay = policy.getNextRedeliveryDelay(delay);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Incorrect delay for cycle 3", 1000LL, delay);
+    ASSERT_EQ(1000LL, delay) << ("Incorrect delay for cycle 3");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,34 +127,34 @@ void OpenWireRedeliveryPolicyTest::testExponentialRedeliveryPolicyDelaysDelivery
 
     Pointer<cms::Message> received(consumer->receive(1000));
     Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT(textMessage != NULL);
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_TRUE(textMessage != NULL);
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     // No delay on first rollback..
     received.reset(consumer->receive(250));
-    CPPUNIT_ASSERT(received != NULL);
+    ASSERT_TRUE(received != NULL);
     session->rollback();
 
     // Show subsequent re-delivery delay is incrementing.
     received.reset(consumer->receive(250));
-    CPPUNIT_ASSERT(received == NULL);
+    ASSERT_TRUE(received == NULL);
 
     received.reset(consumer->receive(750));
-    CPPUNIT_ASSERT(received != NULL);
+    ASSERT_TRUE(received != NULL);
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     // Show re-delivery delay is incrementing exponentially
     received.reset(consumer->receive(100));
-    CPPUNIT_ASSERT(received == NULL);
+    ASSERT_TRUE(received == NULL);
     received.reset(consumer->receive(500));
-    CPPUNIT_ASSERT(received == NULL);
+    ASSERT_TRUE(received == NULL);
     received.reset(consumer->receive(800));
-    CPPUNIT_ASSERT(received != NULL);
+    ASSERT_TRUE(received != NULL);
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -187,32 +187,32 @@ void OpenWireRedeliveryPolicyTest::testNornalRedeliveryPolicyDelaysDeliveryOnRol
 
     Pointer<cms::Message> received(consumer->receive(1000));
     Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT(textMessage != NULL);
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_TRUE(textMessage != NULL);
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     // No delay on first rollback..
     received.reset(consumer->receive(250));
-    CPPUNIT_ASSERT(received != NULL);
+    ASSERT_TRUE(received != NULL);
     session->rollback();
 
     // Show subsequent re-delivery delay is incrementing.
     received.reset(consumer->receive(100));
-    CPPUNIT_ASSERT(received == NULL);
+    ASSERT_TRUE(received == NULL);
     received.reset(consumer->receive(700));
-    CPPUNIT_ASSERT(received != NULL);
+    ASSERT_TRUE(received != NULL);
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     // The message gets redelivered after 500 ms every time since
     // we are not using exponential backoff.
     received.reset(consumer->receive(100));
-    CPPUNIT_ASSERT(received == NULL);
+    ASSERT_TRUE(received == NULL);
     received.reset(consumer->receive(700));
-    CPPUNIT_ASSERT(received != NULL);
+    ASSERT_TRUE(received != NULL);
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->commit();
 }
 
@@ -250,40 +250,39 @@ void OpenWireRedeliveryPolicyTest::testDLQHandling() {
 
     Pointer<cms::Message> received(consumer->receive(1000));
     Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_MESSAGE("Failed to get first delivery", textMessage != NULL);
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     received.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get second delivery", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get second delivery");
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     received.reset(consumer->receive(2000));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get third delivery", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get third delivery");
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     // The last rollback should cause the 1st message to get sent to the DLQ
     received.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get first delivery of msg 2", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get first delivery of msg 2");
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("2nd"), textMessage->getText());
+    ASSERT_EQ(std::string("2nd"), textMessage->getText());
     session->commit();
 
     // We should be able to get the message off the DLQ now.
     received.reset(dlqConsumer->receive(1000));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get DLQ'd message", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get DLQ'd message");
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->commit();
 
     if (textMessage->propertyExists("dlqDeliveryFailureCause")) {
         std::string cause = textMessage->getStringProperty("dlqDeliveryFailureCause");
-        CPPUNIT_ASSERT_MESSAGE("cause exception has no policy ref",
-                               cause.find("RedeliveryPolicy") != std::string::npos);
+        ASSERT_TRUE(cause.find("RedeliveryPolicy") != std::string::npos) << ("cause exception has no policy ref");
     }
     session->commit();
 }
@@ -320,45 +319,45 @@ void OpenWireRedeliveryPolicyTest::testInfiniteMaximumNumberOfRedeliveries() {
 
     Pointer<cms::Message> received(consumer->receive(1000));
     Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_MESSAGE("Failed to get first delivery", textMessage != NULL);
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     // we should be able to get the 1st message redelivered until a session.commit is called
     received.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get second delivery", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get second delivery");
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     received.reset(consumer->receive(2000));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get third delivery", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get third delivery");
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     received.reset(consumer->receive(2000));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get fourth delivery", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get fourth delivery");
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     received.reset(consumer->receive(2000));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get fifth delivery", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get fifth delivery");
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     received.reset(consumer->receive(2000));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get sixth delivery", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get sixth delivery");
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->commit();
 
     received.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get message two", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get message two");
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("2nd"), textMessage->getText());
+    ASSERT_EQ(std::string("2nd"), textMessage->getText());
     session->commit();
 }
 
@@ -401,25 +400,25 @@ void OpenWireRedeliveryPolicyTest::testMaximumRedeliveryDelay() {
         // we should be able to get the 1st message redelivered until a session.commit is called
         received.reset(consumer->receive(2000));
         Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
-        CPPUNIT_ASSERT_MESSAGE("Failed to get message", textMessage != NULL);
-        CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+        ASSERT_TRUE(textMessage != NULL) << ("Failed to get message");
+        ASSERT_EQ(std::string("1st"), textMessage->getText());
         session->rollback();
     }
 
     received.reset(consumer->receive(2000));
     Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_MESSAGE("Failed to get message one last time", textMessage != NULL);
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_TRUE(textMessage != NULL) << ("Failed to get message one last time");
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->commit();
 
     received.reset(consumer->receive(2000));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get message two", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get message two");
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("2nd"), textMessage->getText());
+    ASSERT_EQ(std::string("2nd"), textMessage->getText());
     session->commit();
 
     long long result = policy->getNextRedeliveryDelay(Integer::MAX_VALUE);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Max delay should be 1 second.", 1000LL, result);
+    ASSERT_EQ(1000LL, result) << ("Max delay should be 1 second.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -454,15 +453,15 @@ void OpenWireRedeliveryPolicyTest::testZeroMaximumNumberOfRedeliveries() {
 
     Pointer<cms::Message> received(consumer->receive(1000));
     Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_MESSAGE("Failed to get first delivery", textMessage != NULL);
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     // the 1st  message should not be redelivered since maximumRedeliveries is set to 0
     received.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get message two", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get message two");
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("2nd"), textMessage->getText());
+    ASSERT_EQ(std::string("2nd"), textMessage->getText());
     session->commit();
 }
 
@@ -507,11 +506,11 @@ void OpenWireRedeliveryPolicyTest::testRepeatedRedeliveryReceiveNoCommit() {
 
         if (i <= MAX_REDELIVERIES) {
             Pointer<ActiveMQTextMessage> textMessage = received.dynamicCast<ActiveMQTextMessage>();
-            CPPUNIT_ASSERT_MESSAGE("Failed to get first delivery", textMessage != NULL);
-            CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
-            CPPUNIT_ASSERT_EQUAL(i, textMessage->getRedeliveryCounter());
+            ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
+            ASSERT_EQ(std::string("1st"), textMessage->getText());
+            ASSERT_EQ(i, textMessage->getRedeliveryCounter());
         } else {
-            CPPUNIT_ASSERT_MESSAGE("null on exceeding redelivery count", received == NULL);
+            ASSERT_TRUE(received == NULL) << ("null on exceeding redelivery count");
         }
 
         loopConnection->close();
@@ -519,16 +518,15 @@ void OpenWireRedeliveryPolicyTest::testRepeatedRedeliveryReceiveNoCommit() {
 
     // We should be able to get the message off the DLQ now.
     Pointer<cms::Message> received(consumer->receive(1000));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get from DLQ", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get from DLQ");
     Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
 
     if (textMessage->propertyExists("dlqDeliveryFailureCause")) {
         std::string cause = textMessage->getStringProperty("dlqDeliveryFailureCause");
-        CPPUNIT_ASSERT_MESSAGE("cause exception has no policy ref",
-                               cause.find("RedeliveryPolicy") != std::string::npos);
+        ASSERT_TRUE(cause.find("RedeliveryPolicy") != std::string::npos) << ("cause exception has no policy ref");
     } else {
-        CPPUNIT_FAIL("Message did not have a rollback cause");
+        FAIL() << ("Message did not have a rollback cause");
     }
 }
 
@@ -551,9 +549,9 @@ namespace {
         virtual void onMessage(const cms::Message* message) {
             try {
                 const ActiveMQTextMessage* textMessage = dynamic_cast<const ActiveMQTextMessage*>(message);
-                CPPUNIT_ASSERT_MESSAGE("Failed to get first delivery", textMessage != NULL);
-                CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
-                CPPUNIT_ASSERT_EQUAL(receivedCount->get(), textMessage->getRedeliveryCounter());
+                ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
+                ASSERT_EQ(std::string("1st"), textMessage->getText());
+                ASSERT_EQ(receivedCount->get(), textMessage->getRedeliveryCounter());
                 receivedCount->incrementAndGet();
                 done->countDown();
             } catch (Exception& ignored) {
@@ -609,10 +607,10 @@ void OpenWireRedeliveryPolicyTest::testRepeatedRedeliveryOnMessageNoCommit() {
         consumer->setMessageListener(&listener);
 
         if (i <= MAX_REDELIVERIES) {
-            CPPUNIT_ASSERT_MESSAGE("listener didn't get a message", done.await(5, TimeUnit::SECONDS));
+            ASSERT_TRUE(done.await(5, TimeUnit::SECONDS)) << ("listener didn't get a message");
         } else {
             // final redlivery gets poisoned before dispatch
-            CPPUNIT_ASSERT_MESSAGE("listener got unexpected message", !done.await(2, TimeUnit::SECONDS));
+            ASSERT_TRUE(!done.await(2, TimeUnit::SECONDS)) << ("listener got unexpected message");
         }
 
         loopConnection->close();
@@ -620,16 +618,15 @@ void OpenWireRedeliveryPolicyTest::testRepeatedRedeliveryOnMessageNoCommit() {
 
     // We should be able to get the message off the DLQ now.
     Pointer<cms::Message> received(consumer->receive(1000));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get from DLQ", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get from DLQ");
     Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
 
     if (textMessage->propertyExists("dlqDeliveryFailureCause")) {
         std::string cause = textMessage->getStringProperty("dlqDeliveryFailureCause");
-        CPPUNIT_ASSERT_MESSAGE("cause exception has no policy ref",
-                               cause.find("RedeliveryPolicy") != std::string::npos);
+        ASSERT_TRUE(cause.find("RedeliveryPolicy") != std::string::npos) << ("cause exception has no policy ref");
     } else {
-        CPPUNIT_FAIL("Message did not have a rollback cause");
+        FAIL() << ("Message did not have a rollback cause");
     }
 }
 
@@ -664,20 +661,20 @@ void OpenWireRedeliveryPolicyTest::testInitialRedeliveryDelayZero() {
 
     Pointer<cms::Message> received(consumer->receive(100));
     Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_MESSAGE("Failed to get first delivery", textMessage != NULL);
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     // Both should be able for consumption.
     received.reset(consumer->receive(100));
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_MESSAGE("Failed to get message one again", textMessage != NULL);
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_TRUE(textMessage != NULL) << ("Failed to get message one again");
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
 
     received.reset(consumer->receive(100));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get message two", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get message two");
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("2nd"), textMessage->getText());
+    ASSERT_EQ(std::string("2nd"), textMessage->getText());
     session->commit();
 }
 
@@ -712,22 +709,22 @@ void OpenWireRedeliveryPolicyTest::testInitialRedeliveryDelayOne() {
 
     Pointer<cms::Message> received(consumer->receive(100));
     Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_MESSAGE("Failed to get first delivery", textMessage != NULL);
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     received.reset(consumer->receive(100));
-    CPPUNIT_ASSERT(received == NULL);
+    ASSERT_TRUE(received == NULL);
 
     received.reset(consumer->receive(2000));
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_MESSAGE("Failed to get message one again", textMessage != NULL);
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_TRUE(textMessage != NULL) << ("Failed to get message one again");
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
 
     received.reset(consumer->receive(100));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get message two", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get message two");
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("2nd"), textMessage->getText());
+    ASSERT_EQ(std::string("2nd"), textMessage->getText());
     session->commit();
 }
 
@@ -763,27 +760,27 @@ void OpenWireRedeliveryPolicyTest::testRedeliveryDelayOne() {
 
     Pointer<cms::Message> received(consumer->receive(100));
     Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_MESSAGE("Failed to get first delivery", textMessage != NULL);
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     received.reset(consumer->receive(100));
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_MESSAGE("first redelivery was not immediate.", textMessage != NULL);
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_TRUE(textMessage != NULL) << ("first redelivery was not immediate.");
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
     received.reset(consumer->receive(100));
-    CPPUNIT_ASSERT_MESSAGE("seconds redelivery should be delayed.", received == NULL);
+    ASSERT_TRUE(received == NULL) << ("seconds redelivery should be delayed.");
 
     received.reset(consumer->receive(2000));
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_MESSAGE("Failed to get message one again", textMessage != NULL);
-    CPPUNIT_ASSERT_EQUAL(std::string("1st"), textMessage->getText());
+    ASSERT_TRUE(textMessage != NULL) << ("Failed to get message one again");
+    ASSERT_EQ(std::string("1st"), textMessage->getText());
 
     received.reset(consumer->receive(100));
-    CPPUNIT_ASSERT_MESSAGE("Failed to get message two", received != NULL);
+    ASSERT_TRUE(received != NULL) << ("Failed to get message two");
     textMessage = received.dynamicCast<TextMessage>();
-    CPPUNIT_ASSERT_EQUAL(std::string("2nd"), textMessage->getText());
+    ASSERT_EQ(std::string("2nd"), textMessage->getText());
     session->commit();
 }

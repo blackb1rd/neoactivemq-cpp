@@ -39,10 +39,10 @@ void TransactionStateTest::test() {
     id->setValue( 42 );
     TransactionState state( id );
 
-    CPPUNIT_ASSERT( state.toString() != "NULL" );
-    CPPUNIT_ASSERT( state.getId() != NULL );
+    ASSERT_TRUE(state.toString() != "NULL");
+    ASSERT_TRUE(state.getId() != NULL);
 
     Pointer<LocalTransactionId> temp;
-    CPPUNIT_ASSERT_NO_THROW( temp = state.getId().dynamicCast<LocalTransactionId>() );
-    CPPUNIT_ASSERT( temp->getValue() == id->getValue() );
+    ASSERT_NO_THROW(temp = state.getId().dynamicCast<LocalTransactionId>());
+    ASSERT_TRUE(temp->getValue() == id->getValue());
 }

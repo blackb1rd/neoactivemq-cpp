@@ -18,19 +18,12 @@
 #ifndef _ACTIVEMQ_TRANSPORT_TRANSPORTREGISTRYTEST_H_
 #define _ACTIVEMQ_TRANSPORT_TRANSPORTREGISTRYTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace transport {
 
-    class TransportRegistryTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( TransportRegistryTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class TransportRegistryTest : public ::testing::Test {
+public:
 
         TransportRegistryTest() {}
         virtual ~TransportRegistryTest() {}

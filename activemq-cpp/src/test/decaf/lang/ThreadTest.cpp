@@ -353,7 +353,7 @@ void ThreadTest::testConstructor_2() {
 
     std::unique_ptr<Runnable> runnable( new SimpleThread( 10 ) );
     Thread ct( runnable.get(), "SimpleThread_1" );
-    CPPUNIT_ASSERT( ct.getName() == "SimpleThread_1" );
+    ASSERT_TRUE(ct.getName() == "SimpleThread_1");
     ct.start();
     ct.join();
 }
@@ -362,7 +362,7 @@ void ThreadTest::testConstructor_2() {
 void ThreadTest::testConstructor_3() {
 
     Thread ct( "SimpleThread_1" );
-    CPPUNIT_ASSERT( ct.getName() == "SimpleThread_1" );
+    ASSERT_TRUE(ct.getName() == "SimpleThread_1");
     ct.start();
     ct.join();
 }
@@ -380,12 +380,12 @@ void ThreadTest::testRun() {
             Thread::sleep(100);
             count++;
         }
-        CPPUNIT_ASSERT_MESSAGE("Thread did not run", rt.didThreadRun);
+        ASSERT_TRUE(rt.didThreadRun) << ("Thread did not run");
         t.join();
     } catch(InterruptedException& e) {
-        CPPUNIT_FAIL("Joined thread was interrupted");
+        FAIL() << ("Joined thread was interrupted");
     }
-    CPPUNIT_ASSERT_MESSAGE("Joined thread is still alive", !t.isAlive());
+    ASSERT_TRUE(!t.isAlive()) << ("Joined thread is still alive");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -402,7 +402,7 @@ void ThreadTest::testDelegate(){
 
     // The values should be different - this proves
     // that the runnable was run.
-    CPPUNIT_ASSERT( finalValue != initialValue );
+    ASSERT_TRUE(finalValue != initialValue);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -418,7 +418,7 @@ void ThreadTest::testDerived() {
 
     // The values should be different - this proves
     // that the runnable was run.
-    CPPUNIT_ASSERT( finalValue != initialValue );
+    ASSERT_TRUE(finalValue != initialValue);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -427,21 +427,21 @@ void ThreadTest::testJoin1() {
     JoinTest test;
 
     // Joining a non-started thread should just return.
-    CPPUNIT_ASSERT_NO_THROW( test.join() );
-    CPPUNIT_ASSERT_NO_THROW( test.join( 10 ) );
-    CPPUNIT_ASSERT_NO_THROW( test.join( 10, 10 ) );
+    ASSERT_NO_THROW(test.join());
+    ASSERT_NO_THROW(test.join( 10 ));
+    ASSERT_NO_THROW(test.join( 10, 10 ));
 
-    CPPUNIT_ASSERT_MESSAGE( "Thread is alive", !test.isAlive() );
+    ASSERT_TRUE(!test.isAlive()) << ("Thread is alive");
     time_t startTime = time( NULL );
     test.start();
     test.join();
     time_t endTime = time( NULL );
-    CPPUNIT_ASSERT_MESSAGE( "Joined Thread is still alive", !test.isAlive() );
+    ASSERT_TRUE(!test.isAlive()) << ("Joined Thread is still alive");
 
     time_t delta = endTime - startTime;
 
     // Should be about 2 seconds that elapsed.
-    CPPUNIT_ASSERT( delta >= 1 && delta <= 3 );
+    ASSERT_TRUE(delta >= 1 && delta <= 3);
 
     // Thread should be able to join itself, use a timeout so we don't freeze
     Thread::currentThread()->join( 5 );
@@ -453,21 +453,21 @@ void ThreadTest::testJoin2() {
     JoinTest test;
 
     // Joining a non-started thread should just return.
-    CPPUNIT_ASSERT_NO_THROW( test.join() );
-    CPPUNIT_ASSERT_NO_THROW( test.join( 10 ) );
-    CPPUNIT_ASSERT_NO_THROW( test.join( 10, 10 ) );
+    ASSERT_NO_THROW(test.join());
+    ASSERT_NO_THROW(test.join( 10 ));
+    ASSERT_NO_THROW(test.join( 10, 10 ));
 
-    CPPUNIT_ASSERT_MESSAGE( "Thread is alive", !test.isAlive() );
+    ASSERT_TRUE(!test.isAlive()) << ("Thread is alive");
     time_t startTime = time( NULL );
     test.start();
     test.join( 3500, 999999 );
     time_t endTime = time( NULL );
-    CPPUNIT_ASSERT_MESSAGE( "Joined Thread is still alive", !test.isAlive() );
+    ASSERT_TRUE(!test.isAlive()) << ("Joined Thread is still alive");
 
     time_t delta = endTime - startTime;
 
     // Should be about 2 seconds that elapsed.
-    CPPUNIT_ASSERT( delta >= 1 && delta <= 3 );
+    ASSERT_TRUE(delta >= 1 && delta <= 3);
 
     // Thread should be able to join itself, use a timeout so we don't freeze
     Thread::currentThread()->join( 5 );
@@ -479,16 +479,16 @@ void ThreadTest::testJoin3() {
     JoinTest test;
 
     // Joining a non-started thread should just return.
-    CPPUNIT_ASSERT_NO_THROW( test.join() );
-    CPPUNIT_ASSERT_NO_THROW( test.join( 10 ) );
-    CPPUNIT_ASSERT_NO_THROW( test.join( 10, 10 ) );
+    ASSERT_NO_THROW(test.join());
+    ASSERT_NO_THROW(test.join( 10 ));
+    ASSERT_NO_THROW(test.join( 10, 10 ));
 
-    CPPUNIT_ASSERT_MESSAGE( "Thread is alive", !test.isAlive() );
+    ASSERT_TRUE(!test.isAlive()) << ("Thread is alive");
     test.start();
     test.join( 0, 999999 );
-    CPPUNIT_ASSERT_MESSAGE( "Joined Thread is not still alive", test.isAlive() );
+    ASSERT_TRUE(test.isAlive()) << ("Joined Thread is not still alive");
     test.join( 3500, 999999 );
-    CPPUNIT_ASSERT_MESSAGE( "Joined Thread is still alive", !test.isAlive() );
+    ASSERT_TRUE(!test.isAlive()) << ("Joined Thread is still alive");
 
     // Thread should be able to join itself, use a timeout so we don't freeze
     Thread::currentThread()->join( 5 );
@@ -518,9 +518,9 @@ void ThreadTest::testSetPriority() {
 
     std::unique_ptr<Runnable> runnable( new SimpleThread( 10 ) );
     Thread ct( runnable.get() );
-    CPPUNIT_ASSERT( ct.getPriority() == Thread::NORM_PRIORITY );
+    ASSERT_TRUE(ct.getPriority() == Thread::NORM_PRIORITY);
     ct.setPriority( Thread::MAX_PRIORITY );
-    CPPUNIT_ASSERT( ct.getPriority() == Thread::MAX_PRIORITY );
+    ASSERT_TRUE(ct.getPriority() == Thread::MAX_PRIORITY);
     ct.start();
     ct.join();
 }
@@ -531,7 +531,7 @@ void ThreadTest::testIsAlive() {
     std::unique_ptr<SimpleThread> runnable( new SimpleThread( 500 ) );
     Thread ct( runnable.get() );
 
-    CPPUNIT_ASSERT_MESSAGE( "A thread that wasn't started is alive.", !ct.isAlive() );
+    ASSERT_TRUE(!ct.isAlive()) << ("A thread that wasn't started is alive.");
 
     synchronized( &( runnable->lock ) ) {
         ct.start();
@@ -541,21 +541,21 @@ void ThreadTest::testIsAlive() {
         }
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "Started thread returned false", ct.isAlive() );
+    ASSERT_TRUE(ct.isAlive()) << ("Started thread returned false");
 
     try {
         ct.join();
     } catch( InterruptedException& e ) {
-        CPPUNIT_FAIL( "Thread did not die" );
+        FAIL() << ("Thread did not die");
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "Stopped thread returned true", !ct.isAlive() );
+    ASSERT_TRUE(!ct.isAlive()) << ("Stopped thread returned true");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ThreadTest::testGetId() {
     // Check that the thread ID is valid (not default-constructed)
-    CPPUNIT_ASSERT( Thread::currentThread()->getId() != std::thread::id() );
+    ASSERT_TRUE(Thread::currentThread()->getId() != std::thread::id());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -569,15 +569,12 @@ void ThreadTest::testSleep() {
         Thread::sleep( 1000 );
         endTime = System::currentTimeMillis();
     } catch( InterruptedException& e ) {
-        CPPUNIT_FAIL( "Unexpected interrupt received" );
+        FAIL() << ("Unexpected interrupt received");
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "Failed to sleep long enough", ( endTime - startTime ) >= 800 );
+    ASSERT_TRUE(( endTime - startTime ) >= 800) << ("Failed to sleep long enough");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalArgumentException",
-        Thread::sleep( -1 ),
-        IllegalArgumentException );
+    ASSERT_THROW(Thread::sleep( -1 ), IllegalArgumentException) << ("Should throw an IllegalArgumentException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -591,20 +588,14 @@ void ThreadTest::testSleep2Arg() {
         Thread::sleep( 1000, 10 );
         endTime = System::currentTimeMillis();
     } catch( InterruptedException& e ) {
-        CPPUNIT_FAIL( "Unexpected interrupt received" );
+        FAIL() << ("Unexpected interrupt received");
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "Failed to sleep long enough", ( endTime - startTime ) >= 800 );
+    ASSERT_TRUE(( endTime - startTime ) >= 800) << ("Failed to sleep long enough");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalArgumentException",
-        Thread::sleep( -1, 0 ),
-        IllegalArgumentException );
+    ASSERT_THROW(Thread::sleep( -1, 0 ), IllegalArgumentException) << ("Should throw an IllegalArgumentException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalArgumentException",
-        Thread::sleep( 1000, 10000000 ),
-        IllegalArgumentException );
+    ASSERT_THROW(Thread::sleep( 1000, 10000000 ), IllegalArgumentException) << ("Should throw an IllegalArgumentException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -612,7 +603,7 @@ void ThreadTest::testGetState() {
     std::unique_ptr<SimpleThread> runnable( new SimpleThread( 1000 ) );
     Thread ct( runnable.get() );
 
-    CPPUNIT_ASSERT_MESSAGE( "A thread that wasn't started is alive.", !ct.isAlive() );
+    ASSERT_TRUE(!ct.isAlive()) << ("A thread that wasn't started is alive.");
 
     synchronized( &( runnable->lock ) ) {
         ct.start();
@@ -622,17 +613,17 @@ void ThreadTest::testGetState() {
         }
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "Started thread returned false", ct.isAlive() );
-    CPPUNIT_ASSERT( ct.getState() == Thread::TIMED_WAITING );
+    ASSERT_TRUE(ct.isAlive()) << ("Started thread returned false");
+    ASSERT_TRUE(ct.getState() == Thread::TIMED_WAITING);
 
     try {
         ct.join();
     } catch( InterruptedException& e ) {
-        CPPUNIT_FAIL( "Thread did not die" );
+        FAIL() << ("Thread did not die");
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "Stopped thread returned true", !ct.isAlive() );
-    CPPUNIT_ASSERT( ct.getState() == Thread::TERMINATED );
+    ASSERT_TRUE(!ct.isAlive()) << ("Stopped thread returned true");
+    ASSERT_TRUE(ct.getState() == Thread::TERMINATED);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -647,26 +638,26 @@ void ThreadTest::testUncaughtExceptionHandler() {
 
     Thread t2( runnable.get() );
 
-    CPPUNIT_ASSERT( myHandler.executed == false );
-    CPPUNIT_ASSERT( t2.getUncaughtExceptionHandler() == NULL );
+    ASSERT_TRUE(myHandler.executed == false);
+    ASSERT_TRUE(t2.getUncaughtExceptionHandler() == NULL);
     t2.setUncaughtExceptionHandler( &myHandler );
-    CPPUNIT_ASSERT( t2.getUncaughtExceptionHandler() == &myHandler );
+    ASSERT_TRUE(t2.getUncaughtExceptionHandler() == &myHandler);
 
     t2.start();
     t2.join();
 
-    CPPUNIT_ASSERT( myHandler.executed == true );
+    ASSERT_TRUE(myHandler.executed == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ThreadTest::testCurrentThread() {
 
-    CPPUNIT_ASSERT( Thread::currentThread() != NULL );
-    CPPUNIT_ASSERT( Thread::currentThread()->getName() != "" );
-    CPPUNIT_ASSERT( Thread::currentThread()->getPriority() == Thread::NORM_PRIORITY );
-    CPPUNIT_ASSERT( Thread::currentThread()->getState() == Thread::RUNNABLE );
+    ASSERT_TRUE(Thread::currentThread() != NULL);
+    ASSERT_TRUE(Thread::currentThread()->getName() != "");
+    ASSERT_TRUE(Thread::currentThread()->getPriority() == Thread::NORM_PRIORITY);
+    ASSERT_TRUE(Thread::currentThread()->getState() == Thread::RUNNABLE);
 
-    CPPUNIT_ASSERT( Thread::currentThread() == Thread::currentThread() );
+    ASSERT_TRUE(Thread::currentThread() == Thread::currentThread());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -683,10 +674,10 @@ void ThreadTest::testInterrupt() {
         interrupted = true;
     } catch(Exception& ex) {
         ex.printStackTrace();
-        CPPUNIT_FAIL("Caught unexpected message.");
+        FAIL() << ("Caught unexpected message.");
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to Interrupt thread1", interrupted);
+    ASSERT_TRUE(interrupted) << ("Failed to Interrupt thread1");
 
     interrupted = false;
     try {
@@ -701,19 +692,18 @@ void ThreadTest::testInterrupt() {
         interrupted = true;
     } catch(Exception& ex) {
         ex.printStackTrace();
-        CPPUNIT_FAIL("Caught unexpected message.");
+        FAIL() << ("Caught unexpected message.");
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to Interrupt thread2", interrupted);
+    ASSERT_TRUE(interrupted) << ("Failed to Interrupt thread2");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ThreadTest::testInterrupted() {
 
-    CPPUNIT_ASSERT_MESSAGE("Interrupted returned true for non-interrupted thread",
-                           !Thread::interrupted());
+    ASSERT_TRUE(!Thread::interrupted()) << ("Interrupted returned true for non-interrupted thread");
     Thread::currentThread()->interrupt();
-    CPPUNIT_ASSERT_MESSAGE("Interrupted returned true for non-interrupted thread", Thread::interrupted());
-    CPPUNIT_ASSERT_MESSAGE("Failed to clear interrupted flag", !Thread::interrupted());
+    ASSERT_TRUE(Thread::interrupted()) << ("Interrupted returned true for non-interrupted thread");
+    ASSERT_TRUE(!Thread::interrupted()) << ("Failed to clear interrupted flag");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -725,9 +715,9 @@ void ThreadTest::testIsInterrupted() {
     Thread::sleep(100);
 
     try {
-        CPPUNIT_ASSERT_MESSAGE("Non-Interrupted thread returned true", !spinner.isInterrupted());
+        ASSERT_TRUE(!spinner.isInterrupted()) << ("Non-Interrupted thread returned true");
         spinner.interrupt();
-        CPPUNIT_ASSERT_MESSAGE("Interrupted thread returned false", spinner.isInterrupted());
+        ASSERT_TRUE(spinner.isInterrupted()) << ("Interrupted thread returned false");
         spin.done = true;
     } catch(...) {
         spinner.interrupt();
@@ -742,9 +732,9 @@ void ThreadTest::testSetName() {
 
     JoinTest st;
     st.setName("Bogus Name");
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed to set thread name", std::string("Bogus Name"), st.getName());
+    ASSERT_EQ(std::string("Bogus Name"), st.getName()) << ("Failed to set thread name");
     st.setName("Another Bogus Name");
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed to set thread name", std::string("Another Bogus Name"), st.getName());
+    ASSERT_EQ(std::string("Another Bogus Name"), st.getName()) << ("Failed to set thread name");
     st.start();
 }
 
@@ -762,7 +752,7 @@ void ThreadTest::testInterruptSleep() {
             Thread::sleep(10);
         }
     }
-    CPPUNIT_ASSERT(ct.getState() == Thread::SLEEPING);
+    ASSERT_TRUE(ct.getState() == Thread::SLEEPING);
 
     ct.interrupt();
     for(int i = 0; i < 10; ++i) {
@@ -772,7 +762,7 @@ void ThreadTest::testInterruptSleep() {
             Thread::sleep(10);
         }
     }
-    CPPUNIT_ASSERT(runnable->wasInterrupted());
+    ASSERT_TRUE(runnable->wasInterrupted());
 
     ct.join();
 }
@@ -791,7 +781,7 @@ void ThreadTest::testInterruptJoin() {
             Thread::sleep(10);
         }
     }
-    CPPUNIT_ASSERT(ct.getState() == Thread::SLEEPING);
+    ASSERT_TRUE(ct.getState() == Thread::SLEEPING);
 
     ct.interrupt();
     for(int i = 0; i < 10; ++i) {
@@ -801,7 +791,7 @@ void ThreadTest::testInterruptJoin() {
             Thread::sleep(10);
         }
     }
-    CPPUNIT_ASSERT(runnable->wasInterrupted());
+    ASSERT_TRUE(runnable->wasInterrupted());
 
     ct.join();
 }
@@ -820,7 +810,7 @@ void ThreadTest::testInterruptWait() {
             Thread::sleep(10);
         }
     }
-    CPPUNIT_ASSERT(ct.getState() == Thread::WAITING);
+    ASSERT_TRUE(ct.getState() == Thread::WAITING);
 
     ct.interrupt();
     for(int i = 0; i < 10; ++i) {
@@ -830,7 +820,7 @@ void ThreadTest::testInterruptWait() {
             Thread::sleep(10);
         }
     }
-    CPPUNIT_ASSERT(runnable->wasInterrupted());
+    ASSERT_TRUE(runnable->wasInterrupted());
 
     ct.join();
 }

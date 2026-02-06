@@ -18,25 +18,15 @@
 #ifndef _DECAF_IO_INPUTSTREAMREADERTEST_H_
 #define _DECAF_IO_INPUTSTREAMREADERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/io/ByteArrayInputStream.h>
 #include <decaf/io/InputStreamReader.h>
 
 namespace decaf {
 namespace io {
 
-    class InputStreamReaderTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( InputStreamReaderTest );
-        CPPUNIT_TEST( testClose );
-        CPPUNIT_TEST( testConstructorInputStream );
-        CPPUNIT_TEST( testRead );
-        CPPUNIT_TEST( testReady );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class InputStreamReaderTest : public ::testing::Test {
+private:
 
         ByteArrayInputStream* buffer1;
 
@@ -54,8 +44,8 @@ namespace io {
         InputStreamReaderTest();
         virtual ~InputStreamReaderTest();
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         void testClose();
         void testConstructorInputStream();

@@ -82,7 +82,7 @@ InactivityMonitorTest::~InactivityMonitorTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitorTest::setUp() {
+void InactivityMonitorTest::SetUp() {
 
     URI uri( "mock://mock?wireformat=openwire" );
     MockTransportFactory factory;
@@ -97,7 +97,7 @@ void InactivityMonitorTest::setUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitorTest::tearDown() {
+void InactivityMonitorTest::TearDown() {
     this->transport.reset( NULL );
 }
 
@@ -106,11 +106,11 @@ void InactivityMonitorTest::testCreate() {
 
     InactivityMonitor monitor( this->transport, this->transport->getWireFormat() );
 
-    CPPUNIT_ASSERT( monitor.getInitialDelayTime() == 0 );
-    CPPUNIT_ASSERT( monitor.getReadCheckTime() == 0 );
-    CPPUNIT_ASSERT( monitor.getWriteCheckTime() == 0 );
-    CPPUNIT_ASSERT( monitor.isKeepAliveResponseRequired() == false );
-    CPPUNIT_ASSERT( monitor.isClosed() == false );
+    ASSERT_TRUE(monitor.getInitialDelayTime() == 0);
+    ASSERT_TRUE(monitor.getReadCheckTime() == 0);
+    ASSERT_TRUE(monitor.getWriteCheckTime() == 0);
+    ASSERT_TRUE(monitor.isKeepAliveResponseRequired() == false);
+    ASSERT_TRUE(monitor.isClosed() == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,12 +127,12 @@ void InactivityMonitorTest::testReadTimeout() {
     Thread::sleep( 2000 );
 
     // Should not have timed out on Read yet.
-    CPPUNIT_ASSERT( listener.exceptionFired == false );
+    ASSERT_TRUE(listener.exceptionFired == false);
 
     Thread::sleep( 5000 );
 
     // Channel should have been inactive for to long.
-    CPPUNIT_ASSERT( listener.exceptionFired == true );
+    ASSERT_TRUE(listener.exceptionFired == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -155,12 +155,12 @@ void InactivityMonitorTest::testWriteMessageFail() {
     this->transport->fireCommand( message );
 
     // Should not have timed out on Read yet.
-    CPPUNIT_ASSERT( listener.exceptionFired == false );
+    ASSERT_TRUE(listener.exceptionFired == false);
 
     Thread::sleep( 5000 );
 
     // Channel should have been inactive for to long.
-    CPPUNIT_ASSERT( listener.exceptionFired == true );
+    ASSERT_TRUE(listener.exceptionFired == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -183,5 +183,5 @@ void InactivityMonitorTest::testNonFailureSendCase() {
     }
 
     // Channel should have been inactive for to long.
-    CPPUNIT_ASSERT( listener.exceptionFired == false );
+    ASSERT_TRUE(listener.exceptionFired == false);
 }

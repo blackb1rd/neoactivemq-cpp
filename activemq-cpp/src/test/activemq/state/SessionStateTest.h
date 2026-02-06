@@ -18,19 +18,12 @@
 #ifndef _ACTIVEMQ_STATE_SESSIONSTATETEST_H_
 #define _ACTIVEMQ_STATE_SESSIONSTATETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace state {
 
-    class SessionStateTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( SessionStateTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class SessionStateTest : public ::testing::Test {
+public:
 
         SessionStateTest() {}
         virtual ~SessionStateTest() {}

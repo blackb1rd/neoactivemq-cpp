@@ -56,7 +56,7 @@ using namespace activemq::test::openwire;
 
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireJmsRecoverTest::OpenwireJmsRecoverTest() :
-    CppUnit::TestFixture(), factory(), connection(), destination() {
+    factory(), connection(), destination() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,15 +64,15 @@ OpenwireJmsRecoverTest::~OpenwireJmsRecoverTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireJmsRecoverTest::setUp() {
+void OpenwireJmsRecoverTest::SetUp() {
 
     factory = ConnectionFactory::createCMSConnectionFactory(getBrokerURL());
-    CPPUNIT_ASSERT(factory != NULL);
+    ASSERT_TRUE(factory != NULL);
     connection = factory->createConnection();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireJmsRecoverTest::tearDown() {
+void OpenwireJmsRecoverTest::TearDown() {
     delete factory;
     delete connection;
     delete destination;
@@ -127,19 +127,19 @@ void OpenwireJmsRecoverTest::doTestSynchRecover() {
     producer->send(std::unique_ptr<cms::Message>(session->createTextMessage("Second")).get());
 
     std::unique_ptr<TextMessage> message(dynamic_cast<TextMessage*>(consumer->receive(2000)));
-    CPPUNIT_ASSERT_EQUAL(string("First"), message->getText());
-    CPPUNIT_ASSERT(!message->getCMSRedelivered());
+    ASSERT_EQ(string("First"), message->getText());
+    ASSERT_TRUE(!message->getCMSRedelivered());
     message->acknowledge();
 
     message.reset(dynamic_cast<TextMessage*>(consumer->receive(2000)));
-    CPPUNIT_ASSERT_EQUAL(string("Second"), message->getText());
-    CPPUNIT_ASSERT(!message->getCMSRedelivered());
+    ASSERT_EQ(string("Second"), message->getText());
+    ASSERT_TRUE(!message->getCMSRedelivered());
 
     session->recover();
 
     message.reset(dynamic_cast<TextMessage*>(consumer->receive(2000)));
-    CPPUNIT_ASSERT_EQUAL(string("Second"), message->getText());
-    CPPUNIT_ASSERT(message->getCMSRedelivered());
+    ASSERT_EQ(string("Second"), message->getText());
+    ASSERT_TRUE(message->getCMSRedelivered());
 
     message->acknowledge();
 }
@@ -175,18 +175,18 @@ namespace {
                 const TextMessage* message = dynamic_cast<const TextMessage*>(msg);
                 switch (counter) {
                 case 1:
-                    CPPUNIT_ASSERT_EQUAL(string("First"), message->getText());
-                    CPPUNIT_ASSERT(!message->getCMSRedelivered());
+                    ASSERT_EQ(string("First"), message->getText());
+                    ASSERT_TRUE(!message->getCMSRedelivered());
                     message->acknowledge();
                     break;
                 case 2:
-                    CPPUNIT_ASSERT_EQUAL(string("Second"), message->getText());
-                    CPPUNIT_ASSERT(!message->getCMSRedelivered());
+                    ASSERT_EQ(string("Second"), message->getText());
+                    ASSERT_TRUE(!message->getCMSRedelivered());
                     session->recover();
                     break;
                 case 3:
-                    CPPUNIT_ASSERT_EQUAL(string("Second"), message->getText());
-                    CPPUNIT_ASSERT(message->getCMSRedelivered());
+                    ASSERT_EQ(string("Second"), message->getText());
+                    ASSERT_TRUE(message->getCMSRedelivered());
                     message->acknowledge();
                     doneCountDownLatch->countDown();
                     break;
@@ -224,10 +224,10 @@ void OpenwireJmsRecoverTest::doTestAsynchRecover() {
 
     if (doneCountDownLatch.await(5, TimeUnit::SECONDS)) {
         if (!errorMessages.empty()) {
-            CPPUNIT_FAIL(errorMessages.front());
+            FAIL() << (errorMessages.front());
         }
     } else {
-        CPPUNIT_FAIL("Timeout waiting for async message delivery to complete.");
+        FAIL() << ("Timeout waiting for async message delivery to complete.");
     }
 }
 
@@ -262,17 +262,17 @@ namespace {
                 const TextMessage* message = dynamic_cast<const TextMessage*>(msg);
                 switch (counter) {
                 case 1:
-                    CPPUNIT_ASSERT_EQUAL(string("First"), message->getText());
-                    CPPUNIT_ASSERT(!message->getCMSRedelivered());
+                    ASSERT_EQ(string("First"), message->getText());
+                    ASSERT_TRUE(!message->getCMSRedelivered());
                     break;
                 case 2:
-                    CPPUNIT_ASSERT_EQUAL(string("Second"), message->getText());
-                    CPPUNIT_ASSERT(!message->getCMSRedelivered());
+                    ASSERT_EQ(string("Second"), message->getText());
+                    ASSERT_TRUE(!message->getCMSRedelivered());
                     session->recover();
                     break;
                 case 3:
-                    CPPUNIT_ASSERT_EQUAL(string("Second"), message->getText());
-                    CPPUNIT_ASSERT(message->getCMSRedelivered());
+                    ASSERT_EQ(string("Second"), message->getText());
+                    ASSERT_TRUE(message->getCMSRedelivered());
                     doneCountDownLatch->countDown();
                     break;
                 default:
@@ -309,9 +309,9 @@ void OpenwireJmsRecoverTest::doTestAsynchRecoverWithAutoAck() {
 
     if (doneCountDownLatch.await(5, TimeUnit::SECONDS)) {
         if (!errorMessages.empty()) {
-            CPPUNIT_FAIL(errorMessages.front());
+            FAIL() << (errorMessages.front());
         }
     } else {
-        CPPUNIT_FAIL("Timeout waiting for async message delivery to complete.");
+        FAIL() << ("Timeout waiting for async message delivery to complete.");
     }
 }

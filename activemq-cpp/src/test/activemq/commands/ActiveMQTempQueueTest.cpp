@@ -30,23 +30,20 @@ void ActiveMQTempQueueTest::test()
 {
     ActiveMQTempQueue myQueue;
 
-    CPPUNIT_ASSERT( myQueue.getDestinationType() == cms::Destination::TEMPORARY_QUEUE );
+    ASSERT_TRUE(myQueue.getDestinationType() == cms::Destination::TEMPORARY_QUEUE);
 
     myQueue.setPhysicalName("ID:SomeValue:0:1");
     std::string connectionId = myQueue.getConnectionId();
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("ConnectionId did not parse correctly",
-        std::string("ID:SomeValue:0"), myQueue.getConnectionId());
+    ASSERT_EQ(std::string("ID:SomeValue:0"), myQueue.getConnectionId()) << ("ConnectionId did not parse correctly");
 
     myQueue.setPhysicalName("");
     myQueue.setPhysicalName("ID:SomeValue:0:A");
     connectionId = myQueue.getConnectionId();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("ConnectionId should not have parsed",
-        std::string("ID:SomeValue:0"), myQueue.getConnectionId());
+    ASSERT_EQ(std::string("ID:SomeValue:0"), myQueue.getConnectionId()) << ("ConnectionId should not have parsed");
 
     myQueue.setPhysicalName("");
     myQueue.setPhysicalName("SomeValueThatWillNotParse");
     connectionId = myQueue.getConnectionId();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("ConnectionId should not have parsed",
-        std::string(""), myQueue.getConnectionId());
+    ASSERT_EQ(std::string(""), myQueue.getConnectionId()) << ("ConnectionId should not have parsed");
 }

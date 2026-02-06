@@ -28,14 +28,14 @@ using namespace decaf::util;
 using namespace decaf::io;
 
 ////////////////////////////////////////////////////////////////////////////////
-void PropertiesTest::setUp() {
+void PropertiesTest::SetUp() {
 
     this->testProperties.setProperty( "test.prop", "this is a test property" );
     this->testProperties.setProperty( "bogus.prop", "bogus" );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PropertiesTest::tearDown() {
+void PropertiesTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -43,23 +43,23 @@ void PropertiesTest::testPutAndGet() {
 
     Properties properties;
 
-    CPPUNIT_ASSERT( properties.isEmpty() == true );
-    CPPUNIT_ASSERT( properties.getProperty( "Bob" ) == NULL );
-    CPPUNIT_ASSERT( properties.getProperty( "Bob", "Steve" ) == "Steve" );
+    ASSERT_TRUE(properties.isEmpty() == true);
+    ASSERT_TRUE(properties.getProperty( "Bob" ) == NULL);
+    ASSERT_TRUE(properties.getProperty( "Bob", "Steve" ) == "Steve");
 
-    CPPUNIT_ASSERT( properties.size() == 0 );
+    ASSERT_TRUE(properties.size() == 0);
 
     properties.setProperty( "Bob", "Foo" );
-    CPPUNIT_ASSERT( properties.isEmpty() == false );
+    ASSERT_TRUE(properties.isEmpty() == false);
 
-    CPPUNIT_ASSERT( properties.hasProperty( "Steve" ) == false );
+    ASSERT_TRUE(properties.hasProperty( "Steve" ) == false);
     properties.setProperty( "Steve", "Foo" );
-    CPPUNIT_ASSERT( properties.hasProperty( "Steve" ) == true );
+    ASSERT_TRUE(properties.hasProperty( "Steve" ) == true);
 
-    CPPUNIT_ASSERT( properties.size() == 2 );
+    ASSERT_TRUE(properties.size() == 2);
 
-    CPPUNIT_ASSERT( properties.getProperty( "Bob" ) == std::string( "Foo" ) );
-    CPPUNIT_ASSERT( properties.getProperty( "Bob", "Steve" ) == "Foo" );
+    ASSERT_TRUE(properties.getProperty( "Bob" ) == std::string( "Foo" ));
+    ASSERT_TRUE(properties.getProperty( "Bob", "Steve" ) == "Foo");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -73,19 +73,19 @@ void PropertiesTest::testAssign() {
     properties1.setProperty( "C", "C" );
     properties1.setProperty( "D", "D" );
 
-    CPPUNIT_ASSERT( properties2.hasProperty( "A" ) == false );
-    CPPUNIT_ASSERT( properties2.hasProperty( "B" ) == false );
-    CPPUNIT_ASSERT( properties2.hasProperty( "C" ) == false );
-    CPPUNIT_ASSERT( properties2.hasProperty( "D" ) == false );
+    ASSERT_TRUE(properties2.hasProperty( "A" ) == false);
+    ASSERT_TRUE(properties2.hasProperty( "B" ) == false);
+    ASSERT_TRUE(properties2.hasProperty( "C" ) == false);
+    ASSERT_TRUE(properties2.hasProperty( "D" ) == false);
 
     properties2 = properties1;
 
-    CPPUNIT_ASSERT( properties2.hasProperty( "A" ) == true );
-    CPPUNIT_ASSERT( properties2.hasProperty( "B" ) == true );
-    CPPUNIT_ASSERT( properties2.hasProperty( "C" ) == true );
-    CPPUNIT_ASSERT( properties2.hasProperty( "D" ) == true );
+    ASSERT_TRUE(properties2.hasProperty( "A" ) == true);
+    ASSERT_TRUE(properties2.hasProperty( "B" ) == true);
+    ASSERT_TRUE(properties2.hasProperty( "C" ) == true);
+    ASSERT_TRUE(properties2.hasProperty( "D" ) == true);
 
-    CPPUNIT_ASSERT( properties1.size() == properties2.size() );
+    ASSERT_TRUE(properties1.size() == properties2.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -99,19 +99,19 @@ void PropertiesTest::testCopy() {
     properties1.setProperty( "C", "C" );
     properties1.setProperty( "D", "D" );
 
-    CPPUNIT_ASSERT( properties2.hasProperty( "A" ) == false );
-    CPPUNIT_ASSERT( properties2.hasProperty( "B" ) == false );
-    CPPUNIT_ASSERT( properties2.hasProperty( "C" ) == false );
-    CPPUNIT_ASSERT( properties2.hasProperty( "D" ) == false );
+    ASSERT_TRUE(properties2.hasProperty( "A" ) == false);
+    ASSERT_TRUE(properties2.hasProperty( "B" ) == false);
+    ASSERT_TRUE(properties2.hasProperty( "C" ) == false);
+    ASSERT_TRUE(properties2.hasProperty( "D" ) == false);
 
     properties2.copy( properties1 );
 
-    CPPUNIT_ASSERT( properties2.hasProperty( "A" ) == true );
-    CPPUNIT_ASSERT( properties2.hasProperty( "B" ) == true );
-    CPPUNIT_ASSERT( properties2.hasProperty( "C" ) == true );
-    CPPUNIT_ASSERT( properties2.hasProperty( "D" ) == true );
+    ASSERT_TRUE(properties2.hasProperty( "A" ) == true);
+    ASSERT_TRUE(properties2.hasProperty( "B" ) == true);
+    ASSERT_TRUE(properties2.hasProperty( "C" ) == true);
+    ASSERT_TRUE(properties2.hasProperty( "D" ) == true);
 
-    CPPUNIT_ASSERT( properties1.size() == properties2.size() );
+    ASSERT_TRUE(properties1.size() == properties2.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,12 +127,12 @@ void PropertiesTest::testClone() {
 
     properties2.reset( properties1.clone() );
 
-    CPPUNIT_ASSERT( properties2->hasProperty( "A" ) == true );
-    CPPUNIT_ASSERT( properties2->hasProperty( "B" ) == true );
-    CPPUNIT_ASSERT( properties2->hasProperty( "C" ) == true );
-    CPPUNIT_ASSERT( properties2->hasProperty( "D" ) == true );
+    ASSERT_TRUE(properties2->hasProperty( "A" ) == true);
+    ASSERT_TRUE(properties2->hasProperty( "B" ) == true);
+    ASSERT_TRUE(properties2->hasProperty( "C" ) == true);
+    ASSERT_TRUE(properties2->hasProperty( "D" ) == true);
 
-    CPPUNIT_ASSERT( properties1.size() == properties2->size() );
+    ASSERT_TRUE(properties1.size() == properties2->size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -148,12 +148,12 @@ void PropertiesTest::testRemove() {
     properties1.remove( "A" );
     properties1.remove( "C" );
 
-    CPPUNIT_ASSERT( properties1.hasProperty( "A" ) == false );
-    CPPUNIT_ASSERT( properties1.hasProperty( "B" ) == true );
-    CPPUNIT_ASSERT( properties1.hasProperty( "C" ) == false );
-    CPPUNIT_ASSERT( properties1.hasProperty( "D" ) == true );
+    ASSERT_TRUE(properties1.hasProperty( "A" ) == false);
+    ASSERT_TRUE(properties1.hasProperty( "B" ) == true);
+    ASSERT_TRUE(properties1.hasProperty( "C" ) == false);
+    ASSERT_TRUE(properties1.hasProperty( "D" ) == true);
 
-    CPPUNIT_ASSERT( properties1.size() == 2 );
+    ASSERT_TRUE(properties1.size() == 2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -166,13 +166,13 @@ void PropertiesTest::testClear() {
     properties1.setProperty( "C", "C" );
     properties1.setProperty( "D", "D" );
 
-    CPPUNIT_ASSERT( properties1.size() == 4 );
-    CPPUNIT_ASSERT( properties1.isEmpty() == false );
+    ASSERT_TRUE(properties1.size() == 4);
+    ASSERT_TRUE(properties1.isEmpty() == false);
 
     properties1.clear();
 
-    CPPUNIT_ASSERT( properties1.size() == 0 );
-    CPPUNIT_ASSERT( properties1.isEmpty() == true );
+    ASSERT_TRUE(properties1.size() == 0);
+    ASSERT_TRUE(properties1.isEmpty() == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -186,21 +186,21 @@ void PropertiesTest::testEquals() {
     properties1.setProperty( "C", "C" );
     properties1.setProperty( "D", "D" );
 
-    CPPUNIT_ASSERT( properties2.hasProperty( "A" ) == false );
-    CPPUNIT_ASSERT( properties2.hasProperty( "B" ) == false );
-    CPPUNIT_ASSERT( properties2.hasProperty( "C" ) == false );
-    CPPUNIT_ASSERT( properties2.hasProperty( "D" ) == false );
+    ASSERT_TRUE(properties2.hasProperty( "A" ) == false);
+    ASSERT_TRUE(properties2.hasProperty( "B" ) == false);
+    ASSERT_TRUE(properties2.hasProperty( "C" ) == false);
+    ASSERT_TRUE(properties2.hasProperty( "D" ) == false);
 
-    CPPUNIT_ASSERT( !properties2.equals( properties1 ) );
+    ASSERT_TRUE(!properties2.equals( properties1 ));
 
     properties2.copy( properties1 );
 
-    CPPUNIT_ASSERT( properties2.hasProperty( "A" ) == true );
-    CPPUNIT_ASSERT( properties2.hasProperty( "B" ) == true );
-    CPPUNIT_ASSERT( properties2.hasProperty( "C" ) == true );
-    CPPUNIT_ASSERT( properties2.hasProperty( "D" ) == true );
+    ASSERT_TRUE(properties2.hasProperty( "A" ) == true);
+    ASSERT_TRUE(properties2.hasProperty( "B" ) == true);
+    ASSERT_TRUE(properties2.hasProperty( "C" ) == true);
+    ASSERT_TRUE(properties2.hasProperty( "D" ) == true);
 
-    CPPUNIT_ASSERT( properties2.equals( properties1 ) );
+    ASSERT_TRUE(properties2.equals( properties1 ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -210,15 +210,9 @@ void PropertiesTest::testLoadNPE() {
     decaf::io::InputStream* nullStream = NULL;
     decaf::io::Reader* nullReader = NULL;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        properties.load( nullStream ),
-        decaf::lang::exceptions::NullPointerException );
+    ASSERT_THROW(properties.load( nullStream ), decaf::lang::exceptions::NullPointerException) << ("Should have thrown a NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        properties.load( nullReader ),
-        decaf::lang::exceptions::NullPointerException );
+    ASSERT_THROW(properties.load( nullReader ), decaf::lang::exceptions::NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -229,7 +223,7 @@ void PropertiesTest::testLoadInputStream() {
         string value(" a= b");
         ByteArrayInputStream stream( (const unsigned char*)value.c_str(), (int)value.size() );
         properties.load( &stream );
-        CPPUNIT_ASSERT( string( "b" ) == properties.getProperty( "a" ) );
+        ASSERT_TRUE(string( "b" ) == properties.getProperty( "a" ));
     }
 
     {
@@ -237,7 +231,7 @@ void PropertiesTest::testLoadInputStream() {
         string value(" a b");
         ByteArrayInputStream stream( (const unsigned char*)value.c_str(), (int)value.size() );
         properties.load( &stream );
-        CPPUNIT_ASSERT( string( "b" ) == properties.getProperty( "a" ) );
+        ASSERT_TRUE(string( "b" ) == properties.getProperty( "a" ));
     }
 
     {
@@ -245,7 +239,7 @@ void PropertiesTest::testLoadInputStream() {
         string value("#comment\na=value");
         ByteArrayInputStream stream( (const unsigned char*)value.c_str(), (int)value.size() );
         properties.load( &stream );
-        CPPUNIT_ASSERT( string( "value" ) == properties.getProperty( "a" ) );
+        ASSERT_TRUE(string( "value" ) == properties.getProperty( "a" ));
     }
 
     {
@@ -253,7 +247,7 @@ void PropertiesTest::testLoadInputStream() {
         string value("#properties file\r\nfred=1\r\n#last comment");
         ByteArrayInputStream stream( (const unsigned char*)value.c_str(), (int)value.size() );
         properties.load( &stream );
-        CPPUNIT_ASSERT( string( "1" ) == properties.getProperty( "fred" ) );
+        ASSERT_TRUE(string( "1" ) == properties.getProperty( "fred" ));
     }
 
 }
@@ -267,11 +261,10 @@ void PropertiesTest::testPropertyNames() {
     std::vector<std::string>::const_iterator name = names.begin();
     int i = 0;
 
-    CPPUNIT_ASSERT( names.size() == 2 );
+    ASSERT_TRUE(names.size() == 2);
 
     for( ; name != names.end(); ++name, ++i ) {
-        CPPUNIT_ASSERT_MESSAGE( "Incorrect names returned",
-                                *name == "test.prop" || *name == "bogus.prop" );
+        ASSERT_TRUE(*name == "test.prop" || *name == "bogus.prop") << ("Incorrect names returned");
     }
 }
 
@@ -282,10 +275,10 @@ void PropertiesTest::testPropertyNamesOverride() {
     props.setProperty( "test.prop", "anotherValue" );
     props.setProperty( "3rdKey", "3rdValue" );
     std::vector<string> set = props.propertyNames();
-    CPPUNIT_ASSERT( 3 == set.size() );
-    CPPUNIT_ASSERT( std::find( set.begin(), set.end(), "test.prop" ) != set.end() );
-    CPPUNIT_ASSERT( std::find( set.begin(), set.end(), "bogus.prop") != set.end() );
-    CPPUNIT_ASSERT( std::find( set.begin(), set.end(), "3rdKey" ) != set.end() );
+    ASSERT_TRUE(3 == set.size());
+    ASSERT_TRUE(std::find( set.begin(), set.end(), "test.prop" ) != set.end());
+    ASSERT_TRUE(std::find( set.begin(), set.end(), "bogus.prop") != set.end());
+    ASSERT_TRUE(std::find( set.begin(), set.end(), "3rdKey" ) != set.end());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -304,18 +297,18 @@ void PropertiesTest::testPropertyNamesScenario1() {
 
     Properties properties2( properties );
     std::vector<string> nameSet = properties.propertyNames();
-    CPPUNIT_ASSERT_EQUAL( 3, (int)nameSet.size() );
+    ASSERT_EQ(3, (int)nameSet.size());
     std::vector<string>::const_iterator iterator = nameSet.begin();
     for( ; iterator != nameSet.end(); ++iterator ) {
-        CPPUNIT_ASSERT( keyList.find( *iterator ) != keyList.end() );
+        ASSERT_TRUE(keyList.find( *iterator ) != keyList.end());
     }
 
     Properties properties3( properties2 );
     nameSet = properties2.propertyNames();
-    CPPUNIT_ASSERT_EQUAL( 3, (int)nameSet.size() );
+    ASSERT_EQ(3, (int)nameSet.size());
     iterator = nameSet.begin();
     for( ; iterator != nameSet.end(); ++iterator ) {
-        CPPUNIT_ASSERT( keyList.find( *iterator ) != keyList.end() );
+        ASSERT_TRUE(keyList.find( *iterator ) != keyList.end());
     }
 }
 
@@ -341,13 +334,13 @@ void PropertiesTest::testStoreOutputStream() {
         in.close();
 
     } catch( IOException& ioe ) {
-        CPPUNIT_FAIL( string("IOException occurred reading/writing file : ") + ioe.getMessage() );
+        FAIL() << (string("IOException occurred reading/writing file : ") + ioe.getMessage());
     }
 
-    CPPUNIT_ASSERT( myProps.size() == myProps2.size() );
+    ASSERT_TRUE(myProps.size() == myProps2.size());
     std::vector<string> nameSet = myProps.propertyNames();
     std::vector<string>::const_iterator iterator = nameSet.begin();
     for( ; iterator != nameSet.end(); ++iterator ) {
-        CPPUNIT_ASSERT( string( myProps2.getProperty( *iterator ) ) == string( myProps.getProperty( *iterator ) ) );
+        ASSERT_TRUE(string( myProps2.getProperty( *iterator ) ) == string( myProps.getProperty( *iterator ) ));
     }
 }

@@ -18,28 +18,12 @@
 #ifndef _ACTIVEMQ_CORE_FIFOMESSAGEDISPATCHCHANNELTEST_H_
 #define _ACTIVEMQ_CORE_FIFOMESSAGEDISPATCHCHANNELTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace core {
 
-    class FifoMessageDispatchChannelTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( FifoMessageDispatchChannelTest );
-        CPPUNIT_TEST( testCtor );
-        CPPUNIT_TEST( testStart );
-        CPPUNIT_TEST( testStop );
-        CPPUNIT_TEST( testClose );
-        CPPUNIT_TEST( testEnqueue );
-        CPPUNIT_TEST( testEnqueueFront );
-        CPPUNIT_TEST( testPeek );
-        CPPUNIT_TEST( testDequeueNoWait );
-        CPPUNIT_TEST( testDequeue );
-        CPPUNIT_TEST( testRemoveAll );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class FifoMessageDispatchChannelTest : public ::testing::Test {
+public:
 
         FifoMessageDispatchChannelTest() {}
         virtual ~FifoMessageDispatchChannelTest() {}

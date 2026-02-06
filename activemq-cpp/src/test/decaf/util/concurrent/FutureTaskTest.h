@@ -25,34 +25,7 @@ namespace util {
 namespace concurrent {
 
     class FutureTaskTest : public ExecutorsTestSupport {
-
-        CPPUNIT_TEST_SUITE( FutureTaskTest );
-        CPPUNIT_TEST( testConstructor1 );
-        CPPUNIT_TEST( testConstructor2 );
-        CPPUNIT_TEST( testConstructor3 );
-        CPPUNIT_TEST( testConstructor4 );
-        CPPUNIT_TEST( testIsDone );
-        CPPUNIT_TEST( testRunAndReset );
-        CPPUNIT_TEST( testResetAfterCancel );
-        CPPUNIT_TEST( testSet );
-        CPPUNIT_TEST( testSetException );
-        CPPUNIT_TEST( testCancelBeforeRun );
-        CPPUNIT_TEST( testCancelBeforeRun2 );
-        CPPUNIT_TEST( testCancelAfterRun );
-        CPPUNIT_TEST( testCancelInterrupt );
-        CPPUNIT_TEST( testCancelNoInterrupt );
-        CPPUNIT_TEST( testGet1 );
-        CPPUNIT_TEST( testTimedGet1 );
-        CPPUNIT_TEST( testTimedGetCancellation );
-        CPPUNIT_TEST( testGetCancellation );
-        CPPUNIT_TEST( testGetExecutionException );
-        CPPUNIT_TEST( testTimedGetExecutionException2 );
-        CPPUNIT_TEST( testGetInterruptedException );
-        CPPUNIT_TEST( testTimedGetInterruptedException2 );
-        CPPUNIT_TEST( testGetTimeoutException );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         FutureTaskTest();
         virtual ~FutureTaskTest();

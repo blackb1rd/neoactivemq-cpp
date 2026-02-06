@@ -86,38 +86,38 @@ void ActiveMQDestinationTest::test()
     dest.setExclusive( true );
     dest.setOrdered( true );
 
-    CPPUNIT_ASSERT( dest.getPhysicalName().find( "test" ) != string::npos );
-    CPPUNIT_ASSERT( dest.isAdvisory() == true );
-    CPPUNIT_ASSERT( dest.isExclusive() == true );
-    CPPUNIT_ASSERT( dest.isAdvisory() == true );
+    ASSERT_TRUE(dest.getPhysicalName().find( "test" ) != string::npos);
+    ASSERT_TRUE(dest.isAdvisory() == true);
+    ASSERT_TRUE(dest.isExclusive() == true);
+    ASSERT_TRUE(dest.isAdvisory() == true);
 
     MyDestination dest2;
     dest2.copyDataStructure( &dest );
 
-    CPPUNIT_ASSERT( dest2.getPhysicalName().find( "test" ) != string::npos );
-    CPPUNIT_ASSERT( dest2.isAdvisory() == true );
-    CPPUNIT_ASSERT( dest2.isExclusive() == true );
-    CPPUNIT_ASSERT( dest2.isAdvisory() == true );
+    ASSERT_TRUE(dest2.getPhysicalName().find( "test" ) != string::npos);
+    ASSERT_TRUE(dest2.isAdvisory() == true);
+    ASSERT_TRUE(dest2.isExclusive() == true);
+    ASSERT_TRUE(dest2.isAdvisory() == true);
 
     MyDestination* dest3 = NULL;
     dest3 = dynamic_cast<MyDestination*>( dest.cloneDataStructure() );
 
-    CPPUNIT_ASSERT( dest3 != NULL );
-    CPPUNIT_ASSERT( dest3->getPhysicalName().find( "test" ) != string::npos );
-    CPPUNIT_ASSERT( dest3->isAdvisory() == true );
-    CPPUNIT_ASSERT( dest3->isExclusive() == true );
-    CPPUNIT_ASSERT( dest3->isAdvisory() == true );
+    ASSERT_TRUE(dest3 != NULL);
+    ASSERT_TRUE(dest3->getPhysicalName().find( "test" ) != string::npos);
+    ASSERT_TRUE(dest3->isAdvisory() == true);
+    ASSERT_TRUE(dest3->isExclusive() == true);
+    ASSERT_TRUE(dest3->isAdvisory() == true);
 
     delete dest3;
 
     std::string clientId = UUID::randomUUID().toString();
     std::string result = dest.createTemporaryName( clientId );
-    CPPUNIT_ASSERT( result.find( clientId ) != string::npos );
+    ASSERT_TRUE(result.find( clientId ) != string::npos);
     dest.setPhysicalName( result );
-    CPPUNIT_ASSERT( clientId != dest.getClientId( &dest ) );
+    ASSERT_TRUE(clientId != dest.getClientId( &dest ));
     MyTempDestination tmpDest;
     tmpDest.setPhysicalName( result );
-    CPPUNIT_ASSERT( clientId == ActiveMQDestination::getClientId( &tmpDest ) );
+    ASSERT_TRUE(clientId == ActiveMQDestination::getClientId( &tmpDest ));
 
 }
 
@@ -130,9 +130,9 @@ void ActiveMQDestinationTest::testOptions(){
 
     const util::ActiveMQProperties& properties = dest.getOptions();
 
-    CPPUNIT_ASSERT( properties.hasProperty( "option1" ) == true );
-    CPPUNIT_ASSERT( properties.hasProperty( "option2" ) == true );
+    ASSERT_TRUE(properties.hasProperty( "option1" ) == true);
+    ASSERT_TRUE(properties.hasProperty( "option2" ) == true);
 
-    CPPUNIT_ASSERT( std::string( properties.getProperty( "option1" ) ) == "test1" );
-    CPPUNIT_ASSERT( std::string( properties.getProperty( "option2" ) ) == "test2" );
+    ASSERT_TRUE(std::string( properties.getProperty( "option1" ) ) == "test1");
+    ASSERT_TRUE(std::string( properties.getProperty( "option2" ) ) == "test2");
 }

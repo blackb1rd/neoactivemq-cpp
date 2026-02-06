@@ -121,9 +121,6 @@ public:
                 return command;
             }
 
-            CPPUNIT_ASSERT( false );
-            return Pointer<Command>();
-
         }catch( decaf::lang::Exception& ex ){
             IOException cx;
             cx.setMark( __FILE__, __LINE__ );
@@ -134,6 +131,8 @@ public:
             cx.setMark( __FILE__, __LINE__ );
             throw cx;
         }
+
+        return Pointer<Command>();
     }
 
     virtual void marshal( const Pointer<commands::Command> command,
@@ -292,7 +291,7 @@ void IOTransportTest::testRead(){
 
     listener.await();
 
-    CPPUNIT_ASSERT( listener.str == "1234567890" );
+    ASSERT_TRUE(listener.str == "1234567890");
 
     transport.close();
 }
@@ -330,12 +329,12 @@ void IOTransportTest::testWrite(){
     std::pair<const unsigned char*, int> array = os.toByteArray();
     const unsigned char* bytes = array.first;
     std::size_t size = array.second;
-    CPPUNIT_ASSERT( size >= 5 );
-    CPPUNIT_ASSERT( bytes[0] == '1' );
-    CPPUNIT_ASSERT( bytes[1] == '2' );
-    CPPUNIT_ASSERT( bytes[2] == '3' );
-    CPPUNIT_ASSERT( bytes[3] == '4' );
-    CPPUNIT_ASSERT( bytes[4] == '5' );
+    ASSERT_TRUE(size >= 5);
+    ASSERT_TRUE(bytes[0] == '1');
+    ASSERT_TRUE(bytes[1] == '2');
+    ASSERT_TRUE(bytes[2] == '3');
+    ASSERT_TRUE(bytes[3] == '4');
+    ASSERT_TRUE(bytes[4] == '5');
 
     delete [] array.first;
 
@@ -385,12 +384,12 @@ void IOTransportTest::testNarrow(){
     IOTransport transport;
 
     Transport* narrowed = transport.narrow( typeid( transport ) );
-    CPPUNIT_ASSERT( narrowed == &transport );
+    ASSERT_TRUE(narrowed == &transport);
 
     narrowed = transport.narrow( typeid( std::string() ) );
-    CPPUNIT_ASSERT( narrowed == NULL );
+    ASSERT_TRUE(narrowed == NULL);
 
     narrowed = transport.narrow( typeid( transport::IOTransport ) );
-    CPPUNIT_ASSERT( narrowed == &transport );
+    ASSERT_TRUE(narrowed == &transport);
 
 }

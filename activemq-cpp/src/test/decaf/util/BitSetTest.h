@@ -18,51 +18,17 @@
 #ifndef _DECAF_UTIL_BITSETTEST_H_
 #define _DECAF_UTIL_BITSETTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 
-    class BitSetTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( BitSetTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testConstructorI );
-        CPPUNIT_TEST( testCopy );
-        CPPUNIT_TEST( testCardinality );
-        CPPUNIT_TEST( testEquals );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testClearI );
-        CPPUNIT_TEST( testClearII );
-        CPPUNIT_TEST( testGetI );
-        CPPUNIT_TEST( testGetII );
-        CPPUNIT_TEST( testFlipI );
-        CPPUNIT_TEST( testFlipII );
-        CPPUNIT_TEST( testSetI );
-        CPPUNIT_TEST( testSetIB );
-        CPPUNIT_TEST( testSetII );
-        CPPUNIT_TEST( testSetIIB );
-        CPPUNIT_TEST( testIsEmpty );
-        CPPUNIT_TEST( testIntersects );
-        CPPUNIT_TEST( testAnd );
-        CPPUNIT_TEST( testAndNot );
-        CPPUNIT_TEST( testOR );
-        CPPUNIT_TEST( testXOR );
-        CPPUNIT_TEST( testSize );
-        CPPUNIT_TEST( testLength );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST( testNextSetBitI );
-        CPPUNIT_TEST( testNextClearBitI );
-        CPPUNIT_TEST( testNotModified );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class BitSetTest : public ::testing::Test {
+public:
 
         BitSetTest();
         virtual ~BitSetTest();
 
-        virtual void setUp();
+        void SetUp() override;
 
         void testConstructor();
         void testConstructorI();

@@ -26,16 +26,7 @@ namespace openwire {
 
     class OpenwireMapMessageTest : public MapMessageTest {
     private:
-
-        CPPUNIT_TEST_SUITE( OpenwireMapMessageTest );
-        CPPUNIT_TEST( testEmptyMapSendReceive );
-        CPPUNIT_TEST( testMapWithEmptyStringValue );
-        CPPUNIT_TEST( testMapSetEmptyBytesVector );
-        CPPUNIT_TEST( testMapWithSingleCharEntry );
-        CPPUNIT_TEST( testMapWithCharAndStringEntry );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireMapMessageTest();
         virtual ~OpenwireMapMessageTest();

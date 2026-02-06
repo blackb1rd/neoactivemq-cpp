@@ -18,34 +18,12 @@
 #ifndef _ACTIVEMQ_COMMANDS_ACTIVEMQSTREAMMESSAGETEST_H_
 #define _ACTIVEMQ_COMMANDS_ACTIVEMQSTREAMMESSAGETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace commands {
 
-    class ActiveMQStreamMessageTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ActiveMQStreamMessageTest );
-        CPPUNIT_TEST( testSetAndGet );
-        CPPUNIT_TEST( testReadBoolean );
-        CPPUNIT_TEST( testReadByte );
-        CPPUNIT_TEST( testReadShort );
-        CPPUNIT_TEST( testReadChar );
-        CPPUNIT_TEST( testReadInt );
-        CPPUNIT_TEST( testReadLong );
-        CPPUNIT_TEST( testReadFloat );
-        CPPUNIT_TEST( testReadDouble );
-        CPPUNIT_TEST( testReadString );
-        CPPUNIT_TEST( testReadBigString );
-        CPPUNIT_TEST( testReadBytes );
-        CPPUNIT_TEST( testClearBody );
-        CPPUNIT_TEST( testReset );
-        CPPUNIT_TEST( testReadOnlyBody );
-        CPPUNIT_TEST( testWriteOnlyBody );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class ActiveMQStreamMessageTest : public ::testing::Test {
+private:
 
         std::vector<unsigned char> buffer;
 
@@ -54,8 +32,8 @@ namespace commands {
         ActiveMQStreamMessageTest() : buffer() {}
         virtual ~ActiveMQStreamMessageTest() {}
 
-        void setUp();
-        void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         void testSetAndGet();
         void testReadBoolean();

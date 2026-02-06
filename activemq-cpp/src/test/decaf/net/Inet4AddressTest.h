@@ -18,19 +18,12 @@
 #ifndef _DECAF_NET_INET4ADDRESSTEST_H_
 #define _DECAF_NET_INET4ADDRESSTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace net {
 
-    class Inet4AddressTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( Inet4AddressTest );
-        CPPUNIT_TEST( testGetByAddress );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class Inet4AddressTest : public ::testing::Test {
+public:
 
         Inet4AddressTest();
         virtual ~Inet4AddressTest();

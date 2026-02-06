@@ -25,20 +25,7 @@ namespace test{
 namespace stomp{
 
     class StompSimpleTest : public SimpleTest {
-
-        CPPUNIT_TEST_SUITE( StompSimpleTest );
-        CPPUNIT_TEST( testAutoAck );
-        CPPUNIT_TEST( testClientAck );
-        CPPUNIT_TEST( testProducerWithNullDestination );
-        CPPUNIT_TEST( testSyncReceive );
-        CPPUNIT_TEST( testSyncReceiveClientAck );
-        CPPUNIT_TEST( testMultipleConnections );
-        CPPUNIT_TEST( testMultipleSessions );
-        CPPUNIT_TEST( testReceiveAlreadyInQueue );
-        CPPUNIT_TEST( testQuickCreateAndDestroy );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         StompSimpleTest();
         virtual ~StompSimpleTest();

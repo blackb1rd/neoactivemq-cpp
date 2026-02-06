@@ -75,7 +75,7 @@ void BufferedOutputStreamTest::testConstructor1() {
         BufferedOutputStream os( &myStream );
         os.write( (unsigned char*)&testString[0], 500, 0, 500 );
     } catch( IOException& e ) {
-        CPPUNIT_FAIL("Constrcutor test failed");
+        FAIL() << ("Constrcutor test failed");
     }
 }
 
@@ -87,7 +87,7 @@ void BufferedOutputStreamTest::testConstructor2() {
         BufferedOutputStream os( &myStream, 1024 );
         os.write( (unsigned char*)&testString[0], 500, 0, 500 );
     } catch( IOException& e) {
-        CPPUNIT_FAIL("IOException during Constrcutor test");
+        FAIL() << ("IOException during Constrcutor test");
     }
 }
 
@@ -100,10 +100,9 @@ void BufferedOutputStreamTest::testFlush() {
         BufferedOutputStream os( &myStream, 600 );
         os.write( (unsigned char*)&testString[0], 500, 0, 500 );
         os.flush();
-        CPPUNIT_ASSERT_MESSAGE("Bytes not written after flush",
-                500 == myStream.size() );
+        ASSERT_TRUE(500 == myStream.size()) << ("Bytes not written after flush");
     } catch( IOException& e) {
-        CPPUNIT_FAIL("Flush test failed");
+        FAIL() << ("Flush test failed");
     }
 }
 
@@ -117,30 +116,27 @@ void BufferedOutputStreamTest::testWrite() {
         os.write( (unsigned char*)&testString[0], 500, 0, 500 );
 
         std::pair<const unsigned char*, int> array = baos.toByteArray();
-        CPPUNIT_ASSERT_MESSAGE( "Bytes written, not buffered", NULL == array.first );
+        ASSERT_TRUE(NULL == array.first) << ("Bytes written, not buffered");
         delete [] array.first;
         os.flush();
 
         array = baos.toByteArray();
         ByteArrayInputStream bais2( array.first, array.second );
-        CPPUNIT_ASSERT_MESSAGE( "Bytes not written after flush", 500 == bais2.available() );
+        ASSERT_TRUE(500 == bais2.available()) << ("Bytes not written after flush");
         os.write( (unsigned char*)&testString[500], (int)testString.size(), 0, 514 );
         delete [] array.first;
 
         array = baos.toByteArray();
         ByteArrayInputStream bais3( array.first, array.second );
-        CPPUNIT_ASSERT_MESSAGE( "Bytes not written when buffer full",
-                                bais3.available() >= 1000);
+        ASSERT_TRUE(bais3.available() >= 1000) << ("Bytes not written when buffer full");
         unsigned char wbytes[1014] = {0};
         bais3.read( wbytes, 1014, 0, 1013 );
         delete [] array.first;
 
-        CPPUNIT_ASSERT_MESSAGE(
-            "Incorrect bytes written",
-            testString.substr(0, 1012) == string( (const char*)wbytes ) );
+        ASSERT_TRUE(testString.substr(0, 1012) == string( (const char*)wbytes )) << ("Incorrect bytes written");
 
     } catch( IOException& e) {
-        CPPUNIT_FAIL("write test failed: ");
+        FAIL() << ("write test failed: ");
     }
 }
 
@@ -151,20 +147,14 @@ void BufferedOutputStreamTest::testWriteException() {
     unsigned char* nullByteArray = NULL;
     unsigned char byteArray[10];
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw NullPointerException",
-        bos.write( nullByteArray, 0, 0, 1 ),
-        NullPointerException );
+    ASSERT_THROW(bos.write( nullByteArray, 0, 0, 1 ), NullPointerException) << ("should throw NullPointerException");
 
     bos.write( byteArray, 10, 0, 0 );
     bos.write( byteArray, 10, 0, 1 );
     bos.write( byteArray, 10, 0, 10 );
     bos.close();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IOException",
-        bos.write( nullByteArray, 0, 0, 1 ),
-        IOException );
+    ASSERT_THROW(bos.write( nullByteArray, 0, 0, 1 ), IOException) << ("should throw IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -173,14 +163,9 @@ void BufferedOutputStreamTest::testWriteNullStreamNullArray() {
     BufferedOutputStream bos( NULL );
     unsigned char* nullByteArray = NULL;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw NullPointerException",
-        bos.write( nullByteArray, 0, 0, 1 ),
-        IOException );
+    ASSERT_THROW(bos.write( nullByteArray, 0, 0, 1 ), IOException) << ("should throw NullPointerException");
 
-    CPPUNIT_ASSERT_NO_THROW_MESSAGE(
-        "should not throw NullPointerException",
-        bos.write( nullByteArray, 0, 0, 0 ) );
+    ASSERT_NO_THROW(bos.write( nullByteArray, 0, 0, 0 )) << ("should not throw NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -189,14 +174,9 @@ void BufferedOutputStreamTest::testWriteNullStreamNullArraySize() {
     BufferedOutputStream bos( NULL, 1 );
     unsigned char* nullByteArray = NULL;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IOException",
-        bos.write( nullByteArray, 0, 0, 1 ),
-        IOException );
+    ASSERT_THROW(bos.write( nullByteArray, 0, 0, 1 ), IOException) << ("should throw IOException");
 
-    CPPUNIT_ASSERT_NO_THROW_MESSAGE(
-        "should not throw NullPointerException",
-        bos.write( nullByteArray, 0, 0, 0 ) );
+    ASSERT_NO_THROW(bos.write( nullByteArray, 0, 0, 0 )) << ("should not throw NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -205,19 +185,11 @@ void BufferedOutputStreamTest::testWriteNullStream() {
     BufferedOutputStream bos( NULL );
     unsigned char byteArray[10];
 
-    CPPUNIT_ASSERT_NO_THROW_MESSAGE(
-        "should not throw IOException",
-        bos.write( byteArray, 10, 0, 0 ) );
+    ASSERT_NO_THROW(bos.write( byteArray, 10, 0, 0 )) << ("should not throw IOException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IOException",
-        bos.write( byteArray, 10, 0, 1 ),
-        IOException );
+    ASSERT_THROW(bos.write( byteArray, 10, 0, 1 ), IOException) << ("should throw IOException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IOException",
-        bos.write( byteArray, 10, 0, 10 ),
-        IOException );
+    ASSERT_THROW(bos.write( byteArray, 10, 0, 10 ), IOException) << ("should throw IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -228,15 +200,9 @@ void BufferedOutputStreamTest::testWriteNullStreamSize() {
 
     bos.write( byteArray, 0, 0, 0 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw NullPointerException",
-        bos.write( byteArray, 10 , 0, 2 ),
-        IOException );
+    ASSERT_THROW(bos.write( byteArray, 10 , 0, 2 ), IOException) << ("should throw NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw NullPointerException",
-        bos.write( byteArray, 10, 0, 10 ),
-        IOException );
+    ASSERT_THROW(bos.write( byteArray, 10, 0, 10 ), IOException) << ("should throw NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -247,19 +213,19 @@ void BufferedOutputStreamTest::testWriteI() {
         ByteArrayOutputStream baos;
         BufferedOutputStream os( &baos );
         os.write('t');
-        CPPUNIT_ASSERT_MESSAGE( "Byte written, not buffered", NULL == baos.toByteArray().first );
+        ASSERT_TRUE(NULL == baos.toByteArray().first) << ("Byte written, not buffered");
         os.flush();
 
         std::pair<const unsigned char*, int> array = baos.toByteArray();
         ByteArrayInputStream bais2( array.first, array.second );
-        CPPUNIT_ASSERT_MESSAGE( "Byte not written after flush", 1 == bais2.available() );
+        ASSERT_TRUE(1 == bais2.available()) << ("Byte not written after flush");
         unsigned char wbytes[10];
         bais2.read( wbytes, 10, 0, 1 );
-        CPPUNIT_ASSERT_MESSAGE( "Incorrect byte written", 't' == wbytes[0] );
+        ASSERT_TRUE('t' == wbytes[0]) << ("Incorrect byte written");
         delete [] array.first;
 
     } catch( IOException& e) {
-        CPPUNIT_FAIL("Write test failed");
+        FAIL() << ("Write test failed");
     }
 }
 
@@ -273,18 +239,18 @@ void BufferedOutputStreamTest::testSmallerBuffer(){
 
     bufStream.write( (unsigned char)'T' );
     // Should not be written yet.
-    CPPUNIT_ASSERT( strcmp( buffer, "" ) == 0 );
+    ASSERT_TRUE(strcmp( buffer, "" ) == 0);
 
     bufStream.write( (unsigned char)'E' );
     // This time the T should have been written.
-    CPPUNIT_ASSERT( strcmp( buffer, "T" ) == 0 );
+    ASSERT_TRUE(strcmp( buffer, "T" ) == 0);
 
     bufStream.write( (unsigned char*)"ST", 2, 0, 2 );
     // This time the ES should have been written.
-    CPPUNIT_ASSERT( strcmp( buffer, "TES" ) == 0 );
+    ASSERT_TRUE(strcmp( buffer, "TES" ) == 0);
 
     bufStream.flush();
-    CPPUNIT_ASSERT( strcmp( buffer, "TEST" ) == 0 );
+    ASSERT_TRUE(strcmp( buffer, "TEST" ) == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -298,16 +264,16 @@ void BufferedOutputStreamTest::testBiggerBuffer(){
     bufStream.write( (unsigned char*)"TEST", 4, 0, 4 );
 
     // Should not be written yet.
-    CPPUNIT_ASSERT( strcmp( buffer, "" ) == 0 );
+    ASSERT_TRUE(strcmp( buffer, "" ) == 0);
 
     bufStream.flush();
-    CPPUNIT_ASSERT( strcmp( buffer, "TEST" ) == 0 );
+    ASSERT_TRUE(strcmp( buffer, "TEST" ) == 0);
 
     bufStream.write( (unsigned char*)"TEST", 4, 0, 4 );
     bufStream.write( (unsigned char*)"12345678910", 11, 0, 11 );
 
-    CPPUNIT_ASSERT( strcmp( buffer, "TESTTEST123456" ) == 0 );
+    ASSERT_TRUE(strcmp( buffer, "TESTTEST123456" ) == 0);
 
     bufStream.flush();
-    CPPUNIT_ASSERT( strcmp( buffer, "TESTTEST12345678910" ) == 0 );
+    ASSERT_TRUE(strcmp( buffer, "TESTTEST12345678910" ) == 0);
 }

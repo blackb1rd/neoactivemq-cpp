@@ -30,5 +30,5 @@ void ActiveMQTopicTest::test()
 {
     ActiveMQTopic myQueue;
 
-    CPPUNIT_ASSERT( myQueue.getDestinationType() == cms::Destination::TOPIC );
+    ASSERT_TRUE(myQueue.getDestinationType() == cms::Destination::TOPIC);
 }

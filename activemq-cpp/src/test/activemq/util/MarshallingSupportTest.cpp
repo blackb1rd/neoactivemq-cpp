@@ -50,7 +50,7 @@ void MarshallingSupportTest::writeTestHelper( unsigned char* input, int inputLen
     std::string result = MarshallingSupport::asciiToModifiedUtf8( testStr );
 
     for( int i = 0; i < expectLength; ++i ) {
-        CPPUNIT_ASSERT( (unsigned char)result[i] == expect[i] );
+        ASSERT_TRUE((unsigned char)result[i] == expect[i]);
     }
 }
 
@@ -93,7 +93,7 @@ void MarshallingSupportTest::readTestHelper( unsigned char* input, int inputLeng
     std::string result = MarshallingSupport::modifiedUtf8ToAscii( inputString );
 
     for( std::size_t i = 0; i < result.length(); ++i ) {
-        CPPUNIT_ASSERT( (unsigned char)result[i] == expect[i] );
+        ASSERT_TRUE((unsigned char)result[i] == expect[i]);
     }
 }
 
@@ -131,10 +131,7 @@ void MarshallingSupportTest::testModifiedUtf8ToAscii() {
         unsigned char input[] = { 0xC0, 0x80, 0x04, 0xC3, 0x82, 0xC2, 0xC2, 0xC3, 0x83, 0xC0, 0x80, 0xC2, 0xA6 };
         std::string inputString( (char*)input, (int) sizeof(input) / (int) sizeof(unsigned char) );
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should throw a UTFDataFormatException",
-            MarshallingSupport::modifiedUtf8ToAscii( inputString ),
-            UTFDataFormatException );
+        ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii( inputString ), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
     }
 
     // Test with bad UTF-8 encoding, encoded value greater than 255
@@ -142,10 +139,7 @@ void MarshallingSupportTest::testModifiedUtf8ToAscii() {
         unsigned char input[] = { 0xC0, 0x80, 0x04, 0xC3, 0x82, 0xC2, 0xC2, 0xC3, 0x83, 0xC0, 0x80, 0xC2, 0xA6 };
         std::string inputString( (char*)input, (int) sizeof(input) / (int) sizeof(unsigned char) );
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should throw a UTFDataFormatException",
-            MarshallingSupport::modifiedUtf8ToAscii( inputString ),
-            UTFDataFormatException );
+        ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii( inputString ), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
     }
 
     // Test data with value greater than 255 in 2-byte encoding.
@@ -153,10 +147,7 @@ void MarshallingSupportTest::testModifiedUtf8ToAscii() {
         unsigned char input[] = { 0xC8, 0xA9, 0xC3, 0xA6};
         std::string inputString( (char*)input, (int) sizeof(input) / (int) sizeof(unsigned char) );
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should throw a UTFDataFormatException",
-            MarshallingSupport::modifiedUtf8ToAscii( inputString ),
-            UTFDataFormatException );
+        ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii( inputString ), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
     }
 
     // Test data with value greater than 255 in 3-byte encoding.
@@ -164,10 +155,7 @@ void MarshallingSupportTest::testModifiedUtf8ToAscii() {
         unsigned char input[] = { 0xE8, 0xA8, 0xA9, 0xC3, 0xA6};
         std::string inputString( (char*)input, (int) sizeof(input) / (int) sizeof(unsigned char) );
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should throw a UTFDataFormatException",
-            MarshallingSupport::modifiedUtf8ToAscii( inputString ),
-            UTFDataFormatException );
+        ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii( inputString ), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
     }
 
     // Test with three byte encode that's missing a last byte.
@@ -175,10 +163,7 @@ void MarshallingSupportTest::testModifiedUtf8ToAscii() {
         unsigned char input[] = { 0x00, 0x00, 0x00, 0x02, 0xE8, 0xA8};
         std::string inputString( (char*)input, (int) sizeof(input) / (int) sizeof(unsigned char) );
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should throw a UTFDataFormatException",
-            MarshallingSupport::modifiedUtf8ToAscii( inputString ),
-            UTFDataFormatException );
+        ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii( inputString ), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
     }
 }
 
@@ -196,8 +181,8 @@ void MarshallingSupportTest::testWriteString() {
         std::pair<const unsigned char*, int> array = baos.toByteArray();
         bais.setByteArray( array.first, array.second );
 
-        CPPUNIT_ASSERT( dataIn.read() == PrimitiveValueNode::STRING_TYPE );
-        CPPUNIT_ASSERT( dataIn.readShort() == 0 );
+        ASSERT_TRUE(dataIn.read() == PrimitiveValueNode::STRING_TYPE);
+        ASSERT_TRUE(dataIn.readShort() == 0);
 
         delete [] array.first;
     }
@@ -212,8 +197,8 @@ void MarshallingSupportTest::testWriteString() {
         std::pair<const unsigned char*, int> array = baos.toByteArray();
         bais.setByteArray( array.first, array.second );
 
-        CPPUNIT_ASSERT( dataIn.read() == PrimitiveValueNode::STRING_TYPE );
-        CPPUNIT_ASSERT( dataIn.readShort() == 11 );
+        ASSERT_TRUE(dataIn.read() == PrimitiveValueNode::STRING_TYPE);
+        ASSERT_TRUE(dataIn.readShort() == 11);
 
         delete [] array.first;
     }
@@ -228,8 +213,8 @@ void MarshallingSupportTest::testWriteString() {
         std::pair<const unsigned char*, int> array = baos.toByteArray();
         bais.setByteArray( array.first, array.second );
 
-        CPPUNIT_ASSERT( dataIn.read() == PrimitiveValueNode::BIG_STRING_TYPE );
-        CPPUNIT_ASSERT( dataIn.readInt() == Short::MAX_VALUE );
+        ASSERT_TRUE(dataIn.read() == PrimitiveValueNode::BIG_STRING_TYPE);
+        ASSERT_TRUE(dataIn.readInt() == Short::MAX_VALUE);
 
         delete [] array.first;
     }
@@ -249,7 +234,7 @@ void MarshallingSupportTest::testWriteString16() {
         std::pair<const unsigned char*, int> array = baos.toByteArray();
         bais.setByteArray( array.first, array.second );
 
-        CPPUNIT_ASSERT( dataIn.readShort() == 11 );
+        ASSERT_TRUE(dataIn.readShort() == 11);
 
         delete [] array.first;
     }
@@ -269,7 +254,7 @@ void MarshallingSupportTest::testWriteString32() {
         std::pair<const unsigned char*, int> array = baos.toByteArray();
         bais.setByteArray( array.first, array.second );
 
-        CPPUNIT_ASSERT( dataIn.readInt() == 11 );
+        ASSERT_TRUE(dataIn.readInt() == 11);
 
         delete [] array.first;
     }
@@ -295,13 +280,11 @@ void MarshallingSupportTest::testReadString16() {
     string resultStr = "";
     int type = dataIn.read();
 
-    CPPUNIT_ASSERT( type == PrimitiveValueNode::STRING_TYPE );
+    ASSERT_TRUE(type == PrimitiveValueNode::STRING_TYPE);
 
-    CPPUNIT_ASSERT_NO_THROW_MESSAGE(
-        "Should not have thrown a message for valid String type",
-        resultStr = MarshallingSupport::readString16( dataIn ) );
+    ASSERT_NO_THROW(resultStr = MarshallingSupport::readString16( dataIn )) << ("Should not have thrown a message for valid String type");
 
-    CPPUNIT_ASSERT( testStr == resultStr );
+    ASSERT_TRUE(testStr == resultStr);
 
     delete [] array.first;
 }
@@ -326,13 +309,11 @@ void MarshallingSupportTest::testReadString32() {
     string resultStr = "";
     int type = dataIn.read();
 
-    CPPUNIT_ASSERT( type == PrimitiveValueNode::BIG_STRING_TYPE );
+    ASSERT_TRUE(type == PrimitiveValueNode::BIG_STRING_TYPE);
 
-    CPPUNIT_ASSERT_NO_THROW_MESSAGE(
-        "Should not have thrown a message for valid Big String type",
-        resultStr = MarshallingSupport::readString32( dataIn ) );
+    ASSERT_NO_THROW(resultStr = MarshallingSupport::readString32( dataIn )) << ("Should not have thrown a message for valid Big String type");
 
-    CPPUNIT_ASSERT( testStr == resultStr );
+    ASSERT_TRUE(testStr == resultStr);
 
     delete [] array.first;
 }

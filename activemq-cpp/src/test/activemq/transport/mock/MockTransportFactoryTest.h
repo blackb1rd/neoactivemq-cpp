@@ -18,20 +18,13 @@
 #ifndef _ACTIVEMQ_TRANSPORT_MOCK_MOCKTRANSPORTFACTORYTEST_H_
 #define _ACTIVEMQ_TRANSPORT_MOCK_MOCKTRANSPORTFACTORYTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace transport {
 namespace mock {
 
-    class MockTransportFactoryTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( MockTransportFactoryTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class MockTransportFactoryTest : public ::testing::Test {
+public:
 
         MockTransportFactoryTest() {}
         virtual ~MockTransportFactoryTest() {}

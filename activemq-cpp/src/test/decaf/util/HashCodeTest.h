@@ -18,27 +18,12 @@
 #ifndef _DECAF_UTIL_HASHCODETEST_H_
 #define _DECAF_UTIL_HASHCODETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 
-    class HashCodeTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( HashCodeTest );
-        CPPUNIT_TEST( testHashPointerT );
-        CPPUNIT_TEST( testHashString );
-        CPPUNIT_TEST( testHashBool );
-        CPPUNIT_TEST( testHashChar );
-        CPPUNIT_TEST( testHashShort );
-        CPPUNIT_TEST( testHashInteger );
-        CPPUNIT_TEST( testHashLong );
-        CPPUNIT_TEST( testHashFloat );
-        CPPUNIT_TEST( testHashDouble );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class HashCodeTest : public ::testing::Test {
+public:
 
         HashCodeTest();
 

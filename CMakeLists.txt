@@ -205,28 +205,16 @@ add_subdirectory(activemq-cpp/src/main)
 add_subdirectory(activemq-cpp/src/examples)
 
 if(AMQCPP_BUILD_TESTS)
-    find_package(CppUnit CONFIG REQUIRED)
+    find_package(GTest CONFIG REQUIRED)
+
+	# Enable CTest before add_subdirectory so gtest_discover_tests works
+	# in subdirectories (generates CTestTestfile.cmake for each)
+	enable_testing()
+
 	add_subdirectory(activemq-cpp/src/test)
 	add_subdirectory(activemq-cpp/src/test-benchmarks)
 	add_subdirectory(activemq-cpp/src/test-integration)
 	add_subdirectory(activemq-cpp/src/test-system)
-
-	# Enable CTest and register the test executables
-	enable_testing()
-
-	# Register unit tests
-	add_test(NAME neoactivemq-unit-tests COMMAND neoactivemq-test)
-	set_tests_properties(neoactivemq-unit-tests PROPERTIES
-		TIMEOUT 6000
-		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
-	)
-
-	# Register benchmark tests
-	# Per-test timeout of 300s (5 min) is the default, watchdog dumps flight recorder on hang
-	add_test(NAME neoactivemq-benchmarks COMMAND neoactivemq-benchmark)
-	set_tests_properties(neoactivemq-benchmarks PROPERTIES
-		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
-	)
 
 	# Register integration tests with automatic Docker management
 	# Setup fixture: Start Docker before integration tests
@@ -249,14 +237,9 @@ if(AMQCPP_BUILD_TESTS)
 		LABELS "integration;fixture"
 	)
 
-	# The actual integration tests
-	# Per-test timeout of 300s (5 min) is the default, watchdog dumps flight recorder on hang
-	add_test(NAME neoactivemq-integration-tests COMMAND neoactivemq-integration-test)
-	set_tests_properties(neoactivemq-integration-tests PROPERTIES
-		LABELS "integration"
-		FIXTURES_REQUIRED IntegrationFixture
-		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
-	)
+	# Individual integration tests are discovered via gtest_discover_tests
+	# in activemq-cpp/src/test-integration/CMakeLists.txt with
+	# FIXTURES_REQUIRED IntegrationFixture
 
 	# Cleanup fixture: Stop Docker after integration tests
 	add_test(NAME integration-docker-stop
@@ -355,15 +338,9 @@ if(AMQCPP_BUILD_TESTS)
 		LABELS "system;fixture"
 	)
 
-	# The actual system tests (failover, multi-connection, high-volume)
-	# Per-test timeout of 600s (10 min) for high-volume tests
-	add_test(NAME neoactivemq-system-tests COMMAND neoactivemq-system-test)
-	set_tests_properties(neoactivemq-system-tests PROPERTIES
-		LABELS "system"
-		FIXTURES_REQUIRED SystemFixture
-		TIMEOUT 1800
-		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
-	)
+	# Individual system tests are discovered via gtest_discover_tests
+	# in activemq-cpp/src/test-system/CMakeLists.txt with
+	# FIXTURES_REQUIRED SystemFixture
 
 	# Cleanup fixture: Stop Docker with failover profile after system tests
 	add_test(NAME system-docker-stop

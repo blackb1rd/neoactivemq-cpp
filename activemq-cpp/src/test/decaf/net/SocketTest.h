@@ -18,40 +18,12 @@
 #ifndef _DECAF_NET_SOCKETTEST_H_
 #define _DECAF_NET_SOCKETTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf{
 namespace net{
 
-    class SocketTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( SocketTest );
-        //CPPUNIT_TEST( testConnectUnknownHost );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testGetReuseAddress );
-        CPPUNIT_TEST( testClose );
-        CPPUNIT_TEST( testGetPort );
-        CPPUNIT_TEST( testGetInputStream );
-        CPPUNIT_TEST( testGetOutputStream );
-        CPPUNIT_TEST( testGetKeepAlive );
-        CPPUNIT_TEST( testGetLocalPort );
-        CPPUNIT_TEST( testGetSoLinger );
-        CPPUNIT_TEST( testGetSoTimeout );
-        CPPUNIT_TEST( testGetTcpNoDelay );
-        CPPUNIT_TEST( testIsConnected );
-        CPPUNIT_TEST( testIsClosed );
-        CPPUNIT_TEST( testIsInputShutdown );
-        CPPUNIT_TEST( testIsOutputShutdown );
-        CPPUNIT_TEST( testConnectPortOutOfRange );
-
-        CPPUNIT_TEST( testTx );
-        CPPUNIT_TEST( testTrx );
-        CPPUNIT_TEST( testTrxNoDelay );
-        CPPUNIT_TEST( testRxFail );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class SocketTest : public ::testing::Test {
+public:
 
         virtual ~SocketTest() {}
 

@@ -18,9 +18,7 @@
 #ifndef _ACTIVEMQ_TRANSPORT_INACTIVITY_INACTIVITYMONITORTEST_H_
 #define _ACTIVEMQ_TRANSPORT_INACTIVITY_INACTIVITYMONITORTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <activemq/util/Config.h>
 #include <activemq/commands/WireFormatInfo.h>
 #include <activemq/transport/mock/MockTransport.h>
@@ -31,16 +29,8 @@ namespace activemq {
 namespace transport {
 namespace inactivity {
 
-    class InactivityMonitorTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( InactivityMonitorTest );
-        CPPUNIT_TEST( testCreate );
-        CPPUNIT_TEST( testReadTimeout );
-        CPPUNIT_TEST( testWriteMessageFail );
-        CPPUNIT_TEST( testNonFailureSendCase );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class InactivityMonitorTest : public ::testing::Test {
+private:
 
         decaf::lang::Pointer<mock::MockTransport> transport;
 
@@ -51,8 +41,8 @@ namespace inactivity {
         InactivityMonitorTest();
         virtual ~InactivityMonitorTest();
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         void testCreate();
         void testReadTimeout();

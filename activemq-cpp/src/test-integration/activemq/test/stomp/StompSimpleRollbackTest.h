@@ -25,12 +25,7 @@ namespace test{
 namespace stomp{
 
     class StompSimpleRollbackTest : public SimpleRollbackTest {
-
-        CPPUNIT_TEST_SUITE( StompSimpleRollbackTest );
-        CPPUNIT_TEST( testRollbacks );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         StompSimpleRollbackTest();
         virtual ~StompSimpleRollbackTest();

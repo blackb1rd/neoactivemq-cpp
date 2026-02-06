@@ -18,21 +18,15 @@
 #ifndef _DECAF_LANG_BYTETEST_H_
 #define _DECAF_LANG_BYTETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/lang/Byte.h>
 
 namespace decaf{
 namespace lang{
 
-    class ByteTest : public CppUnit::TestFixture
+    class ByteTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( ByteTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         ByteTest();
         virtual ~ByteTest() {}

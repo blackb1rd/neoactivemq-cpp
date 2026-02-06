@@ -25,12 +25,7 @@ namespace test {
 namespace openwire {
 
     class OpenwireJmsMessageGroupsTest : public JmsMessageGroupsTest {
-
-        CPPUNIT_TEST_SUITE( OpenwireJmsMessageGroupsTest );
-        CPPUNIT_TEST( testMessageSend );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireJmsMessageGroupsTest();
         virtual ~OpenwireJmsMessageGroupsTest();

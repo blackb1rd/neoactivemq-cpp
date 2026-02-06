@@ -43,13 +43,13 @@ void DataInputStreamTest::testConstructor() {
         os->close();
         openDataInputStream();
     } catch (IOException e) {
-        CPPUNIT_FAIL("IOException during constructor test : " + e.getMessage());
+        FAIL() << ("IOException during constructor test : " + e.getMessage());
     }
 
     try {
         is->close();
     } catch (IOException e) {
-        CPPUNIT_FAIL("IOException during constructor test : " + e.getMessage());
+        FAIL() << ("IOException during constructor test : " + e.getMessage());
     }
 }
 
@@ -65,10 +65,9 @@ void DataInputStreamTest::testRead1() {
         std::vector<unsigned char> result;
         result.resize( testData.length() );
         is->read( &result[0], (int)testData.length() );
-        CPPUNIT_ASSERT_MESSAGE( "Incorrect data read",
-            string( (const char*)&result[0], result.size() ) == testData );
+        ASSERT_TRUE(string( (const char*)&result[0], result.size() ) == testData) << ("Incorrect data read");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("IOException during read test : " + e.getMessage());
+        FAIL() << ("IOException during read test : " + e.getMessage());
     }
 }
 
@@ -83,11 +82,10 @@ void DataInputStreamTest::testRead2() {
         openDataInputStream();
         unsigned char* result = new unsigned char[ testData.length() ];
         is->read( result, (int)testData.length(), 0, (int)testData.length() );
-        CPPUNIT_ASSERT_MESSAGE("Incorrect data read",
-            string( (const char*)result, (int)testData.size() ) == testData );
+        ASSERT_TRUE(string( (const char*)result, (int)testData.size() ) == testData) << ("Incorrect data read");
         delete [] result;
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("IOException during read test : " + e.getMessage());
+        FAIL() << ("IOException during read test : " + e.getMessage());
     }
 }
 
@@ -98,9 +96,9 @@ void DataInputStreamTest::test_readBoolean() {
         os->writeBoolean(true);
         os->close();
         openDataInputStream();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect boolean written", is->readBoolean() );
+        ASSERT_TRUE(is->readBoolean()) << ("Incorrect boolean written");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("readBoolean test failed : " + e.getMessage());
+        FAIL() << ("readBoolean test failed : " + e.getMessage());
     }
 }
 
@@ -110,9 +108,9 @@ void DataInputStreamTest::test_readByte() {
         os->writeByte( (unsigned char) 127);
         os->close();
         openDataInputStream();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect byte read", is->readByte() == (unsigned char) 127);
+        ASSERT_TRUE(is->readByte() == (unsigned char) 127) << ("Incorrect byte read");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("IOException during readByte test : " + e.getMessage());
+        FAIL() << ("IOException during readByte test : " + e.getMessage());
     }
 }
 
@@ -122,9 +120,9 @@ void DataInputStreamTest::test_readChar() {
         os->writeChar('t');
         os->close();
         openDataInputStream();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect char read", 't' == is->readChar());
+        ASSERT_TRUE('t' == is->readChar()) << ("Incorrect char read");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("IOException during readChar test : " + e.getMessage());
+        FAIL() << ("IOException during readChar test : " + e.getMessage());
     }
 }
 
@@ -134,10 +132,9 @@ void DataInputStreamTest::test_readDouble() {
         os->writeDouble(2345.76834720202);
         os->close();
         openDataInputStream();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect double read",
-                2345.76834720202 == is->readDouble());
+        ASSERT_TRUE(2345.76834720202 == is->readDouble()) << ("Incorrect double read");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("IOException during readDouble test" + e.getMessage());
+        FAIL() << ("IOException during readDouble test" + e.getMessage());
     }
 }
 
@@ -147,9 +144,9 @@ void DataInputStreamTest::test_readFloat() {
         os->writeFloat(29.08764f);
         os->close();
         openDataInputStream();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect float read", is->readFloat() == 29.08764f);
+        ASSERT_TRUE(is->readFloat() == 29.08764f) << ("Incorrect float read");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("readFloat test failed : " + e.getMessage());
+        FAIL() << ("readFloat test failed : " + e.getMessage());
     }
 }
 
@@ -169,12 +166,9 @@ void DataInputStreamTest::test_readFully1() {
         expected += (char)result[ix];
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Incorrect data read", expected == testData );
+    ASSERT_TRUE(expected == testData) << ("Incorrect data read");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IndexOutOfBoundsException",
-        is->readFully( &result[0], -1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(is->readFully( &result[0], -1 ), IndexOutOfBoundsException) << ("should throw IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -191,41 +185,23 @@ void DataInputStreamTest::test_readFully2() {
         expected += (char)rbytes[ix];
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Incorrect data read", expected == testData );
+    ASSERT_TRUE(expected == testData) << ("Incorrect data read");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IndexOutOfBoundsException",
-        is->readFully( &temp[0], (int)temp.size(), -1, -1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(is->readFully( &temp[0], (int)temp.size(), -1, -1 ), IndexOutOfBoundsException) << ("should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IndexOutOfBoundsException",
-        is->readFully( &temp[0], (int)temp.size(), 0, -1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(is->readFully( &temp[0], (int)temp.size(), 0, -1 ), IndexOutOfBoundsException) << ("should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IndexOutOfBoundsException",
-        is->readFully( &temp[0], (int)temp.size(), 1, -1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(is->readFully( &temp[0], (int)temp.size(), 1, -1 ), IndexOutOfBoundsException) << ("should throw IndexOutOfBoundsException");
 
     is->readFully( &temp[0], (int)temp.size(), -1, 0 );
     is->readFully( &temp[0], (int)temp.size(), 0, 0 );
     is->readFully( &temp[0], (int)temp.size(), 1, 0 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IndexOutOfBoundsException",
-        is->readFully( &temp[0], (int)temp.size(), -1, 1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(is->readFully( &temp[0], (int)temp.size(), -1, 1 ), IndexOutOfBoundsException) << ("should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IndexOutOfBoundsException",
-        is->readFully( &temp[0], (int)temp.size(), 0, Integer::MAX_VALUE ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(is->readFully( &temp[0], (int)temp.size(), 0, Integer::MAX_VALUE ), IndexOutOfBoundsException) << ("should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IndexOutOfBoundsException",
-        is->readFully( &temp[0], (int)temp.size(), 1, Integer::MAX_VALUE ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(is->readFully( &temp[0], (int)temp.size(), 1, Integer::MAX_VALUE ), IndexOutOfBoundsException) << ("should throw IndexOutOfBoundsException");
 
     delete [] rbytes;
 }
@@ -240,20 +216,11 @@ void DataInputStreamTest::test_readFullyNullArray() {
     is.readFully( nullByteArray, 0, 0, 0);
     is.readFully( nullByteArray, 0, 1, 0);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw NullPointerException",
-        is.readFully( nullByteArray, 0, 0, 1),
-        NullPointerException );
+    ASSERT_THROW(is.readFully( nullByteArray, 0, 0, 1), NullPointerException) << ("should throw NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw NullPointerException",
-        is.readFully( nullByteArray, 0, 1, 1),
-        NullPointerException );
+    ASSERT_THROW(is.readFully( nullByteArray, 0, 1, 1), NullPointerException) << ("should throw NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw NullPointerException",
-        is.readFully( nullByteArray, 0, 1, Integer::MAX_VALUE),
-        NullPointerException );
+    ASSERT_THROW(is.readFully( nullByteArray, 0, 1, Integer::MAX_VALUE), NullPointerException) << ("should throw NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -265,20 +232,11 @@ void DataInputStreamTest::test_readFullyNullStream() {
     is.readFully( byteArray, (int)testData.length(), 0, 0 );
     is.readFully( byteArray, (int)testData.length(), 1, 0 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw NullPointerException",
-        is.readFully( byteArray, (int)testData.length(), 1, 1 ),
-        NullPointerException );
+    ASSERT_THROW(is.readFully( byteArray, (int)testData.length(), 1, 1 ), NullPointerException) << ("should throw NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw NullPointerException",
-        is.readFully( byteArray, (int)testData.length(), 0, 1 ),
-        NullPointerException );
+    ASSERT_THROW(is.readFully( byteArray, (int)testData.length(), 0, 1 ), NullPointerException) << ("should throw NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw NullPointerException",
-        is.readFully( byteArray, (int)testData.length(), 0, Integer::MAX_VALUE ),
-        NullPointerException );
+    ASSERT_THROW(is.readFully( byteArray, (int)testData.length(), 0, Integer::MAX_VALUE ), NullPointerException) << ("should throw NullPointerException");
 
     delete [] byteArray;
 }
@@ -292,20 +250,11 @@ void DataInputStreamTest::test_readFullyNullStreamNullArray() {
     is.readFully( nullByteArray, 0, 0, 0 );
     is.readFully( nullByteArray, 0, 1, 0 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw NullPointerException",
-        is.readFully( nullByteArray, 0, 0, 1),
-        NullPointerException );
+    ASSERT_THROW(is.readFully( nullByteArray, 0, 0, 1), NullPointerException) << ("should throw NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw NullPointerException",
-        is.readFully( nullByteArray, 0, 1, 1),
-        NullPointerException );
+    ASSERT_THROW(is.readFully( nullByteArray, 0, 1, 1), NullPointerException) << ("should throw NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw NullPointerException",
-        is.readFully( nullByteArray, 0, 1, Integer::MAX_VALUE),
-        NullPointerException );
+    ASSERT_THROW(is.readFully( nullByteArray, 0, 1, Integer::MAX_VALUE), NullPointerException) << ("should throw NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -314,9 +263,9 @@ void DataInputStreamTest::test_readInt() {
         os->writeInt(768347202);
         os->close();
         openDataInputStream();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect int read", 768347202 == is->readInt());
+        ASSERT_TRUE(768347202 == is->readInt()) << ("Incorrect int read");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("IOException during readInt test : " + e.getMessage());
+        FAIL() << ("IOException during readInt test : " + e.getMessage());
     }
 }
 
@@ -326,9 +275,9 @@ void DataInputStreamTest::test_readLong() {
         os->writeLong(9875645283333LL);
         os->close();
         openDataInputStream();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect long read", 9875645283333LL == is->readLong());
+        ASSERT_TRUE(9875645283333LL == is->readLong()) << ("Incorrect long read");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("read long test failed : " + e.getMessage());
+        FAIL() << ("read long test failed : " + e.getMessage());
     }
 }
 
@@ -338,9 +287,9 @@ void DataInputStreamTest::test_readShort() {
         os->writeShort(9875);
         os->close();
         openDataInputStream();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect short read", is->readShort() == (short) 9875);
+        ASSERT_TRUE(is->readShort() == (short) 9875) << ("Incorrect short read");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("Exception during read short test : " + e.getMessage());
+        FAIL() << ("Exception during read short test : " + e.getMessage());
     }
 }
 
@@ -350,9 +299,9 @@ void DataInputStreamTest::test_readUnsignedByte() {
         os->writeByte((unsigned char) -127);
         os->close();
         openDataInputStream();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect byte read", 129 == is->readUnsignedByte());
+        ASSERT_TRUE(129 == is->readUnsignedByte()) << ("Incorrect byte read");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("IOException during readUnsignedByte test : " + e.getMessage());
+        FAIL() << ("IOException during readUnsignedByte test : " + e.getMessage());
     }
 }
 
@@ -361,7 +310,7 @@ void DataInputStreamTest::test_readUnsignedShort() {
     os->writeShort(9875);
     os->close();
     openDataInputStream();
-    CPPUNIT_ASSERT_MESSAGE("Incorrect short read", 9875 == is->readUnsignedShort());
+    ASSERT_TRUE(9875 == is->readUnsignedShort()) << ("Incorrect short read");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -375,28 +324,23 @@ void DataInputStreamTest::test_skipBytes() {
         std::vector<unsigned char> result( 50 );
         is->read( &result[0], 50 );
         is->close();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect data read",
-            string( (const char*)&result[0], 50) == testData.substr( 100, 50) );
+        ASSERT_TRUE(string( (const char*)&result[0], 50) == testData.substr( 100, 50)) << ("Incorrect data read");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("IOException during skipBytes test 1 : " + e.getMessage());
+        FAIL() << ("IOException during skipBytes test 1 : " + e.getMessage());
     }
     try {
 
         std::size_t skipped = 0;
         openDataInputStream();
 
-        CPPUNIT_ASSERT_NO_THROW_MESSAGE(
-            "Should throw an EOFException",
-            skipped = (std::size_t)is->skip( 500000 ) );
+        ASSERT_NO_THROW(skipped = (std::size_t)is->skip( 500000 )) << ("Should throw an EOFException");
 
-        CPPUNIT_ASSERT_MESSAGE(
-            "Skipped should report " +
+        ASSERT_TRUE(skipped == testData.length()) << ("Skipped should report " +
             Integer::toString( (int)testData.length() ) + " not " +
-            Integer::toString( (int)skipped ),
-            skipped == testData.length() );
+            Integer::toString( (int)skipped ));
 
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("IOException during skipBytes test 2 : " + e.getMessage());
+        FAIL() << ("IOException during skipBytes test 2 : " + e.getMessage());
     }
 }
 
@@ -455,35 +399,35 @@ void DataInputStreamTest::test(){
 
     byteVal = reader.readByte();
     //std::cout << "Byte Value = " << byteVal << std::endl;
-    CPPUNIT_ASSERT( byteVal == (unsigned char)'T' );
+    ASSERT_TRUE(byteVal == (unsigned char)'T');
 
     shortVal = reader.readShort();
     //std::cout << "short Value = " << shortVal << std::endl;
-    CPPUNIT_ASSERT( shortVal == 5 );
+    ASSERT_TRUE(shortVal == 5);
 
     intVal = reader.readInt();
     //std::cout << "int Value = " << intVal << std::endl;
-    CPPUNIT_ASSERT( intVal == 10000 );
+    ASSERT_TRUE(intVal == 10000);
 
     longVal = reader.readLong();
     //std::cout << "long long Value = " << longVal << std::endl;
-    CPPUNIT_ASSERT( longVal == 1000000000 );
+    ASSERT_TRUE(longVal == 1000000000);
 
     floatVal = reader.readFloat();
     //std::cout << "float Value = " << floatVal << std::endl;
-    CPPUNIT_ASSERT( floatVal == 10.0f );
+    ASSERT_TRUE(floatVal == 10.0f);
 
     doubleVal = reader.readDouble();
     //std::cout << "double Value = " << doubleVal << std::endl;
-    CPPUNIT_ASSERT( doubleVal == 100.0 );
+    ASSERT_TRUE(doubleVal == 100.0);
 
     reader.read( arrayVal, 3, 0, 3 );
     //std::cout << "char[0] Value = " << (int)arrayVal[0] << std::endl;
-    CPPUNIT_ASSERT( arrayVal[0] == 'a' );
+    ASSERT_TRUE(arrayVal[0] == 'a');
     //std::cout << "char[1] Value = " << (int)arrayVal[1] << std::endl;
-    CPPUNIT_ASSERT( arrayVal[1] == 'b' );
+    ASSERT_TRUE(arrayVal[1] == 'b');
     //std::cout << "char[2] Value = " << (int)arrayVal[2] << std::endl;
-    CPPUNIT_ASSERT( arrayVal[2] == 'c' );
+    ASSERT_TRUE(arrayVal[2] == 'c');
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -508,21 +452,21 @@ void DataInputStreamTest::testString() {
     std::string result1 = reader.readString();
     std::string result2 = reader.readString();
 
-    CPPUNIT_ASSERT( result1 == data1 );
-    CPPUNIT_ASSERT( result2 == data2 );
+    ASSERT_TRUE(result1 == data1);
+    ASSERT_TRUE(result2 == data2);
 
     try{
         std::string result3 = reader.readString();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     } catch(...){
-        CPPUNIT_ASSERT( true );
+        ASSERT_TRUE(true);
     }
 
     try{
         unsigned char buffer2[1];
         reader.readFully( buffer2, 0 );
     } catch(...){
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -560,14 +504,14 @@ void DataInputStreamTest::testUTF() {
     std::string result1 = reader.readUTF();
     std::string result2 = reader.readUTF();
 
-    CPPUNIT_ASSERT( result1 == data1 );
-    CPPUNIT_ASSERT( result2 == data2 );
+    ASSERT_TRUE(result1 == data1);
+    ASSERT_TRUE(result2 == data2);
 
     try{
         std::string result3 = reader.readUTF();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     } catch(...){
-        CPPUNIT_ASSERT( true );
+        ASSERT_TRUE(true);
     }
 }
 
@@ -581,7 +525,7 @@ void DataInputStreamTest::testHelper( unsigned char* input, int inputLength,
     std::string result = reader.readUTF();
 
     for( std::size_t i = 0; i < result.length(); ++i ) {
-        CPPUNIT_ASSERT( (unsigned char)result[i] == expect[i] );
+        ASSERT_TRUE((unsigned char)result[i] == expect[i]);
     }
 }
 
@@ -621,10 +565,7 @@ void DataInputStreamTest::testUTFDecoding() {
         ByteArrayInputStream myStream( input, (int) sizeof(input) / (int) sizeof(unsigned char) );
         DataInputStream reader( &myStream );
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should throw a UTFDataFormatException",
-            reader.readUTF(),
-            UTFDataFormatException );
+        ASSERT_THROW(reader.readUTF(), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
     }
 
     // Test with bad UTF-8 encoding, encoded value greater than 255
@@ -634,10 +575,7 @@ void DataInputStreamTest::testUTFDecoding() {
         ByteArrayInputStream myStream( input, (int) sizeof(input) / (int) sizeof(unsigned char) );
         DataInputStream reader( &myStream );
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should throw a UTFDataFormatException",
-            reader.readUTF(),
-            UTFDataFormatException );
+        ASSERT_THROW(reader.readUTF(), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
     }
 
     // Test data with value greater than 255 in 2-byte encoding.
@@ -646,10 +584,7 @@ void DataInputStreamTest::testUTFDecoding() {
         ByteArrayInputStream myStream( input, (int) sizeof(input) / (int) sizeof(unsigned char) );
         DataInputStream reader( &myStream );
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should throw a UTFDataFormatException",
-            reader.readUTF(),
-            UTFDataFormatException );
+        ASSERT_THROW(reader.readUTF(), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
     }
 
     // Test data with value greater than 255 in 3-byte encoding.
@@ -658,10 +593,7 @@ void DataInputStreamTest::testUTFDecoding() {
         ByteArrayInputStream myStream( input, (int) sizeof(input) / (int) sizeof(unsigned char) );
         DataInputStream reader( &myStream );
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should throw a UTFDataFormatException",
-            reader.readUTF(),
-            UTFDataFormatException );
+        ASSERT_THROW(reader.readUTF(), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
     }
 
     // Test with three byte encode that's missing a last byte.
@@ -670,10 +602,7 @@ void DataInputStreamTest::testUTFDecoding() {
         ByteArrayInputStream myStream( input, (int) sizeof(input) / (int) sizeof(unsigned char) );
         DataInputStream reader( &myStream );
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should throw a UTFDataFormatException",
-            reader.readUTF(),
-            UTFDataFormatException );
+        ASSERT_THROW(reader.readUTF(), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
     }
 
 }

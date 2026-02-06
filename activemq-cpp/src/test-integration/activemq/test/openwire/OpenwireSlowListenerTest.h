@@ -25,12 +25,7 @@ namespace test{
 namespace openwire{
 
     class OpenwireSlowListenerTest : public SlowListenerTest {
-
-        CPPUNIT_TEST_SUITE( OpenwireSlowListenerTest );
-        CPPUNIT_TEST( testSlowListener );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireSlowListenerTest();
         virtual ~OpenwireSlowListenerTest();

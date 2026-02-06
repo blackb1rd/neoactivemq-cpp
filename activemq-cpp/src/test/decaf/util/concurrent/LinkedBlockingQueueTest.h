@@ -18,8 +18,7 @@
 #ifndef _DECAF_UTIL_CONCURRENT_LINKEDBLOCKINGQUEUETEST_H_
 #define _DECAF_UTIL_CONCURRENT_LINKEDBLOCKINGQUEUETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 namespace decaf {
@@ -27,60 +26,7 @@ namespace util {
 namespace concurrent {
 
     class LinkedBlockingQueueTest : public ExecutorsTestSupport {
-
-        CPPUNIT_TEST_SUITE( LinkedBlockingQueueTest );
-//        CPPUNIT_TEST( testConstructor1 );
-//        CPPUNIT_TEST( testConstructor2 );
-//        CPPUNIT_TEST( testConstructor3 );
-//        CPPUNIT_TEST( testConstructor4 );
-//        CPPUNIT_TEST( testEquals );
-//        CPPUNIT_TEST( testEmptyFull );
-//        CPPUNIT_TEST( testRemainingCapacity );
-//        CPPUNIT_TEST( testOffer );
-//        CPPUNIT_TEST( testAdd );
-//        CPPUNIT_TEST( testAddAllSelf );
-//        CPPUNIT_TEST( testAddAll1 );
-//        CPPUNIT_TEST( testAddAll2 );
-//        CPPUNIT_TEST( testPut );
-//        CPPUNIT_TEST( testTake );
-//        CPPUNIT_TEST( testPoll );
-//        CPPUNIT_TEST( testTimedPoll1 );
-//        CPPUNIT_TEST( testTimedPoll2 );
-//        CPPUNIT_TEST( testPeek );
-//        CPPUNIT_TEST( testElement );
-//        CPPUNIT_TEST( testRemove );
-//        CPPUNIT_TEST( testRemoveElement );
-//        CPPUNIT_TEST( testRemoveElement2 );
-//        CPPUNIT_TEST( testRemoveElementAndAdd );
-//        CPPUNIT_TEST( testContains );
-//        CPPUNIT_TEST( testClear );
-//        CPPUNIT_TEST( testContainsAll );
-//        CPPUNIT_TEST( testRetainAll );
-//        CPPUNIT_TEST( testRemoveAll );
-//        CPPUNIT_TEST( testToArray );
-//        CPPUNIT_TEST( testDrainToSelf );
-//        CPPUNIT_TEST( testDrainTo );
-//        CPPUNIT_TEST( testDrainToSelfN );
-//        CPPUNIT_TEST( testDrainToWithActivePut );
-//        CPPUNIT_TEST( testDrainToN );
-//        CPPUNIT_TEST( testIterator );
-//        CPPUNIT_TEST( testIteratorRemove );
-//        CPPUNIT_TEST( testIteratorOrdering );
-//        CPPUNIT_TEST( testWeaklyConsistentIteration );
-//        CPPUNIT_TEST( testConcurrentPut );
-//        CPPUNIT_TEST( testConcurrentTake );
-//        CPPUNIT_TEST( testConcurrentPutAndTake );
-//        CPPUNIT_TEST( testBlockingPut );
-//        CPPUNIT_TEST( testTimedOffer );
-//        CPPUNIT_TEST( testTakeFromEmpty );
-//        CPPUNIT_TEST( testBlockingTake );
-//        CPPUNIT_TEST( testInterruptedTimedPoll );
-//        CPPUNIT_TEST( testTimedPollWithOffer );
-//        CPPUNIT_TEST( testOfferInExecutor );
-        CPPUNIT_TEST( testPollInExecutor );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         static const int SIZE;
 

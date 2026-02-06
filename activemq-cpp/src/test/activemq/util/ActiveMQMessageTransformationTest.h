@@ -18,20 +18,13 @@
 #ifndef _ACTIVEMQ_UTIL_ACTIVEMQMESSAGETRANSFORMATIONTEST_H_
 #define _ACTIVEMQ_UTIL_ACTIVEMQMESSAGETRANSFORMATIONTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace util {
 
-    class ActiveMQMessageTransformationTest : public CppUnit::TestFixture {
+    class ActiveMQMessageTransformationTest : public ::testing::Test {
     private:
-
-        CPPUNIT_TEST_SUITE( ActiveMQMessageTransformationTest );
-        CPPUNIT_TEST( testTransformDestination );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         ActiveMQMessageTransformationTest();
         virtual ~ActiveMQMessageTransformationTest();

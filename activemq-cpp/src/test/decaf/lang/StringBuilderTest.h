@@ -18,67 +18,13 @@
 #ifndef _DECAF_LANG_STRINGBUILDERTEST_H_
 #define _DECAF_LANG_STRINGBUILDERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace lang {
 
-    class StringBuilderTest : public CppUnit::TestFixture {
+    class StringBuilderTest : public ::testing::Test {
     private:
-
-        CPPUNIT_TEST_SUITE( StringBuilderTest );
-        CPPUNIT_TEST( testDefaultConstructor );
-        CPPUNIT_TEST( testConstructorInt );
-        CPPUNIT_TEST( testConstructorString );
-        CPPUNIT_TEST( testAppendBoolean );
-        CPPUNIT_TEST( testAppendChar );
-        CPPUNIT_TEST( testAppendCharArray );
-        CPPUNIT_TEST( testAppendCharArrayIntInt );
-        CPPUNIT_TEST( testAppendCharSequence );
-        CPPUNIT_TEST( testAppendCharSequenceIntInt );
-        CPPUNIT_TEST( testAppendShort );
-        CPPUNIT_TEST( testAppendInt );
-        CPPUNIT_TEST( testAppendLong );
-        CPPUNIT_TEST( testAppendDouble );
-        CPPUNIT_TEST( testAppendFloat );
-        CPPUNIT_TEST( testAppendString );
-        CPPUNIT_TEST( testAppendStringBuffer );
-        CPPUNIT_TEST( testAppendRawPointer );
-        CPPUNIT_TEST( testAppendPointer );
-        CPPUNIT_TEST( testCapacity );
-        CPPUNIT_TEST( testCharAt );
-        CPPUNIT_TEST( testDeleteRange );
-        CPPUNIT_TEST( testDeleteCharAt );
-        CPPUNIT_TEST( testEnsureCapacity );
-        CPPUNIT_TEST( testGetChars );
-        CPPUNIT_TEST( testIndexOfString );
-        CPPUNIT_TEST( testIndexOfStringInt );
-        CPPUNIT_TEST( testLastIndexOfString );
-        CPPUNIT_TEST( testLastIndexOfStringInt );
-        CPPUNIT_TEST( testReverse );
-        CPPUNIT_TEST( testSubSequence );
-        CPPUNIT_TEST( testSubstringInt );
-        CPPUNIT_TEST( testSubstringIntInt );
-        CPPUNIT_TEST( testInsertChar );
-        CPPUNIT_TEST( testInsertBoolean );
-        CPPUNIT_TEST( testInsertCharArray );
-        CPPUNIT_TEST( testInsertCharArrayWithOffset );
-        CPPUNIT_TEST( testInsertString );
-        CPPUNIT_TEST( testInsertStdString );
-        CPPUNIT_TEST( testInsertCharSequence );
-        CPPUNIT_TEST( testInsertCharSequenceIntInt );
-        CPPUNIT_TEST( testInsertShort );
-        CPPUNIT_TEST( testInsertInt );
-        CPPUNIT_TEST( testInsertLong );
-        CPPUNIT_TEST( testInsertFloat );
-        CPPUNIT_TEST( testInsertDouble );
-        CPPUNIT_TEST( testInsertPointer );
-        CPPUNIT_TEST( testInsertRawPointer );
-        CPPUNIT_TEST( testReplace );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         StringBuilderTest();
         virtual ~StringBuilderTest();

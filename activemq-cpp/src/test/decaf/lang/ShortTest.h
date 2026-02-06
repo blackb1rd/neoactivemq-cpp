@@ -18,21 +18,15 @@
 #ifndef _DECAF_LANG_SHORTTEST_H_
 #define _DECAF_LANG_SHORTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/lang/Short.h>
 
 namespace decaf{
 namespace lang{
 
-    class ShortTest : public CppUnit::TestFixture
+    class ShortTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( ShortTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         ShortTest();
         virtual ~ShortTest() {}

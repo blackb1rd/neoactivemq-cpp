@@ -25,12 +25,7 @@ namespace test{
 namespace openwire{
 
     class OpenwireDurableTest : public DurableTest {
-
-        CPPUNIT_TEST_SUITE( OpenwireDurableTest );
-        CPPUNIT_TEST( testDurableConsumer );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireDurableTest();
         virtual ~OpenwireDurableTest();

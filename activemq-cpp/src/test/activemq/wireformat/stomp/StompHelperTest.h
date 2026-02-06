@@ -18,21 +18,13 @@
 #ifndef _ACTIVEMQ_WIREFORMAT_STOMP_STOMPHELPERTEST_H_
 #define _ACTIVEMQ_WIREFORMAT_STOMP_STOMPHELPERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace wireformat {
 namespace stomp {
 
-    class StompHelperTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( StompHelperTest );
-        CPPUNIT_TEST( testConvertDestinationFromString );
-        CPPUNIT_TEST( testConvertDestinationFromCommand );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class StompHelperTest : public ::testing::Test {
+public:
 
         StompHelperTest();
         virtual ~StompHelperTest();

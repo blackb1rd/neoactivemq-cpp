@@ -18,22 +18,12 @@
 #ifndef _DECAF_UTIL_ABSTRACTSEQUENTIALLISTTEST_H_
 #define _DECAF_UTIL_ABSTRACTSEQUENTIALLISTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 
-    class AbstractSequentialListTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( AbstractSequentialListTest );
-        CPPUNIT_TEST( testAddAll );
-        CPPUNIT_TEST( testGet );
-        CPPUNIT_TEST( testSet );
-        CPPUNIT_TEST( testRemove );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class AbstractSequentialListTest : public ::testing::Test {
+public:
 
         AbstractSequentialListTest();
 

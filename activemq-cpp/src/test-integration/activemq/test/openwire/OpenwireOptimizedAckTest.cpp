@@ -89,7 +89,7 @@ void OpenwireOptimizedAckTest::testOptimizedAckSettings() {
     connectionFactory->setOptimizeAcknowledgeTimeOut(500);
     connectionFactory->setOptimizedAckScheduledAckInterval(1000);
 
-    CPPUNIT_ASSERT_EQUAL(100, connectionFactory->getPrefetchPolicy()->getQueuePrefetch());
+    ASSERT_EQ(100, connectionFactory->getPrefetchPolicy()->getQueuePrefetch());
 
     Pointer<Connection> connection(connectionFactory->createConnection());
     connection->start();
@@ -99,8 +99,8 @@ void OpenwireOptimizedAckTest::testOptimizedAckSettings() {
     Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
 
     Pointer<ActiveMQConsumer> amqConsumer = consumer.dynamicCast<ActiveMQConsumer>();
-    CPPUNIT_ASSERT(amqConsumer->isOptimizeAcknowledge());
-    CPPUNIT_ASSERT(amqConsumer->getOptimizedAckScheduledAckInterval() == 1000);
+    ASSERT_TRUE(amqConsumer->isOptimizeAcknowledge());
+    ASSERT_TRUE(amqConsumer->getOptimizedAckScheduledAckInterval() == 1000);
 
     Pointer<MessageProducer> producer(session->createProducer(destination.get()));
     producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
@@ -112,7 +112,7 @@ void OpenwireOptimizedAckTest::testOptimizedAckSettings() {
     producer->send(message.get());
 
     Pointer<Message> received(consumer->receive(5000));
-    CPPUNIT_ASSERT(received != NULL);
+    ASSERT_TRUE(received != NULL);
 
     Thread::sleep(1200);
 }
@@ -159,7 +159,7 @@ void OpenwireOptimizedAckTest::testOptimizedAckWithExpiredMsgs() {
         Thread::sleep(1000);
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Should have received 60 messages.", listener.getCounter() == 60);
+    ASSERT_TRUE(listener.getCounter() == 60) << ("Should have received 60 messages.");
 
     producer->close();
     consumer->close();
@@ -201,7 +201,7 @@ void OpenwireOptimizedAckTest::testOptimizedAckWithExpiredMsgsSync() {
 
     for (int counter = 1; counter <= 60; ++counter) {
         Pointer<Message> message(consumer->receive(2000));
-        CPPUNIT_ASSERT(message != NULL);
+        ASSERT_TRUE(message != NULL);
     }
 
     producer->close();
@@ -248,7 +248,7 @@ void OpenwireOptimizedAckTest::testOptimizedAckWithExpiredMsgsSync2() {
 
     for (int counter = 1; counter <= 60; ++counter) {
         Pointer<Message> message(consumer->receive(2000));
-        CPPUNIT_ASSERT(message != NULL);
+        ASSERT_TRUE(message != NULL);
     }
 
     producer->close();

@@ -50,8 +50,7 @@ void CheckedInputStreamTest::testConstructor() {
     ByteArrayInputStream baos( outPutBuf );
     CRC32 check;
     CheckedInputStream chkIn( &baos, &check );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "the checkSum value of the constructor is not 0",
-                                  0LL, chkIn.getChecksum()->getValue() );
+    ASSERT_EQ(0LL, chkIn.getChecksum()->getValue()) << ("the checkSum value of the constructor is not 0");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,8 +63,7 @@ void CheckedInputStreamTest::testGetChecksum() {
 
     while( checkEmpty.read() >= 0 ) {
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "the checkSum value of an empty file is not zero",
-                                  0LL, checkEmpty.getChecksum()->getValue() );
+    ASSERT_EQ(0LL, checkEmpty.getChecksum()->getValue()) << ("the checkSum value of an empty file is not zero");
 
     static const int SIZE = 10;
     unsigned char byteArray[] = { 1, 3, 4, 7, 8, 'e', 'r', 't', 'y', '5' };
@@ -85,8 +83,7 @@ void CheckedInputStreamTest::testGetChecksum() {
     while( checkIn.read() >= 0 ) {
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "the checksum value is incorrect",
-                            checkIn.getChecksum()->getValue() > 0 );
+    ASSERT_TRUE(checkIn.getChecksum()->getValue() > 0) << ("the checksum value is incorrect");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,11 +108,10 @@ void CheckedInputStreamTest::testSkip() {
     CheckedInputStream checkIn( &bais, &adler );
 
     long long skipValue = 5;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "the value returned by skip(n) is not the same as its parameter",
-                                  skipValue, checkIn.skip( skipValue ) );
+    ASSERT_EQ(skipValue, checkIn.skip( skipValue )) << ("the value returned by skip(n) is not the same as its parameter");
     checkIn.skip( skipValue );
 
-    CPPUNIT_ASSERT_MESSAGE( "checkSum value is not correct", checkIn.getChecksum()->getValue() > 0 );
+    ASSERT_TRUE(checkIn.getChecksum()->getValue() > 0) << ("checkSum value is not correct");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -142,10 +138,7 @@ void CheckedInputStreamTest::testRead() {
     checkIn.read();
     checkIn.close();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IOException",
-        checkIn.read(),
-        IOException );
+    ASSERT_THROW(checkIn.read(), IOException) << ("Should have thrown an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -173,8 +166,5 @@ void CheckedInputStreamTest::testReadBIII() {
     checkIn.read( buff, 50, 10, 5 );
     checkIn.close();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IOException",
-        checkIn.read( buff, 50, 10, 5 ),
-        IOException );
+    ASSERT_THROW(checkIn.read( buff, 50, 10, 5 ), IOException) << ("Should have thrown an IOException");
 }

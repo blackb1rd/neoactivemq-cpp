@@ -25,12 +25,7 @@ namespace test {
 namespace stomp {
 
     class StompJmsMessageGroupsTest : public JmsMessageGroupsTest {
-
-        CPPUNIT_TEST_SUITE( StompJmsMessageGroupsTest );
-        //CPPUNIT_TEST( testMessageSend );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         StompJmsMessageGroupsTest();
         virtual ~StompJmsMessageGroupsTest();

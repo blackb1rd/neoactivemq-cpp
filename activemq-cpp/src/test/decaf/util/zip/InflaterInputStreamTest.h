@@ -18,34 +18,13 @@
 #ifndef _DECAF_UTIL_ZIP_INFLATERINPUTSTREAMTEST_H_
 #define _DECAF_UTIL_ZIP_INFLATERINPUTSTREAMTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 namespace zip {
 
-    class InflaterInputStreamTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( InflaterInputStreamTest );
-        CPPUNIT_TEST( testConstructorInputStreamInflater );
-        CPPUNIT_TEST( testConstructorInputStreamInflaterI );
-        CPPUNIT_TEST( testMark );
-        CPPUNIT_TEST( testMarkSupported );
-        CPPUNIT_TEST( testRead );
-        CPPUNIT_TEST( testAvailableNonEmptySource );
-        CPPUNIT_TEST( testAvailableSkip );
-        CPPUNIT_TEST( testAvailableEmptySource );
-        CPPUNIT_TEST( testReadBIII );
-        CPPUNIT_TEST( testReadBIII2 );
-        CPPUNIT_TEST( testReadBIII3 );
-        CPPUNIT_TEST( testReset );
-        CPPUNIT_TEST( testClose );
-        CPPUNIT_TEST( testSkip );
-        CPPUNIT_TEST( testSkip2 );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class InflaterInputStreamTest : public ::testing::Test {
+private:
 
         static const std::string testString;
 
@@ -57,7 +36,7 @@ namespace zip {
         InflaterInputStreamTest();
         virtual ~InflaterInputStreamTest();
 
-        void setUp();
+        void SetUp() override;
 
         void testConstructorInputStreamInflater();
         void testConstructorInputStreamInflaterI();

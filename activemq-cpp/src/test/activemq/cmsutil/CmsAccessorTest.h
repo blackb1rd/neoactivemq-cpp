@@ -18,9 +18,7 @@
 #ifndef _ACTIVEMQ_CMSUTIL_CMSACCESSORTEST_H_
 #define _ACTIVEMQ_CMSUTIL_CMSACCESSORTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <activemq/cmsutil/CmsAccessor.h>
 
 namespace activemq{
@@ -28,15 +26,9 @@ namespace cmsutil{
 
     class DummyConnectionFactory;
 
-    class CmsAccessorTest : public CppUnit::TestFixture
+    class CmsAccessorTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( CmsAccessorTest );
-        CPPUNIT_TEST( testConnectionFactory );
-        CPPUNIT_TEST( testAckMode );
-        CPPUNIT_TEST( testCreateResources );
-        CPPUNIT_TEST_SUITE_END();
-
-        class MyAccessor : public CmsAccessor {
+class MyAccessor : public CmsAccessor {
         public:
 
             virtual ~MyAccessor() {}
@@ -63,8 +55,8 @@ namespace cmsutil{
         CmsAccessorTest() : accessor(), cf() {}
         virtual ~CmsAccessorTest() {}
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         void testConnectionFactory();
         void testAckMode();

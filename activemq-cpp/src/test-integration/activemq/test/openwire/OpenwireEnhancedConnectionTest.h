@@ -18,23 +18,15 @@
 #ifndef _ACTIVEMQ_TEST_OPENWIRE_OPENWIREENHANCEDCONNECTIONTEST_H_
 #define _ACTIVEMQ_TEST_OPENWIRE_OPENWIREENHANCEDCONNECTIONTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <activemq/util/IntegrationCommon.h>
 
 namespace activemq {
 namespace test {
 namespace openwire {
 
-    class OpenwireEnhancedConnectionTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( OpenwireEnhancedConnectionTest );
-        CPPUNIT_TEST( testDestinationSource );
-        CPPUNIT_TEST( testDestinationSourceGetters );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class OpenwireEnhancedConnectionTest : public ::testing::Test {
+public:
 
         OpenwireEnhancedConnectionTest();
         virtual ~OpenwireEnhancedConnectionTest();
@@ -43,8 +35,8 @@ namespace openwire {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
 
-        virtual void setUp() {}
-        virtual void tearDown() {}
+        void SetUp() override {}
+        void TearDown() override {}
 
         void testDestinationSource();
         void testDestinationSourceGetters();

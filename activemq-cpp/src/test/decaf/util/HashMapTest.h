@@ -18,46 +18,17 @@
 #ifndef _DECAF_UTIL_HASHMAPTEST_H_
 #define _DECAF_UTIL_HASHMAPTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 
-    class HashMapTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( HashMapTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testConstructorI );
-        CPPUNIT_TEST( testConstructorIF );
-        CPPUNIT_TEST( testConstructorMap );
-        CPPUNIT_TEST( testCopyConstructor );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testContainsKey );
-        CPPUNIT_TEST( testContainsValue );
-        CPPUNIT_TEST( testGet );
-        CPPUNIT_TEST( testPut );
-        CPPUNIT_TEST( testRemove );
-        CPPUNIT_TEST( testIsEmpty );
-        CPPUNIT_TEST( testKeySet );
-        CPPUNIT_TEST( testPutAll );
-        CPPUNIT_TEST( testRehash );
-        CPPUNIT_TEST( testSize );
-        CPPUNIT_TEST( testEntrySet );
-        CPPUNIT_TEST( testValues );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST( testEntrySetIterator );
-        CPPUNIT_TEST( testKeySetIterator );
-        CPPUNIT_TEST( testValuesIterator );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class HashMapTest : public ::testing::Test {
+public:
 
         HashMapTest();
         virtual ~HashMapTest();
 
-        virtual void setUp();
+        void SetUp() override;
 
         void testConstructor();
         void testConstructorI();

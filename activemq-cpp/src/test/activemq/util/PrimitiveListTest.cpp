@@ -28,83 +28,56 @@ void PrimitiveListTest::testSetGet(){
 
     PrimitiveList plist;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw IndexOutOfBoundsException",
-        plist.getBool( 0 ),
-        decaf::lang::exceptions::IndexOutOfBoundsException );
+    ASSERT_THROW(plist.getBool( 0 ), decaf::lang::exceptions::IndexOutOfBoundsException) << ("Should Throw IndexOutOfBoundsException");
 
     plist.add( true );
-    CPPUNIT_ASSERT( plist.getBool(0) == true );
-    CPPUNIT_ASSERT( plist.getString(0) == "true" );
+    ASSERT_TRUE(plist.getBool(0) == true);
+    ASSERT_TRUE(plist.getString(0) == "true");
     plist.add( false );
-    CPPUNIT_ASSERT( plist.getBool(1) == false );
-    CPPUNIT_ASSERT( plist.getString(1) == "false" );
+    ASSERT_TRUE(plist.getBool(1) == false);
+    ASSERT_TRUE(plist.getString(1) == "false");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw UnsupportedOperationException",
-        plist.getByte( 0 ),
-        decaf::lang::exceptions::UnsupportedOperationException );
+    ASSERT_THROW(plist.getByte( 0 ), decaf::lang::exceptions::UnsupportedOperationException) << ("Should Throw UnsupportedOperationException");
 
     plist.setByte( 0, 1 );
-    CPPUNIT_ASSERT( plist.getByte(0) == 1 );
+    ASSERT_TRUE(plist.getByte(0) == 1);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw UnsupportedOperationException",
-        plist.getChar( 0 ),
-        decaf::lang::exceptions::UnsupportedOperationException );
+    ASSERT_THROW(plist.getChar( 0 ), decaf::lang::exceptions::UnsupportedOperationException) << ("Should Throw UnsupportedOperationException");
 
     plist.setChar( 0, 'a' );
-    CPPUNIT_ASSERT( plist.getChar(0) == 'a' );
-    CPPUNIT_ASSERT( plist.getString(0) == "a" );
+    ASSERT_TRUE(plist.getChar(0) == 'a');
+    ASSERT_TRUE(plist.getString(0) == "a");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw UnsupportedOperationException",
-        plist.getShort( 0 ),
-        decaf::lang::exceptions::UnsupportedOperationException );
+    ASSERT_THROW(plist.getShort( 0 ), decaf::lang::exceptions::UnsupportedOperationException) << ("Should Throw UnsupportedOperationException");
 
     plist.setShort( 0, 2 );
-    CPPUNIT_ASSERT( plist.getShort(0) == 2 );
-    CPPUNIT_ASSERT( plist.getInt(0) == 2 );
+    ASSERT_TRUE(plist.getShort(0) == 2);
+    ASSERT_TRUE(plist.getInt(0) == 2);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw UnsupportedOperationException",
-        plist.getByte( 0 ),
-        decaf::lang::exceptions::UnsupportedOperationException );
+    ASSERT_THROW(plist.getByte( 0 ), decaf::lang::exceptions::UnsupportedOperationException) << ("Should Throw UnsupportedOperationException");
 
     plist.setInt( 0, 3 );
-    CPPUNIT_ASSERT( plist.getInt(0) == 3 );
+    ASSERT_TRUE(plist.getInt(0) == 3);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw UnsupportedOperationException",
-        plist.getShort( 0 ),
-        decaf::lang::exceptions::UnsupportedOperationException );
+    ASSERT_THROW(plist.getShort( 0 ), decaf::lang::exceptions::UnsupportedOperationException) << ("Should Throw UnsupportedOperationException");
 
     plist.setLong( 0, 4L );
-    CPPUNIT_ASSERT( plist.getLong(0) == 4L );
+    ASSERT_TRUE(plist.getLong(0) == 4L);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw UnsupportedOperationException",
-        plist.getDouble( 0 ),
-        decaf::lang::exceptions::UnsupportedOperationException );
+    ASSERT_THROW(plist.getDouble( 0 ), decaf::lang::exceptions::UnsupportedOperationException) << ("Should Throw UnsupportedOperationException");
 
     plist.setDouble( 0, 2.3 );
-    CPPUNIT_ASSERT( plist.getDouble(0) == 2.3 );
+    ASSERT_TRUE(plist.getDouble(0) == 2.3);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw UnsupportedOperationException",
-        plist.getFloat( 0 ),
-        decaf::lang::exceptions::UnsupportedOperationException );
+    ASSERT_THROW(plist.getFloat( 0 ), decaf::lang::exceptions::UnsupportedOperationException) << ("Should Throw UnsupportedOperationException");
 
     plist.setFloat( 0, 3.2f );
-    CPPUNIT_ASSERT( plist.getFloat(0) == 3.2f );
+    ASSERT_TRUE(plist.getFloat(0) == 3.2f);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw UnsupportedOperationException",
-        plist.getChar( 0 ),
-        decaf::lang::exceptions::UnsupportedOperationException );
+    ASSERT_THROW(plist.getChar( 0 ), decaf::lang::exceptions::UnsupportedOperationException) << ("Should Throw UnsupportedOperationException");
 
     plist.setString( 0, "hello" );
-    CPPUNIT_ASSERT( plist.getString(0) == "hello" );
+    ASSERT_TRUE(plist.getString(0) == "hello");
 
     std::vector<unsigned char> byteArray;
     byteArray.push_back( 'a' );
@@ -112,13 +85,10 @@ void PrimitiveListTest::testSetGet(){
     byteArray.push_back( 'c' );
     byteArray.push_back( 'd' );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw UnsupportedOperationException",
-        plist.getByteArray( 0 ),
-        decaf::lang::exceptions::UnsupportedOperationException );
+    ASSERT_THROW(plist.getByteArray( 0 ), decaf::lang::exceptions::UnsupportedOperationException) << ("Should Throw UnsupportedOperationException");
 
     plist.setByteArray( 0, byteArray );
-    CPPUNIT_ASSERT( plist.getByteArray(0) == byteArray );
+    ASSERT_TRUE(plist.getByteArray(0) == byteArray);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -151,26 +121,20 @@ void PrimitiveListTest::testAdd(){
     plist.add( stringValue );
     plist.add( byteArrayValue );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw UnsupportedOperationException",
-        plist.getInt( 0 ),
-        decaf::lang::exceptions::UnsupportedOperationException );
+    ASSERT_THROW(plist.getInt( 0 ), decaf::lang::exceptions::UnsupportedOperationException) << ("Should Throw UnsupportedOperationException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw IndexOutOfBoundsException",
-        plist.getInt( plist.size() ),
-        decaf::lang::exceptions::IndexOutOfBoundsException );
+    ASSERT_THROW(plist.getInt( plist.size() ), decaf::lang::exceptions::IndexOutOfBoundsException) << ("Should Throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT( plist.get(0).getType() == PrimitiveValueNode::BOOLEAN_TYPE );
-    CPPUNIT_ASSERT( plist.get(1).getType() == PrimitiveValueNode::BYTE_TYPE );
-    CPPUNIT_ASSERT( plist.get(2).getType() == PrimitiveValueNode::CHAR_TYPE );
-    CPPUNIT_ASSERT( plist.get(3).getType() == PrimitiveValueNode::SHORT_TYPE );
-    CPPUNIT_ASSERT( plist.get(4).getType() == PrimitiveValueNode::INTEGER_TYPE );
-    CPPUNIT_ASSERT( plist.get(5).getType() == PrimitiveValueNode::LONG_TYPE );
-    CPPUNIT_ASSERT( plist.get(6).getType() == PrimitiveValueNode::FLOAT_TYPE );
-    CPPUNIT_ASSERT( plist.get(7).getType() == PrimitiveValueNode::DOUBLE_TYPE );
-    CPPUNIT_ASSERT( plist.get(8).getType() == PrimitiveValueNode::STRING_TYPE );
-    CPPUNIT_ASSERT( plist.get(9).getType() == PrimitiveValueNode::BYTE_ARRAY_TYPE );
+    ASSERT_TRUE(plist.get(0).getType() == PrimitiveValueNode::BOOLEAN_TYPE);
+    ASSERT_TRUE(plist.get(1).getType() == PrimitiveValueNode::BYTE_TYPE);
+    ASSERT_TRUE(plist.get(2).getType() == PrimitiveValueNode::CHAR_TYPE);
+    ASSERT_TRUE(plist.get(3).getType() == PrimitiveValueNode::SHORT_TYPE);
+    ASSERT_TRUE(plist.get(4).getType() == PrimitiveValueNode::INTEGER_TYPE);
+    ASSERT_TRUE(plist.get(5).getType() == PrimitiveValueNode::LONG_TYPE);
+    ASSERT_TRUE(plist.get(6).getType() == PrimitiveValueNode::FLOAT_TYPE);
+    ASSERT_TRUE(plist.get(7).getType() == PrimitiveValueNode::DOUBLE_TYPE);
+    ASSERT_TRUE(plist.get(8).getType() == PrimitiveValueNode::STRING_TYPE);
+    ASSERT_TRUE(plist.get(9).getType() == PrimitiveValueNode::BYTE_ARRAY_TYPE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -182,32 +146,29 @@ void PrimitiveListTest::testRemove(){
     plist.add( 6 );
     plist.removeAt( 0 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw UnsupportedOperationException",
-        plist.getInt( 0 ),
-        decaf::lang::exceptions::UnsupportedOperationException );
+    ASSERT_THROW(plist.getInt( 0 ), decaf::lang::exceptions::UnsupportedOperationException) << ("Should Throw UnsupportedOperationException");
 
     plist.removeAt( 0 );
     plist.removeAt( 0 );
 
-    CPPUNIT_ASSERT( plist.isEmpty() );
+    ASSERT_TRUE(plist.isEmpty());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void PrimitiveListTest::testCount(){
 
     PrimitiveList plist;
-    CPPUNIT_ASSERT( plist.size() == 0 );
+    ASSERT_TRUE(plist.size() == 0);
     plist.add( 5 );
-    CPPUNIT_ASSERT( plist.size() == 1);
+    ASSERT_TRUE(plist.size() == 1);
     plist.add( 5.5f );
-    CPPUNIT_ASSERT( plist.size() == 2 );
+    ASSERT_TRUE(plist.size() == 2);
     plist.add( 6 );
-    CPPUNIT_ASSERT( plist.size() == 3 );
+    ASSERT_TRUE(plist.size() == 3);
     plist.removeAt( 0 );
-    CPPUNIT_ASSERT( plist.size() == 2 );
+    ASSERT_TRUE(plist.size() == 2);
 
-    CPPUNIT_ASSERT( plist.toString() != "" );
+    ASSERT_TRUE(plist.toString() != "");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -220,10 +181,10 @@ void PrimitiveListTest::testCopy(){
 
     PrimitiveList copy;
     copy.copy( plist );
-    CPPUNIT_ASSERT( plist.equals( copy ) );
+    ASSERT_TRUE(plist.equals( copy ));
 
     PrimitiveList copy1( plist );
-    CPPUNIT_ASSERT( plist.equals( copy1 ) );
+    ASSERT_TRUE(plist.equals( copy1 ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -235,22 +196,13 @@ void PrimitiveListTest::testClear(){
     plist.add( 6 );
 
     plist.clear();
-    CPPUNIT_ASSERT( plist.size() == 0 );
+    ASSERT_TRUE(plist.size() == 0);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw IndexOutOfBoundsException",
-        plist.getInt( 0 ),
-        decaf::lang::exceptions::IndexOutOfBoundsException );
+    ASSERT_THROW(plist.getInt( 0 ), decaf::lang::exceptions::IndexOutOfBoundsException) << ("Should Throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw IndexOutOfBoundsException",
-        plist.getFloat( 1 ),
-        decaf::lang::exceptions::IndexOutOfBoundsException );
+    ASSERT_THROW(plist.getFloat( 1 ), decaf::lang::exceptions::IndexOutOfBoundsException) << ("Should Throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw IndexOutOfBoundsException",
-        plist.getInt( 2 ),
-        decaf::lang::exceptions::IndexOutOfBoundsException );
+    ASSERT_THROW(plist.getInt( 2 ), decaf::lang::exceptions::IndexOutOfBoundsException) << ("Should Throw IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -258,19 +210,19 @@ void PrimitiveListTest::testContains(){
 
     PrimitiveList plist;
 
-    CPPUNIT_ASSERT( plist.contains( 255 ) == false );
+    ASSERT_TRUE(plist.contains( 255 ) == false);
 
     plist.add( 5 );
-    CPPUNIT_ASSERT( plist.contains( 5 ) == true );
+    ASSERT_TRUE(plist.contains( 5 ) == true);
 
     plist.add( 5.5f );
-    CPPUNIT_ASSERT( plist.contains( 5.5f ) == true );
+    ASSERT_TRUE(plist.contains( 5.5f ) == true);
 
     plist.add( 6 );
-    CPPUNIT_ASSERT( plist.contains( 6 ) == true );
+    ASSERT_TRUE(plist.contains( 6 ) == true);
 
     plist.remove( PrimitiveValueNode(5) );
-    CPPUNIT_ASSERT( plist.contains( 5 ) == false );
+    ASSERT_TRUE(plist.contains( 5 ) == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -289,9 +241,9 @@ void PrimitiveListTest::testListOfLists() {
     list.add( sublist2 );
     list.add( sublist3 );
 
-    CPPUNIT_ASSERT( list.get(0).getList().get(0).getInt() == 1 );
-    CPPUNIT_ASSERT( list.get(1).getList().get(0).getInt() == 2 );
-    CPPUNIT_ASSERT( list.get(2).getList().get(0).getInt() == 3 );
+    ASSERT_TRUE(list.get(0).getList().get(0).getInt() == 1);
+    ASSERT_TRUE(list.get(1).getList().get(0).getInt() == 2);
+    ASSERT_TRUE(list.get(2).getList().get(0).getInt() == 3);
 
 }
 
@@ -311,8 +263,8 @@ void PrimitiveListTest::testListOfMaps() {
     list.add( map2 );
     list.add( map3 );
 
-    CPPUNIT_ASSERT( list.get(0).getMap().get("1").getInt() == 1 );
-    CPPUNIT_ASSERT( list.get(1).getMap().get("2").getInt() == 2 );
-    CPPUNIT_ASSERT( list.get(2).getMap().get("3").getInt() == 3 );
+    ASSERT_TRUE(list.get(0).getMap().get("1").getInt() == 1);
+    ASSERT_TRUE(list.get(1).getMap().get("2").getInt() == 2);
+    ASSERT_TRUE(list.get(2).getMap().get("3").getInt() == 3);
 
 }

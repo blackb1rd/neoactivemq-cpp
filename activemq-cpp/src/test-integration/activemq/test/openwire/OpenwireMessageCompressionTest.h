@@ -26,15 +26,7 @@ namespace openwire {
 
     class OpenwireMessageCompressionTest : public MessageCompressionTest {
     private:
-
-        CPPUNIT_TEST_SUITE( OpenwireMessageCompressionTest );
-        CPPUNIT_TEST( testTextMessageCompression );
-        CPPUNIT_TEST( testBytesMessageCompression );
-        CPPUNIT_TEST( testStreamMessageCompression );
-        CPPUNIT_TEST( testMapMessageCompression );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireMessageCompressionTest();
         virtual ~OpenwireMessageCompressionTest();

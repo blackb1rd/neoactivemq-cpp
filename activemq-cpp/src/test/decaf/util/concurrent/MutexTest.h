@@ -18,32 +18,17 @@
 #ifndef _DECAF_UTIL_CONCURRENT_MUTEXTEST_H_
 #define _DECAF_UTIL_CONCURRENT_MUTEXTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf{
 namespace util{
 namespace concurrent{
 
-    class MutexTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( MutexTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testSimpleThread );
-        CPPUNIT_TEST( testWait );
-        CPPUNIT_TEST( testTimedWait );
-        CPPUNIT_TEST( testNotify );
-        CPPUNIT_TEST( testNotifyAll );
-        CPPUNIT_TEST( testRecursiveLock );
-        CPPUNIT_TEST( testDoubleLock );
-        CPPUNIT_TEST( testStressMutex );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class MutexTest : public ::testing::Test {
+public:
 
         virtual ~MutexTest(){}
-        virtual void setUp(){}
-        virtual void tearDown(){}
+        void SetUp() override{}
+        void TearDown() override{}
 
         void testConstructor();
         void testTimedWait();

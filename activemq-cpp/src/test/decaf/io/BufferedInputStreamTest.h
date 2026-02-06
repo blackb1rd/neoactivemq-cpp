@@ -18,45 +18,23 @@
 #ifndef _DECAF_IO_BUFFEREDINPUTSTREAMTEST_H_
 #define _DECAF_IO_BUFFEREDINPUTSTREAMTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/io/BufferedInputStream.h>
 #include <decaf/util/Config.h>
 
 namespace decaf{
 namespace io{
 
-    class BufferedInputStreamTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( BufferedInputStreamTest );
-        CPPUNIT_TEST( testSmallerBuffer );
-        CPPUNIT_TEST( testBiggerBuffer );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testAvailable );
-        CPPUNIT_TEST( testClose );
-        CPPUNIT_TEST( testRead );
-        CPPUNIT_TEST( testRead2 );
-        CPPUNIT_TEST( testReadException );
-        CPPUNIT_TEST( testSkipNullInputStream );
-        CPPUNIT_TEST( testMarkSupported );
-        CPPUNIT_TEST( testResetScenario1 );
-        CPPUNIT_TEST( testResetScenario2 );
-        CPPUNIT_TEST( testResetException );
-        CPPUNIT_TEST( testReset );
-        CPPUNIT_TEST( testMarkI );
-        CPPUNIT_TEST( testSkipJ );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class BufferedInputStreamTest : public ::testing::Test {
+private:
 
         static const std::string testString;
 
     public:
 
         virtual ~BufferedInputStreamTest(){}
-        virtual void setUp(){}
-        virtual void tearDown(){}
+        void SetUp() override{}
+        void TearDown() override{}
 
         void testSmallerBuffer();
         void testBiggerBuffer();

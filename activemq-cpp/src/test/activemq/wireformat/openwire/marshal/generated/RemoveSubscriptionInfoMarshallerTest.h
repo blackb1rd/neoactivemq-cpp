@@ -23,9 +23,7 @@
 #pragma warning( disable : 4290 )
 #endif
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq{
 namespace wireformat{
 namespace openwire{
@@ -39,15 +37,8 @@ namespace generated{
      *         if you need to make a change, please see the Java Classes
      *         in the activemq-openwire-generator module
      */
-    class RemoveSubscriptionInfoMarshallerTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( RemoveSubscriptionInfoMarshallerTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( testLooseMarshal );
-        CPPUNIT_TEST( testTightMarshal );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class RemoveSubscriptionInfoMarshallerTest : public ::testing::Test {
+public:
 
         RemoveSubscriptionInfoMarshallerTest() {}
         virtual ~RemoveSubscriptionInfoMarshallerTest() {}

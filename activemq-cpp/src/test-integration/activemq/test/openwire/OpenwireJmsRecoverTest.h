@@ -18,9 +18,7 @@
 #ifndef _ACTIVEMQ_TEST_OPENWIRE_OPENWIREJMSRECOVERTEST_H_
 #define _ACTIVEMQ_TEST_OPENWIRE_OPENWIREJMSRECOVERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <cms/ConnectionFactory.h>
 #include <cms/Connection.h>
 #include <cms/Destination.h>
@@ -31,19 +29,9 @@ namespace activemq {
 namespace test {
 namespace openwire {
 
-    class OpenwireJmsRecoverTest : public CppUnit::TestFixture {
+    class OpenwireJmsRecoverTest : public ::testing::Test {
     private:
-
-        CPPUNIT_TEST_SUITE( OpenwireJmsRecoverTest );
-        CPPUNIT_TEST( testQueueSynchRecover );
-        CPPUNIT_TEST( testQueueAsynchRecover );
-        CPPUNIT_TEST( testTopicSynchRecover );
-        CPPUNIT_TEST( testTopicAsynchRecover );
-        CPPUNIT_TEST( testQueueAsynchRecoverWithAutoAck );
-        CPPUNIT_TEST( testTopicAsynchRecoverWithAutoAck );
-        CPPUNIT_TEST_SUITE_END();
-
-        cms::ConnectionFactory* factory;
+cms::ConnectionFactory* factory;
         cms::Connection* connection;
         cms::Destination* destination;
 
@@ -61,8 +49,8 @@ namespace openwire {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         void testQueueSynchRecover();
         void testQueueAsynchRecover();

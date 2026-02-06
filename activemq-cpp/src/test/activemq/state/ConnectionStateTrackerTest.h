@@ -18,21 +18,12 @@
 #ifndef _ACTIVEMQ_STATE_CONNECTIONSTATETRACKERTEST_H_
 #define _ACTIVEMQ_STATE_CONNECTIONSTATETRACKERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace state {
 
-    class ConnectionStateTrackerTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ConnectionStateTrackerTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( testMessageCache );
-        CPPUNIT_TEST( testMessagePullCache );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class ConnectionStateTrackerTest : public ::testing::Test {
+public:
 
         ConnectionStateTrackerTest() {}
         virtual ~ConnectionStateTrackerTest() {}

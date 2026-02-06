@@ -67,8 +67,8 @@ void LazyPropertyUnmarshalTest::testPropertiesLazilyUnmarshaled() {
     util::PrimitiveMap& messageProps = message->getMessageProperties();
 
     // Verify property values (proves lazy unmarshal worked)
-    CPPUNIT_ASSERT_EQUAL(std::string("testValue"), messageProps.getString("testKey"));
-    CPPUNIT_ASSERT_EQUAL(42, messageProps.getInt("intKey"));
+    ASSERT_EQ(std::string("testValue"), messageProps.getString("testKey"));
+    ASSERT_EQ(42, messageProps.getInt("intKey"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,14 +91,13 @@ void LazyPropertyUnmarshalTest::testCorruptedPropertiesThrowIOException() {
     bool exceptionThrown = false;
     try {
         message->getMessageProperties();
-        CPPUNIT_FAIL("Expected IOException for corrupted properties");
+        FAIL() << ("Expected IOException for corrupted properties");
     } catch (IOException& e) {
         exceptionThrown = true;
         // Expected - corrupted properties should throw IOException
     }
 
-    CPPUNIT_ASSERT_MESSAGE("IOException should be thrown for corrupted properties",
-                           exceptionThrown);
+    ASSERT_TRUE(exceptionThrown) << ("IOException should be thrown for corrupted properties");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,11 +105,11 @@ void LazyPropertyUnmarshalTest::testRedeliveryLimitConfiguration() {
 
     // Test default redelivery limit
     DefaultRedeliveryPolicy defaultPolicy;
-    CPPUNIT_ASSERT_EQUAL(6, defaultPolicy.getMaximumRedeliveries());
+    ASSERT_EQ(6, defaultPolicy.getMaximumRedeliveries());
 
     // Test setting redelivery limit
     defaultPolicy.setMaximumRedeliveries(10);
-    CPPUNIT_ASSERT_EQUAL(10, defaultPolicy.getMaximumRedeliveries());
+    ASSERT_EQ(10, defaultPolicy.getMaximumRedeliveries());
 
     // Test redelivery limit via properties
     DefaultRedeliveryPolicy configuredPolicy;
@@ -118,7 +117,7 @@ void LazyPropertyUnmarshalTest::testRedeliveryLimitConfiguration() {
     props.setProperty("cms.redeliveryPolicy.maximumRedeliveries", "15");
     configuredPolicy.configure(props);
 
-    CPPUNIT_ASSERT_EQUAL(15, configuredPolicy.getMaximumRedeliveries());
+    ASSERT_EQ(15, configuredPolicy.getMaximumRedeliveries());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -143,9 +142,9 @@ void LazyPropertyUnmarshalTest::testRedeliveryExceededAfterMaxAttempts() {
         bool exceeded = (counter > policy.getMaximumRedeliveries());
 
         if (counter <= 6) {
-            CPPUNIT_ASSERT_MESSAGE("Redelivery should not exceed before limit", !exceeded);
+            ASSERT_TRUE(!exceeded) << ("Redelivery should not exceed before limit");
         } else {
-            CPPUNIT_ASSERT_MESSAGE("Redelivery should exceed after limit", exceeded);
+            ASSERT_TRUE(exceeded) << ("Redelivery should exceed after limit");
         }
     }
 }
@@ -199,20 +198,19 @@ void LazyPropertyUnmarshalTest::testCorruptedMessageDoesNotCloseConnection() {
             ioExceptionThrown = true;
         }
 
-        CPPUNIT_ASSERT_MESSAGE("IOException should be thrown for corrupted properties",
-                               ioExceptionThrown);
+        ASSERT_TRUE(ioExceptionThrown) << ("IOException should be thrown for corrupted properties");
 
         // Check if redelivery exceeded
         if (attempt > policy.getMaximumRedeliveries()) {
             // After 6 redeliveries (attempt 7), POISON_ACK should be sent
             // Connection remains alive
-            CPPUNIT_ASSERT_MESSAGE("Redelivery exceeded, POISON_ACK should be sent", true);
+            ASSERT_TRUE(true) << ("Redelivery exceeded, POISON_ACK should be sent");
         }
     }
 
     // Connection stays alive (no exception thrown to close connection)
     // Property corruption is handled at consumer level, not transport level
-    CPPUNIT_ASSERT_MESSAGE("Test completed - connection would stay alive", true);
+    ASSERT_TRUE(true) << ("Test completed - connection would stay alive");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -231,8 +229,8 @@ void LazyPropertyUnmarshalTest::testWireFormatRedeliveryConfiguration() {
     DefaultRedeliveryPolicy policy;
     policy.configure(props);
 
-    CPPUNIT_ASSERT_EQUAL(20, policy.getMaximumRedeliveries());
-    CPPUNIT_ASSERT_EQUAL(5000LL, policy.getInitialRedeliveryDelay());
-    CPPUNIT_ASSERT_EQUAL(true, policy.isUseExponentialBackOff());
-    CPPUNIT_ASSERT_EQUAL(2.0, policy.getBackOffMultiplier());
+    ASSERT_EQ(20, policy.getMaximumRedeliveries());
+    ASSERT_EQ(5000LL, policy.getInitialRedeliveryDelay());
+    ASSERT_EQ(true, policy.isUseExponentialBackOff());
+    ASSERT_EQ(2.0, policy.getBackOffMultiplier());
 }

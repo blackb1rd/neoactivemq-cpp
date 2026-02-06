@@ -27,14 +27,7 @@ namespace openwire {
 
     class OpenwireCmsConnectionStartStopTest : public CmsConnectionStartStopTest {
     private:
-
-        CPPUNIT_TEST_SUITE( OpenwireCmsConnectionStartStopTest );
-        CPPUNIT_TEST( testStoppedConsumerHoldsMessagesTillStarted );
-        CPPUNIT_TEST( testMultipleConnectionStops );
-        CPPUNIT_TEST( testConcurrentSessionCreateWithStart );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireCmsConnectionStartStopTest();
         virtual ~OpenwireCmsConnectionStartStopTest();

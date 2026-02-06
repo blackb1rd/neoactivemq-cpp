@@ -16,35 +16,65 @@
  */
 
 #include <activemq/util/PrimitiveMapBenchmark.h>
-CPPUNIT_TEST_SUITE_REGISTRATION( activemq::util::PrimitiveMapBenchmark );
+namespace activemq { namespace util {
+TEST_F(PrimitiveMapBenchmark, runBenchmark) { runBenchmark(); }
+}}
 
 #include <decaf/lang/BooleanBenchmark.h>
-CPPUNIT_TEST_SUITE_REGISTRATION( decaf::lang::BooleanBenchmark );
+namespace decaf { namespace lang {
+TEST_F(BooleanBenchmark, runBenchmark) { runBenchmark(); }
+}}
 #include <decaf/lang/ThreadBenchmark.h>
-CPPUNIT_TEST_SUITE_REGISTRATION( decaf::lang::ThreadBenchmark );
+namespace decaf { namespace lang {
+TEST_F(ThreadBenchmark, runBenchmark) { runBenchmark(); }
+}}
 
 #include <decaf/util/PropertiesBenchmark.h>
-CPPUNIT_TEST_SUITE_REGISTRATION( decaf::util::PropertiesBenchmark );
+namespace decaf { namespace util {
+TEST_F(PropertiesBenchmark, runBenchmark) { runBenchmark(); }
+}}
 #include <decaf/util/QueueBenchmark.h>
-CPPUNIT_TEST_SUITE_REGISTRATION( decaf::util::QueueBenchmark );
+namespace decaf { namespace util {
+TEST_F(QueueBenchmark, runBenchmark) { runBenchmark(); }
+}}
 #include <decaf/util/SetBenchmark.h>
-CPPUNIT_TEST_SUITE_REGISTRATION( decaf::util::SetBenchmark );
+namespace decaf { namespace util {
+TEST_F(SetBenchmark, runBenchmark) { runBenchmark(); }
+}}
 #include <decaf/util/StlMapBenchmark.h>
-CPPUNIT_TEST_SUITE_REGISTRATION( decaf::util::StlMapBenchmark );
+namespace decaf { namespace util {
+TEST_F(StlMapBenchmark, runBenchmark) { runBenchmark(); }
+}}
 #include <decaf/util/HashMapBenchmark.h>
-CPPUNIT_TEST_SUITE_REGISTRATION( decaf::util::HashMapBenchmark );
+namespace decaf { namespace util {
+TEST_F(HashMapBenchmark, runBenchmark) { runBenchmark(); }
+}}
 #include <decaf/util/StlListBenchmark.h>
-CPPUNIT_TEST_SUITE_REGISTRATION( decaf::util::StlListBenchmark );
+namespace decaf { namespace util {
+TEST_F(StlListBenchmark, runBenchmark) { runBenchmark(); }
+}}
 #include <decaf/util/LinkedListBenchmark.h>
-CPPUNIT_TEST_SUITE_REGISTRATION( decaf::util::LinkedListBenchmark );
+namespace decaf { namespace util {
+TEST_F(LinkedListBenchmark, runBenchmark) { runBenchmark(); }
+}}
 
 #include <decaf/io/ByteArrayOutputStreamBenchmark.h>
-CPPUNIT_TEST_SUITE_REGISTRATION( decaf::io::ByteArrayOutputStreamBenchmark );
+namespace decaf { namespace io {
+TEST_F(ByteArrayOutputStreamBenchmark, runBenchmark) { runBenchmark(); }
+}}
 #include <decaf/io/ByteArrayInputStreamBenchmark.h>
-CPPUNIT_TEST_SUITE_REGISTRATION( decaf::io::ByteArrayInputStreamBenchmark );
+namespace decaf { namespace io {
+TEST_F(ByteArrayInputStreamBenchmark, runBenchmark) { runBenchmark(); }
+}}
 #include <decaf/io/BufferedInputStreamBenchmark.h>
-CPPUNIT_TEST_SUITE_REGISTRATION( decaf::io::BufferedInputStreamBenchmark );
+namespace decaf { namespace io {
+TEST_F(BufferedInputStreamBenchmark, runBenchmark) { runBenchmark(); }
+}}
 #include <decaf/io/DataInputStreamBenchmark.h>
-CPPUNIT_TEST_SUITE_REGISTRATION( decaf::io::DataInputStreamBenchmark );
+namespace decaf { namespace io {
+TEST_F(DataInputStreamBenchmark, runBenchmark) { runBenchmark(); }
+}}
 #include <decaf/io/DataOutputStreamBenchmark.h>
-CPPUNIT_TEST_SUITE_REGISTRATION( decaf::io::DataOutputStreamBenchmark );
+namespace decaf { namespace io {
+TEST_F(DataOutputStreamBenchmark, runBenchmark) { runBenchmark(); }
+}}

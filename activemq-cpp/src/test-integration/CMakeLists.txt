@@ -130,19 +130,19 @@ if(AMQCPP_SHARED_LIB AND WIN32)
   )
 endif()
 
-# Link to the consolidated library and CppUnit
-target_link_libraries(neoactivemq-integration-test PRIVATE neoactivemq-cpp CppUnit)
+# Link to the consolidated library and Google Test
+target_link_libraries(neoactivemq-integration-test PRIVATE neoactivemq-cpp GTest::gtest)
 
-# Note: Integration tests are NOT registered with CTest by default because they
-# require a running ActiveMQ broker. To run integration tests manually:
-#
-# 1. Start ActiveMQ broker (see Docker commands above)
-# 2. Run: ./activemq-integration-test
-# 3. Stop the broker when done
-#
-# To register with CTest (advanced users only), uncomment the following:
-# add_test(NAME activemq-integration-tests COMMAND activemq-integration-test)
-# set_tests_properties(activemq-integration-tests PROPERTIES
-#   TIMEOUT 600
-#   ENVIRONMENT "ACTIVEMQ_BROKER_URI=tcp://localhost:61616"
-# )
+# Discover individual GTest cases for CTest/VSCode Test Explorer
+# Note: These tests require a running ActiveMQ broker (Docker fixtures
+# are defined in the top-level CMakeLists.txt via IntegrationFixture)
+include(GoogleTest)
+gtest_discover_tests(neoactivemq-integration-test
+  TEST_PREFIX "integration/"
+  DISCOVERY_TIMEOUT 120
+  PROPERTIES
+    LABELS "integration"
+    FIXTURES_REQUIRED IntegrationFixture
+    TIMEOUT 300
+    ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
+)

@@ -18,24 +18,14 @@
 #ifndef _DECAF_INTERNAL_NET_SSL_DEFAULTSSLSOCKETFACTORYTEST_H_
 #define _DECAF_INTERNAL_NET_SSL_DEFAULTSSLSOCKETFACTORYTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace internal {
 namespace net {
 namespace ssl {
 
-    class DefaultSSLSocketFactoryTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( DefaultSSLSocketFactoryTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testCreateSocket );
-        CPPUNIT_TEST( testGetDefaultCipherSuites );
-        CPPUNIT_TEST( testGetSupportedCipherSuites );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class DefaultSSLSocketFactoryTest : public ::testing::Test {
+public:
 
         DefaultSSLSocketFactoryTest();
         virtual ~DefaultSSLSocketFactoryTest();

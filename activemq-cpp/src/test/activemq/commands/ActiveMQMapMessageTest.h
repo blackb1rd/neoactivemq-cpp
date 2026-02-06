@@ -18,35 +18,12 @@
 #ifndef _ACTIVEMQ_COMMANDS_ACTIVEMQMAPMESSAGETEST_H_
 #define _ACTIVEMQ_COMMANDS_ACTIVEMQMAPMESSAGETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq{
 namespace commands{
 
-    class ActiveMQMapMessageTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ActiveMQMapMessageTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( testBytesConversion );
-        CPPUNIT_TEST( testGetBoolean );
-        CPPUNIT_TEST( testGetByte );
-        CPPUNIT_TEST( testGetShort );
-        CPPUNIT_TEST( testGetChar );
-        CPPUNIT_TEST( testGetInt );
-        CPPUNIT_TEST( testGetLong );
-        CPPUNIT_TEST( testGetFloat );
-        CPPUNIT_TEST( testGetDouble );
-        CPPUNIT_TEST( testGetString );
-        CPPUNIT_TEST( testGetBytes );
-        CPPUNIT_TEST( testGetMapNames );
-        CPPUNIT_TEST( testItemExists );
-        CPPUNIT_TEST( testClearBody );
-        CPPUNIT_TEST( testReadOnlyBody );
-        CPPUNIT_TEST( testWriteOnlyBody );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class ActiveMQMapMessageTest : public ::testing::Test {
+private:
 
         std::string name;
 

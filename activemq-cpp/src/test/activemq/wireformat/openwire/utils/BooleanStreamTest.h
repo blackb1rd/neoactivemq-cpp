@@ -18,22 +18,14 @@
 #ifndef _ACTYIVEMQ_WIREFORMAT_OPENWIRE_UTIL_BOOLEANSTREAMTEST_H_
 #define _ACTYIVEMQ_WIREFORMAT_OPENWIRE_UTIL_BOOLEANSTREAMTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq{
 namespace wireformat{
 namespace openwire{
 namespace utils{
 
-    class BooleanStreamTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( BooleanStreamTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( test2 );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class BooleanStreamTest : public ::testing::Test {
+public:
 
         BooleanStreamTest() {}
         virtual ~BooleanStreamTest() {}

@@ -18,34 +18,13 @@
 #ifndef _DECAF_LANG_FLOATTEST_H_
 #define _DECAF_LANG_FLOATTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf{
 namespace lang{
 
-    class FloatTest : public CppUnit::TestFixture
+    class FloatTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( FloatTest );
-        CPPUNIT_TEST( test_ConstructorF );
-        CPPUNIT_TEST( test_ConstructorString );
-        CPPUNIT_TEST( test_byteValue );
-        CPPUNIT_TEST( test_compare );
-        CPPUNIT_TEST( test_doubleValue );
-        CPPUNIT_TEST( test_floatToIntBitsF );
-        CPPUNIT_TEST( test_floatToRawIntBitsF );
-        CPPUNIT_TEST( test_floatValue );
-        CPPUNIT_TEST( test_intBitsToFloatI );
-        CPPUNIT_TEST( test_intValue );
-        CPPUNIT_TEST( test_isInfinite );
-        CPPUNIT_TEST( test_isInfiniteF );
-        CPPUNIT_TEST( test_isNaN );
-        CPPUNIT_TEST( test_isNaNF );
-        CPPUNIT_TEST( test_longValue );
-        CPPUNIT_TEST( test_parseFloatLDecaf_lang_String );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         static const int rawBitsFor3_4eN38To38[];
         static const std::string expectedStringFor3_4eN38To38[];

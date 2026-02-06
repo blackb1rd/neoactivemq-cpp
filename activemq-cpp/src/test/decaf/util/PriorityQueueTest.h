@@ -18,40 +18,12 @@
 #ifndef _DECAF_UTIL_PRIORITYQUEUETEST_H_
 #define _DECAF_UTIL_PRIORITYQUEUETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 
-    class PriorityQueueTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( PriorityQueueTest );
-        CPPUNIT_TEST( testConstructor_1 );
-        CPPUNIT_TEST( testConstructor_2 );
-        CPPUNIT_TEST( testConstructor_3 );
-        CPPUNIT_TEST( testAssignment );
-        CPPUNIT_TEST( testSize );
-        CPPUNIT_TEST( testOfferString );
-        CPPUNIT_TEST( testPoll );
-        CPPUNIT_TEST( testPollEmpty );
-        CPPUNIT_TEST( testPeek );
-        CPPUNIT_TEST( testPeekEmpty );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testAdd );
-        CPPUNIT_TEST( testAddAll );
-        CPPUNIT_TEST( testRemove );
-        CPPUNIT_TEST( testRemoveUsingComparator );
-        CPPUNIT_TEST( testRemoveNotExists );
-        CPPUNIT_TEST( testComparator );
-        CPPUNIT_TEST( testIterator );
-        CPPUNIT_TEST( testIteratorEmpty );
-        CPPUNIT_TEST( testIteratorOutOfBounds );
-        CPPUNIT_TEST( testIteratorRemove );
-        CPPUNIT_TEST( testIteratorRemoveIllegalState );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class PriorityQueueTest : public ::testing::Test {
+public:
 
         PriorityQueueTest() {}
         virtual ~PriorityQueueTest() {}

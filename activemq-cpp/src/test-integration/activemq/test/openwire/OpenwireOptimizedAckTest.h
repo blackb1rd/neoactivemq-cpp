@@ -26,21 +26,13 @@ namespace test {
 namespace openwire {
 
     class OpenwireOptimizedAckTest : public CMSTestFixture {
-
-        CPPUNIT_TEST_SUITE( OpenwireOptimizedAckTest );
-        CPPUNIT_TEST( testOptimizedAckSettings );
-        CPPUNIT_TEST( testOptimizedAckWithExpiredMsgs );
-        CPPUNIT_TEST( testOptimizedAckWithExpiredMsgsSync );
-        CPPUNIT_TEST( testOptimizedAckWithExpiredMsgsSync2 );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireOptimizedAckTest();
         virtual ~OpenwireOptimizedAckTest();
 
-        virtual void setUp() {}
-        virtual void tearDown() {}
+        void SetUp() override {}
+        void TearDown() override {}
 
         virtual std::string getBrokerURL() const;
 

@@ -18,23 +18,13 @@
 #ifndef _DECAF_INTERNAL_UTIL_TIMERTASKHEAPTEST_H_
 #define _DECAF_INTERNAL_UTIL_TIMERTASKHEAPTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace internal {
 namespace util {
 
-    class TimerTaskHeapTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( TimerTaskHeapTest );
-        CPPUNIT_TEST( testCreate );
-        CPPUNIT_TEST( testInsert );
-        CPPUNIT_TEST( testRemove );
-        CPPUNIT_TEST( testFind );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class TimerTaskHeapTest : public ::testing::Test {
+public:
 
         TimerTaskHeapTest() {}
         virtual ~TimerTaskHeapTest() {}

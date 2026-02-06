@@ -34,7 +34,7 @@ void FilterOutputStreamTest::testConstructor() {
         FilterOutputStream os( &baos );
         os.write( 't' );
     } catch( IOException& e ) {
-        CPPUNIT_FAIL("Constructor test failed : " + e.getMessage());
+        FAIL() << ("Constructor test failed : " + e.getMessage());
     }
 }
 
@@ -46,11 +46,10 @@ void FilterOutputStreamTest::testClose() {
         FilterOutputStream os( &baos );
         os.write( (unsigned char*)&testString[0], (int)testString.size(), 0, 500 );
         os.flush();
-        CPPUNIT_ASSERT_MESSAGE( "Bytes not written after flush",
-                                500 == baos.size() );
+        ASSERT_TRUE(500 == baos.size()) << ("Bytes not written after flush");
         os.close();
     } catch( IOException& e ) {
-        CPPUNIT_FAIL("Close test failed : " + e.getMessage());
+        FAIL() << ("Close test failed : " + e.getMessage());
     }
 }
 
@@ -62,11 +61,10 @@ void FilterOutputStreamTest::testFlush() {
         FilterOutputStream os( &baos );
         os.write( (unsigned char*)&testString[0], (int)testString.size(), 0, 500 );
         os.flush();
-        CPPUNIT_ASSERT_MESSAGE( "Bytes not written after flush",
-                                500 == baos.size() );
+        ASSERT_TRUE(500 == baos.size()) << ("Bytes not written after flush");
         os.close();
     } catch( IOException& e ) {
-        CPPUNIT_FAIL("Flush test failed : " + e.getMessage());
+        FAIL() << ("Flush test failed : " + e.getMessage());
     }
 }
 
@@ -81,16 +79,14 @@ void FilterOutputStreamTest::testWrite1() {
         std::pair<const unsigned char*, int> array = baos.toByteArray();
         ByteArrayInputStream bais( array.first, array.second, true );
         os.flush();
-        CPPUNIT_ASSERT_MESSAGE( "Bytes not written after flush",
-                                bais.available() == (int)testString.length() );
+        ASSERT_TRUE(bais.available() == (int)testString.length()) << ("Bytes not written after flush");
         unsigned char* wbytes = new unsigned char[ testString.length() ];
         bais.read( wbytes, (int)testString.length(), 0, (int)testString.length() );
-        CPPUNIT_ASSERT_MESSAGE("Incorrect bytes written",
-            testString == string( (const char*)wbytes, testString.length() ) );
+        ASSERT_TRUE(testString == string( (const char*)wbytes, testString.length() )) << ("Incorrect bytes written");
 
         delete [] wbytes;
     } catch( IOException& e ) {
-        CPPUNIT_FAIL("Write test failed : " + e.getMessage());
+        FAIL() << ("Write test failed : " + e.getMessage());
     }
 }
 
@@ -104,12 +100,12 @@ void FilterOutputStreamTest::testWrite2() {
         std::pair<const unsigned char*, int> array = baos.toByteArray();
         ByteArrayInputStream bais( array.first, array.second, true );
         os.flush();
-        CPPUNIT_ASSERT_MESSAGE( "Byte not written after flush", 1 == bais.available() );
+        ASSERT_TRUE(1 == bais.available()) << ("Byte not written after flush");
         unsigned char wbytes[1];
         bais.read( wbytes, 1, 0, 1 );
-        CPPUNIT_ASSERT_MESSAGE("Incorrect byte written", 't' == wbytes[0] );
+        ASSERT_TRUE('t' == wbytes[0]) << ("Incorrect byte written");
     } catch( IOException& e ) {
-        CPPUNIT_FAIL("Write test failed : " + e.getMessage());
+        FAIL() << ("Write test failed : " + e.getMessage());
     }
 }
 
@@ -119,32 +115,17 @@ void FilterOutputStreamTest::testWriteBIIIExceptions() {
     ByteArrayOutputStream baos;
     FilterOutputStream os( &baos );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an NullPointerException",
-        os.write( NULL, 1000, 0, 1001 ),
-        NullPointerException );
+    ASSERT_THROW(os.write( NULL, 1000, 0, 1001 ), NullPointerException) << ("Should have thrown an NullPointerException");
 
     unsigned char buffer[1000];
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        os.write( buffer, 1000, 0, 1001 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(os.write( buffer, 1000, 0, 1001 ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        os.write( buffer, 1000, 1001, 0 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(os.write( buffer, 1000, 1001, 0 ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        os.write( buffer, 1000, 500, 501 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(os.write( buffer, 1000, 500, 501 ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 
     os.close();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IOException",
-        os.write( buffer, 1000, 0, 100 ),
-        IOException );
+    ASSERT_THROW(os.write( buffer, 1000, 0, 100 ), IOException) << ("Should have thrown an IOException");
 }

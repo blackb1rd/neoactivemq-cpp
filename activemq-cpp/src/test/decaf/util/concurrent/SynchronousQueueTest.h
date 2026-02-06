@@ -18,9 +18,7 @@
 #ifndef _DECAF_UTIL_CONCURRENT_SYNCHRONOUSQUEUETEST_H_
 #define _DECAF_UTIL_CONCURRENT_SYNCHRONOUSQUEUETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/util/concurrent/Concurrent.h>
@@ -32,13 +30,8 @@ namespace decaf {
 namespace util {
 namespace concurrent {
 
-    class SynchronousQueueTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( SynchronousQueueTest );
-        CPPUNIT_TEST( testConstructor_1 );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class SynchronousQueueTest : public ::testing::Test {
+public:
 
         SynchronousQueueTest() {}
         virtual ~SynchronousQueueTest() {}

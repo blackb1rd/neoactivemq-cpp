@@ -18,19 +18,12 @@
 #ifndef _ACTIVEMQ_COMMANDS_BROKERINFOTEST_H_
 #define _ACTIVEMQ_COMMANDS_BROKERINFOTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq{
 namespace commands{
 
-    class BrokerInfoTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( BrokerInfoTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class BrokerInfoTest : public ::testing::Test {
+public:
 
         BrokerInfoTest() {}
         virtual ~BrokerInfoTest() {}

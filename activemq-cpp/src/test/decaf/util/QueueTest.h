@@ -18,19 +18,12 @@
 #ifndef _DECAF_UTIL_QUEUETEST_H_
 #define _DECAF_UTIL_QUEUETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf{
 namespace util{
 
-   class QueueTest : public CppUnit::TestFixture {
-
-       CPPUNIT_TEST_SUITE( QueueTest );
-       CPPUNIT_TEST( test );
-       CPPUNIT_TEST_SUITE_END();
-
-   public:
+   class QueueTest : public ::testing::Test {
+public:
 
        virtual ~QueueTest() {}
 

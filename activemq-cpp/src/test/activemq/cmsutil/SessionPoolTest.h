@@ -18,21 +18,12 @@
 #ifndef _ACTIVEMQ_CMSUTIL_SESSIONPOOLEST_H_
 #define _ACTIVEMQ_CMSUTIL_SESSIONPOOLEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq{
 namespace cmsutil{
 
-    class SessionPoolTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( SessionPoolTest );
-        CPPUNIT_TEST( testTakeSession );
-        CPPUNIT_TEST( testReturnSession );
-        CPPUNIT_TEST( testCloseSession );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class SessionPoolTest : public ::testing::Test {
+public:
 
         SessionPoolTest() {}
         virtual ~SessionPoolTest() {}

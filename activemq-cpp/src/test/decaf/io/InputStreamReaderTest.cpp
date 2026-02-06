@@ -39,14 +39,14 @@ InputStreamReaderTest::~InputStreamReaderTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InputStreamReaderTest::setUp() {
+void InputStreamReaderTest::SetUp() {
 
     this->buffer1 = new ByteArrayInputStream( (unsigned char*)TEST_STRING.c_str(), (int)TEST_STRING.length() );
     this->reader1 = new InputStreamReader( this->buffer1 );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InputStreamReaderTest::tearDown() {
+void InputStreamReaderTest::TearDown() {
 
     try{
         delete this->reader1;
@@ -59,26 +59,17 @@ void InputStreamReaderTest::testClose() {
 
     this->reader1->close();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IOException",
-        this->reader1->read(),
-        IOException );
+    ASSERT_THROW(this->reader1->read(), IOException) << ("Should throw an IOException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IOException",
-        this->reader1->ready(),
-        IOException );
+    ASSERT_THROW(this->reader1->ready(), IOException) << ("Should throw an IOException");
 
-    CPPUNIT_ASSERT_NO_THROW( this->reader1->close() );
+    ASSERT_NO_THROW(this->reader1->close());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void InputStreamReaderTest::testConstructorInputStream() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an NullPointerException",
-        InputStreamReader( NULL ),
-        NullPointerException );
+    ASSERT_THROW(InputStreamReader( NULL ), NullPointerException) << ("Should throw an NullPointerException");
 
     InputStreamReader* reader2 = new InputStreamReader( this->buffer1 );
     reader2->close();
@@ -88,33 +79,30 @@ void InputStreamReaderTest::testConstructorInputStream() {
 ////////////////////////////////////////////////////////////////////////////////
 void InputStreamReaderTest::testRead() {
 
-    CPPUNIT_ASSERT_EQUAL( 'T', (char) this->reader1->read() );
-    CPPUNIT_ASSERT_EQUAL( 'h', (char) this->reader1->read() );
-    CPPUNIT_ASSERT_EQUAL( 'i', (char) this->reader1->read() );
-    CPPUNIT_ASSERT_EQUAL( 's', (char) this->reader1->read() );
-    CPPUNIT_ASSERT_EQUAL( ' ', (char) this->reader1->read() );
+    ASSERT_EQ('T', (char) this->reader1->read());
+    ASSERT_EQ('h', (char) this->reader1->read());
+    ASSERT_EQ('i', (char) this->reader1->read());
+    ASSERT_EQ('s', (char) this->reader1->read());
+    ASSERT_EQ(' ', (char) this->reader1->read());
 
     std::vector<char> buffer( TEST_STRING.length() - 5 );
     this->reader1->read( &buffer[0], (int)buffer.size(), 0, (int)TEST_STRING.length() - 5 );
-    CPPUNIT_ASSERT_EQUAL( -1, this->reader1->read() );
+    ASSERT_EQ(-1, this->reader1->read());
 
     this->reader1->close();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IOException",
-        this->reader1->read(),
-        IOException );
+    ASSERT_THROW(this->reader1->read(), IOException) << ("Should throw an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void InputStreamReaderTest::testReady() {
 
-    CPPUNIT_ASSERT_MESSAGE( "Ready test failed", this->reader1->ready() );
+    ASSERT_TRUE(this->reader1->ready()) << ("Ready test failed");
     this->reader1->read();
-    CPPUNIT_ASSERT_MESSAGE("More chars, but not ready", this->reader1->ready());
+    ASSERT_TRUE(this->reader1->ready()) << ("More chars, but not ready");
 
-    CPPUNIT_ASSERT( this->reader1->ready() );
+    ASSERT_TRUE(this->reader1->ready());
     std::vector<char> buffer( TEST_STRING.length() - 1 );
     this->reader1->read( buffer );
-    CPPUNIT_ASSERT( !this->reader1->ready() );
+    ASSERT_TRUE(!this->reader1->ready());
 }

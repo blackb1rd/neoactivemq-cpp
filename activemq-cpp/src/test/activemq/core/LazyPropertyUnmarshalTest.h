@@ -18,9 +18,7 @@
 #ifndef _ACTIVEMQ_CORE_LAZYPROPERTYUNMARSHALTEST_H_
 #define _ACTIVEMQ_CORE_LAZYPROPERTYUNMARSHALTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace core {
 
@@ -34,18 +32,8 @@ namespace core {
      * - POISON_ACK is sent after maximum redeliveries
      * - Connection stays alive when property corruption occurs
      */
-    class LazyPropertyUnmarshalTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE(LazyPropertyUnmarshalTest);
-        CPPUNIT_TEST(testPropertiesLazilyUnmarshaled);
-        CPPUNIT_TEST(testCorruptedPropertiesThrowIOException);
-        CPPUNIT_TEST(testRedeliveryLimitConfiguration);
-        CPPUNIT_TEST(testRedeliveryExceededAfterMaxAttempts);
-        CPPUNIT_TEST(testCorruptedMessageDoesNotCloseConnection);
-        CPPUNIT_TEST(testWireFormatRedeliveryConfiguration);
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class LazyPropertyUnmarshalTest : public ::testing::Test {
+public:
 
         LazyPropertyUnmarshalTest();
         virtual ~LazyPropertyUnmarshalTest();

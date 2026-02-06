@@ -18,29 +18,14 @@
 #ifndef _DECAF_IO_BYTEARRAYINPUTSTREAMTEST_H_
 #define _DECAF_IO_BYTEARRAYINPUTSTREAMTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/io/ByteArrayInputStream.h>
 
 namespace decaf{
 namespace io{
 
-   class ByteArrayInputStreamTest : public CppUnit::TestFixture {
-
-       CPPUNIT_TEST_SUITE( ByteArrayInputStreamTest );
-       CPPUNIT_TEST( testStream );
-       CPPUNIT_TEST( testConstructor );
-       CPPUNIT_TEST( testConstructor2 );
-       CPPUNIT_TEST( testAvailable );
-       CPPUNIT_TEST( testClose );
-       CPPUNIT_TEST( testRead );
-       CPPUNIT_TEST( testRead2 );
-       CPPUNIT_TEST( testRead3 );
-       CPPUNIT_TEST( testSkip );
-       CPPUNIT_TEST_SUITE_END();
-
-   public:
+   class ByteArrayInputStreamTest : public ::testing::Test {
+public:
 
        ByteArrayInputStreamTest() {}
        virtual ~ByteArrayInputStreamTest() {}

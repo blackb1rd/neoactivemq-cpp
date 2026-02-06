@@ -18,8 +18,7 @@
 #ifndef _DECAF_UTIL_CONCURRENT_LOCKS_REENTRANTLOCKTEST_H_
 #define _DECAF_UTIL_CONCURRENT_LOCKS_REENTRANTLOCKTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 namespace decaf {
@@ -28,54 +27,7 @@ namespace concurrent {
 namespace locks {
 
     class ReentrantLockTest : public ExecutorsTestSupport {
-
-        CPPUNIT_TEST_SUITE( ReentrantLockTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testLock );
-        CPPUNIT_TEST( testFairLock );
-        CPPUNIT_TEST( testUnlockIllegalMonitorStateException );
-        CPPUNIT_TEST( testTryLock );
-        CPPUNIT_TEST( testhasQueuedThreads );
-        CPPUNIT_TEST( testGetQueueLength );
-        CPPUNIT_TEST( testGetQueueLengthFair );
-        CPPUNIT_TEST( testHasQueuedThreadNPE );
-        CPPUNIT_TEST( testHasQueuedThread );
-        CPPUNIT_TEST( testGetQueuedThreads );
-        CPPUNIT_TEST( testInterruptedException2 );
-        CPPUNIT_TEST( testTryLockWhenLocked );
-        CPPUNIT_TEST( testTryLockTimeout );
-        CPPUNIT_TEST( testGetHoldCount );
-        CPPUNIT_TEST( testIsLocked );
-        CPPUNIT_TEST( testLockInterruptibly1 );
-        CPPUNIT_TEST( testLockInterruptibly2 );
-        CPPUNIT_TEST( testAwaitIllegalMonitor );
-        CPPUNIT_TEST( testSignalIllegalMonitor );
-        CPPUNIT_TEST( testAwaitNanosTimeout );
-        CPPUNIT_TEST( testAwaitTimeout );
-        CPPUNIT_TEST( testAwaitUntilTimeout );
-        CPPUNIT_TEST( testAwait );
-        CPPUNIT_TEST( testHasWaitersNPE );
-        CPPUNIT_TEST( testGetWaitQueueLengthNPE );
-        CPPUNIT_TEST( testGetWaitingThreadsNPE );
-        CPPUNIT_TEST( testHasWaitersIAE );
-        CPPUNIT_TEST( testHasWaitersIMSE );
-        CPPUNIT_TEST( testGetWaitQueueLengthIAE );
-        CPPUNIT_TEST( testGetWaitQueueLengthIMSE );
-        CPPUNIT_TEST( testGetWaitingThreadsIAE );
-        CPPUNIT_TEST( testGetWaitingThreadsIMSE );
-        CPPUNIT_TEST( testHasWaiters );
-        CPPUNIT_TEST( testGetWaitQueueLength );
-        CPPUNIT_TEST( testGetWaitingThreads );
-        CPPUNIT_TEST( testAwaitUninterruptibly );
-        CPPUNIT_TEST( testAwaitInterrupt );
-        CPPUNIT_TEST( testAwaitNanosInterrupt );
-        CPPUNIT_TEST( testAwaitUntilInterrupt );
-        CPPUNIT_TEST( testSignalAll );
-        CPPUNIT_TEST( testAwaitLockCount );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         ReentrantLockTest();
         virtual ~ReentrantLockTest();

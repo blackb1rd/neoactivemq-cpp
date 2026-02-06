@@ -18,27 +18,13 @@
 #ifndef _ACTIVEMQ_CORE_ACTIVEMQCONNECTIONFACTORYTEST_H_
 #define _ACTIVEMQ_CORE_ACTIVEMQCONNECTIONFACTORYTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq{
 namespace core{
 
-    class ActiveMQConnectionFactoryTest : public CppUnit::TestFixture
+    class ActiveMQConnectionFactoryTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( ActiveMQConnectionFactoryTest );
-        CPPUNIT_TEST( test1WithOpenWire );
-        CPPUNIT_TEST( test2WithOpenWire );
-        CPPUNIT_TEST( test3WithOpenWire );
-        CPPUNIT_TEST( test4WithOpenWire );
-        CPPUNIT_TEST( testExceptionOnCreate );
-        CPPUNIT_TEST( testCreateWithURIOptions );
-        CPPUNIT_TEST( testTransportListener );
-        CPPUNIT_TEST( testExceptionWithPortOutOfRange );
-        CPPUNIT_TEST( testURIOptionsProcessing );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         std::string username;
         std::string password;

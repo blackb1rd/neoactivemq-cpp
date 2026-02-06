@@ -20,26 +20,13 @@
 
 #include <activemq/util/PrimitiveMap.h>
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq{
 namespace util{
 
-    class PrimitiveMapTest : public CppUnit::TestFixture
+    class PrimitiveMapTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( PrimitiveMapTest );
-        CPPUNIT_TEST( testValueNode );
-        CPPUNIT_TEST( testSetGet );
-        CPPUNIT_TEST( testRemove );
-        CPPUNIT_TEST( testCount );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testCopy );
-        CPPUNIT_TEST( testContains );
-        CPPUNIT_TEST( testGetKeys );
-        CPPUNIT_TEST_SUITE_END();
-        
-    public:
+public:
     
     	PrimitiveMapTest(){};
     	virtual ~PrimitiveMapTest(){};

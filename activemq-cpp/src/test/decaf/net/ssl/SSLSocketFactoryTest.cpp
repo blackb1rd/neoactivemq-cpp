@@ -39,19 +39,16 @@ void SSLSocketFactoryTest::testGetDefault() {
 
     SocketFactory* factory = SSLSocketFactory::getDefault();
 
-    CPPUNIT_ASSERT( factory != NULL );
+    ASSERT_TRUE(factory != NULL);
 
 #ifdef HAVE_OPENSSL
 
     std::unique_ptr<Socket> sock( factory->createSocket() );
-    CPPUNIT_ASSERT( sock.get() != NULL );
+    ASSERT_TRUE(sock.get() != NULL);
 
 #else
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IOException",
-        factory->createSocket(),
-        IOException );
+    ASSERT_THROW(factory->createSocket(), IOException) << ("Should have thrown an IOException");
 
 #endif
 }

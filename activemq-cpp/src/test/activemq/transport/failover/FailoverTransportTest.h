@@ -18,8 +18,7 @@
 #ifndef _ACTIVEMQ_TRANSPORT_FAILOVER_FAILOVERTRANSPORTTEST_H_
 #define _ACTIVEMQ_TRANSPORT_FAILOVER_FAILOVERTRANSPORTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include <activemq/util/Config.h>
 
 #include <activemq/commands/ConnectionInfo.h>
@@ -37,48 +36,8 @@ namespace failover {
     using decaf::lang::Pointer;
     using namespace activemq::commands;
 
-    class FailoverTransportTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( FailoverTransportTest );
-        CPPUNIT_TEST( testTransportCreate );
-        CPPUNIT_TEST( testTransportCreateWithBackups );
-        CPPUNIT_TEST( testTransportCreateFailOnCreate );
-        CPPUNIT_TEST( testTransportCreateFailOnCreateSendMessage );
-        CPPUNIT_TEST( testFailingBackupCreation );
-        CPPUNIT_TEST( testSendOnewayMessage );
-        CPPUNIT_TEST( testSendRequestMessage );
-        CPPUNIT_TEST( testSendOnewayMessageFail );
-        CPPUNIT_TEST( testSendRequestMessageFail );
-        CPPUNIT_TEST( testWithOpewireCommands );
-        CPPUNIT_TEST( testTransportHandlesConnectionControl );
-        CPPUNIT_TEST( testPriorityBackupConfig );
-        CPPUNIT_TEST( testUriOptionsApplied );
-        CPPUNIT_TEST( testConnectedToMockBroker );
-        CPPUNIT_TEST( testMaxReconnectsZeroAttemptsOneConnect );
-        CPPUNIT_TEST( testMaxReconnectsHonorsConfiguration );
-        CPPUNIT_TEST( testStartupMaxReconnectsHonorsConfiguration );
-        // CPPUNIT_TEST( testConnectedToPriorityOnFirstTryThenFailover );
-        // Failover tests without randomization (randomize=false)
-        CPPUNIT_TEST( testFailoverNoRandomizeBothOnline );
-        CPPUNIT_TEST( testFailoverNoRandomizeBroker1OnlyOnline );
-        CPPUNIT_TEST( testFailoverNoRandomizeBroker2OnlyOnline );
-        CPPUNIT_TEST( testFailoverNoRandomizeBothOfflineBroker1ComesOnline );
-        CPPUNIT_TEST( testFailoverNoRandomizeBothOfflineBroker2ComesOnline );
-        // Failover tests with randomization (randomize=true, default)
-        CPPUNIT_TEST( testFailoverWithRandomizeBothOnline );
-        CPPUNIT_TEST( testFailoverWithRandomizeBroker1OnlyOnline );
-        CPPUNIT_TEST( testFailoverWithRandomizeBroker2OnlyOnline );
-        CPPUNIT_TEST( testFailoverWithRandomizeBothOfflineBroker1ComesOnline );
-        CPPUNIT_TEST( testFailoverWithRandomizeBothOfflineBroker2ComesOnline );
-        //CPPUNIT_TEST( testConnectsToPriorityOnceStarted );
-        //CPPUNIT_TEST( testPriorityBackupRapidSwitchingOnRestore );
-        CPPUNIT_TEST( testSimpleBrokerRestart );
-        CPPUNIT_TEST( testBrokerRestartWithProperSync );
-        CPPUNIT_TEST( testFuzzyBrokerAvailability );
-        //CPPUNIT_TEST( testConnectsToPriorityAfterInitialBackupFails );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class FailoverTransportTest : public ::testing::Test {
+public:
 
         FailoverTransportTest();
         virtual ~FailoverTransportTest();

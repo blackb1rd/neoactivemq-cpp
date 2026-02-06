@@ -25,14 +25,7 @@ namespace test{
 namespace openwire{
 
     class OpenwireExpirationTest : public ExpirationTest {
-
-        CPPUNIT_TEST_SUITE( OpenwireExpirationTest );
-        CPPUNIT_TEST( testExpired );
-        CPPUNIT_TEST( testExpiredWithChecksDisabled );
-        CPPUNIT_TEST( testNotExpired );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireExpirationTest();
         virtual ~OpenwireExpirationTest();

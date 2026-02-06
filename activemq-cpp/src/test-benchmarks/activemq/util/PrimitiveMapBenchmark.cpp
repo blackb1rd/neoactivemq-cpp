@@ -31,7 +31,7 @@ PrimitiveMapBenchmark::PrimitiveMapBenchmark() : map(), testString(), byteBuffer
 PrimitiveMapBenchmark::~PrimitiveMapBenchmark() {}
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveMapBenchmark::setUp(){
+void PrimitiveMapBenchmark::SetUp(){
     for( int i = 0; i < 1024; ++i ) {
         testString += "a";
         byteBuffer.push_back( 'a' );
@@ -90,25 +90,25 @@ void PrimitiveMapBenchmark::run() {
 
     for( int i = 0; i < numRuns; ++i ){
         boolResult = map.getBool( "BOOL" );
-        CPPUNIT_ASSERT(boolResult == true);
+        ASSERT_TRUE(boolResult == true);
         byteResult = map.getByte( "BYTE" );
-        CPPUNIT_ASSERT(byteResult == 12);
+        ASSERT_TRUE(byteResult == 12);
         charResult = map.getChar( "CHAR" );
-        CPPUNIT_ASSERT(charResult == 60);
+        ASSERT_TRUE(charResult == 60);
         intResult = map.getInt( "INT" );
-        CPPUNIT_ASSERT(intResult == 54275482);
+        ASSERT_TRUE(intResult == 54275482);
         shortResult = map.getShort( "SHORT" );
-        CPPUNIT_ASSERT(shortResult == 32767);
+        ASSERT_TRUE(shortResult == 32767);
         longResult = map.getLong( "LONG" );
-        CPPUNIT_ASSERT(longResult == 0xFFLL);
+        ASSERT_TRUE(longResult == 0xFFLL);
         doubleResult = map.getDouble( "DOUBLE" );
-        CPPUNIT_ASSERT(doubleResult == 1321.1516);
+        ASSERT_TRUE(doubleResult == 1321.1516);
         floatResult = map.getFloat( "FLOAT" );
-        CPPUNIT_ASSERT(floatResult == 45.45f);
+        ASSERT_TRUE(floatResult == 45.45f);
         stringResult = map.getString( "STRING" );
-        CPPUNIT_ASSERT(stringResult == testString);
+        ASSERT_TRUE(stringResult == testString);
         bytesResult = map.getByteArray( "BYTES" );
-        CPPUNIT_ASSERT(bytesResult.size() == byteBuffer.size());
+        ASSERT_TRUE(bytesResult.size() == byteBuffer.size());
     }
 
     for( int i = 0; i < numRuns; ++i ){

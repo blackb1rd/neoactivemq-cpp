@@ -30,8 +30,8 @@ void SynchronousQueueTest::testConstructor_1() {
 
     SynchronousQueue<int> q;
 
-    CPPUNIT_ASSERT( q.isEmpty() );
-    CPPUNIT_ASSERT( 0 == q.size() );
-    CPPUNIT_ASSERT( 0 == q.remainingCapacity() );
-    CPPUNIT_ASSERT( !q.offer( 0 ) );
+    ASSERT_TRUE(q.isEmpty());
+    ASSERT_TRUE(0 == q.size());
+    ASSERT_TRUE(0 == q.remainingCapacity());
+    ASSERT_TRUE(!q.offer( 0 ));
 }

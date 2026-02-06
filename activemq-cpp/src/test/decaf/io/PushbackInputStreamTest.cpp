@@ -79,10 +79,7 @@ void PushbackInputStreamTest::testReset() {
     ByteArrayInputStream bais( temp );
     PushbackInputStream pb( &bais );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw an IOException",
-        pb.reset(),
-        IOException );
+    ASSERT_THROW(pb.reset(), IOException) << ("Should Throw an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,10 +99,7 @@ void PushbackInputStreamTest::testConstructor1() {
 
     {
         PushbackInputStream str( NULL );
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should Throw an IOException",
-            str.reset(),
-            IOException );
+        ASSERT_THROW(str.reset(), IOException) << ("Should Throw an IOException");
     }
     {
         std::vector<unsigned char> temp( testString.begin(), testString.end() );
@@ -114,10 +108,7 @@ void PushbackInputStreamTest::testConstructor1() {
 
         unsigned char un[] = { 'h', 'e' };
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should Throw an IOException",
-            pb.unread( un, 2 ),
-            IOException );
+        ASSERT_THROW(pb.unread( un, 2 ), IOException) << ("Should Throw an IOException");
     }
 }
 
@@ -130,20 +121,14 @@ void PushbackInputStreamTest::testConstructor2() {
 
     unsigned char un[] = { 'h', 'e', 'l', 'l', 'o', 's' };
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw an IOException",
-        pb.unread( un, 6 ),
-        IOException );
+    ASSERT_THROW(pb.unread( un, 6 ), IOException) << ("Should Throw an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void PushbackInputStreamTest::testConstructor3() {
 
     PushbackInputStream pb( NULL, 1 );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw an IOException",
-        pb.read(),
-        IOException );
+    ASSERT_THROW(pb.read(), IOException) << ("Should Throw an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -153,10 +138,9 @@ void PushbackInputStreamTest::testAvailable() {
         ByteArrayInputStream bais( temp );
         PushbackInputStream pb( &bais );
 
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Should have been testString.length available.",
-                                      (int)testString.length(), pb.available() );
+        ASSERT_EQ((int)testString.length(), pb.available()) << ("Should have been testString.length available.");
     } catch( IOException& e ) {
-        CPPUNIT_FAIL( std::string() + "Exception during available test: " + e.getMessage() );
+        FAIL() << (std::string() + "Exception during available test: " + e.getMessage());
     }
 }
 
@@ -166,7 +150,7 @@ void PushbackInputStreamTest::testMarkSupported() {
     std::vector<unsigned char> temp( testString.begin(), testString.end() );
     ByteArrayInputStream bais( temp );
     PushbackInputStream pb( &bais );
-    CPPUNIT_ASSERT_MESSAGE( "markSupported returned true", !pb.markSupported() );
+    ASSERT_TRUE(!pb.markSupported()) << ("markSupported returned true");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -176,10 +160,9 @@ void PushbackInputStreamTest::testRead() {
         ByteArrayInputStream bais( temp );
         PushbackInputStream pb( &bais );
 
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Did not return the first value in testString.",
-                                      testString.at( 0 ), (char)pb.read() );
+        ASSERT_EQ(testString.at( 0 ), (char)pb.read()) << ("Did not return the first value in testString.");
     } catch( IOException& e ) {
-        CPPUNIT_FAIL( std::string() + "Exception during available test: " + e.getMessage() );
+        FAIL() << (std::string() + "Exception during available test: " + e.getMessage());
     }
 }
 
@@ -193,11 +176,10 @@ void PushbackInputStreamTest::testReadBIII() {
 
         unsigned char buf[100];
         pb.read( buf, 100 );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect bytes read from the testString.",
-                                      std::string( buf, buf + 100 ), testString.substr( 0, 100 ) );
+        ASSERT_EQ(std::string( buf, buf + 100 ), testString.substr( 0, 100 )) << ("Incorrect bytes read from the testString.");
 
     } catch( IOException& e ) {
-        CPPUNIT_FAIL( std::string() + "Exception during read test : " + e.getMessage() );
+        FAIL() << (std::string() + "Exception during read test : " + e.getMessage());
     }
 }
 
@@ -211,15 +193,13 @@ void PushbackInputStreamTest::testSkip() {
     unsigned char buf[50];
     pb.skip( 50 );
     pb.read( buf, 50, 0, 50 );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect bytes read from the testString.",
-                                  std::string( buf, buf + 50 ), testString.substr( 50, 50 ) );
+    ASSERT_EQ(std::string( buf, buf + 50 ), testString.substr( 50, 50 )) << ("Incorrect bytes read from the testString.");
 
     pb.unread( buf, 50 );
     pb.skip( 25 );
     unsigned char buf2[25];
     pb.read( buf2, 25 );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect bytes read from the testString.",
-                                  std::string( buf2, buf2 + 25 ), testString.substr( 75, 25 ) );
+    ASSERT_EQ(std::string( buf2, buf2 + 25 ), testString.substr( 75, 25 )) << ("Incorrect bytes read from the testString.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -232,14 +212,12 @@ void PushbackInputStreamTest::testUnreadBI() {
 
         unsigned char buf[100];
         pb.read(buf, 100, 0, 100 );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect bytes read from the testString.",
-                                      std::string( buf, buf + 100 ), testString.substr( 0, 100 ) );
+        ASSERT_EQ(std::string( buf, buf + 100 ), testString.substr( 0, 100 )) << ("Incorrect bytes read from the testString.");
         pb.unread( buf, 100 );
         pb.read( buf, 50 );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect bytes read from the testString.",
-                                      std::string( buf, buf + 50 ), testString.substr( 0, 50 ) );
+        ASSERT_EQ(std::string( buf, buf + 50 ), testString.substr( 0, 50 )) << ("Incorrect bytes read from the testString.");
     } catch( IOException& e ) {
-        CPPUNIT_FAIL( std::string() + "IOException during unread test : " + e.getMessage() );
+        FAIL() << (std::string() + "IOException during unread test : " + e.getMessage());
     }
 }
 
@@ -252,13 +230,11 @@ void PushbackInputStreamTest::testUnreadBIII() {
 
     unsigned char buf[100];
     pb.read( buf, 100, 0, 100 );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect bytes read from the testString.",
-                                  std::string( buf, buf + 100 ), testString.substr( 0, 100 ) );
+    ASSERT_EQ(std::string( buf, buf + 100 ), testString.substr( 0, 100 )) << ("Incorrect bytes read from the testString.");
 
     pb.unread( buf, 100, 50, 50 );
     pb.read( buf, 50 );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect bytes read from the testString.",
-                                  std::string( buf, buf + 50 ), testString.substr( 50, 50 ) );
+    ASSERT_EQ(std::string( buf, buf + 50 ), testString.substr( 50, 50 )) << ("Incorrect bytes read from the testString.");
 
     {
         std::vector<unsigned char> temp( 2 );
@@ -267,10 +243,7 @@ void PushbackInputStreamTest::testUnreadBIII() {
 
         unsigned char un[] = { 'h' };
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should Throw an IOException",
-            pb.unread( un, 1, 0, 5 ),
-            IOException );
+        ASSERT_THROW(pb.unread( un, 1, 0, 5 ), IOException) << ("Should Throw an IOException");
     }
 }
 
@@ -285,13 +258,12 @@ void PushbackInputStreamTest::testUnread() {
 
         int x;
 
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect bytes read from the testString.",
-                                      (char)( x = pb.read() ), testString.at( 0 ) );
+        ASSERT_EQ((char)( x = pb.read() ), testString.at( 0 )) << ("Incorrect bytes read from the testString.");
 
         pb.unread( (char) x );
-        CPPUNIT_ASSERT_MESSAGE( "Failed to unread", pb.read() == x );
+        ASSERT_TRUE(pb.read() == x) << ("Failed to unread");
 
     } catch( IOException& e ) {
-        CPPUNIT_FAIL( std::string() + "IOException during read test : " + e.getMessage() );
+        FAIL() << (std::string() + "IOException during read test : " + e.getMessage());
     }
 }

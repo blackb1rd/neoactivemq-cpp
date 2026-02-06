@@ -119,10 +119,10 @@ void AbstractExecutorServiceTest::testExecuteRunnable() {
         DirectExecutorService e;
         TrackedShortRunnable task(&done);
 
-        CPPUNIT_ASSERT(!done);
+        ASSERT_TRUE(!done);
         Future<int>* future = e.submit<int>(&task, false);
         future->get();
-        CPPUNIT_ASSERT(done);
+        ASSERT_TRUE(done);
         delete future;
     } catch (ExecutionException& ex) {
         unexpectedException();
@@ -138,7 +138,7 @@ void AbstractExecutorServiceTest::testSubmitCallable() {
         DirectExecutorService e;
         Future<string>* future = e.submit(new StringTask());
         string result = future->get();
-        CPPUNIT_ASSERT_EQUAL(TEST_STRING, result);
+        ASSERT_EQ(TEST_STRING, result);
         delete future;
     } catch (ExecutionException& ex) {
         unexpectedException();
@@ -153,7 +153,7 @@ void AbstractExecutorServiceTest::testSubmitRunnable() {
         DirectExecutorService e;
         Future<int>* future = e.submit<int>(new NoOpRunnable());
         future->get();
-        CPPUNIT_ASSERT(future->isDone());
+        ASSERT_TRUE(future->isDone());
         delete future;
     } catch (ExecutionException& ex) {
         unexpectedException();
@@ -168,7 +168,7 @@ void AbstractExecutorServiceTest::testSubmitRunnable2() {
         DirectExecutorService e;
         Future<string>* future = e.submit(new NoOpRunnable(), TEST_STRING);
         string result = future->get();
-        CPPUNIT_ASSERT_EQUAL(TEST_STRING, result);
+        ASSERT_EQ(TEST_STRING, result);
         delete future;
     } catch (ExecutionException& ex) {
         unexpectedException();

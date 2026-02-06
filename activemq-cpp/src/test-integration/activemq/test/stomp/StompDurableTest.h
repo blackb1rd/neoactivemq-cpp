@@ -25,12 +25,7 @@ namespace test{
 namespace stomp{
 
     class StompDurableTest : public DurableTest {
-
-        CPPUNIT_TEST_SUITE( StompDurableTest );
-        CPPUNIT_TEST( testDurableConsumer );
-        CPPUNIT_TEST_SUITE_END();
-
-        std::string subscriptionName;
+std::string subscriptionName;
 
     public:
 

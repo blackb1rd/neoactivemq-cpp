@@ -18,58 +18,15 @@
 #ifndef _DECAF_INTERNAL_NIO_CHARARRAYBUFFERTEST_H_
 #define _DECAF_INTERNAL_NIO_CHARARRAYBUFFERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/nio/CharBuffer.h>
 
 namespace decaf{
 namespace internal{
 namespace nio{
 
-    class CharArrayBufferTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( CharArrayBufferTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( testArray );
-        CPPUNIT_TEST( testArrayOffset );
-        CPPUNIT_TEST( testReadOnlyArray );
-        CPPUNIT_TEST( testAsReadOnlyBuffer );
-        CPPUNIT_TEST( testCompact );
-        CPPUNIT_TEST( testCompareTo );
-        CPPUNIT_TEST( testDuplicate );
-        CPPUNIT_TEST( testEquals );
-        CPPUNIT_TEST( testGet );
-        CPPUNIT_TEST( testGetbyteArray );
-        CPPUNIT_TEST( testGetbyteArray2 );
-        CPPUNIT_TEST( testGetWithIndex );
-        CPPUNIT_TEST( testPutbyte );
-        CPPUNIT_TEST( testPutbyteArray );
-        CPPUNIT_TEST( testPutbyteArray2 );
-        CPPUNIT_TEST( testPutCharBuffer );
-        CPPUNIT_TEST( testPutIndexed );
-        CPPUNIT_TEST( testSlice );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST( testWrapNullArray );
-        CPPUNIT_TEST( testCharAt );
-        CPPUNIT_TEST( testLength );
-        CPPUNIT_TEST( testSubSequence );
-        CPPUNIT_TEST( testPutString );
-        CPPUNIT_TEST( testPutStringWithArgs );
-        CPPUNIT_TEST( testAppendSelf );
-        CPPUNIT_TEST( testAppendOverFlow );
-        CPPUNIT_TEST( testReadOnlyMap );
-        CPPUNIT_TEST( testAppendCNormal );
-        CPPUNIT_TEST( testAppendCharSequenceNormal );
-        CPPUNIT_TEST( testAppendCharSequenceIINormal );
-        CPPUNIT_TEST( testAppendCharSequenceII_IllegalArgument );
-        CPPUNIT_TEST( testReadCharBuffer );
-        CPPUNIT_TEST( testReadReadOnly );
-        CPPUNIT_TEST( testReadOverflow );
-        CPPUNIT_TEST( testReadSelf );
-        CPPUNIT_TEST_SUITE_END();
-
-        decaf::nio::CharBuffer* testBuffer1;
+    class CharArrayBufferTest : public ::testing::Test {
+decaf::nio::CharBuffer* testBuffer1;
         char* testData1;
 
         static const int testData1Size;
@@ -86,7 +43,7 @@ namespace nio{
         CharArrayBufferTest() : testBuffer1(), testData1() {}
         virtual ~CharArrayBufferTest() {}
 
-        void setUp() {
+        void SetUp() override {
             testBuffer1 = decaf::nio::CharBuffer::allocate( testData1Size );
 
             testData1 = new char[testData1Size];
@@ -95,7 +52,7 @@ namespace nio{
             }
         }
 
-        void tearDown() {
+        void TearDown() override {
             delete testBuffer1;
             delete [] testData1;
         }

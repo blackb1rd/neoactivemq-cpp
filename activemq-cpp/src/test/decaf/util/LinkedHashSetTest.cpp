@@ -62,16 +62,16 @@ LinkedHashSetTest::~LinkedHashSetTest() {
 void LinkedHashSetTest::testConstructor() {
 
     LinkedHashSet<int> set;
-    CPPUNIT_ASSERT(set.isEmpty());
-    CPPUNIT_ASSERT_EQUAL(0, set.size());
-    CPPUNIT_ASSERT_EQUAL(false, set.contains(1));
+    ASSERT_TRUE(set.isEmpty());
+    ASSERT_EQ(0, set.size());
+    ASSERT_EQ(false, set.contains(1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void LinkedHashSetTest::testConstructorI() {
 
     LinkedHashSet<int> set;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Created incorrect LinkedHashSet", 0, set.size());
+    ASSERT_EQ(0, set.size()) << ("Created incorrect LinkedHashSet");
 
     try {
         LinkedHashSet<int> set(-1);
@@ -79,14 +79,14 @@ void LinkedHashSetTest::testConstructorI() {
         return;
     }
 
-    CPPUNIT_FAIL("Failed to throw IllegalArgumentException for capacity < 0");
+    FAIL() << ("Failed to throw IllegalArgumentException for capacity < 0");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void LinkedHashSetTest::testConstructorIF() {
 
     LinkedHashSet<int> set(5, 0.5);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Created incorrect LinkedHashSet", 0, set.size());
+    ASSERT_EQ(0, set.size()) << ("Created incorrect LinkedHashSet");
 
     try {
         LinkedHashSet<int> set(0, 0);
@@ -94,7 +94,7 @@ void LinkedHashSetTest::testConstructorIF() {
         return;
     }
 
-    CPPUNIT_FAIL("Failed to throw IllegalArgumentException for initial load factor <= 0");
+    FAIL() << ("Failed to throw IllegalArgumentException for initial load factor <= 0");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -109,12 +109,10 @@ void LinkedHashSetTest::testConstructorCollection() {
 
     LinkedHashSet<int> set(intList);
     for (int counter = 0; counter < intList.size(); counter++) {
-        CPPUNIT_ASSERT_MESSAGE("LinkedHashSet does not contain correct elements",
-                               set.contains(intList.get(counter)));
+        ASSERT_TRUE(set.contains(intList.get(counter))) << ("LinkedHashSet does not contain correct elements");
     }
 
-    CPPUNIT_ASSERT_MESSAGE("LinkedHashSet created from collection incorrect size",
-                           set.size() == intList.size() - 1);
+    ASSERT_TRUE(set.size() == intList.size() - 1) << ("LinkedHashSet created from collection incorrect size");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -125,15 +123,15 @@ void LinkedHashSetTest::testEquals() {
     LinkedHashSet<int> set2;
     populateSet(set2);
 
-    CPPUNIT_ASSERT(set1.equals(set2));
-    CPPUNIT_ASSERT(set2.equals(set1));
+    ASSERT_TRUE(set1.equals(set2));
+    ASSERT_TRUE(set2.equals(set1));
 
     set1.add(SET_SIZE + 1);
-    CPPUNIT_ASSERT(!set1.equals(set2));
-    CPPUNIT_ASSERT(!set2.equals(set1));
+    ASSERT_TRUE(!set1.equals(set2));
+    ASSERT_TRUE(!set2.equals(set1));
     set2.add(SET_SIZE + 1);
-    CPPUNIT_ASSERT(set1.equals(set2));
-    CPPUNIT_ASSERT(set2.equals(set1));
+    ASSERT_TRUE(set1.equals(set2));
+    ASSERT_TRUE(set2.equals(set1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -144,10 +142,10 @@ void LinkedHashSetTest::testAdd() {
     int size = set.size();
 
     set.add(8);
-    CPPUNIT_ASSERT_MESSAGE("Added element already contained by set", set.size() == size);
+    ASSERT_TRUE(set.size() == size) << ("Added element already contained by set");
     set.add(-9);
-    CPPUNIT_ASSERT_MESSAGE("Failed to increment set size after add", set.size() == size + 1);
-    CPPUNIT_ASSERT_MESSAGE("Failed to add element to set", set.contains(-9));
+    ASSERT_TRUE(set.size() == size + 1) << ("Failed to increment set size after add");
+    ASSERT_TRUE(set.contains(-9)) << ("Failed to add element to set");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -156,10 +154,10 @@ void LinkedHashSetTest::testClear() {
     LinkedHashSet<int> set;
     populateSet(set);
 
-    CPPUNIT_ASSERT(set.size() > 0);
+    ASSERT_TRUE(set.size() > 0);
     set.clear();
-    CPPUNIT_ASSERT(set.size() == 0);
-    CPPUNIT_ASSERT(!set.contains(1));
+    ASSERT_TRUE(set.size() == 0);
+    ASSERT_TRUE(!set.contains(1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,18 +166,18 @@ void LinkedHashSetTest::testContains() {
     LinkedHashSet<int> set;
     populateSet(set);
 
-    CPPUNIT_ASSERT_MESSAGE("Returned false for valid object", set.contains(90));
-    CPPUNIT_ASSERT_MESSAGE("Returned true for invalid Object", !set.contains(SET_SIZE + 1));
+    ASSERT_TRUE(set.contains(90)) << ("Returned false for valid object");
+    ASSERT_TRUE(!set.contains(SET_SIZE + 1)) << ("Returned true for invalid Object");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void LinkedHashSetTest::testIsEmpty() {
     LinkedHashSet<int> set;
-    CPPUNIT_ASSERT_MESSAGE("Empty set returned true", set.isEmpty());
+    ASSERT_TRUE(set.isEmpty()) << ("Empty set returned true");
     set.add(1);
-    CPPUNIT_ASSERT_MESSAGE("Non-empty set returned true", !set.isEmpty());
+    ASSERT_TRUE(!set.isEmpty()) << ("Non-empty set returned true");
 
-    CPPUNIT_ASSERT_MESSAGE("Empty set returned false", LinkedHashSet<std::string>().isEmpty());
+    ASSERT_TRUE(LinkedHashSet<std::string>().isEmpty()) << ("Empty set returned false");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -191,7 +189,7 @@ void LinkedHashSetTest::testIterator() {
     // Tests that the LinkedHashSet iterates in order of insertion.
     for (int j = 0; iter->hasNext(); j++) {
         int value = iter->next();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect element found", value == j);
+        ASSERT_TRUE(value == j) << ("Incorrect element found");
     }
 
     {
@@ -202,8 +200,8 @@ void LinkedHashSetTest::testIterator() {
         set.add( "fred3" );
 
         Iterator<string>* iterator1 = set.iterator();
-        CPPUNIT_ASSERT( iterator1 != NULL );
-        CPPUNIT_ASSERT( iterator1->hasNext() == true );
+        ASSERT_TRUE(iterator1 != NULL);
+        ASSERT_TRUE(iterator1->hasNext() == true);
 
         int count = 0;
         while( iterator1->hasNext() ) {
@@ -211,7 +209,7 @@ void LinkedHashSetTest::testIterator() {
             ++count;
         }
 
-        CPPUNIT_ASSERT( count == set.size() );
+        ASSERT_TRUE(count == set.size());
 
         Iterator<string>* iterator2 = set.iterator();
 
@@ -220,7 +218,7 @@ void LinkedHashSetTest::testIterator() {
             iterator2->remove();
         }
 
-        CPPUNIT_ASSERT( set.isEmpty() );
+        ASSERT_TRUE(set.isEmpty());
 
         delete iterator1;
         delete iterator2;
@@ -234,8 +232,8 @@ void LinkedHashSetTest::testRemove() {
     populateSet(set);
     int size = set.size();
     set.remove(98);
-    CPPUNIT_ASSERT_MESSAGE("Failed to remove element", !set.contains(98));
-    CPPUNIT_ASSERT_MESSAGE("Failed to decrement set size", set.size() == size - 1);
+    ASSERT_TRUE(!set.contains(98)) << ("Failed to remove element");
+    ASSERT_TRUE(set.size() == size - 1) << ("Failed to decrement set size");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -244,16 +242,16 @@ void LinkedHashSetTest::testSize() {
     LinkedHashSet<int> set;
     populateSet(set);
 
-    CPPUNIT_ASSERT_MESSAGE("Returned incorrect size", set.size() == SET_SIZE);
+    ASSERT_TRUE(set.size() == SET_SIZE) << ("Returned incorrect size");
     set.clear();
-    CPPUNIT_ASSERT_MESSAGE("Cleared set returned non-zero size", 0 == set.size());
+    ASSERT_TRUE(0 == set.size()) << ("Cleared set returned non-zero size");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void LinkedHashSetTest::testToString() {
     LinkedHashSet<std::string> s;
     std::string result = s.toString();
-    CPPUNIT_ASSERT_MESSAGE("toString returned bad value", result.find("LinkedHashSet") != std::string::npos);
+    ASSERT_TRUE(result.find("LinkedHashSet") != std::string::npos) << ("toString returned bad value");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -263,7 +261,7 @@ void LinkedHashSetTest::testToArray() {
     populateSet(set);
 
     std::vector<int> array = set.toArray();
-    CPPUNIT_ASSERT((int)array.size() == SET_SIZE);
+    ASSERT_TRUE((int)array.size() == SET_SIZE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -279,13 +277,13 @@ void LinkedHashSetTest::testCopy1() {
 
     set2.copy(set1);
 
-    CPPUNIT_ASSERT(set1.size() == set2.size());
+    ASSERT_TRUE(set1.size() == set2.size());
 
     for (int i = 0; i < 50; ++i) {
-        CPPUNIT_ASSERT(set2.contains(i));
+        ASSERT_TRUE(set2.contains(i));
     }
 
-    CPPUNIT_ASSERT(set2.equals(set1));
+    ASSERT_TRUE(set2.equals(set1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -301,13 +299,13 @@ void LinkedHashSetTest::testCopy2() {
 
     set.copy(collection);
 
-    CPPUNIT_ASSERT(collection.size() == set.size());
+    ASSERT_TRUE(collection.size() == set.size());
 
     for (int i = 0; i < 50; ++i) {
-        CPPUNIT_ASSERT(set.contains(i));
+        ASSERT_TRUE(set.contains(i));
     }
 
-    CPPUNIT_ASSERT(set.equals(collection));
+    ASSERT_TRUE(set.equals(collection));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -322,18 +320,18 @@ void LinkedHashSetTest::testRemoveAll() {
 
     set.removeAll(collection);
 
-    CPPUNIT_ASSERT_EQUAL(1, set.size());
+    ASSERT_EQ(1, set.size());
 
     LinkedHashSet<int> set2;
     set2.removeAll(collection);
-    CPPUNIT_ASSERT_EQUAL(0, set2.size());
+    ASSERT_EQ(0, set2.size());
 
     LinkedHashSet<int> set3;
     populateSet(set3, 3);
     collection.clear();
 
     set3.removeAll(collection);
-    CPPUNIT_ASSERT_EQUAL(3, set3.size());
+    ASSERT_EQ(3, set3.size());
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -348,16 +346,16 @@ void LinkedHashSetTest::testRetainAll() {
 
     set.retainAll(collection);
 
-    CPPUNIT_ASSERT_EQUAL(2, set.size());
+    ASSERT_EQ(2, set.size());
 
     LinkedHashSet<int> set2;
     set2.retainAll(collection);
-    CPPUNIT_ASSERT_EQUAL(0, set2.size());
+    ASSERT_EQ(0, set2.size());
 
     LinkedHashSet<int> set3;
     populateSet(set3, 3);
     collection.clear();
 
     set3.retainAll(collection);
-    CPPUNIT_ASSERT_EQUAL(0, set3.size());
+    ASSERT_EQ(0, set3.size());
 }

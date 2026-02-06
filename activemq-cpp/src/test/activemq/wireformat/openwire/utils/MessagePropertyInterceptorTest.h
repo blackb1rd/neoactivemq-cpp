@@ -18,21 +18,14 @@
 #ifndef _ACTIVE_WIREFORMAT_OPENWIRE_UTILS_MESSAGEPROPERTYINTERCEPTORTEST_H_
 #define _ACTIVE_WIREFORMAT_OPENWIRE_UTILS_MESSAGEPROPERTYINTERCEPTORTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace wireformat {
 namespace openwire {
 namespace utils {
 
-    class MessagePropertyInterceptorTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( MessagePropertyInterceptorTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class MessagePropertyInterceptorTest : public ::testing::Test {
+public:
 
         MessagePropertyInterceptorTest() {}
         virtual ~MessagePropertyInterceptorTest() {}

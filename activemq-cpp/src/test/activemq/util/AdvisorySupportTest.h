@@ -18,60 +18,13 @@
 #ifndef _ACTIVEMQ_UTIL_ADVISORYSUPPORTTEST_H_
 #define _ACTIVEMQ_UTIL_ADVISORYSUPPORTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace util {
 
-    class AdvisorySupportTest : public CppUnit::TestFixture {
+    class AdvisorySupportTest : public ::testing::Test {
     private:
-
-        CPPUNIT_TEST_SUITE( AdvisorySupportTest );
-        CPPUNIT_TEST( testGetTempDestinationCompositeAdvisoryTopic );
-        CPPUNIT_TEST( testGetAllDestinationsCompositeAdvisoryTopic );
-        CPPUNIT_TEST( testGetAllDestinationAdvisoryTopics );
-        CPPUNIT_TEST( testGetConnectionAdvisoryTopic );
-        CPPUNIT_TEST( testGetQueueAdvisoryTopic );
-        CPPUNIT_TEST( testGetTopicAdvisoryTopic );
-        CPPUNIT_TEST( testGetTempQueueAdvisoryTopic );
-        CPPUNIT_TEST( testGetTempTopicAdvisoryTopic );
-        CPPUNIT_TEST( testGetConsumerAdvisoryTopic );
-        CPPUNIT_TEST( testGetProducerAdvisoryTopic );
-        CPPUNIT_TEST( testGetExpiredMessageTopic );
-        CPPUNIT_TEST( testGetExpiredTopicMessageAdvisoryTopic );
-        CPPUNIT_TEST( testGetExpiredQueueMessageAdvisoryTopic );
-        CPPUNIT_TEST( testGetNoConsumersAdvisoryTopic );
-        CPPUNIT_TEST( testGetNoTopicConsumersAdvisoryTopic );
-        CPPUNIT_TEST( testGetNoQueueConsumersAdvisoryTopic );
-        CPPUNIT_TEST( testGetSlowConsumerAdvisoryTopic );
-        CPPUNIT_TEST( testGetFastProducerAdvisoryTopic );
-        CPPUNIT_TEST( testGetMessageDiscardedAdvisoryTopic );
-        CPPUNIT_TEST( testGetMessageDeliveredAdvisoryTopic );
-        CPPUNIT_TEST( testGetMessageConsumedAdvisoryTopic );
-        CPPUNIT_TEST( testGetMessageDLQdAdvisoryTopic );
-        CPPUNIT_TEST( testGetMasterBrokerAdvisoryTopic );
-        CPPUNIT_TEST( testGetNetworkBridgeAdvisoryTopic );
-        CPPUNIT_TEST( testGetFullAdvisoryTopic );
-        CPPUNIT_TEST( testGetDestinationAdvisoryTopic );
-        CPPUNIT_TEST( testIsDestinationAdvisoryTopic );
-        CPPUNIT_TEST( testIsTempDestinationAdvisoryTopic );
-        CPPUNIT_TEST( testIsAdvisoryTopic );
-        CPPUNIT_TEST( testIsConnectionAdvisoryTopic );
-        CPPUNIT_TEST( testIsProducerAdvisoryTopic );
-        CPPUNIT_TEST( testIsConsumerAdvisoryTopic );
-        CPPUNIT_TEST( testIsSlowConsumerAdvisoryTopic );
-        CPPUNIT_TEST( testIsFastProducerAdvisoryTopic );
-        CPPUNIT_TEST( testIsMessageConsumedAdvisoryTopic );
-        CPPUNIT_TEST( testIsMasterBrokerAdvisoryTopic );
-        CPPUNIT_TEST( testIsMessageDeliveredAdvisoryTopic );
-        CPPUNIT_TEST( testIsMessageDiscardedAdvisoryTopic );
-        CPPUNIT_TEST( testIsMessageDLQdAdvisoryTopic );
-        CPPUNIT_TEST( testIsFullAdvisoryTopic );
-        CPPUNIT_TEST( testIsNetworkBridgeAdvisoryTopic );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         AdvisorySupportTest();
         virtual ~AdvisorySupportTest();

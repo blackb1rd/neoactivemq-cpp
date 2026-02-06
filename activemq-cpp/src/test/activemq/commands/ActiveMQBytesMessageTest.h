@@ -18,34 +18,12 @@
 #ifndef _ACTIVEMQ_COMMANDS_ACTIVEMQBYTESMESSAGETEST_H_
 #define _ACTIVEMQ_COMMANDS_ACTIVEMQBYTESMESSAGETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq{
 namespace commands{
 
-    class ActiveMQBytesMessageTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ActiveMQBytesMessageTest );
-        CPPUNIT_TEST( testGetBodyLength );
-        CPPUNIT_TEST( testReadBoolean );
-        CPPUNIT_TEST( testReadByte );
-        CPPUNIT_TEST( testReadShort );
-        CPPUNIT_TEST( testReadUnsignedShort );
-        CPPUNIT_TEST( testReadChar );
-        CPPUNIT_TEST( testReadInt );
-        CPPUNIT_TEST( testReadLong );
-        CPPUNIT_TEST( testReadFloat );
-        CPPUNIT_TEST( testReadDouble );
-        CPPUNIT_TEST( testReadUTF );
-        CPPUNIT_TEST( testReadBytesbyteArray );
-        CPPUNIT_TEST( testClearBody );
-        CPPUNIT_TEST( testReset );
-        CPPUNIT_TEST( testReadOnlyBody );
-        CPPUNIT_TEST( testWriteOnlyBody );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class ActiveMQBytesMessageTest : public ::testing::Test {
+public:
 
         ActiveMQBytesMessageTest() {}
         virtual ~ActiveMQBytesMessageTest() {}

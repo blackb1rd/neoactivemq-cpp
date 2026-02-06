@@ -26,25 +26,13 @@ namespace test {
 namespace openwire {
 
     class OpenwireNonBlockingRedeliveryTest : public CMSTestFixture {
-
-        CPPUNIT_TEST_SUITE( OpenwireNonBlockingRedeliveryTest );
-        // TODO - Improve the tests.
-//        CPPUNIT_TEST( testConsumerMessagesAreNotOrdered );
-//        CPPUNIT_TEST( testMessageDeleiveredWhenNonBlockingEnabled );
-//        CPPUNIT_TEST( testMessageDeleiveredWhenNonBlockingEnabled );
-//        CPPUNIT_TEST( testMessageDeleiveryDoesntStop );
-//        CPPUNIT_TEST( testNonBlockingMessageDeleiveryIsDelayed );
-//        CPPUNIT_TEST( testNonBlockingMessageDeleiveryWithRollbacks );
-//        CPPUNIT_TEST( testNonBlockingMessageDeleiveryWithAllRolledBack );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireNonBlockingRedeliveryTest();
         virtual ~OpenwireNonBlockingRedeliveryTest();
 
-        virtual void setUp() {}
-        virtual void tearDown() {}
+        void SetUp() override {}
+        void TearDown() override {}
 
         virtual std::string getBrokerURL() const;
 

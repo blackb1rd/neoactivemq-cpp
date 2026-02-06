@@ -32,14 +32,14 @@ void SessionPoolTest::testTakeSession() {
     
     // Take a session.
     PooledSession* pooledSession1 = pool.takeSession();
-    CPPUNIT_ASSERT(pooledSession1 != NULL);
+    ASSERT_TRUE(pooledSession1 != NULL);
     
     // Take a second session.
     PooledSession* pooledSession2 = pool.takeSession();
-    CPPUNIT_ASSERT(pooledSession2 != NULL );
+    ASSERT_TRUE(pooledSession2 != NULL);
     
     // Make sure they're different objects.
-    CPPUNIT_ASSERT(pooledSession1 != pooledSession2);    
+    ASSERT_TRUE(pooledSession1 != pooledSession2);    
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,17 +52,17 @@ void SessionPoolTest::testReturnSession() {
     
     // Take a session.
     PooledSession* pooledSession1 = pool.takeSession();
-    CPPUNIT_ASSERT(pooledSession1 != NULL);
+    ASSERT_TRUE(pooledSession1 != NULL);
     
     // Return the session to the pool
     pool.returnSession(pooledSession1);
     
     // Take a second session.
     PooledSession* pooledSession2 = pool.takeSession();
-    CPPUNIT_ASSERT(pooledSession2 != NULL );
+    ASSERT_TRUE(pooledSession2 != NULL);
     
     // Make sure they're the same object.
-    CPPUNIT_ASSERT(pooledSession1 == pooledSession2); 
+    ASSERT_TRUE(pooledSession1 == pooledSession2); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,15 +75,15 @@ void SessionPoolTest::testCloseSession() {
     
     // Take a session.
     PooledSession* pooledSession1 = pool.takeSession();
-    CPPUNIT_ASSERT(pooledSession1 != NULL);
+    ASSERT_TRUE(pooledSession1 != NULL);
     
     // Return the session to the pool
     pooledSession1->close();
     
     // Take a second session.
     PooledSession* pooledSession2 = pool.takeSession();
-    CPPUNIT_ASSERT(pooledSession2 != NULL );
+    ASSERT_TRUE(pooledSession2 != NULL);
     
     // Make sure they're the same object.
-    CPPUNIT_ASSERT(pooledSession1 == pooledSession2); 
+    ASSERT_TRUE(pooledSession1 == pooledSession2); 
 }

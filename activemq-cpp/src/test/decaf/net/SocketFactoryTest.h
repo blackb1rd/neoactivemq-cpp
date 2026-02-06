@@ -18,9 +18,7 @@
 #ifndef _DECAF_NET_SOCKETFACTORYTEST_H_
 #define _DECAF_NET_SOCKETFACTORYTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/net/Socket.h>
 #include <decaf/net/ServerSocket.h>
 #include <decaf/util/concurrent/Concurrent.h>
@@ -32,14 +30,8 @@
 namespace decaf{
 namespace net{
 
-    class SocketFactoryTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( SocketFactoryTest );
-        //CPPUNIT_TEST( test );
-        //CPPUNIT_TEST( testNoDelay );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class SocketFactoryTest : public ::testing::Test {
+public:
 
         static const int DEFAULT_PORT;
 

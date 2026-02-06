@@ -138,8 +138,7 @@ void FilterInputStreamTest::testAvailable() {
 
     int available = is.available();
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect number of available bytes",
-                                 (int)testStr.length(), available);
+    ASSERT_EQ((int)testStr.length(), available) << ("Returned incorrect number of available bytes");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -152,7 +151,7 @@ void FilterInputStreamTest::testClose() {
     try {
         is.close();
     } catch( IOException& e ) {
-        CPPUNIT_FAIL("Exception attempting to close stream");
+        FAIL() << ("Exception attempting to close stream");
     }
 
     try {
@@ -161,7 +160,7 @@ void FilterInputStreamTest::testClose() {
         return;
     }
 
-    CPPUNIT_FAIL("Able to read from closed stream");
+    FAIL() << ("Able to read from closed stream");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -172,8 +171,7 @@ void FilterInputStreamTest::testRead() {
     FilterInputStream is( &myStream );
 
     char c = (char)is.read();
-    CPPUNIT_ASSERT_MESSAGE( "read returned incorrect char",
-                            c == testStr.at(0) );
+    ASSERT_TRUE(c == testStr.at(0)) << ("read returned incorrect char");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -185,8 +183,7 @@ void FilterInputStreamTest::testRead2() {
 
     unsigned char buf[30];
     is.read( buf, 30, 0, 30 );
-    CPPUNIT_ASSERT_MESSAGE( "Failed to read correct data",
-        string( (const char*)buf, 30 ) == testStr.substr(0, 30) );
+    ASSERT_TRUE(string( (const char*)buf, 30 ) == testStr.substr(0, 30)) << ("Failed to read correct data");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -206,7 +203,7 @@ void FilterInputStreamTest::testRead3() {
     std::string bufferString( (const char*)buf, (const char*)(buf + 100) );
     std::string testSubString = testStr.substr( 3000, 100 );
 
-    CPPUNIT_ASSERT_MESSAGE( "Failed to read correct data", bufferString == testSubString );
+    ASSERT_TRUE(bufferString == testSubString) << ("Failed to read correct data");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -222,8 +219,7 @@ void FilterInputStreamTest::testSkip() {
     unsigned char buf[100];
     is.skip( 1000 );
     is.read( buf, 100, 0, 100 );
-    CPPUNIT_ASSERT_MESSAGE( "Failed to skip to correct position",
-            string( (const char*)buf, 100 ) == testStr.substr( 1000, 100 ) );
+    ASSERT_TRUE(string( (const char*)buf, 100 ) == testStr.substr( 1000, 100 )) << ("Failed to skip to correct position");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -236,27 +232,15 @@ void FilterInputStreamTest::testReadBIIIExceptions() {
     MyInputStream myStream( testStr );
     FilterInputStream is( &myStream );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-         "should throw NullPointerException",
-         is.read( NULL, 1000, 0, 1001 ),
-         NullPointerException );
+    ASSERT_THROW(is.read( NULL, 1000, 0, 1001 ), NullPointerException) << ("should throw NullPointerException");
 
     unsigned char buf[1000];
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-         "should throw IndexOutOfBoundsException",
-         is.read( buf, 1000, 0, 1001 ),
-         IndexOutOfBoundsException );
+    ASSERT_THROW(is.read( buf, 1000, 0, 1001 ), IndexOutOfBoundsException) << ("should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-         "should throw IndexOutOfBoundsException",
-         is.read( buf, 1000, 1001, 0 ),
-         IndexOutOfBoundsException );
+    ASSERT_THROW(is.read( buf, 1000, 1001, 0 ), IndexOutOfBoundsException) << ("should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-         "should throw IndexOutOfBoundsException",
-         is.read( buf, 1000, 500, 501 ),
-         IndexOutOfBoundsException );
+    ASSERT_THROW(is.read( buf, 1000, 500, 501 ), IndexOutOfBoundsException) << ("should throw IndexOutOfBoundsException");
 
     {
         MyInputStream myStream( testStr );
@@ -265,9 +249,6 @@ void FilterInputStreamTest::testReadBIIIExceptions() {
         unsigned char buf[1000];
 
         is.close();
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-             "should throw IOException",
-             is.read( buf, 1000, 0, 100 ),
-             IOException );
+        ASSERT_THROW(is.read( buf, 1000, 0, 100 ), IOException) << ("should throw IOException");
     }
 }

@@ -80,7 +80,7 @@ void LockSupportTest::testPark1() {
         t.join();
 
     } catch(...) {
-        CPPUNIT_FAIL("Caught an unexpected exception");
+        FAIL() << ("Caught an unexpected exception");
     }
 }
 
@@ -129,10 +129,10 @@ void LockSupportTest::testPark2() {
 
         long long delta = after - before;
 
-        CPPUNIT_ASSERT( delta > 800 && delta < 1500 );
+        ASSERT_TRUE(delta > 800 && delta < 1500);
 
     } catch(...) {
-        CPPUNIT_FAIL("Caught an unexpected exception");
+        FAIL() << ("Caught an unexpected exception");
     }
 }
 
@@ -269,7 +269,7 @@ void LockSupportTest::testParkNanos() {
     long long after = System::currentTimeMillis();
     long long delta = after - before;
 
-    CPPUNIT_ASSERT( delta > 1500 && delta < 3000 );
+    ASSERT_TRUE(delta > 1500 && delta < 3000);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -310,6 +310,6 @@ void LockSupportTest::testParkUntil() {
         t.start();
         t.join();
     } catch(...) {
-        CPPUNIT_FAIL("Caught an unexpected exception");
+        FAIL() << ("Caught an unexpected exception");
     }
 }

@@ -56,14 +56,14 @@ void BooleanStreamTest::test() {
 
     b2Stream.unmarshal( &daiStream );
 
-    CPPUNIT_ASSERT( b2Stream.readBoolean() == false );
-    CPPUNIT_ASSERT( b2Stream.readBoolean() == true );
-    CPPUNIT_ASSERT( b2Stream.readBoolean() == false );
-    CPPUNIT_ASSERT( b2Stream.readBoolean() == false );
-    CPPUNIT_ASSERT( b2Stream.readBoolean() == true );
-    CPPUNIT_ASSERT( b2Stream.readBoolean() == false );
-    CPPUNIT_ASSERT( b2Stream.readBoolean() == true );
-    CPPUNIT_ASSERT( b2Stream.readBoolean() == true );
+    ASSERT_TRUE(b2Stream.readBoolean() == false);
+    ASSERT_TRUE(b2Stream.readBoolean() == true);
+    ASSERT_TRUE(b2Stream.readBoolean() == false);
+    ASSERT_TRUE(b2Stream.readBoolean() == false);
+    ASSERT_TRUE(b2Stream.readBoolean() == true);
+    ASSERT_TRUE(b2Stream.readBoolean() == false);
+    ASSERT_TRUE(b2Stream.readBoolean() == true);
+    ASSERT_TRUE(b2Stream.readBoolean() == true);
 
     delete [] array.first;
 }
@@ -93,7 +93,7 @@ void BooleanStreamTest::test2(){
 
     value = false;
     for( int i = 0; i < 65536; i++ ) {
-        CPPUNIT_ASSERT( b2Stream.readBoolean() == value );
+        ASSERT_TRUE(b2Stream.readBoolean() == value);
         value = !value;
     }
 

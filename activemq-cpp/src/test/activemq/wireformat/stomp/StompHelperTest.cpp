@@ -45,7 +45,7 @@ void StompHelperTest::testConvertDestinationFromString() {
 
     Pointer<ActiveMQDestination> destination = helper.convertDestination("mytopics://SomeTopic");
 
-    CPPUNIT_ASSERT_EQUAL(std::string("SomeTopic"), destination->getPhysicalName());
+    ASSERT_EQ(std::string("SomeTopic"), destination->getPhysicalName());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,5 +59,5 @@ void StompHelperTest::testConvertDestinationFromCommand() {
 
     std::string result = helper.convertDestination(destination);
 
-    CPPUNIT_ASSERT_EQUAL(std::string("mytopics://SomeTopic"), result);
+    ASSERT_EQ(std::string("mytopics://SomeTopic"), result);
 }

@@ -18,33 +18,18 @@
 #ifndef _ACTIVEMQ_UTIL_AMQLOGTEST_H_
 #define _ACTIVEMQ_UTIL_AMQLOGTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace util {
 
-    class AMQLogTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( AMQLogTest );
-        CPPUNIT_TEST( testGlobalLogLevel );
-        CPPUNIT_TEST( testGlobalLogLevelParsing );
-        CPPUNIT_TEST( testGlobalLogIsEnabled );
-        CPPUNIT_TEST( testContextLogLevel );
-        CPPUNIT_TEST( testMultiConnectionLogging );
-        CPPUNIT_TEST( testContextOutputHandler );
-        CPPUNIT_TEST( testHandlerWithRecordOnlyMode );
-        CPPUNIT_TEST( testMultiThreadContextIsolation );
-        CPPUNIT_TEST( testFlightRecorder );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class AMQLogTest : public ::testing::Test {
+public:
 
         AMQLogTest();
         virtual ~AMQLogTest();
 
-        void setUp();
-        void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         // Global logging tests
         void testGlobalLogLevel();

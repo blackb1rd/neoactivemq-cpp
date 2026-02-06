@@ -109,9 +109,7 @@ void URITest::testConstructorOneString() {
     // legal chars in scheme
 
     for( unsigned int i = 0; i < constructorTests.size(); i++ ) {
-        CPPUNIT_ASSERT_NO_THROW_MESSAGE(
-            string( "Failed to construct URI for: " ) + constructorTests[i],
-            URI( constructorTests.at(i) ) );
+        ASSERT_NO_THROW(URI( constructorTests.at(i) )) << (string( "Failed to construct URI for: " ) + constructorTests[i]);
     }
 
     std::vector<const char*> constructorTestsInvalid;
@@ -144,10 +142,7 @@ void URITest::testConstructorOneString() {
     constructorTestsInvalid.push_back( "mailto:user^name@fklkf.com"  );
 
     for( unsigned int i = 0; i < constructorTestsInvalid.size(); i++ ) {
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            string( "URI not caught as invalid: " ) + constructorTestsInvalid[i],
-            URI( constructorTestsInvalid.at(i) ),
-            URISyntaxException );
+        ASSERT_THROW(URI( constructorTestsInvalid.at(i) ), URISyntaxException) << (string( "URI not caught as invalid: " ) + constructorTestsInvalid[i]);
     }
 
     std::vector<const char*> constructorTestsInvalid2;
@@ -177,72 +172,54 @@ void URITest::testConstructorOneString() {
     constructorTestsInvalid2.push_back( "asc%20heme:ssp" );// escape octets
 
     for( unsigned int i = 0; i < constructorTestsInvalid2.size(); i++ ) {
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            string( "URI not caught as invalid: " ) + constructorTestsInvalid2[i],
-            URI( constructorTestsInvalid2.at(i) ),
-            URISyntaxException );
+        ASSERT_THROW(URI( constructorTestsInvalid2.at(i) ), URISyntaxException) << (string( "URI not caught as invalid: " ) + constructorTestsInvalid2[i]);
     }
 
     try {
         URI("%3");
-        CPPUNIT_FAIL( "Assert 0: URI constructor failed to throw exception on invalid input." );
+        FAIL() << ("Assert 0: URI constructor failed to throw exception on invalid input.");
     } catch( URISyntaxException& e ) {
-        CPPUNIT_ASSERT_MESSAGE(
-            "Assert 1: Wrong index in URISyntaxException.", 0 == e.getIndex() );
+        ASSERT_TRUE(0 == e.getIndex()) << ("Assert 1: Wrong index in URISyntaxException.");
     }
 
     // Regression test for HARMONY-25
     // if port value is negative, the authority should be considered
     // registry-based.
     URI uri("http://host:-8096/path/index.html");
-    CPPUNIT_ASSERT_MESSAGE(
-        "Assert 2: returned wrong port value,", -1 == uri.getPort() );
-    CPPUNIT_ASSERT_MESSAGE( "Assert 3: returned wrong host value,", uri.getHost() == "" );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Assert 4: Expected URISyntaxException: ",
-        uri.parseServerAuthority(),
-        URISyntaxException );
+    ASSERT_TRUE(-1 == uri.getPort()) << ("Assert 2: returned wrong port value,");
+    ASSERT_TRUE(uri.getHost() == "") << ("Assert 3: returned wrong host value,");
+    ASSERT_THROW(uri.parseServerAuthority(), URISyntaxException) << ("Assert 4: Expected URISyntaxException: ");
 
     URI uri2( "http", "//myhost:-8096", "" );
-    CPPUNIT_ASSERT_MESSAGE(
-        "Assert 5: returned wrong port value,", -1 == uri2.getPort() );
-    CPPUNIT_ASSERT_MESSAGE( "Assert 6: returned wrong host value,", uri2.getHost() == "" );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Assert 7: Expected URISyntaxException: ",
-        uri.parseServerAuthority(),
-        URISyntaxException );
+    ASSERT_TRUE(-1 == uri2.getPort()) << ("Assert 5: returned wrong port value,");
+    ASSERT_TRUE(uri2.getHost() == "") << ("Assert 6: returned wrong host value,");
+    ASSERT_THROW(uri.parseServerAuthority(), URISyntaxException) << ("Assert 7: Expected URISyntaxException: ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void URITest::testURIString() {
 
-    CPPUNIT_ASSERT_NO_THROW_MESSAGE(
-        "Should Not Throw an Exception URI( \"\\\" )",
-        URI uri( "/" )
-    );
+    ASSERT_NO_THROW(URI uri( "/" )) << ("Should Not Throw an Exception URI( \"\\\" )");
 
     try {
         URI myUri( ":abc@mymail.com" );
-        CPPUNIT_FAIL("TestA, URISyntaxException expected, but not received.");
+        FAIL() << ("TestA, URISyntaxException expected, but not received.");
     } catch( URISyntaxException& e ) {
-        CPPUNIT_ASSERT_MESSAGE(
-            "TestA, Wrong URISyntaxException index, ", 0 == e.getIndex());
+        ASSERT_TRUE(0 == e.getIndex()) << ("TestA, Wrong URISyntaxException index, ");
     }
 
     try {
         URI uri( "path[one" );
-        CPPUNIT_FAIL("TestB, URISyntaxException expected, but not received.");
+        FAIL() << ("TestB, URISyntaxException expected, but not received.");
     } catch( URISyntaxException& e1 ) {
-        CPPUNIT_ASSERT_MESSAGE(
-            "TestB, Wrong URISyntaxException index, ", 4 == e1.getIndex());
+        ASSERT_TRUE(4 == e1.getIndex()) << ("TestB, Wrong URISyntaxException index, ");
     }
 
     try {
         URI uri( " " );
-        CPPUNIT_FAIL("TestC, URISyntaxException expected, but not received.");
+        FAIL() << ("TestC, URISyntaxException expected, but not received.");
     } catch( URISyntaxException& e2 ) {
-        CPPUNIT_ASSERT_MESSAGE(
-            "TestC, Wrong URISyntaxException index, ", 0 == e2.getIndex());
+        ASSERT_TRUE(0 == e2.getIndex()) << ("TestC, Wrong URISyntaxException index, ");
     }
 }
 
@@ -251,127 +228,80 @@ void URITest::testConstructorThreeString() {
 
     URI uri( "mailto", "mduerst@ifi.unizh.ch", "" );
 
-    CPPUNIT_ASSERT_MESSAGE( "wrong userinfo", uri.getUserInfo() == "" );
-    CPPUNIT_ASSERT_MESSAGE( "wrong hostname", uri.getHost() == "" );
-    CPPUNIT_ASSERT_MESSAGE( "wrong authority", uri.getAuthority() == "" );
-    CPPUNIT_ASSERT_MESSAGE( "wrong port number", -1 == uri.getPort() );
-    CPPUNIT_ASSERT_MESSAGE( "wrong path", uri.getPath() == "" );
-    CPPUNIT_ASSERT_MESSAGE( "wrong query", uri.getQuery() == "" );
-    CPPUNIT_ASSERT_MESSAGE( "wrong fragment", uri.getFragment() == "" );
-    CPPUNIT_ASSERT_MESSAGE(
-        "wrong SchemeSpecificPart", uri.getSchemeSpecificPart() == "mduerst@ifi.unizh.ch" );
+    ASSERT_TRUE(uri.getUserInfo() == "") << ("wrong userinfo");
+    ASSERT_TRUE(uri.getHost() == "") << ("wrong hostname");
+    ASSERT_TRUE(uri.getAuthority() == "") << ("wrong authority");
+    ASSERT_TRUE(-1 == uri.getPort()) << ("wrong port number");
+    ASSERT_TRUE(uri.getPath() == "") << ("wrong path");
+    ASSERT_TRUE(uri.getQuery() == "") << ("wrong query");
+    ASSERT_TRUE(uri.getFragment() == "") << ("wrong fragment");
+    ASSERT_TRUE(uri.getSchemeSpecificPart() == "mduerst@ifi.unizh.ch") << ("wrong SchemeSpecificPart");
 
     // scheme specific part can not be null
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "mailto", "", "" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "mailto", "", "" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // scheme needs to start with an alpha char
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "3scheme", "//authority/path", "fragment" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "3scheme", "//authority/path", "fragment" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // scheme can not be a colon
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( ":", "//authority/path", "fragment" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( ":", "//authority/path", "fragment" ), URISyntaxException) << ("Expected URISyntaxException: ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void URITest::testConstructorStringPlusInts() {
 
     // check for URISyntaxException for invalid Server Authority
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "http", "user", "host\xC3\x9Fname", -1, "/file", "query", "fragment" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "http", "user", "host\xC3\x9Fname", -1, "/file", "query", "fragment" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // escaped octets in host name
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "http", "user", "host%20name", -1, "/file", "query", "fragment" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "http", "user", "host%20name", -1, "/file", "query", "fragment" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // illegal char in host name
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "http", "user", "host name", -1, "/file", "query", "fragment" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "http", "user", "host name", -1, "/file", "query", "fragment" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // illegal char in host name
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "http", "user", "host]name", -1, "/file", "query", "fragment" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "http", "user", "host]name", -1, "/file", "query", "fragment" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // missing host name
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "http", "user", "", 80, "/file", "query", "fragment" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "http", "user", "", 80, "/file", "query", "fragment" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // missing host name
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "http", "user", "", -1, "/file", "query", "fragment" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "http", "user", "", -1, "/file", "query", "fragment" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // malformed ipv4 address
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "telnet", "", "256.197.221.200", -1, "", "", "" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "telnet", "", "256.197.221.200", -1, "", "", "" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // malformed ipv4 address
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "ftp", "", "198.256.221.200", -1, "", "", "" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "ftp", "", "198.256.221.200", -1, "", "", "" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // check for URISyntaxException for invalid scheme
     // escaped octets in scheme
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "ht%20tp", "user", "hostname", -1, "/file", "query", "fragment" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "ht%20tp", "user", "hostname", -1, "/file", "query", "fragment" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // illegal char in scheme
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "ht tp", "user", "hostname", -1, "/file", "query", "fragment" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "ht tp", "user", "hostname", -1, "/file", "query", "fragment" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // illegal char in scheme
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "ht]tp", "user", "hostname", -1, "/file", "query", "fragment" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "ht]tp", "user", "hostname", -1, "/file", "query", "fragment" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // relative path with scheme
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "http", "user", "hostname", -1, "relative", "query", "fragment" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "http", "user", "hostname", -1, "relative", "query", "fragment" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // functional test
     try {
 
         URI uri( "http", "us:e@r", "hostname", 85, "/file/dir#/qu?e/", "qu?er#y", "frag#me?nt" );
 
-        CPPUNIT_ASSERT_MESSAGE( "wrong userinfo", uri.getUserInfo() == "us:e@r" );
-        CPPUNIT_ASSERT_MESSAGE( "wrong hostname", uri.getHost() == "hostname" );
-        CPPUNIT_ASSERT_MESSAGE( "wrong port number", 85 == uri.getPort() );
-        CPPUNIT_ASSERT_MESSAGE( "wrong path", uri.getPath() =="/file/dir#/qu?e/" );
-        CPPUNIT_ASSERT_MESSAGE( "wrong query", uri.getQuery() == "qu?er#y" );
-        CPPUNIT_ASSERT_MESSAGE( "wrong fragment", uri.getFragment() == "frag#me?nt" );
-        CPPUNIT_ASSERT_MESSAGE( "wrong SchemeSpecificPart",
-            uri.getSchemeSpecificPart() == "//us:e@r@hostname:85/file/dir#/qu?e/?qu?er#y" );
+        ASSERT_TRUE(uri.getUserInfo() == "us:e@r") << ("wrong userinfo");
+        ASSERT_TRUE(uri.getHost() == "hostname") << ("wrong hostname");
+        ASSERT_TRUE(85 == uri.getPort()) << ("wrong port number");
+        ASSERT_TRUE(uri.getPath() =="/file/dir#/qu?e/") << ("wrong path");
+        ASSERT_TRUE(uri.getQuery() == "qu?er#y") << ("wrong query");
+        ASSERT_TRUE(uri.getFragment() == "frag#me?nt") << ("wrong fragment");
+        ASSERT_TRUE(uri.getSchemeSpecificPart() == "//us:e@r@hostname:85/file/dir#/qu?e/?qu?er#y") << ("wrong SchemeSpecificPart");
 
     } catch( URISyntaxException& e ) {
-        CPPUNIT_FAIL( "Unexpected Exception: " + e.getMessage() );
+        FAIL() << ("Unexpected Exception: " + e.getMessage());
     }
 }
 
@@ -379,10 +309,7 @@ void URITest::testConstructorStringPlusInts() {
 void URITest::testConstructorFourString() {
 
     // relative path
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "http", "www.joe.com", "relative", "jimmy" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "http", "www.joe.com", "relative", "jimmy" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // valid parameters for this constructor
     {
@@ -409,42 +336,30 @@ void URITest::testConstructorFourString() {
         URI uri( "", "", "", "" );
     }
 
-//    CPPUNIT_ASSERT_THROW_MESSAGE(
-//        "Expected URISyntaxException: ",
-//        URI( "http", ":2:3:4:5:6:7:8", "/apath", "\u20ACfrag" ),
-//        URISyntaxException );
+//    ASSERT_THROW(//        URI( "http", ":2:3:4:5:6:7:8", "/apath", "\u20ACfrag" ), //        URISyntaxException) << (//        "Expected URISyntaxException: ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void URITest::testConstructorFiveString() {
 
     // URISyntaxException on relative path
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException: ",
-        URI( "http", "www.joe.com", "relative", "query", "jimmy" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "http", "www.joe.com", "relative", "query", "jimmy" ), URISyntaxException) << ("Expected URISyntaxException: ");
 
     // test if empty authority is parsed into undefined host, userinfo and port
     // and if escaped octets in components are preserved, illegal chars are quoted
     URI uri("ht12-3+tp", "", "/p#a%E2%82%ACth", "q^u%25ery", "fragment");
 
-    CPPUNIT_ASSERT_MESSAGE( "wrong scheme", uri.getScheme() == "ht12-3+tp" );
-    CPPUNIT_ASSERT_MESSAGE( "wrong port number", -1 == uri.getPort() );
-    CPPUNIT_ASSERT_MESSAGE( "wrong path", uri.getPath() == "/p#a%E2%82%ACth" );
-    CPPUNIT_ASSERT_MESSAGE( "wrong query", uri.getQuery() == "q^u%25ery" );
-    CPPUNIT_ASSERT_MESSAGE( "wrong fragment", uri.getFragment() == "fragment" );
+    ASSERT_TRUE(uri.getScheme() == "ht12-3+tp") << ("wrong scheme");
+    ASSERT_TRUE(-1 == uri.getPort()) << ("wrong port number");
+    ASSERT_TRUE(uri.getPath() == "/p#a%E2%82%ACth") << ("wrong path");
+    ASSERT_TRUE(uri.getQuery() == "q^u%25ery") << ("wrong query");
+    ASSERT_TRUE(uri.getFragment() == "fragment") << ("wrong fragment");
 
-    CPPUNIT_ASSERT_MESSAGE(
-        string( "wrong SchemeSpecificPart: " ) + uri.getSchemeSpecificPart(),
-        uri.getSchemeSpecificPart() == "///p#a%E2%82%ACth?q^u%25ery" );
+    ASSERT_TRUE(uri.getSchemeSpecificPart() == "///p#a%E2%82%ACth?q^u%25ery") << (string( "wrong SchemeSpecificPart: " ) + uri.getSchemeSpecificPart());
 
-    CPPUNIT_ASSERT_MESSAGE(
-        string( "wrong RawSchemeSpecificPart" ) + uri.getRawSchemeSpecificPart(),
-        uri.getRawSchemeSpecificPart() == "///p%23a%25E2%2582%25ACth?q%5Eu%2525ery" );
+    ASSERT_TRUE(uri.getRawSchemeSpecificPart() == "///p%23a%25E2%2582%25ACth?q%5Eu%2525ery") << (string( "wrong RawSchemeSpecificPart" ) + uri.getRawSchemeSpecificPart());
 
-    CPPUNIT_ASSERT_MESSAGE(
-        string( "incorrect toString()" ) + uri.toString(),
-        uri.toString() == "ht12-3+tp:/p%23a%25E2%2582%25ACth?q%5Eu%2525ery#fragment" );
+    ASSERT_TRUE(uri.toString() == "ht12-3+tp:/p%23a%25E2%2582%25ACth?q%5Eu%2525ery#fragment") << (string( "incorrect toString()" ) + uri.toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -453,20 +368,13 @@ void URITest::testConstructorFiveString2() {
     // accept [] as part of valid ipv6 host name
     URI uri( "ftp", "[0001:1234::0001]", "/dir1/dir2", "query", "frag" );
 
-    CPPUNIT_ASSERT_MESSAGE( "Returned incorrect host",
-                            uri.getHost() == "[0001:1234::0001]" );
+    ASSERT_TRUE(uri.getHost() == "[0001:1234::0001]") << ("Returned incorrect host");
 
     // do not accept [] as part of invalid ipv6 address
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException for invalid ipv6 address",
-        URI( "ftp", "[www.abc.com]", "/dir1/dir2", "query", "frag" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "ftp", "[www.abc.com]", "/dir1/dir2", "query", "frag" ), URISyntaxException) << ("Expected URISyntaxException for invalid ipv6 address");
 
     // do not accept [] as part of user info
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException for invalid user info",
-        URI( "ftp", "[user]@host", "/dir1/dir2", "query", "frag" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "ftp", "[user]@host", "/dir1/dir2", "query", "frag" ), URISyntaxException) << ("Expected URISyntaxException for invalid user info");
 
 }
 
@@ -540,12 +448,12 @@ void URITest::testCompareToOne() {
         URI r( compareToData[i][1] );
 
         if( b.compareTo( r ) != compareToResults[i] ) {
-            CPPUNIT_FAIL( std::string("Test ") + decaf::lang::Integer::toString(i)
+            FAIL() << (std::string("Test ") + decaf::lang::Integer::toString(i)
                         + std::string(": ") + compareToData[i][0] + " compared to "
                         + compareToData[i][1] + " -> "
                         + decaf::lang::Integer::toString( b.compareTo(r) )
                         + " rather than "
-                        + decaf::lang::Integer::toString( compareToResults[i] ) );
+                        + decaf::lang::Integer::toString( compareToResults[i] ));
         }
     }
 }
@@ -557,34 +465,31 @@ void URITest::testCompareToTwo() {
         // test URIs with host names with different casing
         URI uri1( "http://AbC.cOm/root/news" );
         URI uri2( "http://aBc.CoM/root/news" );
-        CPPUNIT_ASSERT_MESSAGE( "TestA", 0 == uri1.compareTo( uri2 ) );
-        CPPUNIT_ASSERT_MESSAGE( "TestB", 0 == uri2.compareTo( uri1 ) );
+        ASSERT_TRUE(0 == uri1.compareTo( uri2 )) << ("TestA");
+        ASSERT_TRUE(0 == uri2.compareTo( uri1 )) << ("TestB");
     }
 
     {
         // test URIs with one undefined component
         URI uri1( "http://abc.com:80/root/news" );
         URI uri2( "http://abc.com/root/news" );
-        CPPUNIT_ASSERT_MESSAGE( "TestC", uri1.compareTo( uri2 ) > 0 );
-        CPPUNIT_ASSERT_MESSAGE( "TestD", uri2.compareTo( uri1 ) < 0 );
+        ASSERT_TRUE(uri1.compareTo( uri2 ) > 0) << ("TestC");
+        ASSERT_TRUE(uri2.compareTo( uri1 ) < 0) << ("TestD");
     }
 
     {
         // test URIs with one undefined component
         URI uri1( "http://user@abc.com/root/news" );
         URI uri2( "http://abc.com/root/news" );
-        CPPUNIT_ASSERT_MESSAGE( "TestE", uri1.compareTo( uri2 ) > 0 );
-        CPPUNIT_ASSERT_MESSAGE( "TestF", uri2.compareTo( uri1 ) < 0 );
+        ASSERT_TRUE(uri1.compareTo( uri2 ) > 0) << ("TestE");
+        ASSERT_TRUE(uri2.compareTo( uri1 ) < 0) << ("TestF");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void URITest::testCreate() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "IllegalArgumentException expected but not received.",
-        URI::create( "a scheme://reg/" ),
-        IllegalArgumentException );
+    ASSERT_THROW(URI::create( "a scheme://reg/" ), IllegalArgumentException) << ("IllegalArgumentException expected but not received.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -642,10 +547,10 @@ void URITest::testEquals() {
         URI b( equalsData[i][0] );
         URI r( equalsData[i][1] );
         if( b.equals( r ) != equalsResults[i] ) {
-            CPPUNIT_FAIL( std::string( "Error: " ) + equalsData[i][0] +
+            FAIL() << (std::string( "Error: " ) + equalsData[i][0] +
                           std::string( " == " ) + equalsData[i][1] + "? -> " +
                           Boolean::toString( b.equals( r ) ) + " expected " +
-                          Boolean::toString( equalsResults[i] ) );
+                          Boolean::toString( equalsResults[i] ));
         }
     }
 }
@@ -659,23 +564,23 @@ void URITest::testEquals2() {
         URI uri2( uri1.getScheme(), uri1.getAuthority(), uri1.getPath(),
                   uri1.getQuery(), uri1.getFragment() );
 
-        CPPUNIT_ASSERT( uri2.equals( uri1 ) );
+        ASSERT_TRUE(uri2.equals( uri1 ));
     }
 
     {
         // test URIs with port number
         URI uri1( "http://abc.com%E2%82%AC:88/root/news" );
         URI uri2( "http://abc.com%E2%82%AC/root/news" );
-        CPPUNIT_ASSERT( !uri1.equals( uri2 ) );
-        CPPUNIT_ASSERT( !uri2.equals( uri1 ) );
+        ASSERT_TRUE(!uri1.equals( uri2 ));
+        ASSERT_TRUE(!uri2.equals( uri1 ));
     }
 
     {
         // test URIs with host names with different casing
         URI uri1( "http://AbC.cOm/root/news" );
         URI uri2( "http://aBc.CoM/root/news" );
-        CPPUNIT_ASSERT( uri1.equals( uri2 ) );
-        CPPUNIT_ASSERT( uri2.equals( uri1 ) );
+        ASSERT_TRUE(uri1.equals( uri2 ));
+        ASSERT_TRUE(uri2.equals( uri1 ));
     }
 }
 
@@ -705,15 +610,14 @@ void URITest::testGetAuthority() {
 
         if( getAuthorityResults[i] != result ) {
 
-            CPPUNIT_FAIL( std::string( "Error: For URI \"" ) + uris[i].toString() +
+            FAIL() << (std::string( "Error: For URI \"" ) + uris[i].toString() +
                           std::string( "\"," ) + "\n" +
                           string( "getAuthority() returned: " ) + result + "\n" +
-                          string( "expected: ") + getAuthorityResults[i] );
+                          string( "expected: ") + getAuthorityResults[i]);
         }
     }
 
-    CPPUNIT_ASSERT(
-        URI( "", "", "", 127, "", "", "" ).getAuthority() == "" );
+    ASSERT_TRUE(URI( "", "", "", 127, "", "", "" ).getAuthority() == "");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -722,51 +626,35 @@ void URITest::testGetAuthority2() {
     {
         // tests for URIs with empty string authority component
         URI uri( "file:///tmp/" );
-        CPPUNIT_ASSERT_MESSAGE( string( "Authority not empty for URI: " ) + uri.toString(),
-                                uri.getAuthority() == "" );
-        CPPUNIT_ASSERT_MESSAGE( string( "Host not empty for URI " ) + uri.toString(),
-                                uri.getHost() == "" );
-        CPPUNIT_ASSERT_MESSAGE( "testA, toString() returned incorrect value",
-                                string( "file:///tmp/" ) == uri.toString() );
+        ASSERT_TRUE(uri.getAuthority() == "") << (string( "Authority not empty for URI: " ) + uri.toString());
+        ASSERT_TRUE(uri.getHost() == "") << (string( "Host not empty for URI " ) + uri.toString());
+        ASSERT_TRUE(string( "file:///tmp/" ) == uri.toString()) << ("testA, toString() returned incorrect value");
     }
     {
         URI uri( "file", "", "/tmp", "frag" );
-        CPPUNIT_ASSERT_MESSAGE( string( "Authority not null for URI: " ) + uri.toString(),
-                                uri.getAuthority() == "" );
-        CPPUNIT_ASSERT_MESSAGE( string( "Host not null for URI " ) + uri.toString(),
-                                uri.getHost() == "" );
-        CPPUNIT_ASSERT_MESSAGE( string( "testB, toString() returned incorrect value:" ) + uri.toString(),
-                                string( "file:/tmp#frag" ) == uri.toString() );
+        ASSERT_TRUE(uri.getAuthority() == "") << (string( "Authority not null for URI: " ) + uri.toString());
+        ASSERT_TRUE(uri.getHost() == "") << (string( "Host not null for URI " ) + uri.toString());
+        ASSERT_TRUE(string( "file:/tmp#frag" ) == uri.toString()) << (string( "testB, toString() returned incorrect value:" ) + uri.toString());
     }
     {
         URI uri( "file", "", "/tmp", "query", "frag" );
-        CPPUNIT_ASSERT_MESSAGE( string( "Authority not null for URI: " ) + uri.toString(),
-                                uri.getAuthority() == "" );
-        CPPUNIT_ASSERT_MESSAGE( "Host not null for URI " + uri.toString(),
-                                uri.getHost() == "" );
-        CPPUNIT_ASSERT_MESSAGE( "test C, toString() returned incorrect value",
-                                string( "file:/tmp?query#frag" ) == uri.toString() );
+        ASSERT_TRUE(uri.getAuthority() == "") << (string( "Authority not null for URI: " ) + uri.toString());
+        ASSERT_TRUE(uri.getHost() == "") << ("Host not null for URI " + uri.toString());
+        ASSERT_TRUE(string( "file:/tmp?query#frag" ) == uri.toString()) << ("test C, toString() returned incorrect value");
     }
 
     // after normalization the host string info may be lost since the
     // uri string is reconstructed
     URI uri( "file", "www.google.com", "/tmp/a/../b/c", "query", "frag" );
     URI uri2 = uri.normalize();
-    CPPUNIT_ASSERT_MESSAGE( string( "Authority not null for URI: " ) + uri2.toString(),
-                            uri.getAuthority() == "www.google.com" );
-    CPPUNIT_ASSERT_MESSAGE( string( "Host not null for URI " ) + uri2.toString(),
-                            uri.getHost() == "www.google.com" );
-    CPPUNIT_ASSERT_MESSAGE( "test D, toString() returned incorrect value: " + uri.toString(),
-                            string( "file://www.google.com/tmp/a/../b/c?query#frag" ) == uri.toString() );
-    CPPUNIT_ASSERT_MESSAGE( "test E, toString() returned incorrect value: " + uri2.toString(),
-                            string( "file://www.google.com/tmp/b/c?query#frag" ) == uri2.toString() );
+    ASSERT_TRUE(uri.getAuthority() == "www.google.com") << (string( "Authority not null for URI: " ) + uri2.toString());
+    ASSERT_TRUE(uri.getHost() == "www.google.com") << (string( "Host not null for URI " ) + uri2.toString());
+    ASSERT_TRUE(string( "file://www.google.com/tmp/a/../b/c?query#frag" ) == uri.toString()) << ("test D, toString() returned incorrect value: " + uri.toString());
+    ASSERT_TRUE(string( "file://www.google.com/tmp/b/c?query#frag" ) == uri2.toString()) << ("test E, toString() returned incorrect value: " + uri2.toString());
 
     // the empty string host will give URISyntaxException
     // for the 7 arg constructor
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "URISyntaxException expected but not received.",
-        URI("file", "user", "", 80, "/path", "query", "frag"),
-        URISyntaxException );
+    ASSERT_THROW(URI("file", "user", "", 80, "/path", "query", "frag"), URISyntaxException) << ("URISyntaxException expected but not received.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -786,9 +674,9 @@ void URITest::testGetFragment() {
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         string result = uris[i].getFragment();
         if( getFragmentResults[i] != result ) {
-            CPPUNIT_FAIL( string( "Error: For URI \"" ) + uris[i].toString() +
+            FAIL() << (string( "Error: For URI \"" ) + uris[i].toString() +
                           string( "\", getFragment() returned: " ) + result +
-                          string( ", expected: " ) + getFragmentResults[i] );
+                          string( ", expected: " ) + getFragmentResults[i]);
         }
     }
 }
@@ -808,9 +696,9 @@ void URITest::testGetHost() {
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         string result = uris[i].getHost();
         if( getHostResults[i] != result ) {
-            CPPUNIT_FAIL( string( "Error: For URI \"" ) + uris[i].toString() +
+            FAIL() << (string( "Error: For URI \"" ) + uris[i].toString() +
                           string( "\", getHost() returned: " ) + result +
-                          string( ", expected: " ) + getHostResults[i] );
+                          string( ", expected: " ) + getHostResults[i]);
         }
     }
 }
@@ -834,9 +722,9 @@ void URITest::testGetPath() {
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         string result = uris[i].getPath();
         if( getPathResults[i] != result ) {
-            CPPUNIT_FAIL( string( "Error: For URI \"" ) + uris[i].toString() +
+            FAIL() << (string( "Error: For URI \"" ) + uris[i].toString() +
                           string( "\", getPath() returned: " ) + result +
-                          string( ", expected: " ) + getPathResults[i] );
+                          string( ", expected: " ) + getPathResults[i]);
         }
     }
 }
@@ -851,12 +739,11 @@ void URITest::testGetPort() {
 
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         int result = uris[i].getPort();
-        CPPUNIT_ASSERT_MESSAGE( string( "Error: For URI \"" ) + uris[i].toString() +
+        ASSERT_TRUE(result == getPortResults[i]) << (string( "Error: For URI \"" ) + uris[i].toString() +
                                 string( "\", getPort() returned: " ) +
                                 Integer::toString( result ) +
                                 string( ", expected: " ) +
-                                Integer::toString( getPortResults[i] ),
-                                result == getPortResults[i] );
+                                Integer::toString( getPortResults[i] ));
     }
 }
 
@@ -866,20 +753,14 @@ void URITest::testGetPort2() {
     // if port value is negative, the authority should be considered registry based.
 
     URI uri( "http://myhost:-8096/site/index.html" );
-    CPPUNIT_ASSERT_MESSAGE( "TestA, returned wrong port value,", -1 == uri.getPort() );
-    CPPUNIT_ASSERT_MESSAGE( "TestA, returned wrong host value,", uri.getHost() == "" );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "TestA - URISyntaxException expected but not received.",
-        uri.parseServerAuthority(),
-        URISyntaxException );
+    ASSERT_TRUE(-1 == uri.getPort()) << ("TestA, returned wrong port value,");
+    ASSERT_TRUE(uri.getHost() == "") << ("TestA, returned wrong host value,");
+    ASSERT_THROW(uri.parseServerAuthority(), URISyntaxException) << ("TestA - URISyntaxException expected but not received.");
 
     URI uri2( "http", "//myhost:-8096", "" );
-    CPPUNIT_ASSERT_MESSAGE( "TestB returned wrong port value,", -1 == uri2.getPort() );
-    CPPUNIT_ASSERT_MESSAGE( "TestB returned wrong host value,", uri2.getHost() == "" );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "TestB - URISyntaxException expected but not received.",
-        uri2.parseServerAuthority(),
-        URISyntaxException );
+    ASSERT_TRUE(-1 == uri2.getPort()) << ("TestB returned wrong port value,");
+    ASSERT_TRUE(uri2.getHost() == "") << ("TestB returned wrong host value,");
+    ASSERT_THROW(uri2.parseServerAuthority(), URISyntaxException) << ("TestB - URISyntaxException expected but not received.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -901,9 +782,9 @@ void URITest::testGetQuery() {
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         string result = uris[i].getQuery();
         if( getQueryResults[i] != result ) {
-            CPPUNIT_FAIL( string( "Error: For URI \"" ) + uris[i].toString() +
+            FAIL() << (string( "Error: For URI \"" ) + uris[i].toString() +
                           string( "\", getQuery() returned: " ) + result +
-                          string( ", expected: " ) + getQueryResults[i] );
+                          string( ", expected: " ) + getQueryResults[i]);
         }
     }
 }
@@ -927,9 +808,9 @@ void URITest::testGetRawAuthority() {
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         string result = uris[i].getRawAuthority();
         if( getRawAuthorityResults[i] != result ) {
-            CPPUNIT_FAIL( string( "Error: For URI \"" ) + uris[i].toString() +
+            FAIL() << (string( "Error: For URI \"" ) + uris[i].toString() +
                           string( "\", getRawAuthority() returned: " ) + result +
-                          string( ", expected: " ) + getRawAuthorityResults[i] );
+                          string( ", expected: " ) + getRawAuthorityResults[i]);
         }
     }
 }
@@ -952,9 +833,9 @@ void URITest::testGetRawFragment() {
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         string result = uris[i].getRawFragment();
         if( getRawFragmentResults[i] != result ) {
-            CPPUNIT_FAIL( string( "Error: For URI \"" ) + uris[i].toString() +
+            FAIL() << (string( "Error: For URI \"" ) + uris[i].toString() +
                           string( "\", getRawFragment() returned: " ) + result +
-                          string( ", expected: " ) + getRawFragmentResults[i] );
+                          string( ", expected: " ) + getRawFragmentResults[i]);
         }
     }
 }
@@ -975,9 +856,9 @@ void URITest::testGetRawPath() {
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         string result = uris[i].getRawPath();
         if( getRawPathResults[i] != result ) {
-            CPPUNIT_FAIL( string( "Error: For URI \"" ) + uris[i].toString() +
+            FAIL() << (string( "Error: For URI \"" ) + uris[i].toString() +
                           string( "\", getRawPath() returned: " ) + result +
-                          string( ", expected: " ) + getRawPathResults[i] );
+                          string( ", expected: " ) + getRawPathResults[i]);
         }
     }
 }
@@ -999,9 +880,9 @@ void URITest::testGetRawQuery() {
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         string result = uris[i].getRawQuery();
         if( getRawQueryResults[i] != result ) {
-            CPPUNIT_FAIL( string( "Error: For URI \"" ) + uris[i].toString() +
+            FAIL() << (string( "Error: For URI \"" ) + uris[i].toString() +
                           string( "\", getRawQuery() returned: " ) + result +
-                          string( ", expected: " ) + getRawQueryResults[i] );
+                          string( ", expected: " ) + getRawQueryResults[i]);
         }
     }
 }
@@ -1029,10 +910,10 @@ void URITest::testGetRawSchemeSpecificPart() {
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         string result = uris[i].getRawSchemeSpecificPart();
         if( getRawSspResults[i] != result ) {
-            CPPUNIT_FAIL( string( "Error: For URI[" ) +
+            FAIL() << (string( "Error: For URI[" ) +
                           Integer::toString( i ) + string( "] \"" ) + uris[i].toString() +
                           string( "\", getRawSchemeSpecificPart() returned: " ) + result +
-                          string( ", expected: " ) + getRawSspResults[i] );
+                          string( ", expected: " ) + getRawSspResults[i]);
         }
     }
 }
@@ -1052,10 +933,10 @@ void URITest::testGetRawUserInfo() {
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         string result = uris[i].getRawUserInfo();
         if( getRawUserInfoResults[i] != result ) {
-            CPPUNIT_FAIL( string( "Error: For URI[" ) +
+            FAIL() << (string( "Error: For URI[" ) +
                           Integer::toString( i ) + string( "] \"" ) + uris[i].toString() +
                           string( "\", getRawUserInfo() returned: " ) + result +
-                          string( ", expected: " ) + getRawUserInfoResults[i] );
+                          string( ", expected: " ) + getRawUserInfoResults[i]);
         }
     }
 }
@@ -1077,10 +958,10 @@ void URITest::testGetScheme() {
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         string result = uris[i].getScheme();
         if( getSchemeResults[i] != result ) {
-            CPPUNIT_FAIL( string( "Error: For URI[" ) +
+            FAIL() << (string( "Error: For URI[" ) +
                           Integer::toString( i ) + string( "] \"" ) + uris[i].toString() +
                           string( "\", getScheme() returned: " ) + result +
-                          string( ", expected: " ) + getSchemeResults[i] );
+                          string( ", expected: " ) + getSchemeResults[i]);
         }
     }
 }
@@ -1108,10 +989,10 @@ void URITest::testGetSchemeSpecificPart() {
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         string result = uris[i].getSchemeSpecificPart();
         if( getSspResults[i] != result ) {
-            CPPUNIT_FAIL( string( "Error: For URI[" ) +
+            FAIL() << (string( "Error: For URI[" ) +
                           Integer::toString( i ) + string( "] \"" ) + uris[i].toString() +
                           string( "\", getSchemeSpecificPart() returned: " ) + result +
-                          string( ", expected: " ) + getSspResults[i] );
+                          string( ", expected: " ) + getSspResults[i]);
         }
     }
 }
@@ -1133,10 +1014,10 @@ void URITest::testGetUserInfo() {
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         string result = uris[i].getUserInfo();
         if( getUserInfoResults[i] != result ) {
-            CPPUNIT_FAIL( string( "Error: For URI[" ) +
+            FAIL() << (string( "Error: For URI[" ) +
                           Integer::toString( i ) + string( "] \"" ) + uris[i].toString() +
                           string( "\", getUserInfo() returned: " ) + result +
-                          string( ", expected: " ) + getUserInfoResults[i] );
+                          string( ", expected: " ) + getUserInfoResults[i]);
         }
     }
 }
@@ -1167,9 +1048,8 @@ void URITest::testIsAbsolute() {
 
     for( unsigned int i = 0; i < 13; i++) {
         bool result = URI( isAbsoluteData[i] ).isAbsolute();
-        CPPUNIT_ASSERT_MESSAGE( string( "URI(" ) + isAbsoluteData[i] +
-                                string( ").isAbsolute() = " ) + Boolean::toString( result ),
-                                results[i] == result );
+        ASSERT_TRUE(results[i] == result) << (string( "URI(" ) + isAbsoluteData[i] +
+                                string( ").isAbsolute() = " ) + Boolean::toString( result ));
     }
 }
 
@@ -1195,9 +1075,8 @@ void URITest::testIsOpaque() {
 
     for( unsigned int i = 0; i < 13; i++) {
         bool result = URI( isOpaqueData[i] ).isOpaque();
-        CPPUNIT_ASSERT_MESSAGE( string( "URI(" ) + isOpaqueData[i] +
-                                string( ").isOpaque() = " ) + Boolean::toString( result ),
-                                results[i] == result );
+        ASSERT_TRUE(results[i] == result) << (string( "URI(" ) + isOpaqueData[i] +
+                                string( ").isOpaque() = " ) + Boolean::toString( result ));
     }
 }
 
@@ -1257,9 +1136,8 @@ void URITest::testNormalize() {
     for( unsigned int i = 0; i < 57; i++) {
         URI test( normalizeData[i] );
         std::string result = test.normalize().toString();
-        CPPUNIT_ASSERT_MESSAGE( string( "URI(" ) + normalizeData[i] +
-                                string( ") normalized incorrectly to := " ) + result,
-                                result == normalizeResults[i] );
+        ASSERT_TRUE(result == normalizeResults[i]) << (string( "URI(" ) + normalizeData[i] +
+                                string( ") normalized incorrectly to := " ) + result);
     }
 }
 
@@ -1270,12 +1148,10 @@ void URITest::testNormalize2() {
     URI uri1( "file:/D:/one/two/../../three" );
     URI uri2 = uri1.normalize();
 
-    CPPUNIT_ASSERT_MESSAGE( "Normalized to incorrect URI: " + uri2.toString(),
-                            string( "file:/D:/three" ) == uri2.toString() );
-    CPPUNIT_ASSERT_MESSAGE( "Resolved URI is not absolute",  uri2.isAbsolute() );
-    CPPUNIT_ASSERT_MESSAGE( "Resolved URI is opaque", !uri2.isOpaque() );
-    CPPUNIT_ASSERT_MESSAGE( "Resolved URI has incorrect scheme specific part",
-                            string( "/D:/three" ) == uri2.getRawSchemeSpecificPart() );
+    ASSERT_TRUE(string( "file:/D:/three" ) == uri2.toString()) << ("Normalized to incorrect URI: " + uri2.toString());
+    ASSERT_TRUE(uri2.isAbsolute()) << ("Resolved URI is not absolute");
+    ASSERT_TRUE(!uri2.isOpaque()) << ("Resolved URI is opaque");
+    ASSERT_TRUE(string( "/D:/three" ) == uri2.getRawSchemeSpecificPart()) << ("Resolved URI has incorrect scheme specific part");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1284,14 +1160,12 @@ void URITest::testNormalize3() {
     // return same URI if it has a normalized path already
     URI uri1( "http://host/D:/one/two/three" );
     URI uri2 = uri1.normalize();
-    CPPUNIT_ASSERT_MESSAGE( "Failed to return same URI after normalization",
-                            uri1.toString() == uri2.toString() );
+    ASSERT_TRUE(uri1.toString() == uri2.toString()) << ("Failed to return same URI after normalization");
 
     // try with empty path
     URI uri3( "http", "host", "", "fragment" );
     URI uri4 = uri3.normalize();
-    CPPUNIT_ASSERT_MESSAGE( "Failed to return same URI after normalization",
-                            uri3.toString() == uri4.toString() );
+    ASSERT_TRUE(uri3.toString() == uri4.toString()) << ("Failed to return same URI after normalization");
 }
 
 
@@ -1347,7 +1221,7 @@ void URITest::testParseServerAuthority() {
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         try {
             URI uri = uris[i].parseServerAuthority();
-            CPPUNIT_FAIL( string( "URISyntaxException expected but not received for URI: " ) +
+            FAIL() << (string( "URISyntaxException expected but not received for URI: " ) +
                           uris[i].toString());
         } catch( URISyntaxException& e ) {
             // Expected
@@ -1362,27 +1236,15 @@ void URITest::testParseServerAuthority() {
     URI( "http", "[34:56::78]:80", "/path", "fragment" ).parseServerAuthority();
 
     // invalid authorities (neither server nor registry)
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException for URI ",
-        URI( "http://us[er@host:80/" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "http://us[er@host:80/" ), URISyntaxException) << ("Expected URISyntaxException for URI ");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException for URI ",
-        URI( "http://[ddd::hgghh]/" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "http://[ddd::hgghh]/" ), URISyntaxException) << ("Expected URISyntaxException for URI ");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException for URI ",
-        URI( "http", "[3ffe:2a00:100:7031:2e:1:80:80]a:80", "/path", "fragment" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "http", "[3ffe:2a00:100:7031:2e:1:80:80]a:80", "/path", "fragment" ), URISyntaxException) << ("Expected URISyntaxException for URI ");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected URISyntaxException for URI ",
-        URI( "http", "host:80", "/path", "fragment" ),
-        URISyntaxException );
+    ASSERT_THROW(URI( "http", "host:80", "/path", "fragment" ), URISyntaxException) << ("Expected URISyntaxException for URI ");
 
-    CPPUNIT_ASSERT_NO_THROW( URI::create("file://C:/1.txt").parseServerAuthority() );
+    ASSERT_NO_THROW(URI::create("file://C:/1.txt").parseServerAuthority());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1438,43 +1300,37 @@ void URITest::testRelativizeLURI() {
             URI r( relativizeData[i][1] );
 
             if( ( b.relativize( r ) ).toString() != relativizeResults[i] ) {
-                CPPUNIT_FAIL( string( "Error: relativize, " ) + relativizeData[i][0] +
+                FAIL() << (string( "Error: relativize, " ) + relativizeData[i][0] +
                               string( ", " ) + relativizeData[i][1] + " returned: " +
                               b.relativize( r ).toString() + ", expected:" +
-                              relativizeResults[i] );
+                              relativizeResults[i]);
             }
 
         } catch( URISyntaxException& e ) {
-            CPPUNIT_FAIL( string( "Exception on relativize test on data " ) +
+            FAIL() << (string( "Exception on relativize test on data " ) +
                           relativizeData[i][0] + ", " + relativizeData[i][1] +
-                          string( ": " ) + e.getMessage() );
+                          string( ": " ) + e.getMessage());
         }
     }
 
     {
         URI a( "http://host/dir" );
         URI b( "http://host/dir/file?query" );
-        CPPUNIT_ASSERT_MESSAGE(
-            string( "Assert 0: URI relativized incorrectly: " ) + a.relativize( b ).toString(),
-            URI( "file?query" ).equals( a.relativize( b ) ) );
+        ASSERT_TRUE(URI( "file?query" ).equals( a.relativize( b ) )) << (string( "Assert 0: URI relativized incorrectly: " ) + a.relativize( b ).toString());
     }
     {
         // One URI with empty host
         URI a( "file:///~/first" );
         URI b( "file://tools/~/first" );
-        CPPUNIT_ASSERT_MESSAGE("Assert 1: URI relativized incorrectly,",
-            URI( "file://tools/~/first" ).equals( a.relativize( b ) ) );
-        CPPUNIT_ASSERT_MESSAGE("Assert 2: URI relativized incorrectly,",
-            URI( "file:///~/first" ).equals( b.relativize( a ) ) );
+        ASSERT_TRUE(URI( "file://tools/~/first" ).equals( a.relativize( b ) )) << ("Assert 1: URI relativized incorrectly,");
+        ASSERT_TRUE(URI( "file:///~/first" ).equals( b.relativize( a ) )) << ("Assert 2: URI relativized incorrectly,");
     }
     {
         // Both URIs with empty hosts
         URI a( "file:///~/first" );
         URI b( "file:///~/second" );
-        CPPUNIT_ASSERT_MESSAGE( "Assert 3: URI relativized incorrectly,",
-                      URI( "file:///~/second").equals( a.relativize( b ) ) );
-        CPPUNIT_ASSERT_MESSAGE("Assert 4: URI relativized incorrectly,",
-            URI( "file:///~/first").equals( b.relativize( a ) ) );
+        ASSERT_TRUE(URI( "file:///~/second").equals( a.relativize( b ) )) << ("Assert 3: URI relativized incorrectly,");
+        ASSERT_TRUE(URI( "file:///~/first").equals( b.relativize( a ) )) << ("Assert 4: URI relativized incorrectly,");
     }
 }
 
@@ -1484,53 +1340,48 @@ void URITest::testRelativize2() {
     {
         URI a( "http://host/dir" );
         URI b( "http://host/dir/file?query" );
-        CPPUNIT_ASSERT_MESSAGE( "relativized incorrectly,",
-            URI( "file?query" ).equals( a.relativize( b ) ) );
+        ASSERT_TRUE(URI( "file?query" ).equals( a.relativize( b ) )) << ("relativized incorrectly,");
     }
     {
         // one URI with empty host
         URI a( "file:///~/dictionary" );
         URI b( "file://tools/~/dictionary" );
-        CPPUNIT_ASSERT_MESSAGE( "relativized incorrectly,",
-            URI( "file://tools/~/dictionary" ).equals( a.relativize( b ) ) );
-        CPPUNIT_ASSERT_MESSAGE("relativized incorrectly,",
-            URI( "file:///~/dictionary" ).equals( b.relativize( a ) ) );
+        ASSERT_TRUE(URI( "file://tools/~/dictionary" ).equals( a.relativize( b ) )) << ("relativized incorrectly,");
+        ASSERT_TRUE(URI( "file:///~/dictionary" ).equals( b.relativize( a ) )) << ("relativized incorrectly,");
     }
     {
         // two URIs with empty hosts
         URI a( "file:///~/dictionary" );
         URI b( "file:///~/therasus" );
-        CPPUNIT_ASSERT_MESSAGE( "relativized incorrectly,",
-            URI( "file:///~/therasus" ).equals( a.relativize( b ) ) );
-        CPPUNIT_ASSERT_MESSAGE( "relativized incorrectly,",
-            URI( "file:///~/dictionary").equals( b.relativize( a ) ) );
+        ASSERT_TRUE(URI( "file:///~/therasus" ).equals( a.relativize( b ) )) << ("relativized incorrectly,");
+        ASSERT_TRUE(URI( "file:///~/dictionary").equals( b.relativize( a ) )) << ("relativized incorrectly,");
     }
 
     {
         URI one( "file:/C:/test/ws" );
         URI two( "file:/C:/test/ws" );
         URI empty("");
-        CPPUNIT_ASSERT( empty.equals( one.relativize( two ) ) );
+        ASSERT_TRUE(empty.equals( one.relativize( two ) ));
     }
     {
         URI one( "file:/C:/test/ws" );
         URI two( "file:/C:/test/ws/p1" );
         URI result( "p1" );
-        CPPUNIT_ASSERT( result.equals( one.relativize( two ) ) );
+        ASSERT_TRUE(result.equals( one.relativize( two ) ));
     }
     {
         URI one( "file:/C:/test/ws/" );
         URI two( "file:/C:/test/ws/p1" );
         URI result( "p1" );
-        CPPUNIT_ASSERT( result.equals( one.relativize( two ) ) );
+        ASSERT_TRUE(result.equals( one.relativize( two ) ));
     }
     {
         URI uri( "file", "", "/test/location", "" );
         URI base( "file", "", "/test", "" );
 
         URI relative = base.relativize( uri );
-        CPPUNIT_ASSERT( string( "location" ) == relative.getSchemeSpecificPart() );
-        CPPUNIT_ASSERT( relative.getScheme() == "" );
+        ASSERT_TRUE(string( "location" ) == relative.getSchemeSpecificPart());
+        ASSERT_TRUE(relative.getScheme() == "");
     }
 }
 
@@ -1541,15 +1392,11 @@ void URITest::testResolve() {
     URI uri1( "file:/D:/one/two/three" );
     URI uri2 = uri1.resolve( URI( ".." ) );
 
-    CPPUNIT_ASSERT_MESSAGE(
-        string( "Resolved to incorrect URI: " ) + uri2.toString(),
-        string( "file:/D:/one/" ) == uri2.toString() );
-    CPPUNIT_ASSERT_MESSAGE( "Resolved URI is not absolute", uri2.isAbsolute());
-    CPPUNIT_ASSERT_MESSAGE( "Resolved URI is opaque", !uri2.isOpaque() );
-    CPPUNIT_ASSERT_MESSAGE(
-        string( "Resolved URI has incorrect scheme specific part" ) +
-        uri2.getRawSchemeSpecificPart(),
-        string( "/D:/one/" ) == uri2.getRawSchemeSpecificPart() );
+    ASSERT_TRUE(string( "file:/D:/one/" ) == uri2.toString()) << (string( "Resolved to incorrect URI: " ) + uri2.toString());
+    ASSERT_TRUE(uri2.isAbsolute()) << ("Resolved URI is not absolute");
+    ASSERT_TRUE(!uri2.isOpaque()) << ("Resolved URI is opaque");
+    ASSERT_TRUE(string( "/D:/one/" ) == uri2.getRawSchemeSpecificPart()) << (string( "Resolved URI has incorrect scheme specific part" ) +
+        uri2.getRawSchemeSpecificPart());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1603,23 +1450,22 @@ void URITest::testResolveURI() {
             URI result = b.resolve( r );
 
             if( result.toString() != resolveResults[i] ) {
-                CPPUNIT_FAIL( string( "Error: resolve at iteration: " ) +
+                FAIL() << (string( "Error: resolve at iteration: " ) +
                               Integer::toString( i ) + ": \n" +
                               resolveData[i][0] + ", " + resolveData[i][1] +
                               string( "\nreturned: " ) + b.resolve( r ).toString() +
-                              string( "\nexpected: " ) + resolveResults[i] );
+                              string( "\nexpected: " ) + resolveResults[i]);
             }
 
             if( !b.isOpaque() ) {
-                CPPUNIT_ASSERT_MESSAGE( b.toString() + " and " + result.toString() +
-                                        " incorrectly differ in absoluteness",
-                                        b.isAbsolute() == result.isAbsolute() );
+                ASSERT_TRUE(b.isAbsolute() == result.isAbsolute()) << (b.toString() + " and " + result.toString() +
+                                        " incorrectly differ in absoluteness");
             }
 
         } catch( URISyntaxException& e ) {
-            CPPUNIT_FAIL( string( "Exception on resolve test on data " ) +
+            FAIL() << (string( "Exception on resolve test on data " ) +
                           resolveData[i][0] + ", " + resolveData[i][1] +
-                          ": " + e.getMessage() );
+                          ": " + e.getMessage());
         }
     }
 }
@@ -1645,10 +1491,9 @@ void URITest::testToString() {
 
     for( unsigned int i = 0; i < uris.size(); i++ ) {
         std::string result = uris[i].toString();
-        CPPUNIT_ASSERT_MESSAGE( string( "Error: For URI \"" ) + uris[i].toString() +
+        ASSERT_TRUE(result == toStringResults[i]) << (string( "Error: For URI \"" ) + uris[i].toString() +
                                 string( "\", toString() returned: \n" ) + result +
-                                string( "\n, expected: \n" ) + toStringResults[i],
-                                result == toStringResults[i] );
+                                string( "\n, expected: \n" ) + toStringResults[i]);
     }
 }
 
@@ -1683,7 +1528,7 @@ void URITest::testToURL() {
     for( int i = 0; i < 7; i++ ) {
         try {
             URI( relativeuris[i] ).toURL();
-            CPPUNIT_FAIL( "Expected IllegalArgumentException not thrown" );
+            FAIL() << ("Expected IllegalArgumentException not thrown");
         } catch( IllegalArgumentException& e ) {
             // Expected
         }

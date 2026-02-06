@@ -30,5 +30,5 @@ using namespace activemq::commands;
 void ActiveMQQueueTest::test() {
 
     ActiveMQQueue myQueue;
-    CPPUNIT_ASSERT( myQueue.getDestinationType() == cms::Destination::QUEUE );
+    ASSERT_TRUE(myQueue.getDestinationType() == cms::Destination::QUEUE);
 }

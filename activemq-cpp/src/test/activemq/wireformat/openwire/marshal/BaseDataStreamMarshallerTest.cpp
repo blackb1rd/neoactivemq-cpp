@@ -39,7 +39,7 @@ using namespace activemq::wireformat::openwire::utils;
 using namespace activemq::wireformat::openwire::marshal;
 
 ////////////////////////////////////////////////////////////////////////////////
-void BaseDataStreamMarshallerTest::setUp(){
+void BaseDataStreamMarshallerTest::SetUp(){
 
     dataStructure = new ComplexDataStructure();
     dataStructure->boolValue = true;
@@ -59,7 +59,7 @@ void BaseDataStreamMarshallerTest::setUp(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BaseDataStreamMarshallerTest::tearDown(){
+void BaseDataStreamMarshallerTest::TearDown(){
 
     if( dataStructure != NULL ) {
         delete dataStructure;
@@ -89,25 +89,25 @@ void BaseDataStreamMarshallerTest::testLooseMarshal()
     DataInputStream looseIn( &bais );
 
     unsigned char dataType = looseIn.readByte();
-    CPPUNIT_ASSERT( dataType == dataStructure->getDataStructureType() );
+    ASSERT_TRUE(dataType == dataStructure->getDataStructureType());
 
     ComplexDataStructure ds;
     complexMarshaller->looseUnmarshal( &openWireFormat, &ds, &looseIn );
 
-    CPPUNIT_ASSERT_EQUAL( dataStructure->boolValue, ds.boolValue );
-    CPPUNIT_ASSERT( ds.cachedChild != NULL );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->boolValue, ds.cachedChild->boolValue );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->charValue, ds.cachedChild->charValue );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->shortValue, ds.cachedChild->shortValue );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->intValue, ds.cachedChild->intValue );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->longValue1, ds.cachedChild->longValue1 );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->longValue2, ds.cachedChild->longValue2 );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->longValue3, ds.cachedChild->longValue3 );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->longValue4, ds.cachedChild->longValue4 );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->longValue5, ds.cachedChild->longValue5 );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->floatValue, ds.cachedChild->floatValue );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->doubleValue, ds.cachedChild->doubleValue );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->stringValue, ds.cachedChild->stringValue );
+    ASSERT_EQ(dataStructure->boolValue, ds.boolValue);
+    ASSERT_TRUE(ds.cachedChild != NULL);
+    ASSERT_EQ(dataStructure->cachedChild->boolValue, ds.cachedChild->boolValue);
+    ASSERT_EQ(dataStructure->cachedChild->charValue, ds.cachedChild->charValue);
+    ASSERT_EQ(dataStructure->cachedChild->shortValue, ds.cachedChild->shortValue);
+    ASSERT_EQ(dataStructure->cachedChild->intValue, ds.cachedChild->intValue);
+    ASSERT_EQ(dataStructure->cachedChild->longValue1, ds.cachedChild->longValue1);
+    ASSERT_EQ(dataStructure->cachedChild->longValue2, ds.cachedChild->longValue2);
+    ASSERT_EQ(dataStructure->cachedChild->longValue3, ds.cachedChild->longValue3);
+    ASSERT_EQ(dataStructure->cachedChild->longValue4, ds.cachedChild->longValue4);
+    ASSERT_EQ(dataStructure->cachedChild->longValue5, ds.cachedChild->longValue5);
+    ASSERT_EQ(dataStructure->cachedChild->floatValue, ds.cachedChild->floatValue);
+    ASSERT_EQ(dataStructure->cachedChild->doubleValue, ds.cachedChild->doubleValue);
+    ASSERT_EQ(dataStructure->cachedChild->stringValue, ds.cachedChild->stringValue);
 
     delete [] array.first;
 }
@@ -143,27 +143,27 @@ void BaseDataStreamMarshallerTest::testTightMarshal()
     DataInputStream dataIn( &bais );
 
     unsigned char dataType = dataIn.readByte();
-    CPPUNIT_ASSERT( dataType == dataStructure->getDataStructureType() );
+    ASSERT_TRUE(dataType == dataStructure->getDataStructureType());
 
     ComplexDataStructure ds;
     bs.clear();
     bs.unmarshal( &dataIn );
     complexMarshaller->tightUnmarshal( &openWireFormat, &ds, &dataIn, &bs );
 
-    CPPUNIT_ASSERT_EQUAL( dataStructure->boolValue, ds.boolValue );
-    CPPUNIT_ASSERT( ds.cachedChild != NULL );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->boolValue, ds.cachedChild->boolValue );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->charValue, ds.cachedChild->charValue );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->shortValue, ds.cachedChild->shortValue );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->intValue, ds.cachedChild->intValue );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->longValue1, ds.cachedChild->longValue1 );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->longValue2, ds.cachedChild->longValue2 );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->longValue3, ds.cachedChild->longValue3 );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->longValue4, ds.cachedChild->longValue4 );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->longValue5, ds.cachedChild->longValue5 );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->floatValue, ds.cachedChild->floatValue );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->doubleValue, ds.cachedChild->doubleValue );
-    CPPUNIT_ASSERT_EQUAL( dataStructure->cachedChild->stringValue, ds.cachedChild->stringValue );
+    ASSERT_EQ(dataStructure->boolValue, ds.boolValue);
+    ASSERT_TRUE(ds.cachedChild != NULL);
+    ASSERT_EQ(dataStructure->cachedChild->boolValue, ds.cachedChild->boolValue);
+    ASSERT_EQ(dataStructure->cachedChild->charValue, ds.cachedChild->charValue);
+    ASSERT_EQ(dataStructure->cachedChild->shortValue, ds.cachedChild->shortValue);
+    ASSERT_EQ(dataStructure->cachedChild->intValue, ds.cachedChild->intValue);
+    ASSERT_EQ(dataStructure->cachedChild->longValue1, ds.cachedChild->longValue1);
+    ASSERT_EQ(dataStructure->cachedChild->longValue2, ds.cachedChild->longValue2);
+    ASSERT_EQ(dataStructure->cachedChild->longValue3, ds.cachedChild->longValue3);
+    ASSERT_EQ(dataStructure->cachedChild->longValue4, ds.cachedChild->longValue4);
+    ASSERT_EQ(dataStructure->cachedChild->longValue5, ds.cachedChild->longValue5);
+    ASSERT_EQ(dataStructure->cachedChild->floatValue, ds.cachedChild->floatValue);
+    ASSERT_EQ(dataStructure->cachedChild->doubleValue, ds.cachedChild->doubleValue);
+    ASSERT_EQ(dataStructure->cachedChild->stringValue, ds.cachedChild->stringValue);
 
     delete [] array.first;
 }

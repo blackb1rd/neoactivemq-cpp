@@ -134,13 +134,13 @@ void ActiveMQConnectionTest::test2WithOpenwire() {
 
         transport::TransportFactory* factory = transport::TransportRegistry::getInstance().findFactory("mock");
         if (factory == NULL) {
-            CPPUNIT_ASSERT(false);
+            ASSERT_TRUE(false);
         }
 
         // Create the transport.
         transport = factory->createComposite(uri);
         if (transport == NULL) {
-            CPPUNIT_ASSERT(false);
+            ASSERT_TRUE(false);
         }
 
         transport->setTransportListener(&cmdListener);
@@ -150,7 +150,7 @@ void ActiveMQConnectionTest::test2WithOpenwire() {
         connection.getClientID();
         connection.close();
 
-        CPPUNIT_ASSERT(connection.getClientID() == "");
+        ASSERT_TRUE(connection.getClientID() == "");
 
     } catch (exceptions::ActiveMQException& ex) {
         ex.printStackTrace();
@@ -211,7 +211,7 @@ void ActiveMQConnectionTest::testCloseCancelsHungStart() {
     }
 
     runner.join(1000);
-    CPPUNIT_ASSERT(runner.isAlive());
+    ASSERT_TRUE(runner.isAlive());
 
     try {
         runnable.getConnection()->close();
@@ -219,7 +219,7 @@ void ActiveMQConnectionTest::testCloseCancelsHungStart() {
     }
 
     runner.join(2000);
-    CPPUNIT_ASSERT(!runner.isAlive());
+    ASSERT_TRUE(!runner.isAlive());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -233,10 +233,10 @@ void ActiveMQConnectionTest::testExceptionInOnException() {
         std::unique_ptr<cms::Connection> connection(factory->createConnection());
 
         connection->setExceptionListener(&exListener);
-        CPPUNIT_ASSERT(exListener.waitForException(0) == false);
+        ASSERT_TRUE(exListener.waitForException(0) == false);
 
         transport::mock::MockTransport* transport = transport::mock::MockTransport::getInstance();
-        CPPUNIT_ASSERT(transport != NULL);
+        ASSERT_TRUE(transport != NULL);
 
         // Setup our ExceptionListener to throw inside the onException callback
         exListener.throwInCallback = true;
@@ -244,7 +244,7 @@ void ActiveMQConnectionTest::testExceptionInOnException() {
         // Trigger the onException callback
         transport->fireException(
             exceptions::ActiveMQException(__FILE__, __LINE__, "test"));
-        CPPUNIT_ASSERT(exListener.waitForException(2000) == true);
+        ASSERT_TRUE(exListener.waitForException(2000) == true);
         connection->close();
     } catch (exceptions::ActiveMQException& ex) {
         ex.printStackTrace();

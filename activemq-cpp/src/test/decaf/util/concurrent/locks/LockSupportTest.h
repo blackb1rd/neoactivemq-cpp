@@ -18,8 +18,7 @@
 #ifndef _DECAF_UTIL_CONCURRENT_LOCKS_LOCKSUPPORTTEST_H_
 #define _DECAF_UTIL_CONCURRENT_LOCKS_LOCKSUPPORTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 namespace decaf {
@@ -28,17 +27,7 @@ namespace concurrent {
 namespace locks {
 
     class LockSupportTest : public ExecutorsTestSupport {
-
-        CPPUNIT_TEST_SUITE( LockSupportTest );
-        CPPUNIT_TEST( testPark1 );
-        CPPUNIT_TEST( testPark2 );
-        CPPUNIT_TEST( testPark3 );
-        CPPUNIT_TEST( testPark4 );
-        CPPUNIT_TEST( testParkNanos );
-        CPPUNIT_TEST( testParkUntil );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         LockSupportTest();
 

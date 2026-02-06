@@ -18,8 +18,7 @@
 #ifndef ACTIVEMQ_TRANSPORT_CORRUPTEDMESSAGETEST_H_
 #define ACTIVEMQ_TRANSPORT_CORRUPTEDMESSAGETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include <activemq/util/Config.h>
 
 namespace activemq {
@@ -36,33 +35,13 @@ namespace transport {
      * Note: Property-level corruption (lazy unmarshal) is tested in LazyPropertyUnmarshalTest.
      * Property corruption is handled at consumer level with rollback and POISON_ACK after 6 attempts.
      */
-    class CorruptedMessageTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( CorruptedMessageTest );
-        CPPUNIT_TEST( testCorruptedFirstMessage );
-        CPPUNIT_TEST( testCorruptedMessageBetweenValidMessages );
-        CPPUNIT_TEST( testContinueAfterCorruptedMessage );
-        CPPUNIT_TEST( testMultipleCorruptedMessages );
-        CPPUNIT_TEST( testCorruptedMessageWithoutMessageId );
-        CPPUNIT_TEST( testMaxConsecutiveErrors );
-        CPPUNIT_TEST( testPoisonAckSent );
-        CPPUNIT_TEST( testStreamResyncAfterSingleCorruption );
-        CPPUNIT_TEST( testCorruptedMessageDuringFailover );
-        CPPUNIT_TEST( testCorruptionInDifferentMessageParts );
-        CPPUNIT_TEST( testCorruptedMessageNonDurableConsumer );
-        CPPUNIT_TEST( testCorruptedMessageDurableTopicSubscriber );
-        CPPUNIT_TEST( testPoisonAckForDurableSubscriber );
-        CPPUNIT_TEST( testEOFDuringMessageIdRead );
-        CPPUNIT_TEST( testEOFDuringPropertiesRead );
-        CPPUNIT_TEST( testEOFDuringBodyRead );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class CorruptedMessageTest : public ::testing::Test {
+public:
 
         virtual ~CorruptedMessageTest() {}
 
-        void setUp();
-        void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         /**
          * Test Case 1: Corrupted message as the first message

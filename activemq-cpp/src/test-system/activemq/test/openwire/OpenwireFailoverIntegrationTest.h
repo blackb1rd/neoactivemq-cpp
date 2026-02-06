@@ -18,9 +18,7 @@
 #ifndef _ACTIVEMQ_TEST_OPENWIRE_OPENWIREFAILOVERINTEGRATIONTEST_H_
 #define _ACTIVEMQ_TEST_OPENWIRE_OPENWIREFAILOVERINTEGRATIONTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <activemq/util/IntegrationCommon.h>
 
 #include <cms/Connection.h>
@@ -46,23 +44,14 @@ namespace openwire {
      * - Message delivery during failover
      * - Connection recovery after broker restart
      */
-    class OpenwireFailoverIntegrationTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE(OpenwireFailoverIntegrationTest);
-        CPPUNIT_TEST(testFailoverConnection);
-        CPPUNIT_TEST(testSendReceiveWithFailover);
-        CPPUNIT_TEST(testFailoverReconnectOnBrokerDown);
-        CPPUNIT_TEST(testMessageDeliveryDuringFailover);
-        CPPUNIT_TEST(testFailoverWithAsyncConsumer);
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class OpenwireFailoverIntegrationTest : public ::testing::Test {
+public:
 
         OpenwireFailoverIntegrationTest();
         virtual ~OpenwireFailoverIntegrationTest();
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         /**
          * Test basic failover connection establishment

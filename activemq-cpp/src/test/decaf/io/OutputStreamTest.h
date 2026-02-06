@@ -18,19 +18,12 @@
 #ifndef _DECAF_IO_OUTPUTSTREAMTEST_H_
 #define _DECAF_IO_OUTPUTSTREAMTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace io {
 
-    class OutputStreamTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( OutputStreamTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class OutputStreamTest : public ::testing::Test {
+public:
 
         OutputStreamTest();
         virtual ~OutputStreamTest();

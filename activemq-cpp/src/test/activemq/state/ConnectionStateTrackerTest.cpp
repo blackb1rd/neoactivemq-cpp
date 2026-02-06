@@ -241,7 +241,7 @@ void ConnectionStateTrackerTest::testMessageCache() {
 
     tracker.restore(transport);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should only be three messages", 4, transport->messages.size());
+    ASSERT_EQ(4, transport->messages.size()) << ("Should only be three messages");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -264,5 +264,5 @@ void ConnectionStateTrackerTest::testMessagePullCache() {
 
     tracker.restore(transport);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should only be three message pulls", 10, transport->messagePulls.size());
+    ASSERT_EQ(10, transport->messagePulls.size()) << ("Should only be three message pulls");
 }

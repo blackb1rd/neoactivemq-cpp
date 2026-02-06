@@ -18,25 +18,12 @@
 #ifndef _ACTIVEMQ_CORE_ACTIVEMQMESSAGEAUDITTEST_H_
 #define _ACTIVEMQ_CORE_ACTIVEMQMESSAGEAUDITTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace core {
 
-    class ActiveMQMessageAuditTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ActiveMQMessageAuditTest );
-        CPPUNIT_TEST( testIsDuplicateString );
-        CPPUNIT_TEST( testIsDuplicateMessageId );
-        CPPUNIT_TEST( testIsInOrderString );
-        CPPUNIT_TEST( testIsInOrderMessageId );
-        CPPUNIT_TEST( testRollbackString );
-        CPPUNIT_TEST( testRollbackMessageId );
-        CPPUNIT_TEST( testGetLastSeqId );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class ActiveMQMessageAuditTest : public ::testing::Test {
+public:
 
         ActiveMQMessageAuditTest();
         virtual ~ActiveMQMessageAuditTest();

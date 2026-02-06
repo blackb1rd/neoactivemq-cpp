@@ -18,21 +18,15 @@
 #ifndef _DECAF_UTIL_RANDOMTEST_H_
 #define _DECAF_UTIL_RANDOMTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/util/Random.h>
 
 namespace decaf{
 namespace util{
 
-    class RandomTest : public CppUnit::TestFixture
+    class RandomTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( RandomTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         RandomTest(){}
         virtual ~RandomTest(){}

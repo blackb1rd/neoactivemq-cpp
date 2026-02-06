@@ -18,9 +18,7 @@
 #ifndef _DECAF_INTERNAL_NET_SSL_OPENSSL_OPENSSLSOCKETTEST_H_
 #define _DECAF_INTERNAL_NET_SSL_OPENSSL_OPENSSLSOCKETTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace internal {
 namespace net {
@@ -31,22 +29,14 @@ namespace openssl {
      * Test suite for OpenSSLSocket to verify SSL/TLS handshake behavior,
      * connection handling, and the fix for immediate handshake after connect.
      */
-    class OpenSSLSocketTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( OpenSSLSocketTest );
-        CPPUNIT_TEST( testHandshakeCalledAfterConnect );
-        CPPUNIT_TEST( testHandshakeIdempotency );
-        CPPUNIT_TEST( testConnectWithInvalidHost );
-        CPPUNIT_TEST( testServerNameConfiguration );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class OpenSSLSocketTest : public ::testing::Test {
+public:
 
         OpenSSLSocketTest();
         virtual ~OpenSSLSocketTest();
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         /**
          * Tests that SSL handshake is performed immediately after connect()

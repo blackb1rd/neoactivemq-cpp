@@ -18,25 +18,12 @@
 #ifndef _DECAF_IO_WRITERTEST_H_
 #define _DECAF_IO_WRITERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace io {
 
-    class WriterTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( WriterTest );
-        CPPUNIT_TEST( testWriteChar );
-        CPPUNIT_TEST( testWriteVector );
-        CPPUNIT_TEST( testWriteString );
-        CPPUNIT_TEST( testWriteStringOffsetCount );
-        CPPUNIT_TEST( testAppendChar );
-        CPPUNIT_TEST( testAppendCharSequence );
-        CPPUNIT_TEST( testAppendCharSequenceIntInt );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class WriterTest : public ::testing::Test {
+public:
 
         WriterTest();
         virtual ~WriterTest();

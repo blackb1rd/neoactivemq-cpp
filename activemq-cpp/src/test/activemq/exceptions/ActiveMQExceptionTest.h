@@ -18,29 +18,20 @@
 #ifndef ACTIVEMQ_EXCEPTIONS_ACTIVEMQEXCEPTIONTEST_H_
 #define ACTIVEMQ_EXCEPTIONS_ACTIVEMQEXCEPTIONTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <string.h>
 
 namespace activemq{
 namespace exceptions{
 
-    class ActiveMQExceptionTest : public CppUnit::TestFixture {
-
-      CPPUNIT_TEST_SUITE( ActiveMQExceptionTest );
-      CPPUNIT_TEST( testMessage0 );
-      CPPUNIT_TEST( testMessage3 );
-      CPPUNIT_TEST( testMacros );
-      CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class ActiveMQExceptionTest : public ::testing::Test {
+public:
 
         virtual ~ActiveMQExceptionTest(){}
 
-        virtual void setUp(){}
-        virtual void tearDown(){}
+        void SetUp() override{}
+        void TearDown() override{}
 
         void testMacros();
         void testMessage0();

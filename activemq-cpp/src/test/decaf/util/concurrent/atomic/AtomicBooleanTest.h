@@ -18,27 +18,14 @@
 #ifndef _DECAF_UTIL_CONCURRENT_ATOMIC_ATOMICBOOLEANTEST_H_
 #define _DECAF_UTIL_CONCURRENT_ATOMIC_ATOMICBOOLEANTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 namespace concurrent {
 namespace atomic {
 
-    class AtomicBooleanTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( AtomicBooleanTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testConstructor2 );
-        CPPUNIT_TEST( testGetSet );
-        CPPUNIT_TEST( testCompareAndSet );
-        CPPUNIT_TEST( testCompareAndSetInMultipleThreads );
-        CPPUNIT_TEST( testGetAndSet );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class AtomicBooleanTest : public ::testing::Test {
+public:
 
         AtomicBooleanTest();
         virtual ~AtomicBooleanTest() {}

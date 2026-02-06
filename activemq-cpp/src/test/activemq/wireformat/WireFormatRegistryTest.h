@@ -18,19 +18,12 @@
 #ifndef _ACTIVEMQ_WIREFORMAT_WIREFORMATREGISTRYTEST_H_
 #define _ACTIVEMQ_WIREFORMAT_WIREFORMATREGISTRYTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace wireformat {
 
-    class WireFormatRegistryTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( WireFormatRegistryTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class WireFormatRegistryTest : public ::testing::Test {
+public:
 
         WireFormatRegistryTest() {}
         virtual ~WireFormatRegistryTest() {}

@@ -72,7 +72,7 @@ void SimpleRollbackTest::testRollbacks() {
         // Wait for the messages to get here
         listener.asyncWaitForMessages(IntegrationCommon::defaultMsgCount);
         unsigned int numReceived = listener.getNumReceived();
-        CPPUNIT_ASSERT(numReceived == IntegrationCommon::defaultMsgCount);
+        ASSERT_TRUE(numReceived == IntegrationCommon::defaultMsgCount);
 
         session->commit();
         Thread::sleep(50);
@@ -95,7 +95,7 @@ void SimpleRollbackTest::testRollbacks() {
 
         // Wait for the messages to get here
         listener.asyncWaitForMessages(1);
-        CPPUNIT_ASSERT(listener.getNumReceived() == 1);
+        ASSERT_TRUE(listener.getNumReceived() == 1);
 
         listener.reset();
         txtMessage->setText("SimpleTest - Message after Rollback");
@@ -104,7 +104,7 @@ void SimpleRollbackTest::testRollbacks() {
 
         // Wait for the messages to get here
         listener.asyncWaitForMessages(1);
-        CPPUNIT_ASSERT(listener.getNumReceived() == 1);
+        ASSERT_TRUE(listener.getNumReceived() == 1);
         session->commit();
 
     } catch (std::exception& ex) {

@@ -165,8 +165,7 @@ namespace {
 
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireHighVolumeListenerTest::OpenwireHighVolumeListenerTest()
-    : CppUnit::TestFixture()
-    , failoverConnection()
+    : failoverConnection()
     , failoverSession()
     , directConnection()
     , directSession() {
@@ -177,12 +176,12 @@ OpenwireHighVolumeListenerTest::~OpenwireHighVolumeListenerTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireHighVolumeListenerTest::setUp() {
+void OpenwireHighVolumeListenerTest::SetUp() {
     // Connections are created in individual tests
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireHighVolumeListenerTest::tearDown() {
+void OpenwireHighVolumeListenerTest::TearDown() {
     try {
         if (failoverSession.get() != nullptr) {
             failoverSession->close();
@@ -261,10 +260,9 @@ void OpenwireHighVolumeListenerTest::testHighVolumeFailoverListener() {
 
     std::cout << "Received " << listener.getMessagesReceived() << " messages in " << totalDuration.count() << "ms" << std::endl;
 
-    CPPUNIT_ASSERT_MESSAGE("Listener should not have errors", !listener.hasError());
-    CPPUNIT_ASSERT_MESSAGE("Should complete within timeout", completed);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("All messages should be received",
-                                  HIGH_VOLUME_MESSAGE_COUNT, listener.getMessagesReceived());
+    ASSERT_TRUE(!listener.hasError()) << ("Listener should not have errors");
+    ASSERT_TRUE(completed) << ("Should complete within timeout");
+    ASSERT_EQ(HIGH_VOLUME_MESSAGE_COUNT, listener.getMessagesReceived()) << ("All messages should be received");
 
     consumer->setMessageListener(nullptr);
     producer->close();
@@ -317,10 +315,9 @@ void OpenwireHighVolumeListenerTest::testHighVolumeDirectListener() {
 
     std::cout << "Received " << listener.getMessagesReceived() << " messages in " << totalDuration.count() << "ms" << std::endl;
 
-    CPPUNIT_ASSERT_MESSAGE("Listener should not have errors", !listener.hasError());
-    CPPUNIT_ASSERT_MESSAGE("Should complete within timeout", completed);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("All messages should be received",
-                                  HIGH_VOLUME_MESSAGE_COUNT, listener.getMessagesReceived());
+    ASSERT_TRUE(!listener.hasError()) << ("Listener should not have errors");
+    ASSERT_TRUE(completed) << ("Should complete within timeout");
+    ASSERT_EQ(HIGH_VOLUME_MESSAGE_COUNT, listener.getMessagesReceived()) << ("All messages should be received");
 
     consumer->setMessageListener(nullptr);
     producer->close();
@@ -403,14 +400,12 @@ void OpenwireHighVolumeListenerTest::testHighVolumeDualConnectionListeners() {
     std::cout << "Failover received: " << failoverListener.getMessagesReceived() << std::endl;
     std::cout << "Direct received: " << directListener.getMessagesReceived() << std::endl;
 
-    CPPUNIT_ASSERT_MESSAGE("Failover listener should not have errors", !failoverListener.hasError());
-    CPPUNIT_ASSERT_MESSAGE("Direct listener should not have errors", !directListener.hasError());
-    CPPUNIT_ASSERT_MESSAGE("Failover should complete within timeout", failoverCompleted);
-    CPPUNIT_ASSERT_MESSAGE("Direct should complete within timeout", directCompleted);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failover should receive all messages",
-                                  HIGH_VOLUME_MESSAGE_COUNT, failoverListener.getMessagesReceived());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Direct should receive all messages",
-                                  HIGH_VOLUME_MESSAGE_COUNT, directListener.getMessagesReceived());
+    ASSERT_TRUE(!failoverListener.hasError()) << ("Failover listener should not have errors");
+    ASSERT_TRUE(!directListener.hasError()) << ("Direct listener should not have errors");
+    ASSERT_TRUE(failoverCompleted) << ("Failover should complete within timeout");
+    ASSERT_TRUE(directCompleted) << ("Direct should complete within timeout");
+    ASSERT_EQ(HIGH_VOLUME_MESSAGE_COUNT, failoverListener.getMessagesReceived()) << ("Failover should receive all messages");
+    ASSERT_EQ(HIGH_VOLUME_MESSAGE_COUNT, directListener.getMessagesReceived()) << ("Direct should receive all messages");
 
     failoverConsumer->setMessageListener(nullptr);
     directConsumer->setMessageListener(nullptr);
@@ -510,10 +505,10 @@ void OpenwireHighVolumeListenerTest::testHighVolumeConcurrentProducerConsumer() 
     std::cout << "Failover: sent=" << failoverSent.load() << " received=" << failoverListener.getMessagesReceived() << std::endl;
     std::cout << "Direct: sent=" << directSent.load() << " received=" << directListener.getMessagesReceived() << std::endl;
 
-    CPPUNIT_ASSERT_MESSAGE("Failover should complete", failoverCompleted);
-    CPPUNIT_ASSERT_MESSAGE("Direct should complete", directCompleted);
-    CPPUNIT_ASSERT_EQUAL(HIGH_VOLUME_MESSAGE_COUNT, failoverListener.getMessagesReceived());
-    CPPUNIT_ASSERT_EQUAL(HIGH_VOLUME_MESSAGE_COUNT, directListener.getMessagesReceived());
+    ASSERT_TRUE(failoverCompleted) << ("Failover should complete");
+    ASSERT_TRUE(directCompleted) << ("Direct should complete");
+    ASSERT_EQ(HIGH_VOLUME_MESSAGE_COUNT, failoverListener.getMessagesReceived());
+    ASSERT_EQ(HIGH_VOLUME_MESSAGE_COUNT, directListener.getMessagesReceived());
 
     failoverConsumer->setMessageListener(nullptr);
     directConsumer->setMessageListener(nullptr);
@@ -580,10 +575,9 @@ void OpenwireHighVolumeListenerTest::testHighVolumeWithBrokerInterruption() {
     std::cout << "Messages received: " << listener.getMessagesReceived() << std::endl;
     std::cout << "Connection exceptions: " << exceptionListener.getExceptionCount() << std::endl;
 
-    CPPUNIT_ASSERT_MESSAGE("Listener should not have errors", !listener.hasError());
-    CPPUNIT_ASSERT_MESSAGE("Should complete within timeout", completed);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("All messages should be received",
-                                  HIGH_VOLUME_MESSAGE_COUNT, listener.getMessagesReceived());
+    ASSERT_TRUE(!listener.hasError()) << ("Listener should not have errors");
+    ASSERT_TRUE(completed) << ("Should complete within timeout");
+    ASSERT_EQ(HIGH_VOLUME_MESSAGE_COUNT, listener.getMessagesReceived()) << ("All messages should be received");
 
     consumer->setMessageListener(nullptr);
     producer->close();
@@ -736,23 +730,20 @@ void OpenwireHighVolumeListenerTest::testDurableTopicTransactedConcurrentServers
     std::cout << "Direct connection exceptions: " << directExceptionListener.getExceptionCount() << std::endl;
 
     // Assertions
-    CPPUNIT_ASSERT_MESSAGE("Failover sender should not have errors", !failoverSendError.load());
-    CPPUNIT_ASSERT_MESSAGE("Direct sender should not have errors", !directSendError.load());
-    CPPUNIT_ASSERT_MESSAGE("Failover listener should not have errors", !failoverListener.hasError());
-    CPPUNIT_ASSERT_MESSAGE("Direct listener should not have errors", !directListener.hasError());
-    CPPUNIT_ASSERT_MESSAGE("Failover should complete within timeout", failoverCompleted);
-    CPPUNIT_ASSERT_MESSAGE("Direct should complete within timeout", directCompleted);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failover should receive all messages",
-                                  DURABLE_TOPIC_MESSAGE_COUNT, failoverListener.getMessagesReceived());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Direct should receive all messages",
-                                  DURABLE_TOPIC_MESSAGE_COUNT, directListener.getMessagesReceived());
+    ASSERT_TRUE(!failoverSendError.load()) << ("Failover sender should not have errors");
+    ASSERT_TRUE(!directSendError.load()) << ("Direct sender should not have errors");
+    ASSERT_TRUE(!failoverListener.hasError()) << ("Failover listener should not have errors");
+    ASSERT_TRUE(!directListener.hasError()) << ("Direct listener should not have errors");
+    ASSERT_TRUE(failoverCompleted) << ("Failover should complete within timeout");
+    ASSERT_TRUE(directCompleted) << ("Direct should complete within timeout");
+    ASSERT_EQ(DURABLE_TOPIC_MESSAGE_COUNT, failoverListener.getMessagesReceived()) << ("Failover should receive all messages");
+    ASSERT_EQ(DURABLE_TOPIC_MESSAGE_COUNT, directListener.getMessagesReceived()) << ("Direct should receive all messages");
 
     // Verify total messages received across both servers
     int totalReceived = failoverListener.getMessagesReceived() + directListener.getMessagesReceived();
     int expectedTotal = DURABLE_TOPIC_MESSAGE_COUNT * 2;
     std::cout << "Total messages received: " << totalReceived << " (expected: " << expectedTotal << ")" << std::endl;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Total messages should match expected",
-                                  expectedTotal, totalReceived);
+    ASSERT_EQ(expectedTotal, totalReceived) << ("Total messages should match expected");
 
     // Cleanup
     failoverConsumer->setMessageListener(nullptr);
@@ -1048,29 +1039,19 @@ void OpenwireHighVolumeListenerTest::testMultiTopicDurableTransactedWithSelector
     std::cout << "Direct connection exceptions: " << directExceptionListener.getExceptionCount() << std::endl;
 
     // ============ Assertions ============
-    CPPUNIT_ASSERT_MESSAGE("No send errors should occur", !sendError.load());
-    CPPUNIT_ASSERT_MESSAGE("All listeners should complete within timeout", allCompleted);
+    ASSERT_TRUE(!sendError.load()) << ("No send errors should occur");
+    ASSERT_TRUE(allCompleted) << ("All listeners should complete within timeout");
 
     for (int t = 0; t < TOPICS_PER_SERVER; t++) {
-        CPPUNIT_ASSERT_MESSAGE(
-            "Failover Topic " + std::to_string(t) + " listener should not have errors",
-            !failoverListeners[t]->hasError());
-        CPPUNIT_ASSERT_MESSAGE(
-            "Direct Topic " + std::to_string(t) + " listener should not have errors",
-            !directListeners[t]->hasError());
-        CPPUNIT_ASSERT_EQUAL_MESSAGE(
-            "Failover Topic " + std::to_string(t) + " should receive all matching messages",
-            MULTI_TOPIC_MESSAGE_COUNT, failoverListeners[t]->getMessagesReceived());
-        CPPUNIT_ASSERT_EQUAL_MESSAGE(
-            "Direct Topic " + std::to_string(t) + " should receive all matching messages",
-            MULTI_TOPIC_MESSAGE_COUNT, directListeners[t]->getMessagesReceived());
+        ASSERT_TRUE(!failoverListeners[t]->hasError()) << ("Failover Topic " + std::to_string(t) + " listener should not have errors");
+        ASSERT_TRUE(!directListeners[t]->hasError()) << ("Direct Topic " + std::to_string(t) + " listener should not have errors");
+        ASSERT_EQ(MULTI_TOPIC_MESSAGE_COUNT, failoverListeners[t]->getMessagesReceived()) << ("Failover Topic " + std::to_string(t) + " should receive all matching messages");
+        ASSERT_EQ(MULTI_TOPIC_MESSAGE_COUNT, directListeners[t]->getMessagesReceived()) << ("Direct Topic " + std::to_string(t) + " should receive all matching messages");
     }
 
     int expectedTotalPerServer = MULTI_TOPIC_MESSAGE_COUNT * TOPICS_PER_SERVER;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Total failover messages should match",
-                                  expectedTotalPerServer, totalFailoverReceived);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Total direct messages should match",
-                                  expectedTotalPerServer, totalDirectReceived);
+    ASSERT_EQ(expectedTotalPerServer, totalFailoverReceived) << ("Total failover messages should match");
+    ASSERT_EQ(expectedTotalPerServer, totalDirectReceived) << ("Total direct messages should match");
 
     // ============ Cleanup ============
     // Remove listeners
@@ -1110,4 +1091,12 @@ void OpenwireHighVolumeListenerTest::testMultiTopicDurableTransactedWithSelector
 
 ////////////////////////////////////////////////////////////////////////////////
 // Register the test suite
-CPPUNIT_TEST_SUITE_REGISTRATION(OpenwireHighVolumeListenerTest);
+namespace activemq { namespace test { namespace openwire {
+TEST_F(OpenwireHighVolumeListenerTest, testHighVolumeFailoverListener) { testHighVolumeFailoverListener(); }
+TEST_F(OpenwireHighVolumeListenerTest, testHighVolumeDirectListener) { testHighVolumeDirectListener(); }
+TEST_F(OpenwireHighVolumeListenerTest, testHighVolumeDualConnectionListeners) { testHighVolumeDualConnectionListeners(); }
+TEST_F(OpenwireHighVolumeListenerTest, testHighVolumeConcurrentProducerConsumer) { testHighVolumeConcurrentProducerConsumer(); }
+TEST_F(OpenwireHighVolumeListenerTest, testHighVolumeWithBrokerInterruption) { testHighVolumeWithBrokerInterruption(); }
+TEST_F(OpenwireHighVolumeListenerTest, testDurableTopicTransactedConcurrentServers) { testDurableTopicTransactedConcurrentServers(); }
+TEST_F(OpenwireHighVolumeListenerTest, testMultiTopicDurableTransactedWithSelector) { testMultiTopicDurableTransactedWithSelector(); }
+}}}

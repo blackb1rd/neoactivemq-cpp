@@ -18,22 +18,12 @@
 #ifndef _ACTIVEMQ_UTIL_MEMORYUSAGETEST_H_
 #define _ACTIVEMQ_UTIL_MEMORYUSAGETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace util {
 
-    class MemoryUsageTest  : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( MemoryUsageTest );
-        CPPUNIT_TEST( testCTors );
-        CPPUNIT_TEST( testUsage );
-        CPPUNIT_TEST( testTimedWait );
-        CPPUNIT_TEST( testWait );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class MemoryUsageTest  : public ::testing::Test {
+public:
 
         MemoryUsageTest() {}
         virtual ~MemoryUsageTest() {}

@@ -18,19 +18,12 @@
 #ifndef _DECAF_NET_URISYNTAXEXCEPTIONTEST_H_
 #define _DECAF_NET_URISYNTAXEXCEPTIONTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf{
 namespace net{
 
-    class URISyntaxExceptionTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( URISyntaxExceptionTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class URISyntaxExceptionTest : public ::testing::Test {
+public:
 
         URISyntaxExceptionTest();
         virtual ~URISyntaxExceptionTest() {}

@@ -147,8 +147,7 @@ namespace {
 
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireMultiConnectionTest::OpenwireMultiConnectionTest()
-    : CppUnit::TestFixture()
-    , failoverConnection()
+    : failoverConnection()
     , failoverSession()
     , directConnection()
     , directSession() {
@@ -159,12 +158,12 @@ OpenwireMultiConnectionTest::~OpenwireMultiConnectionTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireMultiConnectionTest::setUp() {
+void OpenwireMultiConnectionTest::SetUp() {
     // Connections are created in individual tests
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireMultiConnectionTest::tearDown() {
+void OpenwireMultiConnectionTest::TearDown() {
     try {
         if (failoverSession.get() != nullptr) {
             failoverSession->close();
@@ -197,25 +196,25 @@ void OpenwireMultiConnectionTest::testMultipleConnectionsEstablish() {
         new ActiveMQConnectionFactory(getFailoverURL()));
 
     failoverConnection.reset(failoverFactory->createConnection());
-    CPPUNIT_ASSERT(failoverConnection.get() != nullptr);
+    ASSERT_TRUE(failoverConnection.get() != nullptr);
     failoverConnection->start();
 
     failoverSession.reset(failoverConnection->createSession(Session::AUTO_ACKNOWLEDGE));
-    CPPUNIT_ASSERT(failoverSession.get() != nullptr);
+    ASSERT_TRUE(failoverSession.get() != nullptr);
 
     // Create direct connection to broker3
     std::unique_ptr<ActiveMQConnectionFactory> directFactory(
         new ActiveMQConnectionFactory(getBroker3URL()));
 
     directConnection.reset(directFactory->createConnection());
-    CPPUNIT_ASSERT(directConnection.get() != nullptr);
+    ASSERT_TRUE(directConnection.get() != nullptr);
     directConnection->start();
 
     directSession.reset(directConnection->createSession(Session::AUTO_ACKNOWLEDGE));
-    CPPUNIT_ASSERT(directSession.get() != nullptr);
+    ASSERT_TRUE(directSession.get() != nullptr);
 
     // Verify both connections have different client IDs
-    CPPUNIT_ASSERT(failoverConnection->getClientID() != directConnection->getClientID());
+    ASSERT_TRUE(failoverConnection->getClientID() != directConnection->getClientID());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -245,7 +244,7 @@ void OpenwireMultiConnectionTest::testSendReceiveOnBothConnections() {
     failoverProducer->send(failoverMsg.get());
 
     std::unique_ptr<Message> receivedFailover(failoverConsumer->receive(5000));
-    CPPUNIT_ASSERT(receivedFailover.get() != nullptr);
+    ASSERT_TRUE(receivedFailover.get() != nullptr);
 
     // Test on direct connection
     std::string directQueueName = "multi.direct.test." + UUID::randomUUID().toString();
@@ -258,7 +257,7 @@ void OpenwireMultiConnectionTest::testSendReceiveOnBothConnections() {
     directProducer->send(directMsg.get());
 
     std::unique_ptr<Message> receivedDirect(directConsumer->receive(5000));
-    CPPUNIT_ASSERT(receivedDirect.get() != nullptr);
+    ASSERT_TRUE(receivedDirect.get() != nullptr);
 
     // Cleanup
     failoverProducer->close();
@@ -325,8 +324,8 @@ void OpenwireMultiConnectionTest::testFailoverAndDirectConnectionIndependent() {
         if (msg.get() != nullptr) directReceived++;
     }
 
-    CPPUNIT_ASSERT_EQUAL(numMessages, failoverReceived);
-    CPPUNIT_ASSERT_EQUAL(numMessages, directReceived);
+    ASSERT_EQ(numMessages, failoverReceived);
+    ASSERT_EQ(numMessages, directReceived);
 
     failoverProducer->close();
     directProducer->close();
@@ -398,10 +397,10 @@ void OpenwireMultiConnectionTest::testConcurrentMessagingOnMultipleConnections()
     bool failoverComplete = failoverLatch.await(30000);
     bool directComplete = directLatch.await(30000);
 
-    CPPUNIT_ASSERT(failoverComplete);
-    CPPUNIT_ASSERT(directComplete);
-    CPPUNIT_ASSERT_EQUAL(numMessages, failoverListener.getMessagesReceived());
-    CPPUNIT_ASSERT_EQUAL(numMessages, directListener.getMessagesReceived());
+    ASSERT_TRUE(failoverComplete);
+    ASSERT_TRUE(directComplete);
+    ASSERT_EQ(numMessages, failoverListener.getMessagesReceived());
+    ASSERT_EQ(numMessages, directListener.getMessagesReceived());
 
     failoverConsumer->setMessageListener(nullptr);
     directConsumer->setMessageListener(nullptr);
@@ -448,12 +447,12 @@ void OpenwireMultiConnectionTest::testConnectionIsolation() {
     std::unique_ptr<Message> received(directConsumer->receive(2000));
 
     // Message should NOT be found on broker3
-    CPPUNIT_ASSERT(received.get() == nullptr);
+    ASSERT_TRUE(received.get() == nullptr);
 
     // Now verify the message IS on the failover connection
     std::unique_ptr<MessageConsumer> failoverConsumer(failoverSession->createConsumer(failoverQueue.get()));
     std::unique_ptr<Message> failoverReceived(failoverConsumer->receive(5000));
-    CPPUNIT_ASSERT(failoverReceived.get() != nullptr);
+    ASSERT_TRUE(failoverReceived.get() != nullptr);
 
     failoverProducer->close();
     failoverConsumer->close();
@@ -512,13 +511,13 @@ void OpenwireMultiConnectionTest::testFailoverConnectionWithIndependentBroker() 
         if (msg.get() != nullptr) {
             received++;
             TextMessage* textMsg = dynamic_cast<TextMessage*>(msg.get());
-            CPPUNIT_ASSERT(textMsg != nullptr);
+            ASSERT_TRUE(textMsg != nullptr);
             // Verify it's a direct message, not a failover message
-            CPPUNIT_ASSERT(textMsg->getText().find("Direct") != std::string::npos);
+            ASSERT_TRUE(textMsg->getText().find("Direct") != std::string::npos);
         }
     }
 
-    CPPUNIT_ASSERT_EQUAL(numMessages, received);
+    ASSERT_EQ(numMessages, received);
 
     failoverProducer->close();
     directProducer->close();
@@ -692,25 +691,22 @@ void OpenwireMultiConnectionTest::testDurableTopicWithSelectorConcurrentServers(
     std::cout << "Direct connection exceptions: " << directExceptionListener.getExceptionCount() << std::endl;
 
     // Assertions
-    CPPUNIT_ASSERT_MESSAGE("Failover sender should not have errors", !failoverSendError.load());
-    CPPUNIT_ASSERT_MESSAGE("Direct sender should not have errors", !directSendError.load());
-    CPPUNIT_ASSERT_MESSAGE("Failover listener should not have errors", !failoverListener.hasError());
-    CPPUNIT_ASSERT_MESSAGE("Direct listener should not have errors", !directListener.hasError());
-    CPPUNIT_ASSERT_MESSAGE("Failover should complete within timeout", failoverCompleted);
-    CPPUNIT_ASSERT_MESSAGE("Direct should complete within timeout", directCompleted);
+    ASSERT_TRUE(!failoverSendError.load()) << ("Failover sender should not have errors");
+    ASSERT_TRUE(!directSendError.load()) << ("Direct sender should not have errors");
+    ASSERT_TRUE(!failoverListener.hasError()) << ("Failover listener should not have errors");
+    ASSERT_TRUE(!directListener.hasError()) << ("Direct listener should not have errors");
+    ASSERT_TRUE(failoverCompleted) << ("Failover should complete within timeout");
+    ASSERT_TRUE(directCompleted) << ("Direct should complete within timeout");
 
     // Should receive only messages matching selector (half of total sent)
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failover should receive only matching messages",
-                                  DURABLE_SELECTOR_MESSAGE_COUNT, failoverListener.getMessagesReceived());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Direct should receive only matching messages",
-                                  DURABLE_SELECTOR_MESSAGE_COUNT, directListener.getMessagesReceived());
+    ASSERT_EQ(DURABLE_SELECTOR_MESSAGE_COUNT, failoverListener.getMessagesReceived()) << ("Failover should receive only matching messages");
+    ASSERT_EQ(DURABLE_SELECTOR_MESSAGE_COUNT, directListener.getMessagesReceived()) << ("Direct should receive only matching messages");
 
     // Verify total messages received across both servers
     int totalReceived = failoverListener.getMessagesReceived() + directListener.getMessagesReceived();
     int expectedTotal = DURABLE_SELECTOR_MESSAGE_COUNT * 2;
     std::cout << "Total messages received: " << totalReceived << " (expected: " << expectedTotal << ")" << std::endl;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Total messages should match expected",
-                                  expectedTotal, totalReceived);
+    ASSERT_EQ(expectedTotal, totalReceived) << ("Total messages should match expected");
 
     // Cleanup
     failoverConsumer->setMessageListener(nullptr);
@@ -732,4 +728,12 @@ void OpenwireMultiConnectionTest::testDurableTopicWithSelectorConcurrentServers(
 
 ////////////////////////////////////////////////////////////////////////////////
 // Register the test suite
-CPPUNIT_TEST_SUITE_REGISTRATION(OpenwireMultiConnectionTest);
+namespace activemq { namespace test { namespace openwire {
+TEST_F(OpenwireMultiConnectionTest, testMultipleConnectionsEstablish) { testMultipleConnectionsEstablish(); }
+TEST_F(OpenwireMultiConnectionTest, testSendReceiveOnBothConnections) { testSendReceiveOnBothConnections(); }
+TEST_F(OpenwireMultiConnectionTest, testFailoverAndDirectConnectionIndependent) { testFailoverAndDirectConnectionIndependent(); }
+TEST_F(OpenwireMultiConnectionTest, testConcurrentMessagingOnMultipleConnections) { testConcurrentMessagingOnMultipleConnections(); }
+TEST_F(OpenwireMultiConnectionTest, testConnectionIsolation) { testConnectionIsolation(); }
+TEST_F(OpenwireMultiConnectionTest, testFailoverConnectionWithIndependentBroker) { testFailoverConnectionWithIndependentBroker(); }
+TEST_F(OpenwireMultiConnectionTest, testDurableTopicWithSelectorConcurrentServers) { testDurableTopicWithSelectorConcurrentServers(); }
+}}}

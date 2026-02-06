@@ -28,22 +28,22 @@ void QueueTest::test()
 {
    StlQueue<char> q;
 
-   CPPUNIT_ASSERT( q.empty() == true );
-   CPPUNIT_ASSERT( q.size() == 0 );
+   ASSERT_TRUE(q.empty() == true);
+   ASSERT_TRUE(q.size() == 0);
 
    q.push('a');
 
-   CPPUNIT_ASSERT( q.front() == 'a' );
+   ASSERT_TRUE(q.front() == 'a');
 
    q.pop();
 
-   CPPUNIT_ASSERT( q.empty() == true );
+   ASSERT_TRUE(q.empty() == true);
 
    q.push('b');
    q.push('c');
 
-   CPPUNIT_ASSERT( q.size() == 2 );
+   ASSERT_TRUE(q.size() == 2);
 
-   CPPUNIT_ASSERT( q.front() == 'b' );
-   CPPUNIT_ASSERT( q.back() == 'c' );
+   ASSERT_TRUE(q.front() == 'b');
+   ASSERT_TRUE(q.back() == 'c');
 }

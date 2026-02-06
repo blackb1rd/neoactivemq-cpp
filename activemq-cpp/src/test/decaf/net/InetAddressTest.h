@@ -18,22 +18,12 @@
 #ifndef _DECAF_NET_INETADDRESSTEST_H_
 #define _DECAF_NET_INETADDRESSTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace net {
 
-    class InetAddressTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( InetAddressTest );
-        CPPUNIT_TEST( testGetByAddress );
-        CPPUNIT_TEST( testGetHostAddress );
-        CPPUNIT_TEST( testGetLocalHost );
-        CPPUNIT_TEST( testClone );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class InetAddressTest : public ::testing::Test {
+public:
 
         InetAddressTest();
         virtual ~InetAddressTest();

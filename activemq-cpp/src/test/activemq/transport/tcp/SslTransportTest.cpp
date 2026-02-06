@@ -63,11 +63,11 @@ SslTransportTest::~SslTransportTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SslTransportTest::setUp() {
+void SslTransportTest::SetUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SslTransportTest::tearDown() {
+void SslTransportTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,11 +88,11 @@ void SslTransportTest::testSslTransportCreate() {
         Pointer<SslTransport> sslTransport(new SslTransport(transport, uri));
 
         // Verify the transport was created successfully
-        CPPUNIT_ASSERT(sslTransport.get() != NULL);
-        CPPUNIT_ASSERT(!sslTransport->isConnected());
+        ASSERT_TRUE(sslTransport.get() != NULL);
+        ASSERT_TRUE(!sslTransport->isConnected());
 
     } catch (ActiveMQException& ex) {
-        CPPUNIT_FAIL(std::string("Caught unexpected exception: ") + ex.getMessage());
+        FAIL() << (std::string("Caught unexpected exception: ") + ex.getMessage());
     }
 }
 
@@ -114,10 +114,10 @@ void SslTransportTest::testSslHandshakeAfterConnect() {
         // The fix ensures startHandshake() is called in OpenSSLSocket::connect()
         // immediately after BIO setup, preventing lazy handshake on first I/O.
 
-        CPPUNIT_ASSERT(true); // Placeholder for integration test
+        ASSERT_TRUE(true); // Placeholder for integration test
 
     } catch (Exception& ex) {
-        CPPUNIT_FAIL(std::string("Unexpected exception: ") + ex.getMessage());
+        FAIL() << (std::string("Unexpected exception: ") + ex.getMessage());
     }
 }
 
@@ -139,12 +139,12 @@ void SslTransportTest::testSslConnectionWithServerName() {
     }
 
     if (!brokerUsername || !brokerPassword) {
-        CPPUNIT_FAIL("Real broker test enabled but BROKER_USERNAME or BROKER_PASSWORD not set");
+        FAIL() << ("Real broker test enabled but BROKER_USERNAME or BROKER_PASSWORD not set");
         return;
     }
 
     if (!brokerURI) {
-        CPPUNIT_FAIL("Real broker test enabled but BROKER_URI not set");
+        FAIL() << ("Real broker test enabled but BROKER_URI not set");
         return;
     }
 
@@ -156,14 +156,14 @@ void SslTransportTest::testSslConnectionWithServerName() {
         activemq::core::ActiveMQConnectionFactory connectionFactory(brokerURI);
 
         connection = connectionFactory.createConnection(brokerUsername, brokerPassword);
-        CPPUNIT_ASSERT(connection != NULL);
+        ASSERT_TRUE(connection != NULL);
 
         // Start the connection
         connection->start();
 
         // Create a session to verify full protocol handshake
         session = connection->createSession(cms::Session::AUTO_ACKNOWLEDGE);
-        CPPUNIT_ASSERT(session != NULL);
+        ASSERT_TRUE(session != NULL);
 
         // Clean shutdown
         connection->close();
@@ -201,7 +201,7 @@ void SslTransportTest::testSslConnectionWithServerName() {
             // This is acceptable for a unit test environment
             return;
         }
-        CPPUNIT_FAIL(std::string("Failed to connect to real broker: ") + ex.getMessage());
+        FAIL() << (std::string("Failed to connect to real broker: ") + ex.getMessage());
     } catch (ActiveMQException& ex) {
         std::cout << "ActiveMQ Exception caught: " << ex.getMessage() << std::endl;
         if (session) delete session;
@@ -212,7 +212,7 @@ void SslTransportTest::testSslConnectionWithServerName() {
             std::cout << "\nTest Result: Connection timeout (network unreachable or firewall)" << std::endl;
             return;
         }
-        CPPUNIT_FAIL(std::string("ActiveMQ exception: ") + ex.getMessage());
+        FAIL() << (std::string("ActiveMQ exception: ") + ex.getMessage());
     } catch (...) {
         std::cout << "Unknown exception caught" << std::endl;
         if (session) delete session;
@@ -247,14 +247,14 @@ void SslTransportTest::testSslConnectionFailureHandling() {
         }
 
         // Should have caught an exception due to connection failure
-        CPPUNIT_ASSERT(exceptionCaught);
+        ASSERT_TRUE(exceptionCaught);
 
         // Transport should not be connected after failure
-        CPPUNIT_ASSERT(!sslTransport->isConnected());
+        ASSERT_TRUE(!sslTransport->isConnected());
 
     } catch (Exception& ex) {
         // Any exception is acceptable for this test
-        CPPUNIT_ASSERT(true);
+        ASSERT_TRUE(true);
     }
 }
 
@@ -280,11 +280,11 @@ void SslTransportTest::testSslTransportWithProperties() {
         sslTransport->setKeepAlive(true);
 
         // Verify properties were set
-        CPPUNIT_ASSERT_EQUAL(0, sslTransport->getLinger());
-        CPPUNIT_ASSERT_EQUAL(true, sslTransport->isTcpNoDelay());
-        CPPUNIT_ASSERT_EQUAL(true, sslTransport->isKeepAlive());
+        ASSERT_EQ(0, sslTransport->getLinger());
+        ASSERT_EQ(true, sslTransport->isTcpNoDelay());
+        ASSERT_EQ(true, sslTransport->isKeepAlive());
 
     } catch (ActiveMQException& ex) {
-        CPPUNIT_FAIL(std::string("Caught unexpected exception: ") + ex.getMessage());
+        FAIL() << (std::string("Caught unexpected exception: ") + ex.getMessage());
     }
 }

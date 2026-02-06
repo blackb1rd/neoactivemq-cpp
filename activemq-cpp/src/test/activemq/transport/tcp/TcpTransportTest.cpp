@@ -183,7 +183,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TcpTransportTest::setUp() {
+void TcpTransportTest::SetUp() {
 
     server = new TestServer();
     server->start();
@@ -191,7 +191,7 @@ void TcpTransportTest::setUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TcpTransportTest::tearDown() {
+void TcpTransportTest::TearDown() {
 
     try {
         if (server == NULL) {

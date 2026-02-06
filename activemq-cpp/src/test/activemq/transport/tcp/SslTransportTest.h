@@ -18,8 +18,7 @@
 #ifndef _ACTIVEMQ_TRANSPORT_TCP_SSLTRANSPORTTEST_H_
 #define _ACTIVEMQ_TRANSPORT_TCP_SSLTRANSPORTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include <activemq/util/Config.h>
 
 namespace activemq {
@@ -30,23 +29,14 @@ namespace tcp {
      * Test suite for SSL Transport functionality including connection handling,
      * SSL handshake, timeout scenarios, and error conditions.
      */
-    class SslTransportTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( SslTransportTest );
-        CPPUNIT_TEST( testSslTransportCreate );
-        CPPUNIT_TEST( testSslHandshakeAfterConnect );
-        CPPUNIT_TEST( testSslConnectionWithServerName );
-        CPPUNIT_TEST( testSslConnectionFailureHandling );
-        CPPUNIT_TEST( testSslTransportWithProperties );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class SslTransportTest : public ::testing::Test {
+public:
 
         SslTransportTest();
         virtual ~SslTransportTest();
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         /**
          * Tests basic SSL transport creation and configuration.

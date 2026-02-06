@@ -18,8 +18,7 @@
 #ifndef _ACTIVEMQ_WIREFORMAT_OPENWIRE_MARSHAL_PRIMITIVETYPESMARSHALLERTEST_H_
 #define _ACTIVEMQ_WIREFORMAT_OPENWIRE_MARSHAL_PRIMITIVETYPESMARSHALLERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include <activemq/util/PrimitiveMap.h>
 
 namespace activemq{
@@ -27,15 +26,8 @@ namespace wireformat{
 namespace openwire{
 namespace marshal{
 
-    class PrimitiveTypesMarshallerTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( PrimitiveTypesMarshallerTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( testLists );
-        CPPUNIT_TEST( testMaps );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class PrimitiveTypesMarshallerTest : public ::testing::Test {
+private:
 
         activemq::util::PrimitiveMap* unmarshaledMap;
 
@@ -49,11 +41,11 @@ namespace marshal{
         PrimitiveTypesMarshallerTest() : unmarshaledMap() {}
         virtual ~PrimitiveTypesMarshallerTest() {}
 
-        virtual void setUp() {
+        void SetUp() override {
             this->unmarshaledMap = NULL;
         }
 
-        virtual void tearDown() {
+        void TearDown() override {
             delete this->unmarshaledMap;
             this->unmarshaledMap = NULL;
         }

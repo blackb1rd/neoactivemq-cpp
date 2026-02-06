@@ -44,8 +44,7 @@ void CheckedOutputStreamTest::testConstructor() {
     ByteArrayOutputStream baos;
     CRC32 check;
     CheckedOutputStream chkOut( &baos, &check );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "the checkSum value of the constructor is not 0",
-                                  0LL, chkOut.getChecksum()->getValue() );
+    ASSERT_EQ(0LL, chkOut.getChecksum()->getValue()) << ("the checkSum value of the constructor is not 0");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,15 +59,13 @@ void CheckedOutputStreamTest::testGetChecksum() {
     chkOut.write( byteArray[4] );
     // ran JDK and found that checkSum value is 7536755
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "the checkSum value for writeI is incorrect",
-                                  7536755LL, chkOut.getChecksum()->getValue());
+    ASSERT_EQ(7536755LL, chkOut.getChecksum()->getValue()) << ("the checkSum value for writeI is incorrect");
 
     chkOut.getChecksum()->reset();
     chkOut.write( byteArray, 9, 5, 4 );
     // ran JDK and found that checkSum value is 51708133
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "the checkSum value for writeBII is incorrect ",
-                                  51708133LL, chkOut.getChecksum()->getValue() );
+    ASSERT_EQ(51708133LL, chkOut.getChecksum()->getValue()) << ("the checkSum value for writeBII is incorrect ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -85,9 +82,7 @@ void CheckedOutputStreamTest::testWriteI() {
         chkOut.write( byteArray[ix] );
     }
 
-    CPPUNIT_ASSERT_MESSAGE(
-        "the checkSum value is zero, no bytes are written to the output file",
-        chkOut.getChecksum()->getValue() != 0 );
+    ASSERT_TRUE(chkOut.getChecksum()->getValue() != 0) << ("the checkSum value is zero, no bytes are written to the output file");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -101,11 +96,7 @@ void CheckedOutputStreamTest::testWriteBIII() {
     CheckedOutputStream chkOut( &baos, &check );
 
     chkOut.write( byteArray, SIZE, 4, 5 );
-    CPPUNIT_ASSERT_MESSAGE( "the checkSum value is zero, no bytes are written to the output file",
-                            chkOut.getChecksum()->getValue() != 0 );
+    ASSERT_TRUE(chkOut.getChecksum()->getValue() != 0) << ("the checkSum value is zero, no bytes are written to the output file");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        chkOut.write( byteArray, SIZE, 4, 6 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(chkOut.write( byteArray, SIZE, 4, 6 ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 }

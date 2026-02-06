@@ -180,28 +180,22 @@ void BufferedInputStreamTest::testConstructor() {
     BufferedInputStream is( &myStream, (int)testStr.length() );
 
     // Ensure buffer gets filled by evaluating one read
-    CPPUNIT_ASSERT( is.read() != -1 );
+    ASSERT_TRUE(is.read() != -1);
 
     // Read the remaining buffered characters, no IOException should
     // occur.
     is.skip( testStr.length() - 2 );
-    CPPUNIT_ASSERT( is.read() != -1 );
+    ASSERT_TRUE(is.read() != -1);
     // is.read should now return -1 as all data has been read.
-    CPPUNIT_ASSERT( is.read() == -1 );
+    ASSERT_TRUE(is.read() == -1);
 
     {
         BufferedInputStream nullStream( NULL );
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should have thrown an IOException",
-            nullStream.read(),
-            IOException );
+        ASSERT_THROW(nullStream.read(), IOException) << ("Should have thrown an IOException");
     }
     {
         BufferedInputStream nullStream( NULL, 1 );
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should have thrown an IOException",
-            nullStream.read(),
-            IOException );
+        ASSERT_THROW(nullStream.read(), IOException) << ("Should have thrown an IOException");
     }
 }
 
@@ -215,10 +209,9 @@ void BufferedInputStreamTest::testAvailable() {
 
     // Test for method int BufferedInputStream.available()
     try {
-        CPPUNIT_ASSERT_MESSAGE( "Returned incorrect number of available bytes",
-                                 is.available() == (int)testStr.length() );
+        ASSERT_TRUE(is.available() == (int)testStr.length()) << ("Returned incorrect number of available bytes");
     } catch( IOException& e ) {
-        CPPUNIT_ASSERT_MESSAGE("Exception during available test", false );
+        ASSERT_TRUE(false) << ("Exception during available test");
     }
 
     // Test that a closed stream throws an IOE for available()
@@ -232,14 +225,14 @@ void BufferedInputStreamTest::testAvailable() {
         available = bis.available();
         bis.close();
     } catch( IOException& ex ) {
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
         return; // never reached.
     }
-    CPPUNIT_ASSERT( available != 0 );
+    ASSERT_TRUE(available != 0);
 
     try {
         bis.available();
-        CPPUNIT_ASSERT_MESSAGE("Expected test to throw IOE.", false );
+        ASSERT_TRUE(false) << ("Expected test to throw IOE.");
     } catch( IOException& ex ) {
         // expected
     }
@@ -261,14 +254,14 @@ void BufferedInputStreamTest::testClose() {
         BufferedInputStream buf( ptr, 5 );
         buf.close();
     } catch(...) {
-        CPPUNIT_FAIL("Close shouldn't throw an error here" );
+        FAIL() << ("Close shouldn't throw an error here");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void BufferedInputStreamTest::testMarkSupported() {
     BufferedInputStream is( NULL );
-    CPPUNIT_ASSERT_MESSAGE( "markSupported returned incorrect value", is.markSupported() );
+    ASSERT_TRUE(is.markSupported()) << ("markSupported returned incorrect value");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -282,10 +275,9 @@ void BufferedInputStreamTest::testRead() {
         BufferedInputStream is( &myStream, (int)(int)testStr.length() );
 
         char c = (char)is.read();
-        CPPUNIT_ASSERT_MESSAGE( "read returned incorrect char",
-                                c == testStr.at(0) );
+        ASSERT_TRUE(c == testStr.at(0)) << ("read returned incorrect char");
     } catch( IOException& e ) {
-        CPPUNIT_FAIL( "Exception during read test" );
+        FAIL() << ("Exception during read test");
     }
 
     unsigned char bytes[256];
@@ -298,20 +290,19 @@ void BufferedInputStreamTest::testRead() {
         new ByteArrayInputStream( &bytes[0], 256 ), 12, true );
 
     try {
-        CPPUNIT_ASSERT_MESSAGE( "Wrong initial byte", 0 == is.read() );
+        ASSERT_TRUE(0 == is.read()) << ("Wrong initial byte");
         // Fill the buffer
         unsigned char buf[14];
         is.read( &buf[0], 14, 0, 14 );
 
         // Read greater than the buffer
-        CPPUNIT_ASSERT_MESSAGE( "Wrong block read data",
-                string( (const char*)&buf[0], 14 ) ==
-                string( (const char*)&bytes[1], 14 ) );
+        ASSERT_TRUE(string( (const char*)&buf[0], 14 ) ==
+                string( (const char*)&bytes[1], 14 )) << ("Wrong block read data");
 
-        CPPUNIT_ASSERT_MESSAGE("Wrong bytes", 15 == is.read() ); // Check next byte
+        ASSERT_TRUE(15 == is.read()) << ("Wrong bytes"); // Check next byte
 
     } catch( IOException& e ) {
-        CPPUNIT_FAIL("Exception during read test");
+        FAIL() << ("Exception during read test");
     }
 }
 
@@ -331,12 +322,10 @@ void BufferedInputStreamTest::testRead2() {
     try {
         is.skip( 3000 );
         is.read( buf1, 100, 0, 100 );
-        CPPUNIT_ASSERT_MESSAGE(
-            "Failed to read correct data",
-            string( (const char*)&buf1[0], 100 ) == testStr.substr( 3000, 100 ) );
+        ASSERT_TRUE(string( (const char*)&buf1[0], 100 ) == testStr.substr( 3000, 100 )) << ("Failed to read correct data");
 
     } catch( IOException& e ) {
-        CPPUNIT_FAIL("Exception during read test");
+        FAIL() << ("Exception during read test");
     }
 }
 
@@ -347,22 +336,13 @@ void BufferedInputStreamTest::testReadException() {
 
     BufferedInputStream bis( NULL );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw NullPointerException",
-        bis.read( NULL, 1, 0, 1 ),
-        NullPointerException );
+    ASSERT_THROW(bis.read( NULL, 1, 0, 1 ), NullPointerException) << ("should throw NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IndexOutOfBoundsException",
-        bis.read( array, 0, 1, 1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(bis.read( array, 0, 1, 1 ), IndexOutOfBoundsException) << ("should throw IndexOutOfBoundsException");
 
     bis.close();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IOException",
-        bis.read( NULL, 1, 0, 1 ),
-        IOException );
+    ASSERT_THROW(bis.read( NULL, 1, 0, 1 ), IOException) << ("should throw IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -373,37 +353,37 @@ void BufferedInputStreamTest::testSmallerBuffer(){
     BufferedInputStream bufStream( &myStream, 1 );
 
     int available = bufStream.available();
-    CPPUNIT_ASSERT( available == (int)testStr.length() );
+    ASSERT_TRUE(available == (int)testStr.length());
 
     unsigned char dummy = (unsigned char)bufStream.read();
-    CPPUNIT_ASSERT( dummy == 'T' );
+    ASSERT_TRUE(dummy == 'T');
 
     available = bufStream.available();
-    CPPUNIT_ASSERT( available == ((int)testStr.length() - 1) );
+    ASSERT_TRUE(available == ((int)testStr.length() - 1));
 
     dummy = (unsigned char)bufStream.read();
-    CPPUNIT_ASSERT( dummy == 'E' );
+    ASSERT_TRUE(dummy == 'E');
 
     available = bufStream.available();
-    CPPUNIT_ASSERT( available == ((int)testStr.length() - 2 ) );
+    ASSERT_TRUE(available == ((int)testStr.length() - 2 ));
 
     dummy = (unsigned char)bufStream.read();
-    CPPUNIT_ASSERT( dummy == 'S' );
+    ASSERT_TRUE(dummy == 'S');
 
     available = bufStream.available();
-    CPPUNIT_ASSERT( available == ((int)testStr.length() - 3 ) );
+    ASSERT_TRUE(available == ((int)testStr.length() - 3 ));
 
     dummy = (unsigned char)bufStream.read();
-    CPPUNIT_ASSERT( dummy == 'T' );
+    ASSERT_TRUE(dummy == 'T');
 
     unsigned char dummyBuf[20];
     memset( dummyBuf, 0, 20 );
     int numRead = bufStream.read( dummyBuf, 20, 0, 10 );
-    CPPUNIT_ASSERT( numRead == 10 );
-    CPPUNIT_ASSERT( strcmp( (char*)dummyBuf, "1234567891" ) == 0 );
+    ASSERT_TRUE(numRead == 10);
+    ASSERT_TRUE(strcmp( (char*)dummyBuf, "1234567891" ) == 0);
 
     available = bufStream.available();
-    CPPUNIT_ASSERT( available == 1 );
+    ASSERT_TRUE(available == 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -414,44 +394,44 @@ void BufferedInputStreamTest::testBiggerBuffer(){
     BufferedInputStream bufStream( &myStream, 10 );
 
     int available = bufStream.available();
-    CPPUNIT_ASSERT( available == (int)testStr.length() );
+    ASSERT_TRUE(available == (int)testStr.length());
 
     unsigned char dummy = (unsigned char)bufStream.read();
-    CPPUNIT_ASSERT( dummy == 'T' );
+    ASSERT_TRUE(dummy == 'T');
 
     available = bufStream.available();
-    CPPUNIT_ASSERT( available == ((int)testStr.length() - 1 ) );
+    ASSERT_TRUE(available == ((int)testStr.length() - 1 ));
 
     dummy = (unsigned char)bufStream.read();
-    CPPUNIT_ASSERT( dummy == 'E' );
+    ASSERT_TRUE(dummy == 'E');
 
     available = bufStream.available();
-    CPPUNIT_ASSERT( available == ((int)testStr.length() - 2 ) );
+    ASSERT_TRUE(available == ((int)testStr.length() - 2 ));
 
     dummy = (unsigned char)bufStream.read();
-    CPPUNIT_ASSERT( dummy == 'S' );
+    ASSERT_TRUE(dummy == 'S');
 
     available = bufStream.available();
-    CPPUNIT_ASSERT( available == ((int)testStr.length() - 3 ) );
+    ASSERT_TRUE(available == ((int)testStr.length() - 3 ));
 
     dummy = (unsigned char)bufStream.read();
-    CPPUNIT_ASSERT( dummy == 'T' );
+    ASSERT_TRUE(dummy == 'T');
 
     unsigned char dummyBuf[20];
     memset( dummyBuf, 0, 20 );
     int numRead = bufStream.read( dummyBuf, 20, 0, 10 );
-    CPPUNIT_ASSERT( numRead == 10 );
-    CPPUNIT_ASSERT( strcmp( (char*)dummyBuf, "1234567891" ) == 0 );
+    ASSERT_TRUE(numRead == 10);
+    ASSERT_TRUE(strcmp( (char*)dummyBuf, "1234567891" ) == 0);
 
     available = bufStream.available();
-    CPPUNIT_ASSERT( available == 1 );
+    ASSERT_TRUE(available == 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void BufferedInputStreamTest::testSkipNullInputStream() {
 
     BufferedInputStream buf( NULL, 5 );
-    CPPUNIT_ASSERT_EQUAL( 0LL, buf.skip( 0 ) );
+    ASSERT_EQ(0LL, buf.skip( 0 ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -472,9 +452,7 @@ void BufferedInputStreamTest::testMarkI() {
     is.read( buf2, 100 );
     is.reset();
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Failed to mark correct position",
-                                  std::string( buf1, buf1 + 100 ),
-                                  std::string( buf2, buf2 + 100 ) );
+    ASSERT_EQ(std::string( buf1, buf1 + 100 ), std::string( buf2, buf2 + 100 )) << ("Failed to mark correct position");
 
     unsigned char bytes[256];
     for( int i = 0; i < 256; i++ ) {
@@ -492,7 +470,7 @@ void BufferedInputStreamTest::testMarkI() {
         unsigned char bitBucket[14];
         in.read( bitBucket, 14 );
         in.reset();
-        CPPUNIT_ASSERT_MESSAGE( "Wrong bytes", in.read() == 6 && in.read() == 7 );
+        ASSERT_TRUE(in.read() == 6 && in.read() == 7) << ("Wrong bytes");
     }
     {
         ByteArrayInputStream bais;
@@ -503,7 +481,7 @@ void BufferedInputStreamTest::testMarkI() {
         in.mark( 8 );
         in.skip( 7 );
         in.reset();
-        CPPUNIT_ASSERT_MESSAGE( "Wrong bytes 2", in.read() == 6 && in.read() == 7 );
+        ASSERT_TRUE(in.read() == 6 && in.read() == 7) << ("Wrong bytes 2");
     }
     {
         unsigned char temp[] = { 0, 1, 2, 3, 4 };
@@ -514,11 +492,11 @@ void BufferedInputStreamTest::testMarkI() {
         buf.mark( 3 );
         unsigned char bitBucket[3];
         int result = buf.read( bitBucket, 3 );
-        CPPUNIT_ASSERT_EQUAL( 3, result );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Assert 0:", 0, (int)bytes[0] );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Assert 1:", 1, (int)bytes[1] );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Assert 2:", 2, (int)bytes[2] );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Assert 3:", 3, buf.read() );
+        ASSERT_EQ(3, result);
+        ASSERT_EQ(0, (int)bytes[0]) << ("Assert 0:");
+        ASSERT_EQ(1, (int)bytes[1]) << ("Assert 1:");
+        ASSERT_EQ(2, (int)bytes[2]) << ("Assert 2:");
+        ASSERT_EQ(3, buf.read()) << ("Assert 3:");
     }
     {
         unsigned char temp[] = { 0, 1, 2, 3, 4 };
@@ -530,13 +508,13 @@ void BufferedInputStreamTest::testMarkI() {
         unsigned char bitBucket[4];
         int result = buf.read( bitBucket, 4 );
 
-        CPPUNIT_ASSERT_EQUAL(4, result);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Assert 4:", 0, (int)bytes[0] );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Assert 5:", 1, (int)bytes[1] );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Assert 6:", 2, (int)bytes[2] );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Assert 7:", 3, (int)bytes[3] );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Assert 8:", 4, buf.read() );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Assert 9:", -1, buf.read() );
+        ASSERT_EQ(4, result);
+        ASSERT_EQ(0, (int)bytes[0]) << ("Assert 4:");
+        ASSERT_EQ(1, (int)bytes[1]) << ("Assert 5:");
+        ASSERT_EQ(2, (int)bytes[2]) << ("Assert 6:");
+        ASSERT_EQ(3, (int)bytes[3]) << ("Assert 7:");
+        ASSERT_EQ(4, buf.read()) << ("Assert 8:");
+        ASSERT_EQ(-1, buf.read()) << ("Assert 9:");
     }
     {
         unsigned char temp[] = { 0, 1, 2, 3, 4 };
@@ -587,10 +565,7 @@ void BufferedInputStreamTest::testResetException() {
     BufferedInputStream bis( NULL );
 
     // throws IOException with message "Mark has been invalidated"
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IOException",
-        bis.reset(),
-        IOException );
+    ASSERT_THROW(bis.reset(), IOException) << ("should throw IOException");
 
     // does not throw IOException
     bis.mark( 1 );
@@ -598,10 +573,7 @@ void BufferedInputStreamTest::testResetException() {
     bis.close();
 
     // throws IOException with message "stream is closed"
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IOException",
-        bis.reset(),
-        IOException );
+    ASSERT_THROW(bis.reset(), IOException) << ("should throw IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -620,9 +592,7 @@ void BufferedInputStreamTest::testReset() {
     is.reset();
     is.read( buf2, 10 );
     is.reset();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Reset failed",
-                                  std::string( buf1, buf1 + 10 ),
-                                  std::string( buf2, buf2 + 10 ) );
+    ASSERT_EQ(std::string( buf1, buf1 + 10 ), std::string( buf2, buf2 + 10 )) << ("Reset failed");
 
     unsigned char input[] = { '1','2','3','4','5','6','7','8','9','0' };
     ByteArrayInputStream bais;
@@ -651,14 +621,9 @@ void BufferedInputStreamTest::testSkipJ() {
     is.skip( 1000 );
     is.read( buf1, 10 );
     is.reset();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Failed to skip to correct position",
-                                  std::string( buf1, buf1 + 10 ),
-                                  testString.substr( 1000, 10 ) );
+    ASSERT_EQ(std::string( buf1, buf1 + 10 ), testString.substr( 1000, 10 )) << ("Failed to skip to correct position");
 
     // throws IOException with message "stream is closed"
     BufferedInputStream buf( NULL, 5 );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "should throw IOException",
-        buf.skip( 10 ),
-        IOException );
+    ASSERT_THROW(buf.skip( 10 ), IOException) << ("should throw IOException");
 }

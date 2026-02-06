@@ -18,19 +18,12 @@
 #ifndef _DECAF_UTIL_STRINGTOKENIZERTEST_H_
 #define _DECAF_UTIL_STRINGTOKENIZERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf{
 namespace util{
 
-   class StringTokenizerTest : public CppUnit::TestFixture {
-
-       CPPUNIT_TEST_SUITE( StringTokenizerTest );
-       CPPUNIT_TEST( test );
-       CPPUNIT_TEST_SUITE_END();
-
-   public:
+   class StringTokenizerTest : public ::testing::Test {
+public:
 
         virtual ~StringTokenizerTest() {}
 

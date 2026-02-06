@@ -44,13 +44,13 @@ void HashCodeTest::testHashPointerT() {
     int hashCode2 = HashCode< Pointer<std::string> >()(value2);
     int hashCode3 = HashCode< Pointer<std::string> >()(value3);
 
-    CPPUNIT_ASSERT(hashCode1 != 0);
-    CPPUNIT_ASSERT(hashCode2 != 0);
-    CPPUNIT_ASSERT(hashCode3 != 0);
+    ASSERT_TRUE(hashCode1 != 0);
+    ASSERT_TRUE(hashCode2 != 0);
+    ASSERT_TRUE(hashCode3 != 0);
 
-    CPPUNIT_ASSERT_MESSAGE("Values one and two should have equal hash", hashCode1 == hashCode2);
-    CPPUNIT_ASSERT_MESSAGE("Values one and three should have equal hash", hashCode1 != hashCode3);
-    CPPUNIT_ASSERT_MESSAGE("Values two and three should have equal hash", hashCode2 != hashCode3);
+    ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
+    ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three should have equal hash");
+    ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three should have equal hash");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,13 +64,13 @@ void HashCodeTest::testHashString() {
     int hashCode2 = HashCode<std::string>()(value2);
     int hashCode3 = HashCode<std::string>()(value3);
 
-    CPPUNIT_ASSERT(hashCode1 != 0);
-    CPPUNIT_ASSERT(hashCode2 != 0);
-    CPPUNIT_ASSERT(hashCode3 != 0);
+    ASSERT_TRUE(hashCode1 != 0);
+    ASSERT_TRUE(hashCode2 != 0);
+    ASSERT_TRUE(hashCode3 != 0);
 
-    CPPUNIT_ASSERT_MESSAGE("Values one and two should have equal hash", hashCode1 == hashCode2);
-    CPPUNIT_ASSERT_MESSAGE("Values one and three should have equal hash", hashCode1 != hashCode3);
-    CPPUNIT_ASSERT_MESSAGE("Values two and three should have equal hash", hashCode2 != hashCode3);
+    ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
+    ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three should have equal hash");
+    ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three should have equal hash");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,15 +86,15 @@ void HashCodeTest::testHashBool() {
     int hashCode3 = HashCode<bool>()(value3);
     int hashCode4 = HashCode<bool>()(value4);
 
-    CPPUNIT_ASSERT(hashCode1 != 0);
-    CPPUNIT_ASSERT(hashCode2 != 0);
-    CPPUNIT_ASSERT(hashCode3 != 0);
-    CPPUNIT_ASSERT(hashCode4 != 0);
+    ASSERT_TRUE(hashCode1 != 0);
+    ASSERT_TRUE(hashCode2 != 0);
+    ASSERT_TRUE(hashCode3 != 0);
+    ASSERT_TRUE(hashCode4 != 0);
 
-    CPPUNIT_ASSERT_MESSAGE("Values one and two should have equal hash", hashCode1 == hashCode2);
-    CPPUNIT_ASSERT_MESSAGE("Values one and three shouldn't have equal hash", hashCode1 != hashCode3);
-    CPPUNIT_ASSERT_MESSAGE("Values two and three shouldn't have equal hash", hashCode2 != hashCode3);
-    CPPUNIT_ASSERT_MESSAGE("Values three and four should have equal hash", hashCode3 == hashCode4);
+    ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
+    ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
+    ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
+    ASSERT_TRUE(hashCode3 == hashCode4) << ("Values three and four should have equal hash");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -109,13 +109,13 @@ void HashCodeTest::testHashChar() {
         int hashCode2 = HashCode<char>()(value2);
         int hashCode3 = HashCode<char>()(value3);
 
-        CPPUNIT_ASSERT(hashCode1 != 0);
-        CPPUNIT_ASSERT(hashCode2 != 0);
-        CPPUNIT_ASSERT(hashCode3 != 0);
+        ASSERT_TRUE(hashCode1 != 0);
+        ASSERT_TRUE(hashCode2 != 0);
+        ASSERT_TRUE(hashCode3 != 0);
 
-        CPPUNIT_ASSERT_MESSAGE("Values one and two should have equal hash", hashCode1 == hashCode2);
-        CPPUNIT_ASSERT_MESSAGE("Values one and three shouldn't have equal hash", hashCode1 != hashCode3);
-        CPPUNIT_ASSERT_MESSAGE("Values two and three shouldn't have equal hash", hashCode2 != hashCode3);
+        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
     }
 
     {
@@ -127,13 +127,13 @@ void HashCodeTest::testHashChar() {
         int hashCode2 = HashCode<unsigned char>()(value2);
         int hashCode3 = HashCode<unsigned char>()(value3);
 
-        CPPUNIT_ASSERT(hashCode1 != 0);
-        CPPUNIT_ASSERT(hashCode2 != 0);
-        CPPUNIT_ASSERT(hashCode3 != 0);
+        ASSERT_TRUE(hashCode1 != 0);
+        ASSERT_TRUE(hashCode2 != 0);
+        ASSERT_TRUE(hashCode3 != 0);
 
-        CPPUNIT_ASSERT_MESSAGE("Values one and two should have equal hash", hashCode1 == hashCode2);
-        CPPUNIT_ASSERT_MESSAGE("Values one and three shouldn't have equal hash", hashCode1 != hashCode3);
-        CPPUNIT_ASSERT_MESSAGE("Values two and three shouldn't have equal hash", hashCode2 != hashCode3);
+        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
     }
 
     {
@@ -145,13 +145,13 @@ void HashCodeTest::testHashChar() {
         int hashCode2 = HashCode<wchar_t>()(value2);
         int hashCode3 = HashCode<wchar_t>()(value3);
 
-        CPPUNIT_ASSERT(hashCode1 != 0);
-        CPPUNIT_ASSERT(hashCode2 != 0);
-        CPPUNIT_ASSERT(hashCode3 != 0);
+        ASSERT_TRUE(hashCode1 != 0);
+        ASSERT_TRUE(hashCode2 != 0);
+        ASSERT_TRUE(hashCode3 != 0);
 
-        CPPUNIT_ASSERT_MESSAGE("Values one and two should have equal hash", hashCode1 == hashCode2);
-        CPPUNIT_ASSERT_MESSAGE("Values one and three shouldn't have equal hash", hashCode1 != hashCode3);
-        CPPUNIT_ASSERT_MESSAGE("Values two and three shouldn't have equal hash", hashCode2 != hashCode3);
+        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
     }
 }
 
@@ -167,13 +167,13 @@ void HashCodeTest::testHashShort() {
         int hashCode2 = HashCode<short>()(value2);
         int hashCode3 = HashCode<short>()(value3);
 
-        CPPUNIT_ASSERT(hashCode1 != 0);
-        CPPUNIT_ASSERT(hashCode2 != 0);
-        CPPUNIT_ASSERT(hashCode3 != 0);
+        ASSERT_TRUE(hashCode1 != 0);
+        ASSERT_TRUE(hashCode2 != 0);
+        ASSERT_TRUE(hashCode3 != 0);
 
-        CPPUNIT_ASSERT_MESSAGE("Values one and two should have equal hash", hashCode1 == hashCode2);
-        CPPUNIT_ASSERT_MESSAGE("Values one and three shouldn't have equal hash", hashCode1 != hashCode3);
-        CPPUNIT_ASSERT_MESSAGE("Values two and three shouldn't have equal hash", hashCode2 != hashCode3);
+        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
     }
 
     {
@@ -185,13 +185,13 @@ void HashCodeTest::testHashShort() {
         int hashCode2 = HashCode<unsigned short>()(value2);
         int hashCode3 = HashCode<unsigned short>()(value3);
 
-        CPPUNIT_ASSERT(hashCode1 != 0);
-        CPPUNIT_ASSERT(hashCode2 != 0);
-        CPPUNIT_ASSERT(hashCode3 != 0);
+        ASSERT_TRUE(hashCode1 != 0);
+        ASSERT_TRUE(hashCode2 != 0);
+        ASSERT_TRUE(hashCode3 != 0);
 
-        CPPUNIT_ASSERT_MESSAGE("Values one and two should have equal hash", hashCode1 == hashCode2);
-        CPPUNIT_ASSERT_MESSAGE("Values one and three shouldn't have equal hash", hashCode1 != hashCode3);
-        CPPUNIT_ASSERT_MESSAGE("Values two and three shouldn't have equal hash", hashCode2 != hashCode3);
+        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
     }
 }
 
@@ -207,13 +207,13 @@ void HashCodeTest::testHashInteger() {
         int hashCode2 = HashCode<int>()(value2);
         int hashCode3 = HashCode<int>()(value3);
 
-        CPPUNIT_ASSERT(hashCode1 != 0);
-        CPPUNIT_ASSERT(hashCode2 != 0);
-        CPPUNIT_ASSERT(hashCode3 != 0);
+        ASSERT_TRUE(hashCode1 != 0);
+        ASSERT_TRUE(hashCode2 != 0);
+        ASSERT_TRUE(hashCode3 != 0);
 
-        CPPUNIT_ASSERT_MESSAGE("Values one and two should have equal hash", hashCode1 == hashCode2);
-        CPPUNIT_ASSERT_MESSAGE("Values one and three shouldn't have equal hash", hashCode1 != hashCode3);
-        CPPUNIT_ASSERT_MESSAGE("Values two and three shouldn't have equal hash", hashCode2 != hashCode3);
+        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
     }
 
     {
@@ -225,13 +225,13 @@ void HashCodeTest::testHashInteger() {
         int hashCode2 = HashCode<unsigned int>()(value2);
         int hashCode3 = HashCode<unsigned int>()(value3);
 
-        CPPUNIT_ASSERT(hashCode1 != 0);
-        CPPUNIT_ASSERT(hashCode2 != 0);
-        CPPUNIT_ASSERT(hashCode3 != 0);
+        ASSERT_TRUE(hashCode1 != 0);
+        ASSERT_TRUE(hashCode2 != 0);
+        ASSERT_TRUE(hashCode3 != 0);
 
-        CPPUNIT_ASSERT_MESSAGE("Values one and two should have equal hash", hashCode1 == hashCode2);
-        CPPUNIT_ASSERT_MESSAGE("Values one and three shouldn't have equal hash", hashCode1 != hashCode3);
-        CPPUNIT_ASSERT_MESSAGE("Values two and three shouldn't have equal hash", hashCode2 != hashCode3);
+        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
     }
 }
 
@@ -247,13 +247,13 @@ void HashCodeTest::testHashLong() {
         int hashCode2 = HashCode<long long>()(value2);
         int hashCode3 = HashCode<long long>()(value3);
 
-        CPPUNIT_ASSERT(hashCode1 != 0);
-        CPPUNIT_ASSERT(hashCode2 != 0);
-        CPPUNIT_ASSERT(hashCode3 != 0);
+        ASSERT_TRUE(hashCode1 != 0);
+        ASSERT_TRUE(hashCode2 != 0);
+        ASSERT_TRUE(hashCode3 != 0);
 
-        CPPUNIT_ASSERT_MESSAGE("Values one and two should have equal hash", hashCode1 == hashCode2);
-        CPPUNIT_ASSERT_MESSAGE("Values one and three shouldn't have equal hash", hashCode1 != hashCode3);
-        CPPUNIT_ASSERT_MESSAGE("Values two and three shouldn't have equal hash", hashCode2 != hashCode3);
+        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
     }
 
     {
@@ -265,13 +265,13 @@ void HashCodeTest::testHashLong() {
         int hashCode2 = HashCode<unsigned long long>()(value2);
         int hashCode3 = HashCode<unsigned long long>()(value3);
 
-        CPPUNIT_ASSERT(hashCode1 != 0);
-        CPPUNIT_ASSERT(hashCode2 != 0);
-        CPPUNIT_ASSERT(hashCode3 != 0);
+        ASSERT_TRUE(hashCode1 != 0);
+        ASSERT_TRUE(hashCode2 != 0);
+        ASSERT_TRUE(hashCode3 != 0);
 
-        CPPUNIT_ASSERT_MESSAGE("Values one and two should have equal hash", hashCode1 == hashCode2);
-        CPPUNIT_ASSERT_MESSAGE("Values one and three shouldn't have equal hash", hashCode1 != hashCode3);
-        CPPUNIT_ASSERT_MESSAGE("Values two and three shouldn't have equal hash", hashCode2 != hashCode3);
+        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
     }
 }
 
@@ -286,13 +286,13 @@ void HashCodeTest::testHashFloat() {
     int hashCode2 = HashCode<float>()(value2);
     int hashCode3 = HashCode<float>()(value3);
 
-    CPPUNIT_ASSERT(hashCode1 != 0);
-    CPPUNIT_ASSERT(hashCode2 != 0);
-    CPPUNIT_ASSERT(hashCode3 != 0);
+    ASSERT_TRUE(hashCode1 != 0);
+    ASSERT_TRUE(hashCode2 != 0);
+    ASSERT_TRUE(hashCode3 != 0);
 
-    CPPUNIT_ASSERT_MESSAGE("Values one and two should have equal hash", hashCode1 == hashCode2);
-    CPPUNIT_ASSERT_MESSAGE("Values one and three shouldn't have equal hash", hashCode1 != hashCode3);
-    CPPUNIT_ASSERT_MESSAGE("Values two and three shouldn't have equal hash", hashCode2 != hashCode3);
+    ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
+    ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
+    ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -306,11 +306,11 @@ void HashCodeTest::testHashDouble() {
     int hashCode2 = HashCode<double>()(value2);
     int hashCode3 = HashCode<double>()(value3);
 
-    CPPUNIT_ASSERT(hashCode1 != 0);
-    CPPUNIT_ASSERT(hashCode2 != 0);
-    CPPUNIT_ASSERT(hashCode3 != 0);
+    ASSERT_TRUE(hashCode1 != 0);
+    ASSERT_TRUE(hashCode2 != 0);
+    ASSERT_TRUE(hashCode3 != 0);
 
-    CPPUNIT_ASSERT_MESSAGE("Values one and two should have equal hash", hashCode1 == hashCode2);
-    CPPUNIT_ASSERT_MESSAGE("Values one and three shouldn't have equal hash", hashCode1 != hashCode3);
-    CPPUNIT_ASSERT_MESSAGE("Values two and three shouldn't have equal hash", hashCode2 != hashCode3);
+    ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
+    ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
+    ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
 }

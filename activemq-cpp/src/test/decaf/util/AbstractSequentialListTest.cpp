@@ -140,7 +140,7 @@ void AbstractSequentialListTest::testAddAll() {
 
     SimpleList<int> list;
     list.addAll( collection );
-    CPPUNIT_ASSERT_MESSAGE( "Should return true", list.addAll( 2, collection ) );
+    ASSERT_TRUE(list.addAll( 2, collection )) << ("Should return true");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -151,20 +151,20 @@ void AbstractSequentialListTest::testGet() {
     list.add( 1 );
     list.add( 2 );
 
-    CPPUNIT_ASSERT_EQUAL( 1, list.get( 0 ) );
-    CPPUNIT_ASSERT_EQUAL( 2, list.get( 1 ) );
+    ASSERT_EQ(1, list.get( 0 ));
+    ASSERT_EQ(2, list.get( 1 ));
 
     // get value by index which is out of bounds
     try {
         list.get( list.size() );
-        CPPUNIT_FAIL("Should throw IndexOutOfBoundsException.");
+        FAIL() << ("Should throw IndexOutOfBoundsException.");
     } catch( IndexOutOfBoundsException& e ) {
         // expected
     }
 
     try {
         list.get( -1 );
-        CPPUNIT_FAIL("Should throw IndexOutOfBoundsException.");
+        FAIL() << ("Should throw IndexOutOfBoundsException.");
     } catch( IndexOutOfBoundsException& e ) {
         // expected
     }
@@ -176,21 +176,21 @@ void AbstractSequentialListTest::testRemove() {
     SimpleList<int> list;
     list.add(1);
 
-    CPPUNIT_ASSERT_EQUAL( 1, list.removeAt( 0 ) );
+    ASSERT_EQ(1, list.removeAt( 0 ));
 
     list.add( 2 );
-    CPPUNIT_ASSERT_EQUAL( 2, list.removeAt( 0 ) );
+    ASSERT_EQ(2, list.removeAt( 0 ));
 
     // remove index is out of bounds
     try {
         list.removeAt( list.size() );
-        CPPUNIT_FAIL("Should throw IndexOutOfBoundsException.");
+        FAIL() << ("Should throw IndexOutOfBoundsException.");
     } catch( IndexOutOfBoundsException& e ) {
         // expected
     }
     try {
         list.removeAt( -1 );
-        CPPUNIT_FAIL("Should throw IndexOutOfBoundsException.");
+        FAIL() << ("Should throw IndexOutOfBoundsException.");
     } catch( IndexOutOfBoundsException& e ) {
         // expected
     }
@@ -199,7 +199,7 @@ void AbstractSequentialListTest::testRemove() {
     try {
         MockAbstractSequentialList<int> mylist;
         mylist.removeAt( 0 );
-        CPPUNIT_FAIL("Should throw UnsupportedOperationException.");
+        FAIL() << ("Should throw UnsupportedOperationException.");
     } catch( UnsupportedOperationException& e ) {
         // expected
     }
@@ -212,7 +212,7 @@ void AbstractSequentialListTest::testSet() {
 
     try {
         list.set( 0, 12 );
-        CPPUNIT_FAIL("should throw IndexOutOfBoundsException");
+        FAIL() << ("should throw IndexOutOfBoundsException");
     } catch( IndexOutOfBoundsException& e ) {
         // expected
     }

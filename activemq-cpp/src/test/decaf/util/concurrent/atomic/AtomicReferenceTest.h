@@ -18,27 +18,14 @@
 #ifndef _DECAF_UTIL_CONCURRENT_ATOMIC_ATOMICREFERENCETEST_H_
 #define _DECAF_UTIL_CONCURRENT_ATOMIC_ATOMICREFERENCETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 namespace concurrent {
 namespace atomic {
 
-    class AtomicReferenceTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( AtomicReferenceTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testConstructor2 );
-        CPPUNIT_TEST( testGetSet );
-        CPPUNIT_TEST( testCompareAndSet );
-        CPPUNIT_TEST( testCompareAndSetInMultipleThreads );
-        CPPUNIT_TEST( testGetAndSet );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class AtomicReferenceTest : public ::testing::Test {
+public:
 
         AtomicReferenceTest() {}
         virtual ~AtomicReferenceTest() {}

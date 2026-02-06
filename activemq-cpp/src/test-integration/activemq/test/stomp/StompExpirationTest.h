@@ -25,13 +25,7 @@ namespace test{
 namespace stomp{
 
     class StompExpirationTest : public ExpirationTest {
-
-        CPPUNIT_TEST_SUITE( StompExpirationTest );
-        CPPUNIT_TEST( testExpired );
-        CPPUNIT_TEST( testNotExpired );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         StompExpirationTest();
         virtual ~StompExpirationTest();

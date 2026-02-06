@@ -18,21 +18,13 @@
 #ifndef _DECAF_UTIL_ARRAYSTEST_H_
 #define _DECAF_UTIL_ARRAYSTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 
-    class ArraysTest : public CppUnit::TestFixture {
+    class ArraysTest : public ::testing::Test {
     private:
-
-        CPPUNIT_TEST_SUITE( ArraysTest );
-        CPPUNIT_TEST( testFill1 );
-        CPPUNIT_TEST( testFill2 );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+private:
 
         static const int SIZE;
 

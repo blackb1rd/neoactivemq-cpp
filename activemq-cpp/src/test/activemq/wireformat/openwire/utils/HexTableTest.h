@@ -18,21 +18,14 @@
 #ifndef _ACTIVEMQ_WIREFORMAT_OPENWIRE_UTILS_HEXTABLETEST_H_
 #define _ACTIVEMQ_WIREFORMAT_OPENWIRE_UTILS_HEXTABLETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq{
 namespace wireformat{
 namespace openwire{
 namespace utils{
 
-    class HexTableTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( HexTableTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class HexTableTest : public ::testing::Test {
+public:
 
         HexTableTest() {}
         virtual ~HexTableTest() {}

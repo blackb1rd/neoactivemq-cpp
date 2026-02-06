@@ -44,8 +44,8 @@ namespace io {
         ByteArrayOutputStreamBenchmark();
         virtual ~ByteArrayOutputStreamBenchmark();
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
         virtual void run();
 
     };

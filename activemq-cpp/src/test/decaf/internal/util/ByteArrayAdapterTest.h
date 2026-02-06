@@ -18,9 +18,7 @@
 #ifndef _DECAF_INTERNAL_UTIL_BYTEARRAYTEST_H_
 #define _DECAF_INTERNAL_UTIL_BYTEARRAYTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/internal/util/ByteArrayAdapter.h>
 #include <decaf/util/Config.h>
 
@@ -28,37 +26,8 @@ namespace decaf{
 namespace internal{
 namespace util{
 
-    class ByteArrayAdapterTest  : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ByteArrayAdapterTest );
-        CPPUNIT_TEST( testRead );
-        CPPUNIT_TEST( testReadExceptions );
-        CPPUNIT_TEST( testWrite );
-        CPPUNIT_TEST( testWriteExceptions );
-        CPPUNIT_TEST( testCtor1 );
-        CPPUNIT_TEST( testCtor2 );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testReszie );
-        CPPUNIT_TEST( testOperators );
-        CPPUNIT_TEST( testOperatorsExceptions );
-        CPPUNIT_TEST( testArray );
-        CPPUNIT_TEST( testGet );
-        CPPUNIT_TEST( testGetChar );
-        CPPUNIT_TEST( testGetShort );
-        CPPUNIT_TEST( testGetInt );
-        CPPUNIT_TEST( testGetLong );
-        CPPUNIT_TEST( testGetDouble );
-        CPPUNIT_TEST( testGetFloat );
-        CPPUNIT_TEST( testPut );
-        CPPUNIT_TEST( testPutChar );
-        CPPUNIT_TEST( testPutShort );
-        CPPUNIT_TEST( testPutInt );
-        CPPUNIT_TEST( testPutLong );
-        CPPUNIT_TEST( testPutDouble );
-        CPPUNIT_TEST( testPutFloat );
-        CPPUNIT_TEST_SUITE_END();
-
-        unsigned char* testData1;
+    class ByteArrayAdapterTest  : public ::testing::Test {
+unsigned char* testData1;
         static const int testData1Size = 100;
 
     private:
@@ -71,14 +40,14 @@ namespace util{
         ByteArrayAdapterTest() : testData1() {}
         virtual ~ByteArrayAdapterTest() {}
 
-        void setUp() {
+        void SetUp() override {
             testData1 = new unsigned char[testData1Size];
             for( int i = 0; i < testData1Size; ++i ){
                 testData1[i] = (unsigned char)i;
             }
         }
 
-        void tearDown() {
+        void TearDown() override {
             delete [] testData1;
         }
 

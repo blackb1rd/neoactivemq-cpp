@@ -18,20 +18,12 @@
 #ifndef _DECAF_UTIL_DATETEST_H_
 #define _DECAF_UTIL_DATETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf{
 namespace util{
 
-    class DateTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( DateTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class DateTest : public ::testing::Test {
+public:
 
         DateTest(){};
         virtual ~DateTest(){};

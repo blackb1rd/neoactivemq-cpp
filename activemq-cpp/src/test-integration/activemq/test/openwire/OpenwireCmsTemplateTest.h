@@ -26,14 +26,7 @@ namespace test{
 namespace openwire{
 
     class OpenwireCmsTemplateTest : public CmsTemplateTest {
-
-        CPPUNIT_TEST_SUITE( OpenwireCmsTemplateTest );
-        CPPUNIT_TEST( testBasics );
-        CPPUNIT_TEST( testReceiveException );
-        CPPUNIT_TEST( testSendException );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireCmsTemplateTest();
         virtual ~OpenwireCmsTemplateTest();

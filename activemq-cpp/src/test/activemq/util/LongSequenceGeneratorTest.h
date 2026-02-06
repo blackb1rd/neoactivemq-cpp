@@ -18,21 +18,15 @@
 #ifndef _ACTIVEMQ_UTIL_LONGSEQUENCEGENERATORTEST_H_
 #define _ACTIVEMQ_UTIL_LONGSEQUENCEGENERATORTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <activemq/util/LongSequenceGenerator.h>
 
 namespace activemq{
 namespace util{
 
-    class LongSequenceGeneratorTest : public CppUnit::TestFixture
+    class LongSequenceGeneratorTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( LongSequenceGeneratorTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         LongSequenceGeneratorTest() {}
         virtual ~LongSequenceGeneratorTest() {}

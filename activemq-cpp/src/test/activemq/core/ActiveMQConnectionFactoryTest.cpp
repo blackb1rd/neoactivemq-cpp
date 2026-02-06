@@ -88,7 +88,7 @@ void ActiveMQConnectionFactoryTest::test1WithOpenWire() {
         cms::Connection* connection =
             connectionFactory.createConnection();
 
-        CPPUNIT_ASSERT( connection != NULL );
+        ASSERT_TRUE(connection != NULL);
 
         delete connection;
 
@@ -97,7 +97,7 @@ void ActiveMQConnectionFactoryTest::test1WithOpenWire() {
     AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
 
-    CPPUNIT_ASSERT( false );
+    ASSERT_TRUE(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -114,21 +114,21 @@ void ActiveMQConnectionFactoryTest::test2WithOpenWire()
 
         std::unique_ptr<cms::Connection> connection(
             connectionFactory.createConnection() );
-        CPPUNIT_ASSERT( connection.get() != NULL );
+        ASSERT_TRUE(connection.get() != NULL);
 
         ActiveMQConnection* amqConnection =
             dynamic_cast< ActiveMQConnection* >( connection.get() );
-        CPPUNIT_ASSERT( amqConnection != NULL );
-        CPPUNIT_ASSERT( username == amqConnection->getUsername() );
-        CPPUNIT_ASSERT( password == amqConnection->getPassword() );
-        CPPUNIT_ASSERT( clientId == amqConnection->getClientID() );
+        ASSERT_TRUE(amqConnection != NULL);
+        ASSERT_TRUE(username == amqConnection->getUsername());
+        ASSERT_TRUE(password == amqConnection->getPassword());
+        ASSERT_TRUE(clientId == amqConnection->getClientID());
 
         return;
     }
     AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
 
-    CPPUNIT_ASSERT( false );
+    ASSERT_TRUE(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -143,23 +143,23 @@ void ActiveMQConnectionFactoryTest::test3WithOpenWire()
 
         std::unique_ptr<cms::Connection> connection(
             connectionFactory.createConnection(username, password) );
-        CPPUNIT_ASSERT( connection.get() != NULL );
+        ASSERT_TRUE(connection.get() != NULL);
 
         connection->setClientID(clientId);
 
         ActiveMQConnection* amqConnection =
             dynamic_cast< ActiveMQConnection* >( connection.get() );
-        CPPUNIT_ASSERT( amqConnection != NULL );
-        CPPUNIT_ASSERT( username == amqConnection->getUsername() );
-        CPPUNIT_ASSERT( password == amqConnection->getPassword() );
-        CPPUNIT_ASSERT( clientId == amqConnection->getClientID() );
+        ASSERT_TRUE(amqConnection != NULL);
+        ASSERT_TRUE(username == amqConnection->getUsername());
+        ASSERT_TRUE(password == amqConnection->getPassword());
+        ASSERT_TRUE(clientId == amqConnection->getClientID());
 
         return;
     }
     AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
 
-    CPPUNIT_ASSERT( false );
+    ASSERT_TRUE(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -174,23 +174,23 @@ void ActiveMQConnectionFactoryTest::test4WithOpenWire()
 
         std::unique_ptr<cms::Connection> connection(
             connectionFactory.createConnection() );
-        CPPUNIT_ASSERT( connection.get() != NULL );
+        ASSERT_TRUE(connection.get() != NULL);
 
         connection->setClientID(clientId);
 
         ActiveMQConnection* amqConnection =
             dynamic_cast< ActiveMQConnection* >( connection.get() );
-        CPPUNIT_ASSERT( amqConnection != NULL );
-        CPPUNIT_ASSERT( username == amqConnection->getUsername() );
-        CPPUNIT_ASSERT( password == amqConnection->getPassword() );
-        CPPUNIT_ASSERT( clientId == amqConnection->getClientID() );
+        ASSERT_TRUE(amqConnection != NULL);
+        ASSERT_TRUE(username == amqConnection->getUsername());
+        ASSERT_TRUE(password == amqConnection->getPassword());
+        ASSERT_TRUE(clientId == amqConnection->getClientID());
 
         return;
     }
     AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
 
-    CPPUNIT_ASSERT( false );
+    ASSERT_TRUE(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -204,7 +204,7 @@ void ActiveMQConnectionFactoryTest::testExceptionWithPortOutOfRange() {
         std::unique_ptr<cms::Connection> connection(
             connectionFactory.createConnection() );
 
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
     AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
@@ -222,7 +222,7 @@ void ActiveMQConnectionFactoryTest::testExceptionOnCreate() {
         std::unique_ptr<cms::Connection> connection(
             connectionFactory.createConnection() );
 
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
     AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
@@ -240,7 +240,7 @@ void ActiveMQConnectionFactoryTest::testCreateWithURIOptions()
 
         std::unique_ptr<cms::Connection> connection(
             connectionFactory.createConnection() );
-        CPPUNIT_ASSERT( connection.get() != NULL );
+        ASSERT_TRUE(connection.get() != NULL);
 
         ActiveMQConnection* amqConnection =
             dynamic_cast< ActiveMQConnection* >( connection.get() );
@@ -251,14 +251,14 @@ void ActiveMQConnectionFactoryTest::testCreateWithURIOptions()
         std::unique_ptr<ActiveMQProducer> producer( dynamic_cast<ActiveMQProducer*>(
             session->createProducer( NULL ) ) );
 
-        CPPUNIT_ASSERT( producer->getProducerInfo()->getWindowSize() == 65536 );
+        ASSERT_TRUE(producer->getProducerInfo()->getWindowSize() == 65536);
 
         return;
     }
     AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
 
-    CPPUNIT_ASSERT( false );
+    ASSERT_TRUE(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -273,7 +273,7 @@ void ActiveMQConnectionFactoryTest::testTransportListener() {
 
     std::unique_ptr<cms::Connection> connection(
         connectionFactory.createConnection());
-    CPPUNIT_ASSERT(connection.get() != NULL);
+    ASSERT_TRUE(connection.get() != NULL);
 
     ActiveMQConnection* amqConnection =
         dynamic_cast< ActiveMQConnection* >( connection.get() );
@@ -293,8 +293,8 @@ void ActiveMQConnectionFactoryTest::testTransportListener() {
 
     Thread::sleep(2000);
 
-    CPPUNIT_ASSERT( listener.isInterrupted() );
-    CPPUNIT_ASSERT( listener.isResumed() );
+    ASSERT_TRUE(listener.isInterrupted());
+    ASSERT_TRUE(listener.isResumed());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -311,28 +311,28 @@ void ActiveMQConnectionFactoryTest::testURIOptionsProcessing() {
 
         ActiveMQConnectionFactory connectionFactory( URI );
 
-        CPPUNIT_ASSERT( connectionFactory.isDispatchAsync() == true );
-        CPPUNIT_ASSERT( connectionFactory.isAlwaysSyncSend() == true );
-        CPPUNIT_ASSERT( connectionFactory.isUseAsyncSend() == true );
-        CPPUNIT_ASSERT( connectionFactory.isUseCompression() == true );
-        CPPUNIT_ASSERT( connectionFactory.getCloseTimeout() == 10000 );
-        CPPUNIT_ASSERT( connectionFactory.getCompressionLevel() == 7 );
-        CPPUNIT_ASSERT( connectionFactory.getConnectResponseTimeout() == 2000 );
+        ASSERT_TRUE(connectionFactory.isDispatchAsync() == true);
+        ASSERT_TRUE(connectionFactory.isAlwaysSyncSend() == true);
+        ASSERT_TRUE(connectionFactory.isUseAsyncSend() == true);
+        ASSERT_TRUE(connectionFactory.isUseCompression() == true);
+        ASSERT_TRUE(connectionFactory.getCloseTimeout() == 10000);
+        ASSERT_TRUE(connectionFactory.getCompressionLevel() == 7);
+        ASSERT_TRUE(connectionFactory.getConnectResponseTimeout() == 2000);
 
         cms::Connection* connection =
             connectionFactory.createConnection();
 
-        CPPUNIT_ASSERT( connection != NULL );
+        ASSERT_TRUE(connection != NULL);
 
         ActiveMQConnection* amqConnection = dynamic_cast<ActiveMQConnection*>( connection );
 
-        CPPUNIT_ASSERT( amqConnection->isDispatchAsync() == true );
-        CPPUNIT_ASSERT( amqConnection->isAlwaysSyncSend() == true );
-        CPPUNIT_ASSERT( amqConnection->isUseAsyncSend() == true );
-        CPPUNIT_ASSERT( amqConnection->isUseCompression() == true );
-        CPPUNIT_ASSERT( amqConnection->getCloseTimeout() == 10000 );
-        CPPUNIT_ASSERT( amqConnection->getCompressionLevel() == 7 );
-        CPPUNIT_ASSERT( amqConnection->getConnectResponseTimeout() == 2000 );
+        ASSERT_TRUE(amqConnection->isDispatchAsync() == true);
+        ASSERT_TRUE(amqConnection->isAlwaysSyncSend() == true);
+        ASSERT_TRUE(amqConnection->isUseAsyncSend() == true);
+        ASSERT_TRUE(amqConnection->isUseCompression() == true);
+        ASSERT_TRUE(amqConnection->getCloseTimeout() == 10000);
+        ASSERT_TRUE(amqConnection->getCompressionLevel() == 7);
+        ASSERT_TRUE(amqConnection->getConnectResponseTimeout() == 2000);
 
         delete connection;
 
@@ -341,6 +341,6 @@ void ActiveMQConnectionFactoryTest::testURIOptionsProcessing() {
     AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
 
-    CPPUNIT_ASSERT( false );
+    ASSERT_TRUE(false);
 }
 

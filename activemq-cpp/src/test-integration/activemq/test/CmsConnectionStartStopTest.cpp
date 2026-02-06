@@ -51,9 +51,9 @@ CmsConnectionStartStopTest::~CmsConnectionStartStopTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsConnectionStartStopTest::setUp() {
+void CmsConnectionStartStopTest::SetUp() {
 
-    CMSTestFixture::setUp();
+    CMSTestFixture::SetUp();
 
     Pointer<ActiveMQConnectionFactory> factory(new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
 
@@ -63,7 +63,7 @@ void CmsConnectionStartStopTest::setUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsConnectionStartStopTest::tearDown() {
+void CmsConnectionStartStopTest::TearDown() {
 
     startedConnection->close();
     stoppedConnection->close();
@@ -71,7 +71,7 @@ void CmsConnectionStartStopTest::tearDown() {
     startedConnection.reset(NULL);
     stoppedConnection.reset(NULL);
 
-    CMSTestFixture::tearDown();
+    CMSTestFixture::TearDown();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,14 +92,14 @@ void CmsConnectionStartStopTest::testStoppedConsumerHoldsMessagesTillStarted() {
 
     // Test the assertions.
     Pointer<Message> m(startedConsumer->receive(2000));
-    CPPUNIT_ASSERT(m != NULL);
+    ASSERT_TRUE(m != NULL);
 
     m.reset(stoppedConsumer->receive(2000));
-    CPPUNIT_ASSERT(m == NULL);
+    ASSERT_TRUE(m == NULL);
 
     stoppedConnection->start();
     m.reset(stoppedConsumer->receive(5000));
-    CPPUNIT_ASSERT(m != NULL);
+    ASSERT_TRUE(m != NULL);
 
     startedSession->close();
     stoppedSession->close();
@@ -196,6 +196,6 @@ void CmsConnectionStartStopTest::testConcurrentSessionCreateWithStart() {
     }
 
     executor.shutdown();
-    CPPUNIT_ASSERT_MESSAGE("executor terminated", executor.awaitTermination(45, TimeUnit::SECONDS));
-    CPPUNIT_ASSERT_MESSAGE("no exceptions: " + exceptions.toString(), exceptions.isEmpty());
+    ASSERT_TRUE(executor.awaitTermination(45, TimeUnit::SECONDS)) << ("executor terminated");
+    ASSERT_TRUE(exceptions.isEmpty()) << ("no exceptions: " + exceptions.toString());
 }

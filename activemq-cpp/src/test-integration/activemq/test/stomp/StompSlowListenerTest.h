@@ -25,12 +25,7 @@ namespace test{
 namespace stomp{
 
     class StompSlowListenerTest : public SlowListenerTest {
-
-        CPPUNIT_TEST_SUITE( StompSlowListenerTest );
-        CPPUNIT_TEST( testSlowListener );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         StompSlowListenerTest();
         virtual ~StompSlowListenerTest();

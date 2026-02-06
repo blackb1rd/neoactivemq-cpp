@@ -18,9 +18,7 @@
 #ifndef _ACTIVEMQ_CORE_ACTIVEMQSESSIONTEST_H_
 #define _ACTIVEMQ_CORE_ACTIVEMQSESSIONTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <cms/Connection.h>
 #include <cms/MessageListener.h>
 #include <cms/ExceptionListener.h>
@@ -36,24 +34,8 @@
 namespace activemq{
 namespace core{
 
-    class ActiveMQSessionTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ActiveMQSessionTest );
-        CPPUNIT_TEST( testAutoAcking );
-        CPPUNIT_TEST( testClientAck );
-        CPPUNIT_TEST( testTransactionCommitOneConsumer );
-        CPPUNIT_TEST( testTransactionCommitTwoConsumer );
-        CPPUNIT_TEST( testTransactionCommitAfterConsumerClosed );
-        CPPUNIT_TEST( testTransactionRollbackOneConsumer );
-        CPPUNIT_TEST( testTransactionRollbackTwoConsumer );
-        CPPUNIT_TEST( testTransactionCloseWithoutCommit );
-        CPPUNIT_TEST( testExpiration );
-        CPPUNIT_TEST( testCreateManyConsumersAndSetListeners );
-        CPPUNIT_TEST( testCreateTempQueueByName );
-        CPPUNIT_TEST( testCreateTempTopicByName );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class ActiveMQSessionTest : public ::testing::Test {
+private:
 
         class MyExceptionListener : public cms::ExceptionListener{
         public:
@@ -81,8 +63,8 @@ namespace core{
 
     public:
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         void injectTextMessage(const std::string message,
                                const cms::Destination& destination,

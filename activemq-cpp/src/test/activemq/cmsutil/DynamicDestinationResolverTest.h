@@ -18,20 +18,12 @@
 #ifndef _ACTIVEMQ_CMSUTIL_DYNAMICDESTINATIONRESOLVERTEST_H_
 #define _ACTIVEMQ_CMSUTIL_DYNAMICDESTINATIONRESOLVERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq{
 namespace cmsutil{
 
-    class DynamicDestinationResolverTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( DynamicDestinationResolverTest );
-        CPPUNIT_TEST( testTopics );
-        CPPUNIT_TEST( testQueues );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class DynamicDestinationResolverTest : public ::testing::Test {
+public:
 
         DynamicDestinationResolverTest() {}
         virtual ~DynamicDestinationResolverTest() {}

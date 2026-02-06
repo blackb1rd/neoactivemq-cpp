@@ -18,26 +18,12 @@
 #ifndef _DECAF_IO_READERTEST_H_
 #define _DECAF_IO_READERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace io {
 
-    class ReaderTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ReaderTest );
-        CPPUNIT_TEST( testReaderCharBufferNull );
-        CPPUNIT_TEST( testReaderCharBufferZeroChar );
-        CPPUNIT_TEST( testReaderCharBufferChar );
-        CPPUNIT_TEST( testMark );
-        CPPUNIT_TEST( testRead );
-        CPPUNIT_TEST( testReady );
-        CPPUNIT_TEST( testReset );
-        CPPUNIT_TEST( testSkip );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class ReaderTest : public ::testing::Test {
+public:
 
         ReaderTest();
         virtual ~ReaderTest();

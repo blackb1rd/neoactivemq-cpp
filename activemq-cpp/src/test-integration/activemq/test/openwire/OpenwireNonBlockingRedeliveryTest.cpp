@@ -282,7 +282,7 @@ void OpenwireNonBlockingRedeliveryTest::testConsumerMessagesAreNotOrdered() {
     producer.join();
     consumer.join();
 
-    CPPUNIT_ASSERT(!consumer.isFailed());
+    ASSERT_TRUE(!consumer.isFailed());
 
     bool ordered = true;
     int lastId = 0;
@@ -296,7 +296,7 @@ void OpenwireNonBlockingRedeliveryTest::testConsumerMessagesAreNotOrdered() {
         lastId = id;
     }
 
-    CPPUNIT_ASSERT(!ordered);
+    ASSERT_TRUE(!ordered);
     destroyDestination(getBrokerURL(), DEST_NAME);
 }
 
@@ -351,19 +351,19 @@ void OpenwireNonBlockingRedeliveryTest::testMessageDeleiveredWhenNonBlockingEnab
 
     connection->start();
 
-    CPPUNIT_ASSERT_MESSAGE("Pre-Rollack received size incorrect", assertTrue(received, MSG_COUNT));
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Pre-Rollack received size incorrect");
 
     beforeRollback.addAll(received);
     received.clear();
     session->rollback();
 
-    CPPUNIT_ASSERT_MESSAGE("Post-Rollack received size incorrect", assertTrue(received, MSG_COUNT));
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Post-Rollack received size incorrect");
 
     afterRollback.addAll(received);
     received.clear();
 
-    CPPUNIT_ASSERT_EQUAL(beforeRollback.size(), afterRollback.size());
-    CPPUNIT_ASSERT(beforeRollback.equals(afterRollback));
+    ASSERT_EQ(beforeRollback.size(), afterRollback.size());
+    ASSERT_TRUE(beforeRollback.equals(afterRollback));
     session->commit();
     connection->close();
     destroyDestination(getBrokerURL(), destinationName);
@@ -393,19 +393,19 @@ void OpenwireNonBlockingRedeliveryTest::testMessageRedeliveriesAreInOrder() {
 
     connection->start();
 
-    CPPUNIT_ASSERT_MESSAGE("Pre-Rollack received size incorrect", assertTrue(received, MSG_COUNT));
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Pre-Rollack received size incorrect");
 
     beforeRollback.addAll(received);
     received.clear();
     session->rollback();
 
-    CPPUNIT_ASSERT_MESSAGE("Post-Rollack received size incorrect", assertTrue(received, MSG_COUNT));
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Post-Rollack received size incorrect");
 
     afterRollback.addAll(received);
     received.clear();
 
-    CPPUNIT_ASSERT_EQUAL(beforeRollback.size(), afterRollback.size());
-    CPPUNIT_ASSERT(beforeRollback.equals(afterRollback));
+    ASSERT_EQ(beforeRollback.size(), afterRollback.size());
+    ASSERT_TRUE(beforeRollback.equals(afterRollback));
 
     Pointer< Iterator<Pointer<MessageId> > > after(afterRollback.iterator());
     Pointer< Iterator<Pointer<MessageId> > > before(beforeRollback.iterator());
@@ -417,7 +417,7 @@ void OpenwireNonBlockingRedeliveryTest::testMessageRedeliveriesAreInOrder() {
         long long originalSeq = original->getProducerSequenceId();
         long long rolledbackSeq = rolledBack->getProducerSequenceId();
 
-        CPPUNIT_ASSERT_EQUAL(originalSeq, rolledbackSeq);
+        ASSERT_EQ(originalSeq, rolledbackSeq);
     }
 
     session->commit();
@@ -449,7 +449,7 @@ void OpenwireNonBlockingRedeliveryTest::testMessageDeleiveryDoesntStop() {
 
     connection->start();
 
-    CPPUNIT_ASSERT_MESSAGE("Pre-Rollack received size incorrect", assertTrue(received, MSG_COUNT));
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Pre-Rollack received size incorrect");
 
     beforeRollback.addAll(received);
     received.clear();
@@ -457,12 +457,12 @@ void OpenwireNonBlockingRedeliveryTest::testMessageDeleiveryDoesntStop() {
 
     sendMessages(getBrokerURL(), destinationName, MSG_COUNT);
 
-    CPPUNIT_ASSERT_MESSAGE("Post-Rollack received size incorrect", assertTrue(received, MSG_COUNT * 2));
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT * 2)) << ("Post-Rollack received size incorrect");
 
     afterRollback.addAll(received);
     received.clear();
 
-    CPPUNIT_ASSERT_EQUAL(beforeRollback.size() * 2, afterRollback.size());
+    ASSERT_EQ(beforeRollback.size() * 2, afterRollback.size());
     session->commit();
     connection->close();
 
@@ -493,15 +493,15 @@ void OpenwireNonBlockingRedeliveryTest::testNonBlockingMessageDeleiveryIsDelayed
 
     connection->start();
 
-    CPPUNIT_ASSERT_MESSAGE("Pre-Rollack received size incorrect", assertTrue(received, MSG_COUNT));
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Pre-Rollack received size incorrect");
 
     received.clear();
     session->rollback();
 
     TimeUnit::SECONDS.sleep(6);
-    CPPUNIT_ASSERT_MESSAGE("Rollback redelivery was not delayed.", received.isEmpty());
+    ASSERT_TRUE(received.isEmpty()) << ("Rollback redelivery was not delayed.");
 
-    CPPUNIT_ASSERT_MESSAGE("Post-Rollack received size incorrect", assertTrue(received, MSG_COUNT));
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Post-Rollack received size incorrect");
 
     session->commit();
     connection->close();
@@ -573,7 +573,7 @@ void OpenwireNonBlockingRedeliveryTest::testNonBlockingMessageDeleiveryWithRollb
 
     connection->start();
 
-    CPPUNIT_ASSERT_MESSAGE("Pre-Rollack received size incorrect", assertTrue(received, MSG_COUNT));
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Pre-Rollack received size incorrect");
 
     received.clear();
 
@@ -582,7 +582,7 @@ void OpenwireNonBlockingRedeliveryTest::testNonBlockingMessageDeleiveryWithRollb
 
     session->rollback();
 
-    CPPUNIT_ASSERT_MESSAGE("Post-Rollack received size incorrect", assertTrue(received, MSG_COUNT));
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Post-Rollack received size incorrect");
 
     session->commit();
     connection->close();
@@ -649,14 +649,14 @@ void OpenwireNonBlockingRedeliveryTest::testNonBlockingMessageDeleiveryWithAllRo
     sendMessages(getBrokerURL(), destinationName, MSG_COUNT);
     connection->start();
 
-    CPPUNIT_ASSERT_MESSAGE("Pre-Rollack received size incorrect", assertTrue(received, MSG_COUNT));
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Pre-Rollack received size incorrect");
 
     session->rollback();
 
     RollbacksListener rollbackListener(session);
     consumer->setMessageListener(&rollbackListener);
 
-    CPPUNIT_ASSERT_MESSAGE("Post-Rollack DQL size incorrect", assertTrue(dlqed, MSG_COUNT));
+    ASSERT_TRUE(assertTrue(dlqed, MSG_COUNT)) << ("Post-Rollack DQL size incorrect");
 
     session->commit();
     connection->close();

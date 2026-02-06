@@ -18,36 +18,12 @@
 #ifndef _DECAF_UTIL_LINKEDHASHSETTEST_H_
 #define _DECAF_UTIL_LINKEDHASHSETTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 
-    class LinkedHashSetTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( LinkedHashSetTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testConstructorI );
-        CPPUNIT_TEST( testConstructorIF );
-        CPPUNIT_TEST( testConstructorCollection );
-        CPPUNIT_TEST( testAdd );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testContains );
-        CPPUNIT_TEST( testIsEmpty );
-        CPPUNIT_TEST( testIterator );
-        CPPUNIT_TEST( testRemove );
-        CPPUNIT_TEST( testSize );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST( testToArray );
-        CPPUNIT_TEST( testCopy1 );
-        CPPUNIT_TEST( testCopy2 );
-        CPPUNIT_TEST( testEquals );
-        CPPUNIT_TEST( testRemoveAll );
-        CPPUNIT_TEST( testRetainAll );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class LinkedHashSetTest : public ::testing::Test {
+public:
 
         LinkedHashSetTest();
         virtual ~LinkedHashSetTest();

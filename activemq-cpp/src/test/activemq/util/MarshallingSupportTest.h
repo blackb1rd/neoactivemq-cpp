@@ -18,25 +18,12 @@
 #ifndef _ACTIVEMQ_UTIL_MARSHALLINGSUPPORTTEST_H_
 #define _ACTIVEMQ_UTIL_MARSHALLINGSUPPORTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace util {
 
-    class MarshallingSupportTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( MarshallingSupportTest );
-        CPPUNIT_TEST( testWriteString );
-        CPPUNIT_TEST( testWriteString16 );
-        CPPUNIT_TEST( testWriteString32 );
-        CPPUNIT_TEST( testReadString16 );
-        CPPUNIT_TEST( testReadString32 );
-        CPPUNIT_TEST( testAsciiToModifiedUtf8 );
-        CPPUNIT_TEST( testModifiedUtf8ToAscii );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class MarshallingSupportTest : public ::testing::Test {
+public:
 
         MarshallingSupportTest();
         virtual ~MarshallingSupportTest();

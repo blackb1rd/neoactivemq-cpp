@@ -25,12 +25,7 @@ namespace test{
 namespace openwire{
 
     class OpenwireSimpleRollbackTest : public SimpleRollbackTest {
-
-        CPPUNIT_TEST_SUITE( OpenwireSimpleRollbackTest );
-        CPPUNIT_TEST( testRollbacks );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireSimpleRollbackTest();
         virtual ~OpenwireSimpleRollbackTest();

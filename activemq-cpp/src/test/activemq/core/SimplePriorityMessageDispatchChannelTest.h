@@ -18,28 +18,12 @@
 #ifndef _ACTIVEMQ_CORE_SIMPLEPRIORITYMESSAGEDISPATCHCHANNELTEST_H_
 #define _ACTIVEMQ_CORE_SIMPLEPRIORITYMESSAGEDISPATCHCHANNELTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace core {
 
-    class SimplePriorityMessageDispatchChannelTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( SimplePriorityMessageDispatchChannelTest );
-        CPPUNIT_TEST( testCtor );
-        CPPUNIT_TEST( testStart );
-        CPPUNIT_TEST( testStop );
-        CPPUNIT_TEST( testClose );
-        CPPUNIT_TEST( testEnqueue );
-        CPPUNIT_TEST( testEnqueueFront );
-        CPPUNIT_TEST( testPeek );
-        CPPUNIT_TEST( testDequeueNoWait );
-        CPPUNIT_TEST( testDequeue );
-        CPPUNIT_TEST( testRemoveAll );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class SimplePriorityMessageDispatchChannelTest : public ::testing::Test {
+public:
 
         SimplePriorityMessageDispatchChannelTest() {}
         virtual ~SimplePriorityMessageDispatchChannelTest() {}

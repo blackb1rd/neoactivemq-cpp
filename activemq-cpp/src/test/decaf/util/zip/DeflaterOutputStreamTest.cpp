@@ -92,13 +92,13 @@ DeflaterOutputStreamTest::~DeflaterOutputStreamTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterOutputStreamTest::tearDown() {
+void DeflaterOutputStreamTest::TearDown() {
 
     this->outputBuffer.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterOutputStreamTest::setUp() {
+void DeflaterOutputStreamTest::SetUp() {
 
     this->outputBuffer.clear();
     this->outputBuffer.resize( 500 );
@@ -130,16 +130,12 @@ void DeflaterOutputStreamTest::testConstructorOutputStreamDeflater() {
     ByteArrayOutputStream baos;
     Deflater* nullDeflater = NULL;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        DeflaterOutputStream( &baos, nullDeflater ),
-        NullPointerException );
+    ASSERT_THROW(DeflaterOutputStream( &baos, nullDeflater ), NullPointerException) << ("Should have thrown a NullPointerException");
 
     Deflater defl;
     MyDeflaterOutputStream dos( &baos, &defl );
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Buffer Size for new DeflaterOutputStream",
-                                  (std::size_t)512, dos.getProtectedBuf().size() );
+    ASSERT_EQ((std::size_t)512, dos.getProtectedBuf().size()) << ("Incorrect Buffer Size for new DeflaterOutputStream");
 
     dos.write( byteArray, 5 );
     dos.close();
@@ -153,8 +149,7 @@ void DeflaterOutputStreamTest::testConstructorOutputStream() {
 
     // Test to see if DeflaterOutputStream was created with the correct
     // buffer.
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Buffer Size",
-                                  (std::size_t)512, dos.getProtectedBuf().size() );
+    ASSERT_EQ((std::size_t)512, dos.getProtectedBuf().size()) << ("Incorrect Buffer Size");
 
     dos.write( &outputBuffer[0], (int)outputBuffer.size() );
     dos.close();
@@ -171,25 +166,18 @@ void DeflaterOutputStreamTest::testConstructorOutputStreamDeflaterI() {
     Deflater* nullDeflater = NULL;
 
     // Test for a null Deflater.
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        DeflaterOutputStream( &baos, nullDeflater, buf ),
-        NullPointerException );
+    ASSERT_THROW(DeflaterOutputStream( &baos, nullDeflater, buf ), NullPointerException) << ("Should have thrown a NullPointerException");
 
     Deflater defl;
 
     // Test for a zero buf.
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        DeflaterOutputStream( &baos, &defl, zeroBuf ),
-        IllegalArgumentException );
+    ASSERT_THROW(DeflaterOutputStream( &baos, &defl, zeroBuf ), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 
     // Test to see if DeflaterOutputStream was created with the correct
     // buffer.
     MyDeflaterOutputStream dos( &baos, &defl, buf );
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Buffer Size for new DeflaterOutputStream",
-                                  (std::size_t)5, dos.getProtectedBuf().size() );
+    ASSERT_EQ((std::size_t)5, dos.getProtectedBuf().size()) << ("Incorrect Buffer Size for new DeflaterOutputStream");
 
     dos.write( byteArray, 7, 0, 7 );
     dos.close();
@@ -209,19 +197,16 @@ void DeflaterOutputStreamTest::testClose() {
     InflaterInputStream iis( &bais );
 
     // Test to see if the finish method wrote the bytes to the file.
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned.", 1, iis.read());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned.", 3, iis.read());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned.", 4, iis.read());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned.", 6, iis.read());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned.", -1, iis.read());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned.", -1, iis.read());
+    ASSERT_EQ(1, iis.read()) << ("Incorrect Byte Returned.");
+    ASSERT_EQ(3, iis.read()) << ("Incorrect Byte Returned.");
+    ASSERT_EQ(4, iis.read()) << ("Incorrect Byte Returned.");
+    ASSERT_EQ(6, iis.read()) << ("Incorrect Byte Returned.");
+    ASSERT_EQ(-1, iis.read()) << ("Incorrect Byte Returned.");
+    ASSERT_EQ(-1, iis.read()) << ("Incorrect Byte Returned.");
     iis.close();
 
     // Test for a zero buf.
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IOException",
-        dos.write( 5 ),
-        IOException );
+    ASSERT_THROW(dos.write( 5 ), IOException) << ("Should have thrown a IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -235,10 +220,7 @@ void DeflaterOutputStreamTest::testFinish() {
 
     // Test to see if the same FileOutputStream can be used with the
     // DeflaterOutputStream after finish is called.
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IOException",
-        dos.write( 1 ),
-        IOException );
+    ASSERT_THROW(dos.write( 1 ), IOException) << ("Should have thrown an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -257,10 +239,10 @@ void DeflaterOutputStreamTest::testWriteI() {
     InflaterInputStream iis( &bais );
 
     for( int i = 0; i < 3; i++ ) {
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned.", i, iis.read() );
+        ASSERT_EQ(i, iis.read()) << ("Incorrect Byte Returned.");
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned (EOF).", -1, iis.read() );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned (EOF).", -1, iis.read() );
+    ASSERT_EQ(-1, iis.read()) << ("Incorrect Byte Returned (EOF).");
+    ASSERT_EQ(-1, iis.read()) << ("Incorrect Byte Returned (EOF).");
     iis.close();
 }
 
@@ -278,28 +260,22 @@ void DeflaterOutputStreamTest::testWriteBIII() {
     std::pair<const unsigned char*, int> array = baos.toByteArray();
     ByteArrayInputStream bais( array.first, array.second, true );
     InflaterInputStream iis( &bais );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned.", 4, iis.read() );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned.", 7, iis.read() );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned.", 8, iis.read() );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned (EOF).", -1, iis.read() );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned (EOF).", -1, iis.read() );
+    ASSERT_EQ(4, iis.read()) << ("Incorrect Byte Returned.");
+    ASSERT_EQ(7, iis.read()) << ("Incorrect Byte Returned.");
+    ASSERT_EQ(8, iis.read()) << ("Incorrect Byte Returned.");
+    ASSERT_EQ(-1, iis.read()) << ("Incorrect Byte Returned (EOF).");
+    ASSERT_EQ(-1, iis.read()) << ("Incorrect Byte Returned (EOF).");
     iis.close();
 
     // Test for trying to write more bytes than available from the array
     ByteArrayOutputStream baos2;
     DeflaterOutputStream dos2( &baos2 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        dos2.write( byteArray, 7, 2, 10 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(dos2.write( byteArray, 7, 2, 10 ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 
     // Test for trying to start writing from a unsigned char > than the array
     // size.
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        dos2.write( byteArray, 7, 2, 10 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(dos2.write( byteArray, 7, 2, 10 ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 
     dos2.close();
 }
@@ -309,10 +285,10 @@ void DeflaterOutputStreamTest::testDeflate() {
 
     ByteArrayOutputStream baos;
     MyDeflaterOutputStream dos( &baos );
-    CPPUNIT_ASSERT( !dos.getDaflateFlag() );
+    ASSERT_TRUE(!dos.getDaflateFlag());
     for( int i = 0; i < 3; i++ ) {
         dos.write( (unsigned char)i );
     }
-    CPPUNIT_ASSERT( dos.getDaflateFlag() );
+    ASSERT_TRUE(dos.getDaflateFlag());
     dos.close();
 }

@@ -18,26 +18,12 @@
 #ifndef _DECAF_SECURITY_SECURERANDOMTEST_H_
 #define _DECAF_SECURITY_SECURERANDOMTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace security {
 
-    class SecureRandomTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( SecureRandomTest );
-        CPPUNIT_TEST( testConstructor1 );
-        CPPUNIT_TEST( testConstructor2 );
-        CPPUNIT_TEST( testConstructor3 );
-        CPPUNIT_TEST( testNextBytes1 );
-        CPPUNIT_TEST( testNextBytes2 );
-        CPPUNIT_TEST( testSetSeed1 );
-        CPPUNIT_TEST( testSetSeed2 );
-        CPPUNIT_TEST( testSetSeed3 );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class SecureRandomTest : public ::testing::Test {
+public:
 
         SecureRandomTest();
         virtual ~SecureRandomTest();

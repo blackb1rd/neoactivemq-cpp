@@ -47,11 +47,11 @@ void ActiveMQBytesMessageTest::testGetBodyLength() {
     try {
 
         msg.reset();
-        CPPUNIT_ASSERT( msg.getBodyLength() == ( len * 8 ) );
+        ASSERT_TRUE(msg.getBodyLength() == ( len * 8 ));
 
     } catch( Exception& e ) {
         e.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -62,10 +62,10 @@ void ActiveMQBytesMessageTest::testReadBoolean() {
     try {
         msg.writeBoolean( true );
         msg.reset();
-        CPPUNIT_ASSERT( msg.readBoolean() );
+        ASSERT_TRUE(msg.readBoolean());
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -76,10 +76,10 @@ void ActiveMQBytesMessageTest::testReadByte() {
     try {
         msg.writeByte( (unsigned char)2 );
         msg.reset();
-        CPPUNIT_ASSERT( msg.readByte() == 2 );
+        ASSERT_TRUE(msg.readByte() == 2);
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -90,10 +90,10 @@ void ActiveMQBytesMessageTest::testReadShort() {
     try {
         msg.writeShort( (short)3000 );
         msg.reset();
-        CPPUNIT_ASSERT( msg.readShort() == 3000 );
+        ASSERT_TRUE(msg.readShort() == 3000);
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -104,10 +104,10 @@ void ActiveMQBytesMessageTest::testReadUnsignedShort() {
     try {
         msg.writeShort( (short)3000 );
         msg.reset();
-        CPPUNIT_ASSERT( msg.readUnsignedShort() == 3000 );
+        ASSERT_TRUE(msg.readUnsignedShort() == 3000);
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -118,10 +118,10 @@ void ActiveMQBytesMessageTest::testReadChar() {
     try {
         msg.writeChar( 'a' );
         msg.reset();
-        CPPUNIT_ASSERT( msg.readChar() == 'a' );
+        ASSERT_TRUE(msg.readChar() == 'a');
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -132,10 +132,10 @@ void ActiveMQBytesMessageTest::testReadInt() {
     try {
         msg.writeInt( 3000 );
         msg.reset();
-        CPPUNIT_ASSERT( msg.readInt() == 3000 );
+        ASSERT_TRUE(msg.readInt() == 3000);
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -146,10 +146,10 @@ void ActiveMQBytesMessageTest::testReadLong() {
     try {
         msg.writeLong( 3000 );
         msg.reset();
-        CPPUNIT_ASSERT( msg.readLong() == 3000 );
+        ASSERT_TRUE(msg.readLong() == 3000);
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -160,10 +160,10 @@ void ActiveMQBytesMessageTest::testReadFloat() {
     try {
         msg.writeFloat( 3.3f );
         msg.reset();
-        CPPUNIT_ASSERT( msg.readFloat() == 3.3f );
+        ASSERT_TRUE(msg.readFloat() == 3.3f);
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -174,10 +174,10 @@ void ActiveMQBytesMessageTest::testReadDouble() {
     try {
         msg.writeDouble( 3.3 );
         msg.reset();
-        CPPUNIT_ASSERT( msg.readDouble() == 3.3 );
+        ASSERT_TRUE(msg.readDouble() == 3.3);
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -189,10 +189,10 @@ void ActiveMQBytesMessageTest::testReadUTF() {
         std::string str = "this is a test";
         msg.writeUTF( str );
         msg.reset();
-        CPPUNIT_ASSERT( msg.readUTF() == str );
+        ASSERT_TRUE(msg.readUTF() == str);
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -210,17 +210,14 @@ void ActiveMQBytesMessageTest::testReadBytesbyteArray() {
         unsigned char test[50];
         msg.readBytes( test, 50 );
         for( int i = 0; i < 50; i++ ) {
-            CPPUNIT_ASSERT( test[i] == i );
+            ASSERT_TRUE(test[i] == i);
         }
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should have thrown a CMSException",
-            msg.readBytes( test, -1 ),
-            CMSException);
+        ASSERT_THROW(msg.readBytes( test, -1 ), CMSException) << ("Should have thrown a CMSException");
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -230,12 +227,12 @@ void ActiveMQBytesMessageTest::testClearBody() {
     try {
         bytesMessage.writeInt( 1 );
         bytesMessage.clearBody();
-        CPPUNIT_ASSERT( !bytesMessage.isReadOnlyBody() );
+        ASSERT_TRUE(!bytesMessage.isReadOnlyBody());
         bytesMessage.writeInt( 1 );
         bytesMessage.readInt();
     } catch( MessageNotReadableException& mnwe ) {
     } catch( MessageNotWriteableException& mnwe ) {
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -246,19 +243,19 @@ void ActiveMQBytesMessageTest::testReset() {
         message.writeDouble( 24.5 );
         message.writeLong( 311 );
     } catch( MessageNotWriteableException& mnwe ) {
-        CPPUNIT_FAIL( "should be writeable" );
+        FAIL() << ("should be writeable");
     }
     message.reset();
     try {
-        CPPUNIT_ASSERT( message.isReadOnlyBody() );
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( message.readDouble(), 24.5, 0 );
-        CPPUNIT_ASSERT_EQUAL( message.readLong(), 311LL );
+        ASSERT_TRUE(message.isReadOnlyBody());
+        ASSERT_NEAR(message.readDouble(), 24.5, 0);
+        ASSERT_EQ(message.readLong(), 311LL);
     } catch( MessageNotReadableException& mnre ) {
-        CPPUNIT_FAIL( "should be readable" );
+        FAIL() << ("should be readable");
     }
     try {
         message.writeInt( 33 );
-        CPPUNIT_FAIL( "should throw exception" );
+        FAIL() << ("should throw exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
 }
@@ -286,7 +283,7 @@ void ActiveMQBytesMessageTest::testReadOnlyBody() {
         message.writeShort( (short)1 );
         message.writeUTF( "utfstring" );
     } catch( MessageNotWriteableException& mnwe ) {
-        CPPUNIT_FAIL( "Should be writeable" );
+        FAIL() << ("Should be writeable");
     }
     message.reset();
     try {
@@ -305,66 +302,66 @@ void ActiveMQBytesMessageTest::testReadOnlyBody() {
         message.readUnsignedShort();
         message.readUTF();
     } catch( MessageNotReadableException& mnwe ) {
-        CPPUNIT_FAIL( "Should be readable" );
+        FAIL() << ("Should be readable");
     }
     try {
         message.writeBoolean( true );
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeByte( (unsigned char)1 );
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeBytes( buffer );
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeBytes( &array[0], 0, 2 );
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeChar( 'a' );
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeDouble( 1.5 );
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeFloat( (float)1.5 );
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeInt( 1 );
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeLong( 1 );
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeString( "stringobj" );
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeShort( (short)1 );
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeUTF( "utfstring" );
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
 }
@@ -391,71 +388,71 @@ void ActiveMQBytesMessageTest::testWriteOnlyBody() {
         message.writeShort( (short)1 );
         message.writeUTF( "utfstring" );
     } catch( MessageNotWriteableException& mnwe ) {
-        CPPUNIT_FAIL( "Should be writeable" );
+        FAIL() << ("Should be writeable");
     }
     try {
         message.readBoolean();
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& mnwe ) {
     }
     try {
         message.readByte();
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readBytes( buffer );
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readBytes( &array[0], 2 );
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readChar();
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readDouble();
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readFloat();
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readInt();
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readLong();
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readString();
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readShort();
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readUnsignedShort();
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readUTF();
-        CPPUNIT_FAIL( "Should have thrown exception" );
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
 }

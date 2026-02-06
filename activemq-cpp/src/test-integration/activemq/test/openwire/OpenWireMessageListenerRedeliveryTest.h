@@ -27,15 +27,7 @@ namespace openwire {
 
     class OpenWireMessageListenerRedeliveryTest : public CMSTestFixture {
     private:
-
-        CPPUNIT_TEST_SUITE( OpenWireMessageListenerRedeliveryTest );
-        CPPUNIT_TEST( testQueueRollbackConsumerListener );
-        CPPUNIT_TEST( testQueueSessionListenerExceptionRetry );
-        CPPUNIT_TEST( testQueueSessionListenerExceptionDlq );
-        CPPUNIT_TEST( testTransactedQueueSessionListenerExceptionDlq );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenWireMessageListenerRedeliveryTest();
         virtual ~OpenWireMessageListenerRedeliveryTest();

@@ -18,34 +18,14 @@
 #ifndef _DECAF_NIO_BUFFERTEST_H_
 #define _DECAF_NIO_BUFFERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/nio/Buffer.h>
 
 namespace decaf{
 namespace nio{
 
-    class BufferTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( BufferTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( testCapacity );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testFlip );
-        CPPUNIT_TEST( testHasRemaining );
-        CPPUNIT_TEST( testIsReadOnly );
-        CPPUNIT_TEST( testLimit );
-        CPPUNIT_TEST( testLimitInt );
-        CPPUNIT_TEST( testMark );
-        CPPUNIT_TEST( testPosition );
-        CPPUNIT_TEST( testPositionInt );
-        CPPUNIT_TEST( testRemaining );
-        CPPUNIT_TEST( testReset );
-        CPPUNIT_TEST( testRewind );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class BufferTest : public ::testing::Test {
+private:
 
         Buffer* buffer;
 
@@ -72,11 +52,11 @@ namespace nio{
         BufferTest() : buffer() {}
         virtual ~BufferTest() {}
 
-        void setUp() {
+        void SetUp() override {
             buffer = new MyBuffer( DEFAULT_BUFFER_SIZE );
         }
 
-        void tearDown() {
+        void TearDown() override {
             delete buffer;
             buffer = NULL;
         }

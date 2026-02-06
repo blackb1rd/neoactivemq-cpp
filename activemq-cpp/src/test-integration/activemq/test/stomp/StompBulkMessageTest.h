@@ -25,12 +25,7 @@ namespace test{
 namespace stomp{
 
     class StompBulkMessageTest : public BulkMessageTest {
-
-        CPPUNIT_TEST_SUITE( StompBulkMessageTest );
-        CPPUNIT_TEST( testBulkMessageSendReceive );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         StompBulkMessageTest();
         virtual ~StompBulkMessageTest();

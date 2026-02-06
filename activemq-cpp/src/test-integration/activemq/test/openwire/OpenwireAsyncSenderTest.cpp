@@ -47,17 +47,17 @@ void OpenwireAsyncSenderTest::testOpenWireConnector() {
 
         ActiveMQConnection* amqConnection =
             dynamic_cast<ActiveMQConnection*>( connection.get() );
-        CPPUNIT_ASSERT( amqConnection != NULL );
+        ASSERT_TRUE(amqConnection != NULL);
 
-        CPPUNIT_ASSERT( amqConnection->isUseAsyncSend() );
-        CPPUNIT_ASSERT( !amqConnection->isAlwaysSyncSend() );
+        ASSERT_TRUE(amqConnection->isUseAsyncSend());
+        ASSERT_TRUE(!amqConnection->isAlwaysSyncSend());
 
         connection->start();
         connection->stop();
 
-        CPPUNIT_ASSERT( true );
+        ASSERT_TRUE(true);
     } catch(...) {
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 

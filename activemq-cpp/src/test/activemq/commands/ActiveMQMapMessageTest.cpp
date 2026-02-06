@@ -31,10 +31,10 @@ using namespace activemq::commands;
 void ActiveMQMapMessageTest::test() {
     ActiveMQMapMessage myMessage;
 
-    CPPUNIT_ASSERT( myMessage.getDataStructureType() == ActiveMQMapMessage::ID_ACTIVEMQMAPMESSAGE );
+    ASSERT_TRUE(myMessage.getDataStructureType() == ActiveMQMapMessage::ID_ACTIVEMQMAPMESSAGE);
 
-    CPPUNIT_ASSERT( myMessage.getMapNames().size() == 0 );
-    CPPUNIT_ASSERT( myMessage.itemExists( "Something" ) == false );
+    ASSERT_TRUE(myMessage.getMapNames().size() == 0);
+    ASSERT_TRUE(myMessage.itemExists( "Something" ) == false);
 
     std::vector<unsigned char> data;
 
@@ -54,15 +54,15 @@ void ActiveMQMapMessageTest::test() {
     myMessage.setDouble( "double", 64.54654 );
     myMessage.setBytes( "bytes", data );
 
-    CPPUNIT_ASSERT( myMessage.getBoolean( "boolean" ) == false );
-    CPPUNIT_ASSERT( myMessage.getByte( "byte" ) == 127 );
-    CPPUNIT_ASSERT( myMessage.getChar( "char" ) == 'a' );
-    CPPUNIT_ASSERT( myMessage.getShort( "short" ) == 32000 );
-    CPPUNIT_ASSERT( myMessage.getInt( "int" ) == 6789999 );
-    CPPUNIT_ASSERT( myMessage.getLong( "long" ) == 0xFFFAAA33345LL );
-    CPPUNIT_ASSERT( myMessage.getFloat( "float" ) == 0.000012f );
-    CPPUNIT_ASSERT( myMessage.getDouble( "double" ) == 64.54654 );
-    CPPUNIT_ASSERT( myMessage.getBytes( "bytes" ) == data );
+    ASSERT_TRUE(myMessage.getBoolean( "boolean" ) == false);
+    ASSERT_TRUE(myMessage.getByte( "byte" ) == 127);
+    ASSERT_TRUE(myMessage.getChar( "char" ) == 'a');
+    ASSERT_TRUE(myMessage.getShort( "short" ) == 32000);
+    ASSERT_TRUE(myMessage.getInt( "int" ) == 6789999);
+    ASSERT_TRUE(myMessage.getLong( "long" ) == 0xFFFAAA33345LL);
+    ASSERT_TRUE(myMessage.getFloat( "float" ) == 0.000012f);
+    ASSERT_TRUE(myMessage.getDouble( "double" ) == 64.54654);
+    ASSERT_TRUE(myMessage.getBytes( "bytes" ) == data);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,17 +96,17 @@ void ActiveMQMapMessageTest::testBytesConversion() {
     ActiveMQMapMessage msg2;
     msg2.copyDataStructure( &msg );
 
-    CPPUNIT_ASSERT_EQUAL( msg2.getBoolean("boolean"), true);
-    CPPUNIT_ASSERT_EQUAL( msg2.getByte( "byte" ), (unsigned char)1 );
-    CPPUNIT_ASSERT_EQUAL( msg2.getBytes( "bytes" ).size(), (std::size_t)1 );
-    CPPUNIT_ASSERT_EQUAL( msg2.getChar( "char" ), 'a' );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( msg2.getDouble( "double" ), 1.5, 0.01 );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( msg2.getFloat( "float" ), 1.5f, 0.01 );
-    CPPUNIT_ASSERT_EQUAL( msg2.getInt( "int" ), 1 );
-    CPPUNIT_ASSERT_EQUAL( msg2.getLong( "long" ), 1LL );
-    CPPUNIT_ASSERT_EQUAL( msg2.getShort( "short" ), (short)1 );
-    CPPUNIT_ASSERT_EQUAL( msg2.getString( "string" ), std::string( "string" ) );
-    CPPUNIT_ASSERT_EQUAL( msg2.getString( "bigString" ), bigString );
+    ASSERT_EQ(msg2.getBoolean("boolean"), true);
+    ASSERT_EQ(msg2.getByte( "byte" ), (unsigned char)1);
+    ASSERT_EQ(msg2.getBytes( "bytes" ).size(), (std::size_t)1);
+    ASSERT_EQ(msg2.getChar( "char" ), 'a');
+    ASSERT_NEAR(msg2.getDouble( "double" ), 1.5, 0.01);
+    ASSERT_NEAR(msg2.getFloat( "float" ), 1.5f, 0.01);
+    ASSERT_EQ(msg2.getInt( "int" ), 1);
+    ASSERT_EQ(msg2.getLong( "long" ), 1LL);
+    ASSERT_EQ(msg2.getShort( "short" ), (short)1);
+    ASSERT_EQ(msg2.getString( "string" ), std::string( "string" ));
+    ASSERT_EQ(msg2.getString( "bigString" ), bigString);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -115,14 +115,14 @@ void ActiveMQMapMessageTest::testGetBoolean() {
     ActiveMQMapMessage msg;
     msg.setBoolean( name, true );
     msg.setReadOnlyBody( true );
-    CPPUNIT_ASSERT( msg.getBoolean( name ) );
+    ASSERT_TRUE(msg.getBoolean( name ));
     msg.clearBody();
     msg.setString( name, "true" );
 
     ActiveMQMapMessage msg2;
     msg2.copyDataStructure( &msg );
 
-    CPPUNIT_ASSERT( msg2.getBoolean( name ) );
+    ASSERT_TRUE(msg2.getBoolean( name ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +133,7 @@ void ActiveMQMapMessageTest::testGetByte() {
     ActiveMQMapMessage msg2;
     msg2.copyDataStructure( &msg );
 
-    CPPUNIT_ASSERT( msg2.getByte( name ) == (unsigned char)1 );
+    ASSERT_TRUE(msg2.getByte( name ) == (unsigned char)1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -145,11 +145,11 @@ void ActiveMQMapMessageTest::testGetShort() {
         ActiveMQMapMessage msg2;
         msg2.copyDataStructure( &msg );
 
-        CPPUNIT_ASSERT( msg2.getShort( name ) == (short)1 );
+        ASSERT_TRUE(msg2.getShort( name ) == (short)1);
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -162,11 +162,11 @@ void ActiveMQMapMessageTest::testGetChar() {
         ActiveMQMapMessage msg2;
         msg2.copyDataStructure( &msg );
 
-        CPPUNIT_ASSERT( msg2.getChar( name ) == 'a' );
+        ASSERT_TRUE(msg2.getChar( name ) == 'a');
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -179,11 +179,11 @@ void ActiveMQMapMessageTest::testGetInt() {
         ActiveMQMapMessage msg2;
         msg2.copyDataStructure( &msg );
 
-        CPPUNIT_ASSERT( msg2.getInt( name ) == 1 );
+        ASSERT_TRUE(msg2.getInt( name ) == 1);
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -196,11 +196,11 @@ void ActiveMQMapMessageTest::testGetLong() {
         ActiveMQMapMessage msg2;
         msg2.copyDataStructure( &msg );
 
-        CPPUNIT_ASSERT( msg2.getLong( name ) == 1 );
+        ASSERT_TRUE(msg2.getLong( name ) == 1);
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -213,11 +213,11 @@ void ActiveMQMapMessageTest::testGetFloat() {
         ActiveMQMapMessage msg2;
         msg2.copyDataStructure( &msg );
 
-        CPPUNIT_ASSERT( msg2.getFloat( name ) == 1.5f );
+        ASSERT_TRUE(msg2.getFloat( name ) == 1.5f);
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -230,11 +230,11 @@ void ActiveMQMapMessageTest::testGetDouble() {
         ActiveMQMapMessage msg2;
         msg2.copyDataStructure( &msg );
 
-        CPPUNIT_ASSERT( msg2.getDouble( name ) == 1.5 );
+        ASSERT_TRUE(msg2.getDouble( name ) == 1.5);
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -248,11 +248,11 @@ void ActiveMQMapMessageTest::testGetString() {
         ActiveMQMapMessage msg2;
         msg2.copyDataStructure( &msg );
 
-        CPPUNIT_ASSERT( msg2.getString( name ) == str );
+        ASSERT_TRUE(msg2.getString( name ) == str);
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -270,17 +270,17 @@ void ActiveMQMapMessageTest::testGetBytes() {
         ActiveMQMapMessage msg2;
         msg2.copyDataStructure( &msg );
 
-        CPPUNIT_ASSERT( msg2.getBytes( name ) == bytes1 );
-        CPPUNIT_ASSERT_EQUAL( msg2.getBytes( name + "2" ).size(), bytes2.size() );
+        ASSERT_TRUE(msg2.getBytes( name ) == bytes1);
+        ASSERT_EQ(msg2.getBytes( name + "2" ).size(), bytes2.size());
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 
     ActiveMQMapMessage msg3;
     msg3.setBytes( "empty", std::vector<unsigned char>() );
-    CPPUNIT_ASSERT_NO_THROW( msg3.getBytes( "empty" ) );
+    ASSERT_NO_THROW(msg3.getBytes( "empty" ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -308,18 +308,18 @@ void ActiveMQMapMessageTest::testGetMapNames() {
 
     std::vector<std::string> mapNamesList = msg2.getMapNames();
 
-    CPPUNIT_ASSERT_EQUAL( (std::size_t)11, mapNamesList.size() );
-    CPPUNIT_ASSERT( std::find( mapNamesList.begin(), mapNamesList.end(), "boolean" ) != mapNamesList.end() );
-    CPPUNIT_ASSERT( std::find( mapNamesList.begin(), mapNamesList.end(), "byte" ) != mapNamesList.end() );
-    CPPUNIT_ASSERT( std::find( mapNamesList.begin(), mapNamesList.end(), "bytes1" ) != mapNamesList.end() );
-    CPPUNIT_ASSERT( std::find( mapNamesList.begin(), mapNamesList.end(), "bytes2" ) != mapNamesList.end() );
-    CPPUNIT_ASSERT( std::find( mapNamesList.begin(), mapNamesList.end(), "char" ) != mapNamesList.end() );
-    CPPUNIT_ASSERT( std::find( mapNamesList.begin(), mapNamesList.end(), "double" ) != mapNamesList.end() );
-    CPPUNIT_ASSERT( std::find( mapNamesList.begin(), mapNamesList.end(), "float" ) != mapNamesList.end() );
-    CPPUNIT_ASSERT( std::find( mapNamesList.begin(), mapNamesList.end(), "int" ) != mapNamesList.end() );
-    CPPUNIT_ASSERT( std::find( mapNamesList.begin(), mapNamesList.end(), "long" ) != mapNamesList.end() );
-    CPPUNIT_ASSERT( std::find( mapNamesList.begin(), mapNamesList.end(), "short" ) != mapNamesList.end() );
-    CPPUNIT_ASSERT( std::find( mapNamesList.begin(), mapNamesList.end(), "string" ) != mapNamesList.end() );
+    ASSERT_EQ((std::size_t)11, mapNamesList.size());
+    ASSERT_TRUE(std::find( mapNamesList.begin(), mapNamesList.end(), "boolean" ) != mapNamesList.end());
+    ASSERT_TRUE(std::find( mapNamesList.begin(), mapNamesList.end(), "byte" ) != mapNamesList.end());
+    ASSERT_TRUE(std::find( mapNamesList.begin(), mapNamesList.end(), "bytes1" ) != mapNamesList.end());
+    ASSERT_TRUE(std::find( mapNamesList.begin(), mapNamesList.end(), "bytes2" ) != mapNamesList.end());
+    ASSERT_TRUE(std::find( mapNamesList.begin(), mapNamesList.end(), "char" ) != mapNamesList.end());
+    ASSERT_TRUE(std::find( mapNamesList.begin(), mapNamesList.end(), "double" ) != mapNamesList.end());
+    ASSERT_TRUE(std::find( mapNamesList.begin(), mapNamesList.end(), "float" ) != mapNamesList.end());
+    ASSERT_TRUE(std::find( mapNamesList.begin(), mapNamesList.end(), "int" ) != mapNamesList.end());
+    ASSERT_TRUE(std::find( mapNamesList.begin(), mapNamesList.end(), "long" ) != mapNamesList.end());
+    ASSERT_TRUE(std::find( mapNamesList.begin(), mapNamesList.end(), "short" ) != mapNamesList.end());
+    ASSERT_TRUE(std::find( mapNamesList.begin(), mapNamesList.end(), "string" ) != mapNamesList.end());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -331,8 +331,8 @@ void ActiveMQMapMessageTest::testItemExists() {
     ActiveMQMapMessage mapMessage2;
     mapMessage2.copyDataStructure( &mapMessage );
 
-    CPPUNIT_ASSERT( mapMessage2.itemExists( "exists" ) );
-    CPPUNIT_ASSERT( !mapMessage2.itemExists( "doesntExist" ) );
+    ASSERT_TRUE(mapMessage2.itemExists( "exists" ));
+    ASSERT_TRUE(!mapMessage2.itemExists( "doesntExist" ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -341,18 +341,18 @@ void ActiveMQMapMessageTest::testClearBody() {
     ActiveMQMapMessage mapMessage;
     mapMessage.setString( "String", "String" );
     mapMessage.clearBody();
-    CPPUNIT_ASSERT( !mapMessage.isReadOnlyBody() );
+    ASSERT_TRUE(!mapMessage.isReadOnlyBody());
 
     mapMessage.onSend();
     mapMessage.setContent( mapMessage.getContent() );
-    CPPUNIT_ASSERT( mapMessage.itemExists( "String" ) == false );
+    ASSERT_TRUE(mapMessage.itemExists( "String" ) == false);
     mapMessage.clearBody();
     mapMessage.setString( "String", "String" );
 
     ActiveMQMapMessage mapMessage2;
     mapMessage2.copyDataStructure( &mapMessage );
 
-    CPPUNIT_ASSERT( mapMessage2.itemExists( "String" ) );
+    ASSERT_TRUE(mapMessage2.itemExists( "String" ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -386,56 +386,56 @@ void ActiveMQMapMessageTest::testReadOnlyBody() {
         msg.getShort( "short" );
         msg.getString( "string" );
     } catch( MessageNotReadableException& mnre ) {
-        CPPUNIT_FAIL( "should be readable" );
+        FAIL() << ("should be readable");
     }
     try {
         msg.setBoolean( "boolean", true );
-        CPPUNIT_FAIL( "should throw exception" );
+        FAIL() << ("should throw exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         msg.setByte( "byte", (unsigned char)1 );
-        CPPUNIT_FAIL( "should throw exception" );
+        FAIL() << ("should throw exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         msg.setBytes( "bytes", buffer );
-        CPPUNIT_FAIL( "should throw exception" );
+        FAIL() << ("should throw exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         msg.setChar( "char", 'a' );
-        CPPUNIT_FAIL( "should throw exception" );
+        FAIL() << ("should throw exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         msg.setDouble( "double", 1.5 );
-        CPPUNIT_FAIL( "should throw exception" );
+        FAIL() << ("should throw exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         msg.setFloat( "float", 1.5f );
-        CPPUNIT_FAIL( "should throw exception" );
+        FAIL() << ("should throw exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         msg.setInt( "int", 1 );
-        CPPUNIT_FAIL( "should throw exception" );
+        FAIL() << ("should throw exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         msg.setLong( "long", 1 );
-        CPPUNIT_FAIL( "should throw exception" );
+        FAIL() << ("should throw exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         msg.setShort( "short", (short)1 );
-        CPPUNIT_FAIL( "should throw exception" );
+        FAIL() << ("should throw exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         msg.setString( "string", "string" );
-        CPPUNIT_FAIL( "should throw exception" );
+        FAIL() << ("should throw exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
 }

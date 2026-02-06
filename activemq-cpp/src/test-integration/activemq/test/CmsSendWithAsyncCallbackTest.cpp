@@ -133,7 +133,7 @@ CmsSendWithAsyncCallbackTest::~CmsSendWithAsyncCallbackTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsSendWithAsyncCallbackTest::setUp() {
+void CmsSendWithAsyncCallbackTest::SetUp() {
 
     factory.reset(ConnectionFactory::createCMSConnectionFactory(getBrokerURL()));
     connection.reset(factory->createConnection());
@@ -144,7 +144,7 @@ void CmsSendWithAsyncCallbackTest::setUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsSendWithAsyncCallbackTest::tearDown() {
+void CmsSendWithAsyncCallbackTest::TearDown() {
 
     factory.reset(NULL);
     connection.reset(NULL);
@@ -171,6 +171,6 @@ void CmsSendWithAsyncCallbackTest::testAsyncCallbackIsFaster() {
     double callbackRate = benchmarkCallbackRate(30);
     double nonCallbackRate = benchmarkNonCallbackRate(30);
 
-    CPPUNIT_ASSERT(callbackRate > 0);
-    CPPUNIT_ASSERT(nonCallbackRate > 0);
+    ASSERT_TRUE(callbackRate > 0);
+    ASSERT_TRUE(nonCallbackRate > 0);
 }

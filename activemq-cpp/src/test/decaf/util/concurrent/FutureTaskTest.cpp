@@ -126,44 +126,38 @@ FutureTaskTest::~FutureTaskTest() {
 ////////////////////////////////////////////////////////////////////////////////
 void FutureTaskTest::testConstructor1() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        new FutureTask<std::string>(NULL),
-        NullPointerException);
+    ASSERT_THROW(new FutureTask<std::string>(NULL), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void FutureTaskTest::testConstructor2() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        new FutureTask<std::string>(NULL, std::string("Test")),
-        NullPointerException);
+    ASSERT_THROW(new FutureTask<std::string>(NULL, std::string("Test")), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void FutureTaskTest::testConstructor3() {
     FutureTask<int> task(new FutureRunnable(), 10);
-    CPPUNIT_ASSERT(!task.isCancelled());
-    CPPUNIT_ASSERT(!task.isDone());
+    ASSERT_TRUE(!task.isCancelled());
+    ASSERT_TRUE(!task.isDone());
 
     task.run();
 
-    CPPUNIT_ASSERT(!task.isCancelled());
-    CPPUNIT_ASSERT(task.isDone());
+    ASSERT_TRUE(!task.isCancelled());
+    ASSERT_TRUE(task.isDone());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void FutureTaskTest::testConstructor4() {
 
     FutureTask<std::string> task(new FutureCallable<std::string>());
-    CPPUNIT_ASSERT(!task.isCancelled());
-    CPPUNIT_ASSERT(!task.isDone());
+    ASSERT_TRUE(!task.isCancelled());
+    ASSERT_TRUE(!task.isDone());
 
     task.run();
 
-    CPPUNIT_ASSERT(!task.isCancelled());
-    CPPUNIT_ASSERT(task.isDone());
+    ASSERT_TRUE(!task.isCancelled());
+    ASSERT_TRUE(task.isDone());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,24 +165,24 @@ void FutureTaskTest::testIsDone() {
 
     FutureTask<int> task(new NoOpCallable<int>());
     task.run();
-    CPPUNIT_ASSERT(task.isDone());
-    CPPUNIT_ASSERT(!task.isCancelled());
+    ASSERT_TRUE(task.isDone());
+    ASSERT_TRUE(!task.isCancelled());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void FutureTaskTest::testRunAndReset() {
     PublicFutureTask task(new NoOpCallable<std::string>());
-    CPPUNIT_ASSERT(task.runAndReset());
-    CPPUNIT_ASSERT(!task.isDone());
+    ASSERT_TRUE(task.runAndReset());
+    ASSERT_TRUE(!task.isDone());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void FutureTaskTest::testResetAfterCancel() {
     PublicFutureTask task(new NoOpCallable<std::string>());
-    CPPUNIT_ASSERT(task.cancel(false));
-    CPPUNIT_ASSERT(!task.runAndReset());
-    CPPUNIT_ASSERT(task.isDone());
-    CPPUNIT_ASSERT(task.isCancelled());
+    ASSERT_TRUE(task.cancel(false));
+    ASSERT_TRUE(!task.runAndReset());
+    ASSERT_TRUE(task.isDone());
+    ASSERT_TRUE(task.isCancelled());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -196,7 +190,7 @@ void FutureTaskTest::testSet() {
     PublicFutureTask task(new NoOpCallable<std::string>());
     task.set("one");
     try {
-        CPPUNIT_ASSERT_EQUAL(task.get(), std::string("one"));
+        ASSERT_EQ(task.get(), std::string("one"));
     } catch(Exception& e) {
         unexpectedException();
     }
@@ -213,7 +207,7 @@ void FutureTaskTest::testSetException() {
     } catch(ExecutionException& ee) {
         const NoSuchElementException* cause =
             dynamic_cast<const NoSuchElementException*>(ee.getCause());
-        CPPUNIT_ASSERT(cause != NULL);
+        ASSERT_TRUE(cause != NULL);
     } catch(Exception& e) {
         unexpectedException();
     }
@@ -222,28 +216,28 @@ void FutureTaskTest::testSetException() {
 ////////////////////////////////////////////////////////////////////////////////
 void FutureTaskTest::testCancelBeforeRun() {
     PublicFutureTask task(new NoOpCallable<std::string>());
-    CPPUNIT_ASSERT(task.cancel(false));
+    ASSERT_TRUE(task.cancel(false));
     task.run();
-    CPPUNIT_ASSERT(task.isDone());
-    CPPUNIT_ASSERT(task.isCancelled());
+    ASSERT_TRUE(task.isDone());
+    ASSERT_TRUE(task.isCancelled());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void FutureTaskTest::testCancelBeforeRun2() {
     PublicFutureTask task(new NoOpCallable<std::string>());
-    CPPUNIT_ASSERT(task.cancel(true));
+    ASSERT_TRUE(task.cancel(true));
     task.run();
-    CPPUNIT_ASSERT(task.isDone());
-    CPPUNIT_ASSERT(task.isCancelled());
+    ASSERT_TRUE(task.isDone());
+    ASSERT_TRUE(task.isCancelled());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void FutureTaskTest::testCancelAfterRun() {
     PublicFutureTask task(new NoOpCallable<std::string>());
     task.run();
-    CPPUNIT_ASSERT(!task.cancel(false));
-    CPPUNIT_ASSERT(task.isDone());
-    CPPUNIT_ASSERT(!task.isCancelled());
+    ASSERT_TRUE(!task.cancel(false));
+    ASSERT_TRUE(task.isDone());
+    ASSERT_TRUE(!task.isCancelled());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -255,10 +249,10 @@ void FutureTaskTest::testCancelInterrupt() {
 
     try {
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(task.cancel(true));
+        ASSERT_TRUE(task.cancel(true));
         t.join();
-        CPPUNIT_ASSERT(task.isDone());
-        CPPUNIT_ASSERT(task.isCancelled());
+        ASSERT_TRUE(task.isDone());
+        ASSERT_TRUE(task.isCancelled());
     } catch(InterruptedException& e) {
         unexpectedException();
     }
@@ -307,10 +301,10 @@ void FutureTaskTest::testCancelNoInterrupt() {
 
     try {
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(task.cancel(false));
+        ASSERT_TRUE(task.cancel(false));
         t.join();
-        CPPUNIT_ASSERT(task.isDone());
-        CPPUNIT_ASSERT(task.isCancelled());
+        ASSERT_TRUE(task.isDone());
+        ASSERT_TRUE(task.isCancelled());
     } catch(InterruptedException& e) {
         unexpectedException();
     }
@@ -357,14 +351,14 @@ void FutureTaskTest::testGet1() {
     Thread t(&runner);
 
     try {
-        CPPUNIT_ASSERT(!ft.isDone());
-        CPPUNIT_ASSERT(!ft.isCancelled());
+        ASSERT_TRUE(!ft.isDone());
+        ASSERT_TRUE(!ft.isCancelled());
         t.start();
         Thread::sleep(SHORT_DELAY_MS);
         ft.run();
         t.join();
-        CPPUNIT_ASSERT(ft.isDone());
-        CPPUNIT_ASSERT(!ft.isCancelled());
+        ASSERT_TRUE(ft.isDone());
+        ASSERT_TRUE(!ft.isCancelled());
     } catch(InterruptedException& e) {
         unexpectedException();
     }
@@ -412,13 +406,13 @@ void FutureTaskTest::testTimedGet1() {
     Thread t(&runner);
 
     try {
-        CPPUNIT_ASSERT(!ft.isDone());
-        CPPUNIT_ASSERT(!ft.isCancelled());
+        ASSERT_TRUE(!ft.isDone());
+        ASSERT_TRUE(!ft.isCancelled());
         t.start();
         ft.run();
         t.join();
-        CPPUNIT_ASSERT(ft.isDone());
-        CPPUNIT_ASSERT(!ft.isCancelled());
+        ASSERT_TRUE(ft.isDone());
+        ASSERT_TRUE(!ft.isCancelled());
     } catch(InterruptedException& e) {
         unexpectedException();
     }

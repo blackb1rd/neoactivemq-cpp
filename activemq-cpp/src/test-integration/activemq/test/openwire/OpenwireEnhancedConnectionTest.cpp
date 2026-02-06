@@ -133,22 +133,22 @@ void OpenwireEnhancedConnectionTest::testDestinationSourceGetters() {
 
     std::unique_ptr<ConnectionFactory> factory(
         ConnectionFactory::createCMSConnectionFactory( getBrokerURL() ) );
-    CPPUNIT_ASSERT( factory.get() != NULL );
+    ASSERT_TRUE(factory.get() != NULL);
 
     std::unique_ptr<Connection> connection( factory->createConnection() );
-    CPPUNIT_ASSERT( connection.get() != NULL );
+    ASSERT_TRUE(connection.get() != NULL);
 
     std::unique_ptr<Session> session( connection->createSession() );
-    CPPUNIT_ASSERT( session.get() != NULL );
+    ASSERT_TRUE(session.get() != NULL);
 
     ActiveMQConnection* amq = dynamic_cast<ActiveMQConnection*>(connection.get());
-    CPPUNIT_ASSERT(amq != NULL);
+    ASSERT_TRUE(amq != NULL);
 
     cms::EnhancedConnection* enhanced = dynamic_cast<cms::EnhancedConnection*>(connection.get());
-    CPPUNIT_ASSERT(enhanced != NULL);
+    ASSERT_TRUE(enhanced != NULL);
 
     std::unique_ptr<cms::DestinationSource> source(enhanced->getDestinationSource());
-    CPPUNIT_ASSERT(source.get() != NULL);
+    ASSERT_TRUE(source.get() != NULL);
 
     source->setListener(&listener);
 
@@ -175,26 +175,25 @@ void OpenwireEnhancedConnectionTest::testDestinationSourceGetters() {
 
     TimeUnit::SECONDS.sleep(2);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should be one Queue", currentQueueCount + 1, listener.queueCount);
-    CPPUNIT_ASSERT_MESSAGE("Should be at least Topic", listener.topicCount > currentTopicCount);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should be one temp Queue", currentTempQueueCount + 1, listener.tempQueueCount);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should be one temp Topic", currentTempTopicCount + 1, listener.tempTopicCount);
+    ASSERT_EQ(currentQueueCount + 1, listener.queueCount) << ("Should be one Queue");
+    ASSERT_TRUE(listener.topicCount > currentTopicCount) << ("Should be at least Topic");
+    ASSERT_EQ(currentTempQueueCount + 1, listener.tempQueueCount) << ("Should be one temp Queue");
+    ASSERT_EQ(currentTempTopicCount + 1, listener.tempTopicCount) << ("Should be one temp Topic");
 
     amq->destroyDestination(destination1.get());
     amq->destroyDestination(destination2.get());
 
     TimeUnit::SECONDS.sleep(2);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should be no Queues created by this test",
-                                 currentQueueCount, listener.queueCount);
+    ASSERT_EQ(currentQueueCount, listener.queueCount) << ("Should be no Queues created by this test");
 
     source->stop();
 
     std::unique_ptr<Destination> destination5( session->createTemporaryQueue() );
     std::unique_ptr<Destination> destination6( session->createTemporaryTopic() );
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Temp Queue Counts shouldn't change", currentTempQueueCount + 1, listener.tempQueueCount);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Temp Topic Counts shouldn't change", currentTempTopicCount + 1, listener.tempTopicCount);
+    ASSERT_EQ(currentTempQueueCount + 1, listener.tempQueueCount) << ("Temp Queue Counts shouldn't change");
+    ASSERT_EQ(currentTempTopicCount + 1, listener.tempTopicCount) << ("Temp Topic Counts shouldn't change");
 
     listener.reset();
     source->start();
@@ -204,10 +203,8 @@ void OpenwireEnhancedConnectionTest::testDestinationSourceGetters() {
 
     TimeUnit::SECONDS.sleep(2);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should be three total temp Queues from this test",
-                                 currentTempQueueCount + 3, listener.tempQueueCount);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should be three total temp Topics from this test",
-                                 currentTempTopicCount + 3, listener.tempTopicCount);
+    ASSERT_EQ(currentTempQueueCount + 3, listener.tempQueueCount) << ("Should be three total temp Queues from this test");
+    ASSERT_EQ(currentTempTopicCount + 3, listener.tempTopicCount) << ("Should be three total temp Topics from this test");
 
     source->stop();
     connection->close();
@@ -220,22 +217,22 @@ void OpenwireEnhancedConnectionTest::testDestinationSource() {
 
     std::unique_ptr<ConnectionFactory> factory(
         ConnectionFactory::createCMSConnectionFactory( getBrokerURL() ) );
-    CPPUNIT_ASSERT( factory.get() != NULL );
+    ASSERT_TRUE(factory.get() != NULL);
 
     std::unique_ptr<Connection> connection( factory->createConnection() );
-    CPPUNIT_ASSERT( connection.get() != NULL );
+    ASSERT_TRUE(connection.get() != NULL);
 
     std::unique_ptr<Session> session( connection->createSession() );
-    CPPUNIT_ASSERT( session.get() != NULL );
+    ASSERT_TRUE(session.get() != NULL);
 
     ActiveMQConnection* amq = dynamic_cast<ActiveMQConnection*>(connection.get());
-    CPPUNIT_ASSERT(amq != NULL);
+    ASSERT_TRUE(amq != NULL);
 
     cms::EnhancedConnection* enhanced = dynamic_cast<cms::EnhancedConnection*>(connection.get());
-    CPPUNIT_ASSERT(enhanced != NULL);
+    ASSERT_TRUE(enhanced != NULL);
 
     std::unique_ptr<cms::DestinationSource> source(enhanced->getDestinationSource());
-    CPPUNIT_ASSERT(source.get() != NULL);
+    ASSERT_TRUE(source.get() != NULL);
 
     source->setListener(&listener);
 
@@ -259,8 +256,8 @@ void OpenwireEnhancedConnectionTest::testDestinationSource() {
     std::vector<cms::TemporaryQueue*> tempQueues = source->getTemporaryQueues();
     std::vector<cms::TemporaryTopic*> tempTopics = source->getTemporaryTopics();
 
-    CPPUNIT_ASSERT_EQUAL(currTempQueueCount + 3, (int)tempQueues.size());
-    CPPUNIT_ASSERT_EQUAL(currTempTopicCount + 3, (int)tempTopics.size());
+    ASSERT_EQ(currTempQueueCount + 3, (int)tempQueues.size());
+    ASSERT_EQ(currTempTopicCount + 3, (int)tempTopics.size());
 
     for (int i = 0; i < 3; ++i) {
         delete tempQueues[i];

@@ -95,10 +95,7 @@ void ReaderTest::testReaderCharBufferNull() {
 
     CharBuffer* charBuffer = NULL;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an NullPointerException",
-        mockReader.read( charBuffer ),
-        NullPointerException );
+    ASSERT_THROW(mockReader.read( charBuffer ), NullPointerException) << ("Should throw an NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,10 +110,10 @@ void ReaderTest::testReaderCharBufferZeroChar() {
     CharBuffer* charBuffer = CharBuffer::allocate( 0 );
 
     int result = mockReader.read( charBuffer );
-    CPPUNIT_ASSERT_EQUAL( 0, result );
+    ASSERT_EQ(0, result);
     std::vector<char> destBuffer( srcBuffer.size() );
     mockReader.read( destBuffer );
-    CPPUNIT_ASSERT_EQUAL( s, std::string( destBuffer.begin(), destBuffer.end() ) );
+    ASSERT_EQ(s, std::string( destBuffer.begin(), destBuffer.end() ));
 
     delete charBuffer;
 }
@@ -133,22 +130,20 @@ void ReaderTest::testReaderCharBufferChar() {
     const int CHARBUFFER_REMAINING = charBuffer->remaining();
     int result = mockReader.read( charBuffer );
 
-    CPPUNIT_ASSERT_EQUAL( CHARBUFFER_REMAINING, result );
+    ASSERT_EQ(CHARBUFFER_REMAINING, result);
     charBuffer->rewind();
 
     CharSequence* subseq =
         charBuffer->subSequence( CHARBUFFER_SIZE - CHARBUFFER_REMAINING, CHARBUFFER_SIZE );
 
-    CPPUNIT_ASSERT_EQUAL( s.substr( 0, CHARBUFFER_REMAINING ),
-                          subseq->toString() );
+    ASSERT_EQ(s.substr( 0, CHARBUFFER_REMAINING ), subseq->toString());
 
     delete subseq;
 
     std::vector<char> destBuffer( srcBuffer.size() - CHARBUFFER_REMAINING );
 
     mockReader.read( destBuffer );
-    CPPUNIT_ASSERT_EQUAL( s.substr( CHARBUFFER_REMAINING ),
-                          std::string( destBuffer.begin(), destBuffer.end() ) );
+    ASSERT_EQ(s.substr( CHARBUFFER_REMAINING ), std::string( destBuffer.begin(), destBuffer.end() ));
 
     delete charBuffer;
 }
@@ -157,10 +152,7 @@ void ReaderTest::testReaderCharBufferChar() {
 void ReaderTest::testMark() {
 
     MockReader mockReader;
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IOException for Reader do not support mark",
-        mockReader.mark(0),
-        IOException );
+    ASSERT_THROW(mockReader.mark(0), IOException) << ("Should throw IOException for Reader do not support mark");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,7 +161,7 @@ void ReaderTest::testRead() {
     MockReader reader;
 
     // return -1 when the stream is null;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should be equal to -1", -1, reader.read());
+    ASSERT_EQ(-1, reader.read()) << ("Should be equal to -1");
 
     std::string s = "MY TEST STRING";
     std::vector<char> srcBuffer( s.begin(), s.end() );
@@ -179,30 +171,25 @@ void ReaderTest::testRead() {
     for( int ix = 0; ix < (int)srcBuffer.size(); ++ix ) {
 
         char c = srcBuffer[ix];
-        CPPUNIT_ASSERT_EQUAL_MESSAGE(
-            std::string( "Should be equal to \'" ) + c + "\'",
-            (int)c, mockReader.read() );
+        ASSERT_EQ((int)c, mockReader.read()) << (std::string( "Should be equal to \'" ) + c + "\'");
     }
 
     // return -1 when read Out of Index
     mockReader.read();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Should be equal to -1", -1, reader.read() );
+    ASSERT_EQ(-1, reader.read()) << ("Should be equal to -1");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ReaderTest::testReady() {
     MockReader mockReader;
-    CPPUNIT_ASSERT_MESSAGE( "Should always return false", !mockReader.ready() );
+    ASSERT_TRUE(!mockReader.ready()) << ("Should always return false");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ReaderTest::testReset() {
 
     MockReader mockReader;
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IOException",
-        mockReader.reset(),
-        IOException );
+    ASSERT_THROW(mockReader.reset(), IOException) << ("Should throw an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -211,11 +198,11 @@ void ReaderTest::testSkip() {
     std::vector<char> srcBuffer( s.begin(), s.end() );
     int length = (int)srcBuffer.size();
     MockReader mockReader( srcBuffer );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Should be equal to \'M\'", (int)'M', mockReader.read() );
+    ASSERT_EQ((int)'M', mockReader.read()) << ("Should be equal to \'M\'");
 
     // normal skip
     mockReader.skip( length / 2 );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Should be equal to \'S\'", (int)'S', mockReader.read() );
+    ASSERT_EQ((int)'S', mockReader.read()) << ("Should be equal to \'S\'");
 
     // try to skip a bigger number of characters than the total
     // Should do nothing

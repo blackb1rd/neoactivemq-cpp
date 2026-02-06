@@ -18,27 +18,12 @@
 #ifndef _ACTIVEMQ_UTIL_PRIMITIVEVALUECONVERTERTEST_H_
 #define _ACTIVEMQ_UTIL_PRIMITIVEVALUECONVERTERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace util {
 
-    class PrimitiveValueConverterTest  : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( PrimitiveValueConverterTest );
-        CPPUNIT_TEST( testConvertToBoolean );
-        CPPUNIT_TEST( testConvertToChar );
-        CPPUNIT_TEST( testConvertToByte );
-        CPPUNIT_TEST( testConvertToShort );
-        CPPUNIT_TEST( testConvertToInt );
-        CPPUNIT_TEST( testConvertToLong );
-        CPPUNIT_TEST( testConvertToFloat );
-        CPPUNIT_TEST( testConvertToDouble );
-        CPPUNIT_TEST( testConvertToString );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class PrimitiveValueConverterTest  : public ::testing::Test {
+public:
 
         PrimitiveValueConverterTest() {}
         virtual ~PrimitiveValueConverterTest() {}

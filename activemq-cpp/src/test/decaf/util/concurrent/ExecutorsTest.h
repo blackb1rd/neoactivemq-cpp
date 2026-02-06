@@ -25,26 +25,7 @@ namespace util {
 namespace concurrent {
 
     class ExecutorsTest : public ExecutorsTestSupport {
-
-        CPPUNIT_TEST_SUITE( ExecutorsTest );
-        CPPUNIT_TEST( testDefaultThreadFactory );
-        CPPUNIT_TEST( testNewFixedThreadPool1 );
-        CPPUNIT_TEST( testNewFixedThreadPool2 );
-        CPPUNIT_TEST( testNewFixedThreadPool3 );
-        CPPUNIT_TEST( testNewFixedThreadPool4 );
-        CPPUNIT_TEST( testNewSingleThreadExecutor1 );
-        CPPUNIT_TEST( testNewSingleThreadExecutor2 );
-        CPPUNIT_TEST( testNewSingleThreadExecutor3 );
-        CPPUNIT_TEST( testCastNewSingleThreadExecutor );
-        CPPUNIT_TEST( testUnconfigurableExecutorService );
-        CPPUNIT_TEST( testUnconfigurableExecutorServiceNPE );
-        CPPUNIT_TEST( testCallable1 );
-        CPPUNIT_TEST( testCallable2 );
-        CPPUNIT_TEST( testCallableNPE1 );
-        CPPUNIT_TEST( testCallableNPE2 );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         ExecutorsTest();
         virtual ~ExecutorsTest();

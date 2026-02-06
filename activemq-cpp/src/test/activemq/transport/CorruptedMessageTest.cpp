@@ -48,7 +48,24 @@ using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::util::concurrent;
 
-CPPUNIT_TEST_SUITE_REGISTRATION( CorruptedMessageTest );
+namespace activemq { namespace transport {
+TEST_F(CorruptedMessageTest, testCorruptedFirstMessage) { testCorruptedFirstMessage(); }
+TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages) { testCorruptedMessageBetweenValidMessages(); }
+TEST_F(CorruptedMessageTest, testContinueAfterCorruptedMessage) { testContinueAfterCorruptedMessage(); }
+TEST_F(CorruptedMessageTest, testMultipleCorruptedMessages) { testMultipleCorruptedMessages(); }
+TEST_F(CorruptedMessageTest, testCorruptedMessageWithoutMessageId) { testCorruptedMessageWithoutMessageId(); }
+TEST_F(CorruptedMessageTest, testMaxConsecutiveErrors) { testMaxConsecutiveErrors(); }
+TEST_F(CorruptedMessageTest, testPoisonAckSent) { testPoisonAckSent(); }
+TEST_F(CorruptedMessageTest, testStreamResyncAfterSingleCorruption) { testStreamResyncAfterSingleCorruption(); }
+TEST_F(CorruptedMessageTest, testCorruptedMessageDuringFailover) { testCorruptedMessageDuringFailover(); }
+TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts) { testCorruptionInDifferentMessageParts(); }
+TEST_F(CorruptedMessageTest, testCorruptedMessageNonDurableConsumer) { testCorruptedMessageNonDurableConsumer(); }
+TEST_F(CorruptedMessageTest, testCorruptedMessageDurableTopicSubscriber) { testCorruptedMessageDurableTopicSubscriber(); }
+TEST_F(CorruptedMessageTest, testPoisonAckForDurableSubscriber) { testPoisonAckForDurableSubscriber(); }
+TEST_F(CorruptedMessageTest, testEOFDuringMessageIdRead) { testEOFDuringMessageIdRead(); }
+TEST_F(CorruptedMessageTest, testEOFDuringPropertiesRead) { testEOFDuringPropertiesRead(); }
+TEST_F(CorruptedMessageTest, testEOFDuringBodyRead) { testEOFDuringBodyRead(); }
+}}
 
 ////////////////////////////////////////////////////////////////////////////////
 /**
@@ -390,12 +407,12 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::setUp() {
+void CorruptedMessageTest::SetUp() {
     // Setup code if needed
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::tearDown() {
+void CorruptedMessageTest::TearDown() {
     // Cleanup code if needed
 }
 
@@ -437,8 +454,7 @@ void CorruptedMessageTest::testCorruptedFirstMessage() {
         caughtException = true;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Corrupted message should throw exception during unmarshal",
-                          caughtException);
+    ASSERT_TRUE(caughtException) << ("Corrupted message should throw exception during unmarshal");
 
     // Test 2: Verify that if MessageId was unmarshaled before corruption,
     // it should be available in thread-local storage
@@ -483,18 +499,18 @@ void CorruptedMessageTest::testCorruptedMessageBetweenValidMessages() {
     // Message 1 - should succeed
     try {
         Pointer<Command> cmd1 = wireFormat->unmarshal(nullptr, dis.get());
-        CPPUNIT_ASSERT(cmd1 != nullptr);
+        ASSERT_TRUE(cmd1 != nullptr);
         Pointer<MessageDispatch> dispatch = cmd1.dynamicCast<MessageDispatch>();
-        CPPUNIT_ASSERT(dispatch != nullptr);
+        ASSERT_TRUE(dispatch != nullptr);
         validCount++;
     } catch (Exception& e) {
-        CPPUNIT_FAIL("First message should unmarshal successfully");
+        FAIL() << ("First message should unmarshal successfully");
     }
 
     // Message 2 - should throw (corrupted)
     try {
         Pointer<Command> cmd2 = wireFormat->unmarshal(nullptr, dis.get());
-        CPPUNIT_FAIL("Corrupted message should throw exception");
+        FAIL() << ("Corrupted message should throw exception");
     } catch (IOException& e) {
         corruptedCount++;
         // Expected - corrupted message
@@ -507,10 +523,8 @@ void CorruptedMessageTest::testCorruptedMessageBetweenValidMessages() {
     // This demonstrates why we need MAX_CONSECUTIVE_ERRORS and reconnection
     // We cannot reliably read message 3 after corruption in message 2
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should have successfully unmarshaled 1 valid message",
-                                1, validCount);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should have caught 1 corrupted message",
-                                1, corruptedCount);
+    ASSERT_EQ(1, validCount) << ("Should have successfully unmarshaled 1 valid message");
+    ASSERT_EQ(1, corruptedCount) << ("Should have caught 1 corrupted message");
 
     std::cout << "[CorruptedMessageTest] testCorruptedMessageBetweenValidMessages: "
               << "Verified valid message before corruption, then corruption detected" << std::endl;
@@ -542,8 +556,7 @@ void CorruptedMessageTest::testContinueAfterCorruptedMessage() {
         caughtException = true;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Corrupted message should throw exception",
-                          caughtException);
+    ASSERT_TRUE(caughtException) << ("Corrupted message should throw exception");
 
     // The key point: We didn't crash, we caught the exception
     // In production, IOTransport would:
@@ -578,14 +591,13 @@ void CorruptedMessageTest::testMultipleCorruptedMessages() {
 
         try {
             Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
-            CPPUNIT_FAIL("Corrupted message should throw exception");
+            FAIL() << ("Corrupted message should throw exception");
         } catch (Exception& e) {
             corruptedCount++;
         }
     }
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should have caught 5 corrupted messages",
-                                5, corruptedCount);
+    ASSERT_EQ(5, corruptedCount) << ("Should have caught 5 corrupted messages");
 
     std::cout << "[CorruptedMessageTest] testMultipleCorruptedMessages: "
               << "Verified 5 consecutive corruptions handled" << std::endl;
@@ -612,8 +624,7 @@ void CorruptedMessageTest::testCorruptedMessageWithoutMessageId() {
         caughtException = true;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Early corruption should throw exception",
-                          caughtException);
+    ASSERT_TRUE(caughtException) << ("Early corruption should throw exception");
 
     // In production, IOTransport would detect partial Message has no MessageId
     // and log: "Cannot send POISON_ACK - no MessageId"
@@ -647,14 +658,13 @@ void CorruptedMessageTest::testMaxConsecutiveErrors() {
 
         try {
             Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
-            CPPUNIT_FAIL("Corrupted message should throw exception");
+            FAIL() << ("Corrupted message should throw exception");
         } catch (Exception& e) {
             corruptedCount++;
         }
     }
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should have caught 10 consecutive errors",
-                                MAX_ERRORS, corruptedCount);
+    ASSERT_EQ(MAX_ERRORS, corruptedCount) << ("Should have caught 10 consecutive errors");
 
     // In production, IOTransport would:
     // - Handle first 9 errors with POISON_ACK
@@ -707,15 +717,14 @@ void CorruptedMessageTest::testPoisonAckSent() {
         wireFormat->marshal(Pointer<commands::Command>(ack), &mockTransport, dos.get());
         dos->flush();
     } catch (Exception& e) {
-        CPPUNIT_FAIL(std::string("POISON_ACK marshal should succeed: ") + e.getMessage());
+        FAIL() << (std::string("POISON_ACK marshal should succeed: ") + e.getMessage());
     }
 
     // Verify we wrote some bytes
     std::pair<unsigned char*, int> ackData = baos->toByteArray();
     std::vector<unsigned char> ackBytes(ackData.first, ackData.first + ackData.second);
     delete[] ackData.first;
-    CPPUNIT_ASSERT_MESSAGE("POISON_ACK should marshal to non-empty bytes",
-                          ackBytes.size() > 0);
+    ASSERT_TRUE(ackBytes.size() > 0) << ("POISON_ACK should marshal to non-empty bytes");
 
     std::cout << "[CorruptedMessageTest] testPoisonAckSent: "
               << "Verified POISON_ACK (ackType=1) marshals successfully, size="
@@ -745,9 +754,9 @@ void CorruptedMessageTest::testStreamResyncAfterSingleCorruption() {
     // Should unmarshal successfully
     try {
         Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
-        CPPUNIT_ASSERT(cmd != nullptr);
+        ASSERT_TRUE(cmd != nullptr);
     } catch (Exception& e) {
-        CPPUNIT_FAIL("Valid message should unmarshal successfully");
+        FAIL() << ("Valid message should unmarshal successfully");
     }
 
     // After corruption, we do NOT attempt resync
@@ -800,7 +809,7 @@ void CorruptedMessageTest::testCorruptedMessageDuringFailover() {
         }
     }
 
-    CPPUNIT_ASSERT_EQUAL(10, errorCount);
+    ASSERT_EQ(10, errorCount);
 
     std::cout << "[CorruptedMessageTest] testCorruptedMessageDuringFailover: "
               << "Verified error counter reaches MAX. Failover integration test "
@@ -828,7 +837,7 @@ void CorruptedMessageTest::testCorruptionInDifferentMessageParts() {
         } catch (Exception& e) {
             caught = true;
         }
-        CPPUNIT_ASSERT_MESSAGE("Early corruption should throw", caught);
+        ASSERT_TRUE(caught) << ("Early corruption should throw");
     }
 
     // Case 2: Corruption after MessageId (properties level - MOST COMMON)
@@ -846,7 +855,7 @@ void CorruptedMessageTest::testCorruptionInDifferentMessageParts() {
         } catch (Exception& e) {
             caught = true;
         }
-        CPPUNIT_ASSERT_MESSAGE("Properties corruption should throw", caught);
+        ASSERT_TRUE(caught) << ("Properties corruption should throw");
     }
 
     // Case 3: Truncated message (simulates EOF during body)
@@ -864,7 +873,7 @@ void CorruptedMessageTest::testCorruptionInDifferentMessageParts() {
         } catch (Exception& e) {
             caught = true;
         }
-        CPPUNIT_ASSERT_MESSAGE("Truncated message should throw", caught);
+        ASSERT_TRUE(caught) << ("Truncated message should throw");
     }
 
     // Summary of behavior:
@@ -905,8 +914,7 @@ void CorruptedMessageTest::testCorruptedMessageNonDurableConsumer() {
         caughtException = true;
     }
     
-    CPPUNIT_ASSERT_MESSAGE("Non-durable consumer corrupted message should throw exception",
-                          caughtException);
+    ASSERT_TRUE(caughtException) << ("Non-durable consumer corrupted message should throw exception");
     
     // In production, IOTransport would:
     // 1. Extract ConsumerId from partial MessageDispatch (non-durable format)
@@ -949,8 +957,7 @@ void CorruptedMessageTest::testCorruptedMessageDurableTopicSubscriber() {
         caughtException = true;
     }
     
-    CPPUNIT_ASSERT_MESSAGE("Durable subscriber corrupted message should throw exception",
-                          caughtException);
+    ASSERT_TRUE(caughtException) << ("Durable subscriber corrupted message should throw exception");
     
     // In production, IOTransport would:
     // 1. Extract ConsumerId from partial MessageDispatch (includes subscription name)
@@ -1006,15 +1013,14 @@ void CorruptedMessageTest::testPoisonAckForDurableSubscriber() {
         wireFormat->marshal(Pointer<commands::Command>(ack), &mockTransport, dos.get());
         dos->flush();
     } catch (Exception& e) {
-        CPPUNIT_FAIL(std::string("POISON_ACK marshal for durable subscriber should succeed: ")
+        FAIL() << (std::string("POISON_ACK marshal for durable subscriber should succeed: ")
                      + e.getMessage());
     }
 
     std::pair<unsigned char*, int> ackData = baos->toByteArray();
     std::vector<unsigned char> ackBytes(ackData.first, ackData.first + ackData.second);
     delete[] ackData.first;
-    CPPUNIT_ASSERT_MESSAGE("POISON_ACK for durable subscriber should marshal to non-empty bytes",
-                          ackBytes.size() > 0);
+    ASSERT_TRUE(ackBytes.size() > 0) << ("POISON_ACK for durable subscriber should marshal to non-empty bytes");
 
     // The key difference for durable subscribers:
     // - Broker uses subscription name to track DLQ messages
@@ -1052,7 +1058,7 @@ void CorruptedMessageTest::testEOFDuringMessageIdRead() {
     std::string exceptionType;
     try {
         Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
-        CPPUNIT_FAIL("Truncated message during MessageId should throw exception");
+        FAIL() << ("Truncated message during MessageId should throw exception");
     } catch (EOFException& e) {
         caughtException = true;
         exceptionType = "EOFException";
@@ -1064,8 +1070,7 @@ void CorruptedMessageTest::testEOFDuringMessageIdRead() {
         exceptionType = "Exception";
     }
     
-    CPPUNIT_ASSERT_MESSAGE("EOF during MessageId read should throw exception",
-                          caughtException);
+    ASSERT_TRUE(caughtException) << ("EOF during MessageId read should throw exception");
     
     // In production, IOTransport would:
     // 1. Catch EOFException
@@ -1105,7 +1110,7 @@ void CorruptedMessageTest::testEOFDuringPropertiesRead() {
     bool caughtException = false;
     try {
         Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
-        CPPUNIT_FAIL("Truncated message during properties should throw exception");
+        FAIL() << ("Truncated message during properties should throw exception");
     } catch (EOFException& e) {
         caughtException = true;
     } catch (IOException& e) {
@@ -1114,8 +1119,7 @@ void CorruptedMessageTest::testEOFDuringPropertiesRead() {
         caughtException = true;
     }
     
-    CPPUNIT_ASSERT_MESSAGE("EOF during properties read should throw exception",
-                          caughtException);
+    ASSERT_TRUE(caughtException) << ("EOF during properties read should throw exception");
     
     // In production, IOTransport would:
     // 1. Catch EOFException
@@ -1160,7 +1164,7 @@ void CorruptedMessageTest::testEOFDuringBodyRead() {
     bool caughtException = false;
     try {
         Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
-        CPPUNIT_FAIL("Truncated message during body should throw exception");
+        FAIL() << ("Truncated message during body should throw exception");
     } catch (EOFException& e) {
         caughtException = true;
     } catch (IOException& e) {
@@ -1169,8 +1173,7 @@ void CorruptedMessageTest::testEOFDuringBodyRead() {
         caughtException = true;
     }
     
-    CPPUNIT_ASSERT_MESSAGE("EOF during body read should throw exception",
-                          caughtException);
+    ASSERT_TRUE(caughtException) << ("EOF during body read should throw exception");
     
     // In production, IOTransport would:
     // 1. Catch EOFException

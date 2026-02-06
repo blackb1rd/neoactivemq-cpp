@@ -137,7 +137,7 @@ jobs:
       run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
 
     - name: Run unit tests
-      run: ctest --preset ${{ matrix.config.preset }} -R "neoactivemq-unit-tests" --output-on-failure --timeout 300
+      run: ctest --preset ${{ matrix.config.preset }} -R "^unit/" --output-on-failure --timeout 300
 
     - name: Upload test results
       if: failure()
@@ -202,7 +202,7 @@ jobs:
       run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
 
     - name: Run benchmarks
-      run: ctest --preset ${{ matrix.config.preset }} -R "neoactivemq-benchmarks" --output-on-failure --timeout 600
+      run: ctest --preset ${{ matrix.config.preset }} -R "^benchmark/" --output-on-failure --timeout 600
 
     - name: Upload test results
       if: failure()
@@ -281,7 +281,7 @@ jobs:
       run: docker compose ps
 
     - name: Run integration tests (${{ matrix.activemq.name }})
-      run: ctest --preset ${{ matrix.config.preset }} -R "neoactivemq-integration-tests" --output-on-failure --timeout 900
+      run: ctest --preset ${{ matrix.config.preset }} -R "^integration/" --output-on-failure --timeout 900
 
     - name: Show broker logs on failure
       if: failure()
@@ -370,7 +370,7 @@ jobs:
       run: docker compose --profile failover ps
 
     - name: Run system tests (${{ matrix.activemq.name }})
-      run: ctest --preset ${{ matrix.config.preset }} -R "neoactivemq-system-tests" --output-on-failure --timeout 1800
+      run: ctest --preset ${{ matrix.config.preset }} -R "^system/" --output-on-failure --timeout 1800
 
     - name: Show broker logs on failure
       if: failure()
@@ -585,7 +585,7 @@ jobs:
         path: output/build/${{ matrix.config.preset }}/
 
     - name: Run unit tests
-      run: ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -R "neoactivemq-unit-tests" --output-on-failure --timeout 300
+      run: ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -R "^unit/" --output-on-failure --timeout 300
 
     - name: Upload test results
       if: failure()
@@ -654,7 +654,7 @@ jobs:
         path: output/build/${{ matrix.config.preset }}/
 
     - name: Run benchmarks
-      run: ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -R "neoactivemq-benchmarks" --output-on-failure --timeout 600
+      run: ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -R "^benchmark/" --output-on-failure --timeout 600
 
     - name: Upload test results
       if: failure()

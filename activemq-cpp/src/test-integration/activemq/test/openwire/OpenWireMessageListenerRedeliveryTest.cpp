@@ -263,17 +263,17 @@ void OpenWireMessageListenerRedeliveryTest::testQueueRollbackConsumerListener() 
     TimeUnit::MILLISECONDS.sleep(500);
 
     // first try.. should get 2 since there is no delay on the first redelivery.
-    CPPUNIT_ASSERT_EQUAL(2, listener.getCounter());
+    ASSERT_EQ(2, listener.getCounter());
 
     TimeUnit::MILLISECONDS.sleep(1000);
 
     // 2nd redeliver (redelivery after 1 sec)
-    CPPUNIT_ASSERT_EQUAL(3, listener.getCounter());
+    ASSERT_EQ(3, listener.getCounter());
 
     TimeUnit::MILLISECONDS.sleep(2000);
 
     // 3rd redeliver (redelivery after 2 seconds) - it should give up after that
-    CPPUNIT_ASSERT_EQUAL(4, listener.getCounter());
+    ASSERT_EQ(4, listener.getCounter());
 
     // create new message
     std::unique_ptr<Message> secondMessage(session->createTextMessage("Hello 2"));
@@ -283,12 +283,12 @@ void OpenWireMessageListenerRedeliveryTest::testQueueRollbackConsumerListener() 
     TimeUnit::MILLISECONDS.sleep(500);
 
     // it should be committed, so no redelivery
-    CPPUNIT_ASSERT_EQUAL(5, listener.getCounter());
+    ASSERT_EQ(5, listener.getCounter());
 
     TimeUnit::MILLISECONDS.sleep(1500);
 
     // no redelivery, counter should still be 4
-    CPPUNIT_ASSERT_EQUAL(5, listener.getCounter());
+    ASSERT_EQ(5, listener.getCounter());
 
     connection->close();
 }
@@ -319,16 +319,14 @@ void OpenWireMessageListenerRedeliveryTest::testQueueSessionListenerExceptionRet
     ExceptionMessageListener listener("testQueueSessionListenerExceptionRetry", 2, maxDeliveries);
     consumer->setMessageListener(&listener);
 
-    CPPUNIT_ASSERT_MESSAGE("got message before retry expiry", listener.await(30, TimeUnit::SECONDS));
+    ASSERT_TRUE(listener.await(30, TimeUnit::SECONDS)) << ("got message before retry expiry");
 
     for (int i = 0; i < maxDeliveries; i++) {
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("got first redelivered: " + Integer::toString(i),
-            std::string("1"), listener.getReceived().get(i));
+        ASSERT_EQ(std::string("1"), listener.getReceived().get(i)) << ("got first redelivered: " + Integer::toString(i));
     }
 
     for (int i = maxDeliveries; i < maxDeliveries * 2; i++) {
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("got first redelivered: " + Integer::toString(i),
-            std::string("2"), listener.getReceived().get(i));
+        ASSERT_EQ(std::string("2"), listener.getReceived().get(i)) << ("got first redelivered: " + Integer::toString(i));
     }
 
     connection->close();
@@ -366,20 +364,20 @@ void OpenWireMessageListenerRedeliveryTest::testQueueSessionListenerExceptionDlq
     std::unique_ptr<MessageConsumer> consumer(session->createConsumer(queue.get()));
     consumer->setMessageListener(&listener);
 
-    CPPUNIT_ASSERT_MESSAGE("got message before retry expiry", listener.await(20, TimeUnit::SECONDS));
+    ASSERT_TRUE(listener.await(20, TimeUnit::SECONDS)) << ("got message before retry expiry");
 
     // check DLQ
-    CPPUNIT_ASSERT_MESSAGE("got dlq message", dlqListener.await(30, TimeUnit::SECONDS));
+    ASSERT_TRUE(dlqListener.await(30, TimeUnit::SECONDS)) << ("got dlq message");
 
     // check DLQ message cause is captured
     Pointer<cms::Message> dlqMessage = dlqListener.getReceived().get(0);
-    CPPUNIT_ASSERT_MESSAGE("dlq message captured", dlqMessage != NULL);
+    ASSERT_TRUE(dlqMessage != NULL) << ("dlq message captured");
     String cause = dlqMessage->getStringProperty(DLQ_DELIVERY_FAILURE_CAUSE_PROPERTY);
 
-    CPPUNIT_ASSERT_MESSAGE("cause 'cause' exception is remembered", cause.contains("Exception"));
-    CPPUNIT_ASSERT_MESSAGE("is correct exception", cause.contains(TEST_NAME));
-    CPPUNIT_ASSERT_MESSAGE("cause exception is remembered", cause.contains("JMSException"));
-    CPPUNIT_ASSERT_MESSAGE("cause policy is remembered", cause.contains("RedeliveryPolicy"));
+    ASSERT_TRUE(cause.contains("Exception")) << ("cause 'cause' exception is remembered");
+    ASSERT_TRUE(cause.contains(TEST_NAME)) << ("is correct exception");
+    ASSERT_TRUE(cause.contains("JMSException")) << ("cause exception is remembered");
+    ASSERT_TRUE(cause.contains("RedeliveryPolicy")) << ("cause policy is remembered");
 
     connection->close();
 }
@@ -417,20 +415,20 @@ void OpenWireMessageListenerRedeliveryTest::testTransactedQueueSessionListenerEx
     std::unique_ptr<MessageConsumer> consumer(session->createConsumer(queue.get()));
     consumer->setMessageListener(&listener);
 
-    CPPUNIT_ASSERT_MESSAGE("got message before retry expiry", listener.await(20, TimeUnit::SECONDS));
+    ASSERT_TRUE(listener.await(20, TimeUnit::SECONDS)) << ("got message before retry expiry");
 
     // check DLQ
-    CPPUNIT_ASSERT_MESSAGE("got dlq message", dlqListener.await(30, TimeUnit::SECONDS));
+    ASSERT_TRUE(dlqListener.await(30, TimeUnit::SECONDS)) << ("got dlq message");
 
     // check DLQ message cause is captured
     Pointer<cms::Message> dlqMessage = dlqListener.getReceived().get(0);
-    CPPUNIT_ASSERT_MESSAGE("dlq message captured", dlqMessage != NULL);
+    ASSERT_TRUE(dlqMessage != NULL) << ("dlq message captured");
     String cause = dlqMessage->getStringProperty(DLQ_DELIVERY_FAILURE_CAUSE_PROPERTY);
 
-    CPPUNIT_ASSERT_MESSAGE("cause 'cause' exception is remembered", cause.contains("Exception"));
-    CPPUNIT_ASSERT_MESSAGE("is correct exception", cause.contains(TEST_NAME));
-    CPPUNIT_ASSERT_MESSAGE("cause exception is remembered", cause.contains("JMSException"));
-    CPPUNIT_ASSERT_MESSAGE("cause policy is remembered", cause.contains("RedeliveryPolicy"));
+    ASSERT_TRUE(cause.contains("Exception")) << ("cause 'cause' exception is remembered");
+    ASSERT_TRUE(cause.contains(TEST_NAME)) << ("is correct exception");
+    ASSERT_TRUE(cause.contains("JMSException")) << ("cause exception is remembered");
+    ASSERT_TRUE(cause.contains("RedeliveryPolicy")) << ("cause policy is remembered");
 
     connection->close();
 }

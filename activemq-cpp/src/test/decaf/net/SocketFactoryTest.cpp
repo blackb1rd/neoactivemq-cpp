@@ -121,9 +121,9 @@ namespace{
 
             } catch (io::IOException& ex) {
                 printf("%s\n", ex.getMessage().c_str());
-                CPPUNIT_ASSERT( false);
+                ASSERT_TRUE(false);
             } catch (...) {
-                CPPUNIT_ASSERT( false);
+                ASSERT_TRUE(false);
             }
         }
     };
@@ -148,9 +148,9 @@ void SocketFactoryTest::test() {
             }
         }
 
-        CPPUNIT_ASSERT( client->isConnected());
+        ASSERT_TRUE(client->isConnected());
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 1);
+        ASSERT_TRUE(serverThread.getNumClients() == 1);
 
         client->close();
 
@@ -160,13 +160,13 @@ void SocketFactoryTest::test() {
             }
         }
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 0);
+        ASSERT_TRUE(serverThread.getNumClients() == 0);
 
         serverThread.stop();
         serverThread.join();
     } catch (lang::Exception& ex) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false);
+        ASSERT_TRUE(false);
     }
 }
 
@@ -184,7 +184,7 @@ void SocketFactoryTest::testNoDelay() {
         client->setSoLinger(false, 0);
         client->setTcpNoDelay(true);
 
-        CPPUNIT_ASSERT( client->getTcpNoDelay() == true);
+        ASSERT_TRUE(client->getTcpNoDelay() == true);
 
         synchronized(&serverThread.mutex) {
             if (serverThread.getNumClients() != 1) {
@@ -192,9 +192,9 @@ void SocketFactoryTest::testNoDelay() {
             }
         }
 
-        CPPUNIT_ASSERT( client->isConnected());
+        ASSERT_TRUE(client->isConnected());
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 1);
+        ASSERT_TRUE(serverThread.getNumClients() == 1);
 
         client->close();
 
@@ -204,11 +204,11 @@ void SocketFactoryTest::testNoDelay() {
             }
         }
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 0);
+        ASSERT_TRUE(serverThread.getNumClients() == 0);
 
         serverThread.stop();
         serverThread.join();
     } catch (lang::Exception& ex) {
-        CPPUNIT_ASSERT( false);
+        ASSERT_TRUE(false);
     }
 }

@@ -83,7 +83,7 @@ namespace {
 
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireFailoverIntegrationTest::OpenwireFailoverIntegrationTest()
-    : CppUnit::TestFixture(), connection(), session() {
+    : connection(), session() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,13 +91,13 @@ OpenwireFailoverIntegrationTest::~OpenwireFailoverIntegrationTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireFailoverIntegrationTest::setUp() {
+void OpenwireFailoverIntegrationTest::SetUp() {
     // Connection setup is done in individual tests since they may need
     // different configurations
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireFailoverIntegrationTest::tearDown() {
+void OpenwireFailoverIntegrationTest::TearDown() {
     try {
         if (session.get() != nullptr) {
             session->close();
@@ -122,16 +122,16 @@ void OpenwireFailoverIntegrationTest::testFailoverConnection() {
         new ActiveMQConnectionFactory(getFailoverURL()));
 
     connection.reset(factory->createConnection());
-    CPPUNIT_ASSERT(connection.get() != nullptr);
+    ASSERT_TRUE(connection.get() != nullptr);
 
     connection->start();
 
     session.reset(connection->createSession(Session::AUTO_ACKNOWLEDGE));
-    CPPUNIT_ASSERT(session.get() != nullptr);
+    ASSERT_TRUE(session.get() != nullptr);
 
     // Verify we can create a destination
     std::unique_ptr<Queue> queue(session->createQueue("failover.test.queue." + UUID::randomUUID().toString()));
-    CPPUNIT_ASSERT(queue.get() != nullptr);
+    ASSERT_TRUE(queue.get() != nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -167,11 +167,11 @@ void OpenwireFailoverIntegrationTest::testSendReceiveWithFailover() {
         if (message.get() != nullptr) {
             received++;
             TextMessage* textMsg = dynamic_cast<TextMessage*>(message.get());
-            CPPUNIT_ASSERT(textMsg != nullptr);
+            ASSERT_TRUE(textMsg != nullptr);
         }
     }
 
-    CPPUNIT_ASSERT_EQUAL(numMessages, received);
+    ASSERT_EQ(numMessages, received);
 
     producer->close();
     consumer->close();
@@ -215,7 +215,7 @@ void OpenwireFailoverIntegrationTest::testFailoverReconnectOnBrokerDown() {
     Thread::sleep(500);
 
     // Connection should still be active
-    CPPUNIT_ASSERT(connection.get() != nullptr);
+    ASSERT_TRUE(connection.get() != nullptr);
 
     // Should still be able to send messages
     std::unique_ptr<TextMessage> message2(
@@ -270,7 +270,7 @@ void OpenwireFailoverIntegrationTest::testMessageDeliveryDuringFailover() {
         received++;
     }
 
-    CPPUNIT_ASSERT_EQUAL(totalMessages, received);
+    ASSERT_EQ(totalMessages, received);
 
     producer->close();
     consumer->close();
@@ -312,7 +312,7 @@ void OpenwireFailoverIntegrationTest::testFailoverWithAsyncConsumer() {
         waitTime += 100;
     }
 
-    CPPUNIT_ASSERT_EQUAL(numMessages, listener.getMessagesReceived());
+    ASSERT_EQ(numMessages, listener.getMessagesReceived());
 
     consumer->setMessageListener(nullptr);
     producer->close();
@@ -321,4 +321,10 @@ void OpenwireFailoverIntegrationTest::testFailoverWithAsyncConsumer() {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Register the test suite
-CPPUNIT_TEST_SUITE_REGISTRATION(OpenwireFailoverIntegrationTest);
+namespace activemq { namespace test { namespace openwire {
+TEST_F(OpenwireFailoverIntegrationTest, testFailoverConnection) { testFailoverConnection(); }
+TEST_F(OpenwireFailoverIntegrationTest, testSendReceiveWithFailover) { testSendReceiveWithFailover(); }
+TEST_F(OpenwireFailoverIntegrationTest, testFailoverReconnectOnBrokerDown) { testFailoverReconnectOnBrokerDown(); }
+TEST_F(OpenwireFailoverIntegrationTest, testMessageDeliveryDuringFailover) { testMessageDeliveryDuringFailover(); }
+TEST_F(OpenwireFailoverIntegrationTest, testFailoverWithAsyncConsumer) { testFailoverWithAsyncConsumer(); }
+}}}

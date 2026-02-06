@@ -193,7 +193,7 @@ namespace util{
 }}
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimerTest::setUp() {
+void TimerTest::SetUp() {
     timerCounter.set( 0 );
 }
 
@@ -215,8 +215,7 @@ void TimerTest::testConstructor() {
         } catch( InterruptedException& e ) {}
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "TimerTask.run() method not called after 200ms",
-                            1 == report.wasRun.get() );
+    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method not called after 200ms");
 
     t->cancel();
 }
@@ -233,10 +232,7 @@ void TimerTest::testCancel() {
     TimerTestTask* testTask = new TimerTestTask( &report, &this->timerCounter, &this->gsync );
     t->cancel();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Scheduling a task after Timer.cancel() should throw IllegalStateException",
-        t->schedule( testTask, 100, 200 ),
-        IllegalStateException );
+    ASSERT_THROW(t->schedule( testTask, 100, 200 ), IllegalStateException) << ("Scheduling a task after Timer.cancel() should throw IllegalStateException");
 
     // unscheduled tasks must be deleted
     delete testTask;
@@ -251,8 +247,7 @@ void TimerTest::testCancel() {
         } catch( InterruptedException& e ) {}
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "TimerTask.run() method not called after 200ms",
-                            1 == report.wasRun.get() );
+    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method not called after 200ms");
 
     t->cancel();
     synchronized( &this->gsync ) {
@@ -261,8 +256,7 @@ void TimerTest::testCancel() {
         } catch( InterruptedException& e ) {}
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "TimerTask.run() method should not have been run more than once",
-                            1 == report.wasRun.get() );
+    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method should not have been run more than once");
 
     // Ensure you can call cancel more than once
     report.wasRun.set( 0 );
@@ -275,8 +269,7 @@ void TimerTest::testCancel() {
         } catch( InterruptedException& e ) {}
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "TimerTask.run() method not called after 200ms",
-                            1 == report.wasRun.get() );
+    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method not called after 200ms");
 
     t->cancel();
     t->cancel();
@@ -288,8 +281,7 @@ void TimerTest::testCancel() {
         } catch( InterruptedException& e ) {}
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "TimerTask.run() method should not have been called after cancel",
-                            1 == report.wasRun.get() );
+    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method should not have been called after cancel");
 
     // Ensure that a call to cancel from within a timer ensures no more
     // run
@@ -310,9 +302,8 @@ void TimerTest::testCancel() {
         } catch( InterruptedException& e ) {}
     }
 
-    CPPUNIT_ASSERT_MESSAGE( std::string( "TimerTask.run() method should be called 5 times not " ) +
-                            Integer::toString( report.wasRun.get() ),
-                            5 == report.wasRun.get() );
+    ASSERT_TRUE(5 == report.wasRun.get()) << (std::string( "TimerTask.run() method should be called 5 times not " ) +
+                            Integer::toString( report.wasRun.get() ));
 
     t->cancel();
     try {
@@ -327,7 +318,7 @@ void TimerTest::testPurge() {
     std::unique_ptr<Timer> t;
 
     t.reset( new Timer() );
-    CPPUNIT_ASSERT( 0 == t->purge() );
+    ASSERT_TRUE(0 == t->purge());
 
     std::vector< TimerTestTask* > tasks;
     tasks.resize( 100 );
@@ -346,8 +337,8 @@ void TimerTest::testPurge() {
         tasks[i]->cancel();
     }
 
-    CPPUNIT_ASSERT( t->purge() <= 50 );
-    CPPUNIT_ASSERT( 0 == t->purge() );
+    ASSERT_TRUE(t->purge() <= 50);
+    ASSERT_TRUE(0 == t->purge());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -371,8 +362,7 @@ void TimerTest::testSchedule_TimerTask_Date() {
         delete testTask;
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after Timer.cancel() should throw exception",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a task after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
     t.reset( new Timer() );
@@ -388,8 +378,7 @@ void TimerTest::testSchedule_TimerTask_Date() {
         delete testTask;
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after cancelling it should throw exception",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
@@ -404,8 +393,7 @@ void TimerTest::testSchedule_TimerTask_Date() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task with negative date should throw IllegalArgumentException",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a task with negative date should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
@@ -417,8 +405,7 @@ void TimerTest::testSchedule_TimerTask_Date() {
     } catch( NullPointerException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task should throw NullPointerException",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a null task should throw NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -431,8 +418,7 @@ void TimerTest::testSchedule_TimerTask_Date() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task with negative date should throw IllegalArgumentException first",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a null task with negative date should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run
@@ -444,8 +430,7 @@ void TimerTest::testSchedule_TimerTask_Date() {
         Thread::sleep( 400 );
     } catch( InterruptedException& e ) {}
 
-    CPPUNIT_ASSERT_MESSAGE( "TimerTask.run() method not called after 200ms",
-                            1 == report.wasRun.get() );
+    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method not called after 200ms");
     t->cancel();
 
     // Ensure multiple tasks are run
@@ -470,8 +455,8 @@ void TimerTest::testSchedule_TimerTask_Date() {
         Thread::sleep( 400 );
     } catch( InterruptedException& e ) {}
 
-    CPPUNIT_ASSERT_MESSAGE( std::string( "Multiple tasks should have incremented counter 4 times not " ) +
-                            Integer::toString( timerCounter.get() ), timerCounter.get() == 4 );
+    ASSERT_TRUE(timerCounter.get() == 4) << (std::string( "Multiple tasks should have incremented counter 4 times not " ) +
+                            Integer::toString( timerCounter.get() ));
     t->cancel();
 }
 
@@ -494,8 +479,7 @@ void TimerTest::testSchedule_TimerTask_Date2() {
         exception = true;
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after Timer.cancel() should throw exception",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a task after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
     t.reset( new Timer() );
@@ -509,8 +493,7 @@ void TimerTest::testSchedule_TimerTask_Date2() {
         exception = true;
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after cancelling it should throw exception",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
@@ -523,8 +506,7 @@ void TimerTest::testSchedule_TimerTask_Date2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task with negative date should throw IllegalArgumentException",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a task with negative date should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
@@ -536,8 +518,7 @@ void TimerTest::testSchedule_TimerTask_Date2() {
     } catch( NullPointerException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task should throw NullPointerException",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a null task should throw NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -550,8 +531,7 @@ void TimerTest::testSchedule_TimerTask_Date2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task with negative date should throw IllegalArgumentException first",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a null task with negative date should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run
@@ -563,8 +543,7 @@ void TimerTest::testSchedule_TimerTask_Date2() {
         Thread::sleep( 500 );
     } catch( InterruptedException& e ) {}
 
-    CPPUNIT_ASSERT_MESSAGE( "TimerTask.run() method not called after 200ms",
-                            1 == report.wasRun.get() );
+    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method not called after 200ms");
     t->cancel();
 
     // Ensure multiple tasks are run
@@ -589,8 +568,8 @@ void TimerTest::testSchedule_TimerTask_Date2() {
         Thread::sleep( 400 );
     } catch( InterruptedException& e ) {}
 
-    CPPUNIT_ASSERT_MESSAGE( std::string( "Multiple tasks should have incremented counter 4 times not " ) +
-                            Integer::toString( timerCounter.get() ), timerCounter.get() == 4 );
+    ASSERT_TRUE(timerCounter.get() == 4) << (std::string( "Multiple tasks should have incremented counter 4 times not " ) +
+                            Integer::toString( timerCounter.get() ));
     t->cancel();
 }
 
@@ -612,8 +591,7 @@ void TimerTest::testSchedule_TimerTask_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after Timer.cancel() should throw exception",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a task after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
     t.reset( new Timer() );
@@ -627,8 +605,7 @@ void TimerTest::testSchedule_TimerTask_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after cancelling it should throw exception",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
@@ -642,8 +619,7 @@ void TimerTest::testSchedule_TimerTask_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task with negative delay should throw IllegalArgumentException",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a task with negative delay should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
@@ -654,8 +630,7 @@ void TimerTest::testSchedule_TimerTask_Long() {
     } catch( NullPointerException e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task should throw NullPointerException",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a null task should throw NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -667,8 +642,7 @@ void TimerTest::testSchedule_TimerTask_Long() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task with negative delays should throw IllegalArgumentException first",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a null task with negative delays should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run
@@ -679,8 +653,7 @@ void TimerTest::testSchedule_TimerTask_Long() {
         Thread::sleep( 400 );
     } catch( InterruptedException& e ) {
     }
-    CPPUNIT_ASSERT_MESSAGE( "TimerTask.run() method not called after 200ms",
-                            1 == report.wasRun.get() );
+    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method not called after 200ms");
     t->cancel();
 
     // Ensure multiple tasks are run
@@ -702,8 +675,8 @@ void TimerTest::testSchedule_TimerTask_Long() {
     } catch( InterruptedException& e ) {
     }
 
-    CPPUNIT_ASSERT_MESSAGE( std::string( "Multiple tasks should have incremented counter 4 times not " ) +
-                            Integer::toString( timerCounter.get() ), timerCounter.get() == 4 );
+    ASSERT_TRUE(timerCounter.get() == 4) << (std::string( "Multiple tasks should have incremented counter 4 times not " ) +
+                            Integer::toString( timerCounter.get() ));
     t->cancel();
 }
 
@@ -723,8 +696,7 @@ void TimerTest::testSchedule_TimerTask_Long2() {
     } catch( IllegalStateException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after Timer.cancel() should throw exception",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a task after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
     t.reset( new Timer() );
@@ -736,8 +708,7 @@ void TimerTest::testSchedule_TimerTask_Long2() {
     } catch( IllegalStateException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after cancelling it should throw exception",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
@@ -749,8 +720,7 @@ void TimerTest::testSchedule_TimerTask_Long2() {
     } catch( IllegalArgumentException e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task with negative delay should throw IllegalArgumentException",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a task with negative delay should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
@@ -761,8 +731,7 @@ void TimerTest::testSchedule_TimerTask_Long2() {
     } catch( NullPointerException e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task should throw NullPointerException",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a null task should throw NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -774,8 +743,7 @@ void TimerTest::testSchedule_TimerTask_Long2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task with negative delays should throw IllegalArgumentException first",
-                            exception == true );
+    ASSERT_TRUE(exception == true) << ("Scheduling a null task with negative delays should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run
@@ -786,8 +754,7 @@ void TimerTest::testSchedule_TimerTask_Long2() {
         Thread::sleep( 400 );
     } catch( InterruptedException& e ) {
     }
-    CPPUNIT_ASSERT_MESSAGE( "TimerTask.run() method not called after 200ms",
-                            1 == report.wasRun.get() );
+    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method not called after 200ms");
     t->cancel();
 
     // Ensure multiple tasks are run
@@ -809,8 +776,8 @@ void TimerTest::testSchedule_TimerTask_Long2() {
     } catch( InterruptedException& e ) {
     }
 
-    CPPUNIT_ASSERT_MESSAGE( std::string( "Multiple tasks should have incremented counter 4 times not " ) +
-                            Integer::toString( timerCounter.get() ), timerCounter.get() == 4 );
+    ASSERT_TRUE(timerCounter.get() == 4) << (std::string( "Multiple tasks should have incremented counter 4 times not " ) +
+                            Integer::toString( timerCounter.get() ));
     t->cancel();
 }
 
@@ -832,7 +799,7 @@ void TimerTest::testSchedule_TimerTask_Long_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after Timer.cancel() should throw exception", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
     t.reset( new Timer() );
@@ -846,7 +813,7 @@ void TimerTest::testSchedule_TimerTask_Long_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after cancelling it should throw exception", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is
@@ -861,7 +828,7 @@ void TimerTest::testSchedule_TimerTask_Long_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task with negative delay should throw IllegalArgumentException", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative delay should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is negative
@@ -875,7 +842,7 @@ void TimerTest::testSchedule_TimerTask_Long_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task with negative period should throw IllegalArgumentException", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative period should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is zero
@@ -889,7 +856,7 @@ void TimerTest::testSchedule_TimerTask_Long_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task with 0 period should throw IllegalArgumentException", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task with 0 period should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
@@ -900,7 +867,7 @@ void TimerTest::testSchedule_TimerTask_Long_Long() {
     } catch( NullPointerException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task should throw NullPointerException", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a null task should throw NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -912,7 +879,7 @@ void TimerTest::testSchedule_TimerTask_Long_Long() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task with negative delays should throw IllegalArgumentException first", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a null task with negative delays should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run at least twice
@@ -923,9 +890,8 @@ void TimerTest::testSchedule_TimerTask_Long_Long() {
         Thread::sleep( 400 );
     } catch( InterruptedException& e ) {
     }
-    CPPUNIT_ASSERT_MESSAGE( "TimerTask.run() method should have been called at least twice (" +
-                            Integer::toString( report.wasRun.get() ) + ")",
-                            report.wasRun.get() >= 2 );
+    ASSERT_TRUE(report.wasRun.get() >= 2) << ("TimerTask.run() method should have been called at least twice (" +
+                            Integer::toString( report.wasRun.get() ) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
@@ -946,8 +912,8 @@ void TimerTest::testSchedule_TimerTask_Long_Long() {
         Thread::sleep( 1200 ); // Allowed more room for error
     } catch( InterruptedException& e ) {
     }
-    CPPUNIT_ASSERT_MESSAGE( std::string( "Multiple tasks should have incremented counter 24 times not " ) +
-                            Integer::toString( timerCounter.get() ), timerCounter.get() >= 24 );
+    ASSERT_TRUE(timerCounter.get() >= 24) << (std::string( "Multiple tasks should have incremented counter 24 times not " ) +
+                            Integer::toString( timerCounter.get() ));
     t->cancel();
 }
 
@@ -967,7 +933,7 @@ void TimerTest::testSchedule_TimerTask_Long_Long2() {
     } catch( IllegalStateException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after Timer.cancel() should throw exception", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
     t.reset( new Timer() );
@@ -979,7 +945,7 @@ void TimerTest::testSchedule_TimerTask_Long_Long2() {
     } catch( IllegalStateException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after cancelling it should throw exception", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is
@@ -992,7 +958,7 @@ void TimerTest::testSchedule_TimerTask_Long_Long2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task with negative delay should throw IllegalArgumentException", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative delay should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is negative
@@ -1004,7 +970,7 @@ void TimerTest::testSchedule_TimerTask_Long_Long2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task with negative period should throw IllegalArgumentException", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative period should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is zero
@@ -1016,7 +982,7 @@ void TimerTest::testSchedule_TimerTask_Long_Long2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task with 0 period should throw IllegalArgumentException", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task with 0 period should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
@@ -1027,7 +993,7 @@ void TimerTest::testSchedule_TimerTask_Long_Long2() {
     } catch( NullPointerException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task should throw NullPointerException", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a null task should throw NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -1039,7 +1005,7 @@ void TimerTest::testSchedule_TimerTask_Long_Long2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task with negative delays should throw IllegalArgumentException first", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a null task with negative delays should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run at least twice
@@ -1050,9 +1016,8 @@ void TimerTest::testSchedule_TimerTask_Long_Long2() {
         Thread::sleep( 400 );
     } catch( InterruptedException& e ) {
     }
-    CPPUNIT_ASSERT_MESSAGE( "TimerTask.run() method should have been called at least twice (" +
-                            Integer::toString( report.wasRun.get() ) + ")",
-                            report.wasRun.get() >= 2 );
+    ASSERT_TRUE(report.wasRun.get() >= 2) << ("TimerTask.run() method should have been called at least twice (" +
+                            Integer::toString( report.wasRun.get() ) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
@@ -1073,8 +1038,8 @@ void TimerTest::testSchedule_TimerTask_Long_Long2() {
         Thread::sleep( 1200 ); // Allowed more room for error
     } catch( InterruptedException& e ) {
     }
-    CPPUNIT_ASSERT_MESSAGE( std::string( "Multiple tasks should have incremented counter 24 times not " ) +
-                            Integer::toString( timerCounter.get() ), timerCounter.get() >= 24 );
+    ASSERT_TRUE(timerCounter.get() >= 24) << (std::string( "Multiple tasks should have incremented counter 24 times not " ) +
+                            Integer::toString( timerCounter.get() ));
     t->cancel();
 }
 
@@ -1097,7 +1062,7 @@ void TimerTest::testSchedule_TimerTask_Date_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after Timer.cancel() should throw exception", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
     t.reset( new Timer() );
@@ -1112,7 +1077,7 @@ void TimerTest::testSchedule_TimerTask_Date_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after cancelling it should throw exception", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is
@@ -1128,7 +1093,7 @@ void TimerTest::testSchedule_TimerTask_Date_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task with negative delay should throw IllegalArgumentException", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative delay should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is
@@ -1144,7 +1109,7 @@ void TimerTest::testSchedule_TimerTask_Date_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task with negative period should throw IllegalArgumentException", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative period should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
@@ -1156,7 +1121,7 @@ void TimerTest::testSchedule_TimerTask_Date_Long() {
     } catch( NullPointerException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task should throw NullPointerException", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a null task should throw NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -1169,7 +1134,7 @@ void TimerTest::testSchedule_TimerTask_Date_Long() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task with negative dates should throw IllegalArgumentException first", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a null task with negative dates should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run at least twice
@@ -1181,9 +1146,8 @@ void TimerTest::testSchedule_TimerTask_Date_Long() {
         Thread::sleep( 800 );
     } catch( InterruptedException& e ) {
     }
-    CPPUNIT_ASSERT_MESSAGE( std::string( "TimerTask.run() method should have been called at least twice (" ) +
-                            Integer::toString( report.wasRun.get() ) + ")",
-                            report.wasRun.get() >= 2 );
+    ASSERT_TRUE(report.wasRun.get() >= 2) << (std::string( "TimerTask.run() method should have been called at least twice (" ) +
+                            Integer::toString( report.wasRun.get() ) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
@@ -1208,8 +1172,8 @@ void TimerTest::testSchedule_TimerTask_Date_Long() {
         Thread::sleep( 3000 );
     } catch( InterruptedException& e ) {
     }
-    CPPUNIT_ASSERT_MESSAGE( std::string( "Multiple tasks should have incremented counter 24 times not " ) +
-                            Integer::toString( timerCounter.get() ), timerCounter.get() >= 24 );
+    ASSERT_TRUE(timerCounter.get() >= 24) << (std::string( "Multiple tasks should have incremented counter 24 times not " ) +
+                            Integer::toString( timerCounter.get() ));
     t->cancel();
 }
 
@@ -1230,7 +1194,7 @@ void TimerTest::testSchedule_TimerTask_Date_Long2() {
     } catch( IllegalStateException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after Timer.cancel() should throw exception", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
     t.reset( new Timer() );
@@ -1243,7 +1207,7 @@ void TimerTest::testSchedule_TimerTask_Date_Long2() {
     } catch( IllegalStateException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task after cancelling it should throw exception", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is
@@ -1257,7 +1221,7 @@ void TimerTest::testSchedule_TimerTask_Date_Long2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task with negative delay should throw IllegalArgumentException", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative delay should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is
@@ -1271,7 +1235,7 @@ void TimerTest::testSchedule_TimerTask_Date_Long2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a task with negative period should throw IllegalArgumentException", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative period should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
@@ -1283,7 +1247,7 @@ void TimerTest::testSchedule_TimerTask_Date_Long2() {
     } catch( NullPointerException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task should throw NullPointerException", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a null task should throw NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -1296,7 +1260,7 @@ void TimerTest::testSchedule_TimerTask_Date_Long2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task with negative dates should throw IllegalArgumentException first", exception );
+    ASSERT_TRUE(exception) << ("Scheduling a null task with negative dates should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run at least twice
@@ -1308,9 +1272,8 @@ void TimerTest::testSchedule_TimerTask_Date_Long2() {
         Thread::sleep( 800 );
     } catch( InterruptedException& e ) {
     }
-    CPPUNIT_ASSERT_MESSAGE( std::string( "TimerTask.run() method should have been called at least twice (" ) +
-                            Integer::toString( report.wasRun.get() ) + ")",
-                            report.wasRun.get() >= 2 );
+    ASSERT_TRUE(report.wasRun.get() >= 2) << (std::string( "TimerTask.run() method should have been called at least twice (" ) +
+                            Integer::toString( report.wasRun.get() ) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
@@ -1335,8 +1298,8 @@ void TimerTest::testSchedule_TimerTask_Date_Long2() {
         Thread::sleep( 3000 );
     } catch( InterruptedException& e ) {
     }
-    CPPUNIT_ASSERT_MESSAGE( std::string( "Multiple tasks should have incremented counter 24 times not " ) +
-                            Integer::toString( timerCounter.get() ), timerCounter.get() >= 24 );
+    ASSERT_TRUE(timerCounter.get() >= 24) << (std::string( "Multiple tasks should have incremented counter 24 times not " ) +
+                            Integer::toString( timerCounter.get() ));
     t->cancel();
 }
 
@@ -1358,7 +1321,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Long_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "scheduleAtFixedRate after Timer.cancel() should throw exception", exception );
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
     t.reset( new Timer() );
@@ -1371,8 +1334,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Long_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "scheduleAtFixedRate with negative delay should throw IllegalArgumentException",
-                            exception );
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative delay should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is negative
@@ -1386,8 +1348,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Long_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "scheduleAtFixedRate with negative period should throw IllegalArgumentException",
-                            exception );
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative period should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a task is run at least twice
@@ -1398,9 +1359,8 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Long_Long() {
         Thread::sleep( 400 );
     } catch( InterruptedException& e ) {
     }
-    CPPUNIT_ASSERT_MESSAGE( std::string( "TimerTask.run() method should have been called at least twice (" ) +
-                            Integer::toString( report.wasRun.get() ) + ")",
-                            report.wasRun.get() >= 2 );
+    ASSERT_TRUE(report.wasRun.get() >= 2) << (std::string( "TimerTask.run() method should have been called at least twice (" ) +
+                            Integer::toString( report.wasRun.get() ) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
@@ -1415,9 +1375,8 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Long_Long() {
     } catch( InterruptedException& e ) {
     }
     long long lastDelta = report.lastDelta;
-    CPPUNIT_ASSERT_MESSAGE( "Fixed Rate Schedule should catch up, but is off by " +
-                            Long::toString( lastDelta ) + " ms",
-                            lastDelta < 300 );
+    ASSERT_TRUE(lastDelta < 300) << ("Fixed Rate Schedule should catch up, but is off by " +
+                            Long::toString( lastDelta ) + " ms");
     t->cancel();
 }
 
@@ -1437,7 +1396,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Long_Long2() {
     } catch( IllegalStateException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "scheduleAtFixedRate after Timer.cancel() should throw exception", exception );
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
     t.reset( new Timer() );
@@ -1448,8 +1407,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Long_Long2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "scheduleAtFixedRate with negative delay should throw IllegalArgumentException",
-                            exception );
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative delay should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is negative
@@ -1461,8 +1419,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Long_Long2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "scheduleAtFixedRate with negative period should throw IllegalArgumentException",
-                            exception );
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative period should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a task is run at least twice
@@ -1473,9 +1430,8 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Long_Long2() {
         Thread::sleep( 400 );
     } catch( InterruptedException& e ) {
     }
-    CPPUNIT_ASSERT_MESSAGE( std::string( "TimerTask.run() method should have been called at least twice (" ) +
-                            Integer::toString( report.wasRun.get() ) + ")",
-                            report.wasRun.get() >= 2 );
+    ASSERT_TRUE(report.wasRun.get() >= 2) << (std::string( "TimerTask.run() method should have been called at least twice (" ) +
+                            Integer::toString( report.wasRun.get() ) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
@@ -1490,9 +1446,8 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Long_Long2() {
     } catch( InterruptedException& e ) {
     }
     long long lastDelta = report.lastDelta;
-    CPPUNIT_ASSERT_MESSAGE( "Fixed Rate Schedule should catch up, but is off by " +
-                            Long::toString( lastDelta ) + " ms",
-                            lastDelta < 300 );
+    ASSERT_TRUE(lastDelta < 300) << ("Fixed Rate Schedule should catch up, but is off by " +
+                            Long::toString( lastDelta ) + " ms");
     t->cancel();
 }
 
@@ -1515,7 +1470,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Date_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "scheduleAtFixedRate after Timer.cancel() should throw exception", exception );
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
     t.reset( new Timer() );
@@ -1529,8 +1484,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Date_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "scheduleAtFixedRate with negative Date should throw IllegalArgumentException",
-                            exception );
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative Date should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is negative
@@ -1544,8 +1498,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Date_Long() {
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    CPPUNIT_ASSERT_MESSAGE( "scheduleAtFixedRate with negative period should throw IllegalArgumentException",
-                            exception );
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative period should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -1558,8 +1511,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Date_Long() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task with negative date should throw IllegalArgumentException first",
-                            exception );
+    ASSERT_TRUE(exception) << ("Scheduling a null task with negative date should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -1571,8 +1523,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Date_Long() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task & negative period should throw IllegalArgumentException first",
-                            exception );
+    ASSERT_TRUE(exception) << ("Scheduling a null task & negative period should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run at least twice
@@ -1584,9 +1535,8 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Date_Long() {
         Thread::sleep( 400 );
     } catch( InterruptedException& e ) {
     }
-    CPPUNIT_ASSERT_MESSAGE( std::string( "TimerTask.run() method should have been called at least twice (" ) +
-                            Integer::toString( report.wasRun.get() ) + ")",
-                            report.wasRun.get() >= 2 );
+    ASSERT_TRUE(report.wasRun.get() >= 2) << (std::string( "TimerTask.run() method should have been called at least twice (" ) +
+                            Integer::toString( report.wasRun.get() ) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
@@ -1602,9 +1552,8 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Date_Long() {
     } catch( InterruptedException& e ) {
     }
     long long lastDelta = report.lastDelta;
-    CPPUNIT_ASSERT_MESSAGE( std::string( "Fixed Rate Schedule should catch up, but is off by " ) +
-                            Long::toString( lastDelta ) + " ms",
-                            lastDelta < 300 );
+    ASSERT_TRUE(lastDelta < 300) << (std::string( "Fixed Rate Schedule should catch up, but is off by " ) +
+                            Long::toString( lastDelta ) + " ms");
     t->cancel();
 }
 
@@ -1625,7 +1574,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Date_Long2() {
     } catch( IllegalStateException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "scheduleAtFixedRate after Timer.cancel() should throw exception", exception );
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
     t.reset( new Timer() );
@@ -1637,8 +1586,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Date_Long2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "scheduleAtFixedRate with negative Date should throw IllegalArgumentException",
-                            exception );
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative Date should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is negative
@@ -1650,8 +1598,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Date_Long2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "scheduleAtFixedRate with negative period should throw IllegalArgumentException",
-                            exception );
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative period should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -1664,8 +1611,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Date_Long2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task with negative date should throw IllegalArgumentException first",
-                            exception );
+    ASSERT_TRUE(exception) << ("Scheduling a null task with negative date should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -1677,8 +1623,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Date_Long2() {
     } catch( IllegalArgumentException& e ) {
         exception = true;
     }
-    CPPUNIT_ASSERT_MESSAGE( "Scheduling a null task & negative period should throw IllegalArgumentException first",
-                            exception );
+    ASSERT_TRUE(exception) << ("Scheduling a null task & negative period should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run at least twice
@@ -1690,9 +1635,8 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Date_Long2() {
         Thread::sleep( 400 );
     } catch( InterruptedException& e ) {
     }
-    CPPUNIT_ASSERT_MESSAGE( std::string( "TimerTask.run() method should have been called at least twice (" ) +
-                            Integer::toString( report.wasRun.get() ) + ")",
-                            report.wasRun.get() >= 2 );
+    ASSERT_TRUE(report.wasRun.get() >= 2) << (std::string( "TimerTask.run() method should have been called at least twice (" ) +
+                            Integer::toString( report.wasRun.get() ) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
@@ -1708,8 +1652,7 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Date_Long2() {
     } catch( InterruptedException& e ) {
     }
     long long lastDelta = report.lastDelta;
-    CPPUNIT_ASSERT_MESSAGE( std::string( "Fixed Rate Schedule should catch up, but is off by " ) +
-                            Long::toString( lastDelta ) + " ms",
-                            lastDelta < 300 );
+    ASSERT_TRUE(lastDelta < 300) << (std::string( "Fixed Rate Schedule should catch up, but is off by " ) +
+                            Long::toString( lastDelta ) + " ms");
     t->cancel();
 }

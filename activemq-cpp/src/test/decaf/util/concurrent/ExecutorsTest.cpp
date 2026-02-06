@@ -95,10 +95,7 @@ void ExecutorsTest::testNewSingleThreadExecutor2() {
 ////////////////////////////////////////////////////////////////////////////////
 void ExecutorsTest::testNewSingleThreadExecutor3() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a NullPointerException",
-        Executors::newSingleThreadExecutor(NULL),
-        NullPointerException);
+    ASSERT_THROW(Executors::newSingleThreadExecutor(NULL), NullPointerException) << ("Should throw a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,10 +103,7 @@ void ExecutorsTest::testCastNewSingleThreadExecutor() {
 
     Pointer<ExecutorService> e(Executors::newSingleThreadExecutor());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a ClassCastException",
-        e.dynamicCast<ThreadPoolExecutor>(),
-        ClassCastException);
+    ASSERT_THROW(e.dynamicCast<ThreadPoolExecutor>(), ClassCastException) << ("Should throw a ClassCastException");
 
     joinPool(e.get());
 }
@@ -125,9 +119,9 @@ void ExecutorsTest::testDefaultThreadFactory() {
 
     Thread* theThread = defaultFactory->newThread(runner);
 
-    CPPUNIT_ASSERT(theThread != NULL);
+    ASSERT_TRUE(theThread != NULL);
     const int expected = Thread::NORM_PRIORITY;
-    CPPUNIT_ASSERT_EQUAL(expected, theThread->getPriority());
+    ASSERT_EQ(expected, theThread->getPriority());
 
     theThread->start();
 
@@ -164,19 +158,13 @@ void ExecutorsTest::testNewFixedThreadPool2() {
 ////////////////////////////////////////////////////////////////////////////////
 void ExecutorsTest::testNewFixedThreadPool3() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a NullPointerException",
-        Executors::newFixedThreadPool(2, NULL),
-        NullPointerException);
+    ASSERT_THROW(Executors::newFixedThreadPool(2, NULL), NullPointerException) << ("Should throw a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ExecutorsTest::testNewFixedThreadPool4() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IllegalArgumentException",
-        Executors::newFixedThreadPool(0),
-        IllegalArgumentException);
+    ASSERT_THROW(Executors::newFixedThreadPool(0), IllegalArgumentException) << ("Should throw a IllegalArgumentException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -194,40 +182,31 @@ void ExecutorsTest::testUnconfigurableExecutorService() {
 ////////////////////////////////////////////////////////////////////////////////
 void ExecutorsTest::testUnconfigurableExecutorServiceNPE() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a NullPointerException",
-        Executors::unconfigurableExecutorService(NULL),
-        NullPointerException);
+    ASSERT_THROW(Executors::unconfigurableExecutorService(NULL), NullPointerException) << ("Should throw a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ExecutorsTest::testCallable1() {
 
     Pointer< Callable<int> > c(Executors::callable<int>(new NoOpRunnable()));
-    CPPUNIT_ASSERT_EQUAL(0, c->call());
+    ASSERT_EQ(0, c->call());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ExecutorsTest::testCallable2() {
 
     Pointer< Callable<int> > c(Executors::callable<int>(new NoOpRunnable(), 42));
-    CPPUNIT_ASSERT_EQUAL(42, c->call());
+    ASSERT_EQ(42, c->call());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ExecutorsTest::testCallableNPE1() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a NullPointerException",
-        Executors::callable<int>(NULL),
-        NullPointerException);
+    ASSERT_THROW(Executors::callable<int>(NULL), NullPointerException) << ("Should throw a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ExecutorsTest::testCallableNPE2() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a NullPointerException",
-        Executors::callable<int>(NULL, 42),
-        NullPointerException);
+    ASSERT_THROW(Executors::callable<int>(NULL, 42), NullPointerException) << ("Should throw a NullPointerException");
 }

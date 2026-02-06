@@ -26,13 +26,7 @@ namespace test {
 namespace openwire {
 
     class OpenwireAsyncSenderTest : public AsyncSenderTest {
-
-        CPPUNIT_TEST_SUITE( OpenwireAsyncSenderTest );
-        CPPUNIT_TEST( testAsyncSends );
-        CPPUNIT_TEST( testOpenWireConnector );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireAsyncSenderTest();
         virtual ~OpenwireAsyncSenderTest();

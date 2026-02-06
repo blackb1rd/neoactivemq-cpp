@@ -18,9 +18,7 @@
 #ifndef _ACTIVEMQ_WIREFORMAT_OPENWIRE_MARSHAL_BASEDATASTREAMMARSHALLERTEST_H_
 #define _ACTIVEMQ_WIREFORMAT_OPENWIRE_MARSHAL_BASEDATASTREAMMARSHALLERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <activemq/wireformat/openwire/marshal/BaseDataStreamMarshaller.h>
 #include <activemq/commands/DataStructure.h>
 
@@ -29,14 +27,8 @@ namespace wireformat{
 namespace openwire{
 namespace marshal{
 
-    class BaseDataStreamMarshallerTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( BaseDataStreamMarshallerTest );
-        CPPUNIT_TEST( testLooseMarshal );
-        CPPUNIT_TEST( testTightMarshal );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class BaseDataStreamMarshallerTest : public ::testing::Test {
+public:
 
         class SimpleDataStructure : public commands::BaseDataStructure {
         public:
@@ -377,8 +369,8 @@ namespace marshal{
         BaseDataStreamMarshallerTest() : dataStructure(NULL) {}
         virtual ~BaseDataStreamMarshallerTest() {}
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         void testLooseMarshal();
         void testTightMarshal();

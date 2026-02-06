@@ -26,16 +26,7 @@ namespace test {
 namespace openwire {
 
     class OpenwireClientAckTest : public CMSTestFixture {
-
-        CPPUNIT_TEST_SUITE( OpenwireClientAckTest );
-        CPPUNIT_TEST( testAckedMessageAreConsumed );
-        CPPUNIT_TEST( testLastMessageAcked );
-        CPPUNIT_TEST( testUnAckedMessageAreNotConsumedOnSessionClose );
-        CPPUNIT_TEST( testUnAckedMessageAreNotConsumedOnSessionCloseAsync );
-        CPPUNIT_TEST( testAckedMessageAreConsumedAsync );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireClientAckTest();
         virtual ~OpenwireClientAckTest();

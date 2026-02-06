@@ -18,25 +18,12 @@
 #ifndef _ACTIVEMQ_THREADS_SCHEDULERTEST_H_
 #define _ACTIVEMQ_THREADS_SCHEDULERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace threads {
 
-    class SchedulerTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( SchedulerTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testScheduleNullRunnableThrows );
-        CPPUNIT_TEST( testExecutePeriodically );
-        CPPUNIT_TEST( testSchedualPeriodically );
-        CPPUNIT_TEST( testExecuteAfterDelay );
-        CPPUNIT_TEST( testCancel );
-        CPPUNIT_TEST( testShutdown );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class SchedulerTest : public ::testing::Test {
+public:
 
         SchedulerTest();
         virtual ~SchedulerTest();

@@ -42,15 +42,12 @@ StringTest::~StringTest() {
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testDefaultConstructor() {
     String test;
-    CPPUNIT_ASSERT_MESSAGE("Default string should equal empty", test == "");
+    ASSERT_TRUE(test == "") << ("Default string should equal empty");
 
-    CPPUNIT_ASSERT(test.length() == 0);
-    CPPUNIT_ASSERT(test.isEmpty() == true);
+    ASSERT_TRUE(test.length() == 0);
+    ASSERT_TRUE(test.isEmpty() == true);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        test.charAt(1),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(test.charAt(1), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,15 +57,12 @@ void StringTest::testConstructorStdString() {
 
     String test(stdString);
 
-    CPPUNIT_ASSERT(test.length() == 5);
-    CPPUNIT_ASSERT(test.isEmpty() == false);
+    ASSERT_TRUE(test.length() == 5);
+    ASSERT_TRUE(test.isEmpty() == false);
 
-    CPPUNIT_ASSERT_MESSAGE("String and std::string should be equal", test == stdString);
+    ASSERT_TRUE(test == stdString) << ("String and std::string should be equal");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        test.charAt(5),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(test.charAt(5), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,20 +72,14 @@ void StringTest::testConstructorCString() {
 
     String test(cstring);
 
-    CPPUNIT_ASSERT(test.length() == 5);
-    CPPUNIT_ASSERT(test.isEmpty() == false);
+    ASSERT_TRUE(test.length() == 5);
+    ASSERT_TRUE(test.isEmpty() == false);
 
-    CPPUNIT_ASSERT_MESSAGE("String and C string should be equal", test == cstring);
+    ASSERT_TRUE(test == cstring) << ("String and C string should be equal");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        test.charAt(5),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(test.charAt(5), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an NullPointerException",
-        String((const char*)NULL),
-        NullPointerException);
+    ASSERT_THROW(String((const char*)NULL), NullPointerException) << ("Should have thrown an NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,25 +90,16 @@ void StringTest::testConstructorCStringWithSize() {
 
     String test(cstring, 5);
 
-    CPPUNIT_ASSERT(test.length() == 5);
-    CPPUNIT_ASSERT(test.isEmpty() == false);
+    ASSERT_TRUE(test.length() == 5);
+    ASSERT_TRUE(test.isEmpty() == false);
 
-    CPPUNIT_ASSERT_MESSAGE("String and C string should be equal", test == expected);
+    ASSERT_TRUE(test == expected) << ("String and C string should be equal");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        test.charAt(5),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(test.charAt(5), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an NullPointerException",
-        String((const char*)NULL, 10),
-        NullPointerException);
+    ASSERT_THROW(String((const char*)NULL, 10), NullPointerException) << ("Should have thrown an NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        String(cstring, -1),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(String(cstring, -1), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -131,30 +110,18 @@ void StringTest::testConstructorCStringOffsetAndLength() {
 
     String test(cstring, 1, 5);
 
-    CPPUNIT_ASSERT(test.length() == 5);
-    CPPUNIT_ASSERT(test.isEmpty() == false);
+    ASSERT_TRUE(test.length() == 5);
+    ASSERT_TRUE(test.isEmpty() == false);
 
-    CPPUNIT_ASSERT_MESSAGE("String and C string should be equal", test == expected);
+    ASSERT_TRUE(test == expected) << ("String and C string should be equal");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        test.charAt(5),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(test.charAt(5), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an NullPointerException",
-        String((const char*)NULL, 1, 20),
-        NullPointerException);
+    ASSERT_THROW(String((const char*)NULL, 1, 20), NullPointerException) << ("Should have thrown an NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        String(cstring, -1, 5),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(String(cstring, -1, 5), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        String(cstring, 1, -5),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(String(cstring, 1, -5), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -165,35 +132,20 @@ void StringTest::testConstructorCStringSizeOffsetAndLength() {
 
     String test(cstring, 7, 1, 5);
 
-    CPPUNIT_ASSERT(test.length() == 5);
-    CPPUNIT_ASSERT(test.isEmpty() == false);
+    ASSERT_TRUE(test.length() == 5);
+    ASSERT_TRUE(test.isEmpty() == false);
 
-    CPPUNIT_ASSERT_MESSAGE("String and C string should be equal", test == expected);
+    ASSERT_TRUE(test == expected) << ("String and C string should be equal");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        test.charAt(5),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(test.charAt(5), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an NullPointerException",
-        String((const char*)NULL, 7, 1, 4),
-        NullPointerException);
+    ASSERT_THROW(String((const char*)NULL, 7, 1, 4), NullPointerException) << ("Should have thrown an NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        String(cstring, -1, 0, 5),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(String(cstring, -1, 0, 5), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        String(cstring, 7, -1, 5),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(String(cstring, 7, -1, 5), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        String(cstring, 7, 1, -5),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(String(cstring, 7, 1, -5), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -203,15 +155,12 @@ void StringTest::testConstructorString() {
 
     String test(original);
 
-    CPPUNIT_ASSERT(test.length() == 5);
-    CPPUNIT_ASSERT(test.isEmpty() == false);
+    ASSERT_TRUE(test.length() == 5);
+    ASSERT_TRUE(test.isEmpty() == false);
 
-    CPPUNIT_ASSERT_MESSAGE("String and std::string should be equal", test == original);
+    ASSERT_TRUE(test == original) << ("String and std::string should be equal");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        test.charAt(5),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(test.charAt(5), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -220,14 +169,11 @@ void StringTest::testConstructorCharFill() {
     String expected("AAAAA");
     String input('A', 5);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("String fill failed", expected, input);
+    ASSERT_EQ(expected, input) << ("String fill failed");
 
-    CPPUNIT_ASSERT_MESSAGE("String should be empty", String('A', 0).isEmpty());
+    ASSERT_TRUE(String('A', 0).isEmpty()) << ("String should be empty");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException",
-        String('A', -1),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(String('A', -1), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -241,16 +187,16 @@ void StringTest::testAssignmentString() {
     const String expected("World");
 
     transient = input;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("String assignment failed", transient, input);
+    ASSERT_EQ(transient, input) << ("String assignment failed");
     transient = hello;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("String assignment failed", transient, hello);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("String assignment failed", input, String("HelloWorld"));
+    ASSERT_EQ(transient, hello) << ("String assignment failed");
+    ASSERT_EQ(input, String("HelloWorld")) << ("String assignment failed");
     transient = world;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("String assignment failed", transient, world);
+    ASSERT_EQ(transient, world) << ("String assignment failed");
 
     String toEmpty("ABCDEF");
     toEmpty = String("");
-    CPPUNIT_ASSERT_MESSAGE("String did not get set to empty", toEmpty.isEmpty());
+    ASSERT_TRUE(toEmpty.isEmpty()) << ("String did not get set to empty");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -264,16 +210,16 @@ void StringTest::testAssignmentStdString() {
     const String expected("World");
 
     transient = input;
-    CPPUNIT_ASSERT_MESSAGE("String assignment failed", transient.equals(input));
+    ASSERT_TRUE(transient.equals(input)) << ("String assignment failed");
     transient = hello;
-    CPPUNIT_ASSERT_MESSAGE("String assignment failed", transient.equals(hello));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("String assignment failed", input, String("HelloWorld"));
+    ASSERT_TRUE(transient.equals(hello)) << ("String assignment failed");
+    ASSERT_EQ(input, String("HelloWorld")) << ("String assignment failed");
     transient = world;
-    CPPUNIT_ASSERT_MESSAGE("String assignment failed", transient.equals(world));
+    ASSERT_TRUE(transient.equals(world)) << ("String assignment failed");
 
     String toEmpty("ABCDEF");
     toEmpty = std::string("");
-    CPPUNIT_ASSERT_MESSAGE("String did not get set to empty", toEmpty.isEmpty());
+    ASSERT_TRUE(toEmpty.isEmpty()) << ("String did not get set to empty");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -287,16 +233,16 @@ void StringTest::testAssignmentCString() {
     const String expected("World");
 
     transient = input;
-    CPPUNIT_ASSERT_MESSAGE("String assignment failed", transient.equals(input));
+    ASSERT_TRUE(transient.equals(input)) << ("String assignment failed");
     transient = hello;
-    CPPUNIT_ASSERT_MESSAGE("String assignment failed", transient.equals(hello));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("String assignment failed", input, String("HelloWorld"));
+    ASSERT_TRUE(transient.equals(hello)) << ("String assignment failed");
+    ASSERT_EQ(input, String("HelloWorld")) << ("String assignment failed");
     transient = world;
-    CPPUNIT_ASSERT_MESSAGE("String assignment failed", transient.equals(world));
+    ASSERT_TRUE(transient.equals(world)) << ("String assignment failed");
 
     String toEmpty("ABCDEF");
     toEmpty = "";
-    CPPUNIT_ASSERT_MESSAGE("String did not get set to empty", toEmpty.isEmpty());
+    ASSERT_TRUE(toEmpty.isEmpty()) << ("String did not get set to empty");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -305,39 +251,39 @@ void StringTest::testCompact() {
     const String input("HelloWorld");
     const String expected("World");
 
-    CPPUNIT_ASSERT_MESSAGE("Incorrect substring returned", expected.equals(input.substring(5)));
-    CPPUNIT_ASSERT_MESSAGE("not identical", expected.substring(0) == expected);
+    ASSERT_TRUE(expected.equals(input.substring(5))) << ("Incorrect substring returned");
+    ASSERT_TRUE(expected.substring(0) == expected) << ("not identical");
 
     String subStr = input.substring(5);
-    CPPUNIT_ASSERT_MESSAGE("wrong length returned.", subStr.length() == 5);
+    ASSERT_TRUE(subStr.length() == 5) << ("wrong length returned.");
     String compacted = subStr.compact();
-    CPPUNIT_ASSERT_MESSAGE("wrong length returned.", compacted.length() == 5);
-    CPPUNIT_ASSERT_MESSAGE("Incorrect compacted string returned", expected.equals(compacted));
+    ASSERT_TRUE(compacted.length() == 5) << ("wrong length returned.");
+    ASSERT_TRUE(expected.equals(compacted)) << ("Incorrect compacted string returned");
 
     String empty;
     empty = empty.compact();
-    CPPUNIT_ASSERT_MESSAGE("wrong length returned.", empty.isEmpty());
+    ASSERT_TRUE(empty.isEmpty()) << ("wrong length returned.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testIsEmpty() {
 
     String hw("HelloWorld");
-    CPPUNIT_ASSERT_MESSAGE("String should not be empty", !hw.isEmpty());
+    ASSERT_TRUE(!hw.isEmpty()) << ("String should not be empty");
 
     String empty;
-    CPPUNIT_ASSERT_MESSAGE("String should be empty", empty.isEmpty());
+    ASSERT_TRUE(empty.isEmpty()) << ("String should be empty");
 
     hw = String("");
-    CPPUNIT_ASSERT_MESSAGE("String should be empty", hw.isEmpty());
+    ASSERT_TRUE(hw.isEmpty()) << ("String should be empty");
     hw = "A";
-    CPPUNIT_ASSERT_MESSAGE("String should not be empty", !hw.isEmpty());
+    ASSERT_TRUE(!hw.isEmpty()) << ("String should not be empty");
     hw = std::string("");
-    CPPUNIT_ASSERT_MESSAGE("String should be empty", hw.isEmpty());
+    ASSERT_TRUE(hw.isEmpty()) << ("String should be empty");
     hw = "A";
-    CPPUNIT_ASSERT_MESSAGE("String should not be empty", !hw.isEmpty());
+    ASSERT_TRUE(!hw.isEmpty()) << ("String should not be empty");
     hw = "";
-    CPPUNIT_ASSERT_MESSAGE("String should be empty", hw.isEmpty());
+    ASSERT_TRUE(hw.isEmpty()) << ("String should be empty");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -354,9 +300,9 @@ void StringTest::testHashCode() {
         powerOfThirtyOne *= 31;
     }
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("String did not hash to correct value", hwHashCode, hw.hashCode());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("The empty string \"\" did not hash to zero", 0, String().hashCode());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Calculated wrong string hashcode", -1933545242, String("Harmony").hashCode());
+    ASSERT_EQ(hwHashCode, hw.hashCode()) << ("String did not hash to correct value");
+    ASSERT_EQ(0, String().hashCode()) << ("The empty string \"\" did not hash to zero");
+    ASSERT_EQ(-1933545242, String("Harmony").hashCode()) << ("Calculated wrong string hashcode");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -365,8 +311,8 @@ void StringTest::testSubstring1() {
     const String input("HelloWorld");
     const String expected("World");
 
-    CPPUNIT_ASSERT_MESSAGE("Incorrect substring returned", expected.equals(input.substring(5)));
-    CPPUNIT_ASSERT_MESSAGE("not identical", expected.substring(0) == expected);
+    ASSERT_TRUE(expected.equals(input.substring(5))) << ("Incorrect substring returned");
+    ASSERT_TRUE(expected.substring(0) == expected) << ("not identical");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -375,9 +321,9 @@ void StringTest::testSubstring2() {
     const String input("HelloWorld");
     const String expected("Hello");
 
-    CPPUNIT_ASSERT_MESSAGE("Incorrect substring returned", input.substring(0, 5).equals("Hello"));
-    CPPUNIT_ASSERT_MESSAGE("Incorrect substring returned", input.substring(5, 10).equals("World"));
-    CPPUNIT_ASSERT_MESSAGE("not identical", input.substring(0, input.length()) == input);
+    ASSERT_TRUE(input.substring(0, 5).equals("Hello")) << ("Incorrect substring returned");
+    ASSERT_TRUE(input.substring(5, 10).equals("World")) << ("Incorrect substring returned");
+    ASSERT_TRUE(input.substring(0, input.length()) == input) << ("not identical");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -387,11 +333,9 @@ void StringTest::testRegionMatches() {
     const String input2("HelloWorld");
     const String bogusString("xxcedkedkleiorem lvvwr e''' 3r3r 23r");
 
-    CPPUNIT_ASSERT_MESSAGE("identical regions failed comparison",
-                           input1.regionMatches(2, input2, 2, 5));
+    ASSERT_TRUE(input1.regionMatches(2, input2, 2, 5)) << ("identical regions failed comparison");
 
-    CPPUNIT_ASSERT_MESSAGE("Different regions returned true",
-                           !input1.regionMatches(2, bogusString, 2, 5));
+    ASSERT_TRUE(!input1.regionMatches(2, bogusString, 2, 5)) << ("Different regions returned true");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -401,30 +345,27 @@ void StringTest::testRegionMatchesCaseSensitive() {
     const String input2("HelloWorld");
     String bogusString = "xxcedkedkleiorem lvvwr e''' 3r3r 23r";
 
-    CPPUNIT_ASSERT_MESSAGE("identical regions failed comparison", input1.regionMatches(
-                           false, 2, input2, 2, 5));
-    CPPUNIT_ASSERT_MESSAGE("identical regions failed comparison with different cases",
-                           input1.regionMatches(true, 2, input2, 2, 5));
-    CPPUNIT_ASSERT_MESSAGE("Different regions returned true",
-                           !input1.regionMatches(true, 2, bogusString, 2, 5));
-    CPPUNIT_ASSERT_MESSAGE("identical regions failed comparison with different cases",
-                           input1.regionMatches(false, 2, input2, 2, 5));
+    ASSERT_TRUE(input1.regionMatches(
+                           false, 2, input2, 2, 5)) << ("identical regions failed comparison");
+    ASSERT_TRUE(input1.regionMatches(true, 2, input2, 2, 5)) << ("identical regions failed comparison with different cases");
+    ASSERT_TRUE(!input1.regionMatches(true, 2, bogusString, 2, 5)) << ("Different regions returned true");
+    ASSERT_TRUE(input1.regionMatches(false, 2, input2, 2, 5)) << ("identical regions failed comparison with different cases");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testStartsWith() {
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to find string", input.startsWith("Hello"));
-    CPPUNIT_ASSERT_MESSAGE("Found incorrect string", !input.startsWith("T"));
+    ASSERT_TRUE(input.startsWith("Hello")) << ("Failed to find string");
+    ASSERT_TRUE(!input.startsWith("T")) << ("Found incorrect string");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testStartsWithI() {
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to find string", input.startsWith("World", 5));
-    CPPUNIT_ASSERT_MESSAGE("Found incorrect string", !input.startsWith("Hello", 5));
+    ASSERT_TRUE(input.startsWith("World", 5)) << ("Failed to find string");
+    ASSERT_TRUE(!input.startsWith("Hello", 5)) << ("Found incorrect string");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -432,20 +373,11 @@ void StringTest::testSubstringExceptions() {
 
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an StringIndexOutOfBoundsException",
-        input.substring(-1, 1),
-        StringIndexOutOfBoundsException);
+    ASSERT_THROW(input.substring(-1, 1), StringIndexOutOfBoundsException) << ("Should have thrown an StringIndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an StringIndexOutOfBoundsException",
-        input.substring(4, 1),
-        StringIndexOutOfBoundsException);
+    ASSERT_THROW(input.substring(4, 1), StringIndexOutOfBoundsException) << ("Should have thrown an StringIndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an StringIndexOutOfBoundsException",
-        input.substring(0, 100),
-        StringIndexOutOfBoundsException);
+    ASSERT_THROW(input.substring(0, 100), StringIndexOutOfBoundsException) << ("Should have thrown an StringIndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -453,7 +385,7 @@ void StringTest::testTrim() {
     const String input(" HelloWorld ");
     const String expected("HelloWorld");
 
-    CPPUNIT_ASSERT_MESSAGE("Incorrect string returned", input.trim().equals(expected));
+    ASSERT_TRUE(input.trim().equals(expected)) << ("Incorrect string returned");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -464,8 +396,8 @@ void StringTest::testToString() {
 
     String substring = input.substring(5);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Incorrect string returned", helloworld, input.toString());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Incorrect string returned", expected, substring.toString());
+    ASSERT_EQ(helloworld, input.toString()) << ("Incorrect string returned");
+    ASSERT_EQ(expected, substring.toString()) << ("Incorrect string returned");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -474,7 +406,7 @@ void StringTest::testToCharArray() {
     char* result = input.toCharArray();
 
     for (int i = 0; i < input.length(); i++) {
-        CPPUNIT_ASSERT_MESSAGE("Returned incorrect char aray", input.charAt(i) == result[i]);
+        ASSERT_TRUE(input.charAt(i) == result[i]) << ("Returned incorrect char aray");
     }
 
     delete [] result;
@@ -487,33 +419,32 @@ void StringTest::testCStr() {
     const char* result = input.c_str();
 
     for (int i = 0; i < input.length(); i++) {
-        CPPUNIT_ASSERT_MESSAGE("Returned incorrect char aray", input.charAt(i) == result[i]);
+        ASSERT_TRUE(input.charAt(i) == result[i]) << ("Returned incorrect char aray");
     }
 
     std::string empty("");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Invalid string returned", empty, std::string(String().c_str()));
+    ASSERT_EQ(empty, std::string(String().c_str())) << ("Invalid string returned");
 
     const String hw("HelloWorld");
     String substr = hw.substring(5);
     String world = "World";
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Invalid string returned",
-                                 std::string(world.c_str()), std::string(substr.c_str()));
+    ASSERT_EQ(std::string(world.c_str()), std::string(substr.c_str())) << ("Invalid string returned");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testEndsWith() {
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to find ending String", input.endsWith(String("ld")));
-    CPPUNIT_ASSERT_MESSAGE("Failed to not find ending String", !input.endsWith(String("lo")));
+    ASSERT_TRUE(input.endsWith(String("ld"))) << ("Failed to find ending String");
+    ASSERT_TRUE(!input.endsWith(String("lo"))) << ("Failed to not find ending String");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to find ending std::string", input.endsWith(std::string("ld")));
-    CPPUNIT_ASSERT_MESSAGE("Failed to not find ending std::string", !input.endsWith(std::string("lo")));
+    ASSERT_TRUE(input.endsWith(std::string("ld"))) << ("Failed to find ending std::string");
+    ASSERT_TRUE(!input.endsWith(std::string("lo"))) << ("Failed to not find ending std::string");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to find ending C string", input.endsWith("ld"));
-    CPPUNIT_ASSERT_MESSAGE("Failed to not find ending C string", !input.endsWith("lo"));
+    ASSERT_TRUE(input.endsWith("ld")) << ("Failed to find ending C string");
+    ASSERT_TRUE(!input.endsWith("lo")) << ("Failed to not find ending C string");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -523,9 +454,9 @@ void StringTest::testEquals() {
     String lower2 = "helloworld";
     String upper = "HELLOWORLD";
 
-    CPPUNIT_ASSERT_MESSAGE("lc version returned equal to uc", !lower.equals(upper));
-    CPPUNIT_ASSERT_MESSAGE("lc version returned unequal to lc", lower.equals(lower));
-    CPPUNIT_ASSERT_MESSAGE("lc version returned unequal to lc", lower.equals(lower2));
+    ASSERT_TRUE(!lower.equals(upper)) << ("lc version returned equal to uc");
+    ASSERT_TRUE(lower.equals(lower)) << ("lc version returned unequal to lc");
+    ASSERT_TRUE(lower.equals(lower2)) << ("lc version returned unequal to lc");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -535,8 +466,8 @@ void StringTest::testEqualsCString() {
     const char* lower2 = "helloworld";
     const char* upper = "HELLOWORLD";
 
-    CPPUNIT_ASSERT_MESSAGE("lc version returned equal to uc", !lower.equals(upper));
-    CPPUNIT_ASSERT_MESSAGE("lc version returned unequal to lc", lower.equals(lower2));
+    ASSERT_TRUE(!lower.equals(upper)) << ("lc version returned equal to uc");
+    ASSERT_TRUE(lower.equals(lower2)) << ("lc version returned unequal to lc");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -546,8 +477,8 @@ void StringTest::testEqualsStdString() {
     std::string lower2 = "helloworld";
     std::string upper = "HELLOWORLD";
 
-    CPPUNIT_ASSERT_MESSAGE("lc version returned equal to uc", !lower.equals(upper));
-    CPPUNIT_ASSERT_MESSAGE("lc version returned unequal to lc", lower.equals(lower2));
+    ASSERT_TRUE(!lower.equals(upper)) << ("lc version returned equal to uc");
+    ASSERT_TRUE(lower.equals(lower2)) << ("lc version returned unequal to lc");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -556,7 +487,7 @@ void StringTest::testEqualsIgnoreCase() {
     String lower = "helloworld";
     String upper = "HELLOWORLD";
 
-    CPPUNIT_ASSERT_MESSAGE("lc version returned unequal to uc", lower.equalsIgnoreCase(upper));
+    ASSERT_TRUE(lower.equalsIgnoreCase(upper)) << ("lc version returned unequal to uc");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -565,7 +496,7 @@ void StringTest::testEqualsIgnoreCaseCString() {
     String lower = "helloworld";
     const char* upper = "HELLOWORLD";
 
-    CPPUNIT_ASSERT_MESSAGE("lc version returned unequal to uc", lower.equalsIgnoreCase(upper));
+    ASSERT_TRUE(lower.equalsIgnoreCase(upper)) << ("lc version returned unequal to uc");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -574,7 +505,7 @@ void StringTest::testEqualsIgnoreCaseStdString() {
     String lower = "helloworld";
     std::string upper = "HELLOWORLD";
 
-    CPPUNIT_ASSERT_MESSAGE("lc version returned unequal to uc", lower.equalsIgnoreCase(upper));
+    ASSERT_TRUE(lower.equalsIgnoreCase(upper)) << ("lc version returned unequal to uc");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -582,8 +513,8 @@ void StringTest::testFindFirstOf() {
 
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_EQUAL(0, input.findFirstOf("H"));
-    CPPUNIT_ASSERT_EQUAL(-1, input.findFirstOf("z"));
+    ASSERT_EQ(0, input.findFirstOf("H"));
+    ASSERT_EQ(-1, input.findFirstOf("z"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -591,10 +522,10 @@ void StringTest::testFindFirstOf2() {
 
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_EQUAL(0, input.findFirstOf("H", 0));
-    CPPUNIT_ASSERT_EQUAL(0, input.findFirstOf("H", -1));
-    CPPUNIT_ASSERT_EQUAL(-1, input.findFirstOf("H", 1));
-    CPPUNIT_ASSERT_EQUAL(-1, input.findFirstOf("H", 25));
+    ASSERT_EQ(0, input.findFirstOf("H", 0));
+    ASSERT_EQ(0, input.findFirstOf("H", -1));
+    ASSERT_EQ(-1, input.findFirstOf("H", 1));
+    ASSERT_EQ(-1, input.findFirstOf("H", 25));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -602,8 +533,8 @@ void StringTest::testFindFirstNotOf() {
 
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_EQUAL(1, input.findFirstNotOf("H"));
-    CPPUNIT_ASSERT_EQUAL(0, input.findFirstNotOf("z"));
+    ASSERT_EQ(1, input.findFirstNotOf("H"));
+    ASSERT_EQ(0, input.findFirstNotOf("z"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -611,36 +542,36 @@ void StringTest::testFindFirstNotOf2() {
 
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_EQUAL(5, input.findFirstNotOf("Hello", 5));
-    CPPUNIT_ASSERT_EQUAL(0, input.findFirstNotOf("z", -1));
-    CPPUNIT_ASSERT_EQUAL(1, input.findFirstNotOf("H", 1));
-    CPPUNIT_ASSERT_EQUAL(-1, input.findFirstNotOf("H", 25));
+    ASSERT_EQ(5, input.findFirstNotOf("Hello", 5));
+    ASSERT_EQ(0, input.findFirstNotOf("z", -1));
+    ASSERT_EQ(1, input.findFirstNotOf("H", 1));
+    ASSERT_EQ(-1, input.findFirstNotOf("H", 25));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testIndexOfChar() {
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Invalid index returned", 1, input.indexOf('e'));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Invalid index returned", -1, input.indexOf('q'));
+    ASSERT_EQ(1, input.indexOf('e')) << ("Invalid index returned");
+    ASSERT_EQ(-1, input.indexOf('q')) << ("Invalid index returned");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testIndexOfChar2() {
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Invalid character index returned", 5, input.indexOf('W', 2));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Invalid index returned", -1, input.indexOf('q', 0));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Invalid index returned", 1, input.indexOf('e', -1));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Invalid index returned", -1, input.indexOf('H', 10));
+    ASSERT_EQ(5, input.indexOf('W', 2)) << ("Invalid character index returned");
+    ASSERT_EQ(-1, input.indexOf('q', 0)) << ("Invalid index returned");
+    ASSERT_EQ(1, input.indexOf('e', -1)) << ("Invalid index returned");
+    ASSERT_EQ(-1, input.indexOf('H', 10)) << ("Invalid index returned");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testIndexOfString() {
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to find string", input.indexOf(String("World")) > 0);
-    CPPUNIT_ASSERT_MESSAGE("Failed to find string", !(input.indexOf(String("ZZ")) > 0));
+    ASSERT_TRUE(input.indexOf(String("World")) > 0) << ("Failed to find string");
+    ASSERT_TRUE(!(input.indexOf(String("ZZ")) > 0)) << ("Failed to find string");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -649,20 +580,19 @@ void StringTest::testIndexOfString2() {
     const String input("HelloWorld");
     const String hello("Hello");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to find string", input.indexOf(String("World"), 0) > 0);
-    CPPUNIT_ASSERT_MESSAGE("Found string outside index", !(input.indexOf(String("Hello"), 6) > 0));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Did not accept valid negative starting position",
-                                 0, hello.indexOf(String(""), -5));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Reported wrong error code", 5, hello.indexOf(String(""), 5));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong for empty in empty", 0, String("").indexOf(String(""), 0));
+    ASSERT_TRUE(input.indexOf(String("World"), 0) > 0) << ("Failed to find string");
+    ASSERT_TRUE(!(input.indexOf(String("Hello"), 6) > 0)) << ("Found string outside index");
+    ASSERT_EQ(0, hello.indexOf(String(""), -5)) << ("Did not accept valid negative starting position");
+    ASSERT_EQ(5, hello.indexOf(String(""), 5)) << ("Reported wrong error code");
+    ASSERT_EQ(0, String("").indexOf(String(""), 0)) << ("Wrong for empty in empty");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testIndexOfStdString() {
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to find string", input.indexOf(std::string("World")) > 0);
-    CPPUNIT_ASSERT_MESSAGE("Failed to find string", !(input.indexOf(std::string("ZZ")) > 0));
+    ASSERT_TRUE(input.indexOf(std::string("World")) > 0) << ("Failed to find string");
+    ASSERT_TRUE(!(input.indexOf(std::string("ZZ")) > 0)) << ("Failed to find string");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -671,12 +601,11 @@ void StringTest::testIndexOfStdString2() {
     const String input("HelloWorld");
     const String hello("Hello");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to find string", input.indexOf(std::string("World"), 0) > 0);
-    CPPUNIT_ASSERT_MESSAGE("Found string outside index", !(input.indexOf(std::string("Hello"), 6) > 0));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Did not accept valid negative starting position",
-                                 0, hello.indexOf(std::string(""), -5));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Reported wrong error code", 5, hello.indexOf(std::string(""), 5));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong for empty in empty", 0, String("").indexOf(std::string(""), 0));
+    ASSERT_TRUE(input.indexOf(std::string("World"), 0) > 0) << ("Failed to find string");
+    ASSERT_TRUE(!(input.indexOf(std::string("Hello"), 6) > 0)) << ("Found string outside index");
+    ASSERT_EQ(0, hello.indexOf(std::string(""), -5)) << ("Did not accept valid negative starting position");
+    ASSERT_EQ(5, hello.indexOf(std::string(""), 5)) << ("Reported wrong error code");
+    ASSERT_EQ(0, String("").indexOf(std::string(""), 0)) << ("Wrong for empty in empty");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -684,9 +613,9 @@ void StringTest::testIndexOfCString() {
     const String input("HelloWorld");
     const char* nullString = NULL;
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to find string", input.indexOf("World") > 0);
-    CPPUNIT_ASSERT_MESSAGE("Failed to find string", !(input.indexOf("ZZ") > 0));
-    CPPUNIT_ASSERT_MESSAGE("Failed to return correct code", !(input.indexOf(nullString) > 0));
+    ASSERT_TRUE(input.indexOf("World") > 0) << ("Failed to find string");
+    ASSERT_TRUE(!(input.indexOf("ZZ") > 0)) << ("Failed to find string");
+    ASSERT_TRUE(!(input.indexOf(nullString) > 0)) << ("Failed to return correct code");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -696,43 +625,39 @@ void StringTest::testIndexOfCString2() {
     const String hello("Hello");
     const char* nullString = NULL;
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to find string", input.indexOf("World", 0) > 0);
-    CPPUNIT_ASSERT_MESSAGE("Found string outside index", !(input.indexOf("Hello", 6) > 0));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Did not accept valid negative starting position",
-                                 0, hello.indexOf("", -5));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Reported wrong error code", 5, hello.indexOf("", 5));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong for empty in empty", 0, String("").indexOf("", 0));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Reported wrong error code", -1, hello.indexOf(nullString, 0));
+    ASSERT_TRUE(input.indexOf("World", 0) > 0) << ("Failed to find string");
+    ASSERT_TRUE(!(input.indexOf("Hello", 6) > 0)) << ("Found string outside index");
+    ASSERT_EQ(0, hello.indexOf("", -5)) << ("Did not accept valid negative starting position");
+    ASSERT_EQ(5, hello.indexOf("", 5)) << ("Reported wrong error code");
+    ASSERT_EQ(0, String("").indexOf("", 0)) << ("Wrong for empty in empty");
+    ASSERT_EQ(-1, hello.indexOf(nullString, 0)) << ("Reported wrong error code");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testLastIndexOfChar() {
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed to return correct index", 5, input.lastIndexOf('W'));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned index for non-existent char", -1, input.lastIndexOf('Z'));
+    ASSERT_EQ(5, input.lastIndexOf('W')) << ("Failed to return correct index");
+    ASSERT_EQ(-1, input.lastIndexOf('Z')) << ("Returned index for non-existent char");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testLastIndexOfChar2() {
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed to return correct index", 5, input.lastIndexOf('W', 6));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned index for char out of specified range",
-                                 -1, input.lastIndexOf('W', 4));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned index for non-existent char",
-                                 -1, input.lastIndexOf('Z', 9));
+    ASSERT_EQ(5, input.lastIndexOf('W', 6)) << ("Failed to return correct index");
+    ASSERT_EQ(-1, input.lastIndexOf('W', 4)) << ("Returned index for char out of specified range");
+    ASSERT_EQ(-1, input.lastIndexOf('Z', 9)) << ("Returned index for non-existent char");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testLastIndexOfString() {
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect index", 5, input.lastIndexOf(String("World")));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Found String outside of index",
-                                 -1, input.lastIndexOf(String("HeKKKKKKKK")));
+    ASSERT_EQ(5, input.lastIndexOf(String("World"))) << ("Returned incorrect index");
+    ASSERT_EQ(-1, input.lastIndexOf(String("HeKKKKKKKK"))) << ("Found String outside of index");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect index", input.length(), input.lastIndexOf(String()));
+    ASSERT_EQ(input.length(), input.lastIndexOf(String())) << ("Returned incorrect index");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -740,21 +665,19 @@ void StringTest::testLastIndexOfString2() {
     const String input("HelloWorld");
     const String hello("Hello");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect index", 5, input.lastIndexOf(String("World"), 9));
+    ASSERT_EQ(5, input.lastIndexOf(String("World"), 9)) << ("Returned incorrect index");
     int result = input.lastIndexOf(String("Hello"), 2);
-    CPPUNIT_ASSERT_MESSAGE("Found String outside of index: " + Integer::toString(result), result == 0);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Reported wrong error code", -1, hello.lastIndexOf(String(""), -5));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Did not accept valid large starting position",
-                                 5, hello.lastIndexOf(String(""), 5));
+    ASSERT_TRUE(result == 0) << ("Found String outside of index: " + Integer::toString(result));
+    ASSERT_EQ(-1, hello.lastIndexOf(String(""), -5)) << ("Reported wrong error code");
+    ASSERT_EQ(5, hello.lastIndexOf(String(""), 5)) << ("Did not accept valid large starting position");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testLastIndexOfStdString() {
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect index", 5, input.lastIndexOf(std::string("World")));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Found String outside of index",
-                                 -1, input.lastIndexOf(std::string("HeKKKKKKKK")));
+    ASSERT_EQ(5, input.lastIndexOf(std::string("World"))) << ("Returned incorrect index");
+    ASSERT_EQ(-1, input.lastIndexOf(std::string("HeKKKKKKKK"))) << ("Found String outside of index");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -762,20 +685,19 @@ void StringTest::testLastIndexOfStdString2() {
     const String input("HelloWorld");
     const String hello("Hello");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect index", 5, input.lastIndexOf(std::string("World"), 9));
+    ASSERT_EQ(5, input.lastIndexOf(std::string("World"), 9)) << ("Returned incorrect index");
     int result = input.lastIndexOf(std::string("Hello"), 2);
-    CPPUNIT_ASSERT_MESSAGE("Found String outside of index: " + Integer::toString(result), result == 0);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Reported wrong error code", -1, hello.lastIndexOf(std::string(""), -5));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Did not accept valid large starting position",
-                                 5, hello.lastIndexOf(std::string(""), 5));
+    ASSERT_TRUE(result == 0) << ("Found String outside of index: " + Integer::toString(result));
+    ASSERT_EQ(-1, hello.lastIndexOf(std::string(""), -5)) << ("Reported wrong error code");
+    ASSERT_EQ(5, hello.lastIndexOf(std::string(""), 5)) << ("Did not accept valid large starting position");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testLastIndexOfCString() {
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect index", 5, input.lastIndexOf("World"));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Found String outside of index", -1, input.lastIndexOf("HeKKKKKKKK"));
+    ASSERT_EQ(5, input.lastIndexOf("World")) << ("Returned incorrect index");
+    ASSERT_EQ(-1, input.lastIndexOf("HeKKKKKKKK")) << ("Found String outside of index");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -784,12 +706,12 @@ void StringTest::testLastIndexOfCString2() {
     const String hello("Hello");
     const char* nullString = NULL;
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect index", -1, input.lastIndexOf(nullString, 0));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect index", 5, input.lastIndexOf("World", 9));
+    ASSERT_EQ(-1, input.lastIndexOf(nullString, 0)) << ("Returned incorrect index");
+    ASSERT_EQ(5, input.lastIndexOf("World", 9)) << ("Returned incorrect index");
     int result = input.lastIndexOf("Hello", 2);
-    CPPUNIT_ASSERT_MESSAGE("Found String outside of index: " + Integer::toString(result), result == 0);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Reported wrong error code", -1, hello.lastIndexOf("", -5));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Did not accept valid large starting position", 5, hello.lastIndexOf("", 5));
+    ASSERT_TRUE(result == 0) << ("Found String outside of index: " + Integer::toString(result));
+    ASSERT_EQ(-1, hello.lastIndexOf("", -5)) << ("Reported wrong error code");
+    ASSERT_EQ(5, hello.lastIndexOf("", 5)) << ("Did not accept valid large starting position");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -800,10 +722,8 @@ void StringTest::testToLowerCase() {
 
     upper.toLowerCase();
 
-    CPPUNIT_ASSERT_MESSAGE("toLowerCase case conversion did not succeed",
-                           upper.toLowerCase().equals(lower));
-    CPPUNIT_ASSERT_MESSAGE("toLowerCase case non-conversion did not succeed",
-                           lower.toLowerCase().equals(lower));
+    ASSERT_TRUE(upper.toLowerCase().equals(lower)) << ("toLowerCase case conversion did not succeed");
+    ASSERT_TRUE(lower.toLowerCase().equals(lower)) << ("toLowerCase case non-conversion did not succeed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -812,10 +732,8 @@ void StringTest::testToUpperCase() {
     String lower = "helloworld";
     String upper = "HELLOWORLD";
 
-    CPPUNIT_ASSERT_MESSAGE("toUpperCase case conversion did not succeed",
-                           lower.toUpperCase().equals(upper));
-    CPPUNIT_ASSERT_MESSAGE("toUpperCase case non-conversion did not succeed",
-                           upper.toUpperCase().equals(upper));
+    ASSERT_TRUE(lower.toUpperCase().equals(upper)) << ("toUpperCase case conversion did not succeed");
+    ASSERT_TRUE(upper.toUpperCase().equals(upper)) << ("toUpperCase case non-conversion did not succeed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -824,35 +742,35 @@ void StringTest::testReplaceCharChar() {
     const String input("HelloWorld");
     const String expected("HezzoWorzd");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed replace", String("HezzoWorzd"), input.replace('l', 'z'));
+    ASSERT_EQ(String("HezzoWorzd"), input.replace('l', 'z')) << ("Failed replace");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testContainsString() {
 
     String s = "abcdefghijklmnopqrstuvwxyz";
-    CPPUNIT_ASSERT(s.contains(String("abc")));
-    CPPUNIT_ASSERT(s.contains(String("def")));
-    CPPUNIT_ASSERT(!s.contains(String("ac")));
+    ASSERT_TRUE(s.contains(String("abc")));
+    ASSERT_TRUE(s.contains(String("def")));
+    ASSERT_TRUE(!s.contains(String("ac")));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testContainsStdString() {
 
     String s = "abcdefghijklmnopqrstuvwxyz";
-    CPPUNIT_ASSERT(s.contains(std::string("abc")));
-    CPPUNIT_ASSERT(s.contains(std::string("def")));
-    CPPUNIT_ASSERT(!s.contains(std::string("ac")));
+    ASSERT_TRUE(s.contains(std::string("abc")));
+    ASSERT_TRUE(s.contains(std::string("def")));
+    ASSERT_TRUE(!s.contains(std::string("ac")));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testContainsCString() {
 
     String s = "abcdefghijklmnopqrstuvwxyz";
-    CPPUNIT_ASSERT(s.contains("abc"));
-    CPPUNIT_ASSERT(s.contains("def"));
-    CPPUNIT_ASSERT(!s.contains("ac"));
-    CPPUNIT_ASSERT(!s.contains((const char*) NULL));
+    ASSERT_TRUE(s.contains("abc"));
+    ASSERT_TRUE(s.contains("def"));
+    ASSERT_TRUE(!s.contains("ac"));
+    ASSERT_TRUE(!s.contains((const char*) NULL));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -862,9 +780,9 @@ void StringTest::testConcatString() {
     const String hello("Hello");
     const String world("World");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed Concat", expected, hello.concat(world));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed Concat", hello, hello.concat(String("")));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed Concat", String(""), String("").concat(String("")));
+    ASSERT_EQ(expected, hello.concat(world)) << ("Failed Concat");
+    ASSERT_EQ(hello, hello.concat(String(""))) << ("Failed Concat");
+    ASSERT_EQ(String(""), String("").concat(String(""))) << ("Failed Concat");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -874,9 +792,9 @@ void StringTest::testConcatStdString() {
     const String hello("Hello");
     const std::string world("World");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed Concat", expected, hello.concat(world));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed Concat", hello, hello.concat(std::string("")));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed Concat", String(""), String("").concat(std::string("")));
+    ASSERT_EQ(expected, hello.concat(world)) << ("Failed Concat");
+    ASSERT_EQ(hello, hello.concat(std::string(""))) << ("Failed Concat");
+    ASSERT_EQ(String(""), String("").concat(std::string(""))) << ("Failed Concat");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -886,105 +804,75 @@ void StringTest::testConcatCString() {
     const String hello("Hello");
     const char* world("World");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed Concat", expected, hello.concat(world));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed Concat", hello, hello.concat(""));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed Concat", String(""), String("").concat(""));
+    ASSERT_EQ(expected, hello.concat(world)) << ("Failed Concat");
+    ASSERT_EQ(hello, hello.concat("")) << ("Failed Concat");
+    ASSERT_EQ(String(""), String("").concat("")) << ("Failed Concat");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testCompareToString() {
 
-    CPPUNIT_ASSERT_MESSAGE("Returned incorrect value for first < second",
-                           String("aaaaab").compareTo(String("aaaaac")) < 0);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect value for first = second",
-                                 0, String("aaaaac").compareTo(String("aaaaac")));
-    CPPUNIT_ASSERT_MESSAGE("Returned incorrect value for first > second",
-                           String("aaaaac").compareTo(String("aaaaab")) > 0);
-    CPPUNIT_ASSERT_MESSAGE("Considered case to not be of importance",
-                           !(String("A").compareTo(String("a")) == 0));
+    ASSERT_TRUE(String("aaaaab").compareTo(String("aaaaac")) < 0) << ("Returned incorrect value for first < second");
+    ASSERT_EQ(0, String("aaaaac").compareTo(String("aaaaac"))) << ("Returned incorrect value for first = second");
+    ASSERT_TRUE(String("aaaaac").compareTo(String("aaaaab")) > 0) << ("Returned incorrect value for first > second");
+    ASSERT_TRUE(!(String("A").compareTo(String("a")) == 0)) << ("Considered case to not be of importance");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testCompareToStdString() {
 
-    CPPUNIT_ASSERT_MESSAGE("Returned incorrect value for first < second",
-                           String("aaaaab").compareTo(std::string("aaaaac")) < 0);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect value for first = second",
-                                 0, String("aaaaac").compareTo(std::string("aaaaac")));
-    CPPUNIT_ASSERT_MESSAGE("Returned incorrect value for first > second",
-                           String("aaaaac").compareTo(std::string("aaaaab")) > 0);
-    CPPUNIT_ASSERT_MESSAGE("Considered case to not be of importance",
-                           !(String("A").compareTo(std::string("a")) == 0));
+    ASSERT_TRUE(String("aaaaab").compareTo(std::string("aaaaac")) < 0) << ("Returned incorrect value for first < second");
+    ASSERT_EQ(0, String("aaaaac").compareTo(std::string("aaaaac"))) << ("Returned incorrect value for first = second");
+    ASSERT_TRUE(String("aaaaac").compareTo(std::string("aaaaab")) > 0) << ("Returned incorrect value for first > second");
+    ASSERT_TRUE(!(String("A").compareTo(std::string("a")) == 0)) << ("Considered case to not be of importance");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testCompareToCString() {
 
-    CPPUNIT_ASSERT_MESSAGE("Returned incorrect value for first < second",
-                           String("aaaaab").compareTo("aaaaac") < 0);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect value for first = second",
-                                 0, String("aaaaac").compareTo("aaaaac"));
-    CPPUNIT_ASSERT_MESSAGE("Returned incorrect value for first > second",
-                           String("aaaaac").compareTo("aaaaab") > 0);
-    CPPUNIT_ASSERT_MESSAGE("Considered case to not be of importance",
-                           !(String("A").compareTo("a") == 0));
+    ASSERT_TRUE(String("aaaaab").compareTo("aaaaac") < 0) << ("Returned incorrect value for first < second");
+    ASSERT_EQ(0, String("aaaaac").compareTo("aaaaac")) << ("Returned incorrect value for first = second");
+    ASSERT_TRUE(String("aaaaac").compareTo("aaaaab") > 0) << ("Returned incorrect value for first > second");
+    ASSERT_TRUE(!(String("A").compareTo("a") == 0)) << ("Considered case to not be of importance");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        String("").compareTo((const char*) NULL),
-        NullPointerException);
+    ASSERT_THROW(String("").compareTo((const char*) NULL), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testCompareToIgnoreCaseString() {
 
-    CPPUNIT_ASSERT_MESSAGE("Returned incorrect value for first < second",
-                          String("aaaaab").compareToIgnoreCase(String("aaaaac")) < 0);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect value for first = second",
-                                 0, String("aaaaac").compareToIgnoreCase(String("aaaaac")));
-    CPPUNIT_ASSERT_MESSAGE("Returned incorrect value for first > second",
-                           String("aaaaac").compareToIgnoreCase(String("aaaaab")) > 0);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Considered case to not be of importance",
-                                 0, String("A").compareToIgnoreCase(String("a")));
+    ASSERT_TRUE(String("aaaaab").compareToIgnoreCase(String("aaaaac")) < 0) << ("Returned incorrect value for first < second");
+    ASSERT_EQ(0, String("aaaaac").compareToIgnoreCase(String("aaaaac"))) << ("Returned incorrect value for first = second");
+    ASSERT_TRUE(String("aaaaac").compareToIgnoreCase(String("aaaaab")) > 0) << ("Returned incorrect value for first > second");
+    ASSERT_EQ(0, String("A").compareToIgnoreCase(String("a"))) << ("Considered case to not be of importance");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testCompareToIgnoreCaseStdString() {
 
-    CPPUNIT_ASSERT_MESSAGE("Returned incorrect value for first < second",
-                          String("aaaaab").compareToIgnoreCase(std::string("aaaaac")) < 0);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect value for first = second",
-                                 0, String("aaaaac").compareToIgnoreCase(std::string("aaaaac")));
-    CPPUNIT_ASSERT_MESSAGE("Returned incorrect value for first > second",
-                           String("aaaaac").compareToIgnoreCase(std::string("aaaaab")) > 0);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Considered case to not be of importance",
-                                 0, String("A").compareToIgnoreCase(std::string("a")));
+    ASSERT_TRUE(String("aaaaab").compareToIgnoreCase(std::string("aaaaac")) < 0) << ("Returned incorrect value for first < second");
+    ASSERT_EQ(0, String("aaaaac").compareToIgnoreCase(std::string("aaaaac"))) << ("Returned incorrect value for first = second");
+    ASSERT_TRUE(String("aaaaac").compareToIgnoreCase(std::string("aaaaab")) > 0) << ("Returned incorrect value for first > second");
+    ASSERT_EQ(0, String("A").compareToIgnoreCase(std::string("a"))) << ("Considered case to not be of importance");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testCompareToIgnoreCaseCString() {
 
-    CPPUNIT_ASSERT_MESSAGE("Returned incorrect value for first < second",
-                          String("aaaaab").compareToIgnoreCase("aaaaac") < 0);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect value for first = second",
-                                 0, String("aaaaac").compareToIgnoreCase("aaaaac"));
-    CPPUNIT_ASSERT_MESSAGE("Returned incorrect value for first > second",
-                           String("aaaaac").compareToIgnoreCase("aaaaab") > 0);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Considered case to not be of importance",
-                                 0, String("A").compareToIgnoreCase("a"));
+    ASSERT_TRUE(String("aaaaab").compareToIgnoreCase("aaaaac") < 0) << ("Returned incorrect value for first < second");
+    ASSERT_EQ(0, String("aaaaac").compareToIgnoreCase("aaaaac")) << ("Returned incorrect value for first = second");
+    ASSERT_TRUE(String("aaaaac").compareToIgnoreCase("aaaaab") > 0) << ("Returned incorrect value for first > second");
+    ASSERT_EQ(0, String("A").compareToIgnoreCase("a")) << ("Considered case to not be of importance");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        String("").compareTo((const char*) NULL),
-        NullPointerException);
+    ASSERT_THROW(String("").compareTo((const char*) NULL), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTest::testIsNullOrEmpty() {
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to detect NULL", String::isNullOrEmpty((const char*) NULL));
-    CPPUNIT_ASSERT_MESSAGE("Failed to detect empty", String::isNullOrEmpty(""));
-    CPPUNIT_ASSERT_MESSAGE("Failed to detect non-empty", !String::isNullOrEmpty("abcd"));
+    ASSERT_TRUE(String::isNullOrEmpty((const char*) NULL)) << ("Failed to detect NULL");
+    ASSERT_TRUE(String::isNullOrEmpty("")) << ("Failed to detect empty");
+    ASSERT_TRUE(!String::isNullOrEmpty("abcd")) << ("Failed to detect non-empty");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -992,8 +880,8 @@ void StringTest::testOperatorEqualsString() {
 
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", input == String("HelloWorld"));
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", !(input == String("HolloWorld")));
+    ASSERT_TRUE(input == String("HelloWorld")) << ("Failed comparison");
+    ASSERT_TRUE(!(input == String("HolloWorld"))) << ("Failed comparison");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1001,11 +889,11 @@ void StringTest::testOperatorEqualsStdString() {
 
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", input == std::string("HelloWorld"));
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", !(input == std::string("HolloWorld")));
+    ASSERT_TRUE(input == std::string("HelloWorld")) << ("Failed comparison");
+    ASSERT_TRUE(!(input == std::string("HolloWorld"))) << ("Failed comparison");
 
     // Test comparison with lhs as std::string
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", std::string("HelloWorld") == input);
+    ASSERT_TRUE(std::string("HelloWorld") == input) << ("Failed comparison");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1013,12 +901,12 @@ void StringTest::testOperatorEqualsCString() {
 
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", input == "HelloWorld");
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", !(input == "HolloWorld"));
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", !(input == NULL));
+    ASSERT_TRUE(input == "HelloWorld") << ("Failed comparison");
+    ASSERT_TRUE(!(input == "HolloWorld")) << ("Failed comparison");
+    ASSERT_TRUE(!(input == NULL)) << ("Failed comparison");
 
     // Test comparison with lhs as C String
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", "HelloWorld" == input);
+    ASSERT_TRUE("HelloWorld" == input) << ("Failed comparison");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1026,8 +914,8 @@ void StringTest::testOperatorNotEqualsString() {
 
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", input != String("HelloWorzd"));
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", !(input != String("HelloWorld")));
+    ASSERT_TRUE(input != String("HelloWorzd")) << ("Failed comparison");
+    ASSERT_TRUE(!(input != String("HelloWorld"))) << ("Failed comparison");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1035,8 +923,8 @@ void StringTest::testOperatorNotEqualsStdString() {
 
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", input != std::string("HelloWorzd"));
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", !(input != std::string("HelloWorld")));
+    ASSERT_TRUE(input != std::string("HelloWorzd")) << ("Failed comparison");
+    ASSERT_TRUE(!(input != std::string("HelloWorld"))) << ("Failed comparison");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1044,9 +932,9 @@ void StringTest::testOperatorNotEqualsCString() {
 
     const String input("HelloWorld");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", input != "HelloWorzd");
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", !(input != "HelloWorld"));
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", input != NULL);
+    ASSERT_TRUE(input != "HelloWorzd") << ("Failed comparison");
+    ASSERT_TRUE(!(input != "HelloWorld")) << ("Failed comparison");
+    ASSERT_TRUE(input != NULL) << ("Failed comparison");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1055,8 +943,8 @@ void StringTest::testOperatorLessString() {
     String upper = "HELLOWORLD";
     String lower = "helloworld";
 
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", upper < lower);
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", !(upper < upper));
+    ASSERT_TRUE(upper < lower) << ("Failed comparison");
+    ASSERT_TRUE(!(upper < upper)) << ("Failed comparison");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1065,12 +953,12 @@ void StringTest::testOperatorLessStdString() {
     String upper = "HELLOWORLD";
     std::string lower = "helloworld";
 
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", upper < lower);
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", !(upper < std::string("HELLOWORLD")));
+    ASSERT_TRUE(upper < lower) << ("Failed comparison");
+    ASSERT_TRUE(!(upper < std::string("HELLOWORLD"))) << ("Failed comparison");
 
     // test lhs as std::string
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", std::string("aaab") < String("aaac"));
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", std::string("aaab") <= String("aaab"));
+    ASSERT_TRUE(std::string("aaab") < String("aaac")) << ("Failed comparison");
+    ASSERT_TRUE(std::string("aaab") <= String("aaab")) << ("Failed comparison");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1079,17 +967,14 @@ void StringTest::testOperatorLessCString() {
     String upper = "HELLOWORLD";
     const char* lower = "helloworld";
 
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", upper < lower);
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", !(upper < "HELLOWORLD"));
+    ASSERT_TRUE(upper < lower) << ("Failed comparison");
+    ASSERT_TRUE(!(upper < "HELLOWORLD")) << ("Failed comparison");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        (upper < NULL),
-        NullPointerException);
+    ASSERT_THROW((upper < NULL), NullPointerException) << ("Should have thrown a NullPointerException");
 
     // test lhs as std::string
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", "aaab" < String("aaac"));
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", "aaab" <= String("aaab"));
+    ASSERT_TRUE("aaab" < String("aaac")) << ("Failed comparison");
+    ASSERT_TRUE("aaab" <= String("aaab")) << ("Failed comparison");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1098,8 +983,8 @@ void StringTest::testOperatorGreaterString() {
     String upper = "HELLOWORLD";
     String lower = "helloworld";
 
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", lower > upper);
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", !(upper > upper));
+    ASSERT_TRUE(lower > upper) << ("Failed comparison");
+    ASSERT_TRUE(!(upper > upper)) << ("Failed comparison");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1108,12 +993,12 @@ void StringTest::testOperatorGreaterStdString() {
     std::string upper = "HELLOWORLD";
     String lower = "helloworld";
 
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", lower > upper);
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", !(lower > std::string("helloworld")));
+    ASSERT_TRUE(lower > upper) << ("Failed comparison");
+    ASSERT_TRUE(!(lower > std::string("helloworld"))) << ("Failed comparison");
 
     // test lhs as std::string
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", std::string("aaac") > String("aaab"));
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", std::string("aaac") >= String("aaac"));
+    ASSERT_TRUE(std::string("aaac") > String("aaab")) << ("Failed comparison");
+    ASSERT_TRUE(std::string("aaac") >= String("aaac")) << ("Failed comparison");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1122,17 +1007,14 @@ void StringTest::testOperatorGreaterCString() {
     String lower = "helloworld";
     const char* upper = "HELLOWORLD";
 
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", lower > upper);
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", !(lower > "helloworld"));
+    ASSERT_TRUE(lower > upper) << ("Failed comparison");
+    ASSERT_TRUE(!(lower > "helloworld")) << ("Failed comparison");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        (lower < NULL),
-        NullPointerException);
+    ASSERT_THROW((lower < NULL), NullPointerException) << ("Should have thrown a NullPointerException");
 
     // test lhs as C string
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", "aaac" > String("aaab"));
-    CPPUNIT_ASSERT_MESSAGE("Failed comparison", "aaac" >= String("aaac"));
+    ASSERT_TRUE("aaac" > String("aaab")) << ("Failed comparison");
+    ASSERT_TRUE("aaac" >= String("aaac")) << ("Failed comparison");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1142,9 +1024,9 @@ void StringTest::testOperatorPlusString() {
     const String hello("Hello");
     const String world("World");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed operator+ ", expected, hello + world);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed operator+ ", hello, hello + String(""));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed operator+ ", String(""), String("") + String(""));
+    ASSERT_EQ(expected, hello + world) << ("Failed operator+ ");
+    ASSERT_EQ(hello, hello + String("")) << ("Failed operator+ ");
+    ASSERT_EQ(String(""), String("") + String("")) << ("Failed operator+ ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1154,9 +1036,9 @@ void StringTest::testOperatorPlusStdString() {
     const String hello("Hello");
     const std::string world("World");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed operator+ ", expected, hello + world);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed operator+ ", hello, hello + std::string(""));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed operator+ ", String(""), String("") + std::string(""));
+    ASSERT_EQ(expected, hello + world) << ("Failed operator+ ");
+    ASSERT_EQ(hello, hello + std::string("")) << ("Failed operator+ ");
+    ASSERT_EQ(String(""), String("") + std::string("")) << ("Failed operator+ ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1166,10 +1048,10 @@ void StringTest::testOperatorPlusCString() {
     const String hello("Hello");
     const char* world("World");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed operator+ ", expected, hello + world);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed operator+ ", hello, hello + "");
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed operator+ ", String(""), String("") + "");
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed operator+ ", String(""), String("") + NULL);
+    ASSERT_EQ(expected, hello + world) << ("Failed operator+ ");
+    ASSERT_EQ(hello, hello + "") << ("Failed operator+ ");
+    ASSERT_EQ(String(""), String("") + "") << ("Failed operator+ ");
+    ASSERT_EQ(String(""), String("") + NULL) << ("Failed operator+ ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1180,47 +1062,23 @@ void StringTest::testGetChars() {
     Arrays::fill(buffer, 10, '\0');
 
     hello.getChars(0, 5, buffer, 10, 0);
-    CPPUNIT_ASSERT_EQUAL(String("Hello"), String(buffer));
+    ASSERT_EQ(String("Hello"), String(buffer));
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IndexOutOfBoundsException",
-        hello.getChars(-1, 1, buffer, 10, 0),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(hello.getChars(-1, 1, buffer, 10, 0), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IndexOutOfBoundsException",
-        hello.getChars(1, -1, buffer, 10, 0),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(hello.getChars(1, -1, buffer, 10, 0), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IndexOutOfBoundsException",
-        hello.getChars(0, 1, buffer, 10, -1),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(hello.getChars(0, 1, buffer, 10, -1), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IndexOutOfBoundsException",
-        hello.getChars(1, 1, buffer, -1, 0),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(hello.getChars(1, 1, buffer, -1, 0), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        hello.getChars(0, 2, (char*) NULL, 10, 0),
-        NullPointerException);
+    ASSERT_THROW(hello.getChars(0, 2, (char*) NULL, 10, 0), NullPointerException) << ("Should have thrown a NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IndexOutOfBoundsException",
-        hello.getChars(15, 1, buffer, 10, 0),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(hello.getChars(15, 1, buffer, 10, 0), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IndexOutOfBoundsException",
-        hello.getChars(0, 12, buffer, 10, 0),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(hello.getChars(0, 12, buffer, 10, 0), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IndexOutOfBoundsException",
-        hello.getChars(2, 10, buffer, 10, 4),
-        IndexOutOfBoundsException);
+    ASSERT_THROW(hello.getChars(2, 10, buffer, 10, 4), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
 
     delete [] buffer;
 }

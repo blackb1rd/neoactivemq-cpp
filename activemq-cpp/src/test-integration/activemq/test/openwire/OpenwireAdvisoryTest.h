@@ -26,14 +26,7 @@ namespace test {
 namespace openwire {
 
     class OpenwireAdvisoryTest : public AdvisoryTest {
-
-        CPPUNIT_TEST_SUITE( OpenwireAdvisoryTest );
-        CPPUNIT_TEST( testConnectionAdvisories );
-        CPPUNIT_TEST( testConcurrentTempDestCreation );
-        CPPUNIT_TEST( testTempDestinationCompositeAdvisoryTopic );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireAdvisoryTest();
         virtual ~OpenwireAdvisoryTest();

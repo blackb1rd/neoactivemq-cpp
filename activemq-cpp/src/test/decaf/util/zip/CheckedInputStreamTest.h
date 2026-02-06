@@ -18,24 +18,13 @@
 #ifndef _DECAF_UTIL_ZIP_CHECKEDINPUTSTREAMTEST_H_
 #define _DECAF_UTIL_ZIP_CHECKEDINPUTSTREAMTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 namespace zip {
 
-    class CheckedInputStreamTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( CheckedInputStreamTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testGetChecksum );
-        CPPUNIT_TEST( testSkip );
-        CPPUNIT_TEST( testRead );
-        CPPUNIT_TEST( testReadBIII );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class CheckedInputStreamTest : public ::testing::Test {
+public:
 
         CheckedInputStreamTest();
         virtual ~CheckedInputStreamTest();

@@ -18,43 +18,15 @@
 #ifndef _DECAF_INTERNAL_NIO_SHORTARRAYBUFFERTEST_H_
 #define _DECAF_INTERNAL_NIO_SHORTARRAYBUFFERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/nio/ShortBuffer.h>
 
 namespace decaf{
 namespace internal{
 namespace nio{
 
-    class ShortArrayBufferTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ShortArrayBufferTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( testArray );
-        CPPUNIT_TEST( testArrayOffset );
-        CPPUNIT_TEST( testReadOnlyArray );
-        CPPUNIT_TEST( testAsReadOnlyBuffer );
-        CPPUNIT_TEST( testCompact );
-        CPPUNIT_TEST( testCompareTo );
-        CPPUNIT_TEST( testDuplicate );
-        CPPUNIT_TEST( testEquals );
-        CPPUNIT_TEST( testHasArray );
-        CPPUNIT_TEST( testGet );
-        CPPUNIT_TEST( testGet2 );
-        CPPUNIT_TEST( testGetShortArray );
-        CPPUNIT_TEST( testGetShortArray2 );
-        CPPUNIT_TEST( testGetWithIndex );
-        CPPUNIT_TEST( testPutShort );
-        CPPUNIT_TEST( testPutShortArray );
-        CPPUNIT_TEST( testPutShortArray2 );
-        CPPUNIT_TEST( testPutShortBuffer );
-        CPPUNIT_TEST( testPutIndexed );
-        CPPUNIT_TEST( testSlice );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST_SUITE_END();
-
-        decaf::nio::ShortBuffer* testBuffer1;
+    class ShortArrayBufferTest : public ::testing::Test {
+decaf::nio::ShortBuffer* testBuffer1;
         short* testData1;
 
         static const int testData1Size;
@@ -71,7 +43,7 @@ namespace nio{
         ShortArrayBufferTest() : testBuffer1(), testData1() {}
         virtual ~ShortArrayBufferTest() {}
 
-        void setUp() {
+        void SetUp() override {
             testBuffer1 = decaf::nio::ShortBuffer::allocate( testData1Size );
 
             testData1 = new short[testData1Size];
@@ -80,7 +52,7 @@ namespace nio{
             }
         }
 
-        void tearDown() {
+        void TearDown() override {
             delete testBuffer1;
             delete [] testData1;
         }
@@ -140,15 +112,15 @@ namespace nio{
                                   int offset, int length) {
 
             for( int i = 0; i < length; i++ ) {
-                CPPUNIT_ASSERT( buf->get(i) == array[offset + i] );
+                ASSERT_TRUE(buf->get(i) == array[offset + i]);
             }
         }
 
         void assertContentEquals( decaf::nio::ShortBuffer* buf,
                                   decaf::nio::ShortBuffer* other ) {
-            CPPUNIT_ASSERT( buf->capacity() == other->capacity() );
+            ASSERT_TRUE(buf->capacity() == other->capacity());
             for( int i = 0; i < buf->capacity(); i++ ) {
-                CPPUNIT_ASSERT(buf->get(i) == other->get(i) );
+                ASSERT_TRUE(buf->get(i) == other->get(i));
             }
         }
 
@@ -158,7 +130,7 @@ namespace nio{
 
             short value = startValue;
             for( int i = 0; i < length; i++ ) {
-                CPPUNIT_ASSERT( buf->get( startIndex + i ) == value );
+                ASSERT_TRUE(buf->get( startIndex + i ) == value);
                 value = (short)( value + 1 );
             }
         }

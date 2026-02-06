@@ -60,17 +60,17 @@ HashMapTest::~HashMapTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::setUp() {
+void HashMapTest::SetUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void HashMapTest::testConstructor() {
 
     HashMap<int, std::string> map;
-    CPPUNIT_ASSERT(map.isEmpty());
-    CPPUNIT_ASSERT_EQUAL(0, map.size());
-    CPPUNIT_ASSERT_EQUAL(false, map.containsKey(1));
-    CPPUNIT_ASSERT_EQUAL(false, map.containsValue("test"));
+    ASSERT_TRUE(map.isEmpty());
+    ASSERT_EQ(0, map.size());
+    ASSERT_EQ(false, map.containsKey(1));
+    ASSERT_EQ(false, map.containsValue("test"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,21 +78,18 @@ void HashMapTest::testConstructorI() {
 
     HashMap<int, std::string> map(5);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Created incorrect HashMap", 0, map.size());
+    ASSERT_EQ(0, map.size()) << ("Created incorrect HashMap");
 
     try {
         HashMap<int, std::string> map(-1);
-        CPPUNIT_FAIL("Should have thrown IllegalArgumentException for negative arg.");
+        FAIL() << ("Should have thrown IllegalArgumentException for negative arg.");
     } catch (IllegalArgumentException& e) {
     }
 
     HashMap<int, std::string> empty(0);
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown NoSuchElementException",
-        empty.get(1),
-        NoSuchElementException);
+    ASSERT_THROW(empty.get(1), NoSuchElementException) << ("Should have thrown NoSuchElementException");
     empty.put(1, "here");
-    CPPUNIT_ASSERT_MESSAGE("cannot get element", empty.get(1) == std::string("here"));
+    ASSERT_TRUE(empty.get(1) == std::string("here")) << ("cannot get element");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -100,21 +97,18 @@ void HashMapTest::testConstructorIF() {
 
     HashMap<int, std::string> map(5, 0.5f);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Created incorrect HashMap", 0, map.size());
+    ASSERT_EQ(0, map.size()) << ("Created incorrect HashMap");
 
     try {
         HashMap<int, std::string> map(0, 0);
-        CPPUNIT_FAIL("Should have thrown IllegalArgumentException for negative arg.");
+        FAIL() << ("Should have thrown IllegalArgumentException for negative arg.");
     } catch (IllegalArgumentException& e) {
     }
 
     HashMap<int, std::string> empty(0, 0.25f);
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown NoSuchElementException",
-        empty.get(1),
-        NoSuchElementException);
+    ASSERT_THROW(empty.get(1), NoSuchElementException) << ("Should have thrown NoSuchElementException");
     empty.put(1, "here");
-    CPPUNIT_ASSERT_MESSAGE("cannot get element", empty.get(1) == std::string("here"));
+    ASSERT_TRUE(empty.get(1) == std::string("here")) << ("cannot get element");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,8 +121,7 @@ void HashMapTest::testConstructorMap() {
 
     HashMap<int, int> hashMap(myMap);
     for (int counter = 0; counter < 125; counter++) {
-        CPPUNIT_ASSERT_MESSAGE("Failed to construct correct HashMap",
-            myMap.get(counter) == hashMap.get(counter));
+        ASSERT_TRUE(myMap.get(counter) == hashMap.get(counter)) << ("Failed to construct correct HashMap");
     }
 }
 
@@ -141,11 +134,11 @@ void HashMapTest::testCopyConstructor() {
     populateMap(map1);
     map2 = populateMapAndReturn();
 
-    CPPUNIT_ASSERT(map1.size() == MAP_SIZE);
-    CPPUNIT_ASSERT(map2.size() == MAP_SIZE);
+    ASSERT_TRUE(map1.size() == MAP_SIZE);
+    ASSERT_TRUE(map2.size() == MAP_SIZE);
 
-    CPPUNIT_ASSERT(map1.equals(map2));
-    CPPUNIT_ASSERT(map2.equals(map1));
+    ASSERT_TRUE(map1.equals(map2));
+    ASSERT_TRUE(map2.equals(map1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -157,12 +150,9 @@ void HashMapTest::testClear() {
     hashMap.put(2, "two");
 
     hashMap.clear();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Clear failed to reset size", 0, hashMap.size());
+    ASSERT_EQ(0, hashMap.size()) << ("Clear failed to reset size");
     for (int i = 0; i < 125; i++) {
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Failed to clear all elements",
-            hashMap.get(i),
-            NoSuchElementException);
+        ASSERT_THROW(hashMap.get(i), NoSuchElementException) << ("Failed to clear all elements");
     }
 
     // Check clear on a large loaded map of Integer keys
@@ -171,12 +161,9 @@ void HashMapTest::testClear() {
         map.put(i, "foobar");
     }
     map.clear();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed to reset size on large integer map", 0, map.size());
+    ASSERT_EQ(0, map.size()) << ("Failed to reset size on large integer map");
     for (int i = -32767; i < 32768; i++) {
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Failed to clear all elements",
-            map.get(i),
-            NoSuchElementException);
+        ASSERT_THROW(map.get(i), NoSuchElementException) << ("Failed to clear all elements");
     }
 }
 
@@ -187,13 +174,13 @@ void HashMapTest::testContainsKey() {
 
     hashMap.put(876, "test");
 
-    CPPUNIT_ASSERT_MESSAGE("Returned false for valid key", hashMap.containsKey(876));
-    CPPUNIT_ASSERT_MESSAGE("Returned true for invalid key", !hashMap.containsKey(1));
+    ASSERT_TRUE(hashMap.containsKey(876)) << ("Returned false for valid key");
+    ASSERT_TRUE(!hashMap.containsKey(1)) << ("Returned true for invalid key");
 
     HashMap<int, std::string> hashMap2;
     hashMap2.put(0, "test");
-    CPPUNIT_ASSERT_MESSAGE("Failed with key", hashMap2.containsKey(0));
-    CPPUNIT_ASSERT_MESSAGE("Failed with missing key matching hash", !hashMap2.containsKey(1));
+    ASSERT_TRUE(hashMap2.containsKey(0)) << ("Failed with key");
+    ASSERT_TRUE(!hashMap2.containsKey(1)) << ("Failed with missing key matching hash");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -203,8 +190,8 @@ void HashMapTest::testContainsValue() {
 
     hashMap.put(876, "test");
 
-    CPPUNIT_ASSERT_MESSAGE("Returned false for valid value", hashMap.containsValue("test"));
-    CPPUNIT_ASSERT_MESSAGE("Returned true for invalid valie", !hashMap.containsValue(""));
+    ASSERT_TRUE(hashMap.containsValue("test")) << ("Returned false for valid value");
+    ASSERT_TRUE(!hashMap.containsValue("")) << ("Returned true for invalid valie");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -219,16 +206,15 @@ void HashMapTest::testEntrySet() {
     Set<MapEntry<int, std::string> >& set = hashMap.entrySet();
     Pointer< Iterator<MapEntry<int, std::string> > > iterator(set.iterator());
 
-    CPPUNIT_ASSERT_MESSAGE("Returned set of incorrect size", hashMap.size() == set.size());
+    ASSERT_TRUE(hashMap.size() == set.size()) << ("Returned set of incorrect size");
     while (iterator->hasNext()) {
         MapEntry<int, std::string> entry = iterator->next();
-        CPPUNIT_ASSERT_MESSAGE("Returned incorrect entry set",
-                               hashMap.containsKey(entry.getKey()) && hashMap.containsValue(entry.getValue()));
+        ASSERT_TRUE(hashMap.containsKey(entry.getKey()) && hashMap.containsValue(entry.getValue())) << ("Returned incorrect entry set");
     }
 
     iterator.reset(set.iterator());
     set.remove(iterator->next());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Remove on set didn't take", 49, set.size());
+    ASSERT_EQ(49, set.size()) << ("Remove on set didn't take");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -236,13 +222,9 @@ void HashMapTest::testGet() {
 
     HashMap<int, std::string> hashMap;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should have thrown NoSuchElementException",
-            hashMap.get(1),
-            NoSuchElementException);
+    ASSERT_THROW(hashMap.get(1), NoSuchElementException) << ("Should have thrown NoSuchElementException");
     hashMap.put(22, "HELLO");
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Get returned incorrect value for existing key",
-                                 std::string("HELLO"), hashMap.get(22));
+    ASSERT_EQ(std::string("HELLO"), hashMap.get(22)) << ("Get returned incorrect value for existing key");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -250,11 +232,11 @@ void HashMapTest::testIsEmpty() {
 
     HashMap<int, std::string> hashMap;
 
-    CPPUNIT_ASSERT_MESSAGE("Returned false for new map", hashMap.isEmpty());
+    ASSERT_TRUE(hashMap.isEmpty()) << ("Returned false for new map");
     hashMap.put(1, "1");
-    CPPUNIT_ASSERT_MESSAGE("Returned true for non-empty", !hashMap.isEmpty());
+    ASSERT_TRUE(!hashMap.isEmpty()) << ("Returned true for non-empty");
     hashMap.clear();
-    CPPUNIT_ASSERT_MESSAGE("Returned false for cleared map", hashMap.isEmpty());
+    ASSERT_TRUE(hashMap.isEmpty()) << ("Returned false for cleared map");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -263,16 +245,16 @@ void HashMapTest::testKeySet() {
     HashMap<int, std::string> hashMap;
     populateMap(hashMap);
     Set<int>& set = hashMap.keySet();
-    CPPUNIT_ASSERT_MESSAGE("Returned set of incorrect size()", set.size() == hashMap.size());
+    ASSERT_TRUE(set.size() == hashMap.size()) << ("Returned set of incorrect size()");
     for (int i = 0; i < MAP_SIZE; i++) {
-        CPPUNIT_ASSERT_MESSAGE("Returned set does not contain all keys", set.contains(i));
+        ASSERT_TRUE(set.contains(i)) << ("Returned set does not contain all keys");
     }
 
     {
         HashMap<int, std::string> localMap;
         localMap.put(0, "test");
         Set<int>& intSet = localMap.keySet();
-        CPPUNIT_ASSERT_MESSAGE("Failed with zero key", intSet.contains(0));
+        ASSERT_TRUE(intSet.contains(0)) << ("Failed with zero key");
     }
     {
         HashMap<int, std::string> localMap;
@@ -296,10 +278,10 @@ void HashMapTest::testKeySet() {
         list.remove(remove1);
         list.remove(remove2);
 
-        CPPUNIT_ASSERT_MESSAGE("Wrong result", it->next() == list.get(0));
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong size", 1, localMap.size());
+        ASSERT_TRUE(it->next() == list.get(0)) << ("Wrong result");
+        ASSERT_EQ(1, localMap.size()) << ("Wrong size");
         it.reset(intSet.iterator());
-        CPPUNIT_ASSERT_MESSAGE("Wrong contents", it->next() == list.get(0));
+        ASSERT_TRUE(it->next() == list.get(0)) << ("Wrong contents");
     }
     {
         HashMap<int, std::string> map2(101);
@@ -319,10 +301,10 @@ void HashMapTest::testKeySet() {
         }
         it2->hasNext();
         it2->remove();
-        CPPUNIT_ASSERT_MESSAGE("Wrong result 2", it2->next() == next);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong size 2", 1, map2.size());
+        ASSERT_TRUE(it2->next() == next) << ("Wrong result 2");
+        ASSERT_EQ(1, map2.size()) << ("Wrong size 2");
         it2.reset(intSet.iterator());
-        CPPUNIT_ASSERT_MESSAGE("Wrong contents 2", it2->next() == next);
+        ASSERT_TRUE(it2->next() == next) << ("Wrong contents 2");
     }
 }
 
@@ -383,8 +365,7 @@ void HashMapTest::testPut() {
     {
         HashMap<std::string, std::string> hashMap(101);
         hashMap.put("KEY", "VALUE");
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed to install key/value pair",
-                                     std::string("VALUE"), hashMap.get("KEY"));
+        ASSERT_EQ(std::string("VALUE"), hashMap.get("KEY")) << ("Failed to install key/value pair");
     }
     {
         // Check my actual key instance is returned
@@ -395,8 +376,8 @@ void HashMapTest::testPut() {
         int myKey = 0;
         // Put a new value at the old key position
         map.put(myKey, "myValue");
-        CPPUNIT_ASSERT(map.containsKey(myKey));
-        CPPUNIT_ASSERT_EQUAL(std::string("myValue"), map.get(myKey));
+        ASSERT_TRUE(map.containsKey(myKey));
+        ASSERT_EQ(std::string("myValue"), map.get(myKey));
         bool found = false;
         Set<int>& intSet = map.keySet();
         Pointer< Iterator<int> > itr(intSet.iterator());
@@ -407,13 +388,13 @@ void HashMapTest::testPut() {
                 break;
             }
         }
-        CPPUNIT_ASSERT_MESSAGE("Should find new key instance in hashashMap", found);
+        ASSERT_TRUE(found) << ("Should find new key instance in hashashMap");
 
         // Add a new key instance and check it is returned
-        CPPUNIT_ASSERT_NO_THROW(map.remove(myKey));
+        ASSERT_NO_THROW(map.remove(myKey));
         map.put(myKey, "myValue");
-        CPPUNIT_ASSERT(map.containsKey(myKey));
-        CPPUNIT_ASSERT_EQUAL(std::string("myValue"), map.get(myKey));
+        ASSERT_TRUE(map.containsKey(myKey));
+        ASSERT_EQ(std::string("myValue"), map.get(myKey));
         itr.reset(intSet.iterator());
         while (itr->hasNext()) {
             int key = itr->next();
@@ -422,7 +403,7 @@ void HashMapTest::testPut() {
                 break;
             }
         }
-        CPPUNIT_ASSERT_MESSAGE("Did not find new key instance in hashashMap", found);
+        ASSERT_TRUE(found) << ("Did not find new key instance in hashashMap");
     }
     {
         // Ensure keys with identical hashcode are stored separately
@@ -430,17 +411,14 @@ void HashMapTest::testPut() {
 
         // Put non-equal object with same hashcode
         MyKey aKey;
-        CPPUNIT_ASSERT(!map.containsKey(aKey));
+        ASSERT_TRUE(!map.containsKey(aKey));
         map.put(aKey, "value");
         MyKey aKey2;
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-                "Should have thrown NoSuchElementException",
-                map.remove(aKey2),
-                NoSuchElementException);
+        ASSERT_THROW(map.remove(aKey2), NoSuchElementException) << ("Should have thrown NoSuchElementException");
         MyKey aKey3;
         map.put(aKey3, "foobar");
-        CPPUNIT_ASSERT_EQUAL(std::string("foobar"), map.get(aKey3));
-        CPPUNIT_ASSERT_EQUAL(std::string("value"), map.get(aKey));
+        ASSERT_EQ(std::string("foobar"), map.get(aKey3));
+        ASSERT_EQ(std::string("value"), map.get(aKey));
     }
 }
 
@@ -453,8 +431,7 @@ void HashMapTest::testPutAll() {
     HashMap<int, std::string> hashMap2;
     hashMap2.putAll(hashMap);
     for (int i = 0; i < 1000; i++) {
-        CPPUNIT_ASSERT_MESSAGE("Failed to put all elements into new Map",
-                               hashMap2.get(i) == Integer::toString(i));
+        ASSERT_TRUE(hashMap2.get(i) == Integer::toString(i)) << ("Failed to put all elements into new Map");
     }
 }
 
@@ -466,17 +443,11 @@ void HashMapTest::testRemove() {
         populateMap(hashMap);
 
         int size = hashMap.size();
-        CPPUNIT_ASSERT_NO_THROW_MESSAGE("Remove returned incorrect value", hashMap.remove(9));
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should have thrown a NoSuchElementException on get of non-existent key.",
-            hashMap.get(9),
-            NoSuchElementException);
+        ASSERT_NO_THROW(hashMap.remove(9)) << ("Remove returned incorrect value");
+        ASSERT_THROW(hashMap.get(9), NoSuchElementException) << ("Should have thrown a NoSuchElementException on get of non-existent key.");
 
-        CPPUNIT_ASSERT_MESSAGE("Failed to decrement size", hashMap.size() == (size - 1));
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should have thrown a NoSuchElementException on remove of non-existent key.",
-            hashMap.remove(9),
-            NoSuchElementException);
+        ASSERT_TRUE(hashMap.size() == (size - 1)) << ("Failed to decrement size");
+        ASSERT_THROW(hashMap.remove(9), NoSuchElementException) << ("Should have thrown a NoSuchElementException on remove of non-existent key.");
     }
     {
         HashMap<int, std::string> hashMap;
@@ -488,11 +459,9 @@ void HashMapTest::testRemove() {
         }
         for (int i = 8191; i >= 0; i--) {
             std::string iValue = Integer::toString(i);
-            CPPUNIT_ASSERT_MESSAGE(std::string("Failed to replace value: ") + iValue,
-                                   hashMap.containsValue(iValue));
+            ASSERT_TRUE(hashMap.containsValue(iValue)) << (std::string("Failed to replace value: ") + iValue);
             hashMap.remove(i);
-            CPPUNIT_ASSERT_MESSAGE(std::string("Failed to remove same value: ") + iValue,
-                                   !hashMap.containsValue(iValue));
+            ASSERT_TRUE(!hashMap.containsValue(iValue)) << (std::string("Failed to remove same value: ") + iValue);
         }
     }
 
@@ -502,21 +471,18 @@ void HashMapTest::testRemove() {
 
         // Put non-equal object with same hashcode
         MyKey aKey;
-        CPPUNIT_ASSERT(!map.containsKey(aKey));
+        ASSERT_TRUE(!map.containsKey(aKey));
         map.put(aKey, "value");
         MyKey aKey2;
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-                "Should have thrown NoSuchElementException",
-                map.remove(aKey2),
-                NoSuchElementException);
+        ASSERT_THROW(map.remove(aKey2), NoSuchElementException) << ("Should have thrown NoSuchElementException");
         MyKey aKey3;
         map.put(aKey3, "foobar");
-        CPPUNIT_ASSERT_EQUAL(std::string("foobar"), map.get(aKey3));
-        CPPUNIT_ASSERT_EQUAL(std::string("value"), map.get(aKey));
+        ASSERT_EQ(std::string("foobar"), map.get(aKey3));
+        ASSERT_EQ(std::string("value"), map.get(aKey));
         map.remove(aKey);
         map.remove(aKey3);
-        CPPUNIT_ASSERT(!map.containsKey(aKey));
-        CPPUNIT_ASSERT(map.isEmpty());
+        ASSERT_TRUE(!map.containsKey(aKey));
+        ASSERT_TRUE(map.isEmpty());
     }
 }
 
@@ -537,7 +503,7 @@ void HashMapTest::testRehash() {
     Set<MyKey>& keySet = hashMap.keySet();
     std::vector<MyKey> returnedKeys = keySet.toArray();
     for (int i = 0; i < 8; i++) {
-        CPPUNIT_ASSERT_EQUAL(keyOrder[i], returnedKeys[7 - i]);
+        ASSERT_EQ(keyOrder[i], returnedKeys[7 - i]);
     }
 
     // The next put causes a rehash
@@ -545,7 +511,7 @@ void HashMapTest::testRehash() {
     // Check expected new ordering (adding order)
     returnedKeys = keySet.toArray();
     for (int i = 0; i < 9; i++) {
-        CPPUNIT_ASSERT_EQUAL(keyOrder[i], returnedKeys[i]);
+        ASSERT_EQ(keyOrder[i], returnedKeys[i]);
     }
 }
 
@@ -554,7 +520,7 @@ void HashMapTest::testSize() {
     HashMap<int, std::string> hashMap;
     populateMap(hashMap);
 
-    CPPUNIT_ASSERT_MESSAGE("Returned incorrect size", hashMap.size() == MAP_SIZE);
+    ASSERT_TRUE(hashMap.size() == MAP_SIZE) << ("Returned incorrect size");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -564,15 +530,13 @@ void HashMapTest::testValues() {
     populateMap(hashMap);
 
     Collection<std::string>& c = hashMap.values();
-    CPPUNIT_ASSERT_MESSAGE("Returned collection of incorrect size()", c.size() == hashMap.size());
+    ASSERT_TRUE(c.size() == hashMap.size()) << ("Returned collection of incorrect size()");
     for (int i = 0; i < MAP_SIZE; i++) {
-        CPPUNIT_ASSERT_MESSAGE("Returned collection does not contain all keys",
-                               c.contains(Integer::toString(i)));
+        ASSERT_TRUE(c.contains(Integer::toString(i))) << ("Returned collection does not contain all keys");
     }
 
     c.remove("10");
-    CPPUNIT_ASSERT_MESSAGE("Removing from collection should alter Map",
-                           !hashMap.containsKey(10));
+    ASSERT_TRUE(!hashMap.containsKey(10)) << ("Removing from collection should alter Map");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -581,7 +545,7 @@ void HashMapTest::testToString() {
     HashMap<int, std::string> hashMap;
     populateMap(hashMap);
     std::string result = hashMap.toString();
-    CPPUNIT_ASSERT_MESSAGE("should return something", result != "");
+    ASSERT_TRUE(result != "") << ("should return something");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -594,18 +558,15 @@ void HashMapTest::testEntrySetIterator() {
     Pointer< Iterator<MapEntry<int, std::string> > > iterator(map.entrySet().iterator());
     while (iterator->hasNext()) {
         MapEntry<int, std::string> entry = iterator->next();
-        CPPUNIT_ASSERT_EQUAL(count, entry.getKey());
-        CPPUNIT_ASSERT_EQUAL(Integer::toString(count), entry.getValue());
+        ASSERT_EQ(count, entry.getKey());
+        ASSERT_EQ(Integer::toString(count), entry.getValue());
         count++;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Iterator didn't cover the expected range", count++ == MAP_SIZE);
+    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.entrySet().iterator());
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalStateException",
-        iterator->remove(),
-        IllegalStateException);
+    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 
     count = 0;
     while (iterator->hasNext()) {
@@ -614,11 +575,8 @@ void HashMapTest::testEntrySetIterator() {
         count++;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Iterator didn't remove the expected range", count++ == MAP_SIZE);
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalStateException",
-        iterator->remove(),
-        IllegalStateException);
+    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
+    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -631,17 +589,14 @@ void HashMapTest::testKeySetIterator() {
     Pointer< Iterator<int> > iterator(map.keySet().iterator());
     while (iterator->hasNext()) {
         int key = iterator->next();
-        CPPUNIT_ASSERT_EQUAL(count, key);
+        ASSERT_EQ(count, key);
         count++;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Iterator didn't cover the expected range", count++ == MAP_SIZE);
+    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.keySet().iterator());
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalStateException",
-        iterator->remove(),
-        IllegalStateException);
+    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 
     count = 0;
     while (iterator->hasNext()) {
@@ -650,11 +605,8 @@ void HashMapTest::testKeySetIterator() {
         count++;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Iterator didn't remove the expected range", count++ == MAP_SIZE);
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalStateException",
-        iterator->remove(),
-        IllegalStateException);
+    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
+    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -667,17 +619,14 @@ void HashMapTest::testValuesIterator() {
     Pointer< Iterator<std::string> > iterator(map.values().iterator());
     while (iterator->hasNext()) {
         std::string value = iterator->next();
-        CPPUNIT_ASSERT_EQUAL(Integer::toString(count), value);
+        ASSERT_EQ(Integer::toString(count), value);
         count++;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Iterator didn't cover the expected range", count++ == MAP_SIZE);
+    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.values().iterator());
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalStateException",
-        iterator->remove(),
-        IllegalStateException);
+    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 
     count = 0;
     while (iterator->hasNext()) {
@@ -686,9 +635,6 @@ void HashMapTest::testValuesIterator() {
         count++;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Iterator didn't remove the expected range", count++ == MAP_SIZE);
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalStateException",
-        iterator->remove(),
-        IllegalStateException);
+    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
+    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 }

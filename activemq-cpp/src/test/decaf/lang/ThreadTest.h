@@ -18,52 +18,17 @@
 #ifndef _DECAF_LANG_THREADTEST_H_
 #define _DECAF_LANG_THREADTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf{
 namespace lang{
 
-    class ThreadTest : public CppUnit::TestFixture {
-
-      CPPUNIT_TEST_SUITE( ThreadTest );
-      CPPUNIT_TEST( testConstructor );
-      CPPUNIT_TEST( testConstructor_1 );
-      CPPUNIT_TEST( testConstructor_2 );
-      CPPUNIT_TEST( testConstructor_3 );
-      CPPUNIT_TEST( testRun );
-      CPPUNIT_TEST( testDelegate );
-      CPPUNIT_TEST( testDerived );
-      CPPUNIT_TEST( testJoin1 );
-      CPPUNIT_TEST( testJoin2 );
-      CPPUNIT_TEST( testJoin3 );
-      CPPUNIT_TEST( testJoin4 );
-      CPPUNIT_TEST( testSetPriority );
-      CPPUNIT_TEST( testIsAlive );
-      CPPUNIT_TEST( testGetId );
-      CPPUNIT_TEST( testGetState );
-      CPPUNIT_TEST( testSleep );
-      CPPUNIT_TEST( testSleep2Arg );
-      CPPUNIT_TEST( testUncaughtExceptionHandler );
-      CPPUNIT_TEST( testCurrentThread );
-      CPPUNIT_TEST( testInterrupt );
-      CPPUNIT_TEST( testInterrupted );
-//      CPPUNIT_TEST( testIsInterrupted );
-      CPPUNIT_TEST( testSetName );
-      CPPUNIT_TEST( testInterruptSleep );
-      CPPUNIT_TEST( testInterruptJoin );
-      CPPUNIT_TEST( testInterruptWait );
-      CPPUNIT_TEST( testRapidCreateAndDestroy );
-      CPPUNIT_TEST( testConcurrentRapidCreateAndDestroy );
-      CPPUNIT_TEST( testCreatedButNotStarted );
-      CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class ThreadTest : public ::testing::Test {
+public:
 
         virtual ~ThreadTest(){}
 
-        virtual void setUp(){}
-        virtual void tearDown(){}
+        void SetUp() override{}
+        void TearDown() override{}
 
         void testConstructor();
         void testConstructor_1();

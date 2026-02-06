@@ -18,45 +18,19 @@
 #ifndef _DECAF_UTIL_ZIP_INFLATERTEST_H_
 #define _DECAF_UTIL_ZIP_INFLATERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 namespace zip {
 
-    class InflaterTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( InflaterTest );
-        CPPUNIT_TEST( testEnd );
-        CPPUNIT_TEST( testFinished );
-        CPPUNIT_TEST( testGetAdler );
-        CPPUNIT_TEST( testGetRemaining );
-        CPPUNIT_TEST( testInflateVector );
-        CPPUNIT_TEST( testInflateB1 );
-        CPPUNIT_TEST( testInflateBII );
-        CPPUNIT_TEST( testInflateBII1 );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testConstructorZ );
-        CPPUNIT_TEST( testNeedsDictionary );
-        CPPUNIT_TEST( testNeedsInput );
-        CPPUNIT_TEST( testReset );
-        CPPUNIT_TEST( testSetInputB );
-        CPPUNIT_TEST( testSetInputBIII );
-        CPPUNIT_TEST( testGetBytesRead );
-        CPPUNIT_TEST( testGetBytesWritten );
-        CPPUNIT_TEST( testInflate );
-        CPPUNIT_TEST( testSetDictionaryB );
-        CPPUNIT_TEST( testSetDictionaryBIII );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class InflaterTest : public ::testing::Test {
+public:
 
         InflaterTest();
         virtual ~InflaterTest();
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         void testEnd();
         void testFinished();

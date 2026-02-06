@@ -40,11 +40,11 @@ OpenSSLSocketTest::~OpenSSLSocketTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenSSLSocketTest::setUp() {
+void OpenSSLSocketTest::SetUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenSSLSocketTest::tearDown() {
+void OpenSSLSocketTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,13 +72,10 @@ void OpenSSLSocketTest::testHandshakeCalledAfterConnect() {
         // Without the fix, step 3 was deferred to first I/O operation,
         // causing the "TcpSocket::connect() timed out" error.
 
-        CPPUNIT_ASSERT_MESSAGE(
-            "Handshake should be performed in connect(), not deferred to first I/O",
-            true
-        );
+        ASSERT_TRUE(true) << ("Handshake should be performed in connect(), not deferred to first I/O");
 
     } catch (Exception& ex) {
-        CPPUNIT_FAIL(std::string("Unexpected exception: ") + ex.getMessage());
+        FAIL() << (std::string("Unexpected exception: ") + ex.getMessage());
     }
 }
 
@@ -99,13 +96,10 @@ void OpenSSLSocketTest::testHandshakeIdempotency() {
         // 2. read() and write() also check and call startHandshake()
         // 3. Multiple calls should be safe and not re-execute handshake
 
-        CPPUNIT_ASSERT_MESSAGE(
-            "Multiple startHandshake() calls should be idempotent",
-            true
-        );
+        ASSERT_TRUE(true) << ("Multiple startHandshake() calls should be idempotent");
 
     } catch (Exception& ex) {
-        CPPUNIT_FAIL(std::string("Unexpected exception: ") + ex.getMessage());
+        FAIL() << (std::string("Unexpected exception: ") + ex.getMessage());
     }
 }
 
@@ -134,15 +128,12 @@ void OpenSSLSocketTest::testConnectWithInvalidHost() {
 
             delete socket;
 
-            CPPUNIT_ASSERT_MESSAGE(
-                "Should throw IOException for invalid host",
-                exceptionThrown
-            );
+            ASSERT_TRUE(exceptionThrown) << ("Should throw IOException for invalid host");
         }
 
     } catch (Exception& ex) {
         // Any exception is acceptable for this test case
-        CPPUNIT_ASSERT(true);
+        ASSERT_TRUE(true);
     }
 }
 
@@ -172,11 +163,11 @@ void OpenSSLSocketTest::testServerNameConfiguration() {
 
             delete socket;
 
-            CPPUNIT_ASSERT_EQUAL((size_t)1, retrievedNames.size());
-            CPPUNIT_ASSERT_EQUAL(std::string("test.example.com"), retrievedNames[0]);
+            ASSERT_EQ((size_t)1, retrievedNames.size());
+            ASSERT_EQ(std::string("test.example.com"), retrievedNames[0]);
         }
 
     } catch (Exception& ex) {
-        CPPUNIT_FAIL(std::string("Unexpected exception: ") + ex.getMessage());
+        FAIL() << (std::string("Unexpected exception: ") + ex.getMessage());
     }
 }

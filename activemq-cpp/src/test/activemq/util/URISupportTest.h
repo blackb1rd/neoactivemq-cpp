@@ -18,23 +18,12 @@
 #ifndef _ACTIVEMQ_UTIL_URISUPPORTTEST_H_
 #define _ACTIVEMQ_UTIL_URISUPPORTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq{
 namespace util{
 
-    class URISupportTest : public CppUnit::TestFixture {
-
-       CPPUNIT_TEST_SUITE( URISupportTest );
-       CPPUNIT_TEST( test );
-       CPPUNIT_TEST( testURIParseEnv );
-       CPPUNIT_TEST( testParseComposite );
-       CPPUNIT_TEST( testApplyParameters );
-       CPPUNIT_TEST( testCreateWithQuery );
-       CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class URISupportTest : public ::testing::Test {
+public:
 
         URISupportTest() {}
         virtual ~URISupportTest() {}

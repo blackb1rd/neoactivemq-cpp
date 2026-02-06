@@ -18,9 +18,7 @@
 #ifndef _DECAF_INTERNAL_UTIL_CONCURRENT_TRANSFERSTACKTEST_H_
 #define _DECAF_INTERNAL_UTIL_CONCURRENT_TRANSFERSTACKTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/internal/util/ByteArrayAdapter.h>
 #include <decaf/util/Config.h>
 
@@ -29,13 +27,8 @@ namespace internal {
 namespace util {
 namespace concurrent {
 
-    class TransferStackTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( TransferStackTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class TransferStackTest : public ::testing::Test {
+public:
 
         TransferStackTest();
         virtual ~TransferStackTest();

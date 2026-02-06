@@ -18,9 +18,7 @@
 #ifndef _DECAF_IO_OUTPUTSTREAMWRITERTEST_H_
 #define _DECAF_IO_OUTPUTSTREAMWRITERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/io/ByteArrayOutputStream.h>
 #include <decaf/io/OutputStreamWriter.h>
 #include <decaf/io/InputStreamReader.h>
@@ -28,19 +26,8 @@
 namespace decaf {
 namespace io {
 
-    class OutputStreamWriterTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( OutputStreamWriterTest );
-        CPPUNIT_TEST( testClose );
-        CPPUNIT_TEST( testFlush );
-        CPPUNIT_TEST( testWriteCharArrayIntIntInt );
-        CPPUNIT_TEST( testWriteChar );
-        CPPUNIT_TEST( testWriteStringIntInt );
-        CPPUNIT_TEST( testOutputStreamWriterOutputStream );
-        CPPUNIT_TEST( testWriteString );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class OutputStreamWriterTest : public ::testing::Test {
+private:
 
         OutputStreamWriter* writer1;
 
@@ -62,8 +49,8 @@ namespace io {
 
         virtual ~OutputStreamWriterTest();
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         void testClose();
         void testFlush();

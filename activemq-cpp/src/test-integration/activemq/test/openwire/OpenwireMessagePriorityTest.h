@@ -25,12 +25,7 @@ namespace test {
 namespace openwire {
 
     class OpenwireMessagePriorityTest : public MessagePriorityTest {
-
-        CPPUNIT_TEST_SUITE( OpenwireMessagePriorityTest );
-        CPPUNIT_TEST( testMessagePrioritySendReceive );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireMessagePriorityTest();
         virtual ~OpenwireMessagePriorityTest();

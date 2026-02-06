@@ -18,32 +18,20 @@
 #ifndef _DECAF_LANG_EXCEPTIONTEST_H_
 #define _DECAF_LANG_EXCEPTIONTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/lang/Exception.h>
 #include <string.h>
 
 namespace decaf{
 namespace lang{
 
-    class ExceptionTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ExceptionTest );
-        CPPUNIT_TEST( testMessage0 );
-        CPPUNIT_TEST( testMessage3 );
-        CPPUNIT_TEST( testClone );
-        CPPUNIT_TEST( testInitCause );
-        CPPUNIT_TEST( testCtors );
-        CPPUNIT_TEST( testAssign );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class ExceptionTest : public ::testing::Test {
+public:
 
         virtual ~ExceptionTest(){}
 
-        virtual void setUp(){}
-        virtual void tearDown(){}
+        void SetUp() override{}
+        void TearDown() override{}
 
         void testCtors();
         void testAssign();

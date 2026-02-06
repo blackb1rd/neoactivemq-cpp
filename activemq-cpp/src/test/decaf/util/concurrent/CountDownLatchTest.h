@@ -18,8 +18,7 @@
 #ifndef _DECAF_UTIL_CONCURRENT_COUNTDOWNLATCHTEST_H_
 #define _DECAF_UTIL_CONCURRENT_COUNTDOWNLATCHTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 #include <decaf/lang/Thread.h>
@@ -30,22 +29,7 @@ namespace util{
 namespace concurrent{
 
     class CountDownLatchTest : public ExecutorsTestSupport {
-
-        CPPUNIT_TEST_SUITE( CountDownLatchTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( test2 );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testGetCount );
-        CPPUNIT_TEST( testCountDown );
-        CPPUNIT_TEST( testAwait );
-        CPPUNIT_TEST( testTimedAwait );
-        CPPUNIT_TEST( testAwaitInterruptedException );
-        CPPUNIT_TEST( testTimedAwaitInterruptedException );
-        CPPUNIT_TEST( testAwaitTimeout );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST_SUITE_END();
-
-    protected:
+protected:
 
         class MyThread : public lang::Thread {
         public:

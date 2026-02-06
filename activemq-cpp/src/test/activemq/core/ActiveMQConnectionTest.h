@@ -18,21 +18,12 @@
 #ifndef _ACTIVEMQ_CORE_ACTIVEMQCONNECTIONTEST_H_
 #define _ACTIVEMQ_CORE_ACTIVEMQCONNECTIONTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace core {
 
-    class ActiveMQConnectionTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ActiveMQConnectionTest );
-        CPPUNIT_TEST( test2WithOpenwire );
-        CPPUNIT_TEST( testCloseCancelsHungStart );
-        CPPUNIT_TEST( testExceptionInOnException );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class ActiveMQConnectionTest : public ::testing::Test {
+public:
 
         ActiveMQConnectionTest() {}
         virtual ~ActiveMQConnectionTest() {}

@@ -44,8 +44,8 @@ void CollectionsTest::testReverseList() {
 
         Collections::reverse(list);
 
-        CPPUNIT_ASSERT_EQUAL(0, list.get(49));
-        CPPUNIT_ASSERT_EQUAL(49, list.get(0));
+        ASSERT_EQ(0, list.get(49));
+        ASSERT_EQ(49, list.get(0));
     }
 
     {
@@ -57,7 +57,7 @@ void CollectionsTest::testReverseList() {
 
         Collections::reverse(list);
 
-        CPPUNIT_ASSERT_EQUAL(0, list.getLast());
-        CPPUNIT_ASSERT_EQUAL(49, list.getFirst());
+        ASSERT_EQ(0, list.getLast());
+        ASSERT_EQ(49, list.getFirst());
     }
 }

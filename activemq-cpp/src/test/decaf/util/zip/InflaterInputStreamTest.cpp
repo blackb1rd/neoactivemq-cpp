@@ -115,7 +115,7 @@ InflaterInputStreamTest::~InflaterInputStreamTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::setUp() {
+void InflaterInputStreamTest::SetUp() {
 
     this->inputBuffer.clear();
     this->inputBuffer.resize( 500 );
@@ -146,7 +146,7 @@ void InflaterInputStreamTest::testConstructorInputStreamInflater() {
     Inflater inflate;
     InflaterInputStream inflatIP( &bais, &inflate );
 
-    CPPUNIT_ASSERT( inflatIP.read( byteArray, 100 , 0, 5 ) == 5 );
+    ASSERT_TRUE(inflatIP.read( byteArray, 100 , 0, 5 ) == 5);
     inflatIP.close();
 }
 
@@ -161,7 +161,7 @@ void InflaterInputStreamTest::testConstructorInputStreamInflaterI() {
 
     int i = 0;
     while( ( result = inflatIP.read() ) != -1 ) {
-        CPPUNIT_ASSERT( testString[i] == (char)result );
+        ASSERT_TRUE(testString[i] == (char)result);
         i++;
     }
 
@@ -185,8 +185,8 @@ void InflaterInputStreamTest::testMarkSupported() {
     ByteArrayInputStream bais( deflatedData );
     InflaterInputStream iis( &bais );
 
-    CPPUNIT_ASSERT( !iis.markSupported() );
-    CPPUNIT_ASSERT( bais.markSupported() );
+    ASSERT_TRUE(!iis.markSupported());
+    ASSERT_TRUE(bais.markSupported());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,7 +199,7 @@ void InflaterInputStreamTest::testRead() {
 
     int i = 0;
     while( ( result = inflatIP.read() ) != -1 ) {
-        CPPUNIT_ASSERT( testString[i] == (char)result );
+        ASSERT_TRUE(testString[i] == (char)result);
         i++;
     }
 
@@ -217,16 +217,16 @@ void InflaterInputStreamTest::testAvailableNonEmptySource() {
 
     // InflaterInputStream.available() returns either 1 or 0, even though
     // that contradicts the behavior defined in InputStream.available()
-    CPPUNIT_ASSERT_EQUAL( 1, in.read() );
-    CPPUNIT_ASSERT_EQUAL( 1, (int)in.available() );
-    CPPUNIT_ASSERT_EQUAL( 3, in.read() );
-    CPPUNIT_ASSERT_EQUAL( 1, (int)in.available() );
-    CPPUNIT_ASSERT_EQUAL( 4, in.read() );
-    CPPUNIT_ASSERT_EQUAL( 1, (int)in.available() );
-    CPPUNIT_ASSERT_EQUAL( 6, in.read() );
-    CPPUNIT_ASSERT_EQUAL( 0, (int)in.available() );
-    CPPUNIT_ASSERT_EQUAL( -1, in.read() );
-    CPPUNIT_ASSERT_EQUAL( -1, in.read() );
+    ASSERT_EQ(1, in.read());
+    ASSERT_EQ(1, (int)in.available());
+    ASSERT_EQ(3, in.read());
+    ASSERT_EQ(1, (int)in.available());
+    ASSERT_EQ(4, in.read());
+    ASSERT_EQ(1, (int)in.available());
+    ASSERT_EQ(6, in.read());
+    ASSERT_EQ(0, (int)in.available());
+    ASSERT_EQ(-1, in.read());
+    ASSERT_EQ(-1, in.read());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -237,9 +237,9 @@ void InflaterInputStreamTest::testAvailableSkip() {
     ByteArrayInputStream bais( deflated, 13 );
     InflaterInputStream in( &bais );
 
-    CPPUNIT_ASSERT_EQUAL( 1, (int)in.available() );
-    CPPUNIT_ASSERT_EQUAL( 4, (int)in.skip( 4 ) );
-    CPPUNIT_ASSERT_EQUAL( 0, (int)in.available() );
+    ASSERT_EQ(1, (int)in.available());
+    ASSERT_EQ(4, (int)in.skip( 4 ));
+    ASSERT_EQ(0, (int)in.available());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -250,9 +250,9 @@ void InflaterInputStreamTest::testAvailableEmptySource() {
     ByteArrayInputStream bais( deflated, 13 );
     InflaterInputStream in( &bais );
 
-    CPPUNIT_ASSERT_EQUAL( -1, in.read() );
-    CPPUNIT_ASSERT_EQUAL( -1, in.read() );
-    CPPUNIT_ASSERT_EQUAL( 0, (int)in.available() );
+    ASSERT_EQ(-1, in.read());
+    ASSERT_EQ(-1, in.read());
+    ASSERT_EQ(0, (int)in.available());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -294,10 +294,7 @@ void InflaterInputStreamTest::testReadBIII2() {
     unsigned char outBuf[530];
     iis.close();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IOException",
-        iis.read( outBuf, 530, 0, 5 ),
-        IOException );
+    ASSERT_THROW(iis.read( outBuf, 530, 0, 5 ), IOException) << ("Should have thrown an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -308,10 +305,7 @@ void InflaterInputStreamTest::testReadBIII3() {
     InflaterInputStream iis( &bais );
     unsigned char outBuf[530];
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IOException",
-        iis.read( outBuf, 530, 0, 5 ),
-        IOException );
+    ASSERT_THROW(iis.read( outBuf, 530, 0, 5 ), IOException) << ("Should have thrown an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -320,10 +314,7 @@ void InflaterInputStreamTest::testReset() {
     ByteArrayInputStream bais( deflatedData );
     InflaterInputStream iis( &bais );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IOException",
-        iis.reset(),
-        IOException );
+    ASSERT_THROW(iis.reset(), IOException) << ("Should have thrown an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -334,21 +325,20 @@ void InflaterInputStreamTest::testSkip() {
 
     // Tests for skipping a zero value
     iis.skip( 0 );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned.", (int)'T', iis.read() );
+    ASSERT_EQ((int)'T', iis.read()) << ("Incorrect Byte Returned.");
 
     // Test to make sure the correct number of bytes were skipped
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Number Of Bytes Skipped.", 3, (int)iis.skip( 3 ) );
+    ASSERT_EQ(3, (int)iis.skip( 3 )) << ("Incorrect Number Of Bytes Skipped.");
 
     // Test to see if the number of bytes skipped returned is true.
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned.", (int)'_', iis.read() );
+    ASSERT_EQ((int)'_', iis.read()) << ("Incorrect Byte Returned.");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Number Of Bytes Skipped.", 0, (int)iis.skip( 0 ) );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned.", (int)'A', iis.read() );
+    ASSERT_EQ(0, (int)iis.skip( 0 )) << ("Incorrect Number Of Bytes Skipped.");
+    ASSERT_EQ((int)'A', iis.read()) << ("Incorrect Byte Returned.");
 
     // Test for skipping more bytes than available in the stream
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Number Of Bytes Skipped.",
-                                  (long long)testString.length() - 6, iis.skip( testString.length() ) );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Incorrect Byte Returned.", -1, iis.read() );
+    ASSERT_EQ((long long)testString.length() - 6, iis.skip( testString.length() )) << ("Incorrect Number Of Bytes Skipped.");
+    ASSERT_EQ(-1, iis.read()) << ("Incorrect Byte Returned.");
     iis.close();
 }
 
@@ -362,16 +352,14 @@ void InflaterInputStreamTest::testSkip2() {
     InflaterInputStream iis1( &bais1 );
 
     long long skip = iis1.skip( Integer::MAX_VALUE );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "method skip() returned wrong number of bytes skipped",
-                                  (long long)testString.size(), skip );
+    ASSERT_EQ((long long)testString.size(), skip) << ("method skip() returned wrong number of bytes skipped");
 
     // test for skipping of 2 bytes
     ByteArrayInputStream bais2( this->deflatedData );
     InflaterInputStream iis2( &bais2 );
 
     skip = iis2.skip( 2 );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "the number of bytes returned by skip did not correspond with its input parameters",
-                                  2LL, skip );
+    ASSERT_EQ(2LL, skip) << ("the number of bytes returned by skip did not correspond with its input parameters");
     int i = 0;
     int result = 0;
     while( ( result = iis2.read() ) != -1 ) {
@@ -382,8 +370,7 @@ void InflaterInputStreamTest::testSkip2() {
     iis2.close();
 
     for( int j = 2; j < (int)testString.length(); j++ ) {
-        CPPUNIT_ASSERT_MESSAGE( "original compressed data did not equal decompressed data",
-                                buffer[j - 2] == testString.at( j ) );
+        ASSERT_TRUE(buffer[j - 2] == testString.at( j )) << ("original compressed data did not equal decompressed data");
     }
 }
 
@@ -401,17 +388,14 @@ void InflaterInputStreamTest::testAvailable() {
         iis.read();
         available = iis.available();
         if( available == 0 ) {
-            CPPUNIT_ASSERT_EQUAL_MESSAGE( "Expected no more bytes to read", -1, iis.read() );
+            ASSERT_EQ(-1, iis.read()) << ("Expected no more bytes to read");
         } else {
-            CPPUNIT_ASSERT_EQUAL_MESSAGE( "Bytes Available Should Return 1.", 1, available );
+            ASSERT_EQ(1, available) << ("Bytes Available Should Return 1.");
         }
     }
 
     iis.close();
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IOException",
-        iis.available(),
-        IOException );
+    ASSERT_THROW(iis.available(), IOException) << ("Should have thrown an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

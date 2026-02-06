@@ -18,22 +18,15 @@
 #ifndef _DECAF_LANG_INTEGERTEST_H_
 #define _DECAF_LANG_INTEGERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/lang/Integer.h>
 
 namespace decaf{
 namespace lang{
 
-    class IntegerTest : public CppUnit::TestFixture
+    class IntegerTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( IntegerTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( test2 );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         IntegerTest() {}
         virtual ~IntegerTest() {}

@@ -18,71 +18,13 @@
 #ifndef _DECAF_UTIL_CONCURRENT_COPYONWRITEARRAYLISTTEST_H_
 #define _DECAF_UTIL_CONCURRENT_COPYONWRITEARRAYLISTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 namespace concurrent {
 
-    class CopyOnWriteArrayListTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( CopyOnWriteArrayListTest );
-        CPPUNIT_TEST( testConstructor1 );
-        CPPUNIT_TEST( testConstructor2 );
-        CPPUNIT_TEST( testConstructor3 );
-        CPPUNIT_TEST( testAddAll );
-        CPPUNIT_TEST( testAddAll1 );
-        CPPUNIT_TEST( testAddAll2 );
-        CPPUNIT_TEST( testAddAll3 );
-        CPPUNIT_TEST( testAddAll4 );
-        CPPUNIT_TEST( testAddAll5 );
-        CPPUNIT_TEST( testAddAll6 );
-        CPPUNIT_TEST( testAddAll7 );
-        CPPUNIT_TEST( testAddAll8 );
-        CPPUNIT_TEST( testAddAll9 );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testContains );
-        CPPUNIT_TEST( testContainsAll );
-        CPPUNIT_TEST( testGet );
-        CPPUNIT_TEST( testSet );
-        CPPUNIT_TEST( testSize );
-        CPPUNIT_TEST( testIsEmpty );
-        CPPUNIT_TEST( testToArray );
-        CPPUNIT_TEST( testIndexOf1 );
-        CPPUNIT_TEST( testIndexOf2 );
-        CPPUNIT_TEST( testLastIndexOf1 );
-        CPPUNIT_TEST( testLastIndexOf2 );
-        CPPUNIT_TEST( testAddIndex );
-        CPPUNIT_TEST( testAddAllIndex );
-        CPPUNIT_TEST( testEquals );
-        CPPUNIT_TEST( testRemove );
-        CPPUNIT_TEST( testRemoveAt );
-        CPPUNIT_TEST( testRemoveAll );
-        CPPUNIT_TEST( testRetainAll );
-        CPPUNIT_TEST( testAddIfAbsent1 );
-        CPPUNIT_TEST( testAddIfAbsent2 );
-        CPPUNIT_TEST( testAddAllAbsent );
-        CPPUNIT_TEST( testIterator );
-        CPPUNIT_TEST( testIteratorRemove );
-        CPPUNIT_TEST( testListIterator1 );
-        CPPUNIT_TEST( testListIterator2 );
-        CPPUNIT_TEST( testAddAll1IndexOutOfBoundsException );
-        CPPUNIT_TEST( testAddAll2IndexOutOfBoundsException );
-        CPPUNIT_TEST( testListIterator1IndexOutOfBoundsException );
-        CPPUNIT_TEST( testListIterator2IndexOutOfBoundsException );
-        CPPUNIT_TEST( testAdd1IndexOutOfBoundsException );
-        CPPUNIT_TEST( testAdd2IndexOutOfBoundsException );
-        CPPUNIT_TEST( testRemoveAt1IndexOutOfBounds );
-        CPPUNIT_TEST( testRemoveAt2IndexOutOfBounds );
-        CPPUNIT_TEST( testGet1IndexOutOfBoundsException );
-        CPPUNIT_TEST( testGet2IndexOutOfBoundsException );
-        CPPUNIT_TEST( testSet1IndexOutOfBoundsException );
-        CPPUNIT_TEST( testSet2IndexOutOfBoundsException );
-//        CPPUNIT_TEST( testConcurrentRandomAddRemoveAndIterate );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class CopyOnWriteArrayListTest : public ::testing::Test {
+private:
 
         static const int SIZE;
 

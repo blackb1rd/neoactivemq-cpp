@@ -42,7 +42,7 @@ CRC32Test::~CRC32Test() {
 void CRC32Test::testConstructor() {
 
     CRC32 crc;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Constructor of CRC32 failed", 0LL, crc.getValue() );
+    ASSERT_EQ(0LL, crc.getValue()) << ("Constructor of CRC32 failed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -50,16 +50,14 @@ void CRC32Test::testGetValue() {
 
     // test methods of java.util.zip.crc32.getValue()
     CRC32 crc;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "getValue() should return a zero as a result of constructing a CRC32 instance",
-                                  0LL, crc.getValue() );
+    ASSERT_EQ(0LL, crc.getValue()) << ("getValue() should return a zero as a result of constructing a CRC32 instance");
 
     crc.reset();
     crc.update( Integer::MAX_VALUE );
 
     // Ran JDK and discovered that the value of the CRC should be
     // 4278190080
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "update(max) failed to update the checksum to the correct value ",
-                                  4278190080LL, crc.getValue() );
+    ASSERT_EQ(4278190080LL, crc.getValue()) << ("update(max) failed to update the checksum to the correct value ");
 
     crc.reset();
     std::vector<unsigned char> byteEmpty( 10000, 0 );
@@ -67,19 +65,17 @@ void CRC32Test::testGetValue() {
 
     // Ran JDK and discovered that the value of the CRC should be
     // 1295764014
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "update(byte[]) failed to update the checksum to the correct value ",
-                                  1295764014LL, crc.getValue() );
+    ASSERT_EQ(1295764014LL, crc.getValue()) << ("update(byte[]) failed to update the checksum to the correct value ");
 
     crc.reset();
     crc.update( 1 );
 
     // Ran JDK and discovered that the value of the CRC should be
     // 2768625435
-    // CPPUNIT_ASSERT_EQUAL_MESSAGE( "update(int) failed to update the checksum to the correct
-    // value ",2768625435L, crc.getValue());
+    // ASSERT_EQ(2768625435L, crc.getValue()) << ("update(int) failed to update the checksum to the correct
+    // value ");
     crc.reset();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "reset failed to reset the checksum value to zero",
-                                  0LL, crc.getValue());
+    ASSERT_EQ(0LL, crc.getValue()) << ("reset failed to reset the checksum value to zero");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,11 +86,9 @@ void CRC32Test::testReset() {
 
     // Ran JDK and discovered that the value of the CRC should be
     // 2768625435
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "update(int) failed to update the checksum to the correct value ",
-                                  2768625435LL, crc.getValue() );
+    ASSERT_EQ(2768625435LL, crc.getValue()) << ("update(int) failed to update the checksum to the correct value ");
     crc.reset();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "reset failed to reset the checksum value to zero",
-                                  0LL, crc.getValue() );
+    ASSERT_EQ(0LL, crc.getValue()) << ("reset failed to reset the checksum value to zero");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -105,24 +99,21 @@ void CRC32Test::testUpdateI() {
 
     // Ran JDK and discovered that the value of the CRC should be
     // 2768625435
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "update(1) failed to update the checksum to the correct value ",
-                                  2768625435LL, crc.getValue() );
+    ASSERT_EQ(2768625435LL, crc.getValue()) << ("update(1) failed to update the checksum to the correct value ");
 
     crc.reset();
     crc.update( Integer::MAX_VALUE );
 
     // Ran JDK and discovered that the value of the CRC should be
     // 4278190080
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "update(max) failed to update the checksum to the correct value ",
-                                  4278190080LL, crc.getValue() );
+    ASSERT_EQ(4278190080LL, crc.getValue()) << ("update(max) failed to update the checksum to the correct value ");
 
     crc.reset();
     crc.update( Integer::MIN_VALUE );
 
     // Ran JDK and discovered that the value of the CRC should be
     // 3523407757
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "update(min) failed to update the checksum to the correct value ",
-                                  3523407757LL, crc.getValue() );
+    ASSERT_EQ(3523407757LL, crc.getValue()) << ("update(min) failed to update the checksum to the correct value ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -134,8 +125,7 @@ void CRC32Test::testUpdateArray() {
 
     // Ran JDK and discovered that the value of the CRC should be
     // 3066839698
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "update(unsigned char[]) failed to update the checksum to the correct value ",
-                                  3066839698LL, crc.getValue() );
+    ASSERT_EQ(3066839698LL, crc.getValue()) << ("update(unsigned char[]) failed to update the checksum to the correct value ");
 
     crc.reset();
     std::vector<unsigned char> byteEmpty( 10000, 0 );
@@ -143,8 +133,7 @@ void CRC32Test::testUpdateArray() {
 
     // Ran JDK and discovered that the value of the CRC should be
     // 1295764014
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "update(unsigned char[]) failed to update the checksum to the correct value ",
-                                  1295764014LL, crc.getValue() );
+    ASSERT_EQ(1295764014LL, crc.getValue()) << ("update(unsigned char[]) failed to update the checksum to the correct value ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -162,16 +151,9 @@ void CRC32Test::testUpdateArrayIndexed() {
 
     // Ran JDK and discovered that the value of the CRC should be
     // 1259060791
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "update(unsigned char[],int,int) failed to update the checksum to the correct value ",
-                                  1259060791LL, crc.getValue() );
+    ASSERT_EQ(1259060791LL, crc.getValue()) << ("update(unsigned char[],int,int) failed to update the checksum to the correct value ");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException for lenError",
-        crc.update( byteArray, SIZE, off, lenError ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(crc.update( byteArray, SIZE, off, lenError ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException for lenError");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IndexOutOfBoundsException for offError",
-        crc.update( byteArray, SIZE, offError, len ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(crc.update( byteArray, SIZE, offError, len ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException for offError");
 }

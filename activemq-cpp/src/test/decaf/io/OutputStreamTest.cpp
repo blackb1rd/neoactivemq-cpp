@@ -68,6 +68,5 @@ void OutputStreamTest::test() {
 
     std::string result( ostream.getBuffer().begin(), ostream.getBuffer().end() );
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Written string not what was expected",
-                                  std::string( "hello world" ), result );
+    ASSERT_EQ(std::string( "hello world" ), result) << ("Written string not what was expected");
 }

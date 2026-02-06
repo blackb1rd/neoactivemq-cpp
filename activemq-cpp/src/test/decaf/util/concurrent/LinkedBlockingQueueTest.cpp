@@ -38,50 +38,50 @@ namespace {
 
     void populate( LinkedBlockingQueue<int>& queue, int n ) {
 
-        CPPUNIT_ASSERT( queue.isEmpty() );
+        ASSERT_TRUE(queue.isEmpty());
 
         for( int i = 0; i < n; ++i ) {
             queue.add( i );
         }
 
-        CPPUNIT_ASSERT( !queue.isEmpty());
-        CPPUNIT_ASSERT_EQUAL( n, queue.size() );
+        ASSERT_TRUE(!queue.isEmpty());
+        ASSERT_EQ(n, queue.size());
     }
 
     void populate( LinkedList<int>& list, int n ) {
 
-        CPPUNIT_ASSERT( list.isEmpty() );
+        ASSERT_TRUE(list.isEmpty());
 
         for( int i = 0; i < n; ++i ) {
             list.add( i );
         }
 
-        CPPUNIT_ASSERT( !list.isEmpty());
-        CPPUNIT_ASSERT_EQUAL( n, list.size() );
+        ASSERT_TRUE(!list.isEmpty());
+        ASSERT_EQ(n, list.size());
     }
 
     void populate( LinkedBlockingQueue<std::string>& queue, int n ) {
 
-        CPPUNIT_ASSERT( queue.isEmpty() );
+        ASSERT_TRUE(queue.isEmpty());
 
         for( int i = 0; i < n; ++i ) {
             queue.add( Integer::toString( i ) );
         }
 
-        CPPUNIT_ASSERT( !queue.isEmpty());
-        CPPUNIT_ASSERT_EQUAL( n, queue.size() );
+        ASSERT_TRUE(!queue.isEmpty());
+        ASSERT_EQ(n, queue.size());
     }
 
     void populate( std::vector<int>& list, int n ) {
 
-        CPPUNIT_ASSERT( list.empty() );
+        ASSERT_TRUE(list.empty());
 
         for( int i = 0; i < n; ++i ) {
             list.push_back( i );
         }
 
-        CPPUNIT_ASSERT( !list.empty());
-        CPPUNIT_ASSERT_EQUAL( n, (int)list.size() );
+        ASSERT_TRUE(!list.empty());
+        ASSERT_EQ(n, (int)list.size());
     }
 }
 
@@ -98,9 +98,9 @@ void LinkedBlockingQueueTest::testConstructor1() {
 
     LinkedBlockingQueue<int> queue;
 
-    CPPUNIT_ASSERT_EQUAL(0, queue.size());
-    CPPUNIT_ASSERT(queue.isEmpty());
-    CPPUNIT_ASSERT_EQUAL((int)Integer::MAX_VALUE, queue.remainingCapacity());
+    ASSERT_EQ(0, queue.size());
+    ASSERT_TRUE(queue.isEmpty());
+    ASSERT_EQ((int)Integer::MAX_VALUE, queue.remainingCapacity());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -108,9 +108,9 @@ void LinkedBlockingQueueTest::testConstructor2() {
 
     LinkedBlockingQueue<int> queue(SIZE);
 
-    CPPUNIT_ASSERT_EQUAL(0, queue.size());
-    CPPUNIT_ASSERT(queue.isEmpty());
-    CPPUNIT_ASSERT_EQUAL(SIZE, queue.remainingCapacity());
+    ASSERT_EQ(0, queue.size());
+    ASSERT_TRUE(queue.isEmpty());
+    ASSERT_EQ(SIZE, queue.remainingCapacity());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -123,18 +123,15 @@ void LinkedBlockingQueueTest::testConstructor3() {
 
     for (int i = 0; i < SIZE; ++i) {
         int result;
-        CPPUNIT_ASSERT(q.poll(result));
-        CPPUNIT_ASSERT_EQUAL(list.get(i), result);
+        ASSERT_TRUE(q.poll(result));
+        ASSERT_EQ(list.get(i), result);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void LinkedBlockingQueueTest::testConstructor4() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IllegalArgumentException",
-        LinkedBlockingQueue<int>(-1),
-        IllegalArgumentException);
+    ASSERT_THROW(LinkedBlockingQueue<int>(-1), IllegalArgumentException) << ("Should have thrown an IllegalArgumentException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -145,29 +142,29 @@ void LinkedBlockingQueueTest::testEquals() {
     LinkedBlockingQueue<int> q2;
     populate( q2, 7 );
 
-    CPPUNIT_ASSERT( q1.equals( q2 ) );
-    CPPUNIT_ASSERT( q2.equals( q1 ) );
+    ASSERT_TRUE(q1.equals( q2 ));
+    ASSERT_TRUE(q2.equals( q1 ));
 
     q1.add( 42 );
-    CPPUNIT_ASSERT( !q1.equals( q2 ) );
-    CPPUNIT_ASSERT( !q2.equals( q1 ) );
+    ASSERT_TRUE(!q1.equals( q2 ));
+    ASSERT_TRUE(!q2.equals( q1 ));
     q2.add( 42 );
-    CPPUNIT_ASSERT( q1.equals( q2 ) );
-    CPPUNIT_ASSERT( q2.equals( q1 ) );
+    ASSERT_TRUE(q1.equals( q2 ));
+    ASSERT_TRUE(q2.equals( q1 ));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void LinkedBlockingQueueTest::testEmptyFull() {
 
     LinkedBlockingQueue<int> q(2);
-    CPPUNIT_ASSERT(q.isEmpty());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("should have room for 2", 2, q.remainingCapacity());
+    ASSERT_TRUE(q.isEmpty());
+    ASSERT_EQ(2, q.remainingCapacity()) << ("should have room for 2");
     q.add(1);
-    CPPUNIT_ASSERT(!q.isEmpty());
+    ASSERT_TRUE(!q.isEmpty());
     q.add(2);
-    CPPUNIT_ASSERT(!q.isEmpty());
-    CPPUNIT_ASSERT_EQUAL(0, q.remainingCapacity());
-    CPPUNIT_ASSERT(!q.offer(3));
+    ASSERT_TRUE(!q.isEmpty());
+    ASSERT_EQ(0, q.remainingCapacity());
+    ASSERT_TRUE(!q.offer(3));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -177,13 +174,13 @@ void LinkedBlockingQueueTest::testRemainingCapacity() {
     populate(q, SIZE);
 
     for(int i = 0; i < SIZE; ++i) {
-        CPPUNIT_ASSERT_EQUAL(i, q.remainingCapacity());
-        CPPUNIT_ASSERT_EQUAL(SIZE - i, q.size());
+        ASSERT_EQ(i, q.remainingCapacity());
+        ASSERT_EQ(SIZE - i, q.size());
         q.remove();
     }
     for(int i = 0; i < SIZE; ++i) {
-        CPPUNIT_ASSERT_EQUAL(SIZE - i, q.remainingCapacity());
-        CPPUNIT_ASSERT_EQUAL(i, q.size());
+        ASSERT_EQ(SIZE - i, q.remainingCapacity());
+        ASSERT_EQ(i, q.size());
         q.add(i);
     }
 }
@@ -192,8 +189,8 @@ void LinkedBlockingQueueTest::testRemainingCapacity() {
 void LinkedBlockingQueueTest::testOffer() {
 
     LinkedBlockingQueue<int> q(1);
-    CPPUNIT_ASSERT(q.offer(0));
-    CPPUNIT_ASSERT(!q.offer(1));
+    ASSERT_TRUE(q.offer(0));
+    ASSERT_TRUE(!q.offer(1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -201,14 +198,11 @@ void LinkedBlockingQueueTest::testAdd() {
 
     LinkedBlockingQueue<int> q(SIZE);
     for(int i = 0; i < SIZE; ++i) {
-        CPPUNIT_ASSERT(q.add(i));
+        ASSERT_TRUE(q.add(i));
     }
-    CPPUNIT_ASSERT_EQUAL(0, q.remainingCapacity());
+    ASSERT_EQ(0, q.remainingCapacity());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IllegalStateException",
-        q.add(SIZE),
-        IllegalStateException);
+    ASSERT_THROW(q.add(SIZE), IllegalStateException) << ("Should have thrown an IllegalStateException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -217,10 +211,7 @@ void LinkedBlockingQueueTest::testAddAllSelf() {
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IllegalArgumentException",
-        q.addAll(q),
-        IllegalArgumentException);
+    ASSERT_THROW(q.addAll(q), IllegalArgumentException) << ("Should have thrown an IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -231,10 +222,7 @@ void LinkedBlockingQueueTest::testAddAll1() {
 
     populate(list, SIZE);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IllegalStateException",
-        q.addAll(list),
-        IllegalStateException);
+    ASSERT_THROW(q.addAll(list), IllegalStateException) << ("Should have thrown an IllegalStateException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -245,13 +233,13 @@ void LinkedBlockingQueueTest::testAddAll2() {
     LinkedList<int> list;
     populate(list, SIZE);
 
-    CPPUNIT_ASSERT(!q.addAll(empty));
-    CPPUNIT_ASSERT(q.addAll(list));
+    ASSERT_TRUE(!q.addAll(empty));
+    ASSERT_TRUE(q.addAll(list));
 
     for (int i = 0; i < SIZE; ++i) {
         int result;
-        CPPUNIT_ASSERT(q.poll(result));
-        CPPUNIT_ASSERT_EQUAL(list.get(i), result);
+        ASSERT_TRUE(q.poll(result));
+        ASSERT_EQ(list.get(i), result);
     }
 }
 
@@ -261,9 +249,9 @@ void LinkedBlockingQueueTest::testPut() {
     LinkedBlockingQueue<int> q(SIZE);
     for(int i = 0; i < SIZE; ++i) {
         q.put(i);
-        CPPUNIT_ASSERT(q.contains(i));
+        ASSERT_TRUE(q.contains(i));
     }
-    CPPUNIT_ASSERT_EQUAL(0, q.remainingCapacity());
+    ASSERT_EQ(0, q.remainingCapacity());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -273,7 +261,7 @@ void LinkedBlockingQueueTest::testTake() {
     populate(q, SIZE);
 
     for(int i = 0; i < SIZE; ++i) {
-        CPPUNIT_ASSERT_EQUAL(i, q.take());
+        ASSERT_EQ(i, q.take());
     }
 }
 
@@ -285,11 +273,11 @@ void LinkedBlockingQueueTest::testPoll() {
     int result;
 
     for(int i = 0; i < SIZE; ++i) {
-        CPPUNIT_ASSERT(q.poll(result));
-        CPPUNIT_ASSERT_EQUAL(i, result);
+        ASSERT_TRUE(q.poll(result));
+        ASSERT_EQ(i, result);
     }
 
-    CPPUNIT_ASSERT(!q.poll(result));
+    ASSERT_TRUE(!q.poll(result));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -300,11 +288,11 @@ void LinkedBlockingQueueTest::testTimedPoll1() {
     int result;
 
     for(int i = 0; i < SIZE; ++i) {
-        CPPUNIT_ASSERT(q.poll(result, 0, TimeUnit::MILLISECONDS));
-        CPPUNIT_ASSERT_EQUAL(i, result);
+        ASSERT_TRUE(q.poll(result, 0, TimeUnit::MILLISECONDS));
+        ASSERT_EQ(i, result);
     }
 
-    CPPUNIT_ASSERT(!q.poll(result, 0, TimeUnit::MILLISECONDS));
+    ASSERT_TRUE(!q.poll(result, 0, TimeUnit::MILLISECONDS));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -315,11 +303,11 @@ void LinkedBlockingQueueTest::testTimedPoll2() {
     int result;
 
     for(int i = 0; i < SIZE; ++i) {
-        CPPUNIT_ASSERT(q.poll(result, 100, TimeUnit::MILLISECONDS));
-        CPPUNIT_ASSERT_EQUAL(i, result);
+        ASSERT_TRUE(q.poll(result, 100, TimeUnit::MILLISECONDS));
+        ASSERT_EQ(i, result);
     }
 
-    CPPUNIT_ASSERT(!q.poll(result, 100, TimeUnit::MILLISECONDS));
+    ASSERT_TRUE(!q.poll(result, 100, TimeUnit::MILLISECONDS));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -330,13 +318,13 @@ void LinkedBlockingQueueTest::testPeek() {
     int result;
 
     for(int i = 0; i < SIZE; ++i) {
-        CPPUNIT_ASSERT(q.peek(result));
-        CPPUNIT_ASSERT_EQUAL(i, result);
+        ASSERT_TRUE(q.peek(result));
+        ASSERT_EQ(i, result);
         q.poll(result);
-        CPPUNIT_ASSERT(q.peek(result) == false || i != result);
+        ASSERT_TRUE(q.peek(result) == false || i != result);
     }
 
-    CPPUNIT_ASSERT(!q.peek(result));
+    ASSERT_TRUE(!q.peek(result));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -347,14 +335,11 @@ void LinkedBlockingQueueTest::testElement() {
     int result;
 
     for(int i = 0; i < SIZE; ++i) {
-        CPPUNIT_ASSERT_EQUAL(i, q.element());
+        ASSERT_EQ(i, q.element());
         q.poll(result);
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an NoSuchElementException",
-        q.element(),
-        NoSuchElementException);
+    ASSERT_THROW(q.element(), NoSuchElementException) << ("Should have thrown an NoSuchElementException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -364,13 +349,10 @@ void LinkedBlockingQueueTest::testRemove() {
     populate(q, SIZE);
 
     for(int i = 0; i < SIZE; ++i) {
-        CPPUNIT_ASSERT_EQUAL(i, q.remove());
+        ASSERT_EQ(i, q.remove());
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an NoSuchElementException",
-        q.remove(),
-        NoSuchElementException);
+    ASSERT_THROW(q.remove(), NoSuchElementException) << ("Should have thrown an NoSuchElementException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -380,15 +362,15 @@ void LinkedBlockingQueueTest::testRemoveElement() {
     populate(q, SIZE);
 
     for(int i = 1; i < SIZE; i += 2) {
-        CPPUNIT_ASSERT(q.remove(i));
+        ASSERT_TRUE(q.remove(i));
     }
 
     for(int i = 0; i < SIZE; i += 2) {
-        CPPUNIT_ASSERT(q.remove(i));
-        CPPUNIT_ASSERT(!q.remove(i + 1));
+        ASSERT_TRUE(q.remove(i));
+        ASSERT_TRUE(!q.remove(i + 1));
     }
 
-    CPPUNIT_ASSERT(q.isEmpty());
+    ASSERT_TRUE(q.isEmpty());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -397,12 +379,12 @@ void LinkedBlockingQueueTest::testRemoveElement2() {
     LinkedBlockingQueue<int> q;
     populate( q, SIZE );
 
-    CPPUNIT_ASSERT_MESSAGE( "Failed to remove valid Object", q.remove(42) );
-    CPPUNIT_ASSERT_MESSAGE( "Removed invalid object", !q.remove(999) );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Found Object after removal", false, q.contains(42) );
+    ASSERT_TRUE(q.remove(42)) << ("Failed to remove valid Object");
+    ASSERT_TRUE(!q.remove(999)) << ("Removed invalid object");
+    ASSERT_EQ(false, q.contains(42)) << ("Found Object after removal");
     q.add(SIZE+1);
     q.remove(SIZE+1);
-    CPPUNIT_ASSERT_MESSAGE( "Should not contain null afrer removal", !q.contains(SIZE+1) );
+    ASSERT_TRUE(!q.contains(SIZE+1)) << ("Should not contain null afrer removal");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -410,12 +392,12 @@ void LinkedBlockingQueueTest::testRemoveElementAndAdd() {
 
     LinkedBlockingQueue<int> q;
 
-    CPPUNIT_ASSERT(q.add(1));
-    CPPUNIT_ASSERT(q.add(2));
-    CPPUNIT_ASSERT(q.remove(1));
-    CPPUNIT_ASSERT(q.remove(2));
-    CPPUNIT_ASSERT(q.add(3));
-    CPPUNIT_ASSERT(q.take() == 3);
+    ASSERT_TRUE(q.add(1));
+    ASSERT_TRUE(q.add(2));
+    ASSERT_TRUE(q.remove(1));
+    ASSERT_TRUE(q.remove(2));
+    ASSERT_TRUE(q.add(3));
+    ASSERT_TRUE(q.take() == 3);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -425,9 +407,9 @@ void LinkedBlockingQueueTest::testContains() {
     populate(q, SIZE);
 
     for(int i = 0; i < SIZE; ++i) {
-        CPPUNIT_ASSERT(q.contains(i));
+        ASSERT_TRUE(q.contains(i));
         q.remove();
-        CPPUNIT_ASSERT(!q.contains(i));
+        ASSERT_TRUE(!q.contains(i));
     }
 }
 
@@ -438,14 +420,14 @@ void LinkedBlockingQueueTest::testClear() {
     populate(q, SIZE);
 
     q.clear();
-    CPPUNIT_ASSERT(q.isEmpty());
-    CPPUNIT_ASSERT_EQUAL(0, q.size());
-    CPPUNIT_ASSERT_EQUAL(SIZE, q.remainingCapacity());
+    ASSERT_TRUE(q.isEmpty());
+    ASSERT_EQ(0, q.size());
+    ASSERT_EQ(SIZE, q.remainingCapacity());
     q.add(1);
-    CPPUNIT_ASSERT(!q.isEmpty());
-    CPPUNIT_ASSERT(q.contains(1));
+    ASSERT_TRUE(!q.isEmpty());
+    ASSERT_TRUE(q.contains(1));
     q.clear();
-    CPPUNIT_ASSERT(q.isEmpty());
+    ASSERT_TRUE(q.isEmpty());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -456,11 +438,11 @@ void LinkedBlockingQueueTest::testContainsAll() {
     populate(q, SIZE);
 
     for(int i = 0; i < SIZE; ++i) {
-        CPPUNIT_ASSERT(q.containsAll(p));
-        CPPUNIT_ASSERT(!p.containsAll(q));
+        ASSERT_TRUE(q.containsAll(p));
+        ASSERT_TRUE(!p.containsAll(q));
         p.add(i);
     }
-    CPPUNIT_ASSERT(p.containsAll(q));
+    ASSERT_TRUE(p.containsAll(q));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -473,13 +455,13 @@ void LinkedBlockingQueueTest::testRetainAll() {
     for(int i = 0; i < SIZE; ++i) {
         bool changed = q.retainAll(p);
         if(i == 0) {
-            CPPUNIT_ASSERT(!changed);
+            ASSERT_TRUE(!changed);
         } else {
-            CPPUNIT_ASSERT(changed);
+            ASSERT_TRUE(changed);
         }
 
-        CPPUNIT_ASSERT(q.containsAll(p));
-        CPPUNIT_ASSERT_EQUAL(SIZE-i, q.size());
+        ASSERT_TRUE(q.containsAll(p));
+        ASSERT_EQ(SIZE-i, q.size());
         p.remove();
     }
 }
@@ -493,11 +475,11 @@ void LinkedBlockingQueueTest::testRemoveAll() {
         populate(q, SIZE);
         populate(p, i);
 
-        CPPUNIT_ASSERT(q.removeAll(p));
-        CPPUNIT_ASSERT_EQUAL(SIZE-i, q.size());
+        ASSERT_TRUE(q.removeAll(p));
+        ASSERT_EQ(SIZE-i, q.size());
         for (int j = 0; j < i; ++j) {
             int result = p.remove();
-            CPPUNIT_ASSERT(!q.contains(result));
+            ASSERT_TRUE(!q.contains(result));
         }
     }
 }
@@ -510,7 +492,7 @@ void LinkedBlockingQueueTest::testToArray() {
 
     std::vector<int> array = q.toArray();
     for(int i = 0; i < (int)array.size(); i++) {
-        CPPUNIT_ASSERT_EQUAL(array[i], q.take());
+        ASSERT_EQ(array[i], q.take());
     }
 }
 
@@ -520,10 +502,7 @@ void LinkedBlockingQueueTest::testDrainToSelf() {
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IllegalArgumentException",
-        q.drainTo(q),
-        IllegalArgumentException);
+    ASSERT_THROW(q.drainTo(q), IllegalArgumentException) << ("Should have thrown an IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -535,26 +514,26 @@ void LinkedBlockingQueueTest::testDrainTo() {
 
     q.drainTo(list);
 
-    CPPUNIT_ASSERT_EQUAL(q.size(), 0);
-    CPPUNIT_ASSERT_EQUAL(list.size(), SIZE);
+    ASSERT_EQ(q.size(), 0);
+    ASSERT_EQ(list.size(), SIZE);
 
     for(int i = 0; i < SIZE; ++i) {
-        CPPUNIT_ASSERT_EQUAL(list.get(i), i);
+        ASSERT_EQ(list.get(i), i);
     }
 
     q.add(0);
     q.add(1);
-    CPPUNIT_ASSERT(!q.isEmpty());
-    CPPUNIT_ASSERT(q.contains(0));
-    CPPUNIT_ASSERT(q.contains(1));
+    ASSERT_TRUE(!q.isEmpty());
+    ASSERT_TRUE(q.contains(0));
+    ASSERT_TRUE(q.contains(1));
     list.clear();
 
     q.drainTo(list);
 
-    CPPUNIT_ASSERT_EQUAL(q.size(), 0);
-    CPPUNIT_ASSERT_EQUAL(list.size(), 2);
+    ASSERT_EQ(q.size(), 0);
+    ASSERT_EQ(list.size(), 2);
     for(int i = 0; i < 2; ++i) {
-        CPPUNIT_ASSERT_EQUAL(list.get(i), i);
+        ASSERT_EQ(list.get(i), i);
     }
 }
 
@@ -564,10 +543,7 @@ void LinkedBlockingQueueTest::testDrainToSelfN() {
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IllegalArgumentException",
-        q.drainTo(q, SIZE),
-        IllegalArgumentException);
+    ASSERT_THROW(q.drainTo(q, SIZE), IllegalArgumentException) << ("Should have thrown an IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -578,15 +554,15 @@ void LinkedBlockingQueueTest::testDrainToN() {
     for(int i = 0; i < SIZE + 2; ++i) {
 
         for(int j = 0; j < SIZE; j++) {
-            CPPUNIT_ASSERT(q.offer(j));
+            ASSERT_TRUE(q.offer(j));
         }
         LinkedList<int> list;
         q.drainTo(list, i);
         int k = (i < SIZE) ? i : SIZE;
-        CPPUNIT_ASSERT_EQUAL(list.size(), k);
-        CPPUNIT_ASSERT_EQUAL(q.size(), SIZE - k);
+        ASSERT_EQ(list.size(), k);
+        ASSERT_EQ(q.size(), SIZE - k);
         for(int j = 0; j < k; ++j) {
-            CPPUNIT_ASSERT_EQUAL(list.get(j), j);
+            ASSERT_EQ(list.get(j), j);
         }
 
         int temp;
@@ -634,15 +610,15 @@ void LinkedBlockingQueueTest::testDrainToWithActivePut() {
 
     LinkedList<int> list;
     q.drainTo(list);
-    CPPUNIT_ASSERT(list.size() >= SIZE);
+    ASSERT_TRUE(list.size() >= SIZE);
 
     for(int i = 0; i < SIZE; ++i) {
-        CPPUNIT_ASSERT_EQUAL(list.get(i), i);
+        ASSERT_EQ(list.get(i), i);
     }
 
     t.join();
 
-    CPPUNIT_ASSERT(q.size() + list.size() >= SIZE);
+    ASSERT_TRUE(q.size() + list.size() >= SIZE);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -654,7 +630,7 @@ void LinkedBlockingQueueTest::testIterator() {
     Pointer< Iterator<int> > iter(q.iterator());
 
     while(iter->hasNext()) {
-        CPPUNIT_ASSERT_EQUAL(iter->next(), q.take());
+        ASSERT_EQ(iter->next(), q.take());
     }
 }
 
@@ -673,9 +649,9 @@ void LinkedBlockingQueueTest::testIteratorRemove () {
 
     iter.reset(q.iterator());
 
-    CPPUNIT_ASSERT_EQUAL(iter->next(), 1);
-    CPPUNIT_ASSERT_EQUAL(iter->next(), 3);
-    CPPUNIT_ASSERT(!iter->hasNext());
+    ASSERT_EQ(iter->next(), 1);
+    ASSERT_EQ(iter->next(), 3);
+    ASSERT_TRUE(!iter->hasNext());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -686,16 +662,16 @@ void LinkedBlockingQueueTest::testIteratorOrdering() {
     q.add(2);
     q.add(3);
 
-    CPPUNIT_ASSERT_EQUAL(0, q.remainingCapacity());
+    ASSERT_EQ(0, q.remainingCapacity());
     int k = 0;
 
     Pointer< Iterator<int> > iter(q.iterator());
 
     while(iter->hasNext()) {
         int i = iter->next();
-        CPPUNIT_ASSERT_EQUAL(++k, i);
+        ASSERT_EQ(++k, i);
     }
-    CPPUNIT_ASSERT_EQUAL(3, k);
+    ASSERT_EQ(3, k);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -713,7 +689,7 @@ void LinkedBlockingQueueTest::testWeaklyConsistentIteration () {
         iter->next();
     }
 
-    CPPUNIT_ASSERT_EQUAL(0, q.size());
+    ASSERT_EQ(0, q.size());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -798,10 +774,10 @@ void LinkedBlockingQueueTest::testConcurrentPut() {
 
         t.join();
 
-        CPPUNIT_ASSERT(list.size() == SIZE);
+        ASSERT_TRUE(list.size() == SIZE);
 
         for(int i = 0; i < SIZE; ++i) {
-            CPPUNIT_ASSERT_EQUAL(list.get(i), i);
+            ASSERT_EQ(list.get(i), i);
         }
     }
     {
@@ -826,7 +802,7 @@ void LinkedBlockingQueueTest::testConcurrentPut() {
         t3.join();
         t4.join();
 
-        CPPUNIT_ASSERT(list.size() == SIZE*4);
+        ASSERT_TRUE(list.size() == SIZE*4);
     }
 }
 
@@ -846,10 +822,10 @@ void LinkedBlockingQueueTest::testConcurrentTake() {
 
         t.join();
 
-        CPPUNIT_ASSERT(list.size() == SIZE);
+        ASSERT_TRUE(list.size() == SIZE);
 
         for(int i = 0; i < SIZE; ++i) {
-            CPPUNIT_ASSERT_EQUAL(list.get(i), i);
+            ASSERT_EQ(list.get(i), i);
         }
     }
     {
@@ -877,10 +853,10 @@ void LinkedBlockingQueueTest::testConcurrentTake() {
         t3.join();
         t4.join();
 
-        CPPUNIT_ASSERT(list1.size() == SIZE);
-        CPPUNIT_ASSERT(list2.size() == SIZE);
-        CPPUNIT_ASSERT(list3.size() == SIZE);
-        CPPUNIT_ASSERT(list4.size() == SIZE);
+        ASSERT_TRUE(list1.size() == SIZE);
+        ASSERT_TRUE(list2.size() == SIZE);
+        ASSERT_TRUE(list3.size() == SIZE);
+        ASSERT_TRUE(list4.size() == SIZE);
     }
 }
 
@@ -901,10 +877,10 @@ void LinkedBlockingQueueTest::testConcurrentPutAndTake() {
         p.join();
         t.join();
 
-        CPPUNIT_ASSERT(list.size() == SCOPED_SIZE);
+        ASSERT_TRUE(list.size() == SCOPED_SIZE);
 
         for(int i = 0; i < SCOPED_SIZE; ++i) {
-            CPPUNIT_ASSERT_EQUAL(list.get(i), i);
+            ASSERT_EQ(list.get(i), i);
         }
     }
 
@@ -945,10 +921,10 @@ void LinkedBlockingQueueTest::testConcurrentPutAndTake() {
         p4.join();
         t4.join();
 
-        CPPUNIT_ASSERT(list1.size() == SIZE);
-        CPPUNIT_ASSERT(list2.size() == SIZE);
-        CPPUNIT_ASSERT(list3.size() == SIZE);
-        CPPUNIT_ASSERT(list4.size() == SIZE);
+        ASSERT_TRUE(list1.size() == SIZE);
+        ASSERT_TRUE(list2.size() == SIZE);
+        ASSERT_TRUE(list3.size() == SIZE);
+        ASSERT_TRUE(list4.size() == SIZE);
     }
 }
 
@@ -1260,7 +1236,7 @@ void LinkedBlockingQueueTest::testTimedPollWithOffer() {
     try {
         t.start();
         Thread::sleep(SMALL_DELAY_MS);
-        CPPUNIT_ASSERT(q.offer(0, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(q.offer(0, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         t.interrupt();
         t.join();
     } catch (Exception& e) {

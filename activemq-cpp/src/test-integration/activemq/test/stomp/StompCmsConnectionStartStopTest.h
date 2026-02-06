@@ -27,14 +27,7 @@ namespace stomp {
 
     class StompCmsConnectionStartStopTest : public CmsConnectionStartStopTest {
     private:
-
-        CPPUNIT_TEST_SUITE( StompCmsConnectionStartStopTest );
-        CPPUNIT_TEST( testStoppedConsumerHoldsMessagesTillStarted );
-        CPPUNIT_TEST( testMultipleConnectionStops );
-        CPPUNIT_TEST( testConcurrentSessionCreateWithStart );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         StompCmsConnectionStartStopTest();
         virtual ~StompCmsConnectionStartStopTest();

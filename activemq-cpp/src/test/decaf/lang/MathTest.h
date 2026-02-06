@@ -18,62 +18,13 @@
 #ifndef _DECAF_LANG_MATHTEST_H_
 #define _DECAF_LANG_MATHTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf{
 namespace lang{
 
-    class MathTest : public CppUnit::TestFixture
+    class MathTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( MathTest );
-        CPPUNIT_TEST( test_absD );
-        CPPUNIT_TEST( test_absF );
-        CPPUNIT_TEST( test_absI );
-        CPPUNIT_TEST( test_absJ );
-//        CPPUNIT_TEST( test_acosD );
-//        CPPUNIT_TEST( test_asinD );
-//        CPPUNIT_TEST( test_atanD );
-//        CPPUNIT_TEST( test_atan2DD );
-//        CPPUNIT_TEST( test_cbrt_D );
-        CPPUNIT_TEST( test_ceilD );
-//        CPPUNIT_TEST( test_cosD );
-//        CPPUNIT_TEST( test_cosh_D );
-//        CPPUNIT_TEST( test_expD );
-//        CPPUNIT_TEST( test_expm1_D );
-        CPPUNIT_TEST( test_floorD );
-//        CPPUNIT_TEST( test_hypot_DD );
-//        CPPUNIT_TEST( test_IEEEremainderDD );
-//        CPPUNIT_TEST( test_logD );
-//        CPPUNIT_TEST( test_log10_D );
-//        CPPUNIT_TEST( test_log1p_D );
-        CPPUNIT_TEST( test_maxDD );
-        CPPUNIT_TEST( test_maxFF );
-        CPPUNIT_TEST( test_maxII );
-        CPPUNIT_TEST( test_maxJJ );
-        CPPUNIT_TEST( test_minDD );
-        CPPUNIT_TEST( test_minFF );
-        CPPUNIT_TEST( test_minII );
-        CPPUNIT_TEST( test_minJJ );
-        CPPUNIT_TEST( test_powDD );
-//        CPPUNIT_TEST( test_rintD );
-        CPPUNIT_TEST( test_roundD );
-        CPPUNIT_TEST( test_roundF );
-        CPPUNIT_TEST( test_signum_D );
-        CPPUNIT_TEST( test_signum_F );
-//        CPPUNIT_TEST( test_sinD );
-//        CPPUNIT_TEST( test_sinh_D );
-        CPPUNIT_TEST( test_sqrtD );
-//        CPPUNIT_TEST( test_tanD );
-//        CPPUNIT_TEST( test_tanh_D );
-        CPPUNIT_TEST( test_random );
-        CPPUNIT_TEST( test_toRadiansD );
-        CPPUNIT_TEST( test_toDegreesD );
-//        CPPUNIT_TEST( test_ulp_D );
-//        CPPUNIT_TEST( test_ulp_f );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+private:
 
         double HYP;
         // double OPP;

@@ -18,27 +18,21 @@
 #ifndef _ACTIVEMQ_TRANSPORT_TCP_TCPTRANSPORTTEST_H_
 #define _ACTIVEMQ_TRANSPORT_TCP_TCPTRANSPORTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include <activemq/util/Config.h>
 
 namespace activemq {
 namespace transport {
 namespace tcp {
 
-    class TcpTransportTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( TcpTransportTest );
-        CPPUNIT_TEST( testTransportCreateWithRadomFailures );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class TcpTransportTest : public ::testing::Test {
+public:
 
         TcpTransportTest();
         virtual ~TcpTransportTest();
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         void testTransportCreateWithRadomFailures();
 

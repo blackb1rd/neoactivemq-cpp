@@ -64,10 +64,10 @@ void AsyncSenderTest::testAsyncSends() {
         listener.asyncWaitForMessages( IntegrationCommon::defaultMsgCount * 2 );
 
         unsigned int numReceived = listener.getNumReceived();
-        CPPUNIT_ASSERT( numReceived == IntegrationCommon::defaultMsgCount * 2 );
+        ASSERT_TRUE(numReceived == IntegrationCommon::defaultMsgCount * 2);
 
     } catch(...) {
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 

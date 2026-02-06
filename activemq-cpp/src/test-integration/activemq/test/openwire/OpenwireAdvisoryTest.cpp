@@ -69,13 +69,13 @@ OpenwireAdvisoryTest::~OpenwireAdvisoryTest() {
 void OpenwireAdvisoryTest::testConnectionAdvisories() {
 
     std::unique_ptr<ConnectionFactory> factory(ConnectionFactory::createCMSConnectionFactory(getBrokerURL()));
-    CPPUNIT_ASSERT(factory.get() != NULL);
+    ASSERT_TRUE(factory.get() != NULL);
 
     std::unique_ptr<Connection> connection(factory->createConnection());
-    CPPUNIT_ASSERT(connection.get() != NULL);
+    ASSERT_TRUE(connection.get() != NULL);
 
     std::unique_ptr<Session> session(connection->createSession());
-    CPPUNIT_ASSERT(session.get() != NULL);
+    ASSERT_TRUE(session.get() != NULL);
 
     std::unique_ptr<Destination> destination(session->createTopic("ActiveMQ.Advisory.Connection"));
     std::unique_ptr<MessageConsumer> consumer(session->createConsumer(destination.get()));
@@ -83,7 +83,7 @@ void OpenwireAdvisoryTest::testConnectionAdvisories() {
     connection->start();
 
     std::unique_ptr<Connection> otherConnection(factory->createConnection());
-    CPPUNIT_ASSERT(otherConnection.get() != NULL);
+    ASSERT_TRUE(otherConnection.get() != NULL);
     otherConnection->start();
 
     std::unique_ptr<cms::Message> message;
@@ -108,7 +108,7 @@ void OpenwireAdvisoryTest::testConnectionAdvisories() {
 
     } while (message.get() != NULL);
 
-    CPPUNIT_ASSERT(connectionInfoCount >= 2);
+    ASSERT_TRUE(connectionInfoCount >= 2);
 
     otherConnection->close();
     connection->close();
@@ -186,7 +186,7 @@ void OpenwireAdvisoryTest::testConcurrentTempDestCreation() {
     thread1.join();
     thread2.join();
 
-    CPPUNIT_ASSERT_MESSAGE(std::string("Thread1 error: ") + thread1.getErrorMessage(), thread1.isNoErrors());
-    CPPUNIT_ASSERT_MESSAGE(std::string("Thread2 error: ") + thread2.getErrorMessage(), thread2.isNoErrors());
+    ASSERT_TRUE(thread1.isNoErrors()) << (std::string("Thread1 error: ") + thread1.getErrorMessage());
+    ASSERT_TRUE(thread2.isNoErrors()) << (std::string("Thread2 error: ") + thread2.getErrorMessage());
 }
 

@@ -37,7 +37,7 @@ namespace io{
         DataOutputStreamBenchmark();
         virtual ~DataOutputStreamBenchmark() {}
 
-        virtual void setUp();
+        void SetUp() override;
         virtual void run();
     };
 

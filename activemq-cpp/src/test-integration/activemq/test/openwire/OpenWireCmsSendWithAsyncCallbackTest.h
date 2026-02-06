@@ -27,12 +27,7 @@ namespace openwire {
 
     class OpenWireCmsSendWithAsyncCallbackTest : public CmsSendWithAsyncCallbackTest {
     private:
-
-        CPPUNIT_TEST_SUITE( OpenWireCmsSendWithAsyncCallbackTest );
-        CPPUNIT_TEST( testAsyncCallbackIsFaster );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenWireCmsSendWithAsyncCallbackTest();
         virtual ~OpenWireCmsSendWithAsyncCallbackTest();

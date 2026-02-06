@@ -18,19 +18,13 @@
 #ifndef _DECAF_LANG_DOUBLETEST_H_
 #define _DECAF_LANG_DOUBLETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf{
 namespace lang{
 
-    class DoubleTest : public CppUnit::TestFixture
+    class DoubleTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( DoubleTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         DoubleTest();
         virtual ~DoubleTest() {}

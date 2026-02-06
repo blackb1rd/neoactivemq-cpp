@@ -18,24 +18,13 @@
 #ifndef _ACTIVEMQ_TRANSPORT_CORRELATOR_RESPONSECORRELATORTEST_H_
 #define _ACTIVEMQ_TRANSPORT_CORRELATOR_RESPONSECORRELATORTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq{
 namespace transport{
 namespace correlator{
 
-    class ResponseCorrelatorTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ResponseCorrelatorTest );
-        CPPUNIT_TEST( testBasics );
-        CPPUNIT_TEST( testOneway );
-        CPPUNIT_TEST( testTransportException );
-        CPPUNIT_TEST( testMultiRequests );
-        CPPUNIT_TEST( testNarrow );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class ResponseCorrelatorTest : public ::testing::Test {
+public:
 
         virtual ~ResponseCorrelatorTest(){}
 

@@ -18,8 +18,7 @@
 #ifndef _DECAF_UTIL_CONCURRENT_SEMAPHORETEST_H_
 #define _DECAF_UTIL_CONCURRENT_SEMAPHORETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 namespace decaf {
@@ -27,46 +26,7 @@ namespace util {
 namespace concurrent {
 
     class SemaphoreTest : public ExecutorsTestSupport {
-
-        CPPUNIT_TEST_SUITE( SemaphoreTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testConstructor2 );
-        CPPUNIT_TEST( testTryAcquireInSameThread );
-        CPPUNIT_TEST( testAcquireReleaseInSameThread );
-        CPPUNIT_TEST( testAcquireUninterruptiblyReleaseInSameThread );
-        CPPUNIT_TEST( testTimedAcquireReleaseInSameThread );
-        CPPUNIT_TEST( testAcquireReleaseInDifferentThreads );
-        CPPUNIT_TEST( testUninterruptibleAcquireReleaseInDifferentThreads );
-        CPPUNIT_TEST( testTimedAcquireReleaseInDifferentThreads );
-        CPPUNIT_TEST( testAcquireInterruptedException );
-        CPPUNIT_TEST( testTryAcquireInterruptedException);
-        CPPUNIT_TEST( testHasQueuedThreads );
-        CPPUNIT_TEST( testGetQueueLength );
-        CPPUNIT_TEST( testGetQueuedThreads );
-        CPPUNIT_TEST( testDrainPermits );
-        CPPUNIT_TEST( testReducePermits );
-        CPPUNIT_TEST( testConstructorFair );
-        CPPUNIT_TEST( testTryAcquireInSameThreadFair );
-        CPPUNIT_TEST( testTryAcquireNInSameThreadFair );
-        CPPUNIT_TEST( testAcquireReleaseInSameThreadFair );
-        CPPUNIT_TEST( testAcquireReleaseNInSameThreadFair );
-        CPPUNIT_TEST( testAcquireUninterruptiblyReleaseNInSameThreadFair );
-        CPPUNIT_TEST( testTimedAcquireReleaseNInSameThreadFair );
-        CPPUNIT_TEST( testTimedAcquireReleaseInSameThreadFair );
-        CPPUNIT_TEST( testAcquireReleaseInDifferentThreadsFair );
-        CPPUNIT_TEST( testAcquireReleaseNInDifferentThreadsFair );
-        CPPUNIT_TEST( testAcquireReleaseNInDifferentThreadsFair2 );
-        CPPUNIT_TEST( testTimedAcquireReleaseInDifferentThreadsFair );
-        CPPUNIT_TEST( testTimedAcquireReleaseNInDifferentThreadsFair );
-        CPPUNIT_TEST( testAcquireInterruptedExceptionFair );
-        CPPUNIT_TEST( testAcquireNInterruptedExceptionFair );
-        CPPUNIT_TEST( testTryAcquireInterruptedExceptionFair );
-        CPPUNIT_TEST( testTryAcquireNInterruptedExceptionFair );
-        CPPUNIT_TEST( testGetQueueLengthFair );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         SemaphoreTest();
         virtual ~SemaphoreTest();

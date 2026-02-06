@@ -18,21 +18,12 @@
 #ifndef _DECAF_UTIL_LRUCACHETEST_H_
 #define _DECAF_UTIL_LRUCACHETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 
-    class LRUCacheTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( LRUCacheTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testExceptions );
-        CPPUNIT_TEST( testChangeMaxCacheSize );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class LRUCacheTest : public ::testing::Test {
+public:
 
         LRUCacheTest();
         virtual ~LRUCacheTest();

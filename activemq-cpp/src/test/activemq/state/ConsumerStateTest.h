@@ -18,19 +18,12 @@
 #ifndef _ACTIVEMQ_STATE_CONSUMERSTATETEST_H_
 #define _ACTIVEMQ_STATE_CONSUMERSTATETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace state {
 
-    class ConsumerStateTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ConsumerStateTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class ConsumerStateTest : public ::testing::Test {
+public:
 
         ConsumerStateTest() {}
         virtual ~ConsumerStateTest() {}

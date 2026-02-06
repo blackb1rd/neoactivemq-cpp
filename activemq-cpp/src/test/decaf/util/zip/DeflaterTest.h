@@ -18,42 +18,15 @@
 #ifndef _DECAF_UTIL_ZIP_DEFLATERTEST_H_
 #define _DECAF_UTIL_ZIP_DEFLATERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/util/zip/Deflater.h>
 
 namespace decaf {
 namespace util {
 namespace zip {
 
-    class DeflaterTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( DeflaterTest );
-        CPPUNIT_TEST( testDeflateVector );
-        CPPUNIT_TEST( testDeflateArray );
-        CPPUNIT_TEST( testEnd );
-        CPPUNIT_TEST( testInitialState );
-        CPPUNIT_TEST( testDeflateBeforeSetInput );
-        CPPUNIT_TEST( testGetBytesRead );
-        CPPUNIT_TEST( testGetBytesWritten );
-        CPPUNIT_TEST( testFinish );
-        CPPUNIT_TEST( testFinished );
-        CPPUNIT_TEST( testGetAdler );
-        CPPUNIT_TEST( testNeedsInput );
-        CPPUNIT_TEST( testReset );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testConstructorI );
-        CPPUNIT_TEST( testConstructorIB );
-        CPPUNIT_TEST( testSetDictionaryVector );
-        CPPUNIT_TEST( testSetDictionaryBIII );
-        CPPUNIT_TEST( testSetInputVector );
-        CPPUNIT_TEST( testSetInputBIII );
-        CPPUNIT_TEST( testSetLevel );
-        CPPUNIT_TEST( testSetStrategy );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class DeflaterTest : public ::testing::Test {
+public:
 
         DeflaterTest();
         virtual ~DeflaterTest();

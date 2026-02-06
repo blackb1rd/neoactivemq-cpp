@@ -26,12 +26,7 @@ namespace test{
 namespace stomp{
 
     class StompAsyncSenderTest : public AsyncSenderTest {
-
-        CPPUNIT_TEST_SUITE( StompAsyncSenderTest );
-        CPPUNIT_TEST( testAsyncSends );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         StompAsyncSenderTest();
         virtual ~StompAsyncSenderTest();

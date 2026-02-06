@@ -18,21 +18,15 @@
 #ifndef _DECAF_LANG_CHARACTERTEST_H_
 #define _DECAF_LANG_CHARACTERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/lang/Character.h>
 
 namespace decaf{
 namespace lang{
 
-    class CharacterTest : public CppUnit::TestFixture
+    class CharacterTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( CharacterTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         CharacterTest();
         virtual ~CharacterTest() {}

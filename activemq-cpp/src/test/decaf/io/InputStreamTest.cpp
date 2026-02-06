@@ -53,8 +53,5 @@ void InputStreamTest::test() {
 
     MockInputStream stream;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a NullPointerException",
-        stream.read( NULL, 0, 0, 1 ),
-        NullPointerException );
+    ASSERT_THROW(stream.read( NULL, 0, 0, 1 ), NullPointerException) << ("Should throw a NullPointerException");
 }

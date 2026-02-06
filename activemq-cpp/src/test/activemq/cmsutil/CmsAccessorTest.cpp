@@ -24,14 +24,14 @@ using namespace activemq;
 using namespace activemq::cmsutil;
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsAccessorTest::setUp() {
+void CmsAccessorTest::SetUp() {
     cf = new DummyConnectionFactory();
     accessor = new MyAccessor();
     accessor->setConnectionFactory(cf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsAccessorTest::tearDown() {
+void CmsAccessorTest::TearDown() {
     delete accessor;
     delete cf;
 }
@@ -39,35 +39,35 @@ void CmsAccessorTest::tearDown() {
 ////////////////////////////////////////////////////////////////////////////////
 void CmsAccessorTest::testConnectionFactory() {
 
-    CPPUNIT_ASSERT(accessor->getConnectionFactory() == cf);
+    ASSERT_TRUE(accessor->getConnectionFactory() == cf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void CmsAccessorTest::testAckMode() {
 
-    CPPUNIT_ASSERT(accessor->getSessionAcknowledgeMode() == cms::Session::AUTO_ACKNOWLEDGE);
+    ASSERT_TRUE(accessor->getSessionAcknowledgeMode() == cms::Session::AUTO_ACKNOWLEDGE);
 
     accessor->setSessionAcknowledgeMode(cms::Session::CLIENT_ACKNOWLEDGE);
 
-    CPPUNIT_ASSERT(accessor->getSessionAcknowledgeMode() == cms::Session::CLIENT_ACKNOWLEDGE) ;
+    ASSERT_TRUE(accessor->getSessionAcknowledgeMode() == cms::Session::CLIENT_ACKNOWLEDGE) ;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void CmsAccessorTest::testCreateResources() {
 
     cms::Connection* c = accessor->createConnection();
-    CPPUNIT_ASSERT( c != NULL);
+    ASSERT_TRUE(c != NULL);
 
     cms::Session* s = accessor->createSession(c);
-    CPPUNIT_ASSERT( s != NULL);
+    ASSERT_TRUE(s != NULL);
 
-    CPPUNIT_ASSERT(s->getAcknowledgeMode() == cms::Session::AUTO_ACKNOWLEDGE);
+    ASSERT_TRUE(s->getAcknowledgeMode() == cms::Session::AUTO_ACKNOWLEDGE);
 
     accessor->setSessionAcknowledgeMode(cms::Session::CLIENT_ACKNOWLEDGE);
 
     s = accessor->createSession(c);
-    CPPUNIT_ASSERT( s != NULL);
+    ASSERT_TRUE(s != NULL);
 
-    CPPUNIT_ASSERT(s->getAcknowledgeMode() == cms::Session::CLIENT_ACKNOWLEDGE);
+    ASSERT_TRUE(s->getAcknowledgeMode() == cms::Session::CLIENT_ACKNOWLEDGE);
 }
 

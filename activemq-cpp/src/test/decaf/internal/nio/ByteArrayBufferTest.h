@@ -18,66 +18,15 @@
 #ifndef _DECAF_INTERNAL_NIO_BYTEBUFFERTEST_H_
 #define _DECAF_INTERNAL_NIO_BYTEBUFFERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/nio/ByteBuffer.h>
 
 namespace decaf{
 namespace internal{
 namespace nio{
 
-    class ByteArrayBufferTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ByteArrayBufferTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( testArray );
-        CPPUNIT_TEST( testArrayOffset );
-        CPPUNIT_TEST( testReadOnlyArray );
-        CPPUNIT_TEST( testAsReadOnlyBuffer );
-        CPPUNIT_TEST( testCompact );
-        CPPUNIT_TEST( testCompareTo );
-        CPPUNIT_TEST( testDuplicate );
-        CPPUNIT_TEST( testEquals );
-        CPPUNIT_TEST( testGet );
-        CPPUNIT_TEST( testGetbyteArray );
-        CPPUNIT_TEST( testGetbyteArray2 );
-        CPPUNIT_TEST( testGetWithIndex );
-        CPPUNIT_TEST( testPutbyte );
-        CPPUNIT_TEST( testPutbyteArray );
-        CPPUNIT_TEST( testPutbyteArray2 );
-        CPPUNIT_TEST( testPutByteBuffer );
-        CPPUNIT_TEST( testPutIndexed );
-        CPPUNIT_TEST( testSlice );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST( testGetChar );
-        CPPUNIT_TEST( testGetChar2 );
-        CPPUNIT_TEST( testPutChar );
-        CPPUNIT_TEST( testPutChar2 );
-        CPPUNIT_TEST( testGetDouble );
-        CPPUNIT_TEST( testGetDouble2 );
-        CPPUNIT_TEST( testPutDouble );
-        CPPUNIT_TEST( testPutDouble2 );
-        CPPUNIT_TEST( testGetFloat );
-        CPPUNIT_TEST( testGetFloat2 );
-        CPPUNIT_TEST( testPutFloat );
-        CPPUNIT_TEST( testPutFloat2 );
-        CPPUNIT_TEST( testGetLong );
-        CPPUNIT_TEST( testGetLong2 );
-        CPPUNIT_TEST( testPutLong );
-        CPPUNIT_TEST( testPutLong2 );
-        CPPUNIT_TEST( testGetInt );
-        CPPUNIT_TEST( testGetInt2 );
-        CPPUNIT_TEST( testPutInt );
-        CPPUNIT_TEST( testPutInt2 );
-        CPPUNIT_TEST( testGetShort );
-        CPPUNIT_TEST( testGetShort2 );
-        CPPUNIT_TEST( testPutShort );
-        CPPUNIT_TEST( testPutShort2 );
-        CPPUNIT_TEST( testWrapNullArray );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class ByteArrayBufferTest : public ::testing::Test {
+private:
 
         decaf::nio::ByteBuffer* testBuffer1;
         unsigned char* testData1;
@@ -96,7 +45,7 @@ namespace nio{
         ByteArrayBufferTest() : testBuffer1(), testData1() {}
         virtual ~ByteArrayBufferTest() {}
 
-        void setUp() {
+        void SetUp() override {
            testBuffer1 = decaf::nio::ByteBuffer::allocate( testData1Size );
 
             testData1 = new unsigned char[testData1Size];
@@ -105,7 +54,7 @@ namespace nio{
             }
         }
 
-        void tearDown() {
+        void TearDown() override {
             delete testBuffer1;
             delete [] testData1;
         }

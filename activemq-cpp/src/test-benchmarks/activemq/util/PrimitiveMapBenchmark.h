@@ -40,7 +40,7 @@ namespace util{
         PrimitiveMapBenchmark();
         virtual ~PrimitiveMapBenchmark();
 
-        void setUp();
+        void SetUp() override;
         void run();
 
     };

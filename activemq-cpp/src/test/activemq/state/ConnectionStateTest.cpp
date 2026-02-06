@@ -46,11 +46,11 @@ void ConnectionStateTest::test() {
     ConnectionState state(info);
 
     state.addSession(sinfo);
-    CPPUNIT_ASSERT( state.getSessionStates().size() == 2 );
+    ASSERT_TRUE(state.getSessionStates().size() == 2);
     state.removeSession(sinfo->getSessionId());
-    CPPUNIT_ASSERT( state.getSessionStates().size() == 1 );
+    ASSERT_TRUE(state.getSessionStates().size() == 1);
 
     state.addSession(sinfo);
     state.addSession(sinfo);
-    CPPUNIT_ASSERT( state.getSessionStates().size() == 2 );
+    ASSERT_TRUE(state.getSessionStates().size() == 2);
 }

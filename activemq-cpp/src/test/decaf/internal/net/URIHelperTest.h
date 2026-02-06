@@ -18,21 +18,13 @@
 #ifndef _DECAF_INTERNAL_NET_URIHELPERTEST_H_
 #define _DECAF_INTERNAL_NET_URIHELPERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf{
 namespace internal{
 namespace net{
 
-    class URIHelperTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( URIHelperTest );
-        CPPUNIT_TEST( testParseURI );
-        CPPUNIT_TEST( isValidIPv4Address );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class URIHelperTest : public ::testing::Test {
+public:
 
         URIHelperTest();
         virtual ~URIHelperTest() {}

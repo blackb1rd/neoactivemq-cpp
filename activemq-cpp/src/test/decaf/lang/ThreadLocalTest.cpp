@@ -43,7 +43,7 @@ ThreadLocalTest::~ThreadLocalTest() {
 ////////////////////////////////////////////////////////////////////////////////
 void ThreadLocalTest::testConstructor() {
     ThreadLocal<int> local;
-    CPPUNIT_ASSERT(local.get() == 0);
+    ASSERT_TRUE(local.get() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -69,11 +69,11 @@ void ThreadLocalTest::testRemove() {
 
     StringThreadLocal tl;
 
-    CPPUNIT_ASSERT_EQUAL(std::string("initial"), tl.get());
+    ASSERT_EQ(std::string("initial"), tl.get());
     tl.set("fixture");
-    CPPUNIT_ASSERT_EQUAL(std::string("fixture"), tl.get());
+    ASSERT_EQ(std::string("fixture"), tl.get());
     tl.remove();
-    CPPUNIT_ASSERT_EQUAL(std::string("initial"), tl.get());
+    ASSERT_EQ(std::string("initial"), tl.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -105,14 +105,14 @@ namespace {
 void ThreadLocalTest::testGet() {
 
     ThreadLocal<long long> l;
-    CPPUNIT_ASSERT_MESSAGE("ThreadLocal's initial value is 0", l.get() == 0);
+    ASSERT_TRUE(l.get() == 0) << ("ThreadLocal's initial value is 0");
 
     // The ThreadLocal has to run once for each thread that touches the
     // ThreadLocal
     StringThreadLocal local;
 
-    CPPUNIT_ASSERT_MESSAGE(std::string("ThreadLocal's initial value should be 'initial'")
-                           + " but is " + local.get(), local.get() == "initial");
+    ASSERT_TRUE(local.get() == "initial") << (std::string("ThreadLocal's initial value should be 'initial'")
+                           + " but is " + local.get());
 
     std::string result;
     TestGetRunnable runnable(&local, &result);
@@ -126,11 +126,10 @@ void ThreadLocalTest::testGet() {
     try {
         t.join();
     } catch (InterruptedException& ie) {
-        CPPUNIT_FAIL("Interrupted!!");
+        FAIL() << ("Interrupted!!");
     }
 
-    CPPUNIT_ASSERT_MESSAGE("ThreadLocal's initial value in other Thread should be 'initial'",
-                           result == "initial");
+    ASSERT_TRUE(result == "initial") << ("ThreadLocal's initial value in other Thread should be 'initial'");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -161,8 +160,8 @@ namespace {
 void ThreadLocalTest::testSet() {
 
     StringThreadLocal local;
-    CPPUNIT_ASSERT_MESSAGE(std::string("ThreadLocal's initial value should be 'initial'")
-                           + " but is " + local.get(), local.get() == "initial");
+    ASSERT_TRUE(local.get() == "initial") << (std::string("ThreadLocal's initial value should be 'initial'")
+                           + " but is " + local.get());
 
     TestSetRunnable runnable(&local);
     Thread t(&runnable);
@@ -175,9 +174,8 @@ void ThreadLocalTest::testSet() {
     try {
         t.join();
     } catch (InterruptedException& ie) {
-        CPPUNIT_FAIL("Interrupted!!");
+        FAIL() << ("Interrupted!!");
     }
 
-    CPPUNIT_ASSERT_MESSAGE("ThreadLocal's value in this Thread should be 'updated'",
-                           local.get() == "updated");
+    ASSERT_TRUE(local.get() == "updated") << ("ThreadLocal's value in this Thread should be 'updated'");
 }

@@ -18,19 +18,12 @@
 #ifndef _ACTIVEMQ_THREADS_DEDICATEDTASKRUNNERTEST_H_
 #define _ACTIVEMQ_THREADS_DEDICATEDTASKRUNNERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace threads {
 
-    class DedicatedTaskRunnerTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( DedicatedTaskRunnerTest );
-        CPPUNIT_TEST( testSimple );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class DedicatedTaskRunnerTest : public ::testing::Test {
+public:
 
         DedicatedTaskRunnerTest() {}
         virtual ~DedicatedTaskRunnerTest() {}

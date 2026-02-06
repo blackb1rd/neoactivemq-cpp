@@ -18,29 +18,15 @@
 #ifndef _DECAF_UTIL_ZIP_DEFLATEROUTPUTSTREAMTEST_H_
 #define _DECAF_UTIL_ZIP_DEFLATEROUTPUTSTREAMTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <vector>
 
 namespace decaf {
 namespace util {
 namespace zip {
 
-    class DeflaterOutputStreamTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( DeflaterOutputStreamTest );
-        CPPUNIT_TEST( testConstructorOutputStreamDeflater );
-        CPPUNIT_TEST( testConstructorOutputStreamDeflaterI );
-        CPPUNIT_TEST( testConstructorOutputStream );
-        CPPUNIT_TEST( testClose );
-        CPPUNIT_TEST( testFinish );
-        CPPUNIT_TEST( testDeflate );
-        CPPUNIT_TEST( testWriteI );
-        CPPUNIT_TEST( testWriteBIII );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class DeflaterOutputStreamTest : public ::testing::Test {
+private:
 
         std::vector<unsigned char> outputBuffer;
 
@@ -49,8 +35,8 @@ namespace zip {
         DeflaterOutputStreamTest();
         virtual ~DeflaterOutputStreamTest();
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         void testConstructorOutputStreamDeflater();
         void testConstructorOutputStream();

@@ -18,20 +18,13 @@
 #ifndef _ACTIVEMQ_WIREFORMAT_OPENWIRE_OPENWIREFORMATTEST_H_
 #define _ACTIVEMQ_WIREFORMAT_OPENWIRE_OPENWIREFORMATTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace wireformat {
 namespace openwire {
 
-    class OpenWireFormatTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( OpenWireFormatTest );
-        CPPUNIT_TEST( testProviderInfoInWireFormat );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class OpenWireFormatTest : public ::testing::Test {
+public:
 
         OpenWireFormatTest() {}
         virtual ~OpenWireFormatTest() {}

@@ -40,7 +40,7 @@ OutputStreamWriterTest::~OutputStreamWriterTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStreamWriterTest::setUp() {
+void OutputStreamWriterTest::SetUp() {
 
     this->buffer1 = new ByteArrayOutputStream();
     this->writer1 = new OutputStreamWriter( this->buffer1 );
@@ -48,7 +48,7 @@ void OutputStreamWriterTest::setUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStreamWriterTest::tearDown() {
+void OutputStreamWriterTest::TearDown() {
 
     try{
 
@@ -65,10 +65,7 @@ void OutputStreamWriterTest::testClose() {
     this->writer1->flush();
     this->writer1->close();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IOException",
-        this->writer1->flush(),
-        IOException );
+    ASSERT_THROW(this->writer1->flush(), IOException) << ("Should throw an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,34 +75,28 @@ void OutputStreamWriterTest::testFlush() {
     this->writer1->flush();
 
     std::string result = this->buffer1->toString();
-    CPPUNIT_ASSERT_EQUAL( TEST_STRING, result );
+    ASSERT_EQ(TEST_STRING, result);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void OutputStreamWriterTest::testWriteCharArrayIntIntInt() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an NullPointerException",
-        this->writer1->write( NULL, 0, 1, 1 ),
-        NullPointerException );
+    ASSERT_THROW(this->writer1->write( NULL, 0, 1, 1 ), NullPointerException) << ("Should throw an NullPointerException");
 
     this->writer1->write( TEST_STRING.c_str(), 1, 2 );
     this->writer1->flush();
 
-    CPPUNIT_ASSERT_EQUAL( std::string("es"), this->buffer1->toString() );
+    ASSERT_EQ(std::string("es"), this->buffer1->toString());
 
     this->writer1->write( TEST_STRING.c_str(), 0, (int)TEST_STRING.length() );
     this->writer1->flush();
 
-    CPPUNIT_ASSERT_EQUAL( std::string("es") + TEST_STRING, this->buffer1->toString() );
+    ASSERT_EQ(std::string("es") + TEST_STRING, this->buffer1->toString());
 
     this->writer1->close();
 
     // After the stream is closed, should throw IOException first
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IOException",
-        this->writer1->write( NULL, 0, 0, 10 ),
-        IOException );
+    ASSERT_THROW(this->writer1->write( NULL, 0, 0, 10 ), IOException) << ("Should throw an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,62 +104,47 @@ void OutputStreamWriterTest::testWriteChar() {
 
     this->writer1->write( 'a' );
     this->writer1->flush();
-    CPPUNIT_ASSERT_EQUAL( std::string( "a" ), this->buffer1->toString() );
+    ASSERT_EQ(std::string( "a" ), this->buffer1->toString());
 
     this->writer1->write( 'b' );
     this->writer1->flush();
-    CPPUNIT_ASSERT_EQUAL( std::string( "ab" ), this->buffer1->toString() );
+    ASSERT_EQ(std::string( "ab" ), this->buffer1->toString());
 
     this->writer1->write( 'c' );
     this->writer1->flush();
-    CPPUNIT_ASSERT_EQUAL( std::string( "abc" ), this->buffer1->toString() );
+    ASSERT_EQ(std::string( "abc" ), this->buffer1->toString());
 
     this->writer1->close();
 
     // After the stream is closed, should throw IOException first
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IOException",
-        this->writer1->write( 'd' ),
-        IOException );
+    ASSERT_THROW(this->writer1->write( 'd' ), IOException) << ("Should throw an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void OutputStreamWriterTest::testWriteStringIntInt() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        this->writer1->write( string( "" ), 0, 1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(this->writer1->write( string( "" ), 0, 1 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        this->writer1->write( string( "abc" ), 1, 3 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(this->writer1->write( string( "abc" ), 1, 3 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 
     this->writer1->write( "abc", 1, 2 );
     this->writer1->flush();
-    CPPUNIT_ASSERT_EQUAL( std::string( "bc" ), this->buffer1->toString() );
+    ASSERT_EQ(std::string( "bc" ), this->buffer1->toString());
 
     this->writer1->write( TEST_STRING, 0, (int)TEST_STRING.length() );
     this->writer1->flush();
-    CPPUNIT_ASSERT_EQUAL( std::string( "bc" ) + TEST_STRING, this->buffer1->toString() );
+    ASSERT_EQ(std::string( "bc" ) + TEST_STRING, this->buffer1->toString());
 
     this->writer1->close();
 
     // After the stream is closed, should throw IOException first
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IOException",
-        this->writer1->write( "abcdefg", 0, 3 ),
-        IOException );
+    ASSERT_THROW(this->writer1->write( "abcdefg", 0, 3 ), IOException) << ("Should throw an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void OutputStreamWriterTest::testOutputStreamWriterOutputStream() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an NullPointerException",
-        OutputStreamWriter( NULL ),
-        NullPointerException );
+    ASSERT_THROW(OutputStreamWriter( NULL ), NullPointerException) << ("Should throw an NullPointerException");
 
     OutputStreamWriter* writer2 = new OutputStreamWriter( this->buffer1 );
     writer2->close();
@@ -180,19 +156,16 @@ void OutputStreamWriterTest::testWriteString() {
 
     this->writer1->write( "abc" );
     this->writer1->flush();
-    CPPUNIT_ASSERT_EQUAL( std::string( "abc" ), this->buffer1->toString() );
+    ASSERT_EQ(std::string( "abc" ), this->buffer1->toString());
 
     this->writer1->write( TEST_STRING, 0, (int)TEST_STRING.length() );
     this->writer1->flush();
-    CPPUNIT_ASSERT_EQUAL( std::string( "abc" ) + TEST_STRING, this->buffer1->toString() );
+    ASSERT_EQ(std::string( "abc" ) + TEST_STRING, this->buffer1->toString());
 
     this->writer1->close();
 
     // After the stream is closed, should throw IOException first
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IOException",
-        this->writer1->write( TEST_STRING ),
-        IOException );
+    ASSERT_THROW(this->writer1->write( TEST_STRING ), IOException) << ("Should throw an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

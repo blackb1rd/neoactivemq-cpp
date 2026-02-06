@@ -32,7 +32,7 @@ ByteArrayInputStreamBenchmark::~ByteArrayInputStreamBenchmark() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayInputStreamBenchmark::setUp() {
+void ByteArrayInputStreamBenchmark::SetUp() {
 
     buffer = new unsigned char[bufferSize];
 
@@ -46,7 +46,7 @@ void ByteArrayInputStreamBenchmark::setUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayInputStreamBenchmark::tearDown(){
+void ByteArrayInputStreamBenchmark::TearDown(){
 
     delete [] buffer;
 }

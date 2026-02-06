@@ -38,13 +38,13 @@ InetAddressTest::~InetAddressTest() {
 void InetAddressTest::testClone() {
 
     InetAddress address = InetAddress::getLocalHost();
-    CPPUNIT_ASSERT( address.getHostName() != "" );
-    CPPUNIT_ASSERT( address.getHostAddress() != "" );
+    ASSERT_TRUE(address.getHostName() != "");
+    ASSERT_TRUE(address.getHostAddress() != "");
 
     std::unique_ptr<InetAddress> copy( address.clone() );
 
-    CPPUNIT_ASSERT( address.getHostName() == copy->getHostName() );
-    CPPUNIT_ASSERT( address.getHostAddress() == copy->getHostAddress() );
+    ASSERT_TRUE(address.getHostName() == copy->getHostName());
+    ASSERT_TRUE(address.getHostAddress() == copy->getHostAddress());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -55,18 +55,15 @@ void InetAddressTest::testGetByAddress() {
 
     ArrayPointer<unsigned char> value = address.getAddress();
 
-    CPPUNIT_ASSERT( value.get() != NULL );
-    CPPUNIT_ASSERT_EQUAL( bytes[0], value[0] );
-    CPPUNIT_ASSERT_EQUAL( bytes[1], value[1] );
-    CPPUNIT_ASSERT_EQUAL( bytes[2], value[2] );
-    CPPUNIT_ASSERT_EQUAL( bytes[3], value[3] );
+    ASSERT_TRUE(value.get() != NULL);
+    ASSERT_EQ(bytes[0], value[0]);
+    ASSERT_EQ(bytes[1], value[1]);
+    ASSERT_EQ(bytes[2], value[2]);
+    ASSERT_EQ(bytes[3], value[3]);
 
     const unsigned char invalid[] = { 1 };
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnknownHostException",
-        InetAddress::getByAddress( invalid, 1 ),
-        UnknownHostException );
+    ASSERT_THROW(InetAddress::getByAddress( invalid, 1 ), UnknownHostException) << ("Should throw an UnknownHostException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,13 +71,13 @@ void InetAddressTest::testGetHostAddress() {
 
     const unsigned char bytes[] = { 127, 0, 0, 1 };
     InetAddress address = InetAddress::getByAddress( bytes, 4 );
-    CPPUNIT_ASSERT_EQUAL( std::string( "127.0.0.1" ), address.getHostAddress() );
+    ASSERT_EQ(std::string( "127.0.0.1" ), address.getHostAddress());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void InetAddressTest::testGetLocalHost() {
 
     InetAddress address = InetAddress::getLocalHost();
-    CPPUNIT_ASSERT( address.getHostName() != "" );
-    CPPUNIT_ASSERT( address.getHostAddress() != "" );
+    ASSERT_TRUE(address.getHostName() != "");
+    ASSERT_TRUE(address.getHostAddress() != "");
 }

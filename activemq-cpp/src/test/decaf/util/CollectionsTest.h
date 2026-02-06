@@ -18,19 +18,12 @@
 #ifndef _DECAF_UTIL_COLLECTIONSTEST_H_
 #define _DECAF_UTIL_COLLECTIONSTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 
-    class CollectionsTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( CollectionsTest );
-        CPPUNIT_TEST( testReverseList );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class CollectionsTest : public ::testing::Test {
+public:
 
         CollectionsTest();
         virtual ~CollectionsTest();

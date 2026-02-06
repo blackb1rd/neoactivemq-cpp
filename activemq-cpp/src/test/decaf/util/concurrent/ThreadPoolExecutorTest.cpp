@@ -177,10 +177,10 @@ void ThreadPoolExecutorTest::testConstructor() {
 
     ThreadPoolExecutor pool(1, 3, 5, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_EQUAL(1, pool.getCorePoolSize());
-    CPPUNIT_ASSERT_EQUAL(3, pool.getMaximumPoolSize());
-    CPPUNIT_ASSERT_EQUAL(false, pool.isShutdown());
-    CPPUNIT_ASSERT_EQUAL(false, pool.isTerminated());
+    ASSERT_EQ(1, pool.getCorePoolSize());
+    ASSERT_EQ(3, pool.getMaximumPoolSize());
+    ASSERT_EQ(false, pool.isShutdown());
+    ASSERT_EQ(false, pool.isTerminated());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -204,13 +204,13 @@ void ThreadPoolExecutorTest::testSimpleTasks()
 
     // Wait for them to finish, if we can't do this in 30 seconds then
     // there's probably something really wrong.
-    CPPUNIT_ASSERT( myLatch.await( 30000 ) );
+    ASSERT_TRUE(myLatch.await( 30000 ));
 
-    CPPUNIT_ASSERT( taskValue1 == 101 );
-    CPPUNIT_ASSERT( taskValue2 == 102 );
-    CPPUNIT_ASSERT( taskValue3 == 103 );
+    ASSERT_TRUE(taskValue1 == 101);
+    ASSERT_TRUE(taskValue2 == 102);
+    ASSERT_TRUE(taskValue3 == 103);
 
-    CPPUNIT_ASSERT( pool.getMaximumPoolSize() == 3 );
+    ASSERT_TRUE(pool.getMaximumPoolSize() == 3);
 
     pool.shutdown();
 }
@@ -236,13 +236,13 @@ void ThreadPoolExecutorTest::testSimpleTasksCallerOwns()
 
     // Wait for them to finish, if we can't do this in 30 seconds then
     // there's probably something really wrong.
-    CPPUNIT_ASSERT( myLatch.await( 30000 ) );
+    ASSERT_TRUE(myLatch.await( 30000 ));
 
-    CPPUNIT_ASSERT( taskValue1 == 101 );
-    CPPUNIT_ASSERT( taskValue2 == 102 );
-    CPPUNIT_ASSERT( taskValue3 == 103 );
+    ASSERT_TRUE(taskValue1 == 101);
+    ASSERT_TRUE(taskValue2 == 102);
+    ASSERT_TRUE(taskValue3 == 103);
 
-    CPPUNIT_ASSERT( pool.getMaximumPoolSize() == 3 );
+    ASSERT_TRUE(pool.getMaximumPoolSize() == 3);
 
     pool.shutdown();
 }
@@ -268,23 +268,23 @@ void ThreadPoolExecutorTest::testAwaitTermination()
 
     // Wait for them to finish, if we can't do this in 30 seconds then
     // there's probably something really wrong.
-    CPPUNIT_ASSERT( myLatch.await( 30000 ) );
+    ASSERT_TRUE(myLatch.await( 30000 ));
 
-    CPPUNIT_ASSERT( taskValue1 == 101 );
-    CPPUNIT_ASSERT( taskValue2 == 102 );
-    CPPUNIT_ASSERT( taskValue3 == 103 );
+    ASSERT_TRUE(taskValue1 == 101);
+    ASSERT_TRUE(taskValue2 == 102);
+    ASSERT_TRUE(taskValue3 == 103);
 
-    CPPUNIT_ASSERT( pool.getMaximumPoolSize() == 3 );
+    ASSERT_TRUE(pool.getMaximumPoolSize() == 3);
 
-    CPPUNIT_ASSERT_EQUAL(false, pool.isShutdown());
-    CPPUNIT_ASSERT_EQUAL(false, pool.isTerminated());
+    ASSERT_EQ(false, pool.isShutdown());
+    ASSERT_EQ(false, pool.isTerminated());
 
     pool.shutdown();
-    CPPUNIT_ASSERT_EQUAL(true, pool.isShutdown());
-    CPPUNIT_ASSERT(pool.awaitTermination(30, TimeUnit::SECONDS));
+    ASSERT_EQ(true, pool.isShutdown());
+    ASSERT_TRUE(pool.awaitTermination(30, TimeUnit::SECONDS));
 
-    CPPUNIT_ASSERT_EQUAL(true, pool.isShutdown());
-    CPPUNIT_ASSERT_EQUAL(true, pool.isTerminated());
+    ASSERT_EQ(true, pool.isShutdown());
+    ASSERT_EQ(true, pool.isTerminated());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -292,7 +292,7 @@ void ThreadPoolExecutorTest::testMoreTasksThanMaxPoolSize() {
 
     ThreadPoolExecutor pool(3, 3, 5, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT( pool.getMaximumPoolSize() == 3);
+    ASSERT_TRUE(pool.getMaximumPoolSize() == 3);
 
     CountDownLatch startedLatch1(3);  // First three should go right away
     CountDownLatch startedLatch2(1);  // The fourth one goes after others finish
@@ -309,7 +309,7 @@ void ThreadPoolExecutorTest::testMoreTasksThanMaxPoolSize() {
 
     // Wait 30 seconds, then we let it fail because something is
     // probably very wrong.
-    CPPUNIT_ASSERT( startedLatch1.await( 30000 ) );
+    ASSERT_TRUE(startedLatch1.await( 30000 ));
 
     Thread::sleep(10);
 
@@ -320,7 +320,7 @@ void ThreadPoolExecutorTest::testMoreTasksThanMaxPoolSize() {
 
     // Wait 30 seconds, then we let it fail because something is
     // probably very wrong.
-    CPPUNIT_ASSERT( startedLatch2.await( 30000 ) );
+    ASSERT_TRUE(startedLatch2.await( 30000 ));
 
     Thread::sleep(10);
 
@@ -331,7 +331,7 @@ void ThreadPoolExecutorTest::testMoreTasksThanMaxPoolSize() {
 
     // Wait for them to finish, if it takes longer than 30 seconds
     // something is not right.
-    CPPUNIT_ASSERT( startedLatch2.await( 30000 ) );
+    ASSERT_TRUE(startedLatch2.await( 30000 ));
 
     pool.shutdown();
     joinPool(&pool);
@@ -365,13 +365,13 @@ void ThreadPoolExecutorTest::testTasksThatThrow()
 
     // Wait for them to finish, if we can't do this in 30 seconds then
     // there's probably something really wrong.
-    CPPUNIT_ASSERT( myLatch.await( 30000 ) );
+    ASSERT_TRUE(myLatch.await( 30000 ));
 
-    CPPUNIT_ASSERT( taskValue1 == 101 );
-    CPPUNIT_ASSERT( taskValue2 == 102 );
-    CPPUNIT_ASSERT( taskValue3 == 103 );
+    ASSERT_TRUE(taskValue1 == 101);
+    ASSERT_TRUE(taskValue2 == 102);
+    ASSERT_TRUE(taskValue3 == 103);
 
-    CPPUNIT_ASSERT( pool.getMaximumPoolSize() == 3 );
+    ASSERT_TRUE(pool.getMaximumPoolSize() == 3);
 
     pool.shutdown();
 }
@@ -381,13 +381,13 @@ void ThreadPoolExecutorTest::testPrestartCoreThread() {
 
     ThreadPoolExecutor p2(2, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_EQUAL(0, p2.getPoolSize());
-    CPPUNIT_ASSERT(p2.prestartCoreThread());
-    CPPUNIT_ASSERT_EQUAL(1, p2.getPoolSize());
-    CPPUNIT_ASSERT(p2.prestartCoreThread());
-    CPPUNIT_ASSERT_EQUAL(2, p2.getPoolSize());
-    CPPUNIT_ASSERT(!p2.prestartCoreThread());
-    CPPUNIT_ASSERT_EQUAL(2, p2.getPoolSize());
+    ASSERT_EQ(0, p2.getPoolSize());
+    ASSERT_TRUE(p2.prestartCoreThread());
+    ASSERT_EQ(1, p2.getPoolSize());
+    ASSERT_TRUE(p2.prestartCoreThread());
+    ASSERT_EQ(2, p2.getPoolSize());
+    ASSERT_TRUE(!p2.prestartCoreThread());
+    ASSERT_EQ(2, p2.getPoolSize());
 
     joinPool(&p2);
 }
@@ -396,11 +396,11 @@ void ThreadPoolExecutorTest::testPrestartCoreThread() {
 void ThreadPoolExecutorTest::testPrestartAllCoreThreads() {
 
     ThreadPoolExecutor p2(2, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
-    CPPUNIT_ASSERT_EQUAL(0, p2.getPoolSize());
+    ASSERT_EQ(0, p2.getPoolSize());
     p2.prestartAllCoreThreads();
-    CPPUNIT_ASSERT_EQUAL(2, p2.getPoolSize());
+    ASSERT_EQ(2, p2.getPoolSize());
     p2.prestartAllCoreThreads();
-    CPPUNIT_ASSERT_EQUAL(2, p2.getPoolSize());
+    ASSERT_EQ(2, p2.getPoolSize());
 
     joinPool(&p2);
 }
@@ -409,16 +409,16 @@ void ThreadPoolExecutorTest::testPrestartAllCoreThreads() {
 void ThreadPoolExecutorTest::testGetCompletedTaskCount() {
 
     ThreadPoolExecutor p2(2, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
-    CPPUNIT_ASSERT_EQUAL(0LL, p2.getCompletedTaskCount());
+    ASSERT_EQ(0LL, p2.getCompletedTaskCount());
     p2.execute(new ShortRunnable(this));
 
     try {
         Thread::sleep(SMALL_DELAY_MS);
     } catch(Exception& e){
-        CPPUNIT_FAIL("Caught unknown exception");
+        FAIL() << ("Caught unknown exception");
     }
 
-    CPPUNIT_ASSERT_EQUAL(1LL, p2.getCompletedTaskCount());
+    ASSERT_EQ(1LL, p2.getCompletedTaskCount());
     p2.shutdown();
 
     joinPool(&p2);
@@ -428,7 +428,7 @@ void ThreadPoolExecutorTest::testGetCompletedTaskCount() {
 void ThreadPoolExecutorTest::testGetCorePoolSize() {
 
     ThreadPoolExecutor p1(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
-    CPPUNIT_ASSERT_EQUAL(1, p1.getCorePoolSize());
+    ASSERT_EQ(1, p1.getCorePoolSize());
     joinPool(&p1);
 }
 
@@ -436,7 +436,7 @@ void ThreadPoolExecutorTest::testGetCorePoolSize() {
 void ThreadPoolExecutorTest::testGetKeepAliveTime() {
 
     ThreadPoolExecutor p2(2, 2, 1000, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
-    CPPUNIT_ASSERT_EQUAL(1LL, p2.getKeepAliveTime(TimeUnit::SECONDS));
+    ASSERT_EQ(1LL, p2.getKeepAliveTime(TimeUnit::SECONDS));
     joinPool(&p2);
 }
 
@@ -445,7 +445,7 @@ void ThreadPoolExecutorTest::testGetThreadFactory() {
 
     ThreadFactory* tf = new SimpleThreadFactory();
     ThreadPoolExecutor p(1,2,LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>(), tf, new NoOpREHandler());
-    CPPUNIT_ASSERT_EQUAL(tf, p.getThreadFactory());
+    ASSERT_EQ(tf, p.getThreadFactory());
     joinPool(&p);
 }
 
@@ -455,7 +455,7 @@ void ThreadPoolExecutorTest::testSetThreadFactory() {
     ThreadPoolExecutor p(1,2,LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     ThreadFactory* tf = new SimpleThreadFactory();
     p.setThreadFactory(tf);
-    CPPUNIT_ASSERT_EQUAL(tf, p.getThreadFactory());
+    ASSERT_EQ(tf, p.getThreadFactory());
     joinPool(&p);
 }
 
@@ -477,7 +477,7 @@ void ThreadPoolExecutorTest::testGetRejectedExecutionHandler() {
 
     RejectedExecutionHandler* h = new NoOpREHandler();
     ThreadPoolExecutor p(1,2,LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>(), h);
-    CPPUNIT_ASSERT_EQUAL(h, p.getRejectedExecutionHandler());
+    ASSERT_EQ(h, p.getRejectedExecutionHandler());
     joinPool(p);
 }
 
@@ -487,7 +487,7 @@ void ThreadPoolExecutorTest::testSetRejectedExecutionHandler() {
     ThreadPoolExecutor p(1,2,LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     RejectedExecutionHandler* h = new NoOpREHandler();
     p.setRejectedExecutionHandler(h);
-    CPPUNIT_ASSERT_EQUAL(h, p.getRejectedExecutionHandler());
+    ASSERT_EQ(h, p.getRejectedExecutionHandler());
     joinPool(p);
 }
 
@@ -496,10 +496,7 @@ void ThreadPoolExecutorTest::testSetRejectedExecutionHandlerNull() {
 
     ThreadPoolExecutor p(1,2,LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        p.setRejectedExecutionHandler(NULL),
-        NullPointerException );
+    ASSERT_THROW(p.setRejectedExecutionHandler(NULL), NullPointerException) << ("Should have thrown a NullPointerException");
 
     joinPool(p);
 }
@@ -509,11 +506,11 @@ void ThreadPoolExecutorTest::testGetLargestPoolSize() {
 
     ThreadPoolExecutor p2(2, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     try {
-        CPPUNIT_ASSERT_EQUAL(0, p2.getLargestPoolSize());
+        ASSERT_EQ(0, p2.getLargestPoolSize());
         p2.execute(new MediumRunnable(this));
         p2.execute(new MediumRunnable(this));
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(2, p2.getLargestPoolSize());
+        ASSERT_EQ(2, p2.getLargestPoolSize());
     } catch(Exception& e){
         unexpectedException();
     }
@@ -525,7 +522,7 @@ void ThreadPoolExecutorTest::testGetLargestPoolSize() {
 void ThreadPoolExecutorTest::testGetMaximumPoolSize() {
 
     ThreadPoolExecutor p2(2, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
-    CPPUNIT_ASSERT_EQUAL(2, p2.getMaximumPoolSize());
+    ASSERT_EQ(2, p2.getMaximumPoolSize());
     joinPool(p2);
 }
 
@@ -533,9 +530,9 @@ void ThreadPoolExecutorTest::testGetMaximumPoolSize() {
 void ThreadPoolExecutorTest::testGetPoolSize() {
 
     ThreadPoolExecutor p1(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
-    CPPUNIT_ASSERT_EQUAL(0, p1.getPoolSize());
+    ASSERT_EQ(0, p1.getPoolSize());
     p1.execute(new MediumRunnable(this));
-    CPPUNIT_ASSERT_EQUAL(1, p1.getPoolSize());
+    ASSERT_EQ(1, p1.getPoolSize());
     joinPool(p1);
 }
 
@@ -544,10 +541,10 @@ void ThreadPoolExecutorTest::testGetTaskCount() {
 
     ThreadPoolExecutor p1(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     try {
-        CPPUNIT_ASSERT_EQUAL(0LL, p1.getTaskCount());
+        ASSERT_EQ(0LL, p1.getTaskCount());
         p1.execute(new MediumRunnable(this));
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(1LL, p1.getTaskCount());
+        ASSERT_EQ(1LL, p1.getTaskCount());
     } catch(Exception& e){
         unexpectedException();
     }
@@ -558,9 +555,9 @@ void ThreadPoolExecutorTest::testGetTaskCount() {
 void ThreadPoolExecutorTest::testIsShutdown() {
 
     ThreadPoolExecutor p1(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
-    CPPUNIT_ASSERT(!p1.isShutdown());
+    ASSERT_TRUE(!p1.isShutdown());
     p1.shutdown();
-    CPPUNIT_ASSERT(p1.isShutdown());
+    ASSERT_TRUE(p1.isShutdown());
     joinPool(p1);
 }
 
@@ -568,7 +565,7 @@ void ThreadPoolExecutorTest::testIsShutdown() {
 void ThreadPoolExecutorTest::testIsTerminated() {
 
     ThreadPoolExecutor p1(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
-    CPPUNIT_ASSERT(!p1.isTerminated());
+    ASSERT_TRUE(!p1.isTerminated());
     try {
         p1.execute(new MediumRunnable(this));
     } catch(...) {
@@ -577,8 +574,8 @@ void ThreadPoolExecutorTest::testIsTerminated() {
     p1.shutdown();
 
     try {
-        CPPUNIT_ASSERT(p1.awaitTermination(LONG_DELAY_MS, TimeUnit::MILLISECONDS));
-        CPPUNIT_ASSERT(p1.isTerminated());
+        ASSERT_TRUE(p1.awaitTermination(LONG_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(p1.isTerminated());
     } catch(Exception& e){
         unexpectedException();
     }
@@ -588,19 +585,19 @@ void ThreadPoolExecutorTest::testIsTerminated() {
 void ThreadPoolExecutorTest::testIsTerminating() {
 
     ThreadPoolExecutor p1(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
-    CPPUNIT_ASSERT(!p1.isTerminating());
+    ASSERT_TRUE(!p1.isTerminating());
     try {
         p1.execute(new SmallRunnable(this));
-        CPPUNIT_ASSERT(!p1.isTerminating());
+        ASSERT_TRUE(!p1.isTerminating());
     } catch(...) {
     }
 
     p1.shutdown();
 
     try {
-        CPPUNIT_ASSERT(p1.awaitTermination(LONG_DELAY_MS, TimeUnit::MILLISECONDS));
-        CPPUNIT_ASSERT(p1.isTerminated());
-        CPPUNIT_ASSERT(!p1.isTerminating());
+        ASSERT_TRUE(p1.awaitTermination(LONG_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(p1.isTerminated());
+        ASSERT_TRUE(!p1.isTerminating());
     } catch(Exception& e){
         unexpectedException();
     }
@@ -619,9 +616,9 @@ void ThreadPoolExecutorTest::testGetQueue() {
     try {
         Thread::sleep(SHORT_DELAY_MS);
         BlockingQueue<Runnable*>* wq = p1.getQueue();
-        CPPUNIT_ASSERT_EQUAL(q, wq);
-        CPPUNIT_ASSERT(!wq->contains(tasks[0]));
-        CPPUNIT_ASSERT(wq->contains(tasks[4]));
+        ASSERT_EQ(q, wq);
+        ASSERT_TRUE(!wq->contains(tasks[0]));
+        ASSERT_TRUE(wq->contains(tasks[4]));
         p1.shutdown();
     } catch(Exception& e) {
         unexpectedException();
@@ -644,15 +641,15 @@ void ThreadPoolExecutorTest::testRemove() {
     try {
 
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!p1.remove(tasks[0]));
-        CPPUNIT_ASSERT(q->contains(tasks[4]));
-        CPPUNIT_ASSERT(q->contains(tasks[3]));
-        CPPUNIT_ASSERT(p1.remove(tasks[4]));
-        CPPUNIT_ASSERT(!p1.remove(tasks[4]));
-        CPPUNIT_ASSERT(!q->contains(tasks[4]));
-        CPPUNIT_ASSERT(q->contains(tasks[3]));
-        CPPUNIT_ASSERT(p1.remove(tasks[3]));
-        CPPUNIT_ASSERT(!q->contains(tasks[3]));
+        ASSERT_TRUE(!p1.remove(tasks[0]));
+        ASSERT_TRUE(q->contains(tasks[4]));
+        ASSERT_TRUE(q->contains(tasks[3]));
+        ASSERT_TRUE(p1.remove(tasks[4]));
+        ASSERT_TRUE(!p1.remove(tasks[4]));
+        ASSERT_TRUE(!q->contains(tasks[4]));
+        ASSERT_TRUE(q->contains(tasks[3]));
+        ASSERT_TRUE(p1.remove(tasks[3]));
+        ASSERT_TRUE(!q->contains(tasks[3]));
 
         delete tasks[3];
         delete tasks[4];
@@ -682,8 +679,8 @@ void ThreadPoolExecutorTest::testShutDownNow() {
     Thread::sleep(SHORT_DELAY_MS);
     list = p1.shutdownNow();
 
-    CPPUNIT_ASSERT(p1.isShutdown());
-    CPPUNIT_ASSERT(list.size() <= 4);
+    ASSERT_TRUE(p1.isShutdown());
+    ASSERT_TRUE(list.size() <= 4);
 
     Pointer< Iterator<Runnable*> > iter(list.iterator());
     while(iter->hasNext()) {
@@ -696,10 +693,7 @@ void ThreadPoolExecutorTest::testConstructor1() {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(-1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(-1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -707,10 +701,7 @@ void ThreadPoolExecutorTest::testConstructor2() {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(1, -1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, -1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -718,10 +709,7 @@ void ThreadPoolExecutorTest::testConstructor3() {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(1, 0, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 0, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -729,10 +717,7 @@ void ThreadPoolExecutorTest::testConstructor4() {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(1, 2, -1LL, TimeUnit::MILLISECONDS, queue.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 2, -1LL, TimeUnit::MILLISECONDS, queue.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -740,10 +725,7 @@ void ThreadPoolExecutorTest::testConstructor5() {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(2, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(2, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -752,10 +734,7 @@ void ThreadPoolExecutorTest::testConstructor6() {
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(-1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(-1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -764,10 +743,7 @@ void ThreadPoolExecutorTest::testConstructor7() {
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(1, -1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, -1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -776,10 +752,7 @@ void ThreadPoolExecutorTest::testConstructor8() {
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(1, 0, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 0, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -788,10 +761,7 @@ void ThreadPoolExecutorTest::testConstructor9() {
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(1, 2, -1LL, TimeUnit::MILLISECONDS, queue.get(), factory.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 2, -1LL, TimeUnit::MILLISECONDS, queue.get(), factory.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -800,10 +770,7 @@ void ThreadPoolExecutorTest::testConstructor10() {
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(2, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(2, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -812,10 +779,7 @@ void ThreadPoolExecutorTest::testConstructor11() {
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(-1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), handler.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(-1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), handler.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -824,10 +788,7 @@ void ThreadPoolExecutorTest::testConstructor12() {
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(1, -1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), handler.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, -1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), handler.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -836,10 +797,7 @@ void ThreadPoolExecutorTest::testConstructor13() {
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(1, 0, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), handler.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 0, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), handler.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -848,10 +806,7 @@ void ThreadPoolExecutorTest::testConstructor14() {
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(1, 2, -1LL, TimeUnit::MILLISECONDS, queue.get(), handler.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 2, -1LL, TimeUnit::MILLISECONDS, queue.get(), handler.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -860,10 +815,7 @@ void ThreadPoolExecutorTest::testConstructor15() {
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(2, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), handler.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(2, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), handler.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -873,10 +825,7 @@ void ThreadPoolExecutorTest::testConstructor16() {
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(-1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get(), handler.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(-1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get(), handler.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -886,10 +835,7 @@ void ThreadPoolExecutorTest::testConstructor17() {
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(1, -1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get(), handler.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, -1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get(), handler.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -899,10 +845,7 @@ void ThreadPoolExecutorTest::testConstructor18() {
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(1, 0, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get(), handler.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 0, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get(), handler.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -912,10 +855,7 @@ void ThreadPoolExecutorTest::testConstructor19() {
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(1, 2, -1LL, TimeUnit::MILLISECONDS, queue.get(), factory.get(), handler.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 2, -1LL, TimeUnit::MILLISECONDS, queue.get(), factory.get(), handler.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -925,10 +865,7 @@ void ThreadPoolExecutorTest::testConstructor20() {
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        new ThreadPoolExecutor(2, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get(), handler.get()),
-        IllegalArgumentException );
+    ASSERT_THROW(new ThreadPoolExecutor(2, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get(), handler.get()), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -936,10 +873,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException1() {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, NULL),
-        NullPointerException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, NULL), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -948,10 +882,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException2() {
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, NULL, factory.get()),
-        NullPointerException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, NULL, factory.get()), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -959,10 +890,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException3() {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), (ThreadFactory*)NULL),
-        NullPointerException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), (ThreadFactory*)NULL), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -970,10 +898,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException4() {
 
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, NULL, handler.get()),
-        NullPointerException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, NULL, handler.get()), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -981,10 +906,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException5() {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), (RejectedExecutionHandler*)NULL),
-        NullPointerException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), (RejectedExecutionHandler*)NULL), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -993,10 +915,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException6() {
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, NULL, factory.get(), handler.get()),
-        NullPointerException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, NULL, factory.get(), handler.get()), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1005,10 +924,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException7() {
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get(), (RejectedExecutionHandler*)NULL),
-        NullPointerException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), factory.get(), (RejectedExecutionHandler*)NULL), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1017,10 +933,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException8() {
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), (ThreadFactory*)NULL, handler.get()),
-        NullPointerException );
+    ASSERT_THROW(new ThreadPoolExecutor(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, queue.get(), (ThreadFactory*)NULL, handler.get()), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1063,7 +976,7 @@ void ThreadPoolExecutorTest::testSaturatedExecute2() {
         }
 
         for(int i = 1; i < 5; ++i) {
-            CPPUNIT_ASSERT(trackTokens[i]);
+            ASSERT_TRUE(trackTokens[i]);
         }
 
         destroyRemaining(p.shutdownNow());
@@ -1096,7 +1009,7 @@ void ThreadPoolExecutorTest::testSaturatedExecute3() {
         }
 
         for(int i = 0; i < 5; ++i) {
-            CPPUNIT_ASSERT(!trackTokens[i]);
+            ASSERT_TRUE(!trackTokens[i]);
         }
 
         destroyRemaining(p.shutdownNow());
@@ -1126,12 +1039,12 @@ void ThreadPoolExecutorTest::testSaturatedExecute4() {
         TrackedLongRunnable* r2 = new TrackedLongRunnable(&longTrackedToken2);
         p.execute(r2);
 
-        CPPUNIT_ASSERT(p.getQueue()->contains(r2));
+        ASSERT_TRUE(p.getQueue()->contains(r2));
         TrackedNoOpRunnable* r3 = new TrackedNoOpRunnable(&longTrackedToken3);
         p.execute(r3);
 
-        CPPUNIT_ASSERT(!p.getQueue()->contains(r2));
-        CPPUNIT_ASSERT(p.getQueue()->contains(r3));
+        ASSERT_TRUE(!p.getQueue()->contains(r2));
+        ASSERT_TRUE(p.getQueue()->contains(r3));
 
         destroyRemaining(p.shutdownNow());
 
@@ -1148,10 +1061,7 @@ void ThreadPoolExecutorTest::testRejectedExecutionExceptionOnShutdown() {
     ThreadPoolExecutor tpe(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>(1));
     tpe.shutdown();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a RejectedExecutionException",
-        tpe.execute(new NoOpRunnable()),
-        RejectedExecutionException );
+    ASSERT_THROW(tpe.execute(new NoOpRunnable()), RejectedExecutionException) << ("Should have thrown a RejectedExecutionException");
 
     joinPool(tpe);
 }
@@ -1168,7 +1078,7 @@ void ThreadPoolExecutorTest::testCallerRunsOnShutdown() {
         bool tracker = false;
         TrackedNoOpRunnable* r = new TrackedNoOpRunnable(&tracker);
         p.execute(r);
-        CPPUNIT_ASSERT(!tracker);
+        ASSERT_TRUE(!tracker);
     } catch(RejectedExecutionException& success) {
         unexpectedException();
     }
@@ -1188,7 +1098,7 @@ void ThreadPoolExecutorTest::testDiscardOnShutdown() {
         bool tracker = false;
         TrackedNoOpRunnable* r = new TrackedNoOpRunnable(&tracker);
         p.execute(r);
-        CPPUNIT_ASSERT(!tracker);
+        ASSERT_TRUE(!tracker);
     } catch(RejectedExecutionException& success) {
         unexpectedException();
     }
@@ -1208,7 +1118,7 @@ void ThreadPoolExecutorTest::testDiscardOldestOnShutdown() {
         bool tracker = false;
         TrackedNoOpRunnable* r = new TrackedNoOpRunnable(&tracker);
         p.execute(r);
-        CPPUNIT_ASSERT(!tracker);
+        ASSERT_TRUE(!tracker);
     } catch(RejectedExecutionException& success) {
         unexpectedException();
     }
@@ -1221,10 +1131,7 @@ void ThreadPoolExecutorTest::testExecuteNull() {
 
     ThreadPoolExecutor tpe(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        tpe.execute(NULL),
-        NullPointerException );
+    ASSERT_THROW(tpe.execute(NULL), NullPointerException) << ("Should have thrown a NullPointerException");
 
     tpe.shutdown();
 
@@ -1236,10 +1143,7 @@ void ThreadPoolExecutorTest::testCorePoolSizeIllegalArgumentException() {
 
     ThreadPoolExecutor tpe(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        tpe.setCorePoolSize(-1),
-        IllegalArgumentException );
+    ASSERT_THROW(tpe.setCorePoolSize(-1), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 
     tpe.shutdown();
 
@@ -1251,10 +1155,7 @@ void ThreadPoolExecutorTest::testMaximumPoolSizeIllegalArgumentException1() {
 
     ThreadPoolExecutor tpe(2, 3, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        tpe.setMaximumPoolSize(1),
-        IllegalArgumentException );
+    ASSERT_THROW(tpe.setMaximumPoolSize(1), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 
     tpe.shutdown();
 
@@ -1266,10 +1167,7 @@ void ThreadPoolExecutorTest::testMaximumPoolSizeIllegalArgumentException2() {
 
     ThreadPoolExecutor tpe(2, 3, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        tpe.setMaximumPoolSize(-1),
-        IllegalArgumentException );
+    ASSERT_THROW(tpe.setMaximumPoolSize(-1), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 
     tpe.shutdown();
 
@@ -1281,10 +1179,7 @@ void ThreadPoolExecutorTest::testKeepAliveTimeIllegalArgumentException() {
 
     ThreadPoolExecutor tpe(2, 3, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a IllegalArgumentException",
-        tpe.setKeepAliveTime(-1,TimeUnit::MILLISECONDS),
-        IllegalArgumentException );
+    ASSERT_THROW(tpe.setKeepAliveTime(-1,TimeUnit::MILLISECONDS), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
 
     tpe.shutdown();
 
@@ -1297,7 +1192,7 @@ void ThreadPoolExecutorTest::testTerminated() {
     MyThreadPoolExecutor tpe;
 
     tpe.shutdown();
-    CPPUNIT_ASSERT(tpe.terminatedCalled);
+    ASSERT_TRUE(tpe.terminatedCalled);
 
     joinPool(tpe);
 }
@@ -1313,9 +1208,9 @@ void ThreadPoolExecutorTest::testBeforeAfter() {
         TrackedNoOpRunnable* r = new TrackedNoOpRunnable(&tracker);
         tpe.execute(r);
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(tracker);
-        CPPUNIT_ASSERT(tpe.beforeCalled);
-        CPPUNIT_ASSERT(tpe.afterCalled);
+        ASSERT_TRUE(tracker);
+        ASSERT_TRUE(tpe.beforeCalled);
+        ASSERT_TRUE(tpe.afterCalled);
         tpe.shutdown();
 
     } catch(Exception& ex) {
@@ -1377,7 +1272,7 @@ void ThreadPoolExecutorTest::testConcurrentRandomDelayedThreads() {
     }
 
     executor.shutdown();
-    CPPUNIT_ASSERT_MESSAGE("executor terminated", executor.awaitTermination(45, TimeUnit::SECONDS));
+    ASSERT_TRUE(executor.awaitTermination(45, TimeUnit::SECONDS)) << ("executor terminated");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1386,6 +1281,6 @@ void ThreadPoolExecutorTest::testRapidCreateAndDestroyExecutor() {
     for (int i = 0; i < 100; i++) {
         ThreadPoolExecutor executor(10, Integer::MAX_VALUE, 60LL, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>());
         executor.shutdown();
-        CPPUNIT_ASSERT_MESSAGE("executor terminated", executor.awaitTermination(45, TimeUnit::SECONDS));
+        ASSERT_TRUE(executor.awaitTermination(45, TimeUnit::SECONDS)) << ("executor terminated");
     }
 }

@@ -115,39 +115,39 @@ SemaphoreTest::~SemaphoreTest() {
 ////////////////////////////////////////////////////////////////////////////////
 void SemaphoreTest::testConstructor() {
     Semaphore s0(0, false);
-    CPPUNIT_ASSERT_EQUAL(0, s0.availablePermits());
-    CPPUNIT_ASSERT(!s0.isFair());
+    ASSERT_EQ(0, s0.availablePermits());
+    ASSERT_TRUE(!s0.isFair());
     Semaphore s1(-1, false);
-    CPPUNIT_ASSERT_EQUAL(-1, s1.availablePermits());
-    CPPUNIT_ASSERT(!s1.isFair());
+    ASSERT_EQ(-1, s1.availablePermits());
+    ASSERT_TRUE(!s1.isFair());
     Semaphore s2(1, false);
-    CPPUNIT_ASSERT_EQUAL(1, s2.availablePermits());
-    CPPUNIT_ASSERT(!s2.isFair());
+    ASSERT_EQ(1, s2.availablePermits());
+    ASSERT_TRUE(!s2.isFair());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SemaphoreTest::testConstructor2() {
 
     Semaphore s0(0);
-    CPPUNIT_ASSERT_EQUAL(0, s0.availablePermits());
-    CPPUNIT_ASSERT(!s0.isFair());
+    ASSERT_EQ(0, s0.availablePermits());
+    ASSERT_TRUE(!s0.isFair());
     Semaphore s1(-1);
-    CPPUNIT_ASSERT_EQUAL(-1, s1.availablePermits());
-    CPPUNIT_ASSERT(!s1.isFair());
+    ASSERT_EQ(-1, s1.availablePermits());
+    ASSERT_TRUE(!s1.isFair());
     Semaphore s2(-1);
-    CPPUNIT_ASSERT_EQUAL(-1, s2.availablePermits());
-    CPPUNIT_ASSERT(!s2.isFair());
+    ASSERT_EQ(-1, s2.availablePermits());
+    ASSERT_TRUE(!s2.isFair());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SemaphoreTest::testTryAcquireInSameThread() {
 
     Semaphore s(2, false);
-    CPPUNIT_ASSERT_EQUAL(2, s.availablePermits());
-    CPPUNIT_ASSERT(s.tryAcquire());
-    CPPUNIT_ASSERT(s.tryAcquire());
-    CPPUNIT_ASSERT_EQUAL(0, s.availablePermits());
-    CPPUNIT_ASSERT(!s.tryAcquire());
+    ASSERT_EQ(2, s.availablePermits());
+    ASSERT_TRUE(s.tryAcquire());
+    ASSERT_TRUE(s.tryAcquire());
+    ASSERT_EQ(0, s.availablePermits());
+    ASSERT_TRUE(!s.tryAcquire());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -165,7 +165,7 @@ void SemaphoreTest::testAcquireReleaseInSameThread() {
         s.release();
         s.acquire();
         s.release();
-        CPPUNIT_ASSERT_EQUAL(1, s.availablePermits());
+        ASSERT_EQ(1, s.availablePermits());
     } catch( InterruptedException& e){
         unexpectedException();
     }
@@ -186,7 +186,7 @@ void SemaphoreTest::testAcquireUninterruptiblyReleaseInSameThread() {
         s.release();
         s.acquireUninterruptibly();
         s.release();
-        CPPUNIT_ASSERT_EQUAL(1, s.availablePermits());
+        ASSERT_EQ(1, s.availablePermits());
     } catch(...) {
     }
 }
@@ -196,17 +196,17 @@ void SemaphoreTest::testTimedAcquireReleaseInSameThread() {
 
     Semaphore s(1, false);
     try {
-        CPPUNIT_ASSERT(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release();
-        CPPUNIT_ASSERT(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release();
-        CPPUNIT_ASSERT(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release();
-        CPPUNIT_ASSERT(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release();
-        CPPUNIT_ASSERT(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release();
-        CPPUNIT_ASSERT_EQUAL(1, s.availablePermits());
+        ASSERT_EQ(1, s.availablePermits());
     } catch(InterruptedException& e) {
         unexpectedException();
     }
@@ -358,9 +358,9 @@ void SemaphoreTest::testTimedAcquireReleaseInDifferentThreads() {
 
     try {
         t.start();
-        CPPUNIT_ASSERT(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release();
-        CPPUNIT_ASSERT(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release();
         s.release();
         t.join();
@@ -473,20 +473,20 @@ void SemaphoreTest::testHasQueuedThreads() {
     Thread t2(&runnable2);
 
     try {
-        CPPUNIT_ASSERT(!lock.hasQueuedThreads());
+        ASSERT_TRUE(!lock.hasQueuedThreads());
         lock.acquireUninterruptibly();
         t1.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(lock.hasQueuedThreads());
+        ASSERT_TRUE(lock.hasQueuedThreads());
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(lock.hasQueuedThreads());
+        ASSERT_TRUE(lock.hasQueuedThreads());
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(lock.hasQueuedThreads());
+        ASSERT_TRUE(lock.hasQueuedThreads());
         lock.release();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!lock.hasQueuedThreads());
+        ASSERT_TRUE(!lock.hasQueuedThreads());
         t1.join();
         t2.join();
     } catch(Exception& e){
@@ -505,20 +505,20 @@ void SemaphoreTest::testGetQueueLength() {
     Thread t2(&runnable2);
 
     try {
-        CPPUNIT_ASSERT_EQUAL(0, lock.getQueueLength());
+        ASSERT_EQ(0, lock.getQueueLength());
         lock.acquireUninterruptibly();
         t1.start();
         Thread::sleep( SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(1, lock.getQueueLength());
+        ASSERT_EQ(1, lock.getQueueLength());
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(2, lock.getQueueLength());
+        ASSERT_EQ(2, lock.getQueueLength());
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(1, lock.getQueueLength());
+        ASSERT_EQ(1, lock.getQueueLength());
         lock.release();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(0, lock.getQueueLength());
+        ASSERT_EQ(0, lock.getQueueLength());
         t1.join();
         t2.join();
     } catch(Exception& e) {
@@ -536,23 +536,23 @@ void SemaphoreTest::testGetQueuedThreads() {
     Thread t2(&runnable2);
 
     try {
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->isEmpty());
         lock.acquireUninterruptibly();
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->isEmpty());
         t1.start();
         Thread::sleep( SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->contains(&t1));
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->contains(&t1));
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->contains(&t1));
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->contains(&t2));
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->contains(&t1));
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->contains(&t2));
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->contains(&t1));
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->contains(&t2));
+        ASSERT_TRUE(!std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->contains(&t1));
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->contains(&t2));
         lock.release();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(lock.getQueuedThreads())->isEmpty());
         t1.join();
         t2.join();
     } catch(Exception& e) {
@@ -563,53 +563,53 @@ void SemaphoreTest::testGetQueuedThreads() {
 ////////////////////////////////////////////////////////////////////////////////
 void SemaphoreTest::testDrainPermits() {
     Semaphore s(0, false);
-    CPPUNIT_ASSERT_EQUAL(0, s.availablePermits());
-    CPPUNIT_ASSERT_EQUAL(0, s.drainPermits());
+    ASSERT_EQ(0, s.availablePermits());
+    ASSERT_EQ(0, s.drainPermits());
     s.release(10);
-    CPPUNIT_ASSERT_EQUAL(10, s.availablePermits());
-    CPPUNIT_ASSERT_EQUAL(10, s.drainPermits());
-    CPPUNIT_ASSERT_EQUAL(0, s.availablePermits());
-    CPPUNIT_ASSERT_EQUAL(0, s.drainPermits());
+    ASSERT_EQ(10, s.availablePermits());
+    ASSERT_EQ(10, s.drainPermits());
+    ASSERT_EQ(0, s.availablePermits());
+    ASSERT_EQ(0, s.drainPermits());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SemaphoreTest::testReducePermits() {
     PublicSemaphore s(10, false);
-    CPPUNIT_ASSERT_EQUAL(10, s.availablePermits());
+    ASSERT_EQ(10, s.availablePermits());
     s.reducePermits(1);
-    CPPUNIT_ASSERT_EQUAL(9, s.availablePermits());
+    ASSERT_EQ(9, s.availablePermits());
     s.reducePermits(10);
-    CPPUNIT_ASSERT_EQUAL(-1, s.availablePermits());
+    ASSERT_EQ(-1, s.availablePermits());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SemaphoreTest::testConstructorFair() {
     Semaphore s0(0, true);
-    CPPUNIT_ASSERT_EQUAL(0, s0.availablePermits());
-    CPPUNIT_ASSERT(s0.isFair());
+    ASSERT_EQ(0, s0.availablePermits());
+    ASSERT_TRUE(s0.isFair());
     Semaphore s1(-1, true);
-    CPPUNIT_ASSERT_EQUAL(-1, s1.availablePermits());
+    ASSERT_EQ(-1, s1.availablePermits());
     Semaphore s2(-1, true);
-    CPPUNIT_ASSERT_EQUAL(-1, s2.availablePermits());
+    ASSERT_EQ(-1, s2.availablePermits());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SemaphoreTest::testTryAcquireInSameThreadFair() {
     Semaphore s(2, true);
-    CPPUNIT_ASSERT_EQUAL(2, s.availablePermits());
-    CPPUNIT_ASSERT(s.tryAcquire());
-    CPPUNIT_ASSERT(s.tryAcquire());
-    CPPUNIT_ASSERT_EQUAL(0, s.availablePermits());
-    CPPUNIT_ASSERT(!s.tryAcquire());
+    ASSERT_EQ(2, s.availablePermits());
+    ASSERT_TRUE(s.tryAcquire());
+    ASSERT_TRUE(s.tryAcquire());
+    ASSERT_EQ(0, s.availablePermits());
+    ASSERT_TRUE(!s.tryAcquire());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SemaphoreTest::testTryAcquireNInSameThreadFair() {
     Semaphore s(2, true);
-    CPPUNIT_ASSERT_EQUAL(2, s.availablePermits());
-    CPPUNIT_ASSERT(s.tryAcquire(2));
-    CPPUNIT_ASSERT_EQUAL(0, s.availablePermits());
-    CPPUNIT_ASSERT(!s.tryAcquire());
+    ASSERT_EQ(2, s.availablePermits());
+    ASSERT_TRUE(s.tryAcquire(2));
+    ASSERT_EQ(0, s.availablePermits());
+    ASSERT_TRUE(!s.tryAcquire());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -626,7 +626,7 @@ void SemaphoreTest::testAcquireReleaseInSameThreadFair() {
         s.release();
         s.acquire();
         s.release();
-        CPPUNIT_ASSERT_EQUAL(1, s.availablePermits());
+        ASSERT_EQ(1, s.availablePermits());
     } catch(InterruptedException& e) {
         unexpectedException();
     }
@@ -646,7 +646,7 @@ void SemaphoreTest::testAcquireReleaseNInSameThreadFair() {
         s.acquire(4);
         s.release(5);
         s.acquire(5);
-        CPPUNIT_ASSERT_EQUAL(1, s.availablePermits());
+        ASSERT_EQ(1, s.availablePermits());
     } catch(InterruptedException& e) {
         unexpectedException();
     }
@@ -666,7 +666,7 @@ void SemaphoreTest::testAcquireUninterruptiblyReleaseNInSameThreadFair() {
         s.acquireUninterruptibly(4);
         s.release(5);
         s.acquireUninterruptibly(5);
-        CPPUNIT_ASSERT_EQUAL(1, s.availablePermits());
+        ASSERT_EQ(1, s.availablePermits());
     }catch(...){
     }
 }
@@ -676,16 +676,16 @@ void SemaphoreTest::testTimedAcquireReleaseNInSameThreadFair() {
     Semaphore s(1, true);
     try {
         s.release(1);
-        CPPUNIT_ASSERT(s.tryAcquire(1, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(1, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release(2);
-        CPPUNIT_ASSERT(s.tryAcquire(2, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(2, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release(3);
-        CPPUNIT_ASSERT(s.tryAcquire(3, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(3, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release(4);
-        CPPUNIT_ASSERT(s.tryAcquire(4, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(4, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release(5);
-        CPPUNIT_ASSERT(s.tryAcquire(5, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
-        CPPUNIT_ASSERT_EQUAL(1, s.availablePermits());
+        ASSERT_TRUE(s.tryAcquire(5, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_EQ(1, s.availablePermits());
     } catch(InterruptedException& e) {
         unexpectedException();
     }
@@ -695,17 +695,17 @@ void SemaphoreTest::testTimedAcquireReleaseNInSameThreadFair() {
 void SemaphoreTest::testTimedAcquireReleaseInSameThreadFair() {
     Semaphore s(1, true);
     try {
-        CPPUNIT_ASSERT(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release();
-        CPPUNIT_ASSERT(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release();
-        CPPUNIT_ASSERT(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release();
-        CPPUNIT_ASSERT(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release();
-        CPPUNIT_ASSERT(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release();
-        CPPUNIT_ASSERT_EQUAL(1, s.availablePermits());
+        ASSERT_EQ(1, s.availablePermits());
     } catch(InterruptedException& e) {
         unexpectedException();
     }
@@ -760,7 +760,7 @@ void SemaphoreTest::testAcquireReleaseInDifferentThreadsFair() {
         s.release();
         s.release();
         t.join();
-        CPPUNIT_ASSERT_EQUAL(2, s.availablePermits());
+        ASSERT_EQ(2, s.availablePermits());
     } catch(InterruptedException& e) {
         unexpectedException();
     }
@@ -961,9 +961,9 @@ void SemaphoreTest::testTimedAcquireReleaseNInDifferentThreadsFair() {
 
     t.start();
     try {
-        CPPUNIT_ASSERT(s.tryAcquire(2, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(2, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release(2);
-        CPPUNIT_ASSERT(s.tryAcquire(2, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(s.tryAcquire(2, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         s.release(2);
         t.join();
     } catch(InterruptedException& e) {
@@ -1162,20 +1162,20 @@ void SemaphoreTest::testGetQueueLengthFair() {
     Thread t2(&runnable2);
 
     try {
-        CPPUNIT_ASSERT_EQUAL(0, lock.getQueueLength());
+        ASSERT_EQ(0, lock.getQueueLength());
         lock.acquireUninterruptibly();
         t1.start();
         Thread::sleep( SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(1, lock.getQueueLength());
+        ASSERT_EQ(1, lock.getQueueLength());
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(2, lock.getQueueLength());
+        ASSERT_EQ(2, lock.getQueueLength());
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(1, lock.getQueueLength());
+        ASSERT_EQ(1, lock.getQueueLength());
         lock.release();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(0, lock.getQueueLength());
+        ASSERT_EQ(0, lock.getQueueLength());
         t1.join();
         t2.join();
     } catch(Exception& e) {
@@ -1188,12 +1188,12 @@ void SemaphoreTest::testToString() {
 
     Semaphore s(0);
     std::string us = s.toString();
-    CPPUNIT_ASSERT((int)us.find_first_of("Permits = 0") >= 0);
+    ASSERT_TRUE((int)us.find_first_of("Permits = 0") >= 0);
     s.release();
     std::string s1 = s.toString();
-    CPPUNIT_ASSERT((int)s1.find_first_of("Permits = 1") >= 0);
+    ASSERT_TRUE((int)s1.find_first_of("Permits = 1") >= 0);
     s.release();
     std::string s2 = s.toString();
-    CPPUNIT_ASSERT((int)s2.find_first_of("Permits = 2") >= 0);
+    ASSERT_TRUE((int)s2.find_first_of("Permits = 2") >= 0);
 }
 

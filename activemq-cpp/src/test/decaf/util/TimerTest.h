@@ -18,42 +18,21 @@
 #ifndef _DECAF_UTIL_TIMERTEST_H_
 #define _DECAF_UTIL_TIMERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
 #include <decaf/util/concurrent/Mutex.h>
 
 namespace decaf {
 namespace util {
 
-    class TimerTest : public CppUnit::TestFixture {
+    class TimerTest : public ::testing::Test {
     private:
 
         decaf::util::concurrent::atomic::AtomicInteger timerCounter;
         decaf::util::concurrent::Mutex gsync;
 
     private:
-
-        CPPUNIT_TEST_SUITE( TimerTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testCancel );
-        CPPUNIT_TEST( testPurge );
-        CPPUNIT_TEST( testSchedule_TimerTask_Date );
-        CPPUNIT_TEST( testSchedule_TimerTask_Date2 );
-        CPPUNIT_TEST( testSchedule_TimerTask_Long );
-        CPPUNIT_TEST( testSchedule_TimerTask_Long2 );
-        CPPUNIT_TEST( testSchedule_TimerTask_Long_Long );
-        CPPUNIT_TEST( testSchedule_TimerTask_Long_Long2 );
-        CPPUNIT_TEST( testSchedule_TimerTask_Date_Long );
-        CPPUNIT_TEST( testSchedule_TimerTask_Date_Long2 );
-        CPPUNIT_TEST( testScheduleAtFixedRate_TimerTask_Long_Long );
-        CPPUNIT_TEST( testScheduleAtFixedRate_TimerTask_Long_Long2 );
-        CPPUNIT_TEST( testScheduleAtFixedRate_TimerTask_Date_Long );
-        CPPUNIT_TEST( testScheduleAtFixedRate_TimerTask_Date_Long2 );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         TimerTest() : timerCounter(), gsync() {}
         virtual ~TimerTest() {}
@@ -74,7 +53,7 @@ namespace util {
         void testScheduleAtFixedRate_TimerTask_Date_Long();
         void testScheduleAtFixedRate_TimerTask_Date_Long2();
 
-        virtual void setUp();
+        void SetUp() override;
 
     };
 

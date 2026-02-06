@@ -34,8 +34,8 @@ namespace test{
         ExpirationTest(){}
         virtual ~ExpirationTest(){}
 
-        virtual void setUp() {}
-        virtual void tearDown() {}
+        void SetUp() override {}
+        void TearDown() override {}
 
         virtual void testExpired();
         virtual void testExpiredWithChecksDisabled();

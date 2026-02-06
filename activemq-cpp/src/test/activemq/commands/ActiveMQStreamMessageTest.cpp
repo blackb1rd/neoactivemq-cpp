@@ -41,12 +41,12 @@ using namespace decaf;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::setUp() {
+void ActiveMQStreamMessageTest::SetUp() {
     this->buffer.resize( 100 );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::tearDown() {
+void ActiveMQStreamMessageTest::TearDown() {
     this->buffer.clear();
 }
 
@@ -55,7 +55,7 @@ void ActiveMQStreamMessageTest::testSetAndGet() {
 
     ActiveMQStreamMessage myMessage;
 
-    CPPUNIT_ASSERT( myMessage.getDataStructureType() == ActiveMQStreamMessage::ID_ACTIVEMQSTREAMMESSAGE );
+    ASSERT_TRUE(myMessage.getDataStructureType() == ActiveMQStreamMessage::ID_ACTIVEMQSTREAMMESSAGE);
 
     std::vector<unsigned char> data;
     data.push_back( 2 );
@@ -77,24 +77,24 @@ void ActiveMQStreamMessageTest::testSetAndGet() {
 
     myMessage.reset();
 
-    CPPUNIT_ASSERT( myMessage.getNextValueType() == cms::Message::BOOLEAN_TYPE );
-    CPPUNIT_ASSERT( myMessage.readBoolean() == false );
-    CPPUNIT_ASSERT( myMessage.getNextValueType() == cms::Message::BYTE_TYPE );
-    CPPUNIT_ASSERT( myMessage.readByte() == 127 );
-    CPPUNIT_ASSERT( myMessage.getNextValueType() == cms::Message::CHAR_TYPE );
-    CPPUNIT_ASSERT( myMessage.readChar() == 'a' );
-    CPPUNIT_ASSERT( myMessage.getNextValueType() == cms::Message::SHORT_TYPE );
-    CPPUNIT_ASSERT( myMessage.readShort() == 32000 );
-    CPPUNIT_ASSERT( myMessage.getNextValueType() == cms::Message::INTEGER_TYPE );
-    CPPUNIT_ASSERT( myMessage.readInt() == 6789999 );
-    CPPUNIT_ASSERT( myMessage.getNextValueType() == cms::Message::LONG_TYPE );
-    CPPUNIT_ASSERT( myMessage.readLong() == 0xFFFAAA33345LL );
-    CPPUNIT_ASSERT( myMessage.getNextValueType() == cms::Message::FLOAT_TYPE );
-    CPPUNIT_ASSERT( myMessage.readFloat() == 0.000012f );
-    CPPUNIT_ASSERT( myMessage.getNextValueType() == cms::Message::DOUBLE_TYPE );
-    CPPUNIT_ASSERT( myMessage.readDouble() == 64.54654 );
-    CPPUNIT_ASSERT( myMessage.getNextValueType() == cms::Message::BYTE_ARRAY_TYPE );
-    CPPUNIT_ASSERT( myMessage.readBytes( readData ) == (int)data.size() );
+    ASSERT_TRUE(myMessage.getNextValueType() == cms::Message::BOOLEAN_TYPE);
+    ASSERT_TRUE(myMessage.readBoolean() == false);
+    ASSERT_TRUE(myMessage.getNextValueType() == cms::Message::BYTE_TYPE);
+    ASSERT_TRUE(myMessage.readByte() == 127);
+    ASSERT_TRUE(myMessage.getNextValueType() == cms::Message::CHAR_TYPE);
+    ASSERT_TRUE(myMessage.readChar() == 'a');
+    ASSERT_TRUE(myMessage.getNextValueType() == cms::Message::SHORT_TYPE);
+    ASSERT_TRUE(myMessage.readShort() == 32000);
+    ASSERT_TRUE(myMessage.getNextValueType() == cms::Message::INTEGER_TYPE);
+    ASSERT_TRUE(myMessage.readInt() == 6789999);
+    ASSERT_TRUE(myMessage.getNextValueType() == cms::Message::LONG_TYPE);
+    ASSERT_TRUE(myMessage.readLong() == 0xFFFAAA33345LL);
+    ASSERT_TRUE(myMessage.getNextValueType() == cms::Message::FLOAT_TYPE);
+    ASSERT_TRUE(myMessage.readFloat() == 0.000012f);
+    ASSERT_TRUE(myMessage.getNextValueType() == cms::Message::DOUBLE_TYPE);
+    ASSERT_TRUE(myMessage.readDouble() == 64.54654);
+    ASSERT_TRUE(myMessage.getNextValueType() == cms::Message::BYTE_ARRAY_TYPE);
+    ASSERT_TRUE(myMessage.readBytes( readData ) == (int)data.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,62 +106,62 @@ void ActiveMQStreamMessageTest::testReadBoolean() {
 
         msg.writeBoolean( true );
         msg.reset();
-        CPPUNIT_ASSERT( msg.readBoolean() );
+        ASSERT_TRUE(msg.readBoolean());
         msg.reset();
-        CPPUNIT_ASSERT( msg.readString() == "true" );
+        ASSERT_TRUE(msg.readString() == "true");
         msg.reset();
 
         try {
             msg.readByte();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readShort();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readInt();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readLong();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readFloat();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readDouble();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readChar();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readBytes( buffer );
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
     }
 }
 
@@ -173,50 +173,50 @@ void ActiveMQStreamMessageTest::testReadByte() {
         unsigned char test = (unsigned char)4;
         msg.writeByte( test );
         msg.reset();
-        CPPUNIT_ASSERT(msg.readByte() == test);
+        ASSERT_TRUE(msg.readByte() == test);
         msg.reset();
-        CPPUNIT_ASSERT(msg.readShort() == test);
+        ASSERT_TRUE(msg.readShort() == test);
         msg.reset();
-        CPPUNIT_ASSERT(msg.readInt() == test);
+        ASSERT_TRUE(msg.readInt() == test);
         msg.reset();
-        CPPUNIT_ASSERT(msg.readLong() == test);
+        ASSERT_TRUE(msg.readLong() == test);
         msg.reset();
-        CPPUNIT_ASSERT(msg.readString() == Byte(test).toString());
+        ASSERT_TRUE(msg.readString() == Byte(test).toString());
         msg.reset();
 
         try {
             msg.readBoolean();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readFloat();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readDouble();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readChar();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readBytes( buffer );
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
     }
 }
 
@@ -228,53 +228,53 @@ void ActiveMQStreamMessageTest::testReadShort() {
         short test = (short)4;
         msg.writeShort( test );
         msg.reset();
-        CPPUNIT_ASSERT(msg.readShort() == test);
+        ASSERT_TRUE(msg.readShort() == test);
         msg.reset();
-        CPPUNIT_ASSERT(msg.readInt() == test);
+        ASSERT_TRUE(msg.readInt() == test);
         msg.reset();
-        CPPUNIT_ASSERT(msg.readLong() == test);
+        ASSERT_TRUE(msg.readLong() == test);
         msg.reset();
-        CPPUNIT_ASSERT(msg.readString() == Short(test).toString());
+        ASSERT_TRUE(msg.readString() == Short(test).toString());
         msg.reset();
         try {
             msg.readBoolean();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readByte();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readFloat();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readDouble();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readChar();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readBytes( buffer );
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
     }
 }
 
@@ -285,62 +285,62 @@ void ActiveMQStreamMessageTest::testReadChar() {
         char test = 'z';
         msg.writeChar( test );
         msg.reset();
-        CPPUNIT_ASSERT(msg.readChar() == test);
+        ASSERT_TRUE(msg.readChar() == test);
         msg.reset();
-        CPPUNIT_ASSERT(msg.readString() == Character(test).toString());
+        ASSERT_TRUE(msg.readString() == Character(test).toString());
         msg.reset();
 
         try {
             msg.readBoolean();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readByte();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readShort();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readInt();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readLong();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readFloat();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readDouble();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readBytes( buffer );
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
     }
 }
 
@@ -353,57 +353,57 @@ void ActiveMQStreamMessageTest::testReadInt() {
         int test = 4;
         msg.writeInt( test );
         msg.reset();
-        CPPUNIT_ASSERT(msg.readInt() == test);
+        ASSERT_TRUE(msg.readInt() == test);
         msg.reset();
-        CPPUNIT_ASSERT(msg.readLong() == test);
+        ASSERT_TRUE(msg.readLong() == test);
         msg.reset();
-        CPPUNIT_ASSERT(msg.readString() == Integer(test).toString());
+        ASSERT_TRUE(msg.readString() == Integer(test).toString());
         msg.reset();
         try {
             msg.readBoolean();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readByte();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readShort();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readFloat();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readDouble();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readChar();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readBytes( buffer );
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
     }
 }
 
@@ -416,62 +416,62 @@ void ActiveMQStreamMessageTest::testReadLong() {
         long test = 4L;
         msg.writeLong( test );
         msg.reset();
-        CPPUNIT_ASSERT(msg.readLong() == test);
+        ASSERT_TRUE(msg.readLong() == test);
         msg.reset();
-        CPPUNIT_ASSERT(msg.readString() == Long::valueOf(test).toString());
+        ASSERT_TRUE(msg.readString() == Long::valueOf(test).toString());
         msg.reset();
 
         try {
             msg.readBoolean();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readByte();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readShort();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readInt();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readFloat();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readDouble();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readChar();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readBytes( buffer );
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
     }
 }
 
@@ -482,58 +482,58 @@ void ActiveMQStreamMessageTest::testReadFloat() {
         float test = 4.4f;
         msg.writeFloat( test );
         msg.reset();
-        CPPUNIT_ASSERT(msg.readFloat() == test);
+        ASSERT_TRUE(msg.readFloat() == test);
         msg.reset();
-        CPPUNIT_ASSERT(msg.readDouble() == test);
+        ASSERT_TRUE(msg.readDouble() == test);
         msg.reset();
-        CPPUNIT_ASSERT(msg.readString() == Float(test).toString());
+        ASSERT_TRUE(msg.readString() == Float(test).toString());
         msg.reset();
 
         try {
             msg.readBoolean();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readByte();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readShort();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readInt();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readLong();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readChar();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readBytes( buffer );
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
     }
 }
 
@@ -544,62 +544,62 @@ void ActiveMQStreamMessageTest::testReadDouble() {
         double test = 4.4;
         msg.writeDouble( test );
         msg.reset();
-        CPPUNIT_ASSERT(msg.readDouble() == test);
+        ASSERT_TRUE(msg.readDouble() == test);
         msg.reset();
-        CPPUNIT_ASSERT(msg.readString() == Double(test).toString());
+        ASSERT_TRUE(msg.readString() == Double(test).toString());
         msg.reset();
 
         try {
             msg.readBoolean();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readByte();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readShort();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readInt();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readLong();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readFloat();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readChar();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readBytes( buffer );
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
     }
 }
 
@@ -610,42 +610,42 @@ void ActiveMQStreamMessageTest::testReadString() {
         unsigned char testByte = (unsigned char)2;
         msg.writeString( Byte( testByte ).toString() );
         msg.reset();
-        CPPUNIT_ASSERT(msg.readByte() == testByte);
+        ASSERT_TRUE(msg.readByte() == testByte);
         msg.clearBody();
         short testShort = 3;
         msg.writeString( Short( testShort ).toString() );
         msg.reset();
-        CPPUNIT_ASSERT(msg.readShort() == testShort);
+        ASSERT_TRUE(msg.readShort() == testShort);
         msg.clearBody();
         int testInt = 4;
         msg.writeString( Integer( testInt ).toString() );
         msg.reset();
-        CPPUNIT_ASSERT(msg.readInt() == testInt);
+        ASSERT_TRUE(msg.readInt() == testInt);
         msg.clearBody();
         long testLong = 6L;
         msg.writeString( Long( testLong ).toString() );
         msg.reset();
-        CPPUNIT_ASSERT(msg.readLong() == testLong);
+        ASSERT_TRUE(msg.readLong() == testLong);
         msg.clearBody();
         float testFloat = 6.6f;
         msg.writeString( Float( testFloat ).toString() );
         msg.reset();
-        CPPUNIT_ASSERT(msg.readFloat() == testFloat);
+        ASSERT_TRUE(msg.readFloat() == testFloat);
         msg.clearBody();
         double testDouble = 7.7;
         msg.writeString( Double( testDouble ).toString() );
         msg.reset();
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( testDouble, msg.readDouble(), 0.05 );
+        ASSERT_NEAR(testDouble, msg.readDouble(), 0.05);
         msg.clearBody();
         msg.writeString( "true" );
         msg.reset();
-        CPPUNIT_ASSERT(msg.readBoolean());
+        ASSERT_TRUE(msg.readBoolean());
         msg.clearBody();
         msg.writeString( "a" );
         msg.reset();
         try {
             msg.readChar();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& e ) {
         }
         msg.clearBody();
@@ -653,13 +653,13 @@ void ActiveMQStreamMessageTest::testReadString() {
         msg.reset();
         try {
             msg.readBytes( buffer );
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& e ) {
         }
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
     }
 }
 
@@ -676,11 +676,11 @@ void ActiveMQStreamMessageTest::testReadBigString() {
 
         msg.writeString( bigString );
         msg.reset();
-        CPPUNIT_ASSERT_EQUAL( bigString, msg.readString() );
+        ASSERT_EQ(bigString, msg.readString());
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
     }
 }
 
@@ -700,55 +700,55 @@ void ActiveMQStreamMessageTest::testReadBytes() {
         unsigned char valid[50];
         msg.readBytes( valid, 50 );
         for( int i = 0; i < 50; i++ ) {
-            CPPUNIT_ASSERT(valid[i] == test[i]);
+            ASSERT_TRUE(valid[i] == test[i]);
         }
 
         msg.reset();
         try {
             msg.readByte();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readShort();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readInt();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readLong();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readFloat();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readChar();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
         msg.reset();
         try {
             msg.readString();
-            CPPUNIT_FAIL("Should have thrown exception");
+            FAIL() << ("Should have thrown exception");
         } catch( MessageFormatException& ex ) {
         }
 
     } catch( CMSException& ex ) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
     }
 }
 
@@ -760,14 +760,14 @@ void ActiveMQStreamMessageTest::testClearBody() {
 
         streamMessage.writeLong( 2LL );
         streamMessage.clearBody();
-        CPPUNIT_ASSERT( !streamMessage.isReadOnlyBody() );
+        ASSERT_TRUE(!streamMessage.isReadOnlyBody());
         streamMessage.writeLong(  2LL );
         streamMessage.readLong();
-        CPPUNIT_FAIL("should throw exception");
+        FAIL() << ("should throw exception");
 
     } catch( MessageNotReadableException& mnwe ) {
     } catch( MessageNotWriteableException& mnwe ) {
-        CPPUNIT_FAIL("should be writeable");
+        FAIL() << ("should be writeable");
     }
 }
 
@@ -780,22 +780,22 @@ void ActiveMQStreamMessageTest::testReset() {
         streamMessage.writeDouble( 24.5 );
         streamMessage.writeLong( 311LL );
     } catch( MessageNotWriteableException& mnwe ) {
-        CPPUNIT_FAIL("should be writeable");
+        FAIL() << ("should be writeable");
     }
 
     streamMessage.reset();
 
     try {
-        CPPUNIT_ASSERT(streamMessage.isReadOnlyBody());
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( streamMessage.readDouble(), 24.5, 0.01 );
-        CPPUNIT_ASSERT_EQUAL( streamMessage.readLong(), 311LL );
+        ASSERT_TRUE(streamMessage.isReadOnlyBody());
+        ASSERT_NEAR(streamMessage.readDouble(), 24.5, 0.01);
+        ASSERT_EQ(streamMessage.readLong(), 311LL);
     } catch( MessageNotReadableException& mnre ) {
-        CPPUNIT_FAIL("should be readable");
+        FAIL() << ("should be readable");
     }
 
     try {
         streamMessage.writeInt( 33 );
-        CPPUNIT_FAIL("should throw exception");
+        FAIL() << ("should throw exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
 }
@@ -814,7 +814,7 @@ void ActiveMQStreamMessageTest::testReadOnlyBody() {
         message.writeShort( (short)1 );
         message.writeString( "string" );
     } catch( MessageNotWriteableException& mnwe ) {
-        CPPUNIT_FAIL("Should be writeable");
+        FAIL() << ("Should be writeable");
     }
     message.reset();
     try {
@@ -828,62 +828,62 @@ void ActiveMQStreamMessageTest::testReadOnlyBody() {
         message.readShort();
         message.readString();
     } catch( MessageNotReadableException& mnwe ) {
-        CPPUNIT_FAIL("Should be readable");
+        FAIL() << ("Should be readable");
     }
     try {
         message.writeBoolean( true );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeByte( (unsigned char)1 );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeBytes( buffer );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         unsigned char test[3];
         message.writeBytes( test, 0, 2 );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeChar( 'a' );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeDouble( 1.5 );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeFloat( (float)1.5 );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeInt( 1 );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeLong( 1 );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeShort( (short)1 );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
     try {
         message.writeString( "string" );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
 }
@@ -904,72 +904,72 @@ void ActiveMQStreamMessageTest::testWriteOnlyBody() {
         message.writeShort( (short)1 );
         message.writeString( "string" );
     } catch( MessageNotWriteableException& mnwe ) {
-        CPPUNIT_FAIL("Should be writeable");
+        FAIL() << ("Should be writeable");
     }
     try {
         message.getNextValueType();
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& mnwe ) {
     }
     try {
         message.readBoolean();
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& mnwe ) {
     }
     try {
         message.readByte();
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readBytes( buffer );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         unsigned char test[50];
         message.readBytes( test, 50 );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readChar();
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readDouble();
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readFloat();
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readInt();
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readLong();
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readString();
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readShort();
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
     try {
         message.readString();
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotReadableException& e ) {
     }
 }

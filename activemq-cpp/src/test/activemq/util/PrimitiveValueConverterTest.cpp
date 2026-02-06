@@ -39,15 +39,12 @@ void PrimitiveValueConverterTest::testConvertToBoolean() {
     bool result3 = converter.convert<bool>( input3 );
     bool result4 = converter.convert<bool>( input4 );
 
-    CPPUNIT_ASSERT( result1 == true );
-    CPPUNIT_ASSERT( result2 == false );
-    CPPUNIT_ASSERT( result3 == true );
-    CPPUNIT_ASSERT( result4 == false );
+    ASSERT_TRUE(result1 == true);
+    ASSERT_TRUE(result2 == false);
+    ASSERT_TRUE(result3 == true);
+    ASSERT_TRUE(result4 == false);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<bool>( input5 ),
-        UnsupportedOperationException );
+    ASSERT_THROW(converter.convert<bool>( input5 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,18 +61,12 @@ void PrimitiveValueConverterTest::testConvertToChar() {
     char result2 = converter.convert<char>( input2 );
     char result3 = converter.convert<char>( input3 );
 
-    CPPUNIT_ASSERT( result1 == (char)127 );
-    CPPUNIT_ASSERT( result2 == (char)255 );
-    CPPUNIT_ASSERT( result3 == 'a' );
+    ASSERT_TRUE(result1 == (char)127);
+    ASSERT_TRUE(result2 == (char)255);
+    ASSERT_TRUE(result3 == 'a');
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<char>( input4 ),
-        UnsupportedOperationException );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<char>( input5 ),
-        UnsupportedOperationException );
+    ASSERT_THROW(converter.convert<char>( input4 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
+    ASSERT_THROW(converter.convert<char>( input5 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,18 +83,12 @@ void PrimitiveValueConverterTest::testConvertToByte() {
     unsigned char result2 = converter.convert<unsigned char>( input2 );
     unsigned char result3 = converter.convert<unsigned char>( input3 );
 
-    CPPUNIT_ASSERT( result1 == (unsigned char)127 );
-    CPPUNIT_ASSERT( result2 == (unsigned char)255 );
-    CPPUNIT_ASSERT( result3 == (unsigned char)4 );
+    ASSERT_TRUE(result1 == (unsigned char)127);
+    ASSERT_TRUE(result2 == (unsigned char)255);
+    ASSERT_TRUE(result3 == (unsigned char)4);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<unsigned char>( input4 ),
-        UnsupportedOperationException );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<unsigned char>( input5 ),
-        UnsupportedOperationException );
+    ASSERT_THROW(converter.convert<unsigned char>( input4 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
+    ASSERT_THROW(converter.convert<unsigned char>( input5 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -120,18 +105,12 @@ void PrimitiveValueConverterTest::testConvertToShort() {
     short result2 = converter.convert<short>( input2 );
     short result3 = converter.convert<short>( input3 );
 
-    CPPUNIT_ASSERT( result1 == 127 );
-    CPPUNIT_ASSERT( result2 == (short)65535 );
-    CPPUNIT_ASSERT( result3 == 4 );
+    ASSERT_TRUE(result1 == 127);
+    ASSERT_TRUE(result2 == (short)65535);
+    ASSERT_TRUE(result3 == 4);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<short>( input4 ),
-        UnsupportedOperationException );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<short>( input5 ),
-        UnsupportedOperationException );
+    ASSERT_THROW(converter.convert<short>( input4 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
+    ASSERT_THROW(converter.convert<short>( input5 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -150,19 +129,13 @@ void PrimitiveValueConverterTest::testConvertToInt() {
     int result3 = converter.convert<int>( input3 );
     int result4 = converter.convert<int>( input4 );
 
-    CPPUNIT_ASSERT( result1 == 127 );
-    CPPUNIT_ASSERT( result2 == (short)65535 );
-    CPPUNIT_ASSERT( result3 == -1 );
-    CPPUNIT_ASSERT( result4 == 4 );
+    ASSERT_TRUE(result1 == 127);
+    ASSERT_TRUE(result2 == (short)65535);
+    ASSERT_TRUE(result3 == -1);
+    ASSERT_TRUE(result4 == 4);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<int>( input5 ),
-        UnsupportedOperationException );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<int>( input6 ),
-        UnsupportedOperationException );
+    ASSERT_THROW(converter.convert<int>( input5 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
+    ASSERT_THROW(converter.convert<int>( input6 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -183,20 +156,14 @@ void PrimitiveValueConverterTest::testConvertToLong() {
     long long result4 = converter.convert<long long>( input4 );
     long long result5 = converter.convert<long long>( input5 );
 
-    CPPUNIT_ASSERT( result1 == 127 );
-    CPPUNIT_ASSERT( result2 == (short)65535 );
-    CPPUNIT_ASSERT( result3 == -1 );
-    CPPUNIT_ASSERT( result4 == 4 );
-    CPPUNIT_ASSERT( result5 == 45LL );
+    ASSERT_TRUE(result1 == 127);
+    ASSERT_TRUE(result2 == (short)65535);
+    ASSERT_TRUE(result3 == -1);
+    ASSERT_TRUE(result4 == 4);
+    ASSERT_TRUE(result5 == 45LL);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<long long>( input6 ),
-        UnsupportedOperationException );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<long long>( input7 ),
-        UnsupportedOperationException );
+    ASSERT_THROW(converter.convert<long long>( input6 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
+    ASSERT_THROW(converter.convert<long long>( input7 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -213,18 +180,12 @@ void PrimitiveValueConverterTest::testConvertToFloat() {
     float result2 = converter.convert<float>( input2 );
     float result3 = converter.convert<float>( input3 );
 
-    CPPUNIT_ASSERT( result1 == 12.1f );
-    CPPUNIT_ASSERT( result2 == 135.0f );
-    CPPUNIT_ASSERT( result3 == 4.0 );
+    ASSERT_TRUE(result1 == 12.1f);
+    ASSERT_TRUE(result2 == 135.0f);
+    ASSERT_TRUE(result3 == 4.0);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<float>( input4 ),
-        UnsupportedOperationException );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<float>( input5 ),
-        UnsupportedOperationException );
+    ASSERT_THROW(converter.convert<float>( input4 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
+    ASSERT_THROW(converter.convert<float>( input5 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -241,18 +202,12 @@ void PrimitiveValueConverterTest::testConvertToDouble() {
     double result2 = converter.convert<double>( input2 );
     double result3 = converter.convert<double>( input3 );
 
-    CPPUNIT_ASSERT( result1 == 12.1 );
-    CPPUNIT_ASSERT( result2 == (double)135.0 );
-    CPPUNIT_ASSERT( result3 == (double)4 );
+    ASSERT_TRUE(result1 == 12.1);
+    ASSERT_TRUE(result2 == (double)135.0);
+    ASSERT_TRUE(result3 == (double)4);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<double>( input4 ),
-        UnsupportedOperationException );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<double>( input5 ),
-        UnsupportedOperationException );
+    ASSERT_THROW(converter.convert<double>( input4 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
+    ASSERT_THROW(converter.convert<double>( input5 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -275,16 +230,13 @@ void PrimitiveValueConverterTest::testConvertToString() {
     std::string result6 = converter.convert<std::string>( input6 );
     std::string result7 = converter.convert<std::string>( input7 );
 
-    CPPUNIT_ASSERT( result1 == "9" );
-    CPPUNIT_ASSERT( result2 == "45" );
-    CPPUNIT_ASSERT( result3 == "135" );
-    CPPUNIT_ASSERT( result4 == "135.01" );
-    CPPUNIT_ASSERT( result5 == "4.0" );
-    CPPUNIT_ASSERT( result6 == "4asd" );
-    CPPUNIT_ASSERT( result7 == "65539" );
+    ASSERT_TRUE(result1 == "9");
+    ASSERT_TRUE(result2 == "45");
+    ASSERT_TRUE(result3 == "135");
+    ASSERT_TRUE(result4 == "135.01");
+    ASSERT_TRUE(result5 == "4.0");
+    ASSERT_TRUE(result6 == "4asd");
+    ASSERT_TRUE(result7 == "65539");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        converter.convert<unsigned int>( 24567 ),
-        UnsupportedOperationException );
+    ASSERT_THROW(converter.convert<unsigned int>( 24567 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
 }

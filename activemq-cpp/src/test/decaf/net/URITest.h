@@ -18,59 +18,12 @@
 #ifndef _DECAF_NET_URITEST_H_
 #define _DECAF_NET_URITEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf{
 namespace net{
 
-    class URITest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( URITest );
-        CPPUNIT_TEST( testConstructorOneString );
-        CPPUNIT_TEST( testConstructorThreeString );
-        CPPUNIT_TEST( testConstructorFourString );
-        CPPUNIT_TEST( testConstructorFiveString );
-        CPPUNIT_TEST( testConstructorFiveString2 );
-        CPPUNIT_TEST( testConstructorStringPlusInts );
-        CPPUNIT_TEST( testURIString );
-        CPPUNIT_TEST( testCompareToOne );
-        CPPUNIT_TEST( testCompareToTwo );
-        CPPUNIT_TEST( testCreate );
-        CPPUNIT_TEST( testEquals );
-        CPPUNIT_TEST( testEquals2 );
-        CPPUNIT_TEST( testGetAuthority );
-        CPPUNIT_TEST( testGetAuthority2 );
-        CPPUNIT_TEST( testGetFragment );
-        CPPUNIT_TEST( testGetHost );
-        CPPUNIT_TEST( testGetPath );
-        CPPUNIT_TEST( testGetPort );
-        CPPUNIT_TEST( testGetPort2 );
-        CPPUNIT_TEST( testGetQuery );
-        CPPUNIT_TEST( testGetRawAuthority );
-        CPPUNIT_TEST( testGetRawFragment );
-        CPPUNIT_TEST( testGetRawPath );
-        CPPUNIT_TEST( testGetRawQuery );
-        CPPUNIT_TEST( testGetRawSchemeSpecificPart );
-        CPPUNIT_TEST( testGetRawUserInfo );
-        CPPUNIT_TEST( testGetScheme );
-        CPPUNIT_TEST( testGetSchemeSpecificPart );
-        CPPUNIT_TEST( testGetUserInfo );
-        CPPUNIT_TEST( testIsAbsolute );
-        CPPUNIT_TEST( testIsOpaque );
-        CPPUNIT_TEST( testNormalize );
-        CPPUNIT_TEST( testNormalize2 );
-        CPPUNIT_TEST( testNormalize3 );
-        CPPUNIT_TEST( testParseServerAuthority );
-        CPPUNIT_TEST( testRelativizeLURI );
-        CPPUNIT_TEST( testRelativize2 );
-        CPPUNIT_TEST( testResolveURI );
-        CPPUNIT_TEST( testResolve );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST( testToURL );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class URITest : public ::testing::Test {
+public:
 
         URITest();
         virtual ~URITest() {}

@@ -18,25 +18,12 @@
 #ifndef _DECAF_SECURITY_MESSAGEDIGESTTEST_H_
 #define _DECAF_SECURITY_MESSAGEDIGESTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace security {
 
-    class MessageDigestTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( MessageDigestTest );
-        CPPUNIT_TEST( testGetInstance1 );
-        CPPUNIT_TEST( testGetInstance2 );
-        CPPUNIT_TEST( testGetInstance3 );
-        CPPUNIT_TEST( testGetInstance4 );
-        CPPUNIT_TEST( testResults1 );
-        CPPUNIT_TEST( testResults2 );
-        CPPUNIT_TEST( testResults3 );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class MessageDigestTest : public ::testing::Test {
+public:
 
         MessageDigestTest();
         virtual ~MessageDigestTest();

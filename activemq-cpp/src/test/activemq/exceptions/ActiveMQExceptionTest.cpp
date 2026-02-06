@@ -37,17 +37,14 @@ namespace {
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQExceptionTest::testMacros() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw a CMSException",
-        testMethod(),
-        cms::CMSException );
+    ASSERT_THROW(testMethod(), cms::CMSException) << ("Should Throw a CMSException");
 
     try{
 
         try{
             try{
                 throw UnsupportedOperationException( __FILE__, __LINE__, "EXCEPTION" );
-                CPPUNIT_FAIL( "Should not get this far." );
+                FAIL() << ("Should not get this far.");
             }
             AMQ_CATCH_EXCEPTION_CONVERT( Exception, ActiveMQException )
         }
@@ -55,12 +52,12 @@ void ActiveMQExceptionTest::testMacros() {
 
     } catch( ActiveMQException& ex ) {
 
-        CPPUNIT_ASSERT( ex.getCause() != NULL );
+        ASSERT_TRUE(ex.getCause() != NULL);
 
         const UnsupportedOperationException* cause =
             dynamic_cast<const UnsupportedOperationException*>( ex.getCause() );
 
-        CPPUNIT_ASSERT( cause != NULL );
+        ASSERT_TRUE(cause != NULL);
     }
 
     try{
@@ -69,14 +66,14 @@ void ActiveMQExceptionTest::testMacros() {
         return;
     }
 
-    CPPUNIT_FAIL( "Should have returned after catching an std exception." );
+    FAIL() << ("Should have returned after catching an std exception.");
 
     try{
 
         try{
             try{
                 throw UnsupportedOperationException( __FILE__, __LINE__, "EXCEPTION" );
-                CPPUNIT_FAIL( "Should not get this far." );
+                FAIL() << ("Should not get this far.");
             }
             AMQ_CATCH_EXCEPTION_CONVERT( Exception, ActiveMQException )
         }
@@ -86,13 +83,13 @@ void ActiveMQExceptionTest::testMacros() {
 
         ActiveMQException* converted = dynamic_cast<ActiveMQException*>( &ex );
 
-        CPPUNIT_ASSERT( converted != NULL );
-        CPPUNIT_ASSERT( converted->getCause() != NULL );
+        ASSERT_TRUE(converted != NULL);
+        ASSERT_TRUE(converted->getCause() != NULL);
 
         const UnsupportedOperationException* cause =
             dynamic_cast<const UnsupportedOperationException*>( converted->getCause() );
 
-        CPPUNIT_ASSERT( cause != NULL );
+        ASSERT_TRUE(cause != NULL);
     }
 }
 
@@ -100,13 +97,13 @@ void ActiveMQExceptionTest::testMacros() {
 void ActiveMQExceptionTest::testMessage0(){
     const char* text = "This is a test";
     ActiveMQException ex( __FILE__, __LINE__, text );
-    CPPUNIT_ASSERT( strcmp( ex.getMessage().c_str(), text ) == 0 );
+    ASSERT_TRUE(strcmp( ex.getMessage().c_str(), text ) == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQExceptionTest::testMessage3(){
     ActiveMQException ex( __FILE__, __LINE__,
         "This is a test %d %d %d", 1, 100, 1000 );
-    CPPUNIT_ASSERT( strcmp( ex.getMessage().c_str(),
-                    "This is a test 1 100 1000" ) == 0 );
+    ASSERT_TRUE(strcmp( ex.getMessage().c_str(),
+                    "This is a test 1 100 1000" ) == 0);
 }

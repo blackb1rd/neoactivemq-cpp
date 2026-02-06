@@ -26,12 +26,7 @@ namespace test {
 namespace stomp {
 
     class StompAdvisoryTest : public AdvisoryTest {
-
-        CPPUNIT_TEST_SUITE( StompAdvisoryTest );
-        CPPUNIT_TEST( testTempDestinationCompositeAdvisoryTopic );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         StompAdvisoryTest();
         virtual ~StompAdvisoryTest();

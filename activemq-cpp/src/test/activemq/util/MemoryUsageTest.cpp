@@ -56,11 +56,11 @@ void MemoryUsageTest::testCTors() {
     MemoryUsage usage1;
     MemoryUsage usage2( 1024 );
 
-    CPPUNIT_ASSERT( usage1.getLimit() == 0 );
-    CPPUNIT_ASSERT( usage2.getLimit() == 1024 );
+    ASSERT_TRUE(usage1.getLimit() == 0);
+    ASSERT_TRUE(usage2.getLimit() == 1024);
 
-    CPPUNIT_ASSERT( usage1.getUsage() == 0 );
-    CPPUNIT_ASSERT( usage2.getUsage() == 0 );
+    ASSERT_TRUE(usage1.getUsage() == 0);
+    ASSERT_TRUE(usage2.getUsage() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,27 +68,27 @@ void MemoryUsageTest::testUsage() {
 
     MemoryUsage usage1( 2048 );
 
-    CPPUNIT_ASSERT( !usage1.isFull() );
-    CPPUNIT_ASSERT( usage1.getUsage() == 0 );
+    ASSERT_TRUE(!usage1.isFull());
+    ASSERT_TRUE(usage1.getUsage() == 0);
 
     usage1.increaseUsage( 1024 );
 
-    CPPUNIT_ASSERT( !usage1.isFull() );
-    CPPUNIT_ASSERT( usage1.getUsage() == 1024 );
+    ASSERT_TRUE(!usage1.isFull());
+    ASSERT_TRUE(usage1.getUsage() == 1024);
 
     usage1.decreaseUsage( 512 );
 
-    CPPUNIT_ASSERT( !usage1.isFull() );
-    CPPUNIT_ASSERT( usage1.getUsage() == 512 );
+    ASSERT_TRUE(!usage1.isFull());
+    ASSERT_TRUE(usage1.getUsage() == 512);
 
     usage1.setUsage( 2048 );
 
-    CPPUNIT_ASSERT( usage1.isFull() );
-    CPPUNIT_ASSERT( usage1.getUsage() == 2048 );
+    ASSERT_TRUE(usage1.isFull());
+    ASSERT_TRUE(usage1.getUsage() == 2048);
 
     usage1.increaseUsage( 1024 );
-    CPPUNIT_ASSERT( usage1.isFull() );
-    CPPUNIT_ASSERT( usage1.getUsage() == 3072 );
+    ASSERT_TRUE(usage1.isFull());
+    ASSERT_TRUE(usage1.getUsage() == 3072);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,7 +103,7 @@ void MemoryUsageTest::testTimedWait() {
 
     unsigned long long endTime = System::currentTimeMillis();
 
-    CPPUNIT_ASSERT( endTime - startTime >= 125 );
+    ASSERT_TRUE(endTime - startTime >= 125);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -117,7 +117,7 @@ void MemoryUsageTest::testWait() {
     myThread.start();
 
     usage.waitForSpace();
-    CPPUNIT_ASSERT( usage.getUsage() == 0 );
+    ASSERT_TRUE(usage.getUsage() == 0);
 
     myThread.join();
 }

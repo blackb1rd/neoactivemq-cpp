@@ -39,8 +39,8 @@ void TimerTaskHeapTest::testCreate() {
 
     TimerTaskHeap heap;
 
-    CPPUNIT_ASSERT( heap.isEmpty() == true );
-    CPPUNIT_ASSERT( heap.peek() == NULL );
+    ASSERT_TRUE(heap.isEmpty() == true);
+    ASSERT_TRUE(heap.peek() == NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,13 +52,13 @@ void TimerTaskHeapTest::testInsert() {
     Pointer<TestTimerTask> task2( new TestTimerTask() );
     Pointer<TestTimerTask> task3( new TestTimerTask() );
 
-    CPPUNIT_ASSERT( heap.isEmpty() == true );
+    ASSERT_TRUE(heap.isEmpty() == true);
 
     heap.insert( task1 );
     heap.insert( task2 );
     heap.insert( task3 );
 
-    CPPUNIT_ASSERT( heap.isEmpty() == false );
+    ASSERT_TRUE(heap.isEmpty() == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -70,30 +70,30 @@ void TimerTaskHeapTest::testRemove() {
     Pointer<TestTimerTask> task2( new TestTimerTask() );
     Pointer<TestTimerTask> task3( new TestTimerTask() );
 
-    CPPUNIT_ASSERT( heap.isEmpty() == true );
+    ASSERT_TRUE(heap.isEmpty() == true);
 
     heap.insert( task1 );
     heap.insert( task2 );
     heap.insert( task3 );
 
-    CPPUNIT_ASSERT( heap.isEmpty() == false );
+    ASSERT_TRUE(heap.isEmpty() == false);
 
     std::size_t pos;
 
     pos = heap.find( task1 );
-    CPPUNIT_ASSERT( pos != (std::size_t)-1 );
+    ASSERT_TRUE(pos != (std::size_t)-1);
     heap.remove( pos );
-    CPPUNIT_ASSERT( heap.isEmpty() == false );
+    ASSERT_TRUE(heap.isEmpty() == false);
 
     pos = heap.find( task2 );
-    CPPUNIT_ASSERT( pos != (std::size_t)-1 );
+    ASSERT_TRUE(pos != (std::size_t)-1);
     heap.remove( pos );
-    CPPUNIT_ASSERT( heap.isEmpty() == false );
+    ASSERT_TRUE(heap.isEmpty() == false);
 
     pos = heap.find( task3 );
-    CPPUNIT_ASSERT( pos != (std::size_t)-1 );
+    ASSERT_TRUE(pos != (std::size_t)-1);
     heap.remove( pos );
-    CPPUNIT_ASSERT( heap.isEmpty() == true );
+    ASSERT_TRUE(heap.isEmpty() == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,18 +103,18 @@ void TimerTaskHeapTest::testFind() {
 
     Pointer<TestTimerTask> task1( new TestTimerTask() );
 
-    CPPUNIT_ASSERT( heap.isEmpty() == true );
+    ASSERT_TRUE(heap.isEmpty() == true);
 
     heap.insert( task1 );
 
-    CPPUNIT_ASSERT( heap.isEmpty() == false );
+    ASSERT_TRUE(heap.isEmpty() == false);
 
     std::size_t pos;
 
     pos = heap.find( task1 );
-    CPPUNIT_ASSERT( pos != (std::size_t)-1 );
+    ASSERT_TRUE(pos != (std::size_t)-1);
     heap.remove( pos );
-    CPPUNIT_ASSERT( heap.isEmpty() == true );
+    ASSERT_TRUE(heap.isEmpty() == true);
     pos = heap.find( task1 );
-    CPPUNIT_ASSERT( pos == (std::size_t)-1 );
+    ASSERT_TRUE(pos == (std::size_t)-1);
 }

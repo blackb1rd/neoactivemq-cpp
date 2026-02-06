@@ -18,72 +18,13 @@
 #ifndef _DECAF_UTIL_LINKEDLISTTEST_H_
 #define _DECAF_UTIL_LINKEDLISTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 
-    class LinkedListTest : public CppUnit::TestFixture
+    class LinkedListTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( LinkedListTest );
-        CPPUNIT_TEST( testConstructor1 );
-        CPPUNIT_TEST( testConstructor2 );
-        CPPUNIT_TEST( testConstructor3 );
-        CPPUNIT_TEST( testEquals );
-        CPPUNIT_TEST( testGet );
-        CPPUNIT_TEST( testSet );
-        CPPUNIT_TEST( testAdd1 );
-        CPPUNIT_TEST( testAdd2 );
-        CPPUNIT_TEST( testAddAll1 );
-        CPPUNIT_TEST( testAddAll2 );
-        CPPUNIT_TEST( testAddAll3 );
-        CPPUNIT_TEST( testAddAll4 );
-        CPPUNIT_TEST( testAddAllSelfAsCollection1 );
-        CPPUNIT_TEST( testAddAllSelfAsCollection2 );
-        CPPUNIT_TEST( testAddFirst );
-        CPPUNIT_TEST( testAddLast );
-        CPPUNIT_TEST( testRemoveAtIndex );
-        CPPUNIT_TEST( testRemoveByValue );
-        CPPUNIT_TEST( testRemoveAll );
-        CPPUNIT_TEST( testRetainAll );
-        CPPUNIT_TEST( testGetFirst );
-        CPPUNIT_TEST( testGetLast );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testIndexOf );
-        CPPUNIT_TEST( testLastIndexOf );
-        CPPUNIT_TEST( testContains );
-        CPPUNIT_TEST( testContainsAll );
-        CPPUNIT_TEST( testToArray );
-        CPPUNIT_TEST( testOffer );
-        CPPUNIT_TEST( testPoll );
-        CPPUNIT_TEST( testPeek );
-        CPPUNIT_TEST( testElement );
-        CPPUNIT_TEST( testQRemove );
-        CPPUNIT_TEST( testOfferFirst );
-        CPPUNIT_TEST( testOfferLast );
-        CPPUNIT_TEST( testRemoveFirst );
-        CPPUNIT_TEST( testRemoveLast );
-        CPPUNIT_TEST( testPollFirst );
-        CPPUNIT_TEST( testPollLast );
-        CPPUNIT_TEST( testPeekFirst );
-        CPPUNIT_TEST( testPeekLast );
-        CPPUNIT_TEST( testPop );
-        CPPUNIT_TEST( testPush );
-        CPPUNIT_TEST( testIterator1 );
-        CPPUNIT_TEST( testIterator2 );
-        CPPUNIT_TEST( testListIterator1 );
-        CPPUNIT_TEST( testListIterator2 );
-        CPPUNIT_TEST( testListIterator3 );
-        CPPUNIT_TEST( testListIterator4 );
-        CPPUNIT_TEST( testListIterator1IndexOutOfBoundsException );
-        CPPUNIT_TEST( testListIterator2IndexOutOfBoundsException );
-        CPPUNIT_TEST( testDescendingIterator );
-        CPPUNIT_TEST( testRemoveFirstOccurrence );
-        CPPUNIT_TEST( testRemoveLastOccurrence );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+private:
 
         static const int SIZE;
 

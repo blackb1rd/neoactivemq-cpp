@@ -39,6 +39,6 @@ void ConsumerStateTest::test() {
     info->setConsumerId( id );
     ConsumerState state( info );
 
-    CPPUNIT_ASSERT( state.toString() != "NULL" );
-    CPPUNIT_ASSERT( info == state.getInfo() );
+    ASSERT_TRUE(state.toString() != "NULL");
+    ASSERT_TRUE(info == state.getInfo());
 }

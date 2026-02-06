@@ -38,7 +38,7 @@ void ProducerStateTest::test() {
     info->setProducerId( id );
     ProducerState state( info );
 
-    CPPUNIT_ASSERT( state.toString() != "NULL" );
-    CPPUNIT_ASSERT( info == state.getInfo() );
+    ASSERT_TRUE(state.toString() != "NULL");
+    ASSERT_TRUE(info == state.getInfo());
 }
 

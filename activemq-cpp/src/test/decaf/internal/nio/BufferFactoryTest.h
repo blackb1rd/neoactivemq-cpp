@@ -18,24 +18,15 @@
 #ifndef _DECAF_INTERNAL_NIO_BUFFERFACTORYTEST_H_
 #define _DECAF_INTERNAL_NIO_BUFFERFACTORYTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/internal/nio/BufferFactory.h>
 
 namespace decaf{
 namespace internal{
 namespace nio{
 
-    class BufferFactoryTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( BufferFactoryTest );
-        CPPUNIT_TEST( testCreateByteBuffer1 );
-        CPPUNIT_TEST( testCreateByteBuffer2 );
-        CPPUNIT_TEST( testCreateByteBuffer3 );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class BufferFactoryTest : public ::testing::Test {
+public:
 
         BufferFactoryTest() {}
         virtual ~BufferFactoryTest() {}

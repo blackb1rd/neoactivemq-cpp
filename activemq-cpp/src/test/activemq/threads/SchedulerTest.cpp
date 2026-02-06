@@ -69,21 +69,21 @@ SchedulerTest::~SchedulerTest() {
 void SchedulerTest::testConstructor() {
 
     Scheduler scheduler("testExecutePeriodically");
-    CPPUNIT_ASSERT_EQUAL(false, scheduler.isStarted());
-    CPPUNIT_ASSERT_EQUAL(false, scheduler.isStopping());
-    CPPUNIT_ASSERT_EQUAL(true, scheduler.isStopped());
+    ASSERT_EQ(false, scheduler.isStarted());
+    ASSERT_EQ(false, scheduler.isStopping());
+    ASSERT_EQ(true, scheduler.isStopped());
     scheduler.start();
-    CPPUNIT_ASSERT_EQUAL(true, scheduler.isStarted());
-    CPPUNIT_ASSERT_EQUAL(false, scheduler.isStopping());
-    CPPUNIT_ASSERT_EQUAL(false, scheduler.isStopped());
+    ASSERT_EQ(true, scheduler.isStarted());
+    ASSERT_EQ(false, scheduler.isStopping());
+    ASSERT_EQ(false, scheduler.isStopped());
     scheduler.shutdown();
-    CPPUNIT_ASSERT_EQUAL(true, scheduler.isStarted());
-    CPPUNIT_ASSERT_EQUAL(false, scheduler.isStopping());
-    CPPUNIT_ASSERT_EQUAL(false, scheduler.isStopped());
+    ASSERT_EQ(true, scheduler.isStarted());
+    ASSERT_EQ(false, scheduler.isStopping());
+    ASSERT_EQ(false, scheduler.isStopped());
     scheduler.stop();
-    CPPUNIT_ASSERT_EQUAL(false, scheduler.isStarted());
-    CPPUNIT_ASSERT_EQUAL(false, scheduler.isStopping());
-    CPPUNIT_ASSERT_EQUAL(true, scheduler.isStopped());
+    ASSERT_EQ(false, scheduler.isStarted());
+    ASSERT_EQ(false, scheduler.isStopping());
+    ASSERT_EQ(true, scheduler.isStopped());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,18 +92,9 @@ void SchedulerTest::testScheduleNullRunnableThrows() {
     Scheduler scheduler("testSchedualPeriodically");
     scheduler.start();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        scheduler.schedualPeriodically(NULL, 400),
-        NullPointerException);
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        scheduler.executePeriodically(NULL, 400),
-        NullPointerException);
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        scheduler.executeAfterDelay(NULL, 400),
-        NullPointerException);
+    ASSERT_THROW(scheduler.schedualPeriodically(NULL, 400), NullPointerException) << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(scheduler.executePeriodically(NULL, 400), NullPointerException) << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(scheduler.executeAfterDelay(NULL, 400), NullPointerException) << ("Should have thrown a NullPointerException");
 
 }
 
@@ -115,12 +106,12 @@ void SchedulerTest::testExecutePeriodically() {
         scheduler.start();
         CounterTask* task = new CounterTask();
         scheduler.executePeriodically(task, 500);
-        CPPUNIT_ASSERT(task->getCount() == 0);
+        ASSERT_TRUE(task->getCount() == 0);
         Thread::sleep(600);
-        CPPUNIT_ASSERT(task->getCount() >= 1);
+        ASSERT_TRUE(task->getCount() >= 1);
         Thread::sleep(600);
-        CPPUNIT_ASSERT(task->getCount() >= 2);
-        CPPUNIT_ASSERT(task->getCount() < 5);
+        ASSERT_TRUE(task->getCount() >= 2);
+        ASSERT_TRUE(task->getCount() < 5);
     }
 
     {
@@ -128,12 +119,12 @@ void SchedulerTest::testExecutePeriodically() {
         scheduler.start();
         CounterTask* task = new CounterTask();
         scheduler.schedualPeriodically(task, 1000);
-        CPPUNIT_ASSERT(task->getCount() == 0);
+        ASSERT_TRUE(task->getCount() == 0);
         scheduler.cancel(task);
 
         try{
             scheduler.cancel(task);
-            CPPUNIT_FAIL("Should have thrown an exception");
+            FAIL() << ("Should have thrown an exception");
         } catch(...) {
         }
 
@@ -149,12 +140,12 @@ void SchedulerTest::testSchedualPeriodically() {
         scheduler.start();
         CounterTask* task = new CounterTask();
         scheduler.schedualPeriodically(task, 400);
-        CPPUNIT_ASSERT(task->getCount() == 0);
+        ASSERT_TRUE(task->getCount() == 0);
         Thread::sleep(600);
-        CPPUNIT_ASSERT(task->getCount() >= 1);
+        ASSERT_TRUE(task->getCount() >= 1);
         Thread::sleep(600);
-        CPPUNIT_ASSERT(task->getCount() >= 2);
-        CPPUNIT_ASSERT(task->getCount() < 5);
+        ASSERT_TRUE(task->getCount() >= 2);
+        ASSERT_TRUE(task->getCount() < 5);
     }
 
     {
@@ -162,12 +153,12 @@ void SchedulerTest::testSchedualPeriodically() {
         scheduler.start();
         CounterTask* task = new CounterTask();
         scheduler.schedualPeriodically(task, 1000);
-        CPPUNIT_ASSERT(task->getCount() == 0);
+        ASSERT_TRUE(task->getCount() == 0);
         scheduler.cancel(task);
 
         try{
             scheduler.cancel(task);
-            CPPUNIT_FAIL("Should have thrown an exception");
+            FAIL() << ("Should have thrown an exception");
         } catch(...) {
         }
 
@@ -183,11 +174,11 @@ void SchedulerTest::testExecuteAfterDelay() {
         scheduler.start();
         CounterTask task;
         scheduler.executeAfterDelay(&task, 500, false);
-        CPPUNIT_ASSERT(task.getCount() == 0);
+        ASSERT_TRUE(task.getCount() == 0);
         Thread::sleep(600);
-        CPPUNIT_ASSERT_EQUAL(1, task.getCount());
+        ASSERT_EQ(1, task.getCount());
         Thread::sleep(600);
-        CPPUNIT_ASSERT_EQUAL(1, task.getCount());
+        ASSERT_EQ(1, task.getCount());
     }
 
     // Should not be any cancelable tasks
@@ -196,11 +187,11 @@ void SchedulerTest::testExecuteAfterDelay() {
         scheduler.start();
         CounterTask* task = new CounterTask();
         scheduler.executeAfterDelay(task, 1000);
-        CPPUNIT_ASSERT(task->getCount() == 0);
+        ASSERT_TRUE(task->getCount() == 0);
 
         try{
             scheduler.cancel(task);
-            CPPUNIT_FAIL("Should have thrown an exception");
+            FAIL() << ("Should have thrown an exception");
         } catch(...) {
         }
 
@@ -213,7 +204,7 @@ void SchedulerTest::testExecuteAfterDelay() {
         scheduler.start();
         CounterTask* task = new CounterTask();
         scheduler.executeAfterDelay(task, 300);
-        CPPUNIT_ASSERT(task->getCount() == 0);
+        ASSERT_TRUE(task->getCount() == 0);
         Thread::sleep(600);
     }
 }
@@ -226,11 +217,11 @@ void SchedulerTest::testCancel() {
     CounterTask task;
     scheduler.executePeriodically(&task, 500, false);
     scheduler.cancel(&task);
-    CPPUNIT_ASSERT(task.getCount() == 0);
+    ASSERT_TRUE(task.getCount() == 0);
     Thread::sleep(600);
-    CPPUNIT_ASSERT_EQUAL(0, task.getCount());
+    ASSERT_EQ(0, task.getCount());
     Thread::sleep(600);
-    CPPUNIT_ASSERT_EQUAL(0, task.getCount());
+    ASSERT_EQ(0, task.getCount());
     scheduler.shutdown();
 }
 
@@ -243,11 +234,11 @@ void SchedulerTest::testShutdown() {
         CounterTask task;
         scheduler.executePeriodically(&task, 500, false);
         scheduler.shutdown();
-        CPPUNIT_ASSERT(task.getCount() == 0);
+        ASSERT_TRUE(task.getCount() == 0);
         Thread::sleep(600);
-        CPPUNIT_ASSERT_EQUAL(0, task.getCount());
+        ASSERT_EQ(0, task.getCount());
         Thread::sleep(600);
-        CPPUNIT_ASSERT_EQUAL(0, task.getCount());
+        ASSERT_EQ(0, task.getCount());
     }
 
     {
@@ -255,9 +246,9 @@ void SchedulerTest::testShutdown() {
         scheduler.start();
         CounterTask* task = new CounterTask();
         scheduler.executeAfterDelay(task, 1000);
-        CPPUNIT_ASSERT(task->getCount() == 0);
+        ASSERT_TRUE(task->getCount() == 0);
         scheduler.shutdown();
         scheduler.stop();
-        CPPUNIT_ASSERT(scheduler.isStopped());
+        ASSERT_TRUE(scheduler.isStopped());
     }
 }

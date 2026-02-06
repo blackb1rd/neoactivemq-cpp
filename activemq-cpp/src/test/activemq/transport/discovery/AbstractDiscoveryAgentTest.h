@@ -18,20 +18,13 @@
 #ifndef _ACTIVEMQ_TRANSPORT_DISCOVERY_ABSTRACTDISCOVERYAGENTTEST_H_
 #define _ACTIVEMQ_TRANSPORT_DISCOVERY_ABSTRACTDISCOVERYAGENTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace transport {
 namespace discovery {
 
-    class AbstractDiscoveryAgentTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE(AbstractDiscoveryAgentTest);
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class AbstractDiscoveryAgentTest : public ::testing::Test {
+public:
 
         AbstractDiscoveryAgentTest();
         virtual ~AbstractDiscoveryAgentTest();

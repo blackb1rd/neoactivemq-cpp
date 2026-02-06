@@ -18,19 +18,12 @@
 #ifndef _ACTIVEMQ_STATE_PRODUCERSTATETEST_H_
 #define _ACTIVEMQ_STATE_PRODUCERSTATETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace state {
 
-    class ProducerStateTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ProducerStateTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class ProducerStateTest : public ::testing::Test {
+public:
 
         ProducerStateTest() {}
         virtual ~ProducerStateTest() {}

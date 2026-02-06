@@ -18,35 +18,13 @@
 #ifndef _DECAF_UTIL_STLMAPTEST_H_
 #define _DECAF_UTIL_STLMAPTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 
-    class StlMapTest : public CppUnit::TestFixture
+    class StlMapTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( StlMapTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testContainsKey );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testCopy );
-        CPPUNIT_TEST( testSize );
-        CPPUNIT_TEST( testGet );
-        CPPUNIT_TEST( testPut );
-        CPPUNIT_TEST( testPutAll );
-        CPPUNIT_TEST( testRemove );
-        CPPUNIT_TEST( testContiansValue );
-        CPPUNIT_TEST( testIsEmpty );
-        CPPUNIT_TEST( testEntrySet );
-        CPPUNIT_TEST( testKeySet );
-        CPPUNIT_TEST( testValues );
-        CPPUNIT_TEST( testEntrySetIterator );
-        CPPUNIT_TEST( testKeySetIterator );
-        CPPUNIT_TEST( testValuesIterator );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         StlMapTest() {}
         virtual ~StlMapTest() {}

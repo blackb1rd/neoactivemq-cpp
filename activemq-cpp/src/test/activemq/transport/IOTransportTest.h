@@ -18,25 +18,14 @@
 #ifndef ACTIVEMQ_COMMANDS_IOTRANSPORTTEST_H_
 #define ACTIVEMQ_COMMANDS_IOTRANSPORTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include <activemq/util/Config.h>
 
 namespace activemq{
 namespace transport{
 
-    class IOTransportTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( IOTransportTest );
-        CPPUNIT_TEST( testStartClose );
-        CPPUNIT_TEST( testStressTransportStartClose );
-        CPPUNIT_TEST( testRead );
-        CPPUNIT_TEST( testWrite );
-        CPPUNIT_TEST( testException );
-        CPPUNIT_TEST( testNarrow );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class IOTransportTest : public ::testing::Test {
+public:
 
         virtual ~IOTransportTest(){}
 

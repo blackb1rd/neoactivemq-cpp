@@ -18,31 +18,13 @@
 #ifndef _DECAF_UTIL_SETTEST_H_
 #define _DECAF_UTIL_SETTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf{
 namespace util{
 
-    class SetTest : public CppUnit::TestFixture
+    class SetTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( SetTest );
-        CPPUNIT_TEST( testConstructor1 );
-        CPPUNIT_TEST( testConstructor2 );
-        CPPUNIT_TEST( testConstructor3 );
-        CPPUNIT_TEST( testContains );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testCopy1 );
-        CPPUNIT_TEST( testCopy2 );
-        CPPUNIT_TEST( testSize );
-        CPPUNIT_TEST( testAdd );
-        CPPUNIT_TEST( testRemove );
-        CPPUNIT_TEST( testIsEmpty );
-        CPPUNIT_TEST( testToArray );
-        CPPUNIT_TEST( testIterator );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         SetTest();
         virtual ~SetTest() {}

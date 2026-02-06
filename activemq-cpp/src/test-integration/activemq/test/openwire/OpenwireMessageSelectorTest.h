@@ -31,21 +31,7 @@ namespace openwire {
      * based on message properties and headers.
      */
     class OpenwireMessageSelectorTest : public CMSTestFixture {
-
-        CPPUNIT_TEST_SUITE( OpenwireMessageSelectorTest );
-        CPPUNIT_TEST( testStringPropertySelector );
-        CPPUNIT_TEST( testIntPropertySelector );
-        CPPUNIT_TEST( testBooleanPropertySelector );
-        CPPUNIT_TEST( testCompoundSelector );
-        CPPUNIT_TEST( testSelectorWithLike );
-        CPPUNIT_TEST( testSelectorWithIn );
-        CPPUNIT_TEST( testSelectorWithBetween );
-        CPPUNIT_TEST( testSelectorWithIsNull );
-        CPPUNIT_TEST( testJMSTypeSelector );
-        CPPUNIT_TEST( testJMSPrioritySelector );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireMessageSelectorTest();
         virtual ~OpenwireMessageSelectorTest();

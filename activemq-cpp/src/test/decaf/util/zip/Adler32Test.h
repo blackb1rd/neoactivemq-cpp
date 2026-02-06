@@ -18,25 +18,13 @@
 #ifndef _DECAF_UTIL_ZIP_ADLER32TEST_H_
 #define _DECAF_UTIL_ZIP_ADLER32TEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 namespace zip {
 
-    class Adler32Test : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( Adler32Test );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testGetValue );
-        CPPUNIT_TEST( testReset );
-        CPPUNIT_TEST( testUpdateI );
-        CPPUNIT_TEST( testUpdateArray );
-        CPPUNIT_TEST( testUpdateArrayIndexed );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class Adler32Test : public ::testing::Test {
+public:
 
         Adler32Test();
         virtual ~Adler32Test();

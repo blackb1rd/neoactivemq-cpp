@@ -18,25 +18,13 @@
 #ifndef _DECAF_UTIL_ZIP_CRC32TEST_H_
 #define _DECAF_UTIL_ZIP_CRC32TEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 namespace zip {
 
-    class CRC32Test : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( CRC32Test );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testGetValue );
-        CPPUNIT_TEST( testReset );
-        CPPUNIT_TEST( testUpdateI );
-        CPPUNIT_TEST( testUpdateArray );
-        CPPUNIT_TEST( testUpdateArrayIndexed );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class CRC32Test : public ::testing::Test {
+public:
 
         CRC32Test();
         virtual ~CRC32Test();

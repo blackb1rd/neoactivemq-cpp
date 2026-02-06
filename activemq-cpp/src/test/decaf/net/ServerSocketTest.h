@@ -18,9 +18,7 @@
 #ifndef _DECAF_NET_SERVERSOCKETTEST_H_
 #define _DECAF_NET_SERVERSOCKETTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/lang/Thread.h>
 
 namespace decaf {
@@ -28,19 +26,8 @@ namespace net {
 
     class Socket;
 
-    class ServerSocketTest  : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ServerSocketTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testClose );
-        CPPUNIT_TEST( testAccept );
-        CPPUNIT_TEST( testGetLocalPort );
-        CPPUNIT_TEST( testGetSoTimeout );
-        CPPUNIT_TEST( testGetReuseAddress );
-        CPPUNIT_TEST( testGetReceiveBufferSize );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class ServerSocketTest  : public ::testing::Test {
+private:
 
         Socket* ssconn;
 
@@ -56,8 +43,8 @@ namespace net {
         ServerSocketTest();
         virtual ~ServerSocketTest();
 
-        void setUp();
-        void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         void testConstructor();
         void testClose();

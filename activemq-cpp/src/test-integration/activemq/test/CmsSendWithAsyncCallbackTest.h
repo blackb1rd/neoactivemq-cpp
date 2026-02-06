@@ -31,8 +31,8 @@ namespace test {
 
         void testAsyncCallbackIsFaster();
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
     };
 

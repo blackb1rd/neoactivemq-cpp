@@ -28,7 +28,7 @@ void CountDownLatchTest::test()
 {
     CountDownLatch latch( 50 );
 
-    CPPUNIT_ASSERT( latch.getCount() == 50 );
+    ASSERT_TRUE(latch.getCount() == 50);
 
     MyThread thread;
     thread.latch = &latch;
@@ -36,11 +36,11 @@ void CountDownLatchTest::test()
 
     latch.await();
 
-    CPPUNIT_ASSERT( latch.getCount() == 0 );
+    ASSERT_TRUE(latch.getCount() == 0);
 
     thread.join();
 
-    CPPUNIT_ASSERT( true );
+    ASSERT_TRUE(true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,21 +48,21 @@ void CountDownLatchTest::test2()
 {
     CountDownLatch latch( 75 );
 
-    CPPUNIT_ASSERT( latch.getCount() == 75 );
+    ASSERT_TRUE(latch.getCount() == 75);
 
     MyThread thread;
     thread.latch = &latch;
     thread.start();
 
-    CPPUNIT_ASSERT( latch.await( 2 ) == false );
+    ASSERT_TRUE(latch.await( 2 ) == false);
 
     latch.await();
 
-    CPPUNIT_ASSERT( latch.getCount() == 0 );
+    ASSERT_TRUE(latch.getCount() == 0);
 
     thread.join();
 
-    CPPUNIT_ASSERT( true );
+    ASSERT_TRUE(true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,19 +76,19 @@ void CountDownLatchTest::testConstructor() {
 ////////////////////////////////////////////////////////////////////////////////
 void CountDownLatchTest::testGetCount() {
     CountDownLatch l(2);
-    CPPUNIT_ASSERT_EQUAL(2, l.getCount());
+    ASSERT_EQ(2, l.getCount());
     l.countDown();
-    CPPUNIT_ASSERT_EQUAL(1, l.getCount());
+    ASSERT_EQ(1, l.getCount());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void CountDownLatchTest::testCountDown() {
     CountDownLatch l(1);
-    CPPUNIT_ASSERT_EQUAL(1, l.getCount());
+    ASSERT_EQ(1, l.getCount());
     l.countDown();
-    CPPUNIT_ASSERT_EQUAL(0, l.getCount());
+    ASSERT_EQ(0, l.getCount());
     l.countDown();
-    CPPUNIT_ASSERT_EQUAL(0, l.getCount());
+    ASSERT_EQ(0, l.getCount());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -131,12 +131,12 @@ void CountDownLatchTest::testAwait() {
 
     t.start();
     try {
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 2);
+        ASSERT_EQ(l.getCount(), 2);
         Thread::sleep(SHORT_DELAY_MS);
         l.countDown();
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 1);
+        ASSERT_EQ(l.getCount(), 1);
         l.countDown();
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 0);
+        ASSERT_EQ(l.getCount(), 0);
         t.join();
     } catch(InterruptedException& e) {
         unexpectedException();
@@ -182,12 +182,12 @@ void CountDownLatchTest::testTimedAwait() {
 
     t.start();
     try {
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 2);
+        ASSERT_EQ(l.getCount(), 2);
         Thread::sleep(SHORT_DELAY_MS);
         l.countDown();
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 1);
+        ASSERT_EQ(l.getCount(), 1);
         l.countDown();
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 0);
+        ASSERT_EQ(l.getCount(), 0);
         t.join();
     } catch(InterruptedException& e) {
         unexpectedException();
@@ -233,7 +233,7 @@ void CountDownLatchTest::testAwaitInterruptedException() {
 
     t.start();
     try {
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 1);
+        ASSERT_EQ(l.getCount(), 1);
         t.interrupt();
         t.join();
     } catch(InterruptedException& e) {
@@ -281,7 +281,7 @@ void CountDownLatchTest::testTimedAwaitInterruptedException() {
     t.start();
     try {
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 1);
+        ASSERT_EQ(l.getCount(), 1);
         t.interrupt();
         t.join();
     } catch(InterruptedException& e) {
@@ -329,7 +329,7 @@ void CountDownLatchTest::testAwaitTimeout() {
 
     t.start();
     try {
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 1);
+        ASSERT_EQ(l.getCount(), 1);
         t.join();
     } catch(InterruptedException& e) {
         unexpectedException();
@@ -340,11 +340,11 @@ void CountDownLatchTest::testAwaitTimeout() {
 void CountDownLatchTest::testToString() {
     CountDownLatch s(2);
     std::string us = s.toString();
-    CPPUNIT_ASSERT((int)us.find_first_of("Count = 2") >= 0);
+    ASSERT_TRUE((int)us.find_first_of("Count = 2") >= 0);
     s.countDown();
     std::string s1 = s.toString();
-    CPPUNIT_ASSERT((int)s1.find_first_of("Count = 1") >= 0);
+    ASSERT_TRUE((int)s1.find_first_of("Count = 1") >= 0);
     s.countDown();
     std::string s2 = s.toString();
-    CPPUNIT_ASSERT((int)s2.find_first_of("Count = 0") >= 0);
+    ASSERT_TRUE((int)s2.find_first_of("Count = 0") >= 0);
 }

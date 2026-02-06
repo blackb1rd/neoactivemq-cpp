@@ -34,21 +34,19 @@ using namespace decaf::util;
 ////////////////////////////////////////////////////////////////////////////////
 void ByteArrayOutputStreamTest::testConstructor1() {
     ByteArrayOutputStream baos( 500 );
-    CPPUNIT_ASSERT_MESSAGE("Failed to create stream", 0 == baos.size() );
+    ASSERT_TRUE(0 == baos.size()) << ("Failed to create stream");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ByteArrayOutputStreamTest::testConstructor2() {
     ByteArrayOutputStream baos;
-    CPPUNIT_ASSERT_MESSAGE("Failed to create stream", 0 == baos.size() );
+    ASSERT_TRUE(0 == baos.size()) << ("Failed to create stream");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ByteArrayOutputStreamTest::testClose() {
 
-    CPPUNIT_ASSERT_MESSAGE(
-        "close() does nothing for this implementation of OutputSteam",
-        true );
+    ASSERT_TRUE(true) << ("close() does nothing for this implementation of OutputSteam");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,16 +54,16 @@ void ByteArrayOutputStreamTest::testReset() {
     ByteArrayOutputStream baos;
     baos.write( (unsigned char*)&testString[0], (int)testString.size(), 0, 100 );
     baos.reset();
-    CPPUNIT_ASSERT_MESSAGE("reset failed", 0 == baos.size() );
+    ASSERT_TRUE(0 == baos.size()) << ("reset failed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ByteArrayOutputStreamTest::testSize() {
     ByteArrayOutputStream baos;
     baos.write( (unsigned char*)&testString[0], (int)testString.size(), 0, 100 );
-    CPPUNIT_ASSERT_MESSAGE("size test failed", 100 == baos.size());
+    ASSERT_TRUE(100 == baos.size()) << ("size test failed");
     baos.reset();
-    CPPUNIT_ASSERT_MESSAGE("size test failed", 0 == baos.size());
+    ASSERT_TRUE(0 == baos.size()) << ("size test failed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +72,7 @@ void ByteArrayOutputStreamTest::testToByteArray() {
     baos.write( (unsigned char*)&testString[0], (int)testString.size(), 0, (int)testString.length() );
     std::pair<const unsigned char*, int> array = baos.toByteArray();
     for( std::size_t i = 0; i < testString.length(); i++) {
-        CPPUNIT_ASSERT_MESSAGE("Error in byte array", array.first[i] == testString.at(i) );
+        ASSERT_TRUE(array.first[i] == testString.at(i)) << ("Error in byte array");
     }
     delete [] array.first;
 }
@@ -84,8 +82,7 @@ void ByteArrayOutputStreamTest::testToString() {
 
     ByteArrayOutputStream baos;
     baos.write( (unsigned char*)&testString[0], (int)testString.size(), 0, (int)testString.length() );
-    CPPUNIT_ASSERT_MESSAGE( "Returned incorrect String",
-                            baos.toString() == testString );
+    ASSERT_TRUE(baos.toString() == testString) << ("Returned incorrect String");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -94,8 +91,7 @@ void ByteArrayOutputStreamTest::testWrite1() {
     ByteArrayOutputStream baos;
     baos.write('t');
     std::pair<const unsigned char*, int> array = baos.toByteArray();
-    CPPUNIT_ASSERT_MESSAGE( "Wrote incorrect bytes",
-                            string("t") == string( (const char*)array.first, array.second ) );
+    ASSERT_TRUE(string("t") == string( (const char*)array.first, array.second )) << ("Wrote incorrect bytes");
     delete [] array.first;
 }
 
@@ -104,8 +100,7 @@ void ByteArrayOutputStreamTest::testWrite2() {
     ByteArrayOutputStream baos;
     baos.write( (unsigned char*)&testString[0], (int)testString.size(), 0, 100 );
     std::pair<const unsigned char*, int> array = baos.toByteArray();
-    CPPUNIT_ASSERT_MESSAGE("Wrote incorrect bytes",
-            string((const char*)array.first, array.second ) == testString.substr(0, 100) );
+    ASSERT_TRUE(string((const char*)array.first, array.second ) == testString.substr(0, 100)) << ("Wrote incorrect bytes");
     delete [] array.first;
 }
 
@@ -114,8 +109,7 @@ void ByteArrayOutputStreamTest::testWrite3() {
     ByteArrayOutputStream baos;
     baos.write( (unsigned char*)&testString[0], (int)testString.size(), 50, 100 );
     std::pair<const unsigned char*, int> array = baos.toByteArray();
-    CPPUNIT_ASSERT_MESSAGE("Wrote incorrect bytes",
-            string((const char*)array.first, array.second ) == testString.substr(50, 100) );
+    ASSERT_TRUE(string((const char*)array.first, array.second ) == testString.substr(50, 100)) << ("Wrote incorrect bytes");
     delete [] array.first;
 }
 
@@ -125,8 +119,7 @@ void ByteArrayOutputStreamTest::testWriteToDecaf_io_OutputStream() {
     ByteArrayOutputStream baos2;
     baos1.write( (unsigned char*)&testString[0], (int)testString.size(), 0, 100 );
     baos1.writeTo( &baos2 );
-    CPPUNIT_ASSERT_MESSAGE( "Returned incorrect String",
-                            baos2.toString() == testString.substr(0, 100) );
+    ASSERT_TRUE(baos2.toString() == testString.substr(0, 100)) << ("Returned incorrect String");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -138,19 +131,19 @@ void ByteArrayOutputStreamTest::testStream()
     stream_a.write(60);
     stream_a.write('c');
 
-    CPPUNIT_ASSERT( stream_a.size() == 3 );
+    ASSERT_TRUE(stream_a.size() == 3);
 
     stream_a.reset();
 
-    CPPUNIT_ASSERT( stream_a.size() == 0 );
+    ASSERT_TRUE(stream_a.size() == 0);
 
     stream_a.write((const unsigned char*)("abc"), 3, 0, 3);
 
-    CPPUNIT_ASSERT( stream_a.size() == 3 );
+    ASSERT_TRUE(stream_a.size() == 3);
 
     stream_a.reset();
 
-    CPPUNIT_ASSERT( stream_a.size() == 0 );
+    ASSERT_TRUE(stream_a.size() == 0);
 
     stream_a.write((const unsigned char*)("abc"), 3, 0, 3);
 
@@ -161,5 +154,5 @@ void ByteArrayOutputStreamTest::testStream()
     memcpy(buffer, array.first, array.second );
     delete [] array.first;
 
-    CPPUNIT_ASSERT( std::string((const char*)buffer) == std::string("abc") );
+    ASSERT_TRUE(std::string((const char*)buffer) == std::string("abc"));
 }

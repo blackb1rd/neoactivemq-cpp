@@ -44,23 +44,23 @@ namespace {
             try{
                 IdGenerator idGen;
 
-                CPPUNIT_ASSERT( idGen.generateId() != "" );
-                CPPUNIT_ASSERT( idGen.generateId() != "" );
+                ASSERT_TRUE(idGen.generateId() != "");
+                ASSERT_TRUE(idGen.generateId() != "");
 
                 std::string id1 = idGen.generateId();
                 std::string id2 = idGen.generateId();
 
-                CPPUNIT_ASSERT( id1 != id2 );
+                ASSERT_TRUE(id1 != id2);
 
                 std::size_t idPos = id1.find("ID:");
 
-                CPPUNIT_ASSERT( idPos == 0 );
+                ASSERT_TRUE(idPos == 0);
 
                 std::size_t firstColon = id1.find(':');
                 std::size_t lastColon = id1.rfind(':');
 
-                CPPUNIT_ASSERT( firstColon != lastColon );
-                CPPUNIT_ASSERT( ( lastColon - firstColon ) > 1 );
+                ASSERT_TRUE(firstColon != lastColon);
+                ASSERT_TRUE(( lastColon - firstColon ) > 1);
             }
             catch(...) {
                 failed = true;
@@ -84,8 +84,8 @@ void IdGeneratorTest::testConstructor1() {
 
     IdGenerator idGen;
 
-    CPPUNIT_ASSERT( idGen.generateId() != "" );
-    CPPUNIT_ASSERT( idGen.generateId() != "" );
+    ASSERT_TRUE(idGen.generateId() != "");
+    ASSERT_TRUE(idGen.generateId() != "");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ void IdGeneratorTest::testConstructor2() {
     std::string id = idGen.generateId();
     std::size_t pos = id.find( "TEST-PREFIX" );
 
-    CPPUNIT_ASSERT( pos != std::string::npos );
+    ASSERT_TRUE(pos != std::string::npos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,9 +107,9 @@ void IdGeneratorTest::testCompare() {
     std::string id1 = idGen.generateId();
     std::string id2 = idGen.generateId();
 
-    CPPUNIT_ASSERT( IdGenerator::compare( id1, id1 ) == 0 );
-    CPPUNIT_ASSERT( IdGenerator::compare( id1, id2 ) < 0 );
-    CPPUNIT_ASSERT( IdGenerator::compare( id2, id1 ) > 0 );
+    ASSERT_TRUE(IdGenerator::compare( id1, id1 ) == 0);
+    ASSERT_TRUE(IdGenerator::compare( id1, id2 ) < 0);
+    ASSERT_TRUE(IdGenerator::compare( id2, id1 ) > 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,5 +140,5 @@ void IdGeneratorTest::testThreadSafety() {
         delete threads[i];
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "One of the Thread Tester failed", !failed );
+    ASSERT_TRUE(!failed) << ("One of the Thread Tester failed");
 }

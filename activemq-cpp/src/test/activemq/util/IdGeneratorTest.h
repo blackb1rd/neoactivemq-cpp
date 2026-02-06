@@ -18,22 +18,12 @@
 #ifndef _ACTIVEMQ_UTIL_IDGENERATORTEST_H_
 #define _ACTIVEMQ_UTIL_IDGENERATORTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace util {
 
-    class IdGeneratorTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( IdGeneratorTest );
-        CPPUNIT_TEST( testConstructor1 );
-        CPPUNIT_TEST( testConstructor2 );
-        CPPUNIT_TEST( testCompare );
-        CPPUNIT_TEST( testThreadSafety );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class IdGeneratorTest : public ::testing::Test {
+public:
 
         IdGeneratorTest();
         virtual ~IdGeneratorTest();

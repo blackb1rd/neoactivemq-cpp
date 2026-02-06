@@ -27,7 +27,7 @@ DataOutputStreamBenchmark::DataOutputStreamBenchmark() : testString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamBenchmark::setUp() {
+void DataOutputStreamBenchmark::SetUp() {
 
     for (size_t i = 0; i < 8096; ++i) {
         testString += 'a';

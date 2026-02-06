@@ -18,9 +18,7 @@
 #ifndef _DECAF_INTERNAL_UTIL_CONCURRENT_TRANSFERQUEUETEST_H_
 #define _DECAF_INTERNAL_UTIL_CONCURRENT_TRANSFERQUEUETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/util/Config.h>
 
 namespace decaf {
@@ -28,13 +26,8 @@ namespace internal {
 namespace util {
 namespace concurrent {
 
-    class TransferQueueTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( TransferQueueTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class TransferQueueTest : public ::testing::Test {
+public:
 
         TransferQueueTest();
         virtual ~TransferQueueTest();

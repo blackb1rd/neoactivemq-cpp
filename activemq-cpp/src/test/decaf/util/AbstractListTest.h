@@ -18,25 +18,12 @@
 #ifndef _DECAF_UTIL_ABSTRACTLISTTEST_H_
 #define _DECAF_UTIL_ABSTRACTLISTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 
-    class AbstractListTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( AbstractListTest );
-        CPPUNIT_TEST( testIterator );
-        CPPUNIT_TEST( testListIterator );
-        CPPUNIT_TEST( testIteratorNext );
-        CPPUNIT_TEST( testRemove );
-        CPPUNIT_TEST( testIndexOf );
-        CPPUNIT_TEST( testLastIndexOf );
-        CPPUNIT_TEST( testRemoveAt );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class AbstractListTest : public ::testing::Test {
+public:
 
         AbstractListTest();
         virtual ~AbstractListTest();

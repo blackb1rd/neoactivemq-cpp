@@ -83,8 +83,8 @@ void CompositeTaskRunnerTest::test() {
         }
     }
 
-    CPPUNIT_ASSERT(task1.getCount() == 100);
-    CPPUNIT_ASSERT(task2.getCount() == 200);
+    ASSERT_TRUE(task1.getCount() == 100);
+    ASSERT_TRUE(task2.getCount() == 200);
 
     runner.removeTask(&task1);
     runner.removeTask(&task2);
@@ -93,7 +93,7 @@ void CompositeTaskRunnerTest::test() {
 ////////////////////////////////////////////////////////////////////////////////
 void CompositeTaskRunnerTest::testCreateButNotStarted() {
     Pointer<CompositeTaskRunner> runner(new CompositeTaskRunner);
-    CPPUNIT_ASSERT(!runner->isStarted());
+    ASSERT_TRUE(!runner->isStarted());
     runner->start();
     runner->shutdown();
     runner.reset(NULL);

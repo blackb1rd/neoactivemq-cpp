@@ -15,23 +15,13 @@
  * limitations under the License.
  */
 
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/ui/text/TestRunner.h>
-#include <cppunit/TestListener.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/Outputter.h>
-#include <cppunit/XmlOutputter.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/TestResult.h>
+#include <gtest/gtest.h>
 #include <util/teamcity/TeamCityProgressListener.h>
 #include <util/TestWatchdog.h>
 #include <activemq/util/Config.h>
 #include <activemq/util/AMQLog.h>
 #include <activemq/library/ActiveMQCPP.h>
-#include <decaf/lang/Runtime.h>
-#include <decaf/lang/Integer.h>
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <memory>
 
@@ -47,101 +37,64 @@ int main( int argc, char **argv ) {
     // Logs will be formatted and printed only on failure/timeout (lazy formatting)
     activemq::util::AMQLogger::setRecordOnlyMode(true);
 
-    bool wasSuccessful = false;
-    std::ofstream outputFile;
-    bool useXMLOutputter = false;
-    std::string testPath = "";
     long long testTimeoutSeconds = 300; // Per-test timeout: 5 minutes default
-    std::unique_ptr<CppUnit::TestListener> listener( new CppUnit::BriefTestProgressListener );
+    bool useTeamCity = false;
 
-    if( argc > 1 ) {
-        for( int i = 1; i < argc; ++i ) {
-            const std::string arg( argv[i] );
-            if( arg == "-teamcity" ) {
-                listener.reset( new test::util::teamcity::TeamCityProgressListener() );
-            } else if( arg == "-quiet" ) {
-                listener.reset( NULL );
-            } else if( arg == "-xml" ) {
-                if( ( i + 1 ) >= argc ) {
-                    std::cout << "-xml requires a filename to be specified" << std::endl;
-                    return -1;
-                }
+    // Let GTest parse --gtest_* flags first
+    ::testing::InitGoogleTest(&argc, argv);
 
-                std::ofstream outputFile( argv[++i] );
-                useXMLOutputter = true;
-            } else if( arg == "-test" ) {
-                if( ( i + 1 ) >= argc ) {
-                    std::cout << "-test requires a test name or path to be specified" << std::endl;
+    // Parse custom flags
+    for( int i = 1; i < argc; ++i ) {
+        const std::string arg( argv[i] );
+        if( arg == "-teamcity" ) {
+            useTeamCity = true;
+        } else if( arg == "-test-timeout" ) {
+            if( ( i + 1 ) >= argc ) {
+                std::cout << "-test-timeout requires a timeout value in seconds" << std::endl;
+                return -1;
+            }
+            try {
+                testTimeoutSeconds = std::stoll( argv[++i] );
+                if( testTimeoutSeconds < 0 ) {
+                    std::cout << "Timeout value must be positive" << std::endl;
                     return -1;
                 }
-                testPath = argv[++i];
-            } else if( arg == "-test-timeout" ) {
-                if( ( i + 1 ) >= argc ) {
-                    std::cout << "-test-timeout requires a timeout value in seconds" << std::endl;
-                    return -1;
-                }
-                try {
-                    testTimeoutSeconds = std::stoll( argv[++i] );
-                    if( testTimeoutSeconds < 0 ) {
-                        std::cout << "Timeout value must be positive" << std::endl;
-                        return -1;
-                    }
-                } catch( std::exception& ex ) {
-                    std::cout << "Invalid timeout value specified on command line: "
-                              << argv[i] << std::endl;
-                    return -1;
-                }
-            } else if( arg == "-help" || arg == "--help" || arg == "-h" ) {
-                std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
-                std::cout << "Options:" << std::endl;
-                std::cout << "  -test <name>       Run specific test or test suite" << std::endl;
-                std::cout << "  -test-timeout <s>  Per-test timeout in seconds (default: 300)" << std::endl;
-                std::cout << "  -teamcity          Use TeamCity progress listener" << std::endl;
-                std::cout << "  -quiet             Suppress test progress output" << std::endl;
-                std::cout << "  -xml <file>        Output results in XML format" << std::endl;
-                std::cout << "  -help, --help, -h  Show this help message" << std::endl;
-                activemq::library::ActiveMQCPP::shutdownLibrary();
-                return 0;
+            } catch( std::exception& ex ) {
+                std::cout << "Invalid timeout value specified on command line: "
+                          << argv[i] << std::endl;
+                return -1;
             }
         }
     }
 
+    // Configure GTest event listeners
+    auto& listeners = ::testing::UnitTest::GetInstance()->listeners();
+
+    if( useTeamCity ) {
+        delete listeners.Release( listeners.default_result_printer() );
+        listeners.Append( new test::util::teamcity::TeamCityProgressListener() );
+    }
+
+    // Add watchdog listener for per-test timeout (0 = disabled)
+    std::unique_ptr<test::util::TestWatchdog> watchdog;
+    if( testTimeoutSeconds > 0 ) {
+        watchdog.reset( new test::util::TestWatchdog( testTimeoutSeconds, true, "Integration test" ) );
+        listeners.Append( watchdog.get() );
+    }
+
+    int result;
+
     try {
-
-        CppUnit::TextUi::TestRunner runner;
-        CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
-        runner.addTest( registry.makeTest() );
-
-        // Shows a message as each test starts
-        if( listener.get() != NULL ) {
-            runner.eventManager().addListener( listener.get() );
-        }
-
-        // Add watchdog listener for per-test timeout (0 = disabled)
-        std::unique_ptr<test::util::TestWatchdog> watchdog;
-        if( testTimeoutSeconds > 0 ) {
-            watchdog.reset( new test::util::TestWatchdog( testTimeoutSeconds, true, "Integration test" ) );
-            runner.eventManager().addListener( watchdog.get() );
-        }
-
-        // Specify XML output and inform the test runner of this format.  The TestRunner
-        // will delete the passed XmlOutputter for us.
-        if( useXMLOutputter ) {
-            runner.setOutputter( new CppUnit::XmlOutputter( &runner.result(), outputFile ) );
-        } else {
-            // Use CompilerOutputter for better error formatting with stack traces
-            runner.setOutputter( new CppUnit::CompilerOutputter( &runner.result(), std::cerr ) );
-        }
-
-        wasSuccessful = runner.run( testPath, false );
+        result = RUN_ALL_TESTS();
 
         // Shutdown watchdog before checking results
         if( watchdog ) {
             watchdog->shutdown();
+            listeners.Release( watchdog.get() );
         }
 
         // If tests failed, dump flight recorder
-        if( !wasSuccessful ) {
+        if( result != 0 ) {
             std::cerr << std::endl << "ERROR: Test execution failed" << std::endl;
 
             // Dump Flight Recorder log entries for debugging
@@ -151,16 +104,12 @@ int main( int argc, char **argv ) {
             std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
         }
 
-        if( useXMLOutputter ) {
-            outputFile.close();
-        }
-
         // Shutdown Flight Recorder
         activemq::util::AMQLogger::shutdownFlightRecorder();
 
         activemq::library::ActiveMQCPP::shutdownLibrary();
 
-        return !wasSuccessful;
+        return result;
     }
     catch(...) {
         std::cout << "----------------------------------------" << std::endl;
@@ -182,4 +131,3 @@ int main( int argc, char **argv ) {
 
     return -1;
 }
-

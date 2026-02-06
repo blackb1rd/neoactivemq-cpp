@@ -18,21 +18,14 @@
 #ifndef _DECAF_NET_URLDECODERTEST_H_
 #define _DECAF_NET_URLDECODERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/net/URLDecoder.h>
 
 namespace decaf {
 namespace net {
 
-    class URLDecoderTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( URLDecoderTest );
-        CPPUNIT_TEST( testDecode );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class URLDecoderTest : public ::testing::Test {
+public:
 
         URLDecoderTest();
         virtual ~URLDecoderTest() {}

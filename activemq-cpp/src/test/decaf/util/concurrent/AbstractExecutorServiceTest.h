@@ -26,21 +26,7 @@ namespace concurrent {
 
     class AbstractExecutorServiceTest : public ExecutorsTestSupport
     {
-        CPPUNIT_TEST_SUITE( AbstractExecutorServiceTest );
-        CPPUNIT_TEST( testExecuteRunnable );
-        CPPUNIT_TEST( testSubmitCallable );
-        CPPUNIT_TEST( testSubmitRunnable );
-        CPPUNIT_TEST( testSubmitRunnable2 );
-        CPPUNIT_TEST( testExecuteNullRunnable );
-        CPPUNIT_TEST( testSubmitNullCallable );
-        CPPUNIT_TEST( testExecute1 );
-        CPPUNIT_TEST( testExecute2 );
-        CPPUNIT_TEST( testInterruptedSubmit );
-        CPPUNIT_TEST( testSubmitIE );
-        CPPUNIT_TEST( testSubmitEE );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         AbstractExecutorServiceTest();
         virtual ~AbstractExecutorServiceTest();

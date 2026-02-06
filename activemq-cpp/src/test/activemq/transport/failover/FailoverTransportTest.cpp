@@ -64,19 +64,19 @@ void FailoverTransportTest::testTransportCreate() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
 
     transport->start();
 
     Thread::sleep(1000);
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
 
     transport->close();
 }
@@ -90,20 +90,20 @@ void FailoverTransportTest::testTransportCreateWithBackups() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
-    CPPUNIT_ASSERT(failover->isBackup() == true);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
+    ASSERT_TRUE(failover->isBackup() == true);
 
     transport->start();
 
     Thread::sleep(1000);
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
 
     transport->close();
 }
@@ -131,22 +131,22 @@ void FailoverTransportTest::testTransportCreateFailOnCreate() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->getMaxReconnectAttempts() == 3);
-    CPPUNIT_ASSERT(failover->getStartupMaxReconnectAttempts() == 3);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->getMaxReconnectAttempts() == 3);
+    ASSERT_TRUE(failover->getStartupMaxReconnectAttempts() == 3);
 
     transport->start();
 
     Thread::sleep(1000);
 
-    CPPUNIT_ASSERT(listener.caughtException == true);
-    CPPUNIT_ASSERT(failover->isConnected() == false);
+    ASSERT_TRUE(listener.caughtException == true);
+    ASSERT_TRUE(failover->isConnected() == false);
 
     transport->close();
 }
@@ -163,21 +163,21 @@ void FailoverTransportTest::testTransportCreateFailOnCreateSendMessage() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->getMaxReconnectAttempts() == 3);
-    CPPUNIT_ASSERT(failover->getStartupMaxReconnectAttempts() == 3);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->getMaxReconnectAttempts() == 3);
+    ASSERT_TRUE(failover->getStartupMaxReconnectAttempts() == 3);
 
     transport->start();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE("Should Throw a IOException", transport->oneway(message), IOException);
+    ASSERT_THROW(transport->oneway(message), IOException) << ("Should Throw a IOException");
 
-    CPPUNIT_ASSERT(listener.caughtException == true);
+    ASSERT_TRUE(listener.caughtException == true);
 
     transport->close();
 }
@@ -192,20 +192,20 @@ void FailoverTransportTest::testFailingBackupCreation() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
-    CPPUNIT_ASSERT(failover->isBackup() == true);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
+    ASSERT_TRUE(failover->isBackup() == true);
 
     transport->start();
 
     Thread::sleep(2000);
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
 
     transport->close();
 }
@@ -236,19 +236,19 @@ void FailoverTransportTest::testSendOnewayMessage() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
 
     transport->start();
 
     Thread::sleep(1000);
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
 
     MockTransport* mock = NULL;
     while (mock == NULL) {
@@ -262,7 +262,7 @@ void FailoverTransportTest::testSendOnewayMessage() {
 
     Thread::sleep(2000);
 
-    CPPUNIT_ASSERT(messageCounter.numMessages = numMessages);
+    ASSERT_TRUE(messageCounter.numMessages = numMessages);
 
     transport->close();
 }
@@ -279,19 +279,19 @@ void FailoverTransportTest::testSendRequestMessage() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
 
     transport->start();
 
     Thread::sleep(1000);
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
 
     MockTransport* mock = NULL;
     while (mock == NULL) {
@@ -305,7 +305,7 @@ void FailoverTransportTest::testSendRequestMessage() {
     transport->request(message);
     Thread::sleep(1000);
 
-    CPPUNIT_ASSERT(messageCounter.numMessages = 4);
+    ASSERT_TRUE(messageCounter.numMessages = 4);
 
     transport->close();
 }
@@ -323,19 +323,19 @@ void FailoverTransportTest::testSendOnewayMessageFail() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
 
     transport->start();
 
     Thread::sleep(1000);
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
 
     MockTransport* mock = NULL;
     while (mock == NULL) {
@@ -349,7 +349,7 @@ void FailoverTransportTest::testSendOnewayMessageFail() {
     transport->oneway(message);
     Thread::sleep(1000);
 
-    CPPUNIT_ASSERT(messageCounter.numMessages = 4);
+    ASSERT_TRUE(messageCounter.numMessages = 4);
 
     transport->close();
 }
@@ -367,19 +367,19 @@ void FailoverTransportTest::testSendRequestMessageFail() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
 
     transport->start();
 
     Thread::sleep(1000);
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
 
     MockTransport* mock = NULL;
     while (mock == NULL) {
@@ -393,7 +393,7 @@ void FailoverTransportTest::testSendRequestMessageFail() {
     transport->request(message);
     Thread::sleep(1000);
 
-    CPPUNIT_ASSERT(messageCounter.numMessages = 4);
+    ASSERT_TRUE(messageCounter.numMessages = 4);
 
     transport->close();
 }
@@ -407,19 +407,19 @@ void FailoverTransportTest::testWithOpewireCommands() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
 
     transport->start();
 
     Thread::sleep(1000);
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
 
     Pointer<ConnectionInfo> connection = createConnection();
     transport->request(connection);
@@ -555,7 +555,7 @@ void FailoverTransportTest::testTransportHandlesConnectionControl() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
@@ -563,13 +563,13 @@ void FailoverTransportTest::testTransportHandlesConnectionControl() {
 
     failover->setUpdateURIsSupported(true);
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
 
     transport->start();
 
     Thread::sleep(3000);
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
 
     MockTransport* mock = NULL;
     while (mock == NULL) {
@@ -592,7 +592,7 @@ void FailoverTransportTest::testTransportHandlesConnectionControl() {
         mock = dynamic_cast<MockTransport*>(transport->narrow(typeid(MockTransport)));
     }
 
-    CPPUNIT_ASSERT_EQUAL(std::string("Reconnect"), mock->getName());
+    ASSERT_EQ(std::string("Reconnect"), mock->getName());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -605,21 +605,21 @@ void FailoverTransportTest::testPriorityBackupConfig() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
-    CPPUNIT_ASSERT(failover->isPriorityBackup() == true);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
+    ASSERT_TRUE(failover->isPriorityBackup() == true);
 
     transport->start();
 
     Thread::sleep(1000);
-    CPPUNIT_ASSERT(failover->isConnected() == true);
-    CPPUNIT_ASSERT(failover->isConnectedToPriority() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnectedToPriority() == true);
 
     transport->close();
 }
@@ -646,27 +646,27 @@ void FailoverTransportTest::testUriOptionsApplied() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == true);
-    CPPUNIT_ASSERT(failover->isPriorityBackup() == true);
-    CPPUNIT_ASSERT(failover->isUseExponentialBackOff() == false);
-    CPPUNIT_ASSERT(failover->getInitialReconnectDelay() == 222);
-    CPPUNIT_ASSERT(failover->getMaxReconnectAttempts() == 27);
-    CPPUNIT_ASSERT(failover->getStartupMaxReconnectAttempts() == 44);
-    CPPUNIT_ASSERT(failover->isBackup() == true);
-    CPPUNIT_ASSERT(failover->isTrackMessages() == false);
-    CPPUNIT_ASSERT(failover->getMaxCacheSize() == 16543217);
-    CPPUNIT_ASSERT(failover->isUpdateURIsSupported() == false);
-    CPPUNIT_ASSERT(failover->getMaxReconnectDelay() == 55555);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == true);
+    ASSERT_TRUE(failover->isPriorityBackup() == true);
+    ASSERT_TRUE(failover->isUseExponentialBackOff() == false);
+    ASSERT_TRUE(failover->getInitialReconnectDelay() == 222);
+    ASSERT_TRUE(failover->getMaxReconnectAttempts() == 27);
+    ASSERT_TRUE(failover->getStartupMaxReconnectAttempts() == 44);
+    ASSERT_TRUE(failover->isBackup() == true);
+    ASSERT_TRUE(failover->isTrackMessages() == false);
+    ASSERT_TRUE(failover->getMaxCacheSize() == 16543217);
+    ASSERT_TRUE(failover->isUpdateURIsSupported() == false);
+    ASSERT_TRUE(failover->getMaxReconnectDelay() == 55555);
 
     const List<URI>& priorityUris = failover->getPriorityURIs();
-    CPPUNIT_ASSERT(priorityUris.size() == 2);
+    ASSERT_TRUE(priorityUris.size() == 2);
 
     transport->close();
 }
@@ -687,13 +687,13 @@ void FailoverTransportTest::testConnectedToMockBroker() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
+    ASSERT_TRUE(failover != NULL);
 
     transport->start();
 
@@ -704,8 +704,8 @@ void FailoverTransportTest::testConnectedToMockBroker() {
     while (!failover->isConnected() && count++ < 100) {
         Thread::sleep(200);
     }
-    CPPUNIT_ASSERT(failover->isConnected() == true);
-    CPPUNIT_ASSERT(failover->isConnectedToPriority() == false);
+    ASSERT_TRUE(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnectedToPriority() == false);
 
     transport->close();
 
@@ -722,18 +722,18 @@ void FailoverTransportTest::testMaxReconnectsZeroAttemptsOneConnect() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
+    ASSERT_TRUE(failover != NULL);
 
     transport->start();
 
     Thread::sleep(1000);
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
 
     transport->close();
 }
@@ -754,21 +754,20 @@ void FailoverTransportTest::testMaxReconnectsHonorsConfiguration() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
 
     transport->start();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE("Send should have failed after max connect attempts of two",
-            transport->oneway(info), Exception);
+    ASSERT_THROW(transport->oneway(info), Exception) << ("Send should have failed after max connect attempts of two");
 
-    CPPUNIT_ASSERT(failover->isConnected() == false);
+    ASSERT_TRUE(failover->isConnected() == false);
 
     transport->close();
 }
@@ -789,14 +788,14 @@ void FailoverTransportTest::testStartupMaxReconnectsHonorsConfiguration() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
 
     transport->start();
 
@@ -804,10 +803,9 @@ void FailoverTransportTest::testStartupMaxReconnectsHonorsConfiguration() {
     // Add extra time to ensure the connection attempts have finished
     Thread::sleep(500);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE("Send should have failed after max connect attempts of two",
-            transport->oneway(info), Exception);
+    ASSERT_THROW(transport->oneway(info), Exception) << ("Send should have failed after max connect attempts of two");
 
-    CPPUNIT_ASSERT(failover->isConnected() == false);
+    ASSERT_TRUE(failover->isConnected() == false);
 
     transport->close();
 }
@@ -903,14 +901,14 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOnline() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
 
     transport->start();
 
@@ -919,7 +917,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOnline() {
     while (!failover->isConnected() && count++ < 75) {
         Thread::sleep(200);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to connect initially");
 
     // Stop broker1, should failover to broker2
     broker1->stop();
@@ -933,7 +931,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOnline() {
     while (!failover->isConnected() && count++ < 50) {
         Thread::sleep(200);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to reconnect", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to reconnect");
 
     transport->close();
     broker1->stop();
@@ -960,14 +958,14 @@ void FailoverTransportTest::testFailoverNoRandomizeBroker1OnlyOnline() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
 
     transport->start();
 
@@ -976,7 +974,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBroker1OnlyOnline() {
     while (!failover->isConnected() && count++ < 50) {
         Thread::sleep(200);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to connect to broker1", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to connect to broker1");
 
     // Stop broker1, should lose connection (broker2 still offline)
     broker1->stop();
@@ -994,7 +992,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBroker1OnlyOnline() {
     while (!failover->isConnected() && count++ < 50) {
         Thread::sleep(200);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to reconnect to broker2", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to reconnect to broker2");
 
     transport->close();
     broker1->stop();
@@ -1020,14 +1018,14 @@ void FailoverTransportTest::testFailoverNoRandomizeBroker2OnlyOnline() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
 
     transport->start();
 
@@ -1036,7 +1034,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBroker2OnlyOnline() {
     while (!failover->isConnected() && count++ < 50) {
         Thread::sleep(200);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to connect to broker2", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to connect to broker2");
 
     // Start broker1
     broker1->start();
@@ -1055,7 +1053,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBroker2OnlyOnline() {
     while (!failover->isConnected() && count++ < 50) {
         Thread::sleep(200);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to reconnect to broker1", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to reconnect to broker1");
 
     transport->close();
     broker1->stop();
@@ -1080,14 +1078,14 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker1ComesOnline
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
 
     transport->start();
 
@@ -1103,7 +1101,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker1ComesOnline
     while (!failover->isConnected() && count++ < 100) {
         Thread::sleep(100);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to connect to broker1", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to connect to broker1");
 
     transport->close();
     broker1->stop();
@@ -1128,14 +1126,14 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker2ComesOnline
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
 
     transport->start();
 
@@ -1151,7 +1149,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker2ComesOnline
     while (!failover->isConnected() && count++ < 100) {
         Thread::sleep(100);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to connect to broker2", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to connect to broker2");
 
     transport->close();
     broker1->stop();
@@ -1184,13 +1182,13 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOnline() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
+    ASSERT_TRUE(failover != NULL);
 
     transport->start();
 
@@ -1199,7 +1197,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOnline() {
     while (!failover->isConnected() && count++ < 200) {
         Thread::sleep(200);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to connect initially");
 
     // Stop broker1 (could be connected to either due to randomization)
     broker1->stop();
@@ -1214,7 +1212,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOnline() {
     while (!failover->isConnected() && count++ < 100) {
         Thread::sleep(200);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to remain connected after broker1 stop", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to remain connected after broker1 stop");
 
     transport->close();
     broker1->stop();
@@ -1253,13 +1251,13 @@ void FailoverTransportTest::testFailoverWithRandomizeBroker1OnlyOnline() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
+    ASSERT_TRUE(failover != NULL);
 
     transport->start();
 
@@ -1268,7 +1266,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBroker1OnlyOnline() {
     while (!failover->isConnected() && count++ < 50) {
         Thread::sleep(200);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to connect to broker1", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to connect to broker1");
 
     // Stop broker1
     broker1->stop();
@@ -1286,7 +1284,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBroker1OnlyOnline() {
     while (!failover->isConnected() && count++ < 100) {
         Thread::sleep(200);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to reconnect to broker2", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to reconnect to broker2");
 
     transport->close();
     broker1->stop();
@@ -1324,13 +1322,13 @@ void FailoverTransportTest::testFailoverWithRandomizeBroker2OnlyOnline() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
+    ASSERT_TRUE(failover != NULL);
 
     transport->start();
 
@@ -1339,7 +1337,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBroker2OnlyOnline() {
     while (!failover->isConnected() && count++ < 50) {
         Thread::sleep(200);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to connect to broker2", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to connect to broker2");
 
     // Start broker1
     broker1->start();
@@ -1358,7 +1356,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBroker2OnlyOnline() {
     while (!failover->isConnected() && count++ < 50) {
         Thread::sleep(200);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to reconnect to broker1", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to reconnect to broker1");
 
     transport->close();
     broker1->stop();
@@ -1382,13 +1380,13 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker1ComesOnli
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
+    ASSERT_TRUE(failover != NULL);
 
     transport->start();
 
@@ -1404,7 +1402,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker1ComesOnli
     while (!failover->isConnected() && count++ < 100) {
         Thread::sleep(100);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to connect to broker1", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to connect to broker1");
 
     transport->close();
     broker1->stop();
@@ -1428,13 +1426,13 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker2ComesOnli
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
+    ASSERT_TRUE(failover != NULL);
 
     transport->start();
 
@@ -1450,7 +1448,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker2ComesOnli
     while (!failover->isConnected() && count++ < 200) {
         Thread::sleep(100);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to connect to broker2", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to connect to broker2");
 
     transport->close();
     broker1->stop();
@@ -1478,34 +1476,34 @@ void FailoverTransportTest::testConnectedToPriorityOnFirstTryThenFailover() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
 
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
-    CPPUNIT_ASSERT(failover->isPriorityBackup() == true);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
+    ASSERT_TRUE(failover->isPriorityBackup() == true);
 
     transport->start();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to get reconnected in time", listener.awaitResumed());
+    ASSERT_TRUE(listener.awaitResumed()) << ("Failed to get reconnected in time");
     listener.reset();
 
-    CPPUNIT_ASSERT(failover->isConnected() == true);
-    CPPUNIT_ASSERT(failover->isConnectedToPriority() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnectedToPriority() == true);
 
     broker1->stop();
     broker1->waitUntilStopped();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to get interrupted in time", listener.awaitInterruption());
-    CPPUNIT_ASSERT_MESSAGE("Failed to get reconnected in time", listener.awaitResumed());
+    ASSERT_TRUE(listener.awaitInterruption()) << ("Failed to get interrupted in time");
+    ASSERT_TRUE(listener.awaitResumed()) << ("Failed to get reconnected in time");
     listener.reset();
 
-    CPPUNIT_ASSERT(failover->isConnected() == true);
-    CPPUNIT_ASSERT(failover->isConnectedToPriority() == false);
+    ASSERT_TRUE(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnectedToPriority() == false);
 
     transport->close();
 
@@ -1532,35 +1530,35 @@ void FailoverTransportTest::testConnectsToPriorityOnceStarted() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
 
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
-    CPPUNIT_ASSERT(failover->isPriorityBackup() == true);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
+    ASSERT_TRUE(failover->isPriorityBackup() == true);
 
     transport->start();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to get reconnected in time", listener.awaitResumed());
+    ASSERT_TRUE(listener.awaitResumed()) << ("Failed to get reconnected in time");
     listener.reset();
 
-    CPPUNIT_ASSERT(failover->isConnected() == true);
-    CPPUNIT_ASSERT(failover->isConnectedToPriority() == false);
+    ASSERT_TRUE(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnectedToPriority() == false);
 
     broker1->start();
     broker1->waitUntilStarted();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to get interrupted in time", listener.awaitInterruption());
+    ASSERT_TRUE(listener.awaitInterruption()) << ("Failed to get interrupted in time");
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to get reconnected in time", listener.awaitResumed());
+    ASSERT_TRUE(listener.awaitResumed()) << ("Failed to get reconnected in time");
     listener.reset();
 
-    CPPUNIT_ASSERT(failover->isConnected() == true);
-    CPPUNIT_ASSERT(failover->isConnectedToPriority() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnectedToPriority() == true);
 
     transport->close();
 
@@ -1592,23 +1590,23 @@ void FailoverTransportTest::testConnectsToPriorityAfterInitialBackupFails() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
-    CPPUNIT_ASSERT(failover->isPriorityBackup() == true);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
+    ASSERT_TRUE(failover->isPriorityBackup() == true);
 
     transport->start();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to get reconnected in time", listener.awaitResumed());
+    ASSERT_TRUE(listener.awaitResumed()) << ("Failed to get reconnected in time");
     listener.reset();
 
-    CPPUNIT_ASSERT(failover->isConnected() == true);
-    CPPUNIT_ASSERT(failover->isConnectedToPriority() == false);
+    ASSERT_TRUE(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnectedToPriority() == false);
 
     Thread::sleep(100);
 
@@ -1620,8 +1618,8 @@ void FailoverTransportTest::testConnectsToPriorityAfterInitialBackupFails() {
 
     for (int i = 0; i < 2; ++i) {
 
-        CPPUNIT_ASSERT_MESSAGE("Failed to get interrupted in time", listener.awaitInterruption());
-        CPPUNIT_ASSERT_MESSAGE("Failed to get reconnected in time", listener.awaitResumed());
+        ASSERT_TRUE(listener.awaitInterruption()) << ("Failed to get interrupted in time");
+        ASSERT_TRUE(listener.awaitResumed()) << ("Failed to get reconnected in time");
         listener.reset();
 
         URI connectedURI = URI(transport->getRemoteAddress());
@@ -1631,8 +1629,8 @@ void FailoverTransportTest::testConnectsToPriorityAfterInitialBackupFails() {
         }
     }
 
-    CPPUNIT_ASSERT(failover->isConnected() == true);
-    CPPUNIT_ASSERT(failover->isConnectedToPriority() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnectedToPriority() == true);
 
     transport->close();
 
@@ -1665,44 +1663,44 @@ void FailoverTransportTest::testPriorityBackupRapidSwitchingOnRestore() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
 
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
-    CPPUNIT_ASSERT(failover->isRandomize() == false);
-    CPPUNIT_ASSERT(failover->isPriorityBackup() == true);
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
+    ASSERT_TRUE(failover->isPriorityBackup() == true);
 
     transport->start();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to get reconnected in time", listener.awaitResumed());
+    ASSERT_TRUE(listener.awaitResumed()) << ("Failed to get reconnected in time");
     listener.reset();
 
-    CPPUNIT_ASSERT(failover->isConnected() == true);
-    CPPUNIT_ASSERT(failover->isConnectedToPriority() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnectedToPriority() == true);
 
     broker1->stop();
     broker1->waitUntilStopped();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to get interrupted in time", listener.awaitInterruption());
-    CPPUNIT_ASSERT_MESSAGE("Failed to get reconnected in time", listener.awaitResumed());
+    ASSERT_TRUE(listener.awaitInterruption()) << ("Failed to get interrupted in time");
+    ASSERT_TRUE(listener.awaitResumed()) << ("Failed to get reconnected in time");
     listener.reset();
 
-    CPPUNIT_ASSERT(failover->isConnected() == true);
-    CPPUNIT_ASSERT(failover->isConnectedToPriority() == false);
+    ASSERT_TRUE(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnectedToPriority() == false);
 
     broker1->start();
     broker1->waitUntilStarted();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to get interrupted in time", listener.awaitInterruption());
-    CPPUNIT_ASSERT_MESSAGE("Failed to get reconnected in time", listener.awaitResumed());
+    ASSERT_TRUE(listener.awaitInterruption()) << ("Failed to get interrupted in time");
+    ASSERT_TRUE(listener.awaitResumed()) << ("Failed to get reconnected in time");
     listener.reset();
 
-    CPPUNIT_ASSERT(failover->isConnected() == true);
-    CPPUNIT_ASSERT(failover->isConnectedToPriority() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnectedToPriority() == true);
 
     transport->close();
 
@@ -1734,14 +1732,14 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
 
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
+    ASSERT_TRUE(failover != NULL);
 
     transport->start();
 
@@ -1750,21 +1748,21 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     while (!failover->isConnected() && count++ < 100) {
         Thread::sleep(100);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Failed to connect initially");
 
     // Check initial broker states
     std::vector<activemq::transport::failover::BrokerStateInfo> initialStates = failover->getBrokerStates();
-    CPPUNIT_ASSERT_MESSAGE("Should have at least one broker tracked", !initialStates.empty());
+    ASSERT_TRUE(!initialStates.empty()) << ("Should have at least one broker tracked");
 
     bool hasConnectedBroker = false;
     for (const auto& state : initialStates) {
         if (state.status == activemq::transport::failover::BrokerStatus::CONNECTED) {
             hasConnectedBroker = true;
-            CPPUNIT_ASSERT_MESSAGE("Connected broker should have zero failures", state.failureCount == 0);
+            ASSERT_TRUE(state.failureCount == 0) << ("Connected broker should have zero failures");
             break;
         }
     }
-    CPPUNIT_ASSERT_MESSAGE("Should have one CONNECTED broker", hasConnectedBroker);
+    ASSERT_TRUE(hasConnectedBroker) << ("Should have one CONNECTED broker");
 
     // Stop broker1, should failover to broker2
     broker1->stop();
@@ -1785,12 +1783,11 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     }
 
     // Verify still connected (should have failed over to broker2)
-    CPPUNIT_ASSERT_MESSAGE("Should remain connected after broker1 stops (failed over to broker2)",
-                          failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Should remain connected after broker1 stops (failed over to broker2)");
 
     // Check broker states after failover from broker1 to broker2
     std::vector<activemq::transport::failover::BrokerStateInfo> afterBroker1Stop = failover->getBrokerStates();
-    CPPUNIT_ASSERT_MESSAGE("Should have broker states tracked", !afterBroker1Stop.empty());
+    ASSERT_TRUE(!afterBroker1Stop.empty()) << ("Should have broker states tracked");
 
     bool hasConnectedAfterFailover = false;
     for (const auto& state : afterBroker1Stop) {
@@ -1799,7 +1796,7 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
             break;
         }
     }
-    CPPUNIT_ASSERT_MESSAGE("Should have one CONNECTED broker after failover", hasConnectedAfterFailover);
+    ASSERT_TRUE(hasConnectedAfterFailover) << ("Should have one CONNECTED broker after failover");
 
     // Restart broker1 and wait for it to be ready
     broker1->start();
@@ -1827,12 +1824,11 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
     }
 
     // Verify still connected (should have failed over back to broker1)
-    CPPUNIT_ASSERT_MESSAGE("Should remain connected after broker2 stops (failed over to broker1)",
-                          failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Should remain connected after broker2 stops (failed over to broker1)");
 
     // Check final broker states - should show broker1 as CONNECTED
     std::vector<activemq::transport::failover::BrokerStateInfo> finalStates = failover->getBrokerStates();
-    CPPUNIT_ASSERT_MESSAGE("Should have broker states", !finalStates.empty());
+    ASSERT_TRUE(!finalStates.empty()) << ("Should have broker states");
 
     bool hasFinalConnectedBroker = false;
     for (const auto& state : finalStates) {
@@ -1841,7 +1837,7 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
             break;
         }
     }
-    CPPUNIT_ASSERT_MESSAGE("Should still have one CONNECTED broker at end", hasFinalConnectedBroker);
+    ASSERT_TRUE(hasFinalConnectedBroker) << ("Should still have one CONNECTED broker at end");
 
     transport->close();
 
@@ -1872,30 +1868,30 @@ void FailoverTransportTest::testBrokerRestartWithProperSync() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
 
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
+    ASSERT_TRUE(failover != NULL);
 
     transport->start();
 
     // Wait for initial connection using listener, not sleep
-    CPPUNIT_ASSERT_MESSAGE("Failed to connect initially", listener.awaitResumed());
+    ASSERT_TRUE(listener.awaitResumed()) << ("Failed to connect initially");
     listener.reset();
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
 
     // Stop broker1, should failover to broker2
     broker1->stop();
     broker1->waitUntilStopped();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to get interrupted", listener.awaitInterruption());
-    CPPUNIT_ASSERT_MESSAGE("Failed to reconnect", listener.awaitResumed());
+    ASSERT_TRUE(listener.awaitInterruption()) << ("Failed to get interrupted");
+    ASSERT_TRUE(listener.awaitResumed()) << ("Failed to reconnect");
     listener.reset();
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
 
     // Restart broker1 - wait for transport to be ready
     broker1->start();
@@ -1910,12 +1906,12 @@ void FailoverTransportTest::testBrokerRestartWithProperSync() {
     broker2->stop();
     broker2->waitUntilStopped();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to get interrupted after broker2 stop", listener.awaitInterruption());
-    CPPUNIT_ASSERT_MESSAGE("Failed to reconnect to broker1", listener.awaitResumed());
+    ASSERT_TRUE(listener.awaitInterruption()) << ("Failed to get interrupted after broker2 stop");
+    ASSERT_TRUE(listener.awaitResumed()) << ("Failed to reconnect to broker1");
     listener.reset();
 
     // Now we're guaranteed to be connected before checking
-    CPPUNIT_ASSERT_MESSAGE("Should be connected to broker1", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Should be connected to broker1");
 
     // Restart broker2
     broker2->start();
@@ -1925,7 +1921,7 @@ void FailoverTransportTest::testBrokerRestartWithProperSync() {
     Thread::sleep(3000);
 
     // Final check - we're still connected
-    CPPUNIT_ASSERT_MESSAGE("Should still be connected", failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true) << ("Should still be connected");
 
     transport->close();
 
@@ -1959,14 +1955,14 @@ void FailoverTransportTest::testFuzzyBrokerAvailability() {
     FailoverTransportFactory factory;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
 
     transport->setTransportListener(&listener);
 
     FailoverTransport* failover =
         dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
 
-    CPPUNIT_ASSERT(failover != NULL);
+    ASSERT_TRUE(failover != NULL);
 
     transport->start();
 
@@ -1975,10 +1971,10 @@ void FailoverTransportTest::testFuzzyBrokerAvailability() {
     while (!listener.awaitResumed() && retries++ < 3) {
         Thread::sleep(1000);
     }
-    CPPUNIT_ASSERT_MESSAGE("Failed to get reconnected in time", failover->isConnected());
+    ASSERT_TRUE(failover->isConnected()) << ("Failed to get reconnected in time");
     listener.reset();
 
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -2006,8 +2002,8 @@ void FailoverTransportTest::testFuzzyBrokerAvailability() {
                     broker1Running = false;
 
                     if (broker2Running) {
-                        CPPUNIT_ASSERT_MESSAGE("Failed to get interrupted in time", listener.awaitInterruption());
-                        CPPUNIT_ASSERT_MESSAGE("Failed to get reconnected in time", listener.awaitResumed());
+                        ASSERT_TRUE(listener.awaitInterruption()) << ("Failed to get interrupted in time");
+                        ASSERT_TRUE(listener.awaitResumed()) << ("Failed to get reconnected in time");
                         listener.reset();
                     }
                 }
@@ -2020,8 +2016,8 @@ void FailoverTransportTest::testFuzzyBrokerAvailability() {
                     broker2Running = false;
 
                     if (broker1Running) {
-                        CPPUNIT_ASSERT_MESSAGE("Failed to get interrupted in time", listener.awaitInterruption());
-                        CPPUNIT_ASSERT_MESSAGE("Failed to get reconnected in time", listener.awaitResumed());
+                        ASSERT_TRUE(listener.awaitInterruption()) << ("Failed to get interrupted in time");
+                        ASSERT_TRUE(listener.awaitResumed()) << ("Failed to get reconnected in time");
                         listener.reset();
                     }
                 }
@@ -2061,8 +2057,7 @@ void FailoverTransportTest::testFuzzyBrokerAvailability() {
                 Thread::sleep(100);
                 retries++;
             }
-            CPPUNIT_ASSERT_MESSAGE("Should be connected when at least one broker is online",
-                                   failover->isConnected());
+            ASSERT_TRUE(failover->isConnected()) << ("Should be connected when at least one broker is online");
         }
     }
 
@@ -2079,7 +2074,7 @@ void FailoverTransportTest::testFuzzyBrokerAvailability() {
     }
 
     Thread::sleep(1000);
-    CPPUNIT_ASSERT(failover->isConnected() == true);
+    ASSERT_TRUE(failover->isConnected() == true);
 
     transport->close();
 

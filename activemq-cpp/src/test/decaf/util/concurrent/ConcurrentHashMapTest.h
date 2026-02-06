@@ -18,20 +18,13 @@
 #ifndef _DECAF_UTIL_CONCURRENT_CONCURRENTHASHMAPTEST_H_
 #define _DECAF_UTIL_CONCURRENT_CONCURRENTHASHMAPTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 namespace concurrent {
 
-    class ConcurrentHashMapTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ConcurrentHashMapTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class ConcurrentHashMapTest : public ::testing::Test {
+public:
 
         ConcurrentHashMapTest();
         virtual ~ConcurrentHashMapTest();

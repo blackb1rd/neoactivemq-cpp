@@ -44,9 +44,7 @@ void OpenWireFormatTest::testProviderInfoInWireFormat() {
     Pointer<OpenWireFormat> myWireFormat =
             factory.createWireFormat(properties).dynamicCast<OpenWireFormat>();
 
-    CPPUNIT_ASSERT_EQUAL(meta.getCMSProviderName(),
-            myWireFormat->getPreferedWireFormatInfo()->getProperties().getString("ProviderName"));
-    CPPUNIT_ASSERT_EQUAL(meta.getProviderVersion(),
-            myWireFormat->getPreferedWireFormatInfo()->getProperties().getString("ProviderVersion"));
-    CPPUNIT_ASSERT(!myWireFormat->getPreferedWireFormatInfo()->getProperties().getString("PlatformDetails").empty());
+    ASSERT_EQ(meta.getCMSProviderName(), myWireFormat->getPreferedWireFormatInfo()->getProperties().getString("ProviderName"));
+    ASSERT_EQ(meta.getProviderVersion(), myWireFormat->getPreferedWireFormatInfo()->getProperties().getString("ProviderVersion"));
+    ASSERT_TRUE(!myWireFormat->getPreferedWireFormatInfo()->getProperties().getString("PlatformDetails").empty());
 }

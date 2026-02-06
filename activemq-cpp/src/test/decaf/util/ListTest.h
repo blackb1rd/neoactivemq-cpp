@@ -18,52 +18,13 @@
 #ifndef _DECAF_UTIL_LISTTEST_H_
 #define _DECAF_UTIL_LISTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf{
 namespace util{
 
-    class ListTest : public CppUnit::TestFixture
+    class ListTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( ListTest );
-        CPPUNIT_TEST( testConstructor1 );
-        CPPUNIT_TEST( testConstructor2 );
-        CPPUNIT_TEST( testConstructor3 );
-        CPPUNIT_TEST( testEquals );
-        CPPUNIT_TEST( testContains );
-        CPPUNIT_TEST( testIndexOf );
-        CPPUNIT_TEST( testLastIndexOf );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testCopy1 );
-        CPPUNIT_TEST( testCopy2 );
-        CPPUNIT_TEST( testSize );
-        CPPUNIT_TEST( testGet );
-        CPPUNIT_TEST( testSet );
-        CPPUNIT_TEST( testAdd );
-        CPPUNIT_TEST( testAdd2 );
-        CPPUNIT_TEST( testAdd3 );
-        CPPUNIT_TEST( testRemove );
-        CPPUNIT_TEST( testRemove2 );
-        CPPUNIT_TEST( testRemove3 );
-        CPPUNIT_TEST( testRemoveAt );
-        CPPUNIT_TEST( testIsEmpty );
-        CPPUNIT_TEST( testToArray );
-        CPPUNIT_TEST( testIterator );
-        CPPUNIT_TEST( testAddAll1 );
-        CPPUNIT_TEST( testAddAll2 );
-        CPPUNIT_TEST( testAddAll3 );
-        CPPUNIT_TEST( testAddAll4 );
-        CPPUNIT_TEST( testAddAll5 );
-        CPPUNIT_TEST( testAddAll6 );
-        CPPUNIT_TEST( testAddAll7 );
-        CPPUNIT_TEST( testAddAll8 );
-        CPPUNIT_TEST( testAddAll9 );
-        CPPUNIT_TEST( testListIterator1IndexOutOfBoundsException );
-        CPPUNIT_TEST( testListIterator2IndexOutOfBoundsException );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+private:
 
         static const int SIZE;
 

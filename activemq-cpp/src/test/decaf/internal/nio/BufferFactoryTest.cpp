@@ -34,9 +34,9 @@ using namespace decaf::nio;
 void BufferFactoryTest::testCreateByteBuffer1() {
 
     ByteBuffer* buffer = BufferFactory::createByteBuffer( 500 );
-    CPPUNIT_ASSERT( buffer != NULL );
-    CPPUNIT_ASSERT( buffer->capacity() == 500 );
-    CPPUNIT_ASSERT( buffer->isReadOnly() == false );
+    ASSERT_TRUE(buffer != NULL);
+    ASSERT_TRUE(buffer->capacity() == 500);
+    ASSERT_TRUE(buffer->isReadOnly() == false);
 
     delete buffer;
 }
@@ -47,11 +47,11 @@ void BufferFactoryTest::testCreateByteBuffer2() {
     std::vector<unsigned char> array;
     array.resize( 500 );
     ByteBuffer* buffer = BufferFactory::createByteBuffer( array );
-    CPPUNIT_ASSERT( buffer != NULL );
-    CPPUNIT_ASSERT( buffer->hasArray() == true );
-    CPPUNIT_ASSERT( buffer->array() == &array[0] );
-    CPPUNIT_ASSERT( buffer->capacity() == 500 );
-    CPPUNIT_ASSERT( buffer->isReadOnly() == false );
+    ASSERT_TRUE(buffer != NULL);
+    ASSERT_TRUE(buffer->hasArray() == true);
+    ASSERT_TRUE(buffer->array() == &array[0]);
+    ASSERT_TRUE(buffer->capacity() == 500);
+    ASSERT_TRUE(buffer->isReadOnly() == false);
 
     delete buffer;
 }
@@ -62,11 +62,11 @@ void BufferFactoryTest::testCreateByteBuffer3() {
     std::vector<unsigned char> array;
     array.resize( 500 );
     ByteBuffer* buffer = BufferFactory::createByteBuffer( &array[0], 500, 100, 400 );
-    CPPUNIT_ASSERT( buffer != NULL );
-    CPPUNIT_ASSERT( buffer->hasArray() == true );
-    CPPUNIT_ASSERT( buffer->array() == &array[0] );
-    CPPUNIT_ASSERT( buffer->capacity() == 400 );
-    CPPUNIT_ASSERT( buffer->isReadOnly() == false );
+    ASSERT_TRUE(buffer != NULL);
+    ASSERT_TRUE(buffer->hasArray() == true);
+    ASSERT_TRUE(buffer->array() == &array[0]);
+    ASSERT_TRUE(buffer->capacity() == 400);
+    ASSERT_TRUE(buffer->isReadOnly() == false);
 
     delete buffer;
 }

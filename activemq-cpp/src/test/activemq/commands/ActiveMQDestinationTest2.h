@@ -18,22 +18,14 @@
 #ifndef _ACTIVEMQ_COMMANDS_ACTIVEMQDESTINATIONTEST_H_
 #define _ACTIVEMQ_COMMANDS_ACTIVEMQDESTINATIONTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <activemq/commands/ActiveMQDestination.h>
 
 namespace activemq{
 namespace commands{
 
-    class ActiveMQDestinationTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ActiveMQDestinationTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( testOptions );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class ActiveMQDestinationTest : public ::testing::Test {
+public:
 
         ActiveMQDestinationTest() {}
         virtual ~ActiveMQDestinationTest() {}

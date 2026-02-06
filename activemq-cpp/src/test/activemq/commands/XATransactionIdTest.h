@@ -18,27 +18,12 @@
 #ifndef _ACTIVEMQ_COMMANDS_XATRANSACTIONIDTEST_H_
 #define _ACTIVEMQ_COMMANDS_XATRANSACTIONIDTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace commands {
 
-    class XATransactionIdTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( XATransactionIdTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testConstructor2 );
-        CPPUNIT_TEST( testEquals );
-        CPPUNIT_TEST( testClone );
-        CPPUNIT_TEST( testGetFormatId );
-        CPPUNIT_TEST( testGetBranchQualifier );
-        CPPUNIT_TEST( testGetGlobalTransactionId );
-        CPPUNIT_TEST( testGetBranchQualifier1 );
-        CPPUNIT_TEST( testGetGlobalTransactionId1 );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class XATransactionIdTest : public ::testing::Test {
+public:
 
         XATransactionIdTest();
         virtual ~XATransactionIdTest();

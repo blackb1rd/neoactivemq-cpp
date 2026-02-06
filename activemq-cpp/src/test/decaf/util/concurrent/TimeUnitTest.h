@@ -18,34 +18,13 @@
 #ifndef _DECAF_UTIL_CONCURRENT_TIMEUNITTEST_H_
 #define _DECAF_UTIL_CONCURRENT_TIMEUNITTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 namespace concurrent {
 
-    class TimeUnitTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( TimeUnitTest );
-        CPPUNIT_TEST( testConvert1 );
-        CPPUNIT_TEST( testConvert2 );
-        CPPUNIT_TEST( testToNanos );
-        CPPUNIT_TEST( testToMicros );
-        CPPUNIT_TEST( testToMillis );
-        CPPUNIT_TEST( testToSeconds );
-        CPPUNIT_TEST( testConvertSaturate );
-        CPPUNIT_TEST( testToNanosSaturate );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST( testTimedWait );
-        CPPUNIT_TEST( testSleep );
-        CPPUNIT_TEST( testToMinutes );
-        CPPUNIT_TEST( testToHours );
-        CPPUNIT_TEST( testToDays );
-        CPPUNIT_TEST( testValueOf );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class TimeUnitTest : public ::testing::Test {
+public:
 
         TimeUnitTest() {}
         virtual ~TimeUnitTest() {}

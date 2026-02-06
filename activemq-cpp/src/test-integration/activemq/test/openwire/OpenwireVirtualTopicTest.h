@@ -26,14 +26,7 @@ namespace openwire {
 
     class OpenwireVirtualTopicTest : public VirtualTopicTest {
     private:
-
-        CPPUNIT_TEST_SUITE( OpenwireVirtualTopicTest );
-        CPPUNIT_TEST( testVirtualTopicSyncReceiveAutoAck );
-        CPPUNIT_TEST( testVirtualTopicSyncReceiveClinetAck );
-        CPPUNIT_TEST( testVirtualTopicSyncReceiveTransacted );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireVirtualTopicTest();
         virtual ~OpenwireVirtualTopicTest();

@@ -24,7 +24,7 @@ using namespace activemq;
 using namespace activemq::cmsutil;
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsDestinationAccessorTest::setUp() {
+void CmsDestinationAccessorTest::SetUp() {
     cf = new DummyConnectionFactory();
     accessor = new MyAccessor();
     accessor->setConnectionFactory(cf);
@@ -32,7 +32,7 @@ void CmsDestinationAccessorTest::setUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsDestinationAccessorTest::tearDown() {
+void CmsDestinationAccessorTest::TearDown() {
     delete accessor;
     delete cf;
 }
@@ -44,25 +44,25 @@ void CmsDestinationAccessorTest::test() {
 
     // Create a queue destination
     cms::Destination* d = accessor->resolveDestinationName(&s, "hello");
-    CPPUNIT_ASSERT( d != NULL );
+    ASSERT_TRUE(d != NULL);
 
     // Make sure it's a queue.
     cms::Queue* queue1 = dynamic_cast<cms::Queue*>(d);
-    CPPUNIT_ASSERT( queue1 != NULL );
+    ASSERT_TRUE(queue1 != NULL);
 
     // Get the same queue again and make sure it's the same object
     d = accessor->resolveDestinationName(&s, "hello");
     cms::Queue* queue2 = dynamic_cast<cms::Queue*>(d);
-    CPPUNIT_ASSERT( queue2 == queue1 );
+    ASSERT_TRUE(queue2 == queue1);
 
     // Change type to topics
     accessor->setPubSubDomain(true);
-    CPPUNIT_ASSERT( accessor->isPubSubDomain() == true );
+    ASSERT_TRUE(accessor->isPubSubDomain() == true);
 
     // Get the same dest and make sure it's a topic.
     d = accessor->resolveDestinationName(&s, "hello");
     cms::Topic* topic1 = dynamic_cast<cms::Topic*>(d);
-    CPPUNIT_ASSERT( topic1 != NULL );
+    ASSERT_TRUE(topic1 != NULL);
 }
 
 

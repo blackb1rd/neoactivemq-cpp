@@ -319,7 +319,7 @@ namespace correlator {
                 resp = transport->request(cmd);
                 Thread::sleep(10);
             } catch (...) {
-                CPPUNIT_ASSERT(false);
+                ASSERT_TRUE(false);
             }
         }
     };
@@ -333,7 +333,7 @@ void ResponseCorrelatorTest::testBasics() {
     Pointer<MyTransport> transport(new MyTransport());
     ResponseCorrelator correlator(transport);
     correlator.setTransportListener(&listener);
-    CPPUNIT_ASSERT(transport->listener == &correlator);
+    ASSERT_TRUE(transport->listener == &correlator);
 
     // Give the thread a little time to get up and running.
     synchronized(&(transport->startedMutex)) {
@@ -345,8 +345,8 @@ void ResponseCorrelatorTest::testBasics() {
     // Send one request.
     Pointer<MyCommand> cmd(new MyCommand);
     Pointer<Response> resp = correlator.request(cmd);
-    CPPUNIT_ASSERT(resp != NULL);
-    CPPUNIT_ASSERT(resp->getCorrelationId() == cmd->getCommandId());
+    ASSERT_TRUE(resp != NULL);
+    ASSERT_TRUE(resp->getCorrelationId() == cmd->getCommandId());
 
     // Wait to get the message back asynchronously.
     decaf::lang::Thread::sleep(100);
@@ -354,8 +354,8 @@ void ResponseCorrelatorTest::testBasics() {
     // Since our transport relays our original command back at us as a
     // non-response message, check to make sure we received it and that
     // it is the original command.
-    CPPUNIT_ASSERT(listener.commands.size() == 1);
-    CPPUNIT_ASSERT(listener.exCount == 0);
+    ASSERT_TRUE(listener.commands.size() == 1);
+    ASSERT_TRUE(listener.exCount == 0);
 
     correlator.close();
 }
@@ -367,7 +367,7 @@ void ResponseCorrelatorTest::testOneway(){
     Pointer<MyTransport> transport(new MyTransport());
     ResponseCorrelator correlator(transport);
     correlator.setTransportListener(&listener);
-    CPPUNIT_ASSERT(transport->listener == &correlator);
+    ASSERT_TRUE(transport->listener == &correlator);
 
     // Give the thread a little time to get up and running.
     synchronized( &(transport->startedMutex) ) {
@@ -389,8 +389,8 @@ void ResponseCorrelatorTest::testOneway(){
     decaf::lang::Thread::sleep(500);
 
     // Make sure we got them all back.
-    CPPUNIT_ASSERT(listener.commands.size() == numCommands);
-    CPPUNIT_ASSERT(listener.exCount == 0);
+    ASSERT_TRUE(listener.commands.size() == numCommands);
+    ASSERT_TRUE(listener.exCount == 0);
 
     correlator.close();
 }
@@ -402,7 +402,7 @@ void ResponseCorrelatorTest::testTransportException(){
     Pointer<MyBrokenTransport> transport(new MyBrokenTransport());
     ResponseCorrelator correlator(transport);
     correlator.setTransportListener(&listener);
-    CPPUNIT_ASSERT(transport->listener == &correlator);
+    ASSERT_TRUE(transport->listener == &correlator);
 
     // Give the thread a little time to get up and running.
     synchronized( &(transport->startedMutex) ) {
@@ -417,7 +417,7 @@ void ResponseCorrelatorTest::testTransportException(){
     try {
         correlator.request(cmd, 1000);
     } catch (IOException& ex) {
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
     }
 
     // Wait to make sure we get the asynchronous message back.
@@ -426,8 +426,8 @@ void ResponseCorrelatorTest::testTransportException(){
     // Since our transport relays our original command back at us as a
     // non-response message, check to make sure we received it and that
     // it is the original command.
-    CPPUNIT_ASSERT(listener.commands.size() == 0);
-    CPPUNIT_ASSERT(listener.exCount == 1);
+    ASSERT_TRUE(listener.commands.size() == 0);
+    ASSERT_TRUE(listener.exCount == 1);
 
     correlator.close();
 }
@@ -439,13 +439,13 @@ void ResponseCorrelatorTest::testMultiRequests(){
     Pointer<MyTransport> transport(new MyTransport());
     ResponseCorrelator correlator(transport);
     correlator.setTransportListener(&listener);
-    CPPUNIT_ASSERT(transport->listener == &correlator);
+    ASSERT_TRUE(transport->listener == &correlator);
 
     // Start the transport.
     correlator.start();
 
     // Make sure the start command got down to the thread.
-    CPPUNIT_ASSERT(transport->thread != NULL);
+    ASSERT_TRUE(transport->thread != NULL);
 
     // Give the thread a little time to get up and running.
     synchronized( &(transport->startedMutex) ) {
@@ -464,8 +464,8 @@ void ResponseCorrelatorTest::testMultiRequests(){
     // what we expected.
     for (unsigned int ix = 0; ix < numRequests; ++ix) {
         requesters[ix].join();
-        CPPUNIT_ASSERT(requesters[ix].resp != NULL);
-        CPPUNIT_ASSERT(requesters[ix].cmd->getCommandId() ==
+        ASSERT_TRUE(requesters[ix].resp != NULL);
+        ASSERT_TRUE(requesters[ix].cmd->getCommandId() ==
                        requesters[ix].resp->getCorrelationId());
     }
 
@@ -487,8 +487,8 @@ void ResponseCorrelatorTest::testMultiRequests(){
     // Since our transport relays our original command back at us as a
     // non-response message, check to make sure we received it and that
     // it is the original command.
-    CPPUNIT_ASSERT(listener.commands.size() == numRequests);
-    CPPUNIT_ASSERT(listener.exCount == 0);
+    ASSERT_TRUE(listener.commands.size() == numRequests);
+    ASSERT_TRUE(listener.exCount == 0);
 
     correlator.close();
 }
@@ -500,17 +500,17 @@ void ResponseCorrelatorTest::testNarrow(){
     ResponseCorrelator correlator(transport);
 
     Transport* narrowed = correlator.narrow(typeid( *transport ));
-    CPPUNIT_ASSERT(narrowed == transport);
+    ASSERT_TRUE(narrowed == transport);
 
     narrowed = correlator.narrow(typeid(std::string()));
-    CPPUNIT_ASSERT(narrowed == NULL);
+    ASSERT_TRUE(narrowed == NULL);
 
     narrowed = correlator.narrow(typeid(MyTransport));
-    CPPUNIT_ASSERT(narrowed == transport);
+    ASSERT_TRUE(narrowed == transport);
 
     narrowed = correlator.narrow(typeid(transport::correlator::ResponseCorrelator));
-    CPPUNIT_ASSERT(narrowed == &correlator);
+    ASSERT_TRUE(narrowed == &correlator);
 
     narrowed = correlator.narrow(typeid( correlator ));
-    CPPUNIT_ASSERT(narrowed == &correlator);
+    ASSERT_TRUE(narrowed == &correlator);
 }

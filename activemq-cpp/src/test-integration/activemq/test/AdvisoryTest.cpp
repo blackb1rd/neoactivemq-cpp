@@ -78,13 +78,13 @@ void AdvisoryTest::testTempDestinationCompositeAdvisoryTopic() {
 
     std::unique_ptr<ConnectionFactory> factory(
         ConnectionFactory::createCMSConnectionFactory(getBrokerURL()));
-    CPPUNIT_ASSERT(factory.get() != NULL);
+    ASSERT_TRUE(factory.get() != NULL);
 
     std::unique_ptr<Connection> connection(factory->createConnection());
-    CPPUNIT_ASSERT(connection.get() != NULL);
+    ASSERT_TRUE(connection.get() != NULL);
 
     std::unique_ptr<Session> session(connection->createSession());
-    CPPUNIT_ASSERT(session.get() != NULL);
+    ASSERT_TRUE(session.get() != NULL);
 
     std::unique_ptr<ActiveMQDestination> composite(
         AdvisorySupport::getTempDestinationCompositeAdvisoryTopic());
@@ -103,9 +103,9 @@ void AdvisoryTest::testTempDestinationCompositeAdvisoryTopic() {
 
     // Should be an advisory for each
     std::unique_ptr<cms::Message> advisory1(consumer->receive(2000));
-    CPPUNIT_ASSERT(advisory1.get() != NULL);
+    ASSERT_TRUE(advisory1.get() != NULL);
     std::unique_ptr<cms::Message> advisory2(consumer->receive(2000));
-    CPPUNIT_ASSERT(advisory2.get() != NULL);
+    ASSERT_TRUE(advisory2.get() != NULL);
 
     ActiveMQMessage* tempTopicAdvisory = dynamic_cast<ActiveMQMessage*>(advisory1.get());
     ActiveMQMessage* tempQueueAdvisory = dynamic_cast<ActiveMQMessage*>(advisory2.get());
@@ -120,9 +120,9 @@ void AdvisoryTest::testTempDestinationCompositeAdvisoryTopic() {
 
     // Should not be an advisory for each
     std::unique_ptr<cms::Message> advisory3(consumer->receive(500));
-    CPPUNIT_ASSERT(advisory3.get() == NULL);
+    ASSERT_TRUE(advisory3.get() == NULL);
     std::unique_ptr<cms::Message> advisory4(consumer->receive(500));
-    CPPUNIT_ASSERT(advisory4.get() == NULL);
+    ASSERT_TRUE(advisory4.get() == NULL);
 
     connection->close();
 }

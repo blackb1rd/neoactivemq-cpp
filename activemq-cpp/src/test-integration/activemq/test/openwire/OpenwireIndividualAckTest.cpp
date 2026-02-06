@@ -54,7 +54,7 @@ void OpenwireIndividualAckTest::testAckedMessageAreConsumed() {
     // Consume the message...
     std::unique_ptr<MessageConsumer> consumer(session->createConsumer(queue.get()));
     std::unique_ptr<Message> msg(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() != NULL);
+    ASSERT_TRUE(msg.get() != NULL);
     msg->acknowledge();
 
     // Reset the session.
@@ -64,7 +64,7 @@ void OpenwireIndividualAckTest::testAckedMessageAreConsumed() {
     // Attempt to Consume the message...
     consumer.reset(session->createConsumer(queue.get()));
     msg.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() == NULL);
+    ASSERT_TRUE(msg.get() == NULL);
 
     session->close();
 }
@@ -90,11 +90,11 @@ void OpenwireIndividualAckTest::testLastMessageAcked() {
     // Consume the message...
     std::unique_ptr<MessageConsumer> consumer(session->createConsumer(queue.get()));
     std::unique_ptr<Message> msg(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() != NULL);
+    ASSERT_TRUE(msg.get() != NULL);
     msg.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() != NULL);
+    ASSERT_TRUE(msg.get() != NULL);
     msg.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() != NULL);
+    ASSERT_TRUE(msg.get() != NULL);
     msg->acknowledge();
 
     // Reset the session->
@@ -104,13 +104,13 @@ void OpenwireIndividualAckTest::testLastMessageAcked() {
     // Attempt to Consume the message...
     consumer.reset(session->createConsumer(queue.get()));
     msg.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() != NULL);
-    CPPUNIT_ASSERT(msg1->getText() == dynamic_cast<TextMessage*>(msg.get())->getText());
+    ASSERT_TRUE(msg.get() != NULL);
+    ASSERT_TRUE(msg1->getText() == dynamic_cast<TextMessage*>(msg.get())->getText());
     msg.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() != NULL);
-    CPPUNIT_ASSERT(msg2->getText() == dynamic_cast<TextMessage*>(msg.get())->getText());
+    ASSERT_TRUE(msg.get() != NULL);
+    ASSERT_TRUE(msg2->getText() == dynamic_cast<TextMessage*>(msg.get())->getText());
     msg.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() == NULL);
+    ASSERT_TRUE(msg.get() == NULL);
 
     session->close();
 }
@@ -131,7 +131,7 @@ void OpenwireIndividualAckTest::testUnAckedMessageAreNotConsumedOnSessionClose()
     // Consume the message...
     std::unique_ptr<MessageConsumer> consumer(session->createConsumer(queue.get()));
     std::unique_ptr<Message> msg(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() != NULL);
+    ASSERT_TRUE(msg.get() != NULL);
     // Don't ack the message.
 
     // Reset the session->  This should cause the unacknowledged message to be re-delivered.
@@ -141,7 +141,7 @@ void OpenwireIndividualAckTest::testUnAckedMessageAreNotConsumedOnSessionClose()
     // Attempt to Consume the message...
     consumer.reset(session->createConsumer(queue.get()));
     msg.reset(consumer->receive(2000));
-    CPPUNIT_ASSERT(msg.get() != NULL);
+    ASSERT_TRUE(msg.get() != NULL);
     msg->acknowledge();
 
     session->close();
@@ -167,13 +167,13 @@ void OpenwireIndividualAckTest::testIndividualAcknowledgeMultiMessages_Acknowled
 
     // Read the first message
     std::unique_ptr<Message> recvMsg1(consumer->receive(2000));
-    CPPUNIT_ASSERT(recvMsg1.get() != NULL);
-    CPPUNIT_ASSERT(msg1->getText() == dynamic_cast<TextMessage*>(recvMsg1.get())->getText());
+    ASSERT_TRUE(recvMsg1.get() != NULL);
+    ASSERT_TRUE(msg1->getText() == dynamic_cast<TextMessage*>(recvMsg1.get())->getText());
 
     // Read the second message
     std::unique_ptr<Message> recvMsg2(consumer->receive(2000));
-    CPPUNIT_ASSERT(recvMsg2.get() != NULL);
-    CPPUNIT_ASSERT(msg2->getText() == dynamic_cast<TextMessage*>(recvMsg2.get())->getText());
+    ASSERT_TRUE(recvMsg2.get() != NULL);
+    ASSERT_TRUE(msg2->getText() == dynamic_cast<TextMessage*>(recvMsg2.get())->getText());
 
     // Acknowledge first message
     recvMsg1->acknowledge();
@@ -183,12 +183,12 @@ void OpenwireIndividualAckTest::testIndividualAcknowledgeMultiMessages_Acknowled
     // Read first message a second time
     consumer.reset(session->createConsumer(queue.get()));
     std::unique_ptr<Message> recvMsg3(consumer->receive(2000));
-    CPPUNIT_ASSERT(recvMsg3.get() != NULL);
-    CPPUNIT_ASSERT(msg2->getText() == dynamic_cast<TextMessage*>(recvMsg3.get())->getText());
+    ASSERT_TRUE(recvMsg3.get() != NULL);
+    ASSERT_TRUE(msg2->getText() == dynamic_cast<TextMessage*>(recvMsg3.get())->getText());
 
     // Try to read second message a second time
     std::unique_ptr<Message> recvMsg4(consumer->receive(2000));
-    CPPUNIT_ASSERT(recvMsg4.get() == NULL);
+    ASSERT_TRUE(recvMsg4.get() == NULL);
 
     consumer->close();
 }
@@ -215,12 +215,12 @@ void OpenwireIndividualAckTest::testManyMessageAckedAfterMessageConsumption() {
 
     for (int i = 0; i < messageCount; i++) {
         msg.reset(consumer->receive(1000));
-        CPPUNIT_ASSERT(msg.get() != NULL);
+        ASSERT_TRUE(msg.get() != NULL);
         msg->acknowledge();
     }
 
     msg.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() == NULL);
+    ASSERT_TRUE(msg.get() == NULL);
 
     // Reset the session.
     session->close();
@@ -229,7 +229,7 @@ void OpenwireIndividualAckTest::testManyMessageAckedAfterMessageConsumption() {
     // Attempt to Consume the message...
     consumer.reset(session->createConsumer(queue.get()));
     msg.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() == NULL);
+    ASSERT_TRUE(msg.get() == NULL);
     session->close();
 }
 
@@ -257,7 +257,7 @@ void OpenwireIndividualAckTest::testManyMessageAckedAfterAllConsumption() {
 
     for (int i = 0; i < messageCount; i++) {
         Message* message = consumer->receive(1000);
-        CPPUNIT_ASSERT(message != NULL);
+        ASSERT_TRUE(message != NULL);
         consumedMessages.push_back(message);
     }
 
@@ -266,7 +266,7 @@ void OpenwireIndividualAckTest::testManyMessageAckedAfterAllConsumption() {
         delete consumedMessages[i];
     }
     msg.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() == NULL);
+    ASSERT_TRUE(msg.get() == NULL);
 
     // Reset the session.
     session->close();
@@ -275,7 +275,7 @@ void OpenwireIndividualAckTest::testManyMessageAckedAfterAllConsumption() {
     // Attempt to Consume the message...
     consumer.reset(session->createConsumer(queue.get()));
     msg.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() == NULL);
+    ASSERT_TRUE(msg.get() == NULL);
     session->close();
 }
 
@@ -286,7 +286,7 @@ void OpenwireIndividualAckTest::tesIndividualAcksWithClosedConsumerAndAudit() {
 
     std::unique_ptr<cms::ConnectionFactory> factory(
         ConnectionFactory::createCMSConnectionFactory(std::string("failover:") + getBrokerURL()));
-    CPPUNIT_ASSERT(factory.get() != NULL);
+    ASSERT_TRUE(factory.get() != NULL);
     std::unique_ptr<Connection> connection(factory->createConnection());
     connection->start();
 
@@ -304,7 +304,7 @@ void OpenwireIndividualAckTest::tesIndividualAcksWithClosedConsumerAndAudit() {
 
     for (int i = 0; i < messageCount; i++) {
         std::unique_ptr<Message> message(consumer->receive(1000));
-        CPPUNIT_ASSERT_MESSAGE("First pass consume failed unexpectedly.", message.get() != NULL);
+        ASSERT_TRUE(message.get() != NULL) << ("First pass consume failed unexpectedly.");
     }
 
     // Consume the messages again, they should all be delivered again.
@@ -313,7 +313,7 @@ void OpenwireIndividualAckTest::tesIndividualAcksWithClosedConsumerAndAudit() {
 
     for (int i = 0; i < messageCount; i++) {
         std::unique_ptr<Message> message(consumer->receive(1000));
-        CPPUNIT_ASSERT_MESSAGE("Second pass consume failed unexpectedly.", message.get() != NULL);
+        ASSERT_TRUE(message.get() != NULL) << ("Second pass consume failed unexpectedly.");
     }
 
     connection->close();

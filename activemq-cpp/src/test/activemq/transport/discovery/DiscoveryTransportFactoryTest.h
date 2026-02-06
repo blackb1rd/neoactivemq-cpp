@@ -18,27 +18,20 @@
 #ifndef _ACTIVEMQ_TRANSPORT_DISCOVERY_DISCOVERYTRANSPORTFACTORYTEST_H_
 #define _ACTIVEMQ_TRANSPORT_DISCOVERY_DISCOVERYTRANSPORTFACTORYTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace transport {
 namespace discovery {
 
-    class DiscoveryTransportFactoryTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( DiscoveryTransportFactoryTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class DiscoveryTransportFactoryTest : public ::testing::Test {
+public:
 
         DiscoveryTransportFactoryTest();
         virtual ~DiscoveryTransportFactoryTest();
 
         void test();
 
-        virtual void setUp();
+        void SetUp() override;
 
     };
 

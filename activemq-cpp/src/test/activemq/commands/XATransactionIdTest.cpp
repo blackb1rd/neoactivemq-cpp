@@ -149,9 +149,9 @@ void XATransactionIdTest::testConstructor() {
 
     XATransactionId id;
 
-    CPPUNIT_ASSERT_EQUAL( 0, id.getFormatId() );
-    CPPUNIT_ASSERT_EQUAL( 0, (int)id.getBranchQualifier().size() );
-    CPPUNIT_ASSERT_EQUAL( 0, (int)id.getGlobalTransactionId().size() );
+    ASSERT_EQ(0, id.getFormatId());
+    ASSERT_EQ(0, (int)id.getBranchQualifier().size());
+    ASSERT_EQ(0, (int)id.getGlobalTransactionId().size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -160,9 +160,9 @@ void XATransactionIdTest::testConstructor2() {
     DummyXid myXid;
     XATransactionId id( &myXid );
 
-    CPPUNIT_ASSERT_EQUAL( 42, id.getFormatId() );
-    CPPUNIT_ASSERT_EQUAL( Xid::MAXBQUALSIZE, (int)id.getBranchQualifier().size() );
-    CPPUNIT_ASSERT_EQUAL( Xid::MAXGTRIDSIZE, (int)id.getGlobalTransactionId().size() );
+    ASSERT_EQ(42, id.getFormatId());
+    ASSERT_EQ(Xid::MAXBQUALSIZE, (int)id.getBranchQualifier().size());
+    ASSERT_EQ(Xid::MAXGTRIDSIZE, (int)id.getGlobalTransactionId().size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,12 +171,12 @@ void XATransactionIdTest::testEquals() {
     DummyXid myXid;
     XATransactionId id( &myXid );
 
-    CPPUNIT_ASSERT_EQUAL( 42, id.getFormatId() );
-    CPPUNIT_ASSERT_EQUAL( Xid::MAXBQUALSIZE, (int)id.getBranchQualifier().size() );
-    CPPUNIT_ASSERT_EQUAL( Xid::MAXGTRIDSIZE, (int)id.getGlobalTransactionId().size() );
+    ASSERT_EQ(42, id.getFormatId());
+    ASSERT_EQ(Xid::MAXBQUALSIZE, (int)id.getBranchQualifier().size());
+    ASSERT_EQ(Xid::MAXGTRIDSIZE, (int)id.getGlobalTransactionId().size());
 
-    CPPUNIT_ASSERT( id.equals( &myXid ) );
-    CPPUNIT_ASSERT( myXid.equals( &id ) );
+    ASSERT_TRUE(id.equals( &myXid ));
+    ASSERT_TRUE(myXid.equals( &id ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -186,13 +186,13 @@ void XATransactionIdTest::testClone() {
     XATransactionId id( &myXid );
     std::unique_ptr<cms::Xid> cloned( id.clone() );
 
-    CPPUNIT_ASSERT_EQUAL( 42, id.getFormatId() );
-    CPPUNIT_ASSERT_EQUAL( Xid::MAXBQUALSIZE, (int)id.getBranchQualifier().size() );
-    CPPUNIT_ASSERT_EQUAL( Xid::MAXGTRIDSIZE, (int)id.getGlobalTransactionId().size() );
+    ASSERT_EQ(42, id.getFormatId());
+    ASSERT_EQ(Xid::MAXBQUALSIZE, (int)id.getBranchQualifier().size());
+    ASSERT_EQ(Xid::MAXGTRIDSIZE, (int)id.getGlobalTransactionId().size());
 
-    CPPUNIT_ASSERT_EQUAL( 42, cloned->getFormatId() );
+    ASSERT_EQ(42, cloned->getFormatId());
 
-    CPPUNIT_ASSERT( myXid.equals( cloned.get() ) );
+    ASSERT_TRUE(myXid.equals( cloned.get() ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -200,11 +200,11 @@ void XATransactionIdTest::testGetFormatId() {
 
     XATransactionId id;
 
-    CPPUNIT_ASSERT_EQUAL( 0, id.getFormatId() );
+    ASSERT_EQ(0, id.getFormatId());
 
     id.setFormatId( 42 );
 
-    CPPUNIT_ASSERT_EQUAL( 42, id.getFormatId() );
+    ASSERT_EQ(42, id.getFormatId());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -212,7 +212,7 @@ void XATransactionIdTest::testGetBranchQualifier() {
 
     XATransactionId id;
 
-    CPPUNIT_ASSERT_EQUAL( 0, (int)id.getBranchQualifier().size() );
+    ASSERT_EQ(0, (int)id.getBranchQualifier().size());
 
     std::vector<unsigned char> bqual;
     for( int i = 0; i < cms::Xid::MAXBQUALSIZE; ++i ) {
@@ -220,7 +220,7 @@ void XATransactionIdTest::testGetBranchQualifier() {
     }
     id.setBranchQualifier( bqual );
 
-    CPPUNIT_ASSERT( bqual == id.getBranchQualifier() );
+    ASSERT_TRUE(bqual == id.getBranchQualifier());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -228,7 +228,7 @@ void XATransactionIdTest::testGetGlobalTransactionId() {
 
     XATransactionId id;
 
-    CPPUNIT_ASSERT_EQUAL( 0, (int)id.getGlobalTransactionId().size() );
+    ASSERT_EQ(0, (int)id.getGlobalTransactionId().size());
 
     std::vector<unsigned char> gtx;
     for( int i = 0; i < cms::Xid::MAXGTRIDSIZE; ++i ) {
@@ -236,7 +236,7 @@ void XATransactionIdTest::testGetGlobalTransactionId() {
     }
     id.setGlobalTransactionId( gtx );
 
-    CPPUNIT_ASSERT( gtx == id.getGlobalTransactionId() );
+    ASSERT_TRUE(gtx == id.getGlobalTransactionId());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -245,17 +245,11 @@ void XATransactionIdTest::testGetBranchQualifier1() {
     XATransactionId id;
     std::vector<unsigned char> buffer( Xid::MAXBQUALSIZE );
 
-    CPPUNIT_ASSERT_EQUAL( 0, (int)id.getBranchQualifier().size() );
+    ASSERT_EQ(0, (int)id.getBranchQualifier().size());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an XAException",
-        id.getBranchQualifier( NULL, 1 ),
-        XAException );
+    ASSERT_THROW(id.getBranchQualifier( NULL, 1 ), XAException) << ("Should have thrown an XAException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an XAException",
-        id.getBranchQualifier( &buffer[0], -1 ),
-        XAException );
+    ASSERT_THROW(id.getBranchQualifier( &buffer[0], -1 ), XAException) << ("Should have thrown an XAException");
 
     std::vector<unsigned char> gtx;
     for( int i = 0; i < cms::Xid::MAXBQUALSIZE; ++i ) {
@@ -263,9 +257,9 @@ void XATransactionIdTest::testGetBranchQualifier1() {
     }
     id.setBranchQualifier( gtx );
 
-    CPPUNIT_ASSERT( id.getBranchQualifier( &buffer[0], 1 ) == -1 );
-    CPPUNIT_ASSERT( id.getBranchQualifier( &buffer[0], Xid::MAXBQUALSIZE ) == Xid::MAXBQUALSIZE );
-    CPPUNIT_ASSERT( gtx == buffer );
+    ASSERT_TRUE(id.getBranchQualifier( &buffer[0], 1 ) == -1);
+    ASSERT_TRUE(id.getBranchQualifier( &buffer[0], Xid::MAXBQUALSIZE ) == Xid::MAXBQUALSIZE);
+    ASSERT_TRUE(gtx == buffer);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -274,17 +268,11 @@ void XATransactionIdTest::testGetGlobalTransactionId1() {
     XATransactionId id;
     std::vector<unsigned char> buffer( Xid::MAXGTRIDSIZE );
 
-    CPPUNIT_ASSERT_EQUAL( 0, (int)id.getGlobalTransactionId().size() );
+    ASSERT_EQ(0, (int)id.getGlobalTransactionId().size());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an XAException",
-        id.getGlobalTransactionId( NULL, 1 ),
-        XAException );
+    ASSERT_THROW(id.getGlobalTransactionId( NULL, 1 ), XAException) << ("Should have thrown an XAException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an XAException",
-        id.getGlobalTransactionId( &buffer[0], -1 ),
-        XAException );
+    ASSERT_THROW(id.getGlobalTransactionId( &buffer[0], -1 ), XAException) << ("Should have thrown an XAException");
 
     std::vector<unsigned char> gtx;
     for( int i = 0; i < cms::Xid::MAXGTRIDSIZE; ++i ) {
@@ -292,7 +280,7 @@ void XATransactionIdTest::testGetGlobalTransactionId1() {
     }
     id.setGlobalTransactionId( gtx );
 
-    CPPUNIT_ASSERT( id.getGlobalTransactionId( &buffer[0], 1 ) == -1 );
-    CPPUNIT_ASSERT( id.getGlobalTransactionId( &buffer[0], Xid::MAXGTRIDSIZE ) == Xid::MAXGTRIDSIZE );
-    CPPUNIT_ASSERT( gtx == buffer );
+    ASSERT_TRUE(id.getGlobalTransactionId( &buffer[0], 1 ) == -1);
+    ASSERT_TRUE(id.getGlobalTransactionId( &buffer[0], Xid::MAXGTRIDSIZE ) == Xid::MAXGTRIDSIZE);
+    ASSERT_TRUE(gtx == buffer);
 }

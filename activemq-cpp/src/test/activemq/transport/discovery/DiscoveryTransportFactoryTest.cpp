@@ -94,7 +94,7 @@ DiscoveryTransportFactoryTest::~DiscoveryTransportFactoryTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryTransportFactoryTest::setUp() {
+void DiscoveryTransportFactoryTest::SetUp() {
 
     DiscoveryAgentRegistry& registry = DiscoveryAgentRegistry::getInstance();
     registry.registerFactory("mock", new MockDiscoveryAgentFactory);
@@ -106,7 +106,7 @@ void DiscoveryTransportFactoryTest::test() {
     DiscoveryTransportFactory factory;
 
     Pointer<Transport> transport = factory.create(URI("discovery:mock://default"));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
 
     MyTransportListener listener;
 

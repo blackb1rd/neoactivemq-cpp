@@ -18,8 +18,7 @@
 #ifndef _ACTIVEMQ_TRANSPORT_TCP_SINGLEBROKERRECONNECTTEST_H_
 #define _ACTIVEMQ_TRANSPORT_TCP_SINGLEBROKERRECONNECTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include <activemq/util/Config.h>
 
 namespace activemq {
@@ -33,21 +32,14 @@ namespace tcp {
      * - On failure, connection dies permanently
      * - App must handle reconnection by creating new transport
      */
-    class SingleBrokerReconnectTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( SingleBrokerReconnectTest );
-        CPPUNIT_TEST( testSingleBrokerNoAutoReconnect );
-        CPPUNIT_TEST( testAppLevelReconnectAfterBrokerRestart );
-        CPPUNIT_TEST( testFuzzyBrokerUpDown );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class SingleBrokerReconnectTest : public ::testing::Test {
+public:
 
         SingleBrokerReconnectTest();
         virtual ~SingleBrokerReconnectTest();
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         /**
          * Test that single broker tcp:// connection does NOT auto-reconnect.

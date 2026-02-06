@@ -18,26 +18,15 @@
 #ifndef _DECAF_INTERNAL_NET_URIENCODERDECODERTEST_H_
 #define _DECAF_INTERNAL_NET_URIENCODERDECODERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/internal/net/URIEncoderDecoder.h>
 
 namespace decaf {
 namespace internal {
 namespace net {
 
-    class URIEncoderDecoderTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( URIEncoderDecoderTest );
-        CPPUNIT_TEST( testValidate );
-        CPPUNIT_TEST( testValidateSimple );
-        CPPUNIT_TEST( testQuoteIllegal );
-        CPPUNIT_TEST( testEncodeOthers );
-        CPPUNIT_TEST( testDecode );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class URIEncoderDecoderTest : public ::testing::Test {
+public:
 
         URIEncoderDecoderTest();
         virtual ~URIEncoderDecoderTest() {}

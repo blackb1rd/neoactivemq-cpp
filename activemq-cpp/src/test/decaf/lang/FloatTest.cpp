@@ -111,19 +111,17 @@ void FloatTest::doTestCompareRawBits( const std::string& originalFloatString,
     int rawBits;
     float result = Float::parseFloat( originalFloatString );
     rawBits = Float::floatToIntBits( result );
-    CPPUNIT_ASSERT_MESSAGE(
-        std::string( "Original float(" ) + originalFloatString +
+    ASSERT_TRUE(expectedRawBits == rawBits) << (std::string( "Original float(" ) + originalFloatString +
         ") Converted float(" + Float::toString( result ) +
         ") Expecting:" + Integer::toHexString( expectedRawBits ) +
-        " Got: " + Integer::toHexString( rawBits ),
-        expectedRawBits == rawBits );
+        " Got: " + Integer::toHexString( rawBits ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void FloatTest::test_ConstructorF() {
     // Test for method decaf.lang.Float(float)
     Float f( 900.89f );
-    CPPUNIT_ASSERT_MESSAGE( "Created incorrect float", f.floatValue() == 900.89f );
+    ASSERT_TRUE(f.floatValue() == 900.89f) << ("Created incorrect float");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -131,7 +129,7 @@ void FloatTest::test_ConstructorString() {
     // Test for method decaf.lang.Float(decaf.lang.String)
     // TODO
     //Float f( "900.89" );
-    //CPPUNIT_ASSERT_MESSAGE("Created incorrect Float", f.floatValue() == 900.89f);
+    //ASSERT_TRUE(f.floatValue() == 900.89f) << ("Created incorrect Float");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,8 +138,7 @@ void FloatTest::test_byteValue() {
     Float f( 0.46874f );
     Float f2( 90.8f );
 
-    CPPUNIT_ASSERT_MESSAGE( "Returned incorrect byte value",
-                            f.byteValue() == 0 && f2.byteValue() == 90 );
+    ASSERT_TRUE(f.byteValue() == 0 && f2.byteValue() == 90) << ("Returned incorrect byte value");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -161,23 +158,17 @@ void FloatTest::test_compare() {
     for( std::size_t i = 0; i < sizeof(values) / sizeof(float); i++ ) {
 
         float f1 = values[i];
-        CPPUNIT_ASSERT_MESSAGE( "compare() should be equal:",
-                                Float::compare( f1, f1 ) == 0 );
+        ASSERT_TRUE(Float::compare( f1, f1 ) == 0) << ("compare() should be equal:");
         Float F1( f1 );
-        CPPUNIT_ASSERT_MESSAGE( "compareTo() should be equal: ",
-                                F1.compareTo( F1 ) == 0);
+        ASSERT_TRUE(F1.compareTo( F1 ) == 0) << ("compareTo() should be equal: ");
 
         for( std::size_t j = i + 1; j < sizeof(values) / sizeof(float); j++ ) {
             float f2 = values[j];
-            CPPUNIT_ASSERT_MESSAGE( "compare() should be less ",
-                    Float::compare(f1, f2) == -1 );
-            CPPUNIT_ASSERT_MESSAGE( "compare() should be greater ",
-                    Float::compare(f2, f1) == 1 );
+            ASSERT_TRUE(Float::compare(f1, f2) == -1) << ("compare() should be less ");
+            ASSERT_TRUE(Float::compare(f2, f1) == 1) << ("compare() should be greater ");
             Float F2(f2);
-            CPPUNIT_ASSERT_MESSAGE( "compareTo() should be less ",
-                                    F1.compareTo(F2) == -1 );
-            CPPUNIT_ASSERT_MESSAGE( "compareTo() should be greater ",
-                                    F2.compareTo(F1) == 1 );
+            ASSERT_TRUE(F1.compareTo(F2) == -1) << ("compareTo() should be less ");
+            ASSERT_TRUE(F2.compareTo(F1) == 1) << ("compareTo() should be greater ");
         }
     }
 }
@@ -185,9 +176,7 @@ void FloatTest::test_compare() {
 ////////////////////////////////////////////////////////////////////////////////
 void FloatTest::test_doubleValue() {
     // Test for method double decaf.lang.Float::doubleValue()
-    CPPUNIT_ASSERT_MESSAGE(
-        "Incorrect double value returned",
-        Math::abs( Float( 999999.999f ).doubleValue() - 999999.999 ) < 1 );
+    ASSERT_TRUE(Math::abs( Float( 999999.999f ).doubleValue() - 999999.999 ) < 1) << ("Incorrect double value returned");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -195,14 +184,14 @@ void FloatTest::test_floatToIntBitsF() {
     float f = 9876.2345f;
     int bits = Float::floatToIntBits( f );
     float r = Float::intBitsToFloat( bits );
-    CPPUNIT_ASSERT_MESSAGE("Incorrect intBits returned", f == r);
+    ASSERT_TRUE(f == r) << ("Incorrect intBits returned");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void FloatTest::test_floatToRawIntBitsF() {
     int i = 0x7fc004d2;
     float f = Float::intBitsToFloat( i );
-    CPPUNIT_ASSERT_MESSAGE( "Wrong raw bits", Float::floatToRawIntBits(f) == i );
+    ASSERT_TRUE(Float::floatToRawIntBits(f) == i) << ("Wrong raw bits");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -210,9 +199,8 @@ void FloatTest::test_floatValue() {
     // Test for method float decaf.lang.Float::floatValue()
     Float f( 87.657f );
     Float f2( -0.876f );
-    CPPUNIT_ASSERT_MESSAGE( "Returned incorrect floatValue",
-                            f.floatValue() == 87.657f &&
-                            ( f2.floatValue() == -0.876f ) );
+    ASSERT_TRUE(f.floatValue() == 87.657f &&
+                            ( f2.floatValue() == -0.876f )) << ("Returned incorrect floatValue");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -220,7 +208,7 @@ void FloatTest::test_intBitsToFloatI() {
     float f = 9876.2345f;
     int bits = Float::floatToIntBits(f);
     float r = Float::intBitsToFloat(bits);
-    CPPUNIT_ASSERT_MESSAGE("Incorrect intBits returned", f == r );
+    ASSERT_TRUE(f == r) << ("Incorrect intBits returned");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -228,41 +216,36 @@ void FloatTest::test_intValue() {
     // Test for method int decaf.lang.Float::intValue()
     Float f( 0.46874f );
     Float f2( 90.8f );
-    CPPUNIT_ASSERT_MESSAGE( "Returned incorrect int value",
-                            f.intValue() == 0 && f2.intValue() == 90 );
+    ASSERT_TRUE(f.intValue() == 0 && f2.intValue() == 90) << ("Returned incorrect int value");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void FloatTest::test_isInfinite() {
     // Test for method boolean decaf.lang.Float::isInfinite()
-    CPPUNIT_ASSERT_MESSAGE("Infinity check failed",
-            Float( Float::POSITIVE_INFINITY ).isInfinite() &&
+    ASSERT_TRUE(Float( Float::POSITIVE_INFINITY ).isInfinite() &&
             Float( Float::NEGATIVE_INFINITY ).isInfinite() &&
-            !(Float( 0.13131414f ).isInfinite() ) );
+            !(Float( 0.13131414f ).isInfinite() )) << ("Infinity check failed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void FloatTest::test_isInfiniteF() {
     // Test for method boolean decaf.lang.Float::isInfinite(float)
 
-    CPPUNIT_ASSERT_MESSAGE( "Infinity check failed",
-        Float::isInfinite( Float::POSITIVE_INFINITY ) &&
+    ASSERT_TRUE(Float::isInfinite( Float::POSITIVE_INFINITY ) &&
         (Float::isInfinite( Float::NEGATIVE_INFINITY) ) &&
-         !( Float::isInfinite( 1.0f ) ) );
+         !( Float::isInfinite( 1.0f ) )) << ("Infinity check failed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void FloatTest::test_isNaN() {
     // Test for method boolean decaf.lang.Float::isNaN()
-    CPPUNIT_ASSERT_MESSAGE( "NAN check failed",
-        Float( Float::NaN ).isNaN() && !( Float( 1.0f ).isNaN() ) );
+    ASSERT_TRUE(Float( Float::NaN ).isNaN() && !( Float( 1.0f ).isNaN() )) << ("NAN check failed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void FloatTest::test_isNaNF() {
     // Test for method boolean decaf.lang.Float::isNaN(float)
-    CPPUNIT_ASSERT_MESSAGE( "NaN check failed",
-        Float::isNaN( Float::NaN ) && !( Float::isNaN( 12.09f ) ) );
+    ASSERT_TRUE(Float::isNaN( Float::NaN ) && !( Float::isNaN( 12.09f ) )) << ("NaN check failed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -270,19 +253,16 @@ void FloatTest::test_longValue() {
     // Test for method long decaf.lang.Float::longValue()
     Float f( 0.46874f );
     Float f2( 90.8f );
-    CPPUNIT_ASSERT_MESSAGE( "Returned incorrect long value",
-        f.longValue() == 0 && f2.longValue() == 90 );
+    ASSERT_TRUE(f.longValue() == 0 && f2.longValue() == 90) << ("Returned incorrect long value");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void FloatTest::test_parseFloatLDecaf_lang_String() {
 
     // TODO
-//    CPPUNIT_ASSERT_MESSAGE( "Incorrect float returned, expected zero.",
-//            0.0 == Float::parseFloat("7.0064923216240853546186479164495e-46"));
-//    CPPUNIT_ASSERT_MESSAGE("Incorrect float returned, expected minimum float.",
-//            Float::MIN_VALUE ==
-//            Float::parseFloat("7.0064923216240853546186479164496e-46") );
+//    ASSERT_TRUE(//            0.0 == Float::parseFloat("7.0064923216240853546186479164495e-46")) << ("Incorrect float returned, expected zero.");
+//    ASSERT_TRUE(//            Float::MIN_VALUE ==
+//            Float::parseFloat("7.0064923216240853546186479164496e-46")) << ("Incorrect float returned, expected minimum float.");
 
 //    doTestCompareRawBits(
 //            "0.000000000000000000000000000000000000011754942807573642917278829910357665133228589927589904276829631184250030649651730385585324256680905818939208984375",

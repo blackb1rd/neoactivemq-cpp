@@ -18,34 +18,12 @@
 #ifndef _DECAF_UTIL_UUIDTEST_H_
 #define _DECAF_UTIL_UUIDTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf{
 namespace util{
 
-    class UUIDTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( UUIDTest );
-        CPPUNIT_TEST( testConstructor1 );
-        CPPUNIT_TEST( testGetLeastSignificantBits );
-        CPPUNIT_TEST( testGetMostSignificantBits );
-        CPPUNIT_TEST( testVersion );
-        CPPUNIT_TEST( testVariant );
-        CPPUNIT_TEST( testTimestamp );
-        CPPUNIT_TEST( testClockSequence );
-        CPPUNIT_TEST( testNode );
-        CPPUNIT_TEST( testCompareTo );
-        CPPUNIT_TEST( testHashCode );
-        CPPUNIT_TEST( testEquals );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST( testRandomUUID );
-        CPPUNIT_TEST( testNameUUIDFromBytes );
-        CPPUNIT_TEST( testFromString );
-        CPPUNIT_TEST( testFromStringStringException );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class UUIDTest : public ::testing::Test {
+public:
 
         UUIDTest();
         virtual ~UUIDTest() {}

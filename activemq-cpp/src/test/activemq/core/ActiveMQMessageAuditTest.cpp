@@ -50,13 +50,13 @@ void ActiveMQMessageAuditTest::testIsDuplicateString() {
     for (int i = 0; i < count; i++) {
         std::string id = idGen.generateId();
         list.add(id);
-        CPPUNIT_ASSERT(!audit.isDuplicate(id));
+        ASSERT_TRUE(!audit.isDuplicate(id));
     }
 
     int index = list.size() -1 -audit.getAuditDepth();
     for (; index < list.size(); index++) {
         std::string id = list.get(index);
-        CPPUNIT_ASSERT_MESSAGE("duplicate, id:" + id, audit.isDuplicate(id));
+        ASSERT_TRUE(audit.isDuplicate(id)) << ("duplicate, id:" + id);
     }
 }
 
@@ -77,13 +77,13 @@ void ActiveMQMessageAuditTest::testIsDuplicateMessageId() {
         id->setProducerId(pid);
         id->setProducerSequenceId(i);
         list.add(id);
-        CPPUNIT_ASSERT(!audit.isDuplicate(id));
+        ASSERT_TRUE(!audit.isDuplicate(id));
     }
 
     int index = list.size() -1 -audit.getAuditDepth();
     for (; index < list.size(); index++) {
         Pointer<MessageId> id = list.get(index);
-        CPPUNIT_ASSERT_MESSAGE(std::string() + "duplicate msg:" + id->toString(), audit.isDuplicate(id));
+        ASSERT_TRUE(audit.isDuplicate(id)) << (std::string() + "duplicate msg:" + id->toString());
     }
 }
 
@@ -98,15 +98,15 @@ void ActiveMQMessageAuditTest::testRollbackString() {
     for (int i = 0; i < count; i++) {
         std::string id = idGen.generateId();
         list.add(id);
-        CPPUNIT_ASSERT(!audit.isDuplicate(id));
+        ASSERT_TRUE(!audit.isDuplicate(id));
     }
 
     int index = list.size() -1 -audit.getAuditDepth();
     for (; index < list.size(); index++) {
         std::string id = list.get(index);
-        CPPUNIT_ASSERT_MESSAGE("duplicate, id:" + id, audit.isDuplicate(id));
+        ASSERT_TRUE(audit.isDuplicate(id)) << ("duplicate, id:" + id);
         audit.rollback(id);
-        CPPUNIT_ASSERT_MESSAGE(std::string() + "duplicate msg:" + id, !audit.isDuplicate(id));
+        ASSERT_TRUE(!audit.isDuplicate(id)) << (std::string() + "duplicate msg:" + id);
     }
 }
 
@@ -127,15 +127,15 @@ void ActiveMQMessageAuditTest::testRollbackMessageId() {
         id->setProducerId(pid);
         id->setProducerSequenceId(i);
         list.add(id);
-        CPPUNIT_ASSERT(!audit.isDuplicate(id));
+        ASSERT_TRUE(!audit.isDuplicate(id));
     }
 
     int index = list.size() -1 -audit.getAuditDepth();
     for (; index < list.size(); index++) {
         Pointer<MessageId> id = list.get(index);
-        CPPUNIT_ASSERT_MESSAGE(std::string() + "duplicate msg:" + id->toString(), audit.isDuplicate(id));
+        ASSERT_TRUE(audit.isDuplicate(id)) << (std::string() + "duplicate msg:" + id->toString());
         audit.rollback(id);
-        CPPUNIT_ASSERT_MESSAGE(std::string() + "duplicate msg:" + id->toString(), !audit.isDuplicate(id));
+        ASSERT_TRUE(!audit.isDuplicate(id)) << (std::string() + "duplicate msg:" + id->toString());
     }
 }
 
@@ -150,8 +150,8 @@ void ActiveMQMessageAuditTest::testIsInOrderString() {
     for (int i = 0; i < count; i++) {
         std::string id = idGen.generateId();
         if (i == 0) {
-            CPPUNIT_ASSERT(!audit.isDuplicate(id));
-            CPPUNIT_ASSERT(audit.isInOrder(id));
+            ASSERT_TRUE(!audit.isDuplicate(id));
+            ASSERT_TRUE(audit.isInOrder(id));
         }
         if (i > 1 && i % 2 != 0) {
             list.add(id);
@@ -160,8 +160,8 @@ void ActiveMQMessageAuditTest::testIsInOrderString() {
 
     for (int i = 0; i < list.size(); i++) {
         std::string id = list.get(i);
-        CPPUNIT_ASSERT_MESSAGE(std::string("Out of order msg: ") + id, !audit.isInOrder(id));
-        CPPUNIT_ASSERT(!audit.isDuplicate(id));
+        ASSERT_TRUE(!audit.isInOrder(id)) << (std::string("Out of order msg: ") + id);
+        ASSERT_TRUE(!audit.isDuplicate(id));
     }
 }
 
@@ -183,8 +183,8 @@ void ActiveMQMessageAuditTest::testIsInOrderMessageId() {
         id->setProducerSequenceId(i);
 
         if (i == 0) {
-            CPPUNIT_ASSERT(!audit.isDuplicate(id));
-            CPPUNIT_ASSERT(audit.isInOrder(id));
+            ASSERT_TRUE(!audit.isDuplicate(id));
+            ASSERT_TRUE(audit.isInOrder(id));
         }
         if (i > 1 && i % 2 != 0) {
             list.add(id);
@@ -193,8 +193,8 @@ void ActiveMQMessageAuditTest::testIsInOrderMessageId() {
 
     for (int i = 0; i < list.size(); i++) {
         Pointer<MessageId> mid = list.get(i);
-        CPPUNIT_ASSERT_MESSAGE(std::string("Out of order msg: ") + mid->toString(), !audit.isInOrder(mid));
-        CPPUNIT_ASSERT(!audit.isDuplicate(mid));
+        ASSERT_TRUE(!audit.isInOrder(mid)) << (std::string("Out of order msg: ") + mid->toString());
+        ASSERT_TRUE(!audit.isDuplicate(mid));
     }
 }
 
@@ -215,8 +215,8 @@ void ActiveMQMessageAuditTest::testGetLastSeqId() {
     for (int i = 0; i < count; i++) {
         id->setProducerSequenceId(i);
         list.add(id);
-        CPPUNIT_ASSERT(!audit.isDuplicate(id));
-        CPPUNIT_ASSERT_EQUAL((long long)i, audit.getLastSeqId(pid));
+        ASSERT_TRUE(!audit.isDuplicate(id));
+        ASSERT_EQ((long long)i, audit.getLastSeqId(pid));
     }
 
 }

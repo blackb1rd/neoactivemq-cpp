@@ -18,28 +18,12 @@
 #ifndef _DECAF_LANG_POINTERTEST_H_
 #define _DECAF_LANG_POINTERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace lang {
 
-    class PointerTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( PointerTest );
-        CPPUNIT_TEST( testBasics );
-        CPPUNIT_TEST( testAssignment );
-        CPPUNIT_TEST( testComparisons );
-        CPPUNIT_TEST( testThreaded1 );
-        CPPUNIT_TEST( testThreaded2 );
-        CPPUNIT_TEST( testOperators );
-        CPPUNIT_TEST( testSTLContainers );
-        CPPUNIT_TEST( testReturnByValue );
-        CPPUNIT_TEST( testDynamicCast );
-        CPPUNIT_TEST( testThreadSafety );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class PointerTest : public ::testing::Test {
+public:
 
         PointerTest() {}
         virtual ~PointerTest() {}

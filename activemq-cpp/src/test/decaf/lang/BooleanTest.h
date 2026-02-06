@@ -18,21 +18,15 @@
 #ifndef _DECAF_LANG_BOOLEANTEST_H_
 #define _DECAF_LANG_BOOLEANTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/lang/Boolean.h>
 
 namespace decaf{
 namespace lang{
 
-    class BooleanTest : public CppUnit::TestFixture
+    class BooleanTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( BooleanTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         BooleanTest() {}
         virtual ~BooleanTest() {}

@@ -18,22 +18,15 @@
 #ifndef _DECAF_LANG_LONGTEST_H_
 #define _DECAF_LANG_LONGTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/lang/Long.h>
 
 namespace decaf{
 namespace lang{
 
-    class LongTest : public CppUnit::TestFixture
+    class LongTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( LongTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( test2 );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         LongTest() {}
         virtual ~LongTest() {}

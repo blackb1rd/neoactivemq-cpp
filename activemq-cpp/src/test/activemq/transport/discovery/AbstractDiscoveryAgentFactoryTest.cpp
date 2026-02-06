@@ -97,16 +97,16 @@ void AbstractDiscoveryAgentFactoryTest::test() {
     DiscoveryAgentRegistry& registry = DiscoveryAgentRegistry::getInstance();
     registry.registerFactory("mock", new MockDiscoveryAgentFactory);
 
-    CPPUNIT_ASSERT_EQUAL(1, (int) registry.getAgentNames().size());
+    ASSERT_EQ(1, (int) registry.getAgentNames().size());
 
     DiscoveryAgentFactory* factory = registry.findFactory("mock");
-    CPPUNIT_ASSERT(factory != NULL);
+    ASSERT_TRUE(factory != NULL);
 
     Pointer<DiscoveryAgent> agent(factory->createAgent(URI("mock://default")));
-    CPPUNIT_ASSERT(agent != NULL);
+    ASSERT_TRUE(agent != NULL);
 
     Pointer<MockDiscoveryAgent> mock = agent.dynamicCast<MockDiscoveryAgent>();
-    CPPUNIT_ASSERT(mock != NULL);
+    ASSERT_TRUE(mock != NULL);
 
     registry.unregisterAllFactories();
 }

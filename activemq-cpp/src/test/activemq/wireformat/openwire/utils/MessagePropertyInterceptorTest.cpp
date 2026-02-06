@@ -42,32 +42,26 @@ void MessagePropertyInterceptorTest::test() {
 
     MessagePropertyInterceptor interceptor( &message, &properties );
 
-    CPPUNIT_ASSERT( message.getGroupID() == "" );
-    CPPUNIT_ASSERT( message.getGroupSequence() == 0 );
-    CPPUNIT_ASSERT( message.getRedeliveryCounter() == 0 );
+    ASSERT_TRUE(message.getGroupID() == "");
+    ASSERT_TRUE(message.getGroupSequence() == 0);
+    ASSERT_TRUE(message.getRedeliveryCounter() == 0);
 
     interceptor.setStringProperty( "JMSXGroupID", "TEST" );
     interceptor.setStringProperty( "JMSXGroupSeq", "15" );
     interceptor.setStringProperty( "JMSXDeliveryCount", "12" );
 
-    CPPUNIT_ASSERT( message.getGroupID() == "TEST" );
-    CPPUNIT_ASSERT( message.getGroupSequence() == 15 );
-    CPPUNIT_ASSERT( message.getRedeliveryCounter() == 12 );
-    CPPUNIT_ASSERT( interceptor.getStringProperty( "JMSXGroupID" ) == "TEST" );
-    CPPUNIT_ASSERT( interceptor.getIntProperty( "JMSXGroupSeq" ) == 15 );
-    CPPUNIT_ASSERT( interceptor.getIntProperty( "JMSXDeliveryCount" ) == 12 );
+    ASSERT_TRUE(message.getGroupID() == "TEST");
+    ASSERT_TRUE(message.getGroupSequence() == 15);
+    ASSERT_TRUE(message.getRedeliveryCounter() == 12);
+    ASSERT_TRUE(interceptor.getStringProperty( "JMSXGroupID" ) == "TEST");
+    ASSERT_TRUE(interceptor.getIntProperty( "JMSXGroupSeq" ) == 15);
+    ASSERT_TRUE(interceptor.getIntProperty( "JMSXDeliveryCount" ) == 12);
 
     interceptor.setStringProperty( "JMSXGroupSeq", "15" );
     interceptor.setStringProperty( "JMSXDeliveryCount", "12" );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw an Exception",
-        interceptor.setBooleanProperty( "JMSXGroupSeq", false ),
-        Exception );
+    ASSERT_THROW(interceptor.setBooleanProperty( "JMSXGroupSeq", false ), Exception) << ("Should Throw an Exception");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw an Exception",
-        interceptor.setStringProperty( "JMSXGroupSeq", "FOO" ),
-        Exception );
+    ASSERT_THROW(interceptor.setStringProperty( "JMSXGroupSeq", "FOO" ), Exception) << ("Should Throw an Exception");
 
 }

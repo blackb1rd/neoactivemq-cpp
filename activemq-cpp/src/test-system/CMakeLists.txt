@@ -76,19 +76,19 @@ if(AMQCPP_SHARED_LIB AND WIN32)
   )
 endif()
 
-# Link to the consolidated library and CppUnit
-target_link_libraries(neoactivemq-system-test PRIVATE neoactivemq-cpp CppUnit)
+# Link to the consolidated library and Google Test
+target_link_libraries(neoactivemq-system-test PRIVATE neoactivemq-cpp GTest::gtest)
 
-# Note: System tests are NOT registered with CTest by default because they
-# require multiple running ActiveMQ brokers. To run system tests manually:
-#
-# 1. Start all brokers: docker compose --profile failover up -d
-# 2. Run: ./neoactivemq-system-test
-# 3. Stop the brokers when done: docker compose --profile failover down
-#
-# To register with CTest (for CI), uncomment the following:
-# add_test(NAME activemq-system-tests COMMAND neoactivemq-system-test)
-# set_tests_properties(activemq-system-tests PROPERTIES
-#   TIMEOUT 1800  # 30 minutes for system tests
-#   LABELS "system"
-# )
+# Discover individual GTest cases for CTest/VSCode Test Explorer
+# Note: These tests require multiple running ActiveMQ brokers (Docker fixtures
+# are defined in the top-level CMakeLists.txt via SystemFixture)
+include(GoogleTest)
+gtest_discover_tests(neoactivemq-system-test
+  TEST_PREFIX "system/"
+  DISCOVERY_TIMEOUT 120
+  PROPERTIES
+    LABELS "system"
+    FIXTURES_REQUIRED SystemFixture
+    TIMEOUT 600
+    ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
+)

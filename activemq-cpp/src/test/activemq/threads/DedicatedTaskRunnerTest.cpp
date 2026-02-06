@@ -75,32 +75,29 @@ namespace {
 ////////////////////////////////////////////////////////////////////////////////
 void DedicatedTaskRunnerTest::testSimple() {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a NullPointerException",
-        std::unique_ptr<TaskRunner>( new DedicatedTaskRunner( NULL ) ),
-        NullPointerException );
+    ASSERT_THROW(std::unique_ptr<TaskRunner>( new DedicatedTaskRunner( NULL ) ), NullPointerException) << ("Should throw a NullPointerException");
 
     SimpleCountingTask simpleTask;
-    CPPUNIT_ASSERT( simpleTask.getCount() == 0 );
+    ASSERT_TRUE(simpleTask.getCount() == 0);
     DedicatedTaskRunner simpleTaskRunner( &simpleTask );
 
     simpleTaskRunner.start();
 
     simpleTaskRunner.wakeup();
     Thread::sleep( 250 );
-    CPPUNIT_ASSERT( simpleTask.getCount() >= 1 );
+    ASSERT_TRUE(simpleTask.getCount() >= 1);
     simpleTaskRunner.wakeup();
     Thread::sleep( 250 );
-    CPPUNIT_ASSERT( simpleTask.getCount() >= 2 );
+    ASSERT_TRUE(simpleTask.getCount() >= 2);
 
     InfiniteCountingTask infiniteTask;
-    CPPUNIT_ASSERT( infiniteTask.getCount() == 0 );
+    ASSERT_TRUE(infiniteTask.getCount() == 0);
     DedicatedTaskRunner infiniteTaskRunner( &infiniteTask );
     infiniteTaskRunner.start();
     Thread::sleep( 500 );
-    CPPUNIT_ASSERT( infiniteTask.getCount() != 0 );
+    ASSERT_TRUE(infiniteTask.getCount() != 0);
     infiniteTaskRunner.shutdown();
     unsigned int count = infiniteTask.getCount();
     Thread::sleep( 250 );
-    CPPUNIT_ASSERT( infiniteTask.getCount() == count );
+    ASSERT_TRUE(infiniteTask.getCount() == count);
 }

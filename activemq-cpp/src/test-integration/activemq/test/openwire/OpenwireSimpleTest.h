@@ -25,37 +25,7 @@ namespace test{
 namespace openwire{
 
     class OpenwireSimpleTest : public SimpleTest {
-
-        CPPUNIT_TEST_SUITE( OpenwireSimpleTest );
-        CPPUNIT_TEST( testAutoAck );
-        CPPUNIT_TEST( testClientAck );
-        CPPUNIT_TEST( testProducerWithNullDestination );
-        CPPUNIT_TEST( testProducerSendWithNullDestination );
-        CPPUNIT_TEST( testProducerSendToNonDefaultDestination );
-        CPPUNIT_TEST( testSyncReceive );
-        CPPUNIT_TEST( testSyncReceiveClientAck );
-        CPPUNIT_TEST( testMultipleConnections );
-        CPPUNIT_TEST( testMultipleSessions );
-        CPPUNIT_TEST( testReceiveAlreadyInQueue );
-        CPPUNIT_TEST( testBytesMessageSendRecv );
-        CPPUNIT_TEST( testQuickCreateAndDestroy );
-        CPPUNIT_TEST( testWithZeroConsumerPrefetch );
-        CPPUNIT_TEST( testWithZeroConsumerPrefetchAndNoMessage );
-        CPPUNIT_TEST( testWithZeroConsumerPrefetch2 );
-        CPPUNIT_TEST( testWithZeroConsumerPrefetchAndNoMessage2 );
-        CPPUNIT_TEST( testWithZeroConsumerPrefetchAndZeroRedelivery );
-        CPPUNIT_TEST( testWithZeroConsumerPrefetchWithInFlightExpiration );
-        CPPUNIT_TEST( testMapMessageSendToQueue );
-        CPPUNIT_TEST( testMapMessageSendToTopic );
-        CPPUNIT_TEST( testDestroyDestination );
-        CPPUNIT_TEST( tesstStreamMessage );
-        CPPUNIT_TEST( testLibraryInitShutdownInit );
-        CPPUNIT_TEST( testBytesMessageSendRecvAsync );
-        CPPUNIT_TEST( testMessageIdSetOnSend );
-        CPPUNIT_TEST( testReceiveWithSessionSyncDispatch );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireSimpleTest();
         virtual ~OpenwireSimpleTest();

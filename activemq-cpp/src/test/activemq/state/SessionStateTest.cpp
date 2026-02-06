@@ -54,22 +54,22 @@ void SessionStateTest::test() {
     info->setSessionId( id );
 
     SessionState state( info );
-    CPPUNIT_ASSERT( state.getInfo() == info );
+    ASSERT_TRUE(state.getInfo() == info);
 
     state.addProducer( pinfo );
     state.addConsumer( cinfo );
 
-    CPPUNIT_ASSERT( state.getConsumerStates().size() == 1 );
-    CPPUNIT_ASSERT( state.getProducerStates().size() == 1 );
+    ASSERT_TRUE(state.getConsumerStates().size() == 1);
+    ASSERT_TRUE(state.getProducerStates().size() == 1);
 
     state.removeProducer( pinfo->getProducerId() );
     state.removeConsumer( cinfo->getConsumerId() );
 
-    CPPUNIT_ASSERT( state.getConsumerStates().size() == 0 );
-    CPPUNIT_ASSERT( state.getProducerStates().size() == 0 );
+    ASSERT_TRUE(state.getConsumerStates().size() == 0);
+    ASSERT_TRUE(state.getProducerStates().size() == 0);
 
     state.addProducer( pinfo );
     state.addProducer( pinfo );
-    CPPUNIT_ASSERT( state.getProducerStates().size() == 1 );
+    ASSERT_TRUE(state.getProducerStates().size() == 1);
 
 }

@@ -18,102 +18,12 @@
 #ifndef _DECAF_LANG_STRINGTEST_H_
 #define _DECAF_LANG_STRINGTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace lang {
 
-    class StringTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( StringTest );
-        CPPUNIT_TEST( testDefaultConstructor );
-        CPPUNIT_TEST( testConstructorCString );
-        CPPUNIT_TEST( testConstructorCStringWithSize );
-        CPPUNIT_TEST( testConstructorCStringOffsetAndLength );
-        CPPUNIT_TEST( testConstructorCStringSizeOffsetAndLength );
-        CPPUNIT_TEST( testConstructorStdString );
-        CPPUNIT_TEST( testConstructorString );
-        CPPUNIT_TEST( testConstructorCharFill );
-        CPPUNIT_TEST( testAssignmentString );
-        CPPUNIT_TEST( testAssignmentStdString );
-        CPPUNIT_TEST( testAssignmentCString );
-        CPPUNIT_TEST( testCompact );
-        CPPUNIT_TEST( testHashCode );
-        CPPUNIT_TEST( testIsEmpty );
-        CPPUNIT_TEST( testSubstring1 );
-        CPPUNIT_TEST( testSubstring2 );
-        CPPUNIT_TEST( testSubstringExceptions );
-        CPPUNIT_TEST( testTrim );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST( testToCharArray );
-        CPPUNIT_TEST( testCStr );
-        CPPUNIT_TEST( testRegionMatches );
-        CPPUNIT_TEST( testRegionMatchesCaseSensitive );
-        CPPUNIT_TEST( testStartsWith );
-        CPPUNIT_TEST( testStartsWithI );
-        CPPUNIT_TEST( testEndsWith );
-        CPPUNIT_TEST( testEquals );
-        CPPUNIT_TEST( testEqualsCString );
-        CPPUNIT_TEST( testEqualsStdString );
-        CPPUNIT_TEST( testEqualsIgnoreCase );
-        CPPUNIT_TEST( testEqualsIgnoreCaseCString );
-        CPPUNIT_TEST( testEqualsIgnoreCaseStdString );
-        CPPUNIT_TEST( testIndexOfChar );
-        CPPUNIT_TEST( testIndexOfChar2 );
-        CPPUNIT_TEST( testIndexOfString );
-        CPPUNIT_TEST( testIndexOfString2 );
-        CPPUNIT_TEST( testIndexOfStdString );
-        CPPUNIT_TEST( testIndexOfStdString2 );
-        CPPUNIT_TEST( testIndexOfCString );
-        CPPUNIT_TEST( testIndexOfCString2 );
-        CPPUNIT_TEST( testLastIndexOfChar );
-        CPPUNIT_TEST( testLastIndexOfChar2 );
-        CPPUNIT_TEST( testLastIndexOfString );
-        CPPUNIT_TEST( testLastIndexOfString2 );
-        CPPUNIT_TEST( testLastIndexOfStdString );
-        CPPUNIT_TEST( testLastIndexOfStdString2 );
-        CPPUNIT_TEST( testLastIndexOfCString );
-        CPPUNIT_TEST( testLastIndexOfCString2 );
-        CPPUNIT_TEST( testToLowerCase );
-        CPPUNIT_TEST( testToUpperCase );
-        CPPUNIT_TEST( testReplaceCharChar );
-        CPPUNIT_TEST( testContainsString );
-        CPPUNIT_TEST( testContainsStdString );
-        CPPUNIT_TEST( testContainsCString );
-        CPPUNIT_TEST( testConcatString );
-        CPPUNIT_TEST( testConcatStdString );
-        CPPUNIT_TEST( testConcatCString );
-        CPPUNIT_TEST( testCompareToString );
-        CPPUNIT_TEST( testCompareToStdString );
-        CPPUNIT_TEST( testCompareToCString );
-        CPPUNIT_TEST( testCompareToIgnoreCaseString );
-        CPPUNIT_TEST( testCompareToIgnoreCaseStdString );
-        CPPUNIT_TEST( testCompareToIgnoreCaseCString );
-        CPPUNIT_TEST( testIsNullOrEmpty );
-        CPPUNIT_TEST( testOperatorEqualsString );
-        CPPUNIT_TEST( testOperatorEqualsStdString );
-        CPPUNIT_TEST( testOperatorEqualsCString );
-        CPPUNIT_TEST( testOperatorLessString );
-        CPPUNIT_TEST( testOperatorLessStdString );
-        CPPUNIT_TEST( testOperatorLessCString );
-        CPPUNIT_TEST( testOperatorGreaterString );
-        CPPUNIT_TEST( testOperatorGreaterStdString );
-        CPPUNIT_TEST( testOperatorGreaterCString );
-        CPPUNIT_TEST( testOperatorNotEqualsString );
-        CPPUNIT_TEST( testOperatorNotEqualsStdString );
-        CPPUNIT_TEST( testOperatorNotEqualsCString );
-        CPPUNIT_TEST( testOperatorPlusString );
-        CPPUNIT_TEST( testOperatorPlusStdString );
-        CPPUNIT_TEST( testOperatorPlusCString );
-        CPPUNIT_TEST( testFindFirstOf );
-        CPPUNIT_TEST( testFindFirstOf2 );
-        CPPUNIT_TEST( testFindFirstNotOf );
-        CPPUNIT_TEST( testFindFirstNotOf2 );
-        CPPUNIT_TEST( testGetChars );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class StringTest : public ::testing::Test {
+public:
 
         StringTest();
         virtual ~StringTest();

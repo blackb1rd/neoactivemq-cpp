@@ -57,7 +57,7 @@ AMQLogTest::~AMQLogTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AMQLogTest::setUp() {
+void AMQLogTest::SetUp() {
     // Reset logger state before each test
     AMQLogger::setLevel(LOG_LEVEL_NONE);
     AMQLogger::clearLogContext();
@@ -76,7 +76,7 @@ void AMQLogTest::setUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AMQLogTest::tearDown() {
+void AMQLogTest::TearDown() {
     // Clean up after each test
     AMQLogger::setLevel(LOG_LEVEL_NONE);
     AMQLogger::clearLogContext();
@@ -92,83 +92,83 @@ void AMQLogTest::tearDown() {
 
 void AMQLogTest::testGlobalLogLevel() {
     // Default should be NONE
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_NONE, AMQLogger::getLevel());
+    ASSERT_EQ(LOG_LEVEL_NONE, AMQLogger::getLevel());
 
     // Test setting each level
     AMQLogger::setLevel(LOG_LEVEL_ERROR);
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_ERROR, AMQLogger::getLevel());
+    ASSERT_EQ(LOG_LEVEL_ERROR, AMQLogger::getLevel());
 
     AMQLogger::setLevel(LOG_LEVEL_WARN);
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_WARN, AMQLogger::getLevel());
+    ASSERT_EQ(LOG_LEVEL_WARN, AMQLogger::getLevel());
 
     AMQLogger::setLevel(LOG_LEVEL_INFO);
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_INFO, AMQLogger::getLevel());
+    ASSERT_EQ(LOG_LEVEL_INFO, AMQLogger::getLevel());
 
     AMQLogger::setLevel(LOG_LEVEL_DEBUG);
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_DEBUG, AMQLogger::getLevel());
+    ASSERT_EQ(LOG_LEVEL_DEBUG, AMQLogger::getLevel());
 
     // Reset to NONE
     AMQLogger::setLevel(LOG_LEVEL_NONE);
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_NONE, AMQLogger::getLevel());
+    ASSERT_EQ(LOG_LEVEL_NONE, AMQLogger::getLevel());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void AMQLogTest::testGlobalLogLevelParsing() {
     // Test case-insensitive parsing
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_DEBUG, AMQLogger::parseLevel("debug"));
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_DEBUG, AMQLogger::parseLevel("DEBUG"));
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_DEBUG, AMQLogger::parseLevel("Debug"));
+    ASSERT_EQ(LOG_LEVEL_DEBUG, AMQLogger::parseLevel("debug"));
+    ASSERT_EQ(LOG_LEVEL_DEBUG, AMQLogger::parseLevel("DEBUG"));
+    ASSERT_EQ(LOG_LEVEL_DEBUG, AMQLogger::parseLevel("Debug"));
 
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_INFO, AMQLogger::parseLevel("info"));
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_INFO, AMQLogger::parseLevel("INFO"));
+    ASSERT_EQ(LOG_LEVEL_INFO, AMQLogger::parseLevel("info"));
+    ASSERT_EQ(LOG_LEVEL_INFO, AMQLogger::parseLevel("INFO"));
 
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_WARN, AMQLogger::parseLevel("warn"));
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_WARN, AMQLogger::parseLevel("WARN"));
+    ASSERT_EQ(LOG_LEVEL_WARN, AMQLogger::parseLevel("warn"));
+    ASSERT_EQ(LOG_LEVEL_WARN, AMQLogger::parseLevel("WARN"));
 
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_ERROR, AMQLogger::parseLevel("error"));
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_ERROR, AMQLogger::parseLevel("ERROR"));
+    ASSERT_EQ(LOG_LEVEL_ERROR, AMQLogger::parseLevel("error"));
+    ASSERT_EQ(LOG_LEVEL_ERROR, AMQLogger::parseLevel("ERROR"));
 
     // Unknown levels should return NONE
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_NONE, AMQLogger::parseLevel("unknown"));
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_NONE, AMQLogger::parseLevel(""));
+    ASSERT_EQ(LOG_LEVEL_NONE, AMQLogger::parseLevel("unknown"));
+    ASSERT_EQ(LOG_LEVEL_NONE, AMQLogger::parseLevel(""));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void AMQLogTest::testGlobalLogIsEnabled() {
     // With NONE level, nothing should be enabled
     AMQLogger::setLevel(LOG_LEVEL_NONE);
-    CPPUNIT_ASSERT(!AMQLogger::isEnabled(LOG_LEVEL_ERROR));
-    CPPUNIT_ASSERT(!AMQLogger::isEnabled(LOG_LEVEL_WARN));
-    CPPUNIT_ASSERT(!AMQLogger::isEnabled(LOG_LEVEL_INFO));
-    CPPUNIT_ASSERT(!AMQLogger::isEnabled(LOG_LEVEL_DEBUG));
+    ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_ERROR));
+    ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_WARN));
+    ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_INFO));
+    ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_DEBUG));
 
     // With ERROR level, only ERROR should be enabled
     AMQLogger::setLevel(LOG_LEVEL_ERROR);
-    CPPUNIT_ASSERT(AMQLogger::isEnabled(LOG_LEVEL_ERROR));
-    CPPUNIT_ASSERT(!AMQLogger::isEnabled(LOG_LEVEL_WARN));
-    CPPUNIT_ASSERT(!AMQLogger::isEnabled(LOG_LEVEL_INFO));
-    CPPUNIT_ASSERT(!AMQLogger::isEnabled(LOG_LEVEL_DEBUG));
+    ASSERT_TRUE(AMQLogger::isEnabled(LOG_LEVEL_ERROR));
+    ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_WARN));
+    ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_INFO));
+    ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_DEBUG));
 
     // With WARN level, ERROR and WARN should be enabled
     AMQLogger::setLevel(LOG_LEVEL_WARN);
-    CPPUNIT_ASSERT(AMQLogger::isEnabled(LOG_LEVEL_ERROR));
-    CPPUNIT_ASSERT(AMQLogger::isEnabled(LOG_LEVEL_WARN));
-    CPPUNIT_ASSERT(!AMQLogger::isEnabled(LOG_LEVEL_INFO));
-    CPPUNIT_ASSERT(!AMQLogger::isEnabled(LOG_LEVEL_DEBUG));
+    ASSERT_TRUE(AMQLogger::isEnabled(LOG_LEVEL_ERROR));
+    ASSERT_TRUE(AMQLogger::isEnabled(LOG_LEVEL_WARN));
+    ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_INFO));
+    ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_DEBUG));
 
     // With INFO level, ERROR, WARN, and INFO should be enabled
     AMQLogger::setLevel(LOG_LEVEL_INFO);
-    CPPUNIT_ASSERT(AMQLogger::isEnabled(LOG_LEVEL_ERROR));
-    CPPUNIT_ASSERT(AMQLogger::isEnabled(LOG_LEVEL_WARN));
-    CPPUNIT_ASSERT(AMQLogger::isEnabled(LOG_LEVEL_INFO));
-    CPPUNIT_ASSERT(!AMQLogger::isEnabled(LOG_LEVEL_DEBUG));
+    ASSERT_TRUE(AMQLogger::isEnabled(LOG_LEVEL_ERROR));
+    ASSERT_TRUE(AMQLogger::isEnabled(LOG_LEVEL_WARN));
+    ASSERT_TRUE(AMQLogger::isEnabled(LOG_LEVEL_INFO));
+    ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_DEBUG));
 
     // With DEBUG level, all should be enabled
     AMQLogger::setLevel(LOG_LEVEL_DEBUG);
-    CPPUNIT_ASSERT(AMQLogger::isEnabled(LOG_LEVEL_ERROR));
-    CPPUNIT_ASSERT(AMQLogger::isEnabled(LOG_LEVEL_WARN));
-    CPPUNIT_ASSERT(AMQLogger::isEnabled(LOG_LEVEL_INFO));
-    CPPUNIT_ASSERT(AMQLogger::isEnabled(LOG_LEVEL_DEBUG));
+    ASSERT_TRUE(AMQLogger::isEnabled(LOG_LEVEL_ERROR));
+    ASSERT_TRUE(AMQLogger::isEnabled(LOG_LEVEL_WARN));
+    ASSERT_TRUE(AMQLogger::isEnabled(LOG_LEVEL_INFO));
+    ASSERT_TRUE(AMQLogger::isEnabled(LOG_LEVEL_DEBUG));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -183,26 +183,26 @@ void AMQLogTest::testContextLogLevel() {
     AMQLogger::setLevel(LOG_LEVEL_WARN);
 
     // Without context, should use global level
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_WARN, AMQLogger::getLevel(context1));
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_WARN, AMQLogger::getLevel(context2));
+    ASSERT_EQ(LOG_LEVEL_WARN, AMQLogger::getLevel(context1));
+    ASSERT_EQ(LOG_LEVEL_WARN, AMQLogger::getLevel(context2));
 
     // Set context-specific levels
     AMQLogger::setLevel(context1, LOG_LEVEL_DEBUG);
     AMQLogger::setLevel(context2, LOG_LEVEL_ERROR);
 
     // Verify context-specific levels
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_DEBUG, AMQLogger::getLevel(context1));
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_ERROR, AMQLogger::getLevel(context2));
+    ASSERT_EQ(LOG_LEVEL_DEBUG, AMQLogger::getLevel(context1));
+    ASSERT_EQ(LOG_LEVEL_ERROR, AMQLogger::getLevel(context2));
 
     // Global level should be unchanged
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_WARN, AMQLogger::getLevel());
+    ASSERT_EQ(LOG_LEVEL_WARN, AMQLogger::getLevel());
 
     // Clear context1 level - should fall back to global
     AMQLogger::clearLevel(context1);
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_WARN, AMQLogger::getLevel(context1));
+    ASSERT_EQ(LOG_LEVEL_WARN, AMQLogger::getLevel(context1));
 
     // context2 should still have its specific level
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_ERROR, AMQLogger::getLevel(context2));
+    ASSERT_EQ(LOG_LEVEL_ERROR, AMQLogger::getLevel(context2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -224,31 +224,31 @@ void AMQLogTest::testMultiConnectionLogging() {
     AMQLogger::setLevel(connection2, LOG_LEVEL_ERROR);
 
     // Verify connection 1 settings
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_DEBUG, AMQLogger::getLevel(connection1));
+    ASSERT_EQ(LOG_LEVEL_DEBUG, AMQLogger::getLevel(connection1));
 
     // Verify connection 2 settings
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_ERROR, AMQLogger::getLevel(connection2));
+    ASSERT_EQ(LOG_LEVEL_ERROR, AMQLogger::getLevel(connection2));
 
     // Test effective level when context is set
     AMQLogger::setLogContext(connection1);
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_DEBUG, AMQLogger::getEffectiveLevel());
-    CPPUNIT_ASSERT(AMQLogger::isEnabled(LOG_LEVEL_DEBUG));
-    CPPUNIT_ASSERT(AMQLogger::isEnabled(LOG_LEVEL_INFO));
-    CPPUNIT_ASSERT(AMQLogger::isEnabled(LOG_LEVEL_WARN));
-    CPPUNIT_ASSERT(AMQLogger::isEnabled(LOG_LEVEL_ERROR));
+    ASSERT_EQ(LOG_LEVEL_DEBUG, AMQLogger::getEffectiveLevel());
+    ASSERT_TRUE(AMQLogger::isEnabled(LOG_LEVEL_DEBUG));
+    ASSERT_TRUE(AMQLogger::isEnabled(LOG_LEVEL_INFO));
+    ASSERT_TRUE(AMQLogger::isEnabled(LOG_LEVEL_WARN));
+    ASSERT_TRUE(AMQLogger::isEnabled(LOG_LEVEL_ERROR));
 
     // Switch to connection 2 context
     AMQLogger::setLogContext(connection2);
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_ERROR, AMQLogger::getEffectiveLevel());
-    CPPUNIT_ASSERT(!AMQLogger::isEnabled(LOG_LEVEL_DEBUG));
-    CPPUNIT_ASSERT(!AMQLogger::isEnabled(LOG_LEVEL_INFO));
-    CPPUNIT_ASSERT(!AMQLogger::isEnabled(LOG_LEVEL_WARN));
-    CPPUNIT_ASSERT(AMQLogger::isEnabled(LOG_LEVEL_ERROR));
+    ASSERT_EQ(LOG_LEVEL_ERROR, AMQLogger::getEffectiveLevel());
+    ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_DEBUG));
+    ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_INFO));
+    ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_WARN));
+    ASSERT_TRUE(AMQLogger::isEnabled(LOG_LEVEL_ERROR));
 
     // Clear context - should fall back to global (NONE)
     AMQLogger::clearLogContext();
-    CPPUNIT_ASSERT_EQUAL(LOG_LEVEL_NONE, AMQLogger::getEffectiveLevel());
-    CPPUNIT_ASSERT(!AMQLogger::isEnabled(LOG_LEVEL_ERROR));
+    ASSERT_EQ(LOG_LEVEL_NONE, AMQLogger::getEffectiveLevel());
+    ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_ERROR));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -287,11 +287,11 @@ void AMQLogTest::testContextOutputHandler() {
     AMQLogger::log(LOG_LEVEL_INFO, "TestComponent", "Connection 2 message");
 
     // Verify logs went to correct handlers
-    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), connection1Logs.size());
-    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), connection2Logs.size());
+    ASSERT_EQ(static_cast<std::size_t>(1), connection1Logs.size());
+    ASSERT_EQ(static_cast<std::size_t>(1), connection2Logs.size());
 
-    CPPUNIT_ASSERT(connection1Logs[0].find("Connection 1 message") != std::string::npos);
-    CPPUNIT_ASSERT(connection2Logs[0].find("Connection 2 message") != std::string::npos);
+    ASSERT_TRUE(connection1Logs[0].find("Connection 1 message") != std::string::npos);
+    ASSERT_TRUE(connection2Logs[0].find("Connection 2 message") != std::string::npos);
 
     // Clear handler and verify
     AMQLogger::clearContextOutputHandler(connection1);
@@ -301,7 +301,7 @@ void AMQLogTest::testContextOutputHandler() {
     AMQLogger::log(LOG_LEVEL_INFO, "TestComponent", "After clear message");
 
     // connection1Logs should not have received the new message
-    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), connection1Logs.size());
+    ASSERT_EQ(static_cast<std::size_t>(1), connection1Logs.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -333,12 +333,12 @@ void AMQLogTest::testHandlerWithRecordOnlyMode() {
     AMQLogger::log(LOG_LEVEL_INFO, "TestComponent", "Message with recordOnlyMode enabled");
 
     // Handler should still have been called despite recordOnlyMode
-    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), capturedLogs.size());
-    CPPUNIT_ASSERT(capturedLogs[0].find("Message with recordOnlyMode enabled") != std::string::npos);
+    ASSERT_EQ(static_cast<std::size_t>(1), capturedLogs.size());
+    ASSERT_TRUE(capturedLogs[0].find("Message with recordOnlyMode enabled") != std::string::npos);
 
     // Log another message
     AMQLogger::log(LOG_LEVEL_ERROR, "TestComponent", "Error message");
-    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), capturedLogs.size());
+    ASSERT_EQ(static_cast<std::size_t>(2), capturedLogs.size());
 
     // Clear context - now logs should NOT appear (recordOnlyMode blocks console)
     AMQLogger::clearLogContext();
@@ -347,7 +347,7 @@ void AMQLogTest::testHandlerWithRecordOnlyMode() {
     AMQLogger::log(LOG_LEVEL_INFO, "TestComponent", "Message without context");
 
     // Handler count should still be 2 (no new messages)
-    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), capturedLogs.size());
+    ASSERT_EQ(static_cast<std::size_t>(2), capturedLogs.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -453,7 +453,7 @@ void AMQLogTest::testMultiThreadContextIsolation() {
         delete thread;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Thread context isolation failed", !failed);
+    ASSERT_TRUE(!failed) << ("Thread context isolation failed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -464,8 +464,8 @@ void AMQLogTest::testFlightRecorder() {
     // Initialize flight recorder with small buffer for testing
     AMQLogger::initializeFlightRecorder(0.001, 100, 1000);
 
-    CPPUNIT_ASSERT(AMQLogger::isFlightRecorderEnabled());
-    CPPUNIT_ASSERT(AMQLogger::flightRecorderCapacity() >= 100);
+    ASSERT_TRUE(AMQLogger::isFlightRecorderEnabled());
+    ASSERT_TRUE(AMQLogger::flightRecorderCapacity() >= 100);
 
     // Enable logging
     AMQLogger::setLevel(LOG_LEVEL_DEBUG);
@@ -479,22 +479,22 @@ void AMQLogTest::testFlightRecorder() {
     }
 
     // Check size
-    CPPUNIT_ASSERT(AMQLogger::flightRecorderSize() >= 50);
-    CPPUNIT_ASSERT(AMQLogger::flightRecorderTotalRecorded() >= 50);
+    ASSERT_TRUE(AMQLogger::flightRecorderSize() >= 50);
+    ASSERT_TRUE(AMQLogger::flightRecorderTotalRecorded() >= 50);
 
     // Dump to stringstream
     std::ostringstream dumpOutput;
     AMQLogger::dumpFlightRecorder(dumpOutput, 10);
 
     std::string output = dumpOutput.str();
-    CPPUNIT_ASSERT(!output.empty());
-    CPPUNIT_ASSERT(output.find("FlightRecorderTest") != std::string::npos);
+    ASSERT_TRUE(!output.empty());
+    ASSERT_TRUE(output.find("FlightRecorderTest") != std::string::npos);
 
     // Clear and verify
     AMQLogger::clearFlightRecorder();
-    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), AMQLogger::flightRecorderSize());
+    ASSERT_EQ(static_cast<std::size_t>(0), AMQLogger::flightRecorderSize());
 
     // Shutdown
     AMQLogger::shutdownFlightRecorder();
-    CPPUNIT_ASSERT(!AMQLogger::isFlightRecorderEnabled());
+    ASSERT_TRUE(!AMQLogger::isFlightRecorderEnabled());
 }

@@ -18,9 +18,7 @@
 #ifndef _ACTIVEMQ_CMSUTIL_CMSTEMPLATETEST_H_
 #define _ACTIVEMQ_CMSUTIL_CMSTEMPLATETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <activemq/cmsutil/CmsTemplate.h>
 #include <activemq/cmsutil/SessionCallback.h>
 #include <activemq/cmsutil/ProducerCallback.h>
@@ -33,21 +31,8 @@ namespace cmsutil{
 
     class DummyConnectionFactory;
 
-    class CmsTemplateTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( CmsTemplateTest );
-        CPPUNIT_TEST( testExecuteSession );
-        CPPUNIT_TEST( testExecuteProducer );
-        CPPUNIT_TEST( testSend );
-        CPPUNIT_TEST( testReceive );
-        CPPUNIT_TEST( testReceive_Destination );
-        CPPUNIT_TEST( testReceive_DestinationName );
-        CPPUNIT_TEST( testReceiveSelected );
-        CPPUNIT_TEST( testReceiveSelected_Destination );
-        CPPUNIT_TEST( testReceiveSelected_DestinationName );
-        CPPUNIT_TEST_SUITE_END();
-
-        CmsTemplate* cmsTemplate;
+    class CmsTemplateTest : public ::testing::Test {
+CmsTemplate* cmsTemplate;
         DummyConnectionFactory* cf;
 
         class MySendListener : public MessageContext::SendListener {
@@ -160,8 +145,8 @@ namespace cmsutil{
         CmsTemplateTest() : cmsTemplate(), cf() {}
         virtual ~CmsTemplateTest() {}
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         void testExecuteSession();
         void testExecuteProducer();

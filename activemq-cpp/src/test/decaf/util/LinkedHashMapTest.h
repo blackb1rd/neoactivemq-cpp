@@ -18,44 +18,12 @@
 #ifndef _DECAF_UTIL_LINKEDHASHMAPTEST_H_
 #define _DECAF_UTIL_LINKEDHASHMAPTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 
-    class LinkedHashMapTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( LinkedHashMapTest );
-        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testConstructorI );
-        CPPUNIT_TEST( testConstructorIF );
-        CPPUNIT_TEST( testConstructorMap );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testContainsKey );
-        CPPUNIT_TEST( testContainsValue );
-        CPPUNIT_TEST( testGet );
-        CPPUNIT_TEST( testPut );
-        CPPUNIT_TEST( testRemove );
-        CPPUNIT_TEST( testIsEmpty );
-        CPPUNIT_TEST( testKeySet );
-        CPPUNIT_TEST( testPutAll );
-        CPPUNIT_TEST( testRehash );
-        CPPUNIT_TEST( testSize );
-        CPPUNIT_TEST( testEntrySet );
-        CPPUNIT_TEST( testValues );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST( testEntrySetIterator );
-        CPPUNIT_TEST( testKeySetIterator );
-        CPPUNIT_TEST( testValuesIterator );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST( testOrderedEntrySet );
-        CPPUNIT_TEST( testOrderedKeySet );
-        CPPUNIT_TEST( testOrderedValues );
-        CPPUNIT_TEST( testRemoveEldest );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class LinkedHashMapTest : public ::testing::Test {
+public:
 
         LinkedHashMapTest();
         virtual ~LinkedHashMapTest();

@@ -26,17 +26,7 @@ namespace openwire {
 
     class OpenwireQueueBrowserTest : public QueueBrowserTest {
     private:
-
-        CPPUNIT_TEST_SUITE( OpenwireQueueBrowserTest );
-        CPPUNIT_TEST( testReceiveBrowseReceive );
-        CPPUNIT_TEST( testBrowseReceive );
-        CPPUNIT_TEST( testQueueBrowserWith2Consumers );
-        CPPUNIT_TEST( testRepeatedQueueBrowserCreateDestroy );
-        CPPUNIT_TEST( testRepeatedQueueBrowserCreateDestroyWithMessageInQueue );
-        CPPUNIT_TEST( testBrowsingExpirationIsIgnored );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         OpenwireQueueBrowserTest();
         virtual ~OpenwireQueueBrowserTest();

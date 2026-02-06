@@ -18,52 +18,12 @@
 #ifndef _DECAF_UTIL_ARRAYLISTTEST_H_
 #define _DECAF_UTIL_ARRAYLISTTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 
-    class ArrayListTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ArrayListTest );
-        CPPUNIT_TEST( testConstructor1 );
-        CPPUNIT_TEST( testConstructor2 );
-        CPPUNIT_TEST( testConstructor3 );
-        CPPUNIT_TEST( testAdd1 );
-        CPPUNIT_TEST( testAdd2 );
-        CPPUNIT_TEST( testAdd3 );
-        CPPUNIT_TEST( testAddAll1 );
-        CPPUNIT_TEST( testAddAll2 );
-        CPPUNIT_TEST( testAddAll3 );
-        CPPUNIT_TEST( testAddAll4 );
-        CPPUNIT_TEST( testAddAll5 );
-        CPPUNIT_TEST( testAddAll6 );
-        CPPUNIT_TEST( testAddAll7 );
-        CPPUNIT_TEST( testAddAll8 );
-        CPPUNIT_TEST( testAddAll9 );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testContains );
-        CPPUNIT_TEST( testEnsureCapacity );
-        CPPUNIT_TEST( testGet );
-        CPPUNIT_TEST( testSet );
-        CPPUNIT_TEST( testIndexOf );
-        CPPUNIT_TEST( testIsEmpty );
-        CPPUNIT_TEST( testLastIndexOf );
-        CPPUNIT_TEST( testRemove );
-        CPPUNIT_TEST( testRemoveAt );
-        CPPUNIT_TEST( testSize );
-        CPPUNIT_TEST( testToString );
-        CPPUNIT_TEST( testToArray );
-        CPPUNIT_TEST( testTrimToSize );
-        CPPUNIT_TEST( testOverrideSize );
-        CPPUNIT_TEST( testRemoveAll );
-        CPPUNIT_TEST( testRetainAll );
-        CPPUNIT_TEST( testListIterator1IndexOutOfBoundsException );
-        CPPUNIT_TEST( testListIterator2IndexOutOfBoundsException );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class ArrayListTest : public ::testing::Test {
+private:
 
         static const int SIZE;
 

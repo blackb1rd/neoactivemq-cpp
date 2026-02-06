@@ -18,33 +18,14 @@
 #ifndef _DECAF_UTIL_PROPERTIESTEST_H_
 #define _DECAF_UTIL_PROPERTIESTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/util/Properties.h>
 
 namespace decaf {
 namespace util {
 
-    class PropertiesTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( PropertiesTest );
-        CPPUNIT_TEST( testPutAndGet );
-        CPPUNIT_TEST( testAssign );
-        CPPUNIT_TEST( testCopy );
-        CPPUNIT_TEST( testClone );
-        CPPUNIT_TEST( testRemove );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testEquals );
-        CPPUNIT_TEST( testLoadNPE );
-        CPPUNIT_TEST( testLoadInputStream );
-        CPPUNIT_TEST( testPropertyNames );
-        CPPUNIT_TEST( testPropertyNamesOverride );
-        CPPUNIT_TEST( testPropertyNamesScenario1 );
-        CPPUNIT_TEST( testStoreOutputStream );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class PropertiesTest : public ::testing::Test {
+private:
 
         Properties testProperties;
 
@@ -54,8 +35,8 @@ namespace util {
 
         virtual ~PropertiesTest() {}
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         void testPutAndGet();
         void testAssign();

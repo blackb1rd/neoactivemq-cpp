@@ -29,7 +29,7 @@ DataInputStreamBenchmark::DataInputStreamBenchmark() : buffer(), bis() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamBenchmark::setUp() {
+void DataInputStreamBenchmark::SetUp() {
 
     buffer = new unsigned char[bufferSize];
 
@@ -42,7 +42,7 @@ void DataInputStreamBenchmark::setUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamBenchmark::tearDown() {
+void DataInputStreamBenchmark::TearDown() {
 
     delete[] buffer;
 }

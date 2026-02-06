@@ -52,8 +52,8 @@ void StompWireFormatFactoryTest::testCreateWireFormat() {
 
     Pointer<StompWireFormat> stomp = format.dynamicCast<StompWireFormat>();
 
-    CPPUNIT_ASSERT_EQUAL(std::string("/test-topic/"), stomp->getTopicPrefix());
-    CPPUNIT_ASSERT_EQUAL(std::string("/test-queue/"), stomp->getQueuePrefix());
-    CPPUNIT_ASSERT_EQUAL(std::string("/test-temp-topic/"), stomp->getTempTopicPrefix());
-    CPPUNIT_ASSERT_EQUAL(std::string("/test-temp-queue/"), stomp->getTempQueuePrefix());
+    ASSERT_EQ(std::string("/test-topic/"), stomp->getTopicPrefix());
+    ASSERT_EQ(std::string("/test-queue/"), stomp->getQueuePrefix());
+    ASSERT_EQ(std::string("/test-temp-topic/"), stomp->getTempTopicPrefix());
+    ASSERT_EQ(std::string("/test-temp-queue/"), stomp->getTempQueuePrefix());
 }

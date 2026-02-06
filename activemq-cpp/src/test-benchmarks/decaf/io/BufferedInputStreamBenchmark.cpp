@@ -32,13 +32,13 @@ BufferedInputStreamBenchmark::~BufferedInputStreamBenchmark() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamBenchmark::setUp() {
+void BufferedInputStreamBenchmark::SetUp() {
     buffer = new unsigned char[bufferSize];
     source.setByteArray(buffer, bufferSize);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamBenchmark::tearDown() {
+void BufferedInputStreamBenchmark::TearDown() {
     delete[] buffer;
 }
 

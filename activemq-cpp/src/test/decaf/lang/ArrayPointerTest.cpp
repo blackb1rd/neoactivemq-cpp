@@ -92,24 +92,24 @@ namespace {
     template<typename T>
     void ConstReferenceMethod( const ArrayPointer<T>& pointer ) {
         ArrayPointer<T> copy = pointer;
-        CPPUNIT_ASSERT( copy.get() != NULL );
+        ASSERT_TRUE(copy.get() != NULL);
     }
 
     template<typename T>
     void ReferenceMethod( ArrayPointer<T>& pointer ) {
         pointer.reset( NULL );
-        CPPUNIT_ASSERT( pointer.get() == NULL );
+        ASSERT_TRUE(pointer.get() == NULL);
     }
 
     ArrayPointer<TestClassA> ReturnByValue() {
         ArrayPointer<TestClassA> pointer( 1 );
-        CPPUNIT_ASSERT( pointer.get() != NULL );
+        EXPECT_TRUE(pointer.get() != NULL);
         return pointer;
     }
 
     const ArrayPointer<TestClassA>& ReturnByConstReference() {
         static ArrayPointer<TestClassA> pointer( 1 );
-        CPPUNIT_ASSERT( pointer.get() != NULL );
+        EXPECT_TRUE(pointer.get() != NULL);
         return pointer;
     }
 
@@ -130,44 +130,44 @@ void ArrayPointerTest::testBasics() {
 
     // Test Null Initialize
     ArrayPointer<TestClassA> nullPointer;
-    CPPUNIT_ASSERT( nullPointer.get() == NULL );
-    CPPUNIT_ASSERT( nullPointer == NULL );
-    CPPUNIT_ASSERT_NO_THROW( nullPointer.reset( NULL ) );
+    ASSERT_TRUE(nullPointer.get() == NULL);
+    ASSERT_TRUE(nullPointer == NULL);
+    ASSERT_NO_THROW(nullPointer.reset( NULL ));
 
     // Test Size Constructor
     ArrayPointer<TestClassA> pointer1( 256 );
-    CPPUNIT_ASSERT( pointer1.get() != NULL );
-    CPPUNIT_ASSERT( pointer1.length() == 256 );
+    ASSERT_TRUE(pointer1.get() != NULL);
+    ASSERT_TRUE(pointer1.length() == 256);
 
     // Test Value Constructor
     ArrayPointer<TestClassA> pointer2( anArray, 12 );
-    CPPUNIT_ASSERT( pointer2.get() == anArray );
-    CPPUNIT_ASSERT( pointer2.get() != NULL );
-    CPPUNIT_ASSERT( pointer2.length() == 12 );
+    ASSERT_TRUE(pointer2.get() == anArray);
+    ASSERT_TRUE(pointer2.get() != NULL);
+    ASSERT_TRUE(pointer2.length() == 12);
 
     // Test Copy Constructor
     ArrayPointer<TestClassA> ctorCopy( pointer2 );
-    CPPUNIT_ASSERT( ctorCopy.get() == anArray );
-    CPPUNIT_ASSERT( ctorCopy.length() == 12 );
+    ASSERT_TRUE(ctorCopy.get() == anArray);
+    ASSERT_TRUE(ctorCopy.length() == 12);
 
     // Test Assignment
     ArrayPointer<TestClassA> copy = pointer2;
-    CPPUNIT_ASSERT( copy.get() == anArray );
-    CPPUNIT_ASSERT( copy.length() == 12 );
+    ASSERT_TRUE(copy.get() == anArray);
+    ASSERT_TRUE(copy.length() == 12);
 
-    CPPUNIT_ASSERT( pointer1[0].returnHello() == "Hello" );
+    ASSERT_TRUE(pointer1[0].returnHello() == "Hello");
 
     copy.reset( NULL );
-    CPPUNIT_ASSERT( copy.get() == NULL );
+    ASSERT_TRUE(copy.get() == NULL);
 
     ArrayPointer<X> p( 1 );
     p[0].next = ArrayPointer<X>( 1 );
     p = p[0].next;
-    CPPUNIT_ASSERT( !p[0].next );
+    ASSERT_TRUE(!p[0].next);
 
     try{
         ArrayPointer<ExceptionThrowingClass> ex( 1 );
-        CPPUNIT_FAIL( "Should Have Thrown." );
+        FAIL() << ("Should Have Thrown.");
     } catch(...) {}
 
     {
@@ -184,8 +184,8 @@ void ArrayPointerTest::testConstructor1() {
 
     ArrayPointer<int> array( SIZE );
 
-    CPPUNIT_ASSERT_EQUAL( SIZE, array.length() );
-    CPPUNIT_ASSERT( array.get() != NULL );
+    ASSERT_EQ(SIZE, array.length());
+    ASSERT_TRUE(array.get() != NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -195,20 +195,20 @@ void ArrayPointerTest::testConstructor2() {
 
     ArrayPointer<bool> trueArray( SIZE, true );
 
-    CPPUNIT_ASSERT_EQUAL( SIZE, trueArray.length() );
-    CPPUNIT_ASSERT( trueArray.get() != NULL );
+    ASSERT_EQ(SIZE, trueArray.length());
+    ASSERT_TRUE(trueArray.get() != NULL);
 
     for( int ix = 0; ix < SIZE; ix++ ) {
-        CPPUNIT_ASSERT_EQUAL( true, trueArray[ix] );
+        ASSERT_EQ(true, trueArray[ix]);
     }
 
     ArrayPointer<bool> falseArray( SIZE, true );
 
-    CPPUNIT_ASSERT_EQUAL( SIZE, falseArray.length() );
-    CPPUNIT_ASSERT( falseArray.get() != NULL );
+    ASSERT_EQ(SIZE, falseArray.length());
+    ASSERT_TRUE(falseArray.get() != NULL);
 
     for( int ix = 0; ix < SIZE; ix++ ) {
-        CPPUNIT_ASSERT_EQUAL( true, falseArray[ix] );
+        ASSERT_EQ(true, falseArray[ix]);
     }
 }
 
@@ -225,11 +225,11 @@ void ArrayPointerTest::testClone() {
 
     ArrayPointer<int> copy = original.clone();
 
-    CPPUNIT_ASSERT_EQUAL( SIZE, copy.length() );
-    CPPUNIT_ASSERT( original.get() != copy.get() );
+    ASSERT_EQ(SIZE, copy.length());
+    ASSERT_TRUE(original.get() != copy.get());
 
     for( int ix = 0; ix < SIZE; ix++ ) {
-        CPPUNIT_ASSERT_EQUAL( original[ix], copy[ix] );
+        ASSERT_EQ(original[ix], copy[ix]);
     }
 }
 
@@ -242,15 +242,15 @@ void ArrayPointerTest::testAssignment() {
     TestClassB* thePointerB = new TestClassB[SIZE + SIZE];
 
     ArrayPointer<TestClassBase> pointer;
-    CPPUNIT_ASSERT( pointer.get() == NULL );
+    ASSERT_TRUE(pointer.get() == NULL);
 
     pointer.reset( thePointerA, SIZE );
-    CPPUNIT_ASSERT( pointer.get() == thePointerA );
-    CPPUNIT_ASSERT( pointer.length() == SIZE );
+    ASSERT_TRUE(pointer.get() == thePointerA);
+    ASSERT_TRUE(pointer.length() == SIZE);
 
     pointer.reset( thePointerB, SIZE + SIZE );
-    CPPUNIT_ASSERT( pointer.get() == thePointerB );
-    CPPUNIT_ASSERT( pointer.length() == SIZE + SIZE );
+    ASSERT_TRUE(pointer.get() == thePointerB);
+    ASSERT_TRUE(pointer.length() == SIZE + SIZE);
 
     // Doing this however won't compile.
     //    SomeOtherClass* other = new SomeOtherClass[SIZE];
@@ -260,28 +260,28 @@ void ArrayPointerTest::testAssignment() {
     ArrayPointer<TestClassA> pointer2 = pointer1;
     ArrayPointer<TestClassA> pointer3 = pointer2;
 
-    CPPUNIT_ASSERT( pointer1.get() == pointer2.get() );
-    CPPUNIT_ASSERT( pointer2.get() == pointer3.get() );
+    ASSERT_TRUE(pointer1.get() == pointer2.get());
+    ASSERT_TRUE(pointer2.get() == pointer3.get());
 
     pointer3.reset( NULL, 0 );
-    CPPUNIT_ASSERT( pointer1.get() != NULL );
-    CPPUNIT_ASSERT( pointer2.get() != NULL );
-    CPPUNIT_ASSERT( pointer3.get() == NULL );
+    ASSERT_TRUE(pointer1.get() != NULL);
+    ASSERT_TRUE(pointer2.get() != NULL);
+    ASSERT_TRUE(pointer3.get() == NULL);
 
     ConstReferenceMethod( pointer1 );
     ReferenceMethod( pointer2 );
-    CPPUNIT_ASSERT( pointer2.get() == NULL );
+    ASSERT_TRUE(pointer2.get() == NULL);
 
     ReturnByValue();
 
     {
         ArrayPointer<TestClassA> copy = ReturnByValue();
-        CPPUNIT_ASSERT( copy.get() != NULL );
+        ASSERT_TRUE(copy.get() != NULL);
     }
 
     {
         ArrayPointer<TestClassA> copy = ReturnByConstReference();
-        CPPUNIT_ASSERT( copy.get() != NULL );
+        ASSERT_TRUE(copy.get() != NULL);
     }
 
     ReturnByConstReference();
@@ -297,30 +297,30 @@ void ArrayPointerTest::testComparisons() {
 
     TestClassA* raw1 = new TestClassA[SIZE];
 
-    CPPUNIT_ASSERT( ( pointer1 == pointer2 ) == false );
-    CPPUNIT_ASSERT( ( pointer1 != pointer2 ) == true );
+    ASSERT_TRUE(( pointer1 == pointer2 ) == false);
+    ASSERT_TRUE(( pointer1 != pointer2 ) == true);
 
-    CPPUNIT_ASSERT( ( pointer1 == raw1 ) == false );
-    CPPUNIT_ASSERT( ( pointer1 != raw1 ) == true );
-    CPPUNIT_ASSERT( ( raw1 == pointer2 ) == false );
-    CPPUNIT_ASSERT( ( raw1 != pointer2 ) == true );
+    ASSERT_TRUE(( pointer1 == raw1 ) == false);
+    ASSERT_TRUE(( pointer1 != raw1 ) == true);
+    ASSERT_TRUE(( raw1 == pointer2 ) == false);
+    ASSERT_TRUE(( raw1 != pointer2 ) == true);
 
     delete [] raw1;
 
     ArrayPointer<TestClassBase> pointer3( new TestClassA[SIZE], SIZE );
     ArrayPointer<TestClassA> pointer4( 1 );
 
-    CPPUNIT_ASSERT( ( pointer3 == pointer4 ) == false );
-    CPPUNIT_ASSERT( ( pointer3 != pointer4 ) == true );
+    ASSERT_TRUE(( pointer3 == pointer4 ) == false);
+    ASSERT_TRUE(( pointer3 != pointer4 ) == true);
 
-    CPPUNIT_ASSERT( pointer1 != NULL );
-    CPPUNIT_ASSERT( !pointer1 == false );
-    CPPUNIT_ASSERT( !!pointer1 == true );
+    ASSERT_TRUE(pointer1 != NULL);
+    ASSERT_TRUE(!pointer1 == false);
+    ASSERT_TRUE(!!pointer1 == true);
 
     // This won't compile which is correct.
     //ArrayPointer<TestClassB> pointer5( 1 );
     //ArrayPointer<TestClassA> pointer6( 1 );
-    //CPPUNIT_ASSERT( pointer5 != pointer6 );
+    //ASSERT_TRUE(pointer5 != pointer6);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -338,9 +338,9 @@ namespace {
 
             for( int i = 0; i < 999; ++i ) {
                 ArrayPointer<TestClassA> copy = this->mine;
-                CPPUNIT_ASSERT( copy[0].returnHello() == "Hello" );
+                ASSERT_TRUE(copy[0].returnHello() == "Hello");
                 copy.reset( new TestClassA[1], 1 );
-                CPPUNIT_ASSERT( copy[0].returnHello() == "Hello" );
+                ASSERT_TRUE(copy[0].returnHello() == "Hello");
             }
         }
     };
@@ -357,10 +357,10 @@ void ArrayPointerTest::testThreaded1() {
 
     for( int i = 0; i < 999; ++i ) {
         ArrayPointer<TestClassA> copy = pointer;
-        CPPUNIT_ASSERT( copy[0].returnHello() == "Hello" );
+        ASSERT_TRUE(copy[0].returnHello() == "Hello");
         Thread::yield();
         copy.reset( new TestClassA[1], 1 );
-        CPPUNIT_ASSERT( copy[0].returnHello() == "Hello" );
+        ASSERT_TRUE(copy[0].returnHello() == "Hello");
     }
 
     testThread.join();
@@ -380,17 +380,11 @@ void ArrayPointerTest::testOperators() {
     pointer1[0] = new TestClassA;
     pointer2[0] = new TestClassB;
 
-    CPPUNIT_ASSERT( pointer1[0]->returnHello() == "Hello" );
-    CPPUNIT_ASSERT( pointer2[0]->returnHello() == "GoodBye" );
+    ASSERT_TRUE(pointer1[0]->returnHello() == "Hello");
+    ASSERT_TRUE(pointer2[0]->returnHello() == "GoodBye");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "operator[] with bigger index than the array size should throw an IndexOutOfBoundsException",
-        pointer2[1]->returnHello(),
-        decaf::lang::exceptions::IndexOutOfBoundsException );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "operator[] on a NULL Should Throw a NullPointerException",
-        pointer3[0].returnHello(),
-        decaf::lang::exceptions::NullPointerException );
+    ASSERT_THROW(pointer2[1]->returnHello(), decaf::lang::exceptions::IndexOutOfBoundsException) << ("operator[] with bigger index than the array size should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(pointer3[0].returnHello(), decaf::lang::exceptions::NullPointerException) << ("operator[] on a NULL Should Throw a NullPointerException");
 
     delete pointer1[0];
     delete pointer2[0];
@@ -400,10 +394,7 @@ void ArrayPointerTest::testOperators() {
 
     pointer2.reset( NULL );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "operator[] on a NULL Should Throw a NullPointerException",
-        pointer2[0]->returnHello(),
-        decaf::lang::exceptions::NullPointerException );
+    ASSERT_THROW(pointer2[0]->returnHello(), decaf::lang::exceptions::NullPointerException) << ("operator[] on a NULL Should Throw a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -413,8 +404,8 @@ void ArrayPointerTest::testSTLContainers() {
     ArrayPointer<TestClassA> pointer2( 1 );
     ArrayPointer<TestClassA> pointer3( pointer2 );
 
-    CPPUNIT_ASSERT( pointer1.get() != NULL );
-    CPPUNIT_ASSERT( pointer2.get() != NULL );
+    ASSERT_TRUE(pointer1.get() != NULL);
+    ASSERT_TRUE(pointer2.get() != NULL);
 
     std::map< ArrayPointer<TestClassA>, std::string > testMap;
 
@@ -424,12 +415,12 @@ void ArrayPointerTest::testSTLContainers() {
 
     // Two and Three should be equivalent (not equal) but in this case
     // equivalent is what matters.  So pointer2 should be bumped out of the map.
-    CPPUNIT_ASSERT( testMap.size() == 2 );
+    ASSERT_TRUE(testMap.size() == 2);
 
     testMap.insert( std::make_pair( ArrayPointer<TestClassA>( new TestClassA[4], 4 ), "Fred" ) );
 
-    CPPUNIT_ASSERT( testMap.find( pointer1 ) != testMap.end() );
-    CPPUNIT_ASSERT( testMap.find( pointer2 ) != testMap.end() );
+    ASSERT_TRUE(testMap.find( pointer1 ) != testMap.end());
+    ASSERT_TRUE(testMap.find( pointer2 ) != testMap.end());
 
     ArrayPointer< int > one( 1 );
     ArrayPointer< int > two( 1 );
@@ -441,18 +432,18 @@ void ArrayPointerTest::testSTLContainers() {
 
     std::map< ArrayPointer<int>, int, ArrayPointerComparator<int> > testMap2;
 
-    CPPUNIT_ASSERT( testMap2.size() == 0 );
+    ASSERT_TRUE(testMap2.size() == 0);
     testMap2.insert( std::make_pair( three, 3 ) );
     testMap2.insert( std::make_pair( two, 2 ) );
     testMap2.insert( std::make_pair( one, 1 ) );
-    CPPUNIT_ASSERT( testMap2.size() == 3 );
-    CPPUNIT_ASSERT( testMap2.begin()->first.get() < testMap2.rbegin()->first.get() );
+    ASSERT_TRUE(testMap2.size() == 3);
+    ASSERT_TRUE(testMap2.begin()->first.get() < testMap2.rbegin()->first.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ArrayPointerTest::testReturnByValue() {
     ArrayPointer<TestClassA> result = methodReturnArrayPointer();
-    CPPUNIT_ASSERT( result.get() != NULL );
+    ASSERT_TRUE(result.get() != NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

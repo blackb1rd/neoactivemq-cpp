@@ -18,20 +18,12 @@
 #ifndef _ACTIVEMQ_THREADS_COMPOSITETASKRUNNERTEST_H_
 #define _ACTIVEMQ_THREADS_COMPOSITETASKRUNNERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq {
 namespace threads {
 
-    class CompositeTaskRunnerTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( CompositeTaskRunnerTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( testCreateButNotStarted );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class CompositeTaskRunnerTest : public ::testing::Test {
+public:
 
         CompositeTaskRunnerTest() {}
         virtual ~CompositeTaskRunnerTest() {}

@@ -20,20 +20,13 @@
 
 #include <activemq/util/PrimitiveValueNode.h>
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace activemq{
 namespace util{
 
-    class PrimitiveValueNodeTest : public CppUnit::TestFixture
+    class PrimitiveValueNodeTest : public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( PrimitiveValueNodeTest );
-        CPPUNIT_TEST( testValueNode );
-        CPPUNIT_TEST( testValueNodeCtors );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         PrimitiveValueNodeTest(){}
         virtual ~PrimitiveValueNodeTest(){}

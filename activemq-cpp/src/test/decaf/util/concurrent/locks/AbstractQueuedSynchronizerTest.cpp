@@ -45,7 +45,7 @@ namespace {
         bool isHeldExclusively() const { return getState() == 1; }
 
         bool tryAcquire(int acquires) {
-            //CPPUNIT_ASSERT(acquires == 1);
+            //ASSERT_TRUE(acquires == 1);
             return compareAndSetState(0, 1);
         }
 
@@ -156,23 +156,23 @@ AbstractQueuedSynchronizerTest::~AbstractQueuedSynchronizerTest() {
 ////////////////////////////////////////////////////////////////////////////////
 void AbstractQueuedSynchronizerTest::testIsHeldExclusively() {
     TestMutex rl;
-    CPPUNIT_ASSERT(!rl.isHeldExclusively());
+    ASSERT_TRUE(!rl.isHeldExclusively());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void AbstractQueuedSynchronizerTest::testAcquire() {
     TestMutex rl;
     rl.acquire(1);
-    CPPUNIT_ASSERT(rl.isHeldExclusively());
+    ASSERT_TRUE(rl.isHeldExclusively());
     rl.release(1);
-    CPPUNIT_ASSERT(!rl.isHeldExclusively());
+    ASSERT_TRUE(!rl.isHeldExclusively());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void AbstractQueuedSynchronizerTest::testTryAcquire() {
     TestMutex rl;
-    CPPUNIT_ASSERT(rl.tryAcquire(1));
-    CPPUNIT_ASSERT(rl.isHeldExclusively());
+    ASSERT_TRUE(rl.tryAcquire(1));
+    ASSERT_TRUE(rl.isHeldExclusively());
     rl.release(1);
 }
 
@@ -188,20 +188,20 @@ void AbstractQueuedSynchronizerTest::testhasQueuedThreads() {
     Thread t2(&iSyncRun2);
 
     try {
-        CPPUNIT_ASSERT(!mutex.hasQueuedThreads());
+        ASSERT_TRUE(!mutex.hasQueuedThreads());
         mutex.acquire(1);
         t1.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(mutex.hasQueuedThreads());
+        ASSERT_TRUE(mutex.hasQueuedThreads());
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(mutex.hasQueuedThreads());
+        ASSERT_TRUE(mutex.hasQueuedThreads());
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(mutex.hasQueuedThreads());
+        ASSERT_TRUE(mutex.hasQueuedThreads());
         mutex.release(1);
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!mutex.hasQueuedThreads());
+        ASSERT_TRUE(!mutex.hasQueuedThreads());
         t1.join();
         t2.join();
     } catch(Exception& e){
@@ -230,25 +230,25 @@ void AbstractQueuedSynchronizerTest::testIsQueued() {
     Thread t2(&iSyncRun2);
 
     try {
-        CPPUNIT_ASSERT(!mutex.isQueued(&t1));
-        CPPUNIT_ASSERT(!mutex.isQueued(&t2));
+        ASSERT_TRUE(!mutex.isQueued(&t1));
+        ASSERT_TRUE(!mutex.isQueued(&t2));
         mutex.acquire(1);
         t1.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(mutex.isQueued(&t1));
+        ASSERT_TRUE(mutex.isQueued(&t1));
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(mutex.isQueued(&t1));
-        CPPUNIT_ASSERT(mutex.isQueued(&t2));
+        ASSERT_TRUE(mutex.isQueued(&t1));
+        ASSERT_TRUE(mutex.isQueued(&t2));
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!mutex.isQueued(&t1));
-        CPPUNIT_ASSERT(mutex.isQueued(&t2));
+        ASSERT_TRUE(!mutex.isQueued(&t1));
+        ASSERT_TRUE(mutex.isQueued(&t2));
         mutex.release(1);
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!mutex.isQueued(&t1));
+        ASSERT_TRUE(!mutex.isQueued(&t1));
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!mutex.isQueued(&t2));
+        ASSERT_TRUE(!mutex.isQueued(&t2));
         t1.join();
         t2.join();
     } catch(Exception& e){
@@ -271,21 +271,21 @@ void AbstractQueuedSynchronizerTest::testGetFirstQueuedThread() {
     Thread t2(&iSyncRun2);
 
     try {
-        CPPUNIT_ASSERT(mutex.getFirstQueuedThread() == NULL);
+        ASSERT_TRUE(mutex.getFirstQueuedThread() == NULL);
         mutex.acquire(1);
         t1.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(&t1, mutex.getFirstQueuedThread());
+        ASSERT_EQ(&t1, mutex.getFirstQueuedThread());
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(&t1, mutex.getFirstQueuedThread());
+        ASSERT_EQ(&t1, mutex.getFirstQueuedThread());
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(&t2, mutex.getFirstQueuedThread());
+        ASSERT_EQ(&t2, mutex.getFirstQueuedThread());
         mutex.release(1);
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(mutex.getFirstQueuedThread() == NULL);
+        ASSERT_TRUE(mutex.getFirstQueuedThread() == NULL);
         t1.join();
         t2.join();
     } catch(Exception& e){
@@ -304,20 +304,20 @@ void AbstractQueuedSynchronizerTest::testHasContended() {
     Thread t2(&iSyncRun2);
 
     try {
-        CPPUNIT_ASSERT(!mutex.hasContended());
+        ASSERT_TRUE(!mutex.hasContended());
         mutex.acquire(1);
         t1.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(mutex.hasContended());
+        ASSERT_TRUE(mutex.hasContended());
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(mutex.hasContended());
+        ASSERT_TRUE(mutex.hasContended());
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(mutex.hasContended());
+        ASSERT_TRUE(mutex.hasContended());
         mutex.release(1);
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(mutex.hasContended());
+        ASSERT_TRUE(mutex.hasContended());
         t1.join();
         t2.join();
     } catch(Exception& e){
@@ -335,23 +335,23 @@ void AbstractQueuedSynchronizerTest::testGetQueuedThreads() {
     Thread t1(&iSyncRun1);
     Thread t2(&iSyncRun2);
     try {
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->isEmpty());
         mutex.acquire(1);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->isEmpty());
         t1.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->contains(&t1));
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->contains(&t1));
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->contains(&t1));
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->contains(&t2));
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->contains(&t1));
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->contains(&t2));
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->contains(&t1));
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->contains(&t2));
+        ASSERT_TRUE(!std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->contains(&t1));
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->contains(&t2));
         mutex.release(1);
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getQueuedThreads())->isEmpty());
         t1.join();
         t2.join();
     } catch(Exception& e){
@@ -370,23 +370,23 @@ void AbstractQueuedSynchronizerTest::testGetExclusiveQueuedThreads() {
     Thread t2(&iSyncRun2);
 
     try {
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->isEmpty());
         mutex.acquire(1);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->isEmpty());
         t1.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->contains(&t1));
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->contains(&t1));
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->contains(&t1));
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->contains(&t2));
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->contains(&t1));
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->contains(&t2));
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->contains(&t1));
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->contains(&t2));
+        ASSERT_TRUE(!std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->contains(&t1));
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->contains(&t2));
         mutex.release(1);
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getExclusiveQueuedThreads())->isEmpty());
         t1.join();
         t2.join();
     } catch(Exception& e){
@@ -405,21 +405,21 @@ void AbstractQueuedSynchronizerTest::testGetSharedQueuedThreads() {
     Thread t2(&iSyncRun2);
 
     try {
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getSharedQueuedThreads())->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getSharedQueuedThreads())->isEmpty());
         mutex.acquire(1);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getSharedQueuedThreads())->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getSharedQueuedThreads())->isEmpty());
         t1.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getSharedQueuedThreads())->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getSharedQueuedThreads())->isEmpty());
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getSharedQueuedThreads())->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getSharedQueuedThreads())->isEmpty());
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getSharedQueuedThreads())->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getSharedQueuedThreads())->isEmpty());
         mutex.release(1);
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getSharedQueuedThreads())->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getSharedQueuedThreads())->isEmpty());
         t1.join();
         t2.join();
     } catch(Exception& e){
@@ -597,18 +597,18 @@ namespace {
 void AbstractQueuedSynchronizerTest::testGetState() {
     TestMutex mutex;
     mutex.acquire(1);
-    CPPUNIT_ASSERT(mutex.isHeldExclusively());
+    ASSERT_TRUE(mutex.isHeldExclusively());
     mutex.release(1);
-    CPPUNIT_ASSERT(!mutex.isHeldExclusively());
+    ASSERT_TRUE(!mutex.isHeldExclusively());
     TestGetStateRunnable run(this, &mutex);
     Thread t(&run);
 
     try {
         t.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(mutex.isHeldExclusively());
+        ASSERT_TRUE(mutex.isHeldExclusively());
         t.join();
-        CPPUNIT_ASSERT(!mutex.isHeldExclusively());
+        ASSERT_TRUE(!mutex.isHeldExclusively());
     } catch(Exception& e){
         unexpectedException();
     }
@@ -648,7 +648,7 @@ void AbstractQueuedSynchronizerTest::testAcquireInterruptibly2() {
     try {
         t.start();
         t.interrupt();
-        CPPUNIT_ASSERT(mutex.isHeldExclusively());
+        ASSERT_TRUE(mutex.isHeldExclusively());
         t.join();
     } catch(Exception& e){
         unexpectedException();
@@ -660,8 +660,8 @@ void AbstractQueuedSynchronizerTest::testOwns() {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     TestMutex mutex2;
-    CPPUNIT_ASSERT(mutex.owns(c));
-    CPPUNIT_ASSERT(!mutex2.owns(c));
+    ASSERT_TRUE(mutex.owns(c));
+    ASSERT_TRUE(!mutex2.owns(c));
     delete c;
 }
 
@@ -700,7 +700,7 @@ void AbstractQueuedSynchronizerTest::testAwaitNanosTimeout() {
     try {
         mutex.acquire(1);
         long long t = c->awaitNanos(100);
-        CPPUNIT_ASSERT(t <= 0);
+        ASSERT_TRUE(t <= 0);
         mutex.release(1);
     } catch(Exception& ex) {
         unexpectedException();
@@ -714,7 +714,7 @@ void AbstractQueuedSynchronizerTest::testAwaitTimeout() {
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     try {
         mutex.acquire(1);
-        CPPUNIT_ASSERT(!c->await(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(!c->await(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         mutex.release(1);
     } catch(Exception& ex) {
         unexpectedException();
@@ -729,7 +729,7 @@ void AbstractQueuedSynchronizerTest::testAwaitUntilTimeout() {
     try {
         mutex.acquire(1);
         Date d;
-        CPPUNIT_ASSERT(!c->awaitUntil((d.getTime() + 15)));
+        ASSERT_TRUE(!c->awaitUntil((d.getTime() + 15)));
         mutex.release(1);
     } catch(Exception& ex) {
         unexpectedException();
@@ -785,7 +785,7 @@ void AbstractQueuedSynchronizerTest::testAwait() {
         c->signal();
         mutex.release(1);
         t.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t.isAlive());
+        ASSERT_TRUE(!t.isAlive());
     }
     catch (Exception& ex) {
         unexpectedException();
@@ -963,17 +963,17 @@ void AbstractQueuedSynchronizerTest::testHasWaiters() {
         t.start();
         Thread::sleep( SHORT_DELAY_MS);
         mutex.acquire(1);
-        CPPUNIT_ASSERT(mutex.hasWaiters(c));
-        CPPUNIT_ASSERT_EQUAL(1, mutex.getWaitQueueLength(c));
+        ASSERT_TRUE(mutex.hasWaiters(c));
+        ASSERT_EQ(1, mutex.getWaitQueueLength(c));
         c->signal();
         mutex.release(1);
         Thread::sleep(SHORT_DELAY_MS);
         mutex.acquire(1);
-        CPPUNIT_ASSERT(!mutex.hasWaiters(c));
-        CPPUNIT_ASSERT_EQUAL(0, mutex.getWaitQueueLength(c));
+        ASSERT_TRUE(!mutex.hasWaiters(c));
+        ASSERT_EQ(0, mutex.getWaitQueueLength(c));
         mutex.release(1);
         t.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t.isAlive());
+        ASSERT_TRUE(!t.isAlive());
     } catch(Exception& ex) {
         unexpectedException();
     }
@@ -1063,19 +1063,19 @@ void AbstractQueuedSynchronizerTest::testGetWaitQueueLength() {
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
         mutex.acquire(1);
-        CPPUNIT_ASSERT(mutex.hasWaiters(c));
-        CPPUNIT_ASSERT_EQUAL(2, mutex.getWaitQueueLength(c));
+        ASSERT_TRUE(mutex.hasWaiters(c));
+        ASSERT_EQ(2, mutex.getWaitQueueLength(c));
         c->signalAll();
         mutex.release(1);
         Thread::sleep(SHORT_DELAY_MS);
         mutex.acquire(1);
-        CPPUNIT_ASSERT(!mutex.hasWaiters(c));
-        CPPUNIT_ASSERT_EQUAL(0, mutex.getWaitQueueLength(c));
+        ASSERT_TRUE(!mutex.hasWaiters(c));
+        ASSERT_EQ(0, mutex.getWaitQueueLength(c));
         mutex.release(1);
         t1.join(SHORT_DELAY_MS);
         t2.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t1.isAlive());
-        CPPUNIT_ASSERT(!t2.isAlive());
+        ASSERT_TRUE(!t1.isAlive());
+        ASSERT_TRUE(!t2.isAlive());
     }
     catch (Exception& ex) {
         unexpectedException();
@@ -1162,27 +1162,27 @@ void AbstractQueuedSynchronizerTest::testGetWaitingThreads() {
 
     try {
         mutex.acquire(1);
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getWaitingThreads(c))->isEmpty());
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getWaitingThreads(c))->isEmpty());
         mutex.release(1);
         t1.start();
         Thread::sleep(SHORT_DELAY_MS);
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
         mutex.acquire(1);
-        CPPUNIT_ASSERT(mutex.hasWaiters(c));
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getWaitingThreads(c))->contains(&t1));
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getWaitingThreads(c))->contains(&t2));
+        ASSERT_TRUE(mutex.hasWaiters(c));
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getWaitingThreads(c))->contains(&t1));
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getWaitingThreads(c))->contains(&t2));
         c->signalAll();
         mutex.release(1);
         Thread::sleep(SHORT_DELAY_MS);
         mutex.acquire(1);
-        CPPUNIT_ASSERT(!mutex.hasWaiters(c));
-        CPPUNIT_ASSERT(std::unique_ptr<Collection<Thread*> >(mutex.getWaitingThreads(c))->isEmpty());
+        ASSERT_TRUE(!mutex.hasWaiters(c));
+        ASSERT_TRUE(std::unique_ptr<Collection<Thread*> >(mutex.getWaitingThreads(c))->isEmpty());
         mutex.release(1);
         t1.join(SHORT_DELAY_MS);
         t2.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t1.isAlive());
-        CPPUNIT_ASSERT(!t2.isAlive());
+        ASSERT_TRUE(!t1.isAlive());
+        ASSERT_TRUE(!t2.isAlive());
     }
     catch (Exception& ex) {
         unexpectedException();
@@ -1239,11 +1239,11 @@ void AbstractQueuedSynchronizerTest::testAwaitUninterruptibly() {
         }
         t.interrupt();
         mutex.acquire(1);
-        CPPUNIT_ASSERT(mutex.hasWaiters(c));
+        ASSERT_TRUE(mutex.hasWaiters(c));
         c->signal();
         mutex.release(1);
         t.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t.isAlive());
+        ASSERT_TRUE(!t.isAlive());
     }
     catch (Exception& ex) {
         unexpectedException();
@@ -1296,7 +1296,7 @@ void AbstractQueuedSynchronizerTest::testAwaitInterrupt() {
         Thread::sleep(SHORT_DELAY_MS);
         t.interrupt();
         t.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t.isAlive());
+        ASSERT_TRUE(!t.isAlive());
     }
     catch (Exception& ex) {
         unexpectedException();
@@ -1349,7 +1349,7 @@ void AbstractQueuedSynchronizerTest::testAwaitNanosInterrupt() {
         Thread::sleep(SHORT_DELAY_MS);
         t.interrupt();
         t.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t.isAlive());
+        ASSERT_TRUE(!t.isAlive());
     }
     catch (Exception& ex) {
         unexpectedException();
@@ -1403,7 +1403,7 @@ void AbstractQueuedSynchronizerTest::testAwaitUntilInterrupt() {
         Thread::sleep(SHORT_DELAY_MS);
         t.interrupt();
         t.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t.isAlive());
+        ASSERT_TRUE(!t.isAlive());
     }
     catch (Exception& ex) {
         unexpectedException();
@@ -1463,8 +1463,8 @@ void AbstractQueuedSynchronizerTest::testSignalAll() {
         mutex.release(1);
         t1.join(SHORT_DELAY_MS);
         t2.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t1.isAlive());
-        CPPUNIT_ASSERT(!t2.isAlive());
+        ASSERT_TRUE(!t1.isAlive());
+        ASSERT_TRUE(!t2.isAlive());
     }
     catch (Exception& ex) {
         unexpectedException();
@@ -1476,28 +1476,28 @@ void AbstractQueuedSynchronizerTest::testSignalAll() {
 void AbstractQueuedSynchronizerTest::testToString() {
     TestMutex mutex;
     std::string us = mutex.toString();
-    CPPUNIT_ASSERT((int)(us.find("State = 0")) >= 0);
+    ASSERT_TRUE((int)(us.find("State = 0")) >= 0);
     mutex.acquire(1);
     std::string ls = mutex.toString();
-    CPPUNIT_ASSERT((int)(ls.find("State = 1")) >= 0);
+    ASSERT_TRUE((int)(ls.find("State = 1")) >= 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void AbstractQueuedSynchronizerTest::testGetStateWithReleaseShared() {
     BooleanLatch l;
-    CPPUNIT_ASSERT(!l.isSignalled());
+    ASSERT_TRUE(!l.isSignalled());
     l.releaseShared(0);
-    CPPUNIT_ASSERT(l.isSignalled());
+    ASSERT_TRUE(l.isSignalled());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void AbstractQueuedSynchronizerTest::testReleaseShared() {
     BooleanLatch l;
-    CPPUNIT_ASSERT(!l.isSignalled());
+    ASSERT_TRUE(!l.isSignalled());
     l.releaseShared(0);
-    CPPUNIT_ASSERT(l.isSignalled());
+    ASSERT_TRUE(l.isSignalled());
     l.releaseShared(0);
-    CPPUNIT_ASSERT(l.isSignalled());
+    ASSERT_TRUE(l.isSignalled());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1540,10 +1540,10 @@ void AbstractQueuedSynchronizerTest::testAcquireSharedInterruptibly() {
 
     try {
         t.start();
-        CPPUNIT_ASSERT(!l.isSignalled());
+        ASSERT_TRUE(!l.isSignalled());
         Thread::sleep(SHORT_DELAY_MS);
         l.releaseShared(0);
-        CPPUNIT_ASSERT(l.isSignalled());
+        ASSERT_TRUE(l.isSignalled());
         t.join();
     } catch (InterruptedException& e){
         unexpectedException();
@@ -1590,10 +1590,10 @@ void AbstractQueuedSynchronizerTest::testAsquireSharedTimed() {
 
     try {
         t.start();
-        CPPUNIT_ASSERT(!l.isSignalled());
+        ASSERT_TRUE(!l.isSignalled());
         Thread::sleep(SHORT_DELAY_MS);
         l.releaseShared(0);
-        CPPUNIT_ASSERT(l.isSignalled());
+        ASSERT_TRUE(l.isSignalled());
         t.join();
     } catch (InterruptedException& e){
         unexpectedException();
@@ -1639,7 +1639,7 @@ void AbstractQueuedSynchronizerTest::testAcquireSharedInterruptiblyInterruptedEx
 
     t.start();
     try {
-        CPPUNIT_ASSERT(!l.isSignalled());
+        ASSERT_TRUE(!l.isSignalled());
         t.interrupt();
         t.join();
     } catch (InterruptedException& e){
@@ -1687,7 +1687,7 @@ void AbstractQueuedSynchronizerTest::testAcquireSharedNanosInterruptedException(
     t.start();
     try {
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!l.isSignalled());
+        ASSERT_TRUE(!l.isSignalled());
         t.interrupt();
         t.join();
     } catch (InterruptedException& e){
@@ -1735,7 +1735,7 @@ void AbstractQueuedSynchronizerTest::testAcquireSharedNanosTimeout() {
     t.start();
     try {
         Thread::sleep( SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!l.isSignalled());
+        ASSERT_TRUE(!l.isSignalled());
         t.join();
     } catch(InterruptedException& e) {
         unexpectedException();

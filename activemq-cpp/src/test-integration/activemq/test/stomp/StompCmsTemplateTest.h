@@ -26,14 +26,7 @@ namespace test{
 namespace stomp{
 
     class StompCmsTemplateTest : public CmsTemplateTest {
-
-        CPPUNIT_TEST_SUITE( StompCmsTemplateTest );
-        CPPUNIT_TEST( testBasics );
-        CPPUNIT_TEST( testReceiveException );
-        CPPUNIT_TEST( testSendException );
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+public:
 
         StompCmsTemplateTest();
         virtual ~StompCmsTemplateTest();

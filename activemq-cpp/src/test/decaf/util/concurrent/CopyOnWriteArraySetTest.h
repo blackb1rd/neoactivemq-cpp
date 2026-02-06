@@ -18,37 +18,13 @@
 #ifndef _DECAF_UTIL_CONCURRENT_COPYONWRITEARRAYSETTEST_H_
 #define _DECAF_UTIL_CONCURRENT_COPYONWRITEARRAYSETTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace util {
 namespace concurrent {
 
-    class CopyOnWriteArraySetTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( CopyOnWriteArraySetTest );
-        CPPUNIT_TEST( testConstructor1 );
-        CPPUNIT_TEST( testConstructor2 );
-        CPPUNIT_TEST( testConstructor3 );
-        CPPUNIT_TEST( testAddAll1 );
-        CPPUNIT_TEST( testAddAll2 );
-        CPPUNIT_TEST( testAdd1 );
-        CPPUNIT_TEST( testAdd2 );
-        CPPUNIT_TEST( testClear );
-        CPPUNIT_TEST( testContains );
-        CPPUNIT_TEST( testContainsAll );
-        CPPUNIT_TEST( testEquals );
-        CPPUNIT_TEST( testIsEmpty );
-        CPPUNIT_TEST( testIterator );
-        CPPUNIT_TEST( testIteratorRemove );
-        CPPUNIT_TEST( testRemoveAll );
-        CPPUNIT_TEST( testRemove );
-        CPPUNIT_TEST( testSize );
-        CPPUNIT_TEST( testToArray );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class CopyOnWriteArraySetTest : public ::testing::Test {
+private:
 
         static const int SIZE;
 

@@ -108,14 +108,14 @@ ReentrantReadWriteLockTest::~ReentrantReadWriteLockTest() {
 void ReentrantReadWriteLockTest::testConstructor() {
 
     ReentrantReadWriteLock rl;
-    CPPUNIT_ASSERT(!rl.isFair());
-    CPPUNIT_ASSERT(!rl.isWriteLocked());
-    CPPUNIT_ASSERT_EQUAL(0, rl.getReadLockCount());
+    ASSERT_TRUE(!rl.isFair());
+    ASSERT_TRUE(!rl.isWriteLocked());
+    ASSERT_EQ(0, rl.getReadLockCount());
 
     ReentrantReadWriteLock r2(true);
-    CPPUNIT_ASSERT(r2.isFair());
-    CPPUNIT_ASSERT(!r2.isWriteLocked());
-    CPPUNIT_ASSERT_EQUAL(0, r2.getReadLockCount());
+    ASSERT_TRUE(r2.isFair());
+    ASSERT_TRUE(!r2.isWriteLocked());
+    ASSERT_EQ(0, r2.getReadLockCount());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -123,21 +123,21 @@ void ReentrantReadWriteLockTest::testLock() {
 
     ReentrantReadWriteLock rl;
     rl.writeLock().lock();
-    CPPUNIT_ASSERT(rl.isWriteLocked());
-    CPPUNIT_ASSERT(rl.isWriteLockedByCurrentThread());
-    CPPUNIT_ASSERT_EQUAL(0, rl.getReadLockCount());
+    ASSERT_TRUE(rl.isWriteLocked());
+    ASSERT_TRUE(rl.isWriteLockedByCurrentThread());
+    ASSERT_EQ(0, rl.getReadLockCount());
     rl.writeLock().unlock();
-    CPPUNIT_ASSERT(!rl.isWriteLocked());
-    CPPUNIT_ASSERT(!rl.isWriteLockedByCurrentThread());
-    CPPUNIT_ASSERT_EQUAL(0, rl.getReadLockCount());
+    ASSERT_TRUE(!rl.isWriteLocked());
+    ASSERT_TRUE(!rl.isWriteLockedByCurrentThread());
+    ASSERT_EQ(0, rl.getReadLockCount());
     rl.readLock().lock();
-    CPPUNIT_ASSERT(!rl.isWriteLocked());
-    CPPUNIT_ASSERT(!rl.isWriteLockedByCurrentThread());
-    CPPUNIT_ASSERT_EQUAL(1, rl.getReadLockCount());
+    ASSERT_TRUE(!rl.isWriteLocked());
+    ASSERT_TRUE(!rl.isWriteLockedByCurrentThread());
+    ASSERT_EQ(1, rl.getReadLockCount());
     rl.readLock().unlock();
-    CPPUNIT_ASSERT(!rl.isWriteLocked());
-    CPPUNIT_ASSERT(!rl.isWriteLockedByCurrentThread());
-    CPPUNIT_ASSERT_EQUAL(0, rl.getReadLockCount());
+    ASSERT_TRUE(!rl.isWriteLocked());
+    ASSERT_TRUE(!rl.isWriteLockedByCurrentThread());
+    ASSERT_EQ(0, rl.getReadLockCount());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -145,21 +145,21 @@ void ReentrantReadWriteLockTest::testFairLock() {
 
     ReentrantReadWriteLock rl(true);
     rl.writeLock().lock();
-    CPPUNIT_ASSERT(rl.isWriteLocked());
-    CPPUNIT_ASSERT(rl.isWriteLockedByCurrentThread());
-    CPPUNIT_ASSERT_EQUAL(0, rl.getReadLockCount());
+    ASSERT_TRUE(rl.isWriteLocked());
+    ASSERT_TRUE(rl.isWriteLockedByCurrentThread());
+    ASSERT_EQ(0, rl.getReadLockCount());
     rl.writeLock().unlock();
-    CPPUNIT_ASSERT(!rl.isWriteLocked());
-    CPPUNIT_ASSERT(!rl.isWriteLockedByCurrentThread());
-    CPPUNIT_ASSERT_EQUAL(0, rl.getReadLockCount());
+    ASSERT_TRUE(!rl.isWriteLocked());
+    ASSERT_TRUE(!rl.isWriteLockedByCurrentThread());
+    ASSERT_EQ(0, rl.getReadLockCount());
     rl.readLock().lock();
-    CPPUNIT_ASSERT(!rl.isWriteLocked());
-    CPPUNIT_ASSERT(!rl.isWriteLockedByCurrentThread());
-    CPPUNIT_ASSERT_EQUAL(1, rl.getReadLockCount());
+    ASSERT_TRUE(!rl.isWriteLocked());
+    ASSERT_TRUE(!rl.isWriteLockedByCurrentThread());
+    ASSERT_EQ(1, rl.getReadLockCount());
     rl.readLock().unlock();
-    CPPUNIT_ASSERT(!rl.isWriteLocked());
-    CPPUNIT_ASSERT(!rl.isWriteLockedByCurrentThread());
-    CPPUNIT_ASSERT_EQUAL(0, rl.getReadLockCount());
+    ASSERT_TRUE(!rl.isWriteLocked());
+    ASSERT_TRUE(!rl.isWriteLockedByCurrentThread());
+    ASSERT_EQ(0, rl.getReadLockCount());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -167,11 +167,11 @@ void ReentrantReadWriteLockTest::testGetWriteHoldCount() {
     ReentrantReadWriteLock lock;
     for (int i = 1; i <= SIZEVAL; i++) {
         lock.writeLock().lock();
-        CPPUNIT_ASSERT_EQUAL(i,lock.getWriteHoldCount());
+        ASSERT_EQ(i, lock.getWriteHoldCount());
     }
     for (int i = SIZEVAL; i > 0; i--) {
         lock.writeLock().unlock();
-        CPPUNIT_ASSERT_EQUAL(i-1,lock.getWriteHoldCount());
+        ASSERT_EQ(i-1, lock.getWriteHoldCount());
     }
 }
 
@@ -577,8 +577,8 @@ void ReentrantReadWriteLockTest::testWriteAfterMultipleReadLocks() {
         lock.readLock().unlock();
         t1.join(MEDIUM_DELAY_MS);
         t2.join(MEDIUM_DELAY_MS);
-        CPPUNIT_ASSERT(!t1.isAlive());
-        CPPUNIT_ASSERT(!t2.isAlive());
+        ASSERT_TRUE(!t1.isAlive());
+        ASSERT_TRUE(!t2.isAlive());
     } catch (Exception& e) {
         unexpectedException();
     }
@@ -627,8 +627,8 @@ void ReentrantReadWriteLockTest::testReadAfterWriteLock() {
         lock.writeLock().unlock();
         t1.join(MEDIUM_DELAY_MS);
         t2.join(MEDIUM_DELAY_MS);
-        CPPUNIT_ASSERT(!t1.isAlive());
-        CPPUNIT_ASSERT(!t2.isAlive());
+        ASSERT_TRUE(!t1.isAlive());
+        ASSERT_TRUE(!t2.isAlive());
     } catch (Exception& e) {
         unexpectedException();
     }
@@ -639,7 +639,7 @@ void ReentrantReadWriteLockTest::testReadHoldingWriteLock() {
 
     ReentrantReadWriteLock lock;
     lock.writeLock().lock();
-    CPPUNIT_ASSERT(lock.readLock().tryLock());
+    ASSERT_TRUE(lock.readLock().tryLock());
     lock.readLock().unlock();
     lock.writeLock().unlock();
 }
@@ -691,8 +691,8 @@ void ReentrantReadWriteLockTest::testReadHoldingWriteLock2() {
         lock.writeLock().unlock();
         t1.join(MEDIUM_DELAY_MS);
         t2.join(MEDIUM_DELAY_MS);
-        CPPUNIT_ASSERT(!t1.isAlive());
-        CPPUNIT_ASSERT(!t2.isAlive());
+        ASSERT_TRUE(!t1.isAlive());
+        ASSERT_TRUE(!t2.isAlive());
     } catch (Exception& e) {
         unexpectedException();
     }
@@ -745,8 +745,8 @@ void ReentrantReadWriteLockTest::testReadHoldingWriteLock3() {
         lock.writeLock().unlock();
         t1.join(MEDIUM_DELAY_MS);
         t2.join(MEDIUM_DELAY_MS);
-        CPPUNIT_ASSERT(!t1.isAlive());
-        CPPUNIT_ASSERT(!t2.isAlive());
+        ASSERT_TRUE(!t1.isAlive());
+        ASSERT_TRUE(!t2.isAlive());
     } catch (Exception& e) {
         unexpectedException();
     }
@@ -799,8 +799,8 @@ void ReentrantReadWriteLockTest::testWriteHoldingWriteLock4() {
         lock.writeLock().unlock();
         t1.join(MEDIUM_DELAY_MS);
         t2.join(MEDIUM_DELAY_MS);
-        CPPUNIT_ASSERT(!t1.isAlive());
-        CPPUNIT_ASSERT(!t2.isAlive());
+        ASSERT_TRUE(!t1.isAlive());
+        ASSERT_TRUE(!t2.isAlive());
     } catch (Exception& e) {
         unexpectedException();
     }
@@ -811,7 +811,7 @@ void ReentrantReadWriteLockTest::testReadHoldingWriteLockFair() {
 
     ReentrantReadWriteLock lock(true);
     lock.writeLock().lock();
-    CPPUNIT_ASSERT(lock.readLock().tryLock());
+    ASSERT_TRUE(lock.readLock().tryLock());
     lock.readLock().unlock();
     lock.writeLock().unlock();
 }
@@ -863,8 +863,8 @@ void ReentrantReadWriteLockTest::testReadHoldingWriteLockFair2() {
         lock.writeLock().unlock();
         t1.join(MEDIUM_DELAY_MS);
         t2.join(MEDIUM_DELAY_MS);
-        CPPUNIT_ASSERT(!t1.isAlive());
-        CPPUNIT_ASSERT(!t2.isAlive());
+        ASSERT_TRUE(!t1.isAlive());
+        ASSERT_TRUE(!t2.isAlive());
     } catch (Exception& e) {
         unexpectedException();
     }
@@ -917,8 +917,8 @@ void ReentrantReadWriteLockTest::testReadHoldingWriteLockFair3() {
         lock.writeLock().unlock();
         t1.join(MEDIUM_DELAY_MS);
         t2.join(MEDIUM_DELAY_MS);
-        CPPUNIT_ASSERT(!t1.isAlive());
-        CPPUNIT_ASSERT(!t2.isAlive());
+        ASSERT_TRUE(!t1.isAlive());
+        ASSERT_TRUE(!t2.isAlive());
     } catch (Exception& e) {
         unexpectedException();
     }
@@ -963,18 +963,18 @@ void ReentrantReadWriteLockTest::testWriteHoldingWriteLockFair4() {
         t1.start();
         t2.start();
         Thread::sleep( SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(lock.isWriteLockedByCurrentThread());
-        CPPUNIT_ASSERT(lock.getWriteHoldCount() == 1);
+        ASSERT_TRUE(lock.isWriteLockedByCurrentThread());
+        ASSERT_TRUE(lock.getWriteHoldCount() == 1);
         lock.writeLock().lock();
-        CPPUNIT_ASSERT(lock.getWriteHoldCount() == 2);
+        ASSERT_TRUE(lock.getWriteHoldCount() == 2);
         lock.writeLock().unlock();
         lock.writeLock().lock();
         lock.writeLock().unlock();
         lock.writeLock().unlock();
         t1.join(MEDIUM_DELAY_MS);
         t2.join(MEDIUM_DELAY_MS);
-        CPPUNIT_ASSERT(!t1.isAlive());
-        CPPUNIT_ASSERT(!t2.isAlive());
+        ASSERT_TRUE(!t1.isAlive());
+        ASSERT_TRUE(!t2.isAlive());
     } catch (Exception& e) {
         unexpectedException();
     }
@@ -1385,7 +1385,7 @@ void ReentrantReadWriteLockTest::testAwaitNanosTimeout() {
     try {
         lock.writeLock().lock();
         long long t = c->awaitNanos(100);
-        CPPUNIT_ASSERT(t <= 0);
+        ASSERT_TRUE(t <= 0);
         lock.writeLock().unlock();
     } catch (Exception& ex) {
         unexpectedException();
@@ -1399,7 +1399,7 @@ void ReentrantReadWriteLockTest::testAwaitTimeout() {
     Pointer<Condition> c(lock.writeLock().newCondition());
     try {
         lock.writeLock().lock();
-        CPPUNIT_ASSERT(!c->await(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(!c->await(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         lock.writeLock().unlock();
     } catch (Exception& ex) {
         unexpectedException();
@@ -1414,7 +1414,7 @@ void ReentrantReadWriteLockTest::testAwaitUntilTimeout() {
     try {
         lock.writeLock().lock();
         Date d;
-        CPPUNIT_ASSERT(!c->awaitUntil(Date(d.getTime() + SHORT_DELAY_MS)));
+        ASSERT_TRUE(!c->awaitUntil(Date(d.getTime() + SHORT_DELAY_MS)));
         lock.writeLock().unlock();
     } catch (Exception& ex) {
         unexpectedException();
@@ -1468,7 +1468,7 @@ void ReentrantReadWriteLockTest::testAwait() {
         c->signal();
         lock.writeLock().unlock();
         t.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t.isAlive());
+        ASSERT_TRUE(!t.isAlive());
     } catch (Exception& ex) {
         unexpectedException();
     }
@@ -1541,8 +1541,8 @@ void ReentrantReadWriteLockTest::testAwaitUninterruptibly() {
         }
 
         thread.join();
-        CPPUNIT_ASSERT(thread.interrupted);
-        CPPUNIT_ASSERT(!thread.isAlive());
+        ASSERT_TRUE(thread.interrupted);
+        ASSERT_TRUE(!thread.isAlive());
     } catch (Exception& ex) {
         unexpectedException();
     }
@@ -1594,7 +1594,7 @@ void ReentrantReadWriteLockTest::testAwaitInterrupt() {
         Thread::sleep(SHORT_DELAY_MS);
         t.interrupt();
         t.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t.isAlive());
+        ASSERT_TRUE(!t.isAlive());
     } catch (Exception& ex) {
         unexpectedException();
     }
@@ -1645,7 +1645,7 @@ void ReentrantReadWriteLockTest::testAwaitNanosInterrupt() {
         Thread::sleep(SHORT_DELAY_MS);
         t.interrupt();
         t.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t.isAlive());
+        ASSERT_TRUE(!t.isAlive());
     } catch (Exception& ex) {
         unexpectedException();
     }
@@ -1697,7 +1697,7 @@ void ReentrantReadWriteLockTest::testAwaitUntilInterrupt() {
         Thread::sleep(SHORT_DELAY_MS);
         t.interrupt();
         t.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t.isAlive());
+        ASSERT_TRUE(!t.isAlive());
     } catch (Exception& ex) {
         unexpectedException();
     }
@@ -1753,8 +1753,8 @@ void ReentrantReadWriteLockTest::testSignalAll() {
         lock.writeLock().unlock();
         t1.join(SHORT_DELAY_MS);
         t2.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t1.isAlive());
-        CPPUNIT_ASSERT(!t2.isAlive());
+        ASSERT_TRUE(!t1.isAlive());
+        ASSERT_TRUE(!t2.isAlive());
     } catch (Exception& ex) {
         unexpectedException();
     }
@@ -1769,20 +1769,20 @@ void ReentrantReadWriteLockTest::testHasQueuedThreads() {
     Thread t2(&interruptable);
 
     try {
-        CPPUNIT_ASSERT(!lock.hasQueuedThreads());
+        ASSERT_TRUE(!lock.hasQueuedThreads());
         lock.writeLock().lock();
         t1.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(lock.hasQueuedThreads());
+        ASSERT_TRUE(lock.hasQueuedThreads());
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(lock.hasQueuedThreads());
+        ASSERT_TRUE(lock.hasQueuedThreads());
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(lock.hasQueuedThreads());
+        ASSERT_TRUE(lock.hasQueuedThreads());
         lock.writeLock().unlock();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!lock.hasQueuedThreads());
+        ASSERT_TRUE(!lock.hasQueuedThreads());
         t1.join();
         t2.join();
     } catch (Exception& e) {
@@ -1809,25 +1809,25 @@ void ReentrantReadWriteLockTest::testHasQueuedThread() {
     Thread t2(&interruptable);
 
     try {
-        CPPUNIT_ASSERT(!sync.hasQueuedThread(&t1));
-        CPPUNIT_ASSERT(!sync.hasQueuedThread(&t2));
+        ASSERT_TRUE(!sync.hasQueuedThread(&t1));
+        ASSERT_TRUE(!sync.hasQueuedThread(&t2));
         sync.writeLock().lock();
         t1.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(sync.hasQueuedThread(&t1));
+        ASSERT_TRUE(sync.hasQueuedThread(&t1));
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(sync.hasQueuedThread(&t1));
-        CPPUNIT_ASSERT(sync.hasQueuedThread(&t2));
+        ASSERT_TRUE(sync.hasQueuedThread(&t1));
+        ASSERT_TRUE(sync.hasQueuedThread(&t2));
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!sync.hasQueuedThread(&t1));
-        CPPUNIT_ASSERT(sync.hasQueuedThread(&t2));
+        ASSERT_TRUE(!sync.hasQueuedThread(&t1));
+        ASSERT_TRUE(sync.hasQueuedThread(&t2));
         sync.writeLock().unlock();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!sync.hasQueuedThread(&t1));
+        ASSERT_TRUE(!sync.hasQueuedThread(&t1));
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!sync.hasQueuedThread(&t2));
+        ASSERT_TRUE(!sync.hasQueuedThread(&t2));
         t1.join();
         t2.join();
     } catch (Exception& e) {
@@ -1844,20 +1844,20 @@ void ReentrantReadWriteLockTest::testGetQueueLength() {
     Thread t2(&interruptable);
 
     try {
-        CPPUNIT_ASSERT_EQUAL(0, lock.getQueueLength());
+        ASSERT_EQ(0, lock.getQueueLength());
         lock.writeLock().lock();
         t1.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(1, lock.getQueueLength());
+        ASSERT_EQ(1, lock.getQueueLength());
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(2, lock.getQueueLength());
+        ASSERT_EQ(2, lock.getQueueLength());
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(1, lock.getQueueLength());
+        ASSERT_EQ(1, lock.getQueueLength());
         lock.writeLock().unlock();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(0, lock.getQueueLength());
+        ASSERT_EQ(0, lock.getQueueLength());
         t1.join();
         t2.join();
     } catch (Exception& e) {
@@ -1874,23 +1874,23 @@ void ReentrantReadWriteLockTest::testGetQueuedThreads() {
     Thread t2(&interruptable);
 
     try {
-        CPPUNIT_ASSERT(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->isEmpty());
+        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->isEmpty());
         lock.writeLock().lock();
-        CPPUNIT_ASSERT(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->isEmpty());
+        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->isEmpty());
         t1.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->contains(&t1));
+        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->contains(&t1));
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->contains(&t1));
-        CPPUNIT_ASSERT(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->contains(&t2));
+        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->contains(&t1));
+        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->contains(&t2));
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->contains(&t1));
-        CPPUNIT_ASSERT(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->contains(&t2));
+        ASSERT_TRUE(!Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->contains(&t1));
+        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->contains(&t2));
         lock.writeLock().unlock();
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->isEmpty());
+        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->isEmpty());
         t1.join();
         t2.join();
     } catch (Exception& e) {
@@ -2061,17 +2061,17 @@ void ReentrantReadWriteLockTest::testHasWaiters() {
         t.start();
         Thread::sleep( SHORT_DELAY_MS);
         lock.writeLock().lock();
-        CPPUNIT_ASSERT(lock.hasWaiters(c.get()));
-        CPPUNIT_ASSERT_EQUAL(1, lock.getWaitQueueLength(c.get()));
+        ASSERT_TRUE(lock.hasWaiters(c.get()));
+        ASSERT_EQ(1, lock.getWaitQueueLength(c.get()));
         c->signal();
         lock.writeLock().unlock();
         Thread::sleep(SHORT_DELAY_MS);
         lock.writeLock().lock();
-        CPPUNIT_ASSERT(!lock.hasWaiters(c.get()));
-        CPPUNIT_ASSERT_EQUAL(0, lock.getWaitQueueLength(c.get()));
+        ASSERT_TRUE(!lock.hasWaiters(c.get()));
+        ASSERT_EQ(0, lock.getWaitQueueLength(c.get()));
         lock.writeLock().unlock();
         t.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t.isAlive());
+        ASSERT_TRUE(!t.isAlive());
     } catch (Exception& ex) {
         unexpectedException();
     }
@@ -2123,17 +2123,17 @@ void ReentrantReadWriteLockTest::testGetWaitQueueLength() {
         t.start();
         Thread::sleep( SHORT_DELAY_MS);
         lock.writeLock().lock();
-        CPPUNIT_ASSERT(lock.hasWaiters(c.get()));
-        CPPUNIT_ASSERT_EQUAL(1, lock.getWaitQueueLength(c.get()));
+        ASSERT_TRUE(lock.hasWaiters(c.get()));
+        ASSERT_EQ(1, lock.getWaitQueueLength(c.get()));
         c->signal();
         lock.writeLock().unlock();
         Thread::sleep(SHORT_DELAY_MS);
         lock.writeLock().lock();
-        CPPUNIT_ASSERT(!lock.hasWaiters(c.get()));
-        CPPUNIT_ASSERT_EQUAL(0, lock.getWaitQueueLength(c.get()));
+        ASSERT_TRUE(!lock.hasWaiters(c.get()));
+        ASSERT_EQ(0, lock.getWaitQueueLength(c.get()));
         lock.writeLock().unlock();
         t.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t.isAlive());
+        ASSERT_TRUE(!t.isAlive());
     } catch (Exception& ex) {
         unexpectedException();
     }
@@ -2216,27 +2216,27 @@ void ReentrantReadWriteLockTest::testGetWaitingThreads() {
 
     try {
         lock.writeLock().lock();
-        CPPUNIT_ASSERT(Pointer<Collection<Thread*> >(lock.getWaitingThreadsPublic(c.get()))->isEmpty());
+        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getWaitingThreadsPublic(c.get()))->isEmpty());
         lock.writeLock().unlock();
         t1.start();
         Thread::sleep( SHORT_DELAY_MS);
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
         lock.writeLock().lock();
-        CPPUNIT_ASSERT(lock.hasWaiters(c.get()));
-        CPPUNIT_ASSERT(Pointer<Collection<Thread*> >(lock.getWaitingThreadsPublic(c.get()))->contains(&t1));
-        CPPUNIT_ASSERT(Pointer<Collection<Thread*> >(lock.getWaitingThreadsPublic(c.get()))->contains(&t2));
+        ASSERT_TRUE(lock.hasWaiters(c.get()));
+        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getWaitingThreadsPublic(c.get()))->contains(&t1));
+        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getWaitingThreadsPublic(c.get()))->contains(&t2));
         c->signalAll();
         lock.writeLock().unlock();
         Thread::sleep(SHORT_DELAY_MS);
         lock.writeLock().lock();
-        CPPUNIT_ASSERT(!lock.hasWaiters(c.get()));
-        CPPUNIT_ASSERT(Pointer<Collection<Thread*> >(lock.getWaitingThreadsPublic(c.get()))->isEmpty());
+        ASSERT_TRUE(!lock.hasWaiters(c.get()));
+        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getWaitingThreadsPublic(c.get()))->isEmpty());
         lock.writeLock().unlock();
         t1.join(SHORT_DELAY_MS);
         t2.join(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(!t1.isAlive());
-        CPPUNIT_ASSERT(!t2.isAlive());
+        ASSERT_TRUE(!t1.isAlive());
+        ASSERT_TRUE(!t2.isAlive());
     } catch (Exception& ex) {
         unexpectedException();
     }
@@ -2246,39 +2246,39 @@ void ReentrantReadWriteLockTest::testGetWaitingThreads() {
 void ReentrantReadWriteLockTest::testToString() {
     ReentrantReadWriteLock lock;
     std::string us = lock.toString();
-    CPPUNIT_ASSERT(us.find_first_of("Write locks = 0") != std::string::npos);
-    CPPUNIT_ASSERT(us.find_first_of("Read locks = 0") != std::string::npos);
+    ASSERT_TRUE(us.find_first_of("Write locks = 0") != std::string::npos);
+    ASSERT_TRUE(us.find_first_of("Read locks = 0") != std::string::npos);
     lock.writeLock().lock();
     std::string ws = lock.toString();
-    CPPUNIT_ASSERT(ws.find_first_of("Write locks = 1") != std::string::npos);
-    CPPUNIT_ASSERT(ws.find_first_of("Read locks = 0") != std::string::npos);
+    ASSERT_TRUE(ws.find_first_of("Write locks = 1") != std::string::npos);
+    ASSERT_TRUE(ws.find_first_of("Read locks = 0") != std::string::npos);
     lock.writeLock().unlock();
     lock.readLock().lock();
     lock.readLock().lock();
     std::string rs = lock.toString();
-    CPPUNIT_ASSERT(rs.find_first_of("Write locks = 0") != std::string::npos);
-    CPPUNIT_ASSERT(rs.find_first_of("Read locks = 2") != std::string::npos);
+    ASSERT_TRUE(rs.find_first_of("Write locks = 0") != std::string::npos);
+    ASSERT_TRUE(rs.find_first_of("Read locks = 2") != std::string::npos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ReentrantReadWriteLockTest::testReadLockToString() {
     ReentrantReadWriteLock lock;
     std::string us = lock.readLock().toString();
-    CPPUNIT_ASSERT(us.find_first_of("Read locks = 0") != std::string::npos);
+    ASSERT_TRUE(us.find_first_of("Read locks = 0") != std::string::npos);
     lock.readLock().lock();
     lock.readLock().lock();
     std::string rs = lock.readLock().toString();
-    CPPUNIT_ASSERT(rs.find_first_of("Read locks = 2") != std::string::npos);
+    ASSERT_TRUE(rs.find_first_of("Read locks = 2") != std::string::npos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ReentrantReadWriteLockTest::testWriteLockToString() {
     ReentrantReadWriteLock lock;
     std::string us = lock.writeLock().toString();
-    CPPUNIT_ASSERT(us.find_first_of("Unlocked") != std::string::npos);
+    ASSERT_TRUE(us.find_first_of("Unlocked") != std::string::npos);
     lock.writeLock().lock();
     std::string ls = lock.writeLock().toString();
-    CPPUNIT_ASSERT(ls.find_first_of("Locked") != std::string::npos);
+    ASSERT_TRUE(ls.find_first_of("Locked") != std::string::npos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

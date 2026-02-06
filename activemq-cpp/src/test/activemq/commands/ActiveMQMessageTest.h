@@ -18,9 +18,7 @@
 #ifndef _ACTIVEMQ_COMMANDS_ACTIVEMQMESSAGETEST_H_
 #define _ACTIVEMQ_COMMANDS_ACTIVEMQMESSAGETEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <activemq/core/ActiveMQAckHandler.h>
 #include <activemq/commands/ActiveMQDestination.h>
 #include <activemq/commands/ActiveMQTopic.h>
@@ -35,49 +33,8 @@
 namespace activemq{
 namespace commands{
 
-    class ActiveMQMessageTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( ActiveMQMessageTest );
-        CPPUNIT_TEST( test );
-        CPPUNIT_TEST( testSetReadOnly );
-        CPPUNIT_TEST( testSetToForeignJMSID );
-        CPPUNIT_TEST( testEqualsObject );
-        CPPUNIT_TEST( testShallowCopy );
-        CPPUNIT_TEST( testCopy );
-        CPPUNIT_TEST( testGetAndSetCMSMessageID );
-        CPPUNIT_TEST( testGetAndSetCMSTimestamp );
-        CPPUNIT_TEST( testGetAndSetCMSCorrelationID );
-        CPPUNIT_TEST( testGetAndSetCMSDeliveryMode );
-        CPPUNIT_TEST( testGetAndSetCMSRedelivered );
-        CPPUNIT_TEST( testGetAndSetCMSType );
-        CPPUNIT_TEST( testGetAndSetCMSExpiration );
-        CPPUNIT_TEST( testGetAndSetCMSPriority );
-        CPPUNIT_TEST( testClearProperties );
-        CPPUNIT_TEST( testPropertyExists );
-        CPPUNIT_TEST( testGetBooleanProperty );
-        CPPUNIT_TEST( testGetByteProperty );
-        CPPUNIT_TEST( testGetShortProperty );
-        CPPUNIT_TEST( testGetIntProperty );
-        CPPUNIT_TEST( testGetLongProperty );
-        CPPUNIT_TEST( testGetFloatProperty );
-        CPPUNIT_TEST( testGetDoubleProperty );
-        CPPUNIT_TEST( testGetStringProperty );
-        CPPUNIT_TEST( testGetPropertyNames );
-        CPPUNIT_TEST( testSetEmptyPropertyName );
-        CPPUNIT_TEST( testGetAndSetCMSXDeliveryCount );
-        CPPUNIT_TEST( testClearBody );
-        CPPUNIT_TEST( testBooleanPropertyConversion );
-        CPPUNIT_TEST( testBytePropertyConversion );
-        CPPUNIT_TEST( testShortPropertyConversion );
-        CPPUNIT_TEST( testIntPropertyConversion );
-        CPPUNIT_TEST( testLongPropertyConversion );
-        CPPUNIT_TEST( testFloatPropertyConversion );
-        CPPUNIT_TEST( testDoublePropertyConversion );
-        CPPUNIT_TEST( testReadOnlyProperties );
-        CPPUNIT_TEST( testIsExpired );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class ActiveMQMessageTest : public ::testing::Test {
+private:
 
         bool readOnlyMessage;
         decaf::lang::Pointer<commands::MessageId> cmsMessageId;
@@ -101,8 +58,8 @@ namespace commands{
         }
         virtual ~ActiveMQMessageTest() {}
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         void test();
         void testSetReadOnly();

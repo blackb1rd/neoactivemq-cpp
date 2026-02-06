@@ -18,31 +18,12 @@
 #ifndef _DECAF_IO_PUSHBACKINPUTSTREAMTEST_H_
 #define _DECAF_IO_PUSHBACKINPUTSTREAMTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 namespace decaf {
 namespace io {
 
-    class PushbackInputStreamTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE( PushbackInputStreamTest );
-        CPPUNIT_TEST( testReset );
-        CPPUNIT_TEST( testMark );
-        CPPUNIT_TEST( testMarkSupported );
-        CPPUNIT_TEST( testAvailable );
-        CPPUNIT_TEST( testConstructor1 );
-        CPPUNIT_TEST( testConstructor2 );
-        CPPUNIT_TEST( testConstructor3 );
-        CPPUNIT_TEST( testRead );
-        CPPUNIT_TEST( testReadBIII );
-        CPPUNIT_TEST( testSkip );
-        CPPUNIT_TEST( testUnreadBI );
-        CPPUNIT_TEST( testUnreadBIII );
-        CPPUNIT_TEST( testUnread );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+    class PushbackInputStreamTest : public ::testing::Test {
+private:
 
         static std::string testString;
 

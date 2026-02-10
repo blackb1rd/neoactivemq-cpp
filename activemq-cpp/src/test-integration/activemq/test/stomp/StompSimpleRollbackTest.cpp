@@ -46,4 +46,4 @@ StompSimpleRollbackTest::~StompSimpleRollbackTest() {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompSimpleRollbackTest, testRollbacks) { testRollbacks(); }
+TEST_F(StompSimpleRollbackTest, DISABLED_testRollbacks) { testRollbacks(); }

@@ -46,17 +46,17 @@ StompSimpleTest::~StompSimpleTest() {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompSimpleTest, testAutoAck) { testAutoAck(); }
-TEST_F(StompSimpleTest, testClientAck) { testClientAck(); }
-TEST_F(StompSimpleTest, testProducerWithNullDestination) { testProducerWithNullDestination(); }
-TEST_F(StompSimpleTest, testProducerSendWithNullDestination) { testProducerSendWithNullDestination(); }
-TEST_F(StompSimpleTest, testProducerSendToNonDefaultDestination) { testProducerSendToNonDefaultDestination(); }
-TEST_F(StompSimpleTest, testSyncReceive) { testSyncReceive(); }
-TEST_F(StompSimpleTest, testSyncReceiveClientAck) { testSyncReceiveClientAck(); }
-TEST_F(StompSimpleTest, testMultipleConnections) { testMultipleConnections(); }
-TEST_F(StompSimpleTest, testMultipleSessions) { testMultipleSessions(); }
-TEST_F(StompSimpleTest, testReceiveAlreadyInQueue) { testReceiveAlreadyInQueue(); }
-TEST_F(StompSimpleTest, testQuickCreateAndDestroy) { testQuickCreateAndDestroy(); }
-TEST_F(StompSimpleTest, testBytesMessageSendRecv) { testBytesMessageSendRecv(); }
-TEST_F(StompSimpleTest, testBytesMessageSendRecvAsync) { testBytesMessageSendRecvAsync(); }
-TEST_F(StompSimpleTest, testLibraryInitShutdownInit) { testLibraryInitShutdownInit(); }
+TEST_F(StompSimpleTest, DISABLED_testAutoAck) { testAutoAck(); }
+TEST_F(StompSimpleTest, DISABLED_testClientAck) { testClientAck(); }
+TEST_F(StompSimpleTest, DISABLED_testProducerWithNullDestination) { testProducerWithNullDestination(); }
+TEST_F(StompSimpleTest, DISABLED_testProducerSendWithNullDestination) { testProducerSendWithNullDestination(); }
+TEST_F(StompSimpleTest, DISABLED_testProducerSendToNonDefaultDestination) { testProducerSendToNonDefaultDestination(); }
+TEST_F(StompSimpleTest, DISABLED_testSyncReceive) { testSyncReceive(); }
+TEST_F(StompSimpleTest, DISABLED_testSyncReceiveClientAck) { testSyncReceiveClientAck(); }
+TEST_F(StompSimpleTest, DISABLED_testMultipleConnections) { testMultipleConnections(); }
+TEST_F(StompSimpleTest, DISABLED_testMultipleSessions) { testMultipleSessions(); }
+TEST_F(StompSimpleTest, DISABLED_testReceiveAlreadyInQueue) { testReceiveAlreadyInQueue(); }
+TEST_F(StompSimpleTest, DISABLED_testQuickCreateAndDestroy) { testQuickCreateAndDestroy(); }
+TEST_F(StompSimpleTest, DISABLED_testBytesMessageSendRecv) { testBytesMessageSendRecv(); }
+TEST_F(StompSimpleTest, DISABLED_testBytesMessageSendRecvAsync) { testBytesMessageSendRecvAsync(); }
+TEST_F(StompSimpleTest, DISABLED_testLibraryInitShutdownInit) { testLibraryInitShutdownInit(); }

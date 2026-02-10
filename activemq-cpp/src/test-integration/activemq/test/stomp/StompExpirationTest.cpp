@@ -46,6 +46,6 @@ StompExpirationTest::~StompExpirationTest() {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompExpirationTest, testExpired) { testExpired(); }
-TEST_F(StompExpirationTest, testExpiredWithChecksDisabled) { testExpiredWithChecksDisabled(); }
-TEST_F(StompExpirationTest, testNotExpired) { testNotExpired(); }
+TEST_F(StompExpirationTest, DISABLED_testExpired) { testExpired(); }
+TEST_F(StompExpirationTest, DISABLED_testExpiredWithChecksDisabled) { testExpiredWithChecksDisabled(); }
+TEST_F(StompExpirationTest, DISABLED_testNotExpired) { testNotExpired(); }

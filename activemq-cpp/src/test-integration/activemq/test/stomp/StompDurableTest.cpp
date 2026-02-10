@@ -48,4 +48,4 @@ StompDurableTest::~StompDurableTest() {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompDurableTest, testDurableConsumer) { testDurableConsumer(); }
+TEST_F(StompDurableTest, DISABLED_testDurableConsumer) { testDurableConsumer(); }

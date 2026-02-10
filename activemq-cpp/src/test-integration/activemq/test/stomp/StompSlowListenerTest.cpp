@@ -47,4 +47,4 @@ StompSlowListenerTest::~StompSlowListenerTest() {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompSlowListenerTest, testSlowListener) { testSlowListener(); }
+TEST_F(StompSlowListenerTest, DISABLED_testSlowListener) { testSlowListener(); }

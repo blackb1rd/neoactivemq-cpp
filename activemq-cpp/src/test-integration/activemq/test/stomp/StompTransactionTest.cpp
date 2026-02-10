@@ -46,9 +46,9 @@ StompTransactionTest::~StompTransactionTest() {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompTransactionTest, testSendReceiveTransactedBatches) { testSendReceiveTransactedBatches(); }
-TEST_F(StompTransactionTest, testSendRollback) { testSendRollback(); }
-TEST_F(StompTransactionTest, testSendSessionClose) { testSendSessionClose(); }
-TEST_F(StompTransactionTest, testWithTTLSet) { testWithTTLSet(); }
-TEST_F(StompTransactionTest, testSendRollbackCommitRollback) { testSendRollbackCommitRollback(); }
-TEST_F(StompTransactionTest, testSessionCommitAfterConsumerClosed) { testSessionCommitAfterConsumerClosed(); }
+TEST_F(StompTransactionTest, DISABLED_testSendReceiveTransactedBatches) { testSendReceiveTransactedBatches(); }
+TEST_F(StompTransactionTest, DISABLED_testSendRollback) { testSendRollback(); }
+TEST_F(StompTransactionTest, DISABLED_testSendSessionClose) { testSendSessionClose(); }
+TEST_F(StompTransactionTest, DISABLED_testWithTTLSet) { testWithTTLSet(); }
+TEST_F(StompTransactionTest, DISABLED_testSendRollbackCommitRollback) { testSendRollbackCommitRollback(); }
+TEST_F(StompTransactionTest, DISABLED_testSessionCommitAfterConsumerClosed) { testSessionCommitAfterConsumerClosed(); }

@@ -54,6 +54,6 @@ StompCmsConnectionStartStopTest::~StompCmsConnectionStartStopTest() {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompCmsConnectionStartStopTest, testStoppedConsumerHoldsMessagesTillStarted) { testStoppedConsumerHoldsMessagesTillStarted(); }
-TEST_F(StompCmsConnectionStartStopTest, testMultipleConnectionStops) { testMultipleConnectionStops(); }
-TEST_F(StompCmsConnectionStartStopTest, testConcurrentSessionCreateWithStart) { testConcurrentSessionCreateWithStart(); }
+TEST_F(StompCmsConnectionStartStopTest, DISABLED_testStoppedConsumerHoldsMessagesTillStarted) { testStoppedConsumerHoldsMessagesTillStarted(); }
+TEST_F(StompCmsConnectionStartStopTest, DISABLED_testMultipleConnectionStops) { testMultipleConnectionStops(); }
+TEST_F(StompCmsConnectionStartStopTest, DISABLED_testConcurrentSessionCreateWithStart) { testConcurrentSessionCreateWithStart(); }

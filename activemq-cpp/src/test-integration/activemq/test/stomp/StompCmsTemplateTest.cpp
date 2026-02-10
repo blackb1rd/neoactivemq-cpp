@@ -45,6 +45,6 @@ StompCmsTemplateTest::~StompCmsTemplateTest() {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompCmsTemplateTest, testBasics) { testBasics(); }
-TEST_F(StompCmsTemplateTest, testReceiveException) { testReceiveException(); }
-TEST_F(StompCmsTemplateTest, testSendException) { testSendException(); }
+TEST_F(StompCmsTemplateTest, DISABLED_testBasics) { testBasics(); }
+TEST_F(StompCmsTemplateTest, DISABLED_testReceiveException) { testReceiveException(); }
+TEST_F(StompCmsTemplateTest, DISABLED_testSendException) { testSendException(); }

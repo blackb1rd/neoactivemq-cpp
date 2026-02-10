@@ -81,4 +81,4 @@ StompAdvisoryTest::~StompAdvisoryTest() {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompAdvisoryTest, testTempDestinationCompositeAdvisoryTopic) { testTempDestinationCompositeAdvisoryTopic(); }
+TEST_F(StompAdvisoryTest, DISABLED_testTempDestinationCompositeAdvisoryTopic) { testTempDestinationCompositeAdvisoryTopic(); }

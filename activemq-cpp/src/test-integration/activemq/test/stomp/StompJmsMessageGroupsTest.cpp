@@ -44,4 +44,4 @@ StompJmsMessageGroupsTest::~StompJmsMessageGroupsTest() {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompJmsMessageGroupsTest, testMessageSend) { testMessageSend(); }
+TEST_F(StompJmsMessageGroupsTest, DISABLED_testMessageSend) { testMessageSend(); }

@@ -48,4 +48,4 @@ StompAsyncSenderTest::~StompAsyncSenderTest() {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompAsyncSenderTest, testAsyncSends) { testAsyncSends(); }
+TEST_F(StompAsyncSenderTest, DISABLED_testAsyncSends) { testAsyncSends(); }

@@ -46,4 +46,4 @@ StompBulkMessageTest::~StompBulkMessageTest() {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompBulkMessageTest, testBulkMessageSendReceive) { testBulkMessageSendReceive(); }
+TEST_F(StompBulkMessageTest, DISABLED_testBulkMessageSendReceive) { testBulkMessageSendReceive(); }

@@ -54,8 +54,6 @@ using namespace activemq;
 using namespace activemq::core;
 using namespace activemq::commands;
 using namespace activemq::exceptions;
-using namespace activemq::test;
-using namespace activemq::test::openwire;
 
 namespace activemq {
 namespace test {
@@ -101,6 +99,9 @@ namespace openwire {
     };
 
 }}}
+
+using namespace activemq::test;
+using namespace activemq::test::openwire;
 
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireJmsRecoverTest::OpenwireJmsRecoverTest() :

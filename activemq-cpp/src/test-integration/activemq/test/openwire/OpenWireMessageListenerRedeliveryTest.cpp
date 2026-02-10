@@ -15,7 +15,26 @@
  * limitations under the License.
  */
 
-#include "OpenWireMessageListenerRedeliveryTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/CMSTestFixture.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenWireMessageListenerRedeliveryTest : public CMSTestFixture {
+    private:
+public:
+        OpenWireMessageListenerRedeliveryTest();
+        virtual ~OpenWireMessageListenerRedeliveryTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+        void testQueueRollbackConsumerListener();
+        void testQueueSessionListenerExceptionRetry();
+        void testQueueSessionListenerExceptionDlq();
+        void testTransactedQueueSessionListenerExceptionDlq();
+    };
+}}}
 
 #include <cms/ConnectionFactory.h>
 #include <cms/Connection.h>
@@ -432,3 +451,10 @@ void OpenWireMessageListenerRedeliveryTest::testTransactedQueueSessionListenerEx
 
     connection->close();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenWireMessageListenerRedeliveryTest, testQueueRollbackConsumerListener) { testQueueRollbackConsumerListener(); }
+TEST_F(OpenWireMessageListenerRedeliveryTest, testQueueSessionListenerExceptionRetry) { testQueueSessionListenerExceptionRetry(); }
+TEST_F(OpenWireMessageListenerRedeliveryTest, testQueueSessionListenerExceptionDlq) { testQueueSessionListenerExceptionDlq(); }
+TEST_F(OpenWireMessageListenerRedeliveryTest, testTransactedQueueSessionListenerExceptionDlq) { testTransactedQueueSessionListenerExceptionDlq(); }

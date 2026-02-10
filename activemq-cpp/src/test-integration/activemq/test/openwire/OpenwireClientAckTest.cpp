@@ -15,7 +15,26 @@
  * limitations under the License.
  */
 
-#include "OpenwireClientAckTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/CMSTestFixture.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenwireClientAckTest : public CMSTestFixture {
+public:
+        OpenwireClientAckTest();
+        virtual ~OpenwireClientAckTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+        void testAckedMessageAreConsumed();
+        void testLastMessageAcked();
+        void testUnAckedMessageAreNotConsumedOnSessionClose();
+        void testAckedMessageAreConsumedAsync();
+        void testUnAckedMessageAreNotConsumedOnSessionCloseAsync();
+    };
+}}}
 
 #include <activemq/exceptions/ActiveMQException.h>
 
@@ -245,3 +264,10 @@ void OpenwireClientAckTest::testUnAckedMessageAreNotConsumedOnSessionCloseAsync(
     session->close();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireClientAckTest, testAckedMessageAreConsumed) { testAckedMessageAreConsumed(); }
+TEST_F(OpenwireClientAckTest, testLastMessageAcked) { testLastMessageAcked(); }
+TEST_F(OpenwireClientAckTest, testUnAckedMessageAreNotConsumedOnSessionClose) { testUnAckedMessageAreNotConsumedOnSessionClose(); }
+TEST_F(OpenwireClientAckTest, testUnAckedMessageAreNotConsumedOnSessionCloseAsync) { testUnAckedMessageAreNotConsumedOnSessionCloseAsync(); }
+TEST_F(OpenwireClientAckTest, testAckedMessageAreConsumedAsync) { testAckedMessageAreConsumedAsync(); }

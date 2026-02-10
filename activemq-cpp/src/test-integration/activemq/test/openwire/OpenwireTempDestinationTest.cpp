@@ -15,7 +15,30 @@
  * limitations under the License.
  */
 
-#include "OpenwireTempDestinationTest.h"
+#include <activemq/test/CMSTestFixture.h>
+
+namespace activemq{
+namespace test{
+namespace openwire{
+    class OpenwireTempDestinationTest : public CMSTestFixture {
+public:
+        OpenwireTempDestinationTest() {}
+        virtual ~OpenwireTempDestinationTest() {}
+        void testBasics();
+        void testTwoConnections();
+        void testTempDestOnlyConsumedByLocalConn();
+        void testTempQueueHoldsMessagesWithConsumers();
+        void testTempQueueHoldsMessagesWithoutConsumers();
+        void testTmpQueueWorksUnderLoad();
+        void testPublishFailsForClosedConnection();
+        void testPublishFailsForDestoryedTempDestination();
+        void testDeleteDestinationWithSubscribersFails();
+        void testCloseConnectionWithManyTempDests();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
 
 #include <decaf/lang/Thread.h>
 #include <decaf/util/concurrent/Mutex.h>
@@ -421,3 +444,15 @@ void OpenwireTempDestinationTest::testCloseConnectionWithManyTempDests() {
     producers.clear();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireTempDestinationTest, testBasics) { testBasics(); }
+TEST_F(OpenwireTempDestinationTest, testTwoConnections) { testTwoConnections(); }
+TEST_F(OpenwireTempDestinationTest, testTempDestOnlyConsumedByLocalConn) { testTempDestOnlyConsumedByLocalConn(); }
+TEST_F(OpenwireTempDestinationTest, testTempQueueHoldsMessagesWithConsumers) { testTempQueueHoldsMessagesWithConsumers(); }
+TEST_F(OpenwireTempDestinationTest, testTempQueueHoldsMessagesWithoutConsumers) { testTempQueueHoldsMessagesWithoutConsumers(); }
+TEST_F(OpenwireTempDestinationTest, testTmpQueueWorksUnderLoad) { testTmpQueueWorksUnderLoad(); }
+TEST_F(OpenwireTempDestinationTest, testPublishFailsForClosedConnection) { testPublishFailsForClosedConnection(); }
+TEST_F(OpenwireTempDestinationTest, testPublishFailsForDestoryedTempDestination) { testPublishFailsForDestoryedTempDestination(); }
+TEST_F(OpenwireTempDestinationTest, testDeleteDestinationWithSubscribersFails) { testDeleteDestinationWithSubscribersFails(); }
+TEST_F(OpenwireTempDestinationTest, testCloseConnectionWithManyTempDests) { testCloseConnectionWithManyTempDests(); }

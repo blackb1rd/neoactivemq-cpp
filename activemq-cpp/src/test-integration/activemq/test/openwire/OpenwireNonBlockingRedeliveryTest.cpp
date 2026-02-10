@@ -15,7 +15,28 @@
  * limitations under the License.
  */
 
-#include "OpenwireNonBlockingRedeliveryTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/CMSTestFixture.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenwireNonBlockingRedeliveryTest : public CMSTestFixture {
+public:
+        OpenwireNonBlockingRedeliveryTest();
+        virtual ~OpenwireNonBlockingRedeliveryTest();
+        void SetUp() override {}
+        void TearDown() override {}
+        virtual std::string getBrokerURL() const;
+        void testConsumerMessagesAreNotOrdered();
+        void testMessageDeleiveredWhenNonBlockingEnabled();
+        void testMessageRedeliveriesAreInOrder();
+        void testMessageDeleiveryDoesntStop();
+        void testNonBlockingMessageDeleiveryIsDelayed();
+        void testNonBlockingMessageDeleiveryWithRollbacks();
+        void testNonBlockingMessageDeleiveryWithAllRolledBack();
+    };
+}}}
 
 #include <cms/MessageListener.h>
 #include <cms/ExceptionListener.h>
@@ -663,3 +684,12 @@ void OpenwireNonBlockingRedeliveryTest::testNonBlockingMessageDeleiveryWithAllRo
 
     destroyDestination(getBrokerURL(), destinationName);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireNonBlockingRedeliveryTest, testConsumerMessagesAreNotOrdered) { testConsumerMessagesAreNotOrdered(); }
+TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageDeleiveredWhenNonBlockingEnabled) { testMessageDeleiveredWhenNonBlockingEnabled(); }
+TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageDeleiveryDoesntStop) { testMessageDeleiveryDoesntStop(); }
+TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryIsDelayed) { testNonBlockingMessageDeleiveryIsDelayed(); }
+TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryWithRollbacks) { testNonBlockingMessageDeleiveryWithRollbacks(); }
+TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryWithAllRolledBack) { testNonBlockingMessageDeleiveryWithAllRolledBack(); }

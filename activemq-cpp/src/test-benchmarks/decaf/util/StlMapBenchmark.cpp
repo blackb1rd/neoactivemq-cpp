@@ -15,13 +15,34 @@
  * limitations under the License.
  */
 
-#include "StlMapBenchmark.h"
+#include <benchmark/BenchmarkBase.h>
+#include <decaf/util/StlMap.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/util/StlMap.h>
 
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
+
+namespace decaf {
+namespace util {
+
+    class StlMapBenchmark :
+        public benchmark::BenchmarkBase<decaf::util::StlMapBenchmark, StlMap<int, int> > {
+    private:
+
+        StlMap<std::string, std::string> stringMap;
+        StlMap<int, int> intMap;
+
+    public:
+
+        StlMapBenchmark();
+        virtual ~StlMapBenchmark() {}
+
+        virtual void run();
+    };
+
+}}
 
 ////////////////////////////////////////////////////////////////////////////////
 StlMapBenchmark::StlMapBenchmark() : stringMap(), intMap() {
@@ -76,3 +97,5 @@ void StlMapBenchmark::run() {
     }
 
 }
+
+TEST_F(StlMapBenchmark, runBenchmark) { runBenchmark(); }

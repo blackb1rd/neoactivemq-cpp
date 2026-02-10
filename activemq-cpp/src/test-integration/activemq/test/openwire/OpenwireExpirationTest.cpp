@@ -15,7 +15,20 @@
  * limitations under the License.
  */
 
-#include "OpenwireExpirationTest.h"
+#include <activemq/test/ExpirationTest.h>
+
+namespace activemq{
+namespace test{
+namespace openwire{
+    class OpenwireExpirationTest : public ExpirationTest {
+public:
+        OpenwireExpirationTest();
+        virtual ~OpenwireExpirationTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
 
 using namespace std;
 using namespace cms;
@@ -30,3 +43,9 @@ OpenwireExpirationTest::OpenwireExpirationTest() {
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireExpirationTest::~OpenwireExpirationTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireExpirationTest, testExpired) { testExpired(); }
+TEST_F(OpenwireExpirationTest, testExpiredWithChecksDisabled) { testExpiredWithChecksDisabled(); }
+TEST_F(OpenwireExpirationTest, testNotExpired) { testNotExpired(); }

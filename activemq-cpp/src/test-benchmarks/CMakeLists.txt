@@ -3,7 +3,6 @@
 set(BENCHMARK_SRCS
   # Top level launcher / registry
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/testRegistry.cpp
 
   # Benchmark utilities
   benchmark/PerformanceTimer.cpp
@@ -67,9 +66,27 @@ endif()
 target_link_libraries(neoactivemq-benchmark PRIVATE neoactivemq-cpp GTest::gtest)
 
 include(StaticTestDiscovery)
+set(BENCHMARK_DISCOVERY_SRCS
+  activemq/util/PrimitiveMapBenchmark.cpp
+  decaf/io/BufferedInputStreamBenchmark.cpp
+  decaf/io/ByteArrayInputStreamBenchmark.cpp
+  decaf/io/ByteArrayOutputStreamBenchmark.cpp
+  decaf/io/DataInputStreamBenchmark.cpp
+  decaf/io/DataOutputStreamBenchmark.cpp
+  decaf/lang/BooleanBenchmark.cpp
+  decaf/lang/ThreadBenchmark.cpp
+  decaf/util/HashMapBenchmark.cpp
+  decaf/util/LinkedListBenchmark.cpp
+  decaf/util/PropertiesBenchmark.cpp
+  decaf/util/QueueBenchmark.cpp
+  decaf/util/SetBenchmark.cpp
+  decaf/util/StlListBenchmark.cpp
+  decaf/util/StlMapBenchmark.cpp
+)
+
 static_discover_tests(neoactivemq-benchmark
   TEST_PREFIX "benchmark/"
-  SOURCES testRegistry.cpp
+  SOURCES ${BENCHMARK_DISCOVERY_SRCS}
   PROPERTIES
     ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
 )

@@ -378,6 +378,8 @@ namespace {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+namespace decaf {
+namespace util {
     template<>
     struct HashCode<MyKey> {
 
@@ -388,7 +390,8 @@ namespace {
             return arg.hashCode();
         }
     };
-
+}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 void HashMapTest::testPut() {

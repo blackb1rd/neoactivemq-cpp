@@ -15,7 +15,23 @@
  * limitations under the License.
  */
 
-#include "OpenwireAsyncSenderTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/AsyncSenderTest.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenwireAsyncSenderTest : public AsyncSenderTest {
+public:
+        OpenwireAsyncSenderTest();
+        virtual ~OpenwireAsyncSenderTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL() +
+                   "&connection.useAsyncSend=true";
+        }
+        virtual void testOpenWireConnector();
+    };
+}}}
 
 #include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/core/ActiveMQConnection.h>
@@ -61,3 +77,7 @@ void OpenwireAsyncSenderTest::testOpenWireConnector() {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireAsyncSenderTest, testAsyncSends) { testAsyncSends(); }
+TEST_F(OpenwireAsyncSenderTest, testOpenWireConnector) { testOpenWireConnector(); }

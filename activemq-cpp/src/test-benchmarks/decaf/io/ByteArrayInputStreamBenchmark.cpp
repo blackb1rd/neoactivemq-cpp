@@ -15,10 +15,42 @@
  * limitations under the License.
  */
 
-#include "ByteArrayInputStreamBenchmark.h"
+#include <benchmark/BenchmarkBase.h>
+#include <decaf/io/ByteArrayInputStream.h>
 
 using namespace decaf;
 using namespace decaf::io;
+
+namespace decaf {
+namespace io {
+
+    class ByteArrayInputStreamBenchmark :
+    public benchmark::BenchmarkBase<
+        decaf::io::ByteArrayInputStreamBenchmark, ByteArrayInputStream >
+    {
+    private:
+
+        unsigned char* buffer;
+        std::vector<unsigned char> stlBuffer;
+        static const int bufferSize;
+
+    private:
+
+        ByteArrayInputStreamBenchmark( const ByteArrayInputStreamBenchmark& );
+        ByteArrayInputStreamBenchmark& operator= ( const ByteArrayInputStreamBenchmark& );
+
+    public:
+
+        ByteArrayInputStreamBenchmark();
+        virtual ~ByteArrayInputStreamBenchmark();
+
+        void SetUp() override;
+        void TearDown() override;
+        virtual void run();
+
+    };
+
+}}
 
 ////////////////////////////////////////////////////////////////////////////////
 const int ByteArrayInputStreamBenchmark::bufferSize = 200000;
@@ -76,3 +108,5 @@ void ByteArrayInputStreamBenchmark::run() {
         bis.reset();
     }
 }
+
+TEST_F(ByteArrayInputStreamBenchmark, runBenchmark) { runBenchmark(); }

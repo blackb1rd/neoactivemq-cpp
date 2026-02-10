@@ -15,7 +15,20 @@
  * limitations under the License.
  */
 
-#include "OpenwireSlowListenerTest.h"
+#include <activemq/test/SlowListenerTest.h>
+
+namespace activemq{
+namespace test{
+namespace openwire{
+    class OpenwireSlowListenerTest : public SlowListenerTest {
+public:
+        OpenwireSlowListenerTest();
+        virtual ~OpenwireSlowListenerTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
 
 using namespace std;
 using namespace cms;
@@ -31,3 +44,7 @@ OpenwireSlowListenerTest::OpenwireSlowListenerTest() {
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireSlowListenerTest::~OpenwireSlowListenerTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireSlowListenerTest, testSlowListener) { testSlowListener(); }

@@ -355,6 +355,8 @@ namespace {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+namespace decaf {
+namespace util {
     template<>
     struct HashCode<MyKey> {
 
@@ -365,7 +367,8 @@ namespace {
             return arg.hashCode();
         }
     };
-
+}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 void LinkedHashMapTest::testPut() {

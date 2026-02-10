@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-#include "SetBenchmark.h"
+#include <benchmark/BenchmarkBase.h>
+#include <decaf/util/StlSet.h>
 
 #include <decaf/lang/Integer.h>
 #include <decaf/util/Iterator.h>
@@ -23,6 +24,28 @@
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
+
+namespace decaf {
+namespace util {
+
+    class SetBenchmark :
+        public benchmark::BenchmarkBase<
+            decaf::util::SetBenchmark, Set<int> >
+    {
+    private:
+
+        StlSet<int> intSet;
+        StlSet<std::string> stringSet;
+
+    public:
+
+        SetBenchmark();
+        virtual ~SetBenchmark() {}
+
+        virtual void run();
+    };
+
+}}
 
 ////////////////////////////////////////////////////////////////////////////////
 SetBenchmark::SetBenchmark() : intSet(), stringSet() {
@@ -93,3 +116,5 @@ void SetBenchmark::run(){
     }
 
 }
+
+TEST_F(SetBenchmark, runBenchmark) { runBenchmark(); }

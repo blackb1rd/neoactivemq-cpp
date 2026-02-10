@@ -15,7 +15,32 @@
  * limitations under the License.
  */
 
-#include "OpenwireSimpleTest.h"
+#include <activemq/test/SimpleTest.h>
+
+namespace activemq{
+namespace test{
+namespace openwire{
+    class OpenwireSimpleTest : public SimpleTest {
+public:
+        OpenwireSimpleTest();
+        virtual ~OpenwireSimpleTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+        void testWithZeroConsumerPrefetch();
+        void testWithZeroConsumerPrefetchAndNoMessage();
+        void testWithZeroConsumerPrefetch2();
+        void testWithZeroConsumerPrefetchAndNoMessage2();
+        void testWithZeroConsumerPrefetchAndZeroRedelivery();
+        void testWithZeroConsumerPrefetchWithInFlightExpiration();
+        void testMapMessageSendToQueue();
+        void testMapMessageSendToTopic();
+        void tesstStreamMessage();
+        void testDestroyDestination();
+        void testMessageIdSetOnSend();
+        void testReceiveWithSessionSyncDispatch();
+    };
+}}}
 
 #include <activemq/util/CMSListener.h>
 #include <activemq/core/ActiveMQConnectionFactory.h>
@@ -511,3 +536,31 @@ void OpenwireSimpleTest::testWithZeroConsumerPrefetchWithInFlightExpiration() {
     amqConnection->destroyDestination(queue.get());
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireSimpleTest, testAutoAck) { testAutoAck(); }
+TEST_F(OpenwireSimpleTest, testClientAck) { testClientAck(); }
+TEST_F(OpenwireSimpleTest, testProducerWithNullDestination) { testProducerWithNullDestination(); }
+TEST_F(OpenwireSimpleTest, testProducerSendWithNullDestination) { testProducerSendWithNullDestination(); }
+TEST_F(OpenwireSimpleTest, testProducerSendToNonDefaultDestination) { testProducerSendToNonDefaultDestination(); }
+TEST_F(OpenwireSimpleTest, testSyncReceive) { testSyncReceive(); }
+TEST_F(OpenwireSimpleTest, testSyncReceiveClientAck) { testSyncReceiveClientAck(); }
+TEST_F(OpenwireSimpleTest, testMultipleConnections) { testMultipleConnections(); }
+TEST_F(OpenwireSimpleTest, testMultipleSessions) { testMultipleSessions(); }
+TEST_F(OpenwireSimpleTest, testReceiveAlreadyInQueue) { testReceiveAlreadyInQueue(); }
+TEST_F(OpenwireSimpleTest, testBytesMessageSendRecv) { testBytesMessageSendRecv(); }
+TEST_F(OpenwireSimpleTest, testQuickCreateAndDestroy) { testQuickCreateAndDestroy(); }
+TEST_F(OpenwireSimpleTest, testWithZeroConsumerPrefetch) { testWithZeroConsumerPrefetch(); }
+TEST_F(OpenwireSimpleTest, testWithZeroConsumerPrefetchAndNoMessage) { testWithZeroConsumerPrefetchAndNoMessage(); }
+TEST_F(OpenwireSimpleTest, testWithZeroConsumerPrefetch2) { testWithZeroConsumerPrefetch2(); }
+TEST_F(OpenwireSimpleTest, testWithZeroConsumerPrefetchAndNoMessage2) { testWithZeroConsumerPrefetchAndNoMessage2(); }
+TEST_F(OpenwireSimpleTest, testWithZeroConsumerPrefetchAndZeroRedelivery) { testWithZeroConsumerPrefetchAndZeroRedelivery(); }
+TEST_F(OpenwireSimpleTest, testWithZeroConsumerPrefetchWithInFlightExpiration) { testWithZeroConsumerPrefetchWithInFlightExpiration(); }
+TEST_F(OpenwireSimpleTest, testMapMessageSendToQueue) { testMapMessageSendToQueue(); }
+TEST_F(OpenwireSimpleTest, testMapMessageSendToTopic) { testMapMessageSendToTopic(); }
+TEST_F(OpenwireSimpleTest, testDestroyDestination) { testDestroyDestination(); }
+TEST_F(OpenwireSimpleTest, tesstStreamMessage) { tesstStreamMessage(); }
+TEST_F(OpenwireSimpleTest, testLibraryInitShutdownInit) { testLibraryInitShutdownInit(); }
+TEST_F(OpenwireSimpleTest, testBytesMessageSendRecvAsync) { testBytesMessageSendRecvAsync(); }
+TEST_F(OpenwireSimpleTest, testMessageIdSetOnSend) { testMessageIdSetOnSend(); }
+TEST_F(OpenwireSimpleTest, testReceiveWithSessionSyncDispatch) { testReceiveWithSessionSyncDispatch(); }

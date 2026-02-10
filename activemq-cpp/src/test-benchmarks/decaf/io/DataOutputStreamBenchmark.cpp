@@ -15,12 +15,35 @@
  * limitations under the License.
  */
 
-#include "DataOutputStreamBenchmark.h"
+#include <benchmark/BenchmarkBase.h>
+#include <decaf/io/DataOutputStream.h>
 #include <decaf/io/ByteArrayOutputStream.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::io;
+
+namespace decaf {
+namespace io {
+
+    class DataOutputStreamBenchmark :
+        public benchmark::BenchmarkBase<
+        decaf::io::DataOutputStreamBenchmark, DataOutputStream >
+    {
+    private:
+
+        std::string testString;
+
+    public:
+
+        DataOutputStreamBenchmark();
+        virtual ~DataOutputStreamBenchmark() {}
+
+        void SetUp() override;
+        virtual void run();
+    };
+
+}}
 
 ////////////////////////////////////////////////////////////////////////////////
 DataOutputStreamBenchmark::DataOutputStreamBenchmark() : testString() {
@@ -81,3 +104,5 @@ void DataOutputStreamBenchmark::run() {
 
     bos.reset();
 }
+
+TEST_F(DataOutputStreamBenchmark, runBenchmark) { runBenchmark(); }

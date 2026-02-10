@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-#include "PrimitiveMapBenchmark.h"
+#include <benchmark/BenchmarkBase.h>
+#include <activemq/util/PrimitiveMap.h>
 
 #include <string>
 #include <decaf/lang/Thread.h>
@@ -23,6 +24,31 @@
 using namespace std;
 using namespace activemq;
 using namespace activemq::util;
+
+namespace activemq {
+namespace util {
+
+    class PrimitiveMapBenchmark :
+        public benchmark::BenchmarkBase<
+            activemq::util::PrimitiveMapBenchmark, PrimitiveMap >
+    {
+    private:
+
+        PrimitiveMap map;
+        std::string testString;
+        std::vector<unsigned char> byteBuffer;
+
+    public:
+
+        PrimitiveMapBenchmark();
+        virtual ~PrimitiveMapBenchmark();
+
+        void SetUp() override;
+        void run();
+
+    };
+
+}}
 
 ////////////////////////////////////////////////////////////////////////////////
 PrimitiveMapBenchmark::PrimitiveMapBenchmark() : map(), testString(), byteBuffer() {}
@@ -121,3 +147,5 @@ void PrimitiveMapBenchmark::run() {
         theCopy.copy( map );
     }
 }
+
+TEST_F(PrimitiveMapBenchmark, runBenchmark) { runBenchmark(); }

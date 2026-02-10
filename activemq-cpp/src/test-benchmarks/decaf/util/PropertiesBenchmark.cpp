@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-#include "PropertiesBenchmark.h"
+#include <benchmark/BenchmarkBase.h>
+#include <decaf/util/Properties.h>
 
 #include <decaf/lang/Integer.h>
 
@@ -23,6 +24,27 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
+
+namespace decaf {
+namespace util {
+
+    class PropertiesBenchmark :
+        public benchmark::BenchmarkBase<
+            decaf::util::PropertiesBenchmark, Properties >
+    {
+    private:
+
+        Properties properties;
+
+    public:
+
+        PropertiesBenchmark();
+        virtual ~PropertiesBenchmark() {}
+
+        virtual void run();
+    };
+
+}}
 
 ////////////////////////////////////////////////////////////////////////////////
 PropertiesBenchmark::PropertiesBenchmark() : properties() {
@@ -60,3 +82,5 @@ void PropertiesBenchmark::run() {
     }
 
 }
+
+TEST_F(PropertiesBenchmark, runBenchmark) { runBenchmark(); }

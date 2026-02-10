@@ -15,12 +15,28 @@
  * limitations under the License.
  */
 
-#include "ThreadBenchmark.h"
+#include <benchmark/BenchmarkBase.h>
+#include <decaf/lang/Thread.h>
 
 #include <decaf/lang/Runnable.h>
 
 using namespace decaf;
 using namespace decaf::lang;
+
+namespace decaf {
+namespace lang {
+
+    class ThreadBenchmark : public benchmark::BenchmarkBase< decaf::lang::ThreadBenchmark, Thread >{
+    public:
+
+        ThreadBenchmark();
+        virtual ~ThreadBenchmark();
+
+        virtual void run();
+
+    };
+
+}}
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace decaf{
@@ -56,3 +72,5 @@ void ThreadBenchmark::run() {
         theThread.join();
     }
 }
+
+TEST_F(ThreadBenchmark, runBenchmark) { runBenchmark(); }

@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-#include "LinkedListBenchmark.h"
+#include <benchmark/BenchmarkBase.h>
+#include <decaf/util/LinkedList.h>
 
 #include <decaf/lang/Integer.h>
 #include <decaf/util/Iterator.h>
@@ -23,6 +24,28 @@
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
+
+namespace decaf {
+namespace util {
+
+    class LinkedListBenchmark :
+        public benchmark::BenchmarkBase<
+            decaf::util::LinkedListBenchmark, LinkedList<int> > {
+    private:
+
+        LinkedList<int> intList;
+        LinkedList<std::string> stringList;
+
+    public:
+
+        LinkedListBenchmark();
+        virtual ~LinkedListBenchmark();
+
+        virtual void run();
+
+    };
+
+}}
 
 ////////////////////////////////////////////////////////////////////////////////
 LinkedListBenchmark::LinkedListBenchmark() : intList(), stringList() {
@@ -97,3 +120,5 @@ void LinkedListBenchmark::run(){
     stringList.clear();
     intList.clear();
 }
+
+TEST_F(LinkedListBenchmark, runBenchmark) { runBenchmark(); }

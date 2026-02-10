@@ -41,7 +41,23 @@
 #include <cms/TextMessage.h>
 
 #include <memory>
-#include "OpenwireAdvisoryTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/AdvisoryTest.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenwireAdvisoryTest : public AdvisoryTest {
+public:
+        OpenwireAdvisoryTest();
+        virtual ~OpenwireAdvisoryTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+        void testConnectionAdvisories();
+        void testConcurrentTempDestCreation();
+    };
+}}}
 
 using namespace cms;
 using namespace std;
@@ -190,3 +206,8 @@ void OpenwireAdvisoryTest::testConcurrentTempDestCreation() {
     ASSERT_TRUE(thread2.isNoErrors()) << (std::string("Thread2 error: ") + thread2.getErrorMessage());
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireAdvisoryTest, testConnectionAdvisories) { testConnectionAdvisories(); }
+TEST_F(OpenwireAdvisoryTest, testConcurrentTempDestCreation) { testConcurrentTempDestCreation(); }
+TEST_F(OpenwireAdvisoryTest, testTempDestinationCompositeAdvisoryTopic) { testTempDestinationCompositeAdvisoryTopic(); }

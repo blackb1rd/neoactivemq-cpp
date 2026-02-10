@@ -15,7 +15,28 @@
  * limitations under the License.
  */
 
-#include "OpenwireIndividualAckTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/CMSTestFixture.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenwireIndividualAckTest : public CMSTestFixture {
+public:
+        OpenwireIndividualAckTest();
+        virtual ~OpenwireIndividualAckTest();
+        void testAckedMessageAreConsumed();
+        void testLastMessageAcked();
+        void testUnAckedMessageAreNotConsumedOnSessionClose();
+        void testIndividualAcknowledgeMultiMessages_AcknowledgeFirstTest();
+        void testManyMessageAckedAfterMessageConsumption();
+        void testManyMessageAckedAfterAllConsumption();
+        void tesIndividualAcksWithClosedConsumerAndAudit();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
 
 #include <activemq/exceptions/ActiveMQException.h>
 
@@ -318,3 +339,13 @@ void OpenwireIndividualAckTest::tesIndividualAcksWithClosedConsumerAndAudit() {
 
     connection->close();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireIndividualAckTest, testAckedMessageAreConsumed) { testAckedMessageAreConsumed(); }
+TEST_F(OpenwireIndividualAckTest, testLastMessageAcked) { testLastMessageAcked(); }
+TEST_F(OpenwireIndividualAckTest, testUnAckedMessageAreNotConsumedOnSessionClose) { testUnAckedMessageAreNotConsumedOnSessionClose(); }
+TEST_F(OpenwireIndividualAckTest, testIndividualAcknowledgeMultiMessages_AcknowledgeFirstTest) { testIndividualAcknowledgeMultiMessages_AcknowledgeFirstTest(); }
+TEST_F(OpenwireIndividualAckTest, testManyMessageAckedAfterMessageConsumption) { testManyMessageAckedAfterMessageConsumption(); }
+TEST_F(OpenwireIndividualAckTest, testManyMessageAckedAfterAllConsumption) { testManyMessageAckedAfterAllConsumption(); }
+TEST_F(OpenwireIndividualAckTest, tesIndividualAcksWithClosedConsumerAndAudit) { tesIndividualAcksWithClosedConsumerAndAudit(); }

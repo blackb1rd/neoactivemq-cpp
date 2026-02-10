@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-#include "StlListBenchmark.h"
+#include <benchmark/BenchmarkBase.h>
+#include <decaf/util/StlList.h>
 
 #include <decaf/lang/Integer.h>
 #include <decaf/util/Iterator.h>
@@ -23,6 +24,28 @@
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
+
+namespace decaf {
+namespace util {
+
+    class StlListBenchmark :
+        public benchmark::BenchmarkBase<
+            decaf::util::StlListBenchmark, StlList<int> > {
+    private:
+
+        StlList<int> intList;
+        StlList<std::string> stringList;
+
+    public:
+
+        StlListBenchmark();
+        virtual ~StlListBenchmark();
+
+        virtual void run();
+
+    };
+
+}}
 
 ////////////////////////////////////////////////////////////////////////////////
 StlListBenchmark::StlListBenchmark() : intList(), stringList() {
@@ -99,3 +122,5 @@ void StlListBenchmark::run(){
     stringList.clear();
     intList.clear();
 }
+
+TEST_F(StlListBenchmark, runBenchmark) { runBenchmark(); }

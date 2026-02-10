@@ -15,7 +15,34 @@
  * limitations under the License.
  */
 
-#include "OpenWireRedeliveryPolicyTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/CMSTestFixture.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenWireRedeliveryPolicyTest : public CMSTestFixture {
+public:
+        OpenWireRedeliveryPolicyTest();
+        virtual ~OpenWireRedeliveryPolicyTest();
+        void SetUp() override {}
+        void TearDown() override {}
+        virtual std::string getBrokerURL() const;
+        void testGetNext();
+        void testGetNextWithInitialDelay();
+        void testExponentialRedeliveryPolicyDelaysDeliveryOnRollback();
+        void testNornalRedeliveryPolicyDelaysDeliveryOnRollback();
+        void testDLQHandling();
+        void testInfiniteMaximumNumberOfRedeliveries();
+        void testMaximumRedeliveryDelay();
+        void testZeroMaximumNumberOfRedeliveries();
+        void testRepeatedRedeliveryReceiveNoCommit();
+        void testRepeatedRedeliveryOnMessageNoCommit();
+        void testInitialRedeliveryDelayZero();
+        void testInitialRedeliveryDelayOne();
+        void testRedeliveryDelayOne();
+    };
+}}}
 
 #include <cms/Connection.h>
 #include <cms/Session.h>
@@ -784,3 +811,19 @@ void OpenWireRedeliveryPolicyTest::testRedeliveryDelayOne() {
     ASSERT_EQ(std::string("2nd"), textMessage->getText());
     session->commit();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenWireRedeliveryPolicyTest, testGetNext) { testGetNext(); }
+TEST_F(OpenWireRedeliveryPolicyTest, testGetNextWithInitialDelay) { testGetNextWithInitialDelay(); }
+TEST_F(OpenWireRedeliveryPolicyTest, testExponentialRedeliveryPolicyDelaysDeliveryOnRollback) { testExponentialRedeliveryPolicyDelaysDeliveryOnRollback(); }
+TEST_F(OpenWireRedeliveryPolicyTest, testNornalRedeliveryPolicyDelaysDeliveryOnRollback) { testNornalRedeliveryPolicyDelaysDeliveryOnRollback(); }
+TEST_F(OpenWireRedeliveryPolicyTest, testDLQHandling) { testDLQHandling(); }
+TEST_F(OpenWireRedeliveryPolicyTest, testInfiniteMaximumNumberOfRedeliveries) { testInfiniteMaximumNumberOfRedeliveries(); }
+TEST_F(OpenWireRedeliveryPolicyTest, testZeroMaximumNumberOfRedeliveries) { testZeroMaximumNumberOfRedeliveries(); }
+TEST_F(OpenWireRedeliveryPolicyTest, testRepeatedRedeliveryReceiveNoCommit) { testRepeatedRedeliveryReceiveNoCommit(); }
+TEST_F(OpenWireRedeliveryPolicyTest, testRepeatedRedeliveryOnMessageNoCommit) { testRepeatedRedeliveryOnMessageNoCommit(); }
+TEST_F(OpenWireRedeliveryPolicyTest, testInitialRedeliveryDelayZero) { testInitialRedeliveryDelayZero(); }
+TEST_F(OpenWireRedeliveryPolicyTest, testInitialRedeliveryDelayOne) { testInitialRedeliveryDelayOne(); }
+TEST_F(OpenWireRedeliveryPolicyTest, testRedeliveryDelayOne) { testRedeliveryDelayOne(); }
+TEST_F(OpenWireRedeliveryPolicyTest, testMaximumRedeliveryDelay) { testMaximumRedeliveryDelay(); }

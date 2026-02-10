@@ -15,7 +15,25 @@
  * limitations under the License.
  */
 
-#include "OpenwireOptimizedAckTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/CMSTestFixture.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenwireOptimizedAckTest : public CMSTestFixture {
+public:
+        OpenwireOptimizedAckTest();
+        virtual ~OpenwireOptimizedAckTest();
+        void SetUp() override {}
+        void TearDown() override {}
+        virtual std::string getBrokerURL() const;
+        void testOptimizedAckSettings();
+        void testOptimizedAckWithExpiredMsgs();
+        void testOptimizedAckWithExpiredMsgsSync();
+        void testOptimizedAckWithExpiredMsgsSync2();
+    };
+}}}
 
 #include <cms/MessageListener.h>
 #include <cms/ExceptionListener.h>
@@ -256,3 +274,10 @@ void OpenwireOptimizedAckTest::testOptimizedAckWithExpiredMsgsSync2() {
     session->close();
     connection->close();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireOptimizedAckTest, testOptimizedAckSettings) { testOptimizedAckSettings(); }
+TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgs) { testOptimizedAckWithExpiredMsgs(); }
+TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync) { testOptimizedAckWithExpiredMsgsSync(); }
+TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync2) { testOptimizedAckWithExpiredMsgsSync2(); }

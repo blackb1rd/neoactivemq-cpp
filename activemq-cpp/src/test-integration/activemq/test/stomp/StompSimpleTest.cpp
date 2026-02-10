@@ -15,7 +15,20 @@
  * limitations under the License.
  */
 
-#include "StompSimpleTest.h"
+#include <activemq/test/SimpleTest.h>
+
+namespace activemq{
+namespace test{
+namespace stomp{
+    class StompSimpleTest : public SimpleTest {
+public:
+        StompSimpleTest();
+        virtual ~StompSimpleTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getStompURL();
+        }
+    };
+}}}
 
 using namespace std;
 using namespace cms;
@@ -30,3 +43,20 @@ StompSimpleTest::StompSimpleTest() {
 ////////////////////////////////////////////////////////////////////////////////
 StompSimpleTest::~StompSimpleTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(StompSimpleTest, testAutoAck) { testAutoAck(); }
+TEST_F(StompSimpleTest, testClientAck) { testClientAck(); }
+TEST_F(StompSimpleTest, testProducerWithNullDestination) { testProducerWithNullDestination(); }
+TEST_F(StompSimpleTest, testProducerSendWithNullDestination) { testProducerSendWithNullDestination(); }
+TEST_F(StompSimpleTest, testProducerSendToNonDefaultDestination) { testProducerSendToNonDefaultDestination(); }
+TEST_F(StompSimpleTest, testSyncReceive) { testSyncReceive(); }
+TEST_F(StompSimpleTest, testSyncReceiveClientAck) { testSyncReceiveClientAck(); }
+TEST_F(StompSimpleTest, testMultipleConnections) { testMultipleConnections(); }
+TEST_F(StompSimpleTest, testMultipleSessions) { testMultipleSessions(); }
+TEST_F(StompSimpleTest, testReceiveAlreadyInQueue) { testReceiveAlreadyInQueue(); }
+TEST_F(StompSimpleTest, testQuickCreateAndDestroy) { testQuickCreateAndDestroy(); }
+TEST_F(StompSimpleTest, testBytesMessageSendRecv) { testBytesMessageSendRecv(); }
+TEST_F(StompSimpleTest, testBytesMessageSendRecvAsync) { testBytesMessageSendRecvAsync(); }
+TEST_F(StompSimpleTest, testLibraryInitShutdownInit) { testLibraryInitShutdownInit(); }

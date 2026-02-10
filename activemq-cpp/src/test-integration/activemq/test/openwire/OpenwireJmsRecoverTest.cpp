@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
-#include "OpenwireJmsRecoverTest.h"
-
+#include <gtest/gtest.h>
+#include <cms/ConnectionFactory.h>
+#include <cms/Connection.h>
+#include <cms/Destination.h>
+#include <activemq/util/IntegrationCommon.h>
 #include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/core/ActiveMQConnection.h>
 #include <activemq/core/ActiveMQSession.h>
@@ -53,6 +56,51 @@ using namespace activemq::commands;
 using namespace activemq::exceptions;
 using namespace activemq::test;
 using namespace activemq::test::openwire;
+
+namespace activemq {
+namespace test {
+namespace openwire {
+
+    class OpenwireJmsRecoverTest : public ::testing::Test {
+    private:
+
+        cms::ConnectionFactory* factory;
+        cms::Connection* connection;
+        cms::Destination* destination;
+
+    private:
+
+        OpenwireJmsRecoverTest(const OpenwireJmsRecoverTest&);
+        OpenwireJmsRecoverTest& operator= (const OpenwireJmsRecoverTest&);
+
+    public:
+
+        OpenwireJmsRecoverTest();
+        virtual ~OpenwireJmsRecoverTest();
+
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+
+        void SetUp() override;
+        void TearDown() override;
+
+        void testQueueSynchRecover();
+        void testQueueAsynchRecover();
+        void testTopicSynchRecover();
+        void testTopicAsynchRecover();
+        void testQueueAsynchRecoverWithAutoAck();
+        void testTopicAsynchRecoverWithAutoAck();
+
+    private:
+
+        void doTestSynchRecover();
+        void doTestAsynchRecover();
+        void doTestAsynchRecoverWithAutoAck();
+
+    };
+
+}}}
 
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireJmsRecoverTest::OpenwireJmsRecoverTest() :
@@ -315,3 +363,12 @@ void OpenwireJmsRecoverTest::doTestAsynchRecoverWithAutoAck() {
         FAIL() << ("Timeout waiting for async message delivery to complete.");
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireJmsRecoverTest, testQueueSynchRecover) { testQueueSynchRecover(); }
+TEST_F(OpenwireJmsRecoverTest, testQueueAsynchRecover) { testQueueAsynchRecover(); }
+TEST_F(OpenwireJmsRecoverTest, testTopicSynchRecover) { testTopicSynchRecover(); }
+TEST_F(OpenwireJmsRecoverTest, testTopicAsynchRecover) { testTopicAsynchRecover(); }
+TEST_F(OpenwireJmsRecoverTest, testQueueAsynchRecoverWithAutoAck) { testQueueAsynchRecoverWithAutoAck(); }
+TEST_F(OpenwireJmsRecoverTest, testTopicAsynchRecoverWithAutoAck) { testTopicAsynchRecoverWithAutoAck(); }

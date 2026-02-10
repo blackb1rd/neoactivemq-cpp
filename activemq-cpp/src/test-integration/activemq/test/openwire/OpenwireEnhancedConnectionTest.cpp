@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#include "OpenwireEnhancedConnectionTest.h"
-
+#include <gtest/gtest.h>
+#include <activemq/util/IntegrationCommon.h>
 #include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/core/ActiveMQConnection.h>
 #include <activemq/core/ActiveMQSession.h>
@@ -52,6 +52,30 @@ using namespace activemq::commands;
 using namespace activemq::exceptions;
 using namespace activemq::test;
 using namespace activemq::test::openwire;
+
+namespace activemq {
+namespace test {
+namespace openwire {
+
+    class OpenwireEnhancedConnectionTest : public ::testing::Test {
+    public:
+
+        OpenwireEnhancedConnectionTest();
+        virtual ~OpenwireEnhancedConnectionTest();
+
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+
+        void SetUp() override {}
+        void TearDown() override {}
+
+        void testDestinationSource();
+        void testDestinationSourceGetters();
+
+    };
+
+}}}
 
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireEnhancedConnectionTest::OpenwireEnhancedConnectionTest() {
@@ -267,3 +291,8 @@ void OpenwireEnhancedConnectionTest::testDestinationSource() {
     source->stop();
     connection->close();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireEnhancedConnectionTest, testDestinationSource) { testDestinationSource(); }
+TEST_F(OpenwireEnhancedConnectionTest, testDestinationSourceGetters) { testDestinationSourceGetters(); }

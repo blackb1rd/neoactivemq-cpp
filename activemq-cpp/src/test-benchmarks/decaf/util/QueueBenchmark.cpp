@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-#include "QueueBenchmark.h"
+#include <benchmark/BenchmarkBase.h>
+#include <decaf/util/StlQueue.h>
 
 #include <decaf/lang/Integer.h>
 
@@ -23,6 +24,28 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
+
+namespace decaf {
+namespace util {
+
+    class QueueBenchmark :
+        public benchmark::BenchmarkBase<
+            decaf::util::QueueBenchmark, StlQueue<int> >
+    {
+    private:
+
+        StlQueue<std::string> stringQ;
+        StlQueue<int> intQ;
+
+    public:
+
+        QueueBenchmark();
+        virtual ~QueueBenchmark() {}
+
+        virtual void run();
+    };
+
+}}
 
 ////////////////////////////////////////////////////////////////////////////////
 QueueBenchmark::QueueBenchmark() : stringQ(), intQ() {
@@ -77,3 +100,5 @@ void QueueBenchmark::run(){
     }
 
 }
+
+TEST_F(QueueBenchmark, runBenchmark) { runBenchmark(); }

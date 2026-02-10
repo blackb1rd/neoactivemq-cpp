@@ -15,10 +15,27 @@
  * limitations under the License.
  */
 
-#include "BooleanBenchmark.h"
+#include <benchmark/BenchmarkBase.h>
+#include <decaf/lang/Boolean.h>
 
 using namespace decaf;
 using namespace decaf::lang;
+
+namespace decaf {
+namespace lang {
+
+    class BooleanBenchmark :
+        public benchmark::BenchmarkBase< decaf::lang::BooleanBenchmark, Boolean >
+    {
+    public:
+
+        BooleanBenchmark();
+        virtual ~BooleanBenchmark() {}
+
+        virtual void run();
+    };
+
+}}
 
 ////////////////////////////////////////////////////////////////////////////////
 BooleanBenchmark::BooleanBenchmark() {
@@ -50,3 +67,5 @@ void BooleanBenchmark::run(){
     }
 
 }
+
+TEST_F(BooleanBenchmark, runBenchmark) { runBenchmark(); }

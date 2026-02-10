@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ResponseCorrelatorTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/util/Config.h>
 #include <activemq/commands/BaseCommand.h>
@@ -32,10 +32,21 @@ using namespace activemq::transport;
 using namespace activemq::transport::correlator;
 using namespace decaf::io;
 
+    class ResponseCorrelatorTest : public ::testing::Test {
+public:
+
+        virtual ~ResponseCorrelatorTest(){}
+
+        void testBasics();
+        void testOneway();
+        void testTransportException();
+        void testMultiRequests();
+        void testNarrow();
+
+    };
+
+
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace transport {
-namespace correlator {
 
     class MyCommand : public commands::BaseCommand {
     public:
@@ -324,7 +335,6 @@ namespace correlator {
         }
     };
 
-}}}
 
 ////////////////////////////////////////////////////////////////////////////////
 void ResponseCorrelatorTest::testBasics() {
@@ -514,3 +524,9 @@ void ResponseCorrelatorTest::testNarrow(){
     narrowed = correlator.narrow(typeid( correlator ));
     ASSERT_TRUE(narrowed == &correlator);
 }
+
+TEST_F(ResponseCorrelatorTest, testBasics) { testBasics(); }
+TEST_F(ResponseCorrelatorTest, testOneway) { testOneway(); }
+TEST_F(ResponseCorrelatorTest, testTransportException) { testTransportException(); }
+TEST_F(ResponseCorrelatorTest, testMultiRequests) { testMultiRequests(); }
+TEST_F(ResponseCorrelatorTest, testNarrow) { testNarrow(); }

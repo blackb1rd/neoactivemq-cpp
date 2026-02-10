@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "MemoryUsageTest.h"
+#include <gtest/gtest.h>
 #include <activemq/util/MemoryUsage.h>
 
 #include <decaf/lang/Runnable.h>
@@ -25,6 +25,20 @@
 using namespace activemq;
 using namespace activemq::util;
 using namespace decaf::lang;
+
+    class MemoryUsageTest  : public ::testing::Test {
+public:
+
+        MemoryUsageTest() {}
+        virtual ~MemoryUsageTest() {}
+
+        void testCTors();
+        void testUsage();
+        void testTimedWait();
+        void testWait();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -121,3 +135,8 @@ void MemoryUsageTest::testWait() {
 
     myThread.join();
 }
+
+TEST_F(MemoryUsageTest, testCTors) { testCTors(); }
+TEST_F(MemoryUsageTest, testUsage) { testUsage(); }
+TEST_F(MemoryUsageTest, testTimedWait) { testTimedWait(); }
+TEST_F(MemoryUsageTest, testWait) { testWait(); }

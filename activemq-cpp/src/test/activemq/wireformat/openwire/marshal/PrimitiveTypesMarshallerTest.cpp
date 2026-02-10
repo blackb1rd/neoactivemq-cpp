@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "PrimitiveTypesMarshallerTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/util/PrimitiveMap.h>
 #include <activemq/util/PrimitiveList.h>
@@ -29,6 +29,37 @@ using namespace decaf::lang::exceptions;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using namespace activemq::wireformat::openwire::marshal;
+
+    class PrimitiveTypesMarshallerTest : public ::testing::Test {
+private:
+
+        activemq::util::PrimitiveMap* unmarshaledMap;
+
+    private:
+
+        PrimitiveTypesMarshallerTest(const PrimitiveTypesMarshallerTest&);
+        PrimitiveTypesMarshallerTest& operator= (const PrimitiveTypesMarshallerTest&);
+
+    public:
+
+        PrimitiveTypesMarshallerTest() : unmarshaledMap() {}
+        virtual ~PrimitiveTypesMarshallerTest() {}
+
+        void SetUp() override {
+            this->unmarshaledMap = NULL;
+        }
+
+        void TearDown() override {
+            delete this->unmarshaledMap;
+            this->unmarshaledMap = NULL;
+        }
+
+        void test();
+        void testLists();
+        void testMaps();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void PrimitiveTypesMarshallerTest::test() {
@@ -158,3 +189,7 @@ void PrimitiveTypesMarshallerTest::testMaps() {
     ASSERT_TRUE(newMap.get() != NULL);
     ASSERT_TRUE(newMap->size() == 3);
 }
+
+TEST_F(PrimitiveTypesMarshallerTest, test) { test(); }
+TEST_F(PrimitiveTypesMarshallerTest, testLists) { testLists(); }
+TEST_F(PrimitiveTypesMarshallerTest, testMaps) { testMaps(); }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "LinkedListTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/LinkedList.h>
@@ -25,6 +25,75 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
+
+    class LinkedListTest : public ::testing::Test
+    {
+private:
+
+        static const int SIZE;
+
+    public:
+
+        LinkedListTest();
+        virtual ~LinkedListTest();
+
+        void testConstructor1();
+        void testConstructor2();
+        void testConstructor3();
+        void testEquals();
+        void testGet();
+        void testSet();
+        void testAdd1();
+        void testAdd2();
+        void testAddAll1();
+        void testAddAll2();
+        void testAddAll3();
+        void testAddAll4();
+        void testAddAllSelfAsCollection1();
+        void testAddAllSelfAsCollection2();
+        void testAddFirst();
+        void testAddLast();
+        void testRemoveAtIndex();
+        void testRemoveByValue();
+        void testRemoveAll();
+        void testRetainAll();
+        void testGetFirst();
+        void testGetLast();
+        void testClear();
+        void testIndexOf();
+        void testLastIndexOf();
+        void testContains();
+        void testContainsAll();
+        void testToArray();
+        void testOffer();
+        void testPoll();
+        void testPeek();
+        void testElement();
+        void testQRemove();
+        void testOfferFirst();
+        void testOfferLast();
+        void testRemoveFirst();
+        void testRemoveLast();
+        void testPollFirst();
+        void testPollLast();
+        void testPeekFirst();
+        void testPeekLast();
+        void testPop();
+        void testPush();
+        void testIterator1();
+        void testIterator2();
+        void testListIterator1();
+        void testListIterator2();
+        void testListIterator3();
+        void testListIterator4();
+        void testListIterator1IndexOutOfBoundsException();
+        void testListIterator2IndexOutOfBoundsException();
+        void testDescendingIterator();
+        void testRemoveFirstOccurrence();
+        void testRemoveLastOccurrence();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int LinkedListTest::SIZE = 256;
@@ -1161,3 +1230,58 @@ void LinkedListTest::testRemoveLastOccurrence() {
     ASSERT_EQ(3, list.getLast());
     ASSERT_TRUE(!list.removeLastOccurrence(1));
 }
+
+TEST_F(LinkedListTest, testConstructor1) { testConstructor1(); }
+TEST_F(LinkedListTest, testConstructor2) { testConstructor2(); }
+TEST_F(LinkedListTest, testConstructor3) { testConstructor3(); }
+TEST_F(LinkedListTest, testEquals) { testEquals(); }
+TEST_F(LinkedListTest, testGet) { testGet(); }
+TEST_F(LinkedListTest, testSet) { testSet(); }
+TEST_F(LinkedListTest, testAdd1) { testAdd1(); }
+TEST_F(LinkedListTest, testAdd2) { testAdd2(); }
+TEST_F(LinkedListTest, testAddAll1) { testAddAll1(); }
+TEST_F(LinkedListTest, testAddAll2) { testAddAll2(); }
+TEST_F(LinkedListTest, testAddAll3) { testAddAll3(); }
+TEST_F(LinkedListTest, testAddAll4) { testAddAll4(); }
+TEST_F(LinkedListTest, testAddAllSelfAsCollection1) { testAddAllSelfAsCollection1(); }
+TEST_F(LinkedListTest, testAddAllSelfAsCollection2) { testAddAllSelfAsCollection2(); }
+TEST_F(LinkedListTest, testAddFirst) { testAddFirst(); }
+TEST_F(LinkedListTest, testAddLast) { testAddLast(); }
+TEST_F(LinkedListTest, testRemoveAtIndex) { testRemoveAtIndex(); }
+TEST_F(LinkedListTest, testRemoveByValue) { testRemoveByValue(); }
+TEST_F(LinkedListTest, testRemoveAll) { testRemoveAll(); }
+TEST_F(LinkedListTest, testRetainAll) { testRetainAll(); }
+TEST_F(LinkedListTest, testGetFirst) { testGetFirst(); }
+TEST_F(LinkedListTest, testGetLast) { testGetLast(); }
+TEST_F(LinkedListTest, testClear) { testClear(); }
+TEST_F(LinkedListTest, testIndexOf) { testIndexOf(); }
+TEST_F(LinkedListTest, testLastIndexOf) { testLastIndexOf(); }
+TEST_F(LinkedListTest, testContains) { testContains(); }
+TEST_F(LinkedListTest, testContainsAll) { testContainsAll(); }
+TEST_F(LinkedListTest, testToArray) { testToArray(); }
+TEST_F(LinkedListTest, testOffer) { testOffer(); }
+TEST_F(LinkedListTest, testPoll) { testPoll(); }
+TEST_F(LinkedListTest, testPeek) { testPeek(); }
+TEST_F(LinkedListTest, testElement) { testElement(); }
+TEST_F(LinkedListTest, testQRemove) { testQRemove(); }
+TEST_F(LinkedListTest, testOfferFirst) { testOfferFirst(); }
+TEST_F(LinkedListTest, testOfferLast) { testOfferLast(); }
+TEST_F(LinkedListTest, testRemoveFirst) { testRemoveFirst(); }
+TEST_F(LinkedListTest, testRemoveLast) { testRemoveLast(); }
+TEST_F(LinkedListTest, testPollFirst) { testPollFirst(); }
+TEST_F(LinkedListTest, testPollLast) { testPollLast(); }
+TEST_F(LinkedListTest, testPeekFirst) { testPeekFirst(); }
+TEST_F(LinkedListTest, testPeekLast) { testPeekLast(); }
+TEST_F(LinkedListTest, testPop) { testPop(); }
+TEST_F(LinkedListTest, testPush) { testPush(); }
+TEST_F(LinkedListTest, testIterator1) { testIterator1(); }
+TEST_F(LinkedListTest, testIterator2) { testIterator2(); }
+TEST_F(LinkedListTest, testListIterator1) { testListIterator1(); }
+TEST_F(LinkedListTest, testListIterator2) { testListIterator2(); }
+TEST_F(LinkedListTest, testListIterator3) { testListIterator3(); }
+TEST_F(LinkedListTest, testListIterator4) { testListIterator4(); }
+TEST_F(LinkedListTest, testListIterator1IndexOutOfBoundsException) { testListIterator1IndexOutOfBoundsException(); }
+TEST_F(LinkedListTest, testListIterator2IndexOutOfBoundsException) { testListIterator2IndexOutOfBoundsException(); }
+TEST_F(LinkedListTest, testDescendingIterator) { testDescendingIterator(); }
+TEST_F(LinkedListTest, testRemoveFirstOccurrence) { testRemoveFirstOccurrence(); }
+TEST_F(LinkedListTest, testRemoveLastOccurrence) { testRemoveLastOccurrence(); }

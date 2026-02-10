@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ServerSocketTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/net/Socket.h>
 #include <decaf/net/ServerSocket.h>
@@ -27,6 +27,41 @@ using namespace decaf::net;
 using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class ServerSocketTest  : public ::testing::Test {
+private:
+
+        Socket* ssconn;
+
+        decaf::lang::Thread* theThread;
+
+    private:
+
+        ServerSocketTest(const ServerSocketTest&);
+        ServerSocketTest& operator= (const ServerSocketTest&);
+
+    public:
+
+        ServerSocketTest();
+        virtual ~ServerSocketTest();
+
+        void SetUp() override;
+        void TearDown() override;
+
+        void testConstructor();
+        void testClose();
+        void testAccept();
+        void testGetLocalPort();
+        void testGetSoTimeout();
+        void testGetReuseAddress();
+        void testGetReceiveBufferSize();
+
+    protected:
+
+        void startClient( int port );
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -309,3 +344,11 @@ void ServerSocketTest::startClient( int port ) {
         FAIL() << (std::string( "Exception during startClinet()" ) + e.getMessage());
     }
 }
+
+TEST_F(ServerSocketTest, testConstructor) { testConstructor(); }
+TEST_F(ServerSocketTest, testClose) { testClose(); }
+TEST_F(ServerSocketTest, testAccept) { testAccept(); }
+TEST_F(ServerSocketTest, testGetLocalPort) { testGetLocalPort(); }
+TEST_F(ServerSocketTest, testGetSoTimeout) { testGetSoTimeout(); }
+TEST_F(ServerSocketTest, testGetReuseAddress) { testGetReuseAddress(); }
+TEST_F(ServerSocketTest, testGetReceiveBufferSize) { testGetReceiveBufferSize(); }

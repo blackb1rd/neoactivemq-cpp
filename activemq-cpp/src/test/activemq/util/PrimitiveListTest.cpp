@@ -15,13 +15,35 @@
  * limitations under the License.
  */
 
-#include "PrimitiveListTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/util/PrimitiveValueNode.h>
 #include <activemq/util/PrimitiveMap.h>
+#include <activemq/util/PrimitiveList.h>
 
 using namespace activemq;
 using namespace activemq::util;
+
+    class PrimitiveListTest : public ::testing::Test
+    {
+public:
+
+        PrimitiveListTest(){}
+        virtual ~PrimitiveListTest(){}
+
+        void testValueNode();
+        void testSetGet();
+        void testAdd();
+        void testRemove();
+        void testCount();
+        void testCopy();
+        void testClear();
+        void testContains();
+        void testListOfLists();
+        void testListOfMaps();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void PrimitiveListTest::testSetGet(){
@@ -268,3 +290,13 @@ void PrimitiveListTest::testListOfMaps() {
     ASSERT_TRUE(list.get(2).getMap().get("3").getInt() == 3);
 
 }
+
+TEST_F(PrimitiveListTest, testSetGet) { testSetGet(); }
+TEST_F(PrimitiveListTest, testAdd) { testAdd(); }
+TEST_F(PrimitiveListTest, testRemove) { testRemove(); }
+TEST_F(PrimitiveListTest, testCount) { testCount(); }
+TEST_F(PrimitiveListTest, testClear) { testClear(); }
+TEST_F(PrimitiveListTest, testCopy) { testCopy(); }
+TEST_F(PrimitiveListTest, testContains) { testContains(); }
+TEST_F(PrimitiveListTest, testListOfLists) { testListOfLists(); }
+TEST_F(PrimitiveListTest, testListOfMaps) { testListOfMaps(); }

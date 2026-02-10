@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "BitSetTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/BitSet.h>
 #include <decaf/lang/Thread.h>
@@ -31,6 +31,46 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class BitSetTest : public ::testing::Test {
+public:
+
+        BitSetTest();
+        virtual ~BitSetTest();
+
+        void SetUp() override;
+
+        void testConstructor();
+        void testConstructorI();
+        void testCopy();
+        void testEquals();
+        void testCardinality();
+        void testClear();
+        void testClearI();
+        void testClearII();
+        void testGetI();
+        void testGetII();
+        void testFlipI();
+        void testFlipII();
+        void testSetI();
+        void testSetIB();
+        void testSetII();
+        void testSetIIB();
+        void testIsEmpty();
+        void testIntersects();
+        void testAnd();
+        void testAndNot();
+        void testOR();
+        void testXOR();
+        void testSize();
+        void testToString();
+        void testLength();
+        void testNextSetBitI();
+        void testNextClearBitI();
+        void testNotModified();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -1412,3 +1452,32 @@ void BitSetTest::testCardinality() {
     bs.set(0, 64);
     ASSERT_EQ(64, bs.cardinality()) << ("cardinality() returned wrong value");
 }
+
+TEST_F(BitSetTest, testConstructor) { testConstructor(); }
+TEST_F(BitSetTest, testConstructorI) { testConstructorI(); }
+TEST_F(BitSetTest, testCopy) { testCopy(); }
+TEST_F(BitSetTest, testCardinality) { testCardinality(); }
+TEST_F(BitSetTest, testEquals) { testEquals(); }
+TEST_F(BitSetTest, testClear) { testClear(); }
+TEST_F(BitSetTest, testClearI) { testClearI(); }
+TEST_F(BitSetTest, testClearII) { testClearII(); }
+TEST_F(BitSetTest, testGetI) { testGetI(); }
+TEST_F(BitSetTest, testGetII) { testGetII(); }
+TEST_F(BitSetTest, testFlipI) { testFlipI(); }
+TEST_F(BitSetTest, testFlipII) { testFlipII(); }
+TEST_F(BitSetTest, testSetI) { testSetI(); }
+TEST_F(BitSetTest, testSetIB) { testSetIB(); }
+TEST_F(BitSetTest, testSetII) { testSetII(); }
+TEST_F(BitSetTest, testSetIIB) { testSetIIB(); }
+TEST_F(BitSetTest, testIsEmpty) { testIsEmpty(); }
+TEST_F(BitSetTest, testIntersects) { testIntersects(); }
+TEST_F(BitSetTest, testAnd) { testAnd(); }
+TEST_F(BitSetTest, testAndNot) { testAndNot(); }
+TEST_F(BitSetTest, testOR) { testOR(); }
+TEST_F(BitSetTest, testXOR) { testXOR(); }
+TEST_F(BitSetTest, testSize) { testSize(); }
+TEST_F(BitSetTest, testLength) { testLength(); }
+TEST_F(BitSetTest, testToString) { testToString(); }
+TEST_F(BitSetTest, testNextSetBitI) { testNextSetBitI(); }
+TEST_F(BitSetTest, testNextClearBitI) { testNextClearBitI(); }
+TEST_F(BitSetTest, testNotModified) { testNotModified(); }

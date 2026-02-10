@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ActiveMQSessionTest.h"
+#include <gtest/gtest.h>
 
 #include <cms/ExceptionListener.h>
 #include <activemq/transport/mock/MockTransportFactory.h>
@@ -33,6 +33,14 @@
 #include <decaf/lang/Thread.h>
 #include <decaf/net/Socket.h>
 #include <decaf/net/ServerSocket.h>
+#include <cms/Connection.h>
+#include <cms/MessageListener.h>
+#include <decaf/util/concurrent/Concurrent.h>
+#include <decaf/util/concurrent/Mutex.h>
+#include <activemq/core/ActiveMQConnection.h>
+#include <activemq/transport/mock/MockTransport.h>
+#include <activemq/util/Config.h>
+#include <memory>
 
 using namespace std;
 using namespace activemq;
@@ -41,9 +49,66 @@ using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
 
+    class ActiveMQSessionTest : public ::testing::Test {
+private:
+
+        class MyExceptionListener : public cms::ExceptionListener{
+        public:
+
+            bool caughtOne;
+
+        public:
+
+            MyExceptionListener() : caughtOne(false) {}
+            virtual ~MyExceptionListener(){}
+
+            virtual void onException(const cms::CMSException& ex AMQCPP_UNUSED){
+                caughtOne = true;
+            }
+        };
+
+        std::unique_ptr<ActiveMQConnection> connection;
+        transport::mock::MockTransport* dTransport;
+        MyExceptionListener exListener;
+
+    private:
+
+        ActiveMQSessionTest(const ActiveMQSessionTest&);
+        ActiveMQSessionTest& operator= (const ActiveMQSessionTest&);
+
+    public:
+
+        void SetUp() override;
+        void TearDown() override;
+
+        void injectTextMessage(const std::string message,
+                               const cms::Destination& destination,
+                               const commands::ConsumerId& id,
+                               const long long timeStamp = -1,
+                               const long long timeToLive = -1);
+
+    public:
+
+        ActiveMQSessionTest();
+        virtual ~ActiveMQSessionTest();
+
+        void testAutoAcking();
+        void testClientAck();
+        void testCreateManyConsumersAndSetListeners();
+        void testTransactionCommitOneConsumer();
+        void testTransactionCommitTwoConsumer();
+        void testTransactionRollbackOneConsumer();
+        void testTransactionRollbackTwoConsumer();
+        void testTransactionCloseWithoutCommit();
+        void testTransactionCommitAfterConsumerClosed();
+        void testExpiration();
+        void testCreateTempQueueByName();
+        void testCreateTempTopicByName();
+
+    };
+
+
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace core {
 
     class MyCMSMessageListener : public cms::MessageListener {
     public:
@@ -101,7 +166,6 @@ namespace core {
             AMQ_CATCHALL_THROW( activemq::exceptions::ActiveMQException )
         }
     };
-}}
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQSessionTest::ActiveMQSessionTest() : connection(), dTransport(), exListener() {
@@ -773,3 +837,16 @@ void ActiveMQSessionTest::injectTextMessage(const std::string message,
 
     dTransport->fireCommand(dispatch);
 }
+
+TEST_F(ActiveMQSessionTest, testAutoAcking) { testAutoAcking(); }
+TEST_F(ActiveMQSessionTest, testClientAck) { testClientAck(); }
+TEST_F(ActiveMQSessionTest, testTransactionCommitOneConsumer) { testTransactionCommitOneConsumer(); }
+TEST_F(ActiveMQSessionTest, testTransactionCommitTwoConsumer) { testTransactionCommitTwoConsumer(); }
+TEST_F(ActiveMQSessionTest, testTransactionCommitAfterConsumerClosed) { testTransactionCommitAfterConsumerClosed(); }
+TEST_F(ActiveMQSessionTest, testTransactionRollbackOneConsumer) { testTransactionRollbackOneConsumer(); }
+TEST_F(ActiveMQSessionTest, testTransactionRollbackTwoConsumer) { testTransactionRollbackTwoConsumer(); }
+TEST_F(ActiveMQSessionTest, testTransactionCloseWithoutCommit) { testTransactionCloseWithoutCommit(); }
+TEST_F(ActiveMQSessionTest, testExpiration) { testExpiration(); }
+TEST_F(ActiveMQSessionTest, testCreateManyConsumersAndSetListeners) { testCreateManyConsumersAndSetListeners(); }
+TEST_F(ActiveMQSessionTest, testCreateTempQueueByName) { testCreateTempQueueByName(); }
+TEST_F(ActiveMQSessionTest, testCreateTempTopicByName) { testCreateTempTopicByName(); }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "LinkedHashMapTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/Set.h>
 #include <decaf/util/Iterator.h>
@@ -30,6 +30,41 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class LinkedHashMapTest : public ::testing::Test {
+public:
+
+        LinkedHashMapTest();
+        virtual ~LinkedHashMapTest();
+
+        void testConstructor();
+        void testConstructorI();
+        void testConstructorIF();
+        void testConstructorMap();
+        void testClear();
+        void testContainsKey();
+        void testContainsValue();
+        void testGet();
+        void testPut();
+        void testRemove();
+        void testIsEmpty();
+        void testPutAll();
+        void testRehash();
+        void testToString();
+        void testSize();
+        void testEntrySet();
+        void testKeySet();
+        void testValues();
+        void testEntrySetIterator();
+        void testKeySetIterator();
+        void testValuesIterator();
+        void testOrderedEntrySet();
+        void testOrderedKeySet();
+        void testOrderedValues();
+        void testRemoveEldest();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -319,8 +354,6 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf {
-namespace util {
 
     template<>
     struct HashCode<MyKey> {
@@ -333,7 +366,6 @@ namespace util {
         }
     };
 
-}}
 
 ////////////////////////////////////////////////////////////////////////////////
 void LinkedHashMapTest::testPut() {
@@ -826,3 +858,29 @@ void LinkedHashMapTest::testRemoveEldest() {
 
     ASSERT_EQ(5, map.removals) << ("Incorrect number of removals");
 }
+
+TEST_F(LinkedHashMapTest, testConstructor) { testConstructor(); }
+TEST_F(LinkedHashMapTest, testConstructorI) { testConstructorI(); }
+TEST_F(LinkedHashMapTest, testConstructorIF) { testConstructorIF(); }
+TEST_F(LinkedHashMapTest, testConstructorMap) { testConstructorMap(); }
+TEST_F(LinkedHashMapTest, testClear) { testClear(); }
+TEST_F(LinkedHashMapTest, testContainsKey) { testContainsKey(); }
+TEST_F(LinkedHashMapTest, testContainsValue) { testContainsValue(); }
+TEST_F(LinkedHashMapTest, testGet) { testGet(); }
+TEST_F(LinkedHashMapTest, testPut) { testPut(); }
+TEST_F(LinkedHashMapTest, testRemove) { testRemove(); }
+TEST_F(LinkedHashMapTest, testIsEmpty) { testIsEmpty(); }
+TEST_F(LinkedHashMapTest, testKeySet) { testKeySet(); }
+TEST_F(LinkedHashMapTest, testPutAll) { testPutAll(); }
+TEST_F(LinkedHashMapTest, testRehash) { testRehash(); }
+TEST_F(LinkedHashMapTest, testSize) { testSize(); }
+TEST_F(LinkedHashMapTest, testEntrySet) { testEntrySet(); }
+TEST_F(LinkedHashMapTest, testValues) { testValues(); }
+TEST_F(LinkedHashMapTest, testToString) { testToString(); }
+TEST_F(LinkedHashMapTest, testEntrySetIterator) { testEntrySetIterator(); }
+TEST_F(LinkedHashMapTest, testKeySetIterator) { testKeySetIterator(); }
+TEST_F(LinkedHashMapTest, testValuesIterator) { testValuesIterator(); }
+TEST_F(LinkedHashMapTest, testOrderedEntrySet) { testOrderedEntrySet(); }
+TEST_F(LinkedHashMapTest, testOrderedKeySet) { testOrderedKeySet(); }
+TEST_F(LinkedHashMapTest, testOrderedValues) { testOrderedValues(); }
+TEST_F(LinkedHashMapTest, testRemoveEldest) { testRemoveEldest(); }

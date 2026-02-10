@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ArraysTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/Arrays.h>
@@ -26,6 +26,23 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class ArraysTest : public ::testing::Test {
+    private:
+private:
+
+        static const int SIZE;
+
+    public:
+
+        ArraysTest();
+        virtual ~ArraysTest();
+
+        void testFill1();
+        void testFill2();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int ArraysTest::SIZE = 256;
@@ -89,3 +106,6 @@ void ArraysTest::testFill2() {
 
     ASSERT_THROW(Arrays::fill( boolArray, SIZE, 0, SIZE + 10, false ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
+
+TEST_F(ArraysTest, testFill1) { testFill1(); }
+TEST_F(ArraysTest, testFill2) { testFill2(); }

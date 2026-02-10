@@ -15,17 +15,134 @@
  * limitations under the License.
  */
 
-#include "ShortArrayBufferTest.h"
+#include <gtest/gtest.h>
+#include <decaf/nio/ShortBuffer.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
 
+
+namespace decaf { namespace internal { namespace nio {} } }
 using namespace std;
 using namespace decaf;
 using namespace decaf::nio;
 using namespace decaf::internal::nio;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class ShortArrayBufferTest : public ::testing::Test {
+decaf::nio::ShortBuffer* testBuffer1;
+        short* testData1;
+
+        static const int testData1Size;
+        static const int SMALL_TEST_LENGTH;
+        static const int BUFFER_LENGTH;
+
+    private:
+
+        ShortArrayBufferTest(const ShortArrayBufferTest&);
+        ShortArrayBufferTest& operator= (const ShortArrayBufferTest&);
+
+    public:
+
+        ShortArrayBufferTest() : testBuffer1(), testData1() {}
+        virtual ~ShortArrayBufferTest() {}
+
+        void SetUp() override {
+            testBuffer1 = decaf::nio::ShortBuffer::allocate( testData1Size );
+
+            testData1 = new short[testData1Size];
+            for( int i = 0; i < testData1Size; ++i ){
+                testData1[i] = (short)i;
+            }
+        }
+
+        void TearDown() override {
+            delete testBuffer1;
+            delete [] testData1;
+        }
+
+        void test();
+        void testArray();
+        void testArrayOffset();
+        void testReadOnlyArray();
+        void testAsReadOnlyBuffer();
+        void testCompact();
+        void testCompareTo();
+        void testDuplicate();
+        void testEquals();
+        void testHasArray();
+        void testGet();
+        void testGet2();
+        void testGetShortArray();
+        void testGetShortArray2();
+        void testGetWithIndex();
+        void testPutShort();
+        void testPutShortArray();
+        void testPutShortArray2();
+        void testPutShortBuffer();
+        void testPutIndexed();
+        void testSlice();
+        void testToString();
+
+    protected:
+
+        void loadTestData1( short* array, int offset, int length ) {
+            for( int i = 0; i < length; i++ ) {
+                array[offset + i] = (short)i;
+            }
+        }
+
+        void loadTestData2( short* array, int offset, int length ) {
+            for( int i = 0; i < length; i++ ) {
+                array[offset + i] = (short)(length - i);
+            }
+        }
+
+        void loadTestData1( decaf::nio::ShortBuffer* buf ) {
+            buf->clear();
+            for( int i = 0; i < buf->capacity(); i++ ) {
+                buf->put( i, (short)i );
+            }
+        }
+
+        void loadTestData2( decaf::nio::ShortBuffer* buf ) {
+            buf->clear();
+            for( int i = 0; i < buf->capacity(); i++ ) {
+                buf->put(i, (short)( buf->capacity() - i) );
+            }
+        }
+
+        void assertContentEquals( decaf::nio::ShortBuffer* buf, short* array,
+                                  int offset, int length) {
+
+            for( int i = 0; i < length; i++ ) {
+                ASSERT_TRUE(buf->get(i) == array[offset + i]);
+            }
+        }
+
+        void assertContentEquals( decaf::nio::ShortBuffer* buf,
+                                  decaf::nio::ShortBuffer* other ) {
+            ASSERT_TRUE(buf->capacity() == other->capacity());
+            for( int i = 0; i < buf->capacity(); i++ ) {
+                ASSERT_TRUE(buf->get(i) == other->get(i));
+            }
+        }
+
+        void assertContentLikeTestData1(
+            decaf::nio::ShortBuffer* buf, int startIndex,
+            short startValue, int length ) {
+
+            short value = startValue;
+            for( int i = 0; i < length; i++ ) {
+                ASSERT_TRUE(buf->get( startIndex + i ) == value);
+                value = (short)( value + 1 );
+            }
+        }
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int ShortArrayBufferTest::testData1Size = 100;
@@ -533,3 +650,26 @@ void ShortArrayBufferTest::testToString() {
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->limit() ) ) != string::npos);
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->capacity() ) ) != string::npos);
 }
+
+TEST_F(ShortArrayBufferTest, test) { test(); }
+TEST_F(ShortArrayBufferTest, testArray) { testArray(); }
+TEST_F(ShortArrayBufferTest, testArrayOffset) { testArrayOffset(); }
+TEST_F(ShortArrayBufferTest, testReadOnlyArray) { testReadOnlyArray(); }
+TEST_F(ShortArrayBufferTest, testAsReadOnlyBuffer) { testAsReadOnlyBuffer(); }
+TEST_F(ShortArrayBufferTest, testCompact) { testCompact(); }
+TEST_F(ShortArrayBufferTest, testCompareTo) { testCompareTo(); }
+TEST_F(ShortArrayBufferTest, testDuplicate) { testDuplicate(); }
+TEST_F(ShortArrayBufferTest, testEquals) { testEquals(); }
+TEST_F(ShortArrayBufferTest, testHasArray) { testHasArray(); }
+TEST_F(ShortArrayBufferTest, testGet) { testGet(); }
+TEST_F(ShortArrayBufferTest, testGet2) { testGet2(); }
+TEST_F(ShortArrayBufferTest, testGetShortArray) { testGetShortArray(); }
+TEST_F(ShortArrayBufferTest, testGetShortArray2) { testGetShortArray2(); }
+TEST_F(ShortArrayBufferTest, testGetWithIndex) { testGetWithIndex(); }
+TEST_F(ShortArrayBufferTest, testPutShort) { testPutShort(); }
+TEST_F(ShortArrayBufferTest, testPutShortArray) { testPutShortArray(); }
+TEST_F(ShortArrayBufferTest, testPutShortArray2) { testPutShortArray2(); }
+TEST_F(ShortArrayBufferTest, testPutShortBuffer) { testPutShortBuffer(); }
+TEST_F(ShortArrayBufferTest, testPutIndexed) { testPutIndexed(); }
+TEST_F(ShortArrayBufferTest, testSlice) { testSlice(); }
+TEST_F(ShortArrayBufferTest, testToString) { testToString(); }

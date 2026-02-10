@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ConnectionStateTrackerTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/Transport.h>
 #include <activemq/wireformat/WireFormat.h>
@@ -40,6 +40,19 @@ using namespace activemq::wireformat;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class ConnectionStateTrackerTest : public ::testing::Test {
+public:
+
+        ConnectionStateTrackerTest() {}
+        virtual ~ConnectionStateTrackerTest() {}
+
+        void test();
+        void testMessageCache();
+        void testMessagePullCache();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -266,3 +279,7 @@ void ConnectionStateTrackerTest::testMessagePullCache() {
 
     ASSERT_EQ(10, transport->messagePulls.size()) << ("Should only be three message pulls");
 }
+
+TEST_F(ConnectionStateTrackerTest, test) { test(); }
+TEST_F(ConnectionStateTrackerTest, testMessageCache) { testMessageCache(); }
+TEST_F(ConnectionStateTrackerTest, testMessagePullCache) { testMessagePullCache(); }

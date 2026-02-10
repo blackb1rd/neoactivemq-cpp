@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ConnectionAuditTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/core/ConnectionAudit.h>
 #include <activemq/core/Dispatcher.h>
@@ -35,6 +35,20 @@ using namespace activemq::util;
 using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::util;
+
+    class ConnectionAuditTest : public ::testing::Test {
+public:
+
+        ConnectionAuditTest();
+        virtual ~ConnectionAuditTest();
+
+        void testConstructor1();
+        void testConstructor2();
+        void testIsDuplicate();
+        void testRollbackDuplicate();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -153,3 +167,8 @@ void ConnectionAuditTest::testRollbackDuplicate() {
         ASSERT_TRUE(!audit.isDuplicate(dispatcher.get(), message)) << (std::string() + "duplicate msg:" + id->toString());
     }
 }
+
+TEST_F(ConnectionAuditTest, testConstructor1) { testConstructor1(); }
+TEST_F(ConnectionAuditTest, testConstructor2) { testConstructor2(); }
+TEST_F(ConnectionAuditTest, testIsDuplicate) { testIsDuplicate(); }
+TEST_F(ConnectionAuditTest, testRollbackDuplicate) { testRollbackDuplicate(); }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "LazyPropertyUnmarshalTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/commands/Message.h>
 #include <activemq/commands/ActiveMQTextMessage.h>
@@ -36,6 +36,59 @@ using namespace activemq::core::policies;
 using namespace activemq::wireformat::openwire::marshal;
 using namespace decaf::io;
 using namespace decaf::lang;
+
+    /**
+     * Unit tests for lazy property unmarshaling behavior.
+     *
+     * Tests verify:
+     * - Properties are lazily unmarshaled (not during wire reading)
+     * - Corrupted properties throw IOException during access
+     * - Redelivery limit is configurable
+     * - POISON_ACK is sent after maximum redeliveries
+     * - Connection stays alive when property corruption occurs
+     */
+    class LazyPropertyUnmarshalTest : public ::testing::Test {
+public:
+
+        LazyPropertyUnmarshalTest();
+        virtual ~LazyPropertyUnmarshalTest();
+
+        /**
+         * Test that properties are lazily unmarshaled when first accessed.
+         */
+        void testPropertiesLazilyUnmarshaled();
+
+        /**
+         * Test that corrupted properties throw IOException when accessed.
+         */
+        void testCorruptedPropertiesThrowIOException();
+
+        /**
+         * Test that redelivery limit can be configured via API and properties.
+         */
+        void testRedeliveryLimitConfiguration();
+
+        /**
+         * Test that redelivery exceeded check works correctly after max attempts.
+         */
+        void testRedeliveryExceededAfterMaxAttempts();
+
+        /**
+         * Test that corrupted messages trigger redelivery without closing connection.
+         * Verifies:
+         * - IOException thrown during property access
+         * - Broker redelivers message
+         * - POISON_ACK sent after 6 redeliveries
+         * - Connection stays alive
+         */
+        void testCorruptedMessageDoesNotCloseConnection();
+
+        /**
+         * Test that redelivery policy can be configured via wireformat properties.
+         */
+        void testWireFormatRedeliveryConfiguration();
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 LazyPropertyUnmarshalTest::LazyPropertyUnmarshalTest() {

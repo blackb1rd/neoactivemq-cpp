@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "URITest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/net/URI.h>
 #include <decaf/net/URL.h>
@@ -27,6 +27,58 @@ using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class URITest : public ::testing::Test {
+public:
+
+        URITest();
+        virtual ~URITest() {}
+
+        void testURIString();
+        void testConstructorOneString();
+        void testConstructorThreeString();
+        void testConstructorFourString();
+        void testConstructorFiveString();
+        void testConstructorFiveString2();
+        void testConstructorStringPlusInts();
+        void testCompareToOne();
+        void testCompareToTwo();
+        void testCreate();
+        void testEquals();
+        void testEquals2();
+        void testGetAuthority();
+        void testGetAuthority2();
+        void testGetFragment();
+        void testGetHost();
+        void testGetPath();
+        void testGetPort();
+        void testGetPort2();
+        void testGetQuery();
+        void testGetRawAuthority();
+        void testGetRawFragment();
+        void testGetRawPath();
+        void testGetRawQuery();
+        void testGetRawSchemeSpecificPart();
+        void testGetRawUserInfo();
+        void testGetScheme();
+        void testGetSchemeSpecificPart();
+        void testGetUserInfo();
+        void testIsAbsolute();
+        void testIsOpaque();
+        void testNormalize();
+        void testNormalize2();
+        void testNormalize3();
+        void testParseServerAuthority();
+        void testRelativizeLURI();
+        void testRelativize2();
+        void testResolveURI();
+        void testResolve();
+        void testToString();
+        void testToURL();
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 URITest::URITest() {
@@ -1534,3 +1586,45 @@ void URITest::testToURL() {
         }
     }
 }
+
+TEST_F(URITest, testConstructorOneString) { testConstructorOneString(); }
+TEST_F(URITest, testConstructorThreeString) { testConstructorThreeString(); }
+TEST_F(URITest, testConstructorFourString) { testConstructorFourString(); }
+TEST_F(URITest, testConstructorFiveString) { testConstructorFiveString(); }
+TEST_F(URITest, testConstructorFiveString2) { testConstructorFiveString2(); }
+TEST_F(URITest, testConstructorStringPlusInts) { testConstructorStringPlusInts(); }
+TEST_F(URITest, testURIString) { testURIString(); }
+TEST_F(URITest, testCompareToOne) { testCompareToOne(); }
+TEST_F(URITest, testCompareToTwo) { testCompareToTwo(); }
+TEST_F(URITest, testCreate) { testCreate(); }
+TEST_F(URITest, testEquals) { testEquals(); }
+TEST_F(URITest, testEquals2) { testEquals2(); }
+TEST_F(URITest, testGetAuthority) { testGetAuthority(); }
+TEST_F(URITest, testGetAuthority2) { testGetAuthority2(); }
+TEST_F(URITest, testGetFragment) { testGetFragment(); }
+TEST_F(URITest, testGetHost) { testGetHost(); }
+TEST_F(URITest, testGetPath) { testGetPath(); }
+TEST_F(URITest, testGetPort) { testGetPort(); }
+TEST_F(URITest, testGetPort2) { testGetPort2(); }
+TEST_F(URITest, testGetQuery) { testGetQuery(); }
+TEST_F(URITest, testGetRawAuthority) { testGetRawAuthority(); }
+TEST_F(URITest, testGetRawFragment) { testGetRawFragment(); }
+TEST_F(URITest, testGetRawPath) { testGetRawPath(); }
+TEST_F(URITest, testGetRawQuery) { testGetRawQuery(); }
+TEST_F(URITest, testGetRawSchemeSpecificPart) { testGetRawSchemeSpecificPart(); }
+TEST_F(URITest, testGetRawUserInfo) { testGetRawUserInfo(); }
+TEST_F(URITest, testGetScheme) { testGetScheme(); }
+TEST_F(URITest, testGetSchemeSpecificPart) { testGetSchemeSpecificPart(); }
+TEST_F(URITest, testGetUserInfo) { testGetUserInfo(); }
+TEST_F(URITest, testIsAbsolute) { testIsAbsolute(); }
+TEST_F(URITest, testIsOpaque) { testIsOpaque(); }
+TEST_F(URITest, testNormalize) { testNormalize(); }
+TEST_F(URITest, testNormalize2) { testNormalize2(); }
+TEST_F(URITest, testNormalize3) { testNormalize3(); }
+TEST_F(URITest, testParseServerAuthority) { testParseServerAuthority(); }
+TEST_F(URITest, testRelativizeLURI) { testRelativizeLURI(); }
+TEST_F(URITest, testRelativize2) { testRelativize2(); }
+TEST_F(URITest, testResolveURI) { testResolveURI(); }
+TEST_F(URITest, testResolve) { testResolve(); }
+TEST_F(URITest, testToString) { testToString(); }
+TEST_F(URITest, testToURL) { testToURL(); }

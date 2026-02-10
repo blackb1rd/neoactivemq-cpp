@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AbstractQueuedSynchronizerTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/System.h>
 #include <decaf/lang/Thread.h>
@@ -24,6 +24,7 @@
 #include <decaf/util/concurrent/TimeUnit.h>
 #include <decaf/util/concurrent/locks/LockSupport.h>
 #include <decaf/util/concurrent/locks/AbstractQueuedSynchronizer.h>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 using namespace std;
 using namespace decaf;
@@ -32,6 +33,65 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
+
+    class AbstractQueuedSynchronizerTest : public ExecutorsTestSupport {
+public:
+
+        AbstractQueuedSynchronizerTest();
+        virtual ~AbstractQueuedSynchronizerTest();
+
+        void testIsHeldExclusively();
+        void testAcquire();
+        void testTryAcquire();
+        void testhasQueuedThreads();
+        void testIsQueuedNPE();
+        void testIsQueued();
+        void testGetFirstQueuedThread();
+        void testHasContended();
+        void testGetQueuedThreads();
+        void testGetExclusiveQueuedThreads();
+        void testGetSharedQueuedThreads();
+        void testInterruptedException2();
+        void testTryAcquireWhenSynced();
+        void testAcquireNanosTimeout();
+        void testGetState();
+        void testAcquireInterruptibly1();
+        void testAcquireInterruptibly2();
+        void testOwns();
+        void testAwaitIllegalMonitor();
+        void testSignalIllegalMonitor();
+        void testAwaitNanosTimeout();
+        void testAwaitTimeout();
+        void testAwaitUntilTimeout();
+        void testAwait();
+        void testHasWaitersNPE();
+        void testGetWaitQueueLengthNPE();
+        void testGetWaitingThreadsNPE();
+        void testHasWaitersIAE();
+        void testHasWaitersIMSE();
+        void testGetWaitQueueLengthIAE();
+        void testGetWaitQueueLengthIMSE();
+        void testGetWaitingThreadsIAE();
+        void testGetWaitingThreadsIMSE();
+        void testHasWaiters();
+        void testGetWaitQueueLength();
+        void testGetWaitingThreads();
+        void testAwaitUninterruptibly();
+        void testAwaitInterrupt();
+        void testAwaitNanosInterrupt();
+        void testAwaitUntilInterrupt();
+        void testSignalAll();
+        void testToString();
+        void testGetStateWithReleaseShared();
+        void testReleaseShared();
+        void testAcquireSharedInterruptibly();
+        void testAsquireSharedTimed();
+        void testAcquireSharedInterruptiblyInterruptedException();
+        void testAcquireSharedNanosInterruptedException();
+        void testAcquireSharedNanosTimeout();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -1741,3 +1801,53 @@ void AbstractQueuedSynchronizerTest::testAcquireSharedNanosTimeout() {
         unexpectedException();
     }
 }
+
+TEST_F(AbstractQueuedSynchronizerTest, testIsHeldExclusively) { testIsHeldExclusively(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAcquire) { testAcquire(); }
+TEST_F(AbstractQueuedSynchronizerTest, testTryAcquire) { testTryAcquire(); }
+TEST_F(AbstractQueuedSynchronizerTest, testhasQueuedThreads) { testhasQueuedThreads(); }
+TEST_F(AbstractQueuedSynchronizerTest, testIsQueuedNPE) { testIsQueuedNPE(); }
+TEST_F(AbstractQueuedSynchronizerTest, testIsQueued) { testIsQueued(); }
+TEST_F(AbstractQueuedSynchronizerTest, testGetFirstQueuedThread) { testGetFirstQueuedThread(); }
+TEST_F(AbstractQueuedSynchronizerTest, testHasContended) { testHasContended(); }
+TEST_F(AbstractQueuedSynchronizerTest, testGetQueuedThreads) { testGetQueuedThreads(); }
+TEST_F(AbstractQueuedSynchronizerTest, testGetExclusiveQueuedThreads) { testGetExclusiveQueuedThreads(); }
+TEST_F(AbstractQueuedSynchronizerTest, testGetSharedQueuedThreads) { testGetSharedQueuedThreads(); }
+TEST_F(AbstractQueuedSynchronizerTest, testInterruptedException2) { testInterruptedException2(); }
+TEST_F(AbstractQueuedSynchronizerTest, testTryAcquireWhenSynced) { testTryAcquireWhenSynced(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAcquireNanosTimeout) { testAcquireNanosTimeout(); }
+TEST_F(AbstractQueuedSynchronizerTest, testGetState) { testGetState(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAcquireInterruptibly1) { testAcquireInterruptibly1(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAcquireInterruptibly2) { testAcquireInterruptibly2(); }
+TEST_F(AbstractQueuedSynchronizerTest, testOwns) { testOwns(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitIllegalMonitor) { testAwaitIllegalMonitor(); }
+TEST_F(AbstractQueuedSynchronizerTest, testSignalIllegalMonitor) { testSignalIllegalMonitor(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitNanosTimeout) { testAwaitNanosTimeout(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitTimeout) { testAwaitTimeout(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitUntilTimeout) { testAwaitUntilTimeout(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAwait) { testAwait(); }
+TEST_F(AbstractQueuedSynchronizerTest, testHasWaitersNPE) { testHasWaitersNPE(); }
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitQueueLengthNPE) { testGetWaitQueueLengthNPE(); }
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitingThreadsNPE) { testGetWaitingThreadsNPE(); }
+TEST_F(AbstractQueuedSynchronizerTest, testHasWaitersIAE) { testHasWaitersIAE(); }
+TEST_F(AbstractQueuedSynchronizerTest, testHasWaitersIMSE) { testHasWaitersIMSE(); }
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitQueueLengthIAE) { testGetWaitQueueLengthIAE(); }
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitQueueLengthIMSE) { testGetWaitQueueLengthIMSE(); }
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitingThreadsIAE) { testGetWaitingThreadsIAE(); }
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitingThreadsIMSE) { testGetWaitingThreadsIMSE(); }
+TEST_F(AbstractQueuedSynchronizerTest, testHasWaiters) { testHasWaiters(); }
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitQueueLength) { testGetWaitQueueLength(); }
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitingThreads) { testGetWaitingThreads(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitUninterruptibly) { testAwaitUninterruptibly(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitInterrupt) { testAwaitInterrupt(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitNanosInterrupt) { testAwaitNanosInterrupt(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitUntilInterrupt) { testAwaitUntilInterrupt(); }
+TEST_F(AbstractQueuedSynchronizerTest, testSignalAll) { testSignalAll(); }
+TEST_F(AbstractQueuedSynchronizerTest, testToString) { testToString(); }
+TEST_F(AbstractQueuedSynchronizerTest, testGetStateWithReleaseShared) { testGetStateWithReleaseShared(); }
+TEST_F(AbstractQueuedSynchronizerTest, testReleaseShared) { testReleaseShared(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAcquireSharedInterruptibly) { testAcquireSharedInterruptibly(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAsquireSharedTimed) { testAsquireSharedTimed(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAcquireSharedInterruptiblyInterruptedException) { testAcquireSharedInterruptiblyInterruptedException(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAcquireSharedNanosInterruptedException) { testAcquireSharedNanosInterruptedException(); }
+TEST_F(AbstractQueuedSynchronizerTest, testAcquireSharedNanosTimeout) { testAcquireSharedNanosTimeout(); }

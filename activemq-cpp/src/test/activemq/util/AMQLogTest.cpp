@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AMQLogTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/util/AMQLog.h>
 
@@ -40,6 +40,33 @@ using namespace activemq::util;
 using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::util::concurrent;
+
+    class AMQLogTest : public ::testing::Test {
+public:
+
+        AMQLogTest();
+        virtual ~AMQLogTest();
+
+        void SetUp() override;
+        void TearDown() override;
+
+        // Global logging tests
+        void testGlobalLogLevel();
+        void testGlobalLogLevelParsing();
+        void testGlobalLogIsEnabled();
+
+        // Context-specific logging tests
+        void testContextLogLevel();
+        void testMultiConnectionLogging();
+        void testContextOutputHandler();
+        void testHandlerWithRecordOnlyMode();
+        void testMultiThreadContextIsolation();
+
+        // Flight recorder tests
+        void testFlightRecorder();
+
+    };
+
 
 // Use aliases to avoid Windows macro conflicts with enum values
 static const AMQLogLevel LOG_LEVEL_NONE  = AMQLogLevel::NONE;
@@ -498,3 +525,13 @@ void AMQLogTest::testFlightRecorder() {
     AMQLogger::shutdownFlightRecorder();
     ASSERT_TRUE(!AMQLogger::isFlightRecorderEnabled());
 }
+
+TEST_F(AMQLogTest, testGlobalLogLevel) { testGlobalLogLevel(); }
+TEST_F(AMQLogTest, testGlobalLogLevelParsing) { testGlobalLogLevelParsing(); }
+TEST_F(AMQLogTest, testGlobalLogIsEnabled) { testGlobalLogIsEnabled(); }
+TEST_F(AMQLogTest, testContextLogLevel) { testContextLogLevel(); }
+TEST_F(AMQLogTest, testMultiConnectionLogging) { testMultiConnectionLogging(); }
+TEST_F(AMQLogTest, testContextOutputHandler) { testContextOutputHandler(); }
+TEST_F(AMQLogTest, testHandlerWithRecordOnlyMode) { testHandlerWithRecordOnlyMode(); }
+TEST_F(AMQLogTest, testMultiThreadContextIsolation) { testMultiThreadContextIsolation(); }
+TEST_F(AMQLogTest, testFlightRecorder) { testFlightRecorder(); }

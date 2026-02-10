@@ -15,10 +15,22 @@
  * limitations under the License.
  */
 
-#include "ByteTest.h"
+#include <gtest/gtest.h>
+#include <decaf/lang/Byte.h>
 
 using namespace decaf;
 using namespace decaf::lang;
+
+    class ByteTest : public ::testing::Test
+    {
+public:
+
+        ByteTest();
+        virtual ~ByteTest() {}
+
+        virtual void test();
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ByteTest::ByteTest(){
@@ -44,3 +56,5 @@ void ByteTest::test() {
     ASSERT_TRUE(ubyte.decode( "255" ) == 255);
 
 }
+
+TEST_F(ByteTest, test) { test(); }

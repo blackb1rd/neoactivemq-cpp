@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ThreadLocalTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/lang/System.h>
@@ -31,6 +31,20 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
+
+    class ThreadLocalTest : public ::testing::Test {
+public:
+
+        ThreadLocalTest();
+        virtual ~ThreadLocalTest();
+
+        void testConstructor();
+        void testGet();
+        void testRemove();
+        void testSet();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ThreadLocalTest::ThreadLocalTest() {
@@ -179,3 +193,8 @@ void ThreadLocalTest::testSet() {
 
     ASSERT_TRUE(local.get() == "updated") << ("ThreadLocal's value in this Thread should be 'updated'");
 }
+
+TEST_F(ThreadLocalTest, testConstructor) { testConstructor(); }
+TEST_F(ThreadLocalTest, testGet) { testGet(); }
+TEST_F(ThreadLocalTest, testRemove) { testRemove(); }
+TEST_F(ThreadLocalTest, testSet) { testSet(); }

@@ -15,17 +15,49 @@
  * limitations under the License.
  */
 
-#include "InputStreamReaderTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/io/Reader.h>
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 
 #include <vector>
+#include <decaf/io/ByteArrayInputStream.h>
+#include <decaf/io/InputStreamReader.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang::exceptions;
+
+    class InputStreamReaderTest : public ::testing::Test {
+private:
+
+        ByteArrayInputStream* buffer1;
+
+        InputStreamReader* reader1;
+
+        static const std::string TEST_STRING;
+
+    private:
+
+        InputStreamReaderTest(const InputStreamReaderTest&);
+        InputStreamReaderTest& operator= (const InputStreamReaderTest&);
+
+    public:
+
+        InputStreamReaderTest();
+        virtual ~InputStreamReaderTest();
+
+        void SetUp() override;
+        void TearDown() override;
+
+        void testClose();
+        void testConstructorInputStream();
+        void testRead();
+        void testReady();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const std::string InputStreamReaderTest::TEST_STRING = "This is a test message with some simple text in it.";
@@ -106,3 +138,8 @@ void InputStreamReaderTest::testReady() {
     this->reader1->read( buffer );
     ASSERT_TRUE(!this->reader1->ready());
 }
+
+TEST_F(InputStreamReaderTest, testClose) { testClose(); }
+TEST_F(InputStreamReaderTest, testConstructorInputStream) { testConstructorInputStream(); }
+TEST_F(InputStreamReaderTest, testRead) { testRead(); }
+TEST_F(InputStreamReaderTest, testReady) { testReady(); }

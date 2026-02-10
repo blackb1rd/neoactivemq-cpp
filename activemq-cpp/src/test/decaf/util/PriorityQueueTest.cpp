@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "PriorityQueueTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/PriorityQueue.h>
 #include <decaf/util/Comparator.h>
@@ -30,9 +30,39 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
+    class PriorityQueueTest : public ::testing::Test {
+public:
+
+        PriorityQueueTest() {}
+        virtual ~PriorityQueueTest() {}
+
+        void testConstructor_1();
+        void testConstructor_2();
+        void testConstructor_3();
+        void testAssignment();
+        void testSize();
+        void testOfferString();
+        void testPoll();
+        void testPollEmpty();
+        void testPeek();
+        void testPeekEmpty();
+        void testClear();
+        void testAdd();
+        void testAddAll();
+        void testRemove();
+        void testRemoveUsingComparator();
+        void testRemoveNotExists();
+        void testComparator();
+        void testIterator();
+        void testIteratorEmpty();
+        void testIteratorOutOfBounds();
+        void testIteratorRemove();
+        void testIteratorRemoveIllegalState();
+
+    };
+
+
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf {
-namespace util {
 
     class MockComparatorStringByLength : public decaf::util::Comparator<std::string> {
 
@@ -46,7 +76,6 @@ namespace util {
 
     };
 
-}}
 
 ////////////////////////////////////////////////////////////////////////////////
 void PriorityQueueTest::testConstructor_1() {
@@ -455,5 +484,27 @@ void PriorityQueueTest::testIteratorRemoveIllegalState() {
     iter->next();
     iter->remove();
     ASSERT_THROW(iter->remove(), IllegalStateException) << ("Should Throw a IllegalStateException");
-
 }
+
+TEST_F(PriorityQueueTest, testConstructor_1) { testConstructor_1(); }
+TEST_F(PriorityQueueTest, testConstructor_2) { testConstructor_2(); }
+TEST_F(PriorityQueueTest, testConstructor_3) { testConstructor_3(); }
+TEST_F(PriorityQueueTest, testAssignment) { testAssignment(); }
+TEST_F(PriorityQueueTest, testSize) { testSize(); }
+TEST_F(PriorityQueueTest, testOfferString) { testOfferString(); }
+TEST_F(PriorityQueueTest, testPoll) { testPoll(); }
+TEST_F(PriorityQueueTest, testPollEmpty) { testPollEmpty(); }
+TEST_F(PriorityQueueTest, testPeek) { testPeek(); }
+TEST_F(PriorityQueueTest, testPeekEmpty) { testPeekEmpty(); }
+TEST_F(PriorityQueueTest, testClear) { testClear(); }
+TEST_F(PriorityQueueTest, testAdd) { testAdd(); }
+TEST_F(PriorityQueueTest, testAddAll) { testAddAll(); }
+TEST_F(PriorityQueueTest, testRemove) { testRemove(); }
+TEST_F(PriorityQueueTest, testRemoveUsingComparator) { testRemoveUsingComparator(); }
+TEST_F(PriorityQueueTest, testRemoveNotExists) { testRemoveNotExists(); }
+TEST_F(PriorityQueueTest, testComparator) { testComparator(); }
+TEST_F(PriorityQueueTest, testIterator) { testIterator(); }
+TEST_F(PriorityQueueTest, testIteratorEmpty) { testIteratorEmpty(); }
+TEST_F(PriorityQueueTest, testIteratorOutOfBounds) { testIteratorOutOfBounds(); }
+TEST_F(PriorityQueueTest, testIteratorRemove) { testIteratorRemove(); }
+TEST_F(PriorityQueueTest, testIteratorRemoveIllegalState) { testIteratorRemoveIllegalState(); }

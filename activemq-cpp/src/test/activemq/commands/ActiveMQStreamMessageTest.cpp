@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ActiveMQStreamMessageTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/commands/ActiveMQStreamMessage.h>
 
@@ -39,6 +39,39 @@ using namespace activemq;
 using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
+
+    class ActiveMQStreamMessageTest : public ::testing::Test {
+private:
+
+        std::vector<unsigned char> buffer;
+
+    public:
+
+        ActiveMQStreamMessageTest() : buffer() {}
+        virtual ~ActiveMQStreamMessageTest() {}
+
+        void SetUp() override;
+        void TearDown() override;
+
+        void testSetAndGet();
+        void testReadBoolean();
+        void testReadByte();
+        void testReadShort();
+        void testReadChar();
+        void testReadInt();
+        void testReadLong();
+        void testReadFloat();
+        void testReadDouble();
+        void testReadString();
+        void testReadBigString();
+        void testReadBytes();
+        void testClearBody();
+        void testReset();
+        void testReadOnlyBody();
+        void testWriteOnlyBody();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQStreamMessageTest::SetUp() {
@@ -973,3 +1006,20 @@ void ActiveMQStreamMessageTest::testWriteOnlyBody() {
     } catch( MessageNotReadableException& e ) {
     }
 }
+
+TEST_F(ActiveMQStreamMessageTest, testSetAndGet) { testSetAndGet(); }
+TEST_F(ActiveMQStreamMessageTest, testReadBoolean) { testReadBoolean(); }
+TEST_F(ActiveMQStreamMessageTest, testReadByte) { testReadByte(); }
+TEST_F(ActiveMQStreamMessageTest, testReadShort) { testReadShort(); }
+TEST_F(ActiveMQStreamMessageTest, testReadChar) { testReadChar(); }
+TEST_F(ActiveMQStreamMessageTest, testReadInt) { testReadInt(); }
+TEST_F(ActiveMQStreamMessageTest, testReadLong) { testReadLong(); }
+TEST_F(ActiveMQStreamMessageTest, testReadFloat) { testReadFloat(); }
+TEST_F(ActiveMQStreamMessageTest, testReadDouble) { testReadDouble(); }
+TEST_F(ActiveMQStreamMessageTest, testReadString) { testReadString(); }
+TEST_F(ActiveMQStreamMessageTest, testReadBigString) { testReadBigString(); }
+TEST_F(ActiveMQStreamMessageTest, testReadBytes) { testReadBytes(); }
+TEST_F(ActiveMQStreamMessageTest, testClearBody) { testClearBody(); }
+TEST_F(ActiveMQStreamMessageTest, testReset) { testReset(); }
+TEST_F(ActiveMQStreamMessageTest, testReadOnlyBody) { testReadOnlyBody(); }
+TEST_F(ActiveMQStreamMessageTest, testWriteOnlyBody) { testWriteOnlyBody(); }

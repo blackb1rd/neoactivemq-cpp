@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "DefaultSSLSocketFactoryTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/internal/net/ssl/DefaultSSLSocketFactory.h>
 
@@ -29,6 +29,20 @@ using namespace decaf::net::ssl;
 using namespace decaf::internal;
 using namespace decaf::internal::net;
 using namespace decaf::internal::net::ssl;
+
+    class DefaultSSLSocketFactoryTest : public ::testing::Test {
+public:
+
+        DefaultSSLSocketFactoryTest();
+        virtual ~DefaultSSLSocketFactoryTest();
+
+        void testConstructor();
+        void testCreateSocket();
+        void testGetDefaultCipherSuites();
+        void testGetSupportedCipherSuites();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 DefaultSSLSocketFactoryTest::DefaultSSLSocketFactoryTest() {
@@ -80,3 +94,8 @@ void DefaultSSLSocketFactoryTest::testGetSupportedCipherSuites() {
     DefaultSSLSocketFactory factory( "Error Message" );
     ASSERT_TRUE(factory.getSupportedCipherSuites().empty());
 }
+
+TEST_F(DefaultSSLSocketFactoryTest, testConstructor) { testConstructor(); }
+TEST_F(DefaultSSLSocketFactoryTest, testCreateSocket) { testCreateSocket(); }
+TEST_F(DefaultSSLSocketFactoryTest, testGetDefaultCipherSuites) { testGetDefaultCipherSuites(); }
+TEST_F(DefaultSSLSocketFactoryTest, testGetSupportedCipherSuites) { testGetSupportedCipherSuites(); }

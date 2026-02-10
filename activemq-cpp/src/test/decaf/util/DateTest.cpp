@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "DateTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/Date.h>
 #include <decaf/lang/Thread.h>
@@ -34,6 +34,18 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
+
+    class DateTest : public ::testing::Test {
+public:
+
+        DateTest(){};
+        virtual ~DateTest(){};
+
+        void test();
+        void testToString();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void DateTest::test() {
@@ -118,3 +130,6 @@ void DateTest::testToString() {
     // Full string check - date library outputs EST for Eastern Standard Time
     ASSERT_EQ(std::string("Thu Jan 15 15:56:14 EST 2015"), result);
 }
+
+TEST_F(DateTest, test) { test(); }
+TEST_F(DateTest, testToString) { testToString(); }

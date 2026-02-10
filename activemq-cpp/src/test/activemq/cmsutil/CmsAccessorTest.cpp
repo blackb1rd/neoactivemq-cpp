@@ -15,13 +15,52 @@
  * limitations under the License.
  */
 
-#include "CmsAccessorTest.h"
+#include <gtest/gtest.h>
 #include <activemq/cmsutil/DynamicDestinationResolver.h>
 #include <activemq/cmsutil/ResourceLifecycleManager.h>
 #include "DummyConnectionFactory.h"
+#include <activemq/cmsutil/CmsAccessor.h>
 
 using namespace activemq;
 using namespace activemq::cmsutil;
+
+    class CmsAccessorTest : public ::testing::Test
+    {
+class MyAccessor : public CmsAccessor {
+        public:
+
+            virtual ~MyAccessor() {}
+
+            virtual cms::Connection* createConnection() {
+                return CmsAccessor::createConnection();
+            }
+
+            virtual cms::Session* createSession(cms::Connection* con) {
+                return CmsAccessor::createSession(con);
+            }
+        };
+
+        MyAccessor* accessor;
+        DummyConnectionFactory* cf;
+
+    private:
+
+        CmsAccessorTest(const CmsAccessorTest&);
+        CmsAccessorTest& operator= (const CmsAccessorTest&);
+
+    public:
+
+        CmsAccessorTest() : accessor(), cf() {}
+        virtual ~CmsAccessorTest() {}
+
+        void SetUp() override;
+        void TearDown() override;
+
+        void testConnectionFactory();
+        void testAckMode();
+        void testCreateResources();
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void CmsAccessorTest::SetUp() {
@@ -71,3 +110,6 @@ void CmsAccessorTest::testCreateResources() {
     ASSERT_TRUE(s->getAcknowledgeMode() == cms::Session::CLIENT_ACKNOWLEDGE);
 }
 
+TEST_F(CmsAccessorTest, testConnectionFactory) { testConnectionFactory(); }
+TEST_F(CmsAccessorTest, testAckMode) { testAckMode(); }
+TEST_F(CmsAccessorTest, testCreateResources) { testCreateResources(); }

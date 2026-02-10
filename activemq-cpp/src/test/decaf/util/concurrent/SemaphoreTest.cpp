@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SemaphoreTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/System.h>
 #include <decaf/lang/Thread.h>
@@ -25,6 +25,7 @@
 #include <decaf/util/concurrent/Semaphore.h>
 #include <decaf/util/concurrent/locks/LockSupport.h>
 #include <decaf/util/concurrent/locks/ReentrantLock.h>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 using namespace std;
 using namespace decaf;
@@ -33,6 +34,52 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
+
+    class SemaphoreTest : public ExecutorsTestSupport {
+public:
+
+        SemaphoreTest();
+        virtual ~SemaphoreTest();
+
+        void testConstructor();
+        void testConstructor2();
+        void testTryAcquireInSameThread();
+        void testAcquireReleaseInSameThread();
+
+        void testAcquireUninterruptiblyReleaseInSameThread();
+        void testTimedAcquireReleaseInSameThread();
+        void testAcquireReleaseInDifferentThreads();
+        void testUninterruptibleAcquireReleaseInDifferentThreads();
+        void testTimedAcquireReleaseInDifferentThreads();
+        void testAcquireInterruptedException();
+        void testTryAcquireInterruptedException();
+        void testHasQueuedThreads();
+        void testGetQueueLength();
+        void testGetQueuedThreads();
+        void testDrainPermits();
+        void testReducePermits();
+        void testConstructorFair();
+        void testTryAcquireInSameThreadFair();
+        void testTryAcquireNInSameThreadFair();
+        void testAcquireReleaseInSameThreadFair();
+        void testAcquireReleaseNInSameThreadFair();
+        void testAcquireUninterruptiblyReleaseNInSameThreadFair();
+        void testTimedAcquireReleaseNInSameThreadFair();
+        void testTimedAcquireReleaseInSameThreadFair();
+        void testAcquireReleaseInDifferentThreadsFair();
+        void testAcquireReleaseNInDifferentThreadsFair();
+        void testAcquireReleaseNInDifferentThreadsFair2();
+        void testTimedAcquireReleaseInDifferentThreadsFair();
+        void testTimedAcquireReleaseNInDifferentThreadsFair();
+        void testAcquireInterruptedExceptionFair();
+        void testAcquireNInterruptedExceptionFair();
+        void testTryAcquireInterruptedExceptionFair();
+        void testTryAcquireNInterruptedExceptionFair();
+        void testGetQueueLengthFair();
+        void testToString();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -1197,3 +1244,38 @@ void SemaphoreTest::testToString() {
     ASSERT_TRUE((int)s2.find_first_of("Permits = 2") >= 0);
 }
 
+TEST_F(SemaphoreTest, testConstructor) { testConstructor(); }
+TEST_F(SemaphoreTest, testConstructor2) { testConstructor2(); }
+TEST_F(SemaphoreTest, testTryAcquireInSameThread) { testTryAcquireInSameThread(); }
+TEST_F(SemaphoreTest, testAcquireReleaseInSameThread) { testAcquireReleaseInSameThread(); }
+TEST_F(SemaphoreTest, testAcquireUninterruptiblyReleaseInSameThread) { testAcquireUninterruptiblyReleaseInSameThread(); }
+TEST_F(SemaphoreTest, testTimedAcquireReleaseInSameThread) { testTimedAcquireReleaseInSameThread(); }
+TEST_F(SemaphoreTest, testAcquireReleaseInDifferentThreads) { testAcquireReleaseInDifferentThreads(); }
+TEST_F(SemaphoreTest, testUninterruptibleAcquireReleaseInDifferentThreads) { testUninterruptibleAcquireReleaseInDifferentThreads(); }
+TEST_F(SemaphoreTest, testTimedAcquireReleaseInDifferentThreads) { testTimedAcquireReleaseInDifferentThreads(); }
+TEST_F(SemaphoreTest, testAcquireInterruptedException) { testAcquireInterruptedException(); }
+TEST_F(SemaphoreTest, testTryAcquireInterruptedException) { testTryAcquireInterruptedException(); }
+TEST_F(SemaphoreTest, testHasQueuedThreads) { testHasQueuedThreads(); }
+TEST_F(SemaphoreTest, testGetQueueLength) { testGetQueueLength(); }
+TEST_F(SemaphoreTest, testGetQueuedThreads) { testGetQueuedThreads(); }
+TEST_F(SemaphoreTest, testDrainPermits) { testDrainPermits(); }
+TEST_F(SemaphoreTest, testReducePermits) { testReducePermits(); }
+TEST_F(SemaphoreTest, testConstructorFair) { testConstructorFair(); }
+TEST_F(SemaphoreTest, testTryAcquireInSameThreadFair) { testTryAcquireInSameThreadFair(); }
+TEST_F(SemaphoreTest, testTryAcquireNInSameThreadFair) { testTryAcquireNInSameThreadFair(); }
+TEST_F(SemaphoreTest, testAcquireReleaseInSameThreadFair) { testAcquireReleaseInSameThreadFair(); }
+TEST_F(SemaphoreTest, testAcquireReleaseNInSameThreadFair) { testAcquireReleaseNInSameThreadFair(); }
+TEST_F(SemaphoreTest, testAcquireUninterruptiblyReleaseNInSameThreadFair) { testAcquireUninterruptiblyReleaseNInSameThreadFair(); }
+TEST_F(SemaphoreTest, testTimedAcquireReleaseNInSameThreadFair) { testTimedAcquireReleaseNInSameThreadFair(); }
+TEST_F(SemaphoreTest, testTimedAcquireReleaseInSameThreadFair) { testTimedAcquireReleaseInSameThreadFair(); }
+TEST_F(SemaphoreTest, testAcquireReleaseInDifferentThreadsFair) { testAcquireReleaseInDifferentThreadsFair(); }
+TEST_F(SemaphoreTest, testAcquireReleaseNInDifferentThreadsFair) { testAcquireReleaseNInDifferentThreadsFair(); }
+TEST_F(SemaphoreTest, testAcquireReleaseNInDifferentThreadsFair2) { testAcquireReleaseNInDifferentThreadsFair2(); }
+TEST_F(SemaphoreTest, testTimedAcquireReleaseInDifferentThreadsFair) { testTimedAcquireReleaseInDifferentThreadsFair(); }
+TEST_F(SemaphoreTest, testTimedAcquireReleaseNInDifferentThreadsFair) { testTimedAcquireReleaseNInDifferentThreadsFair(); }
+TEST_F(SemaphoreTest, testAcquireInterruptedExceptionFair) { testAcquireInterruptedExceptionFair(); }
+TEST_F(SemaphoreTest, testAcquireNInterruptedExceptionFair) { testAcquireNInterruptedExceptionFair(); }
+TEST_F(SemaphoreTest, testTryAcquireInterruptedExceptionFair) { testTryAcquireInterruptedExceptionFair(); }
+TEST_F(SemaphoreTest, testTryAcquireNInterruptedExceptionFair) { testTryAcquireNInterruptedExceptionFair(); }
+TEST_F(SemaphoreTest, testGetQueueLengthFair) { testGetQueueLengthFair(); }
+TEST_F(SemaphoreTest, testToString) { testToString(); }

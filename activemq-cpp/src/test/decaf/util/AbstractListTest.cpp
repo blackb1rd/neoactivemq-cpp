@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AbstractListTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Integer.h>
 #include <decaf/util/AbstractList.h>
@@ -26,6 +26,24 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class AbstractListTest : public ::testing::Test {
+public:
+
+        AbstractListTest();
+        virtual ~AbstractListTest();
+
+        void testIterator();
+        void testListIterator();
+        void testIteratorNext();
+        void testRemove();
+        void testIndexOf();
+        void testLastIndexOf();
+        void testRemoveAt();
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -353,3 +371,11 @@ void AbstractListTest::testRemoveAt() {
         // expected
     }
 }
+
+TEST_F(AbstractListTest, testIterator) { testIterator(); }
+TEST_F(AbstractListTest, testListIterator) { testListIterator(); }
+TEST_F(AbstractListTest, testIteratorNext) { testIteratorNext(); }
+TEST_F(AbstractListTest, testRemove) { testRemove(); }
+TEST_F(AbstractListTest, testIndexOf) { testIndexOf(); }
+TEST_F(AbstractListTest, testLastIndexOf) { testLastIndexOf(); }
+TEST_F(AbstractListTest, testRemoveAt) { testRemoveAt(); }

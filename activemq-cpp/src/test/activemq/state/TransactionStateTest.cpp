@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "TransactionStateTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/state/TransactionState.h>
 #include <activemq/commands/TransactionInfo.h>
@@ -27,6 +27,16 @@ using namespace activemq;
 using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
+
+    class TransactionStateTest : public ::testing::Test {
+public:
+
+        TransactionStateTest() {}
+        virtual ~TransactionStateTest() {}
+
+        void test();
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void TransactionStateTest::test() {
@@ -46,3 +56,5 @@ void TransactionStateTest::test() {
     ASSERT_NO_THROW(temp = state.getId().dynamicCast<LocalTransactionId>());
     ASSERT_TRUE(temp->getValue() == id->getValue());
 }
+
+TEST_F(TransactionStateTest, test) { test(); }

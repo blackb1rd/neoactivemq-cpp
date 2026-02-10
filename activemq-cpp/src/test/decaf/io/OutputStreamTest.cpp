@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "OutputStreamTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/io/OutputStream.h>
 
@@ -23,6 +23,17 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang::exceptions;
+
+    class OutputStreamTest : public ::testing::Test {
+public:
+
+        OutputStreamTest();
+        virtual ~OutputStreamTest();
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -70,3 +81,5 @@ void OutputStreamTest::test() {
 
     ASSERT_EQ(std::string( "hello world" ), result) << ("Written string not what was expected");
 }
+
+TEST_F(OutputStreamTest, test) { test(); }

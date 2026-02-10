@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "MutexTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Thread.h>
 #include <decaf/lang/Runnable.h>
@@ -34,6 +34,26 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::internal::util::concurrent;
+
+    class MutexTest : public ::testing::Test {
+public:
+
+        virtual ~MutexTest(){}
+        void SetUp() override{}
+        void TearDown() override{}
+
+        void testConstructor();
+        void testTimedWait();
+        void testWait();
+        void testSimpleThread();
+        void testNotify();
+        void testNotifyAll();
+        void testRecursiveLock();
+        void testDoubleLock();
+        void testStressMutex();
+
+    };
+
 
 ///////////////////////////////////////////////////////////////////////////////
 void MutexTest::testConstructor() {
@@ -776,3 +796,13 @@ void MutexTest::testStressMutex(){
 
     ASSERT_TRUE(true);
 }
+
+TEST_F(MutexTest, testConstructor) { testConstructor(); }
+TEST_F(MutexTest, testSimpleThread) { testSimpleThread(); }
+TEST_F(MutexTest, testWait) { testWait(); }
+TEST_F(MutexTest, testTimedWait) { testTimedWait(); }
+TEST_F(MutexTest, testNotify) { testNotify(); }
+TEST_F(MutexTest, testNotifyAll) { testNotifyAll(); }
+TEST_F(MutexTest, testRecursiveLock) { testRecursiveLock(); }
+TEST_F(MutexTest, testDoubleLock) { testDoubleLock(); }
+TEST_F(MutexTest, testStressMutex) { testStressMutex(); }

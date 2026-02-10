@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "DeflaterTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/zip/Deflater.h>
 #include <decaf/util/zip/Inflater.h>
@@ -46,6 +46,41 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
+
+    class DeflaterTest : public ::testing::Test {
+public:
+
+        DeflaterTest();
+        virtual ~DeflaterTest();
+
+        void testDeflateVector();
+        void testDeflateArray();
+        void testEnd();
+        void testInitialState();
+        void testDeflateBeforeSetInput();
+        void testGetBytesRead();
+        void testGetBytesWritten();
+        void testFinish();
+        void testFinished();
+        void testGetAdler();
+        void testNeedsInput();
+        void testReset();
+        void testConstructor();
+        void testConstructorI();
+        void testConstructorIB();
+        void testSetDictionaryVector();
+        void testSetDictionaryBIII();
+        void testSetInputVector();
+        void testSetInputBIII();
+        void testSetLevel();
+        void testSetStrategy();
+
+    private:
+
+        void helperEndTest( Deflater& defl, const std::string& testName );
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 DeflaterTest::DeflaterTest() {
@@ -964,3 +999,25 @@ void DeflaterTest::testDeflateBeforeSetInput() {
         ASSERT_EQ(expectedBytes[i], buffer[i]);
     }
 }
+
+TEST_F(DeflaterTest, testDeflateVector) { testDeflateVector(); }
+TEST_F(DeflaterTest, testDeflateArray) { testDeflateArray(); }
+TEST_F(DeflaterTest, testEnd) { testEnd(); }
+TEST_F(DeflaterTest, testInitialState) { testInitialState(); }
+TEST_F(DeflaterTest, testDeflateBeforeSetInput) { testDeflateBeforeSetInput(); }
+TEST_F(DeflaterTest, testGetBytesRead) { testGetBytesRead(); }
+TEST_F(DeflaterTest, testGetBytesWritten) { testGetBytesWritten(); }
+TEST_F(DeflaterTest, testFinish) { testFinish(); }
+TEST_F(DeflaterTest, testFinished) { testFinished(); }
+TEST_F(DeflaterTest, testGetAdler) { testGetAdler(); }
+TEST_F(DeflaterTest, testNeedsInput) { testNeedsInput(); }
+TEST_F(DeflaterTest, testReset) { testReset(); }
+TEST_F(DeflaterTest, testConstructor) { testConstructor(); }
+TEST_F(DeflaterTest, testConstructorI) { testConstructorI(); }
+TEST_F(DeflaterTest, testConstructorIB) { testConstructorIB(); }
+TEST_F(DeflaterTest, testSetDictionaryVector) { testSetDictionaryVector(); }
+TEST_F(DeflaterTest, testSetDictionaryBIII) { testSetDictionaryBIII(); }
+TEST_F(DeflaterTest, testSetInputVector) { testSetInputVector(); }
+TEST_F(DeflaterTest, testSetInputBIII) { testSetInputBIII(); }
+TEST_F(DeflaterTest, testSetLevel) { testSetLevel(); }
+TEST_F(DeflaterTest, testSetStrategy) { testSetStrategy(); }

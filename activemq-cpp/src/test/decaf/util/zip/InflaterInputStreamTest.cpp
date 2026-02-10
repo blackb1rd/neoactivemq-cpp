@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "InflaterInputStreamTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/io/ByteArrayOutputStream.h>
 #include <decaf/io/ByteArrayInputStream.h>
@@ -41,6 +41,41 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
+
+    class InflaterInputStreamTest : public ::testing::Test {
+private:
+
+        static const std::string testString;
+
+        std::vector<unsigned char> deflatedData;
+        std::vector<unsigned char> inputBuffer;
+
+    public:
+
+        InflaterInputStreamTest();
+        virtual ~InflaterInputStreamTest();
+
+        void SetUp() override;
+
+        void testConstructorInputStreamInflater();
+        void testConstructorInputStreamInflaterI();
+        void testMark();
+        void testMarkSupported();
+        void testRead();
+        void testAvailableNonEmptySource();
+        void testAvailableSkip();
+        void testAvailableEmptySource();
+        void testReadBIII();
+        void testReadBIII2();
+        void testReadBIII3();
+        void testReset();
+        void testClose();
+        void testAvailable();
+        void testSkip();
+        void testSkip2();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const std::string InflaterInputStreamTest::testString =
@@ -407,3 +442,19 @@ void InflaterInputStreamTest::testClose() {
     // test for exception
     iin.close();
 }
+
+TEST_F(InflaterInputStreamTest, testConstructorInputStreamInflater) { testConstructorInputStreamInflater(); }
+TEST_F(InflaterInputStreamTest, testConstructorInputStreamInflaterI) { testConstructorInputStreamInflaterI(); }
+TEST_F(InflaterInputStreamTest, testMark) { testMark(); }
+TEST_F(InflaterInputStreamTest, testMarkSupported) { testMarkSupported(); }
+TEST_F(InflaterInputStreamTest, testRead) { testRead(); }
+TEST_F(InflaterInputStreamTest, testAvailableNonEmptySource) { testAvailableNonEmptySource(); }
+TEST_F(InflaterInputStreamTest, testAvailableSkip) { testAvailableSkip(); }
+TEST_F(InflaterInputStreamTest, testAvailableEmptySource) { testAvailableEmptySource(); }
+TEST_F(InflaterInputStreamTest, testReadBIII) { testReadBIII(); }
+TEST_F(InflaterInputStreamTest, testReadBIII2) { testReadBIII2(); }
+TEST_F(InflaterInputStreamTest, testReadBIII3) { testReadBIII3(); }
+TEST_F(InflaterInputStreamTest, testReset) { testReset(); }
+TEST_F(InflaterInputStreamTest, testClose) { testClose(); }
+TEST_F(InflaterInputStreamTest, testSkip) { testSkip(); }
+TEST_F(InflaterInputStreamTest, testSkip2) { testSkip2(); }

@@ -15,18 +15,105 @@
  * limitations under the License.
  */
 
-#include "ByteArrayBufferTest.h"
+#include <gtest/gtest.h>
+#include <decaf/nio/ByteBuffer.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
 #include <string.h>
 
+
+namespace decaf { namespace internal { namespace nio {} } }
 using namespace std;
 using namespace decaf;
 using namespace decaf::nio;
 using namespace decaf::internal::nio;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class ByteArrayBufferTest : public ::testing::Test {
+private:
+
+        decaf::nio::ByteBuffer* testBuffer1;
+        unsigned char* testData1;
+
+        static const int testData1Size;
+        static const int SMALL_TEST_LENGTH;
+        static const int BUFFER_LENGTH;
+
+    private:
+
+        ByteArrayBufferTest(const ByteArrayBufferTest&);
+        ByteArrayBufferTest& operator= (const ByteArrayBufferTest&);
+
+    public:
+
+        ByteArrayBufferTest() : testBuffer1(), testData1() {}
+        virtual ~ByteArrayBufferTest() {}
+
+        void SetUp() override {
+           testBuffer1 = decaf::nio::ByteBuffer::allocate( testData1Size );
+
+            testData1 = new unsigned char[testData1Size];
+            for( int i = 0; i < testData1Size; ++i ){
+                testData1[i] = (unsigned char)i;
+            }
+        }
+
+        void TearDown() override {
+            delete testBuffer1;
+            delete [] testData1;
+        }
+
+        void test();
+        void testArray();
+        void testArrayOffset();
+        void testReadOnlyArray();
+        void testAsReadOnlyBuffer();
+        void testCompact();
+        void testCompareTo();
+        void testDuplicate();
+        void testEquals();
+        void testGet();
+        void testGetbyteArray();
+        void testGetbyteArray2();
+        void testGetWithIndex();
+        void testPutbyte();
+        void testPutbyteArray();
+        void testPutbyteArray2();
+        void testPutByteBuffer();
+        void testPutIndexed();
+        void testSlice();
+        void testToString();
+        void testGetChar();
+        void testGetChar2();
+        void testPutChar();
+        void testPutChar2();
+        void testGetDouble();
+        void testGetDouble2();
+        void testPutDouble();
+        void testPutDouble2();
+        void testGetFloat();
+        void testGetFloat2();
+        void testPutFloat();
+        void testPutFloat2();
+        void testGetLong();
+        void testGetLong2();
+        void testPutLong();
+        void testPutLong2();
+        void testGetInt();
+        void testGetInt2();
+        void testPutInt();
+        void testPutInt2();
+        void testGetShort();
+        void testGetShort2();
+        void testPutShort();
+        void testPutShort2();
+        void testWrapNullArray();
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int ByteArrayBufferTest::testData1Size = 100;
@@ -1051,3 +1138,49 @@ void ByteArrayBufferTest::testWrapNullArray() {
 
     ASSERT_THROW(testBuffer1->wrap( NULL, 0, 0, 3 ), NullPointerException) << ("Should throw a NullPointerException");
 }
+
+TEST_F(ByteArrayBufferTest, test) { test(); }
+TEST_F(ByteArrayBufferTest, testArray) { testArray(); }
+TEST_F(ByteArrayBufferTest, testArrayOffset) { testArrayOffset(); }
+TEST_F(ByteArrayBufferTest, testReadOnlyArray) { testReadOnlyArray(); }
+TEST_F(ByteArrayBufferTest, testAsReadOnlyBuffer) { testAsReadOnlyBuffer(); }
+TEST_F(ByteArrayBufferTest, testCompact) { testCompact(); }
+TEST_F(ByteArrayBufferTest, testCompareTo) { testCompareTo(); }
+TEST_F(ByteArrayBufferTest, testDuplicate) { testDuplicate(); }
+TEST_F(ByteArrayBufferTest, testEquals) { testEquals(); }
+TEST_F(ByteArrayBufferTest, testGet) { testGet(); }
+TEST_F(ByteArrayBufferTest, testGetbyteArray) { testGetbyteArray(); }
+TEST_F(ByteArrayBufferTest, testGetbyteArray2) { testGetbyteArray2(); }
+TEST_F(ByteArrayBufferTest, testGetWithIndex) { testGetWithIndex(); }
+TEST_F(ByteArrayBufferTest, testPutbyte) { testPutbyte(); }
+TEST_F(ByteArrayBufferTest, testPutbyteArray) { testPutbyteArray(); }
+TEST_F(ByteArrayBufferTest, testPutbyteArray2) { testPutbyteArray2(); }
+TEST_F(ByteArrayBufferTest, testPutByteBuffer) { testPutByteBuffer(); }
+TEST_F(ByteArrayBufferTest, testPutIndexed) { testPutIndexed(); }
+TEST_F(ByteArrayBufferTest, testSlice) { testSlice(); }
+TEST_F(ByteArrayBufferTest, testToString) { testToString(); }
+TEST_F(ByteArrayBufferTest, testGetChar) { testGetChar(); }
+TEST_F(ByteArrayBufferTest, testGetChar2) { testGetChar2(); }
+TEST_F(ByteArrayBufferTest, testPutChar) { testPutChar(); }
+TEST_F(ByteArrayBufferTest, testPutChar2) { testPutChar2(); }
+TEST_F(ByteArrayBufferTest, testGetDouble) { testGetDouble(); }
+TEST_F(ByteArrayBufferTest, testGetDouble2) { testGetDouble2(); }
+TEST_F(ByteArrayBufferTest, testPutDouble) { testPutDouble(); }
+TEST_F(ByteArrayBufferTest, testPutDouble2) { testPutDouble2(); }
+TEST_F(ByteArrayBufferTest, testGetFloat) { testGetFloat(); }
+TEST_F(ByteArrayBufferTest, testGetFloat2) { testGetFloat2(); }
+TEST_F(ByteArrayBufferTest, testPutFloat) { testPutFloat(); }
+TEST_F(ByteArrayBufferTest, testPutFloat2) { testPutFloat2(); }
+TEST_F(ByteArrayBufferTest, testGetLong) { testGetLong(); }
+TEST_F(ByteArrayBufferTest, testGetLong2) { testGetLong2(); }
+TEST_F(ByteArrayBufferTest, testPutLong) { testPutLong(); }
+TEST_F(ByteArrayBufferTest, testPutLong2) { testPutLong2(); }
+TEST_F(ByteArrayBufferTest, testGetInt) { testGetInt(); }
+TEST_F(ByteArrayBufferTest, testGetInt2) { testGetInt2(); }
+TEST_F(ByteArrayBufferTest, testPutInt) { testPutInt(); }
+TEST_F(ByteArrayBufferTest, testPutInt2) { testPutInt2(); }
+TEST_F(ByteArrayBufferTest, testGetShort) { testGetShort(); }
+TEST_F(ByteArrayBufferTest, testGetShort2) { testGetShort2(); }
+TEST_F(ByteArrayBufferTest, testPutShort) { testPutShort(); }
+TEST_F(ByteArrayBufferTest, testPutShort2) { testPutShort2(); }
+TEST_F(ByteArrayBufferTest, testWrapNullArray) { testWrapNullArray(); }

@@ -15,18 +15,95 @@
  * limitations under the License.
  */
 
-#include "CharArrayBufferTest.h"
+#include <gtest/gtest.h>
+#include <decaf/nio/CharBuffer.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
 #include <string.h>
 
+
+namespace decaf { namespace internal { namespace nio {} } }
 using namespace std;
 using namespace decaf;
 using namespace decaf::nio;
 using namespace decaf::internal::nio;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class CharArrayBufferTest : public ::testing::Test {
+decaf::nio::CharBuffer* testBuffer1;
+        char* testData1;
+
+        static const int testData1Size;
+        static const int SMALL_TEST_LENGTH;
+        static const int BUFFER_LENGTH;
+
+    private:
+
+        CharArrayBufferTest(const CharArrayBufferTest&);
+        CharArrayBufferTest& operator= (const CharArrayBufferTest&);
+
+    public:
+
+        CharArrayBufferTest() : testBuffer1(), testData1() {}
+        virtual ~CharArrayBufferTest() {}
+
+        void SetUp() override {
+            testBuffer1 = decaf::nio::CharBuffer::allocate( testData1Size );
+
+            testData1 = new char[testData1Size];
+            for( int i = 0; i < testData1Size; ++i ){
+                testData1[i] = (char)i;
+            }
+        }
+
+        void TearDown() override {
+            delete testBuffer1;
+            delete [] testData1;
+        }
+
+        void test();
+        void testArray();
+        void testArrayOffset();
+        void testReadOnlyArray();
+        void testAsReadOnlyBuffer();
+        void testCompact();
+        void testCompareTo();
+        void testDuplicate();
+        void testEquals();
+        void testGet();
+        void testGetbyteArray();
+        void testGetbyteArray2();
+        void testGetWithIndex();
+        void testPutbyte();
+        void testPutbyteArray();
+        void testPutbyteArray2();
+        void testPutCharBuffer();
+        void testPutIndexed();
+        void testSlice();
+        void testToString();
+        void testWrapNullArray();
+        void testCharAt();
+        void testLength();
+        void testSubSequence();
+        void testPutString();
+        void testPutStringWithArgs();
+        void testAppendSelf();
+        void testAppendOverFlow();
+        void testReadOnlyMap();
+        void testAppendCNormal();
+        void testAppendCharSequenceNormal();
+        void testAppendCharSequenceIINormal();
+        void testAppendCharSequenceII_IllegalArgument();
+        void testReadCharBuffer();
+        void testReadReadOnly();
+        void testReadOverflow();
+        void testReadSelf();
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int CharArrayBufferTest::testData1Size = 100;
@@ -920,3 +997,41 @@ void CharArrayBufferTest::testReadSelf() {
 
     delete source;
 }
+
+TEST_F(CharArrayBufferTest, test) { test(); }
+TEST_F(CharArrayBufferTest, testArray) { testArray(); }
+TEST_F(CharArrayBufferTest, testArrayOffset) { testArrayOffset(); }
+TEST_F(CharArrayBufferTest, testReadOnlyArray) { testReadOnlyArray(); }
+TEST_F(CharArrayBufferTest, testAsReadOnlyBuffer) { testAsReadOnlyBuffer(); }
+TEST_F(CharArrayBufferTest, testCompact) { testCompact(); }
+TEST_F(CharArrayBufferTest, testCompareTo) { testCompareTo(); }
+TEST_F(CharArrayBufferTest, testDuplicate) { testDuplicate(); }
+TEST_F(CharArrayBufferTest, testEquals) { testEquals(); }
+TEST_F(CharArrayBufferTest, testGet) { testGet(); }
+TEST_F(CharArrayBufferTest, testGetbyteArray) { testGetbyteArray(); }
+TEST_F(CharArrayBufferTest, testGetbyteArray2) { testGetbyteArray2(); }
+TEST_F(CharArrayBufferTest, testGetWithIndex) { testGetWithIndex(); }
+TEST_F(CharArrayBufferTest, testPutbyte) { testPutbyte(); }
+TEST_F(CharArrayBufferTest, testPutbyteArray) { testPutbyteArray(); }
+TEST_F(CharArrayBufferTest, testPutbyteArray2) { testPutbyteArray2(); }
+TEST_F(CharArrayBufferTest, testPutCharBuffer) { testPutCharBuffer(); }
+TEST_F(CharArrayBufferTest, testPutIndexed) { testPutIndexed(); }
+TEST_F(CharArrayBufferTest, testSlice) { testSlice(); }
+TEST_F(CharArrayBufferTest, testToString) { testToString(); }
+TEST_F(CharArrayBufferTest, testWrapNullArray) { testWrapNullArray(); }
+TEST_F(CharArrayBufferTest, testCharAt) { testCharAt(); }
+TEST_F(CharArrayBufferTest, testLength) { testLength(); }
+TEST_F(CharArrayBufferTest, testSubSequence) { testSubSequence(); }
+TEST_F(CharArrayBufferTest, testPutString) { testPutString(); }
+TEST_F(CharArrayBufferTest, testPutStringWithArgs) { testPutStringWithArgs(); }
+TEST_F(CharArrayBufferTest, testAppendSelf) { testAppendSelf(); }
+TEST_F(CharArrayBufferTest, testAppendOverFlow) { testAppendOverFlow(); }
+TEST_F(CharArrayBufferTest, testReadOnlyMap) { testReadOnlyMap(); }
+TEST_F(CharArrayBufferTest, testAppendCNormal) { testAppendCNormal(); }
+TEST_F(CharArrayBufferTest, testAppendCharSequenceNormal) { testAppendCharSequenceNormal(); }
+TEST_F(CharArrayBufferTest, testAppendCharSequenceIINormal) { testAppendCharSequenceIINormal(); }
+TEST_F(CharArrayBufferTest, testAppendCharSequenceII_IllegalArgument) { testAppendCharSequenceII_IllegalArgument(); }
+TEST_F(CharArrayBufferTest, testReadCharBuffer) { testReadCharBuffer(); }
+TEST_F(CharArrayBufferTest, testReadReadOnly) { testReadReadOnly(); }
+TEST_F(CharArrayBufferTest, testReadOverflow) { testReadOverflow(); }
+TEST_F(CharArrayBufferTest, testReadSelf) { testReadSelf(); }

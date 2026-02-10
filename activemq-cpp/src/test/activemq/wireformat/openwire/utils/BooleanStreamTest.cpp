@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "BooleanStreamTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/wireformat/openwire/utils/BooleanStream.h>
 #include <decaf/io/ByteArrayOutputStream.h>
@@ -29,6 +29,17 @@ using namespace activemq;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using namespace activemq::wireformat::openwire::utils;
+
+    class BooleanStreamTest : public ::testing::Test {
+public:
+
+        BooleanStreamTest() {}
+        virtual ~BooleanStreamTest() {}
+
+        void test();
+        void test2();
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void BooleanStreamTest::test() {
@@ -99,3 +110,6 @@ void BooleanStreamTest::test2(){
 
     delete [] array.first;
 }
+
+TEST_F(BooleanStreamTest, test) { test(); }
+TEST_F(BooleanStreamTest, test2) { test2(); }

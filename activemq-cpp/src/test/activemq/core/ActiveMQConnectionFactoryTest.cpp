@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ActiveMQConnectionFactoryTest.h"
+#include <gtest/gtest.h>
 
 #include <cms/Connection.h>
 #include <decaf/util/concurrent/Concurrent.h>
@@ -36,9 +36,35 @@ using namespace activemq::core;
 using namespace activemq::commands;
 using namespace activemq::transport;
 
+    class ActiveMQConnectionFactoryTest : public ::testing::Test
+    {
+public:
+
+        std::string username;
+        std::string password;
+        std::string clientId;
+
+        ActiveMQConnectionFactoryTest() : username(), password(), clientId() {
+            username = "timmy";
+            password = "auth";
+            clientId = "12345";
+        }
+        virtual ~ActiveMQConnectionFactoryTest() {}
+
+        void test1WithOpenWire();
+        void test2WithOpenWire();
+        void test3WithOpenWire();
+        void test4WithOpenWire();
+        void testExceptionOnCreate();
+        void testExceptionWithPortOutOfRange();
+        void testCreateWithURIOptions();
+        void testTransportListener();
+        void testURIOptionsProcessing();
+
+    };
+
+
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq{
-namespace core{
 
     class MyTransportListener : public TransportListener {
     private:
@@ -73,7 +99,6 @@ namespace core{
         }
     };
 
-}}
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQConnectionFactoryTest::test1WithOpenWire() {
@@ -94,7 +119,7 @@ void ActiveMQConnectionFactoryTest::test1WithOpenWire() {
 
         return;
     }
-    AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
+    AMQ_CATCH_NOTHROW( activemq::exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
 
     ASSERT_TRUE(false);
@@ -125,7 +150,7 @@ void ActiveMQConnectionFactoryTest::test2WithOpenWire()
 
         return;
     }
-    AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
+    AMQ_CATCH_NOTHROW( activemq::exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
 
     ASSERT_TRUE(false);
@@ -156,7 +181,7 @@ void ActiveMQConnectionFactoryTest::test3WithOpenWire()
 
         return;
     }
-    AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
+    AMQ_CATCH_NOTHROW( activemq::exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
 
     ASSERT_TRUE(false);
@@ -187,7 +212,7 @@ void ActiveMQConnectionFactoryTest::test4WithOpenWire()
 
         return;
     }
-    AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
+    AMQ_CATCH_NOTHROW( activemq::exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
 
     ASSERT_TRUE(false);
@@ -206,7 +231,7 @@ void ActiveMQConnectionFactoryTest::testExceptionWithPortOutOfRange() {
 
         ASSERT_TRUE(false);
     }
-    AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
+    AMQ_CATCH_NOTHROW( activemq::exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
 }
 
@@ -224,7 +249,7 @@ void ActiveMQConnectionFactoryTest::testExceptionOnCreate() {
 
         ASSERT_TRUE(false);
     }
-    AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
+    AMQ_CATCH_NOTHROW( activemq::exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
 }
 
@@ -255,7 +280,7 @@ void ActiveMQConnectionFactoryTest::testCreateWithURIOptions()
 
         return;
     }
-    AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
+    AMQ_CATCH_NOTHROW( activemq::exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
 
     ASSERT_TRUE(false);
@@ -338,9 +363,18 @@ void ActiveMQConnectionFactoryTest::testURIOptionsProcessing() {
 
         return;
     }
-    AMQ_CATCH_NOTHROW( exceptions::ActiveMQException )
+    AMQ_CATCH_NOTHROW( activemq::exceptions::ActiveMQException )
     AMQ_CATCHALL_NOTHROW( )
 
     ASSERT_TRUE(false);
 }
 
+TEST_F(ActiveMQConnectionFactoryTest, test1WithOpenWire) { test1WithOpenWire(); }
+TEST_F(ActiveMQConnectionFactoryTest, test2WithOpenWire) { test2WithOpenWire(); }
+TEST_F(ActiveMQConnectionFactoryTest, test3WithOpenWire) { test3WithOpenWire(); }
+TEST_F(ActiveMQConnectionFactoryTest, test4WithOpenWire) { test4WithOpenWire(); }
+TEST_F(ActiveMQConnectionFactoryTest, testExceptionOnCreate) { testExceptionOnCreate(); }
+TEST_F(ActiveMQConnectionFactoryTest, testCreateWithURIOptions) { testCreateWithURIOptions(); }
+TEST_F(ActiveMQConnectionFactoryTest, testTransportListener) { testTransportListener(); }
+TEST_F(ActiveMQConnectionFactoryTest, testExceptionWithPortOutOfRange) { testExceptionWithPortOutOfRange(); }
+TEST_F(ActiveMQConnectionFactoryTest, testURIOptionsProcessing) { testURIOptionsProcessing(); }

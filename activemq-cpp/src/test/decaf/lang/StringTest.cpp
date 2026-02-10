@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "StringTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/String.h>
 #include <decaf/lang/Integer.h>
@@ -30,6 +30,100 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class StringTest : public ::testing::Test {
+public:
+
+        StringTest();
+        virtual ~StringTest();
+
+        void testDefaultConstructor();
+        void testConstructorCString();
+        void testConstructorCStringWithSize();
+        void testConstructorCStringOffsetAndLength();
+        void testConstructorCStringSizeOffsetAndLength();
+        void testConstructorStdString();
+        void testConstructorString();
+        void testConstructorCharFill();
+        void testAssignmentString();
+        void testAssignmentStdString();
+        void testAssignmentCString();
+        void testCompact();
+        void testHashCode();
+        void testIsEmpty();
+        void testSubstring1();
+        void testSubstring2();
+        void testSubstringExceptions();
+        void testTrim();
+        void testToString();
+        void testToCharArray();
+        void testCStr();
+        void testRegionMatches();
+        void testRegionMatchesCaseSensitive();
+        void testStartsWith();
+        void testStartsWithI();
+        void testEndsWith();
+        void testEquals();
+        void testEqualsCString();
+        void testEqualsStdString();
+        void testEqualsIgnoreCase();
+        void testEqualsIgnoreCaseCString();
+        void testEqualsIgnoreCaseStdString();
+        void testIndexOfChar();
+        void testIndexOfChar2();
+        void testIndexOfString();
+        void testIndexOfString2();
+        void testFindFirstOf();
+        void testFindFirstOf2();
+        void testFindFirstNotOf();
+        void testFindFirstNotOf2();
+        void testIndexOfStdString();
+        void testIndexOfStdString2();
+        void testIndexOfCString();
+        void testIndexOfCString2();
+        void testLastIndexOfChar();
+        void testLastIndexOfChar2();
+        void testLastIndexOfString();
+        void testLastIndexOfString2();
+        void testLastIndexOfStdString();
+        void testLastIndexOfStdString2();
+        void testLastIndexOfCString();
+        void testLastIndexOfCString2();
+        void testToLowerCase();
+        void testToUpperCase();
+        void testReplaceCharChar();
+        void testContainsString();
+        void testContainsStdString();
+        void testContainsCString();
+        void testConcatString();
+        void testConcatStdString();
+        void testConcatCString();
+        void testCompareToString();
+        void testCompareToStdString();
+        void testCompareToCString();
+        void testCompareToIgnoreCaseString();
+        void testCompareToIgnoreCaseStdString();
+        void testCompareToIgnoreCaseCString();
+        void testIsNullOrEmpty();
+        void testOperatorEqualsString();
+        void testOperatorEqualsStdString();
+        void testOperatorEqualsCString();
+        void testOperatorNotEqualsString();
+        void testOperatorNotEqualsStdString();
+        void testOperatorNotEqualsCString();
+        void testOperatorLessString();
+        void testOperatorLessStdString();
+        void testOperatorLessCString();
+        void testOperatorGreaterString();
+        void testOperatorGreaterStdString();
+        void testOperatorGreaterCString();
+        void testOperatorPlusString();
+        void testOperatorPlusStdString();
+        void testOperatorPlusCString();
+        void testGetChars();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 StringTest::StringTest() {
@@ -1082,3 +1176,88 @@ void StringTest::testGetChars() {
 
     delete [] buffer;
 }
+
+TEST_F(StringTest, testDefaultConstructor) { testDefaultConstructor(); }
+TEST_F(StringTest, testConstructorCString) { testConstructorCString(); }
+TEST_F(StringTest, testConstructorCStringWithSize) { testConstructorCStringWithSize(); }
+TEST_F(StringTest, testConstructorCStringOffsetAndLength) { testConstructorCStringOffsetAndLength(); }
+TEST_F(StringTest, testConstructorCStringSizeOffsetAndLength) { testConstructorCStringSizeOffsetAndLength(); }
+TEST_F(StringTest, testConstructorStdString) { testConstructorStdString(); }
+TEST_F(StringTest, testConstructorString) { testConstructorString(); }
+TEST_F(StringTest, testConstructorCharFill) { testConstructorCharFill(); }
+TEST_F(StringTest, testAssignmentString) { testAssignmentString(); }
+TEST_F(StringTest, testAssignmentStdString) { testAssignmentStdString(); }
+TEST_F(StringTest, testAssignmentCString) { testAssignmentCString(); }
+TEST_F(StringTest, testCompact) { testCompact(); }
+TEST_F(StringTest, testHashCode) { testHashCode(); }
+TEST_F(StringTest, testIsEmpty) { testIsEmpty(); }
+TEST_F(StringTest, testSubstring1) { testSubstring1(); }
+TEST_F(StringTest, testSubstring2) { testSubstring2(); }
+TEST_F(StringTest, testSubstringExceptions) { testSubstringExceptions(); }
+TEST_F(StringTest, testTrim) { testTrim(); }
+TEST_F(StringTest, testToString) { testToString(); }
+TEST_F(StringTest, testToCharArray) { testToCharArray(); }
+TEST_F(StringTest, testCStr) { testCStr(); }
+TEST_F(StringTest, testRegionMatches) { testRegionMatches(); }
+TEST_F(StringTest, testRegionMatchesCaseSensitive) { testRegionMatchesCaseSensitive(); }
+TEST_F(StringTest, testStartsWith) { testStartsWith(); }
+TEST_F(StringTest, testStartsWithI) { testStartsWithI(); }
+TEST_F(StringTest, testEndsWith) { testEndsWith(); }
+TEST_F(StringTest, testEquals) { testEquals(); }
+TEST_F(StringTest, testEqualsCString) { testEqualsCString(); }
+TEST_F(StringTest, testEqualsStdString) { testEqualsStdString(); }
+TEST_F(StringTest, testEqualsIgnoreCase) { testEqualsIgnoreCase(); }
+TEST_F(StringTest, testEqualsIgnoreCaseCString) { testEqualsIgnoreCaseCString(); }
+TEST_F(StringTest, testEqualsIgnoreCaseStdString) { testEqualsIgnoreCaseStdString(); }
+TEST_F(StringTest, testIndexOfChar) { testIndexOfChar(); }
+TEST_F(StringTest, testIndexOfChar2) { testIndexOfChar2(); }
+TEST_F(StringTest, testIndexOfString) { testIndexOfString(); }
+TEST_F(StringTest, testIndexOfString2) { testIndexOfString2(); }
+TEST_F(StringTest, testIndexOfStdString) { testIndexOfStdString(); }
+TEST_F(StringTest, testIndexOfStdString2) { testIndexOfStdString2(); }
+TEST_F(StringTest, testIndexOfCString) { testIndexOfCString(); }
+TEST_F(StringTest, testIndexOfCString2) { testIndexOfCString2(); }
+TEST_F(StringTest, testLastIndexOfChar) { testLastIndexOfChar(); }
+TEST_F(StringTest, testLastIndexOfChar2) { testLastIndexOfChar2(); }
+TEST_F(StringTest, testLastIndexOfString) { testLastIndexOfString(); }
+TEST_F(StringTest, testLastIndexOfString2) { testLastIndexOfString2(); }
+TEST_F(StringTest, testLastIndexOfStdString) { testLastIndexOfStdString(); }
+TEST_F(StringTest, testLastIndexOfStdString2) { testLastIndexOfStdString2(); }
+TEST_F(StringTest, testLastIndexOfCString) { testLastIndexOfCString(); }
+TEST_F(StringTest, testLastIndexOfCString2) { testLastIndexOfCString2(); }
+TEST_F(StringTest, testToLowerCase) { testToLowerCase(); }
+TEST_F(StringTest, testToUpperCase) { testToUpperCase(); }
+TEST_F(StringTest, testReplaceCharChar) { testReplaceCharChar(); }
+TEST_F(StringTest, testContainsString) { testContainsString(); }
+TEST_F(StringTest, testContainsStdString) { testContainsStdString(); }
+TEST_F(StringTest, testContainsCString) { testContainsCString(); }
+TEST_F(StringTest, testConcatString) { testConcatString(); }
+TEST_F(StringTest, testConcatStdString) { testConcatStdString(); }
+TEST_F(StringTest, testConcatCString) { testConcatCString(); }
+TEST_F(StringTest, testCompareToString) { testCompareToString(); }
+TEST_F(StringTest, testCompareToStdString) { testCompareToStdString(); }
+TEST_F(StringTest, testCompareToCString) { testCompareToCString(); }
+TEST_F(StringTest, testCompareToIgnoreCaseString) { testCompareToIgnoreCaseString(); }
+TEST_F(StringTest, testCompareToIgnoreCaseStdString) { testCompareToIgnoreCaseStdString(); }
+TEST_F(StringTest, testCompareToIgnoreCaseCString) { testCompareToIgnoreCaseCString(); }
+TEST_F(StringTest, testIsNullOrEmpty) { testIsNullOrEmpty(); }
+TEST_F(StringTest, testOperatorEqualsString) { testOperatorEqualsString(); }
+TEST_F(StringTest, testOperatorEqualsStdString) { testOperatorEqualsStdString(); }
+TEST_F(StringTest, testOperatorEqualsCString) { testOperatorEqualsCString(); }
+TEST_F(StringTest, testOperatorLessString) { testOperatorLessString(); }
+TEST_F(StringTest, testOperatorLessStdString) { testOperatorLessStdString(); }
+TEST_F(StringTest, testOperatorLessCString) { testOperatorLessCString(); }
+TEST_F(StringTest, testOperatorGreaterString) { testOperatorGreaterString(); }
+TEST_F(StringTest, testOperatorGreaterStdString) { testOperatorGreaterStdString(); }
+TEST_F(StringTest, testOperatorGreaterCString) { testOperatorGreaterCString(); }
+TEST_F(StringTest, testOperatorNotEqualsString) { testOperatorNotEqualsString(); }
+TEST_F(StringTest, testOperatorNotEqualsStdString) { testOperatorNotEqualsStdString(); }
+TEST_F(StringTest, testOperatorNotEqualsCString) { testOperatorNotEqualsCString(); }
+TEST_F(StringTest, testOperatorPlusString) { testOperatorPlusString(); }
+TEST_F(StringTest, testOperatorPlusStdString) { testOperatorPlusStdString(); }
+TEST_F(StringTest, testOperatorPlusCString) { testOperatorPlusCString(); }
+TEST_F(StringTest, testFindFirstOf) { testFindFirstOf(); }
+TEST_F(StringTest, testFindFirstOf2) { testFindFirstOf2(); }
+TEST_F(StringTest, testFindFirstNotOf) { testFindFirstNotOf(); }
+TEST_F(StringTest, testFindFirstNotOf2) { testFindFirstNotOf2(); }
+TEST_F(StringTest, testGetChars) { testGetChars(); }

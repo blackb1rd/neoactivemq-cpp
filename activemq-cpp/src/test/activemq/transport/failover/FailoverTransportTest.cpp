@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "FailoverTransportTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/util/AMQLog.h>
 #include <activemq/transport/failover/FailoverTransportFactory.h>
@@ -34,6 +34,12 @@
 
 #include <random>
 #include <chrono>
+#include <activemq/util/Config.h>
+#include <activemq/commands/ConnectionInfo.h>
+#include <activemq/commands/SessionInfo.h>
+#include <activemq/commands/ProducerInfo.h>
+#include <activemq/commands/ConsumerInfo.h>
+#include <activemq/transport/Transport.h>
 
 using namespace activemq;
 using namespace activemq::mock;
@@ -46,6 +52,69 @@ using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
+
+    using decaf::lang::Pointer;
+    using namespace activemq::commands;
+
+    class FailoverTransportTest : public ::testing::Test {
+public:
+
+        FailoverTransportTest();
+        virtual ~FailoverTransportTest();
+
+        void testTransportCreate();
+        void testTransportCreateWithBackups();
+        void testTransportCreateFailOnCreate();
+        void testTransportCreateFailOnCreateSendMessage();
+        void testFailingBackupCreation();
+        void testSendOnewayMessage();
+        void testSendRequestMessage();
+        void testSendOnewayMessageFail();
+        void testSendRequestMessageFail();
+        void testWithOpewireCommands();
+        void testTransportHandlesConnectionControl();
+        void testPriorityBackupConfig();
+        void testUriOptionsApplied();
+        void testConnectedToMockBroker();
+        void testMaxReconnectsZeroAttemptsOneConnect();
+        void testMaxReconnectsHonorsConfiguration();
+        void testStartupMaxReconnectsHonorsConfiguration();
+        void testConnectedToPriorityOnFirstTryThenFailover();
+        // Failover tests without randomization
+        void testFailoverNoRandomizeBothOnline();
+        void testFailoverNoRandomizeBroker1OnlyOnline();
+        void testFailoverNoRandomizeBroker2OnlyOnline();
+        void testFailoverNoRandomizeBothOfflineBroker1ComesOnline();
+        void testFailoverNoRandomizeBothOfflineBroker2ComesOnline();
+        // Failover tests with randomization
+        void testFailoverWithRandomizeBothOnline();
+        void testFailoverWithRandomizeBroker1OnlyOnline();
+        void testFailoverWithRandomizeBroker2OnlyOnline();
+        void testFailoverWithRandomizeBothOfflineBroker1ComesOnline();
+        void testFailoverWithRandomizeBothOfflineBroker2ComesOnline();
+        void testConnectsToPriorityOnceStarted();
+        void testPriorityBackupRapidSwitchingOnRestore();
+        void testSimpleBrokerRestart();
+        void testBrokerRestartWithProperSync();
+        void testFuzzyBrokerAvailability();
+        void testConnectsToPriorityAfterInitialBackupFails();
+
+    private:
+
+        Pointer<ConnectionInfo> createConnection();
+        Pointer<SessionInfo> createSession( const Pointer<ConnectionInfo>& parent );
+        Pointer<ConsumerInfo> createConsumer( const Pointer<SessionInfo>& parent );
+        Pointer<ProducerInfo> createProducer( const Pointer<SessionInfo>& parent );
+
+        void disposeOf( const Pointer<SessionInfo>& session,
+                        Pointer<Transport>& transport );
+        void disposeOf( const Pointer<ConsumerInfo>& consumer,
+                        Pointer<Transport>& transport );
+        void disposeOf( const Pointer<ProducerInfo>& producer,
+                        Pointer<Transport>& transport );
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 FailoverTransportTest::FailoverTransportTest() {
@@ -2085,3 +2154,37 @@ void FailoverTransportTest::testFuzzyBrokerAvailability() {
     broker2->waitUntilStopped();
 }
 
+TEST_F(FailoverTransportTest, testTransportCreate) { testTransportCreate(); }
+TEST_F(FailoverTransportTest, testTransportCreateWithBackups) { testTransportCreateWithBackups(); }
+TEST_F(FailoverTransportTest, testTransportCreateFailOnCreate) { testTransportCreateFailOnCreate(); }
+TEST_F(FailoverTransportTest, testTransportCreateFailOnCreateSendMessage) { testTransportCreateFailOnCreateSendMessage(); }
+TEST_F(FailoverTransportTest, testFailingBackupCreation) { testFailingBackupCreation(); }
+TEST_F(FailoverTransportTest, testSendOnewayMessage) { testSendOnewayMessage(); }
+TEST_F(FailoverTransportTest, testSendRequestMessage) { testSendRequestMessage(); }
+TEST_F(FailoverTransportTest, testSendOnewayMessageFail) { testSendOnewayMessageFail(); }
+TEST_F(FailoverTransportTest, testSendRequestMessageFail) { testSendRequestMessageFail(); }
+TEST_F(FailoverTransportTest, testWithOpewireCommands) { testWithOpewireCommands(); }
+TEST_F(FailoverTransportTest, testTransportHandlesConnectionControl) { testTransportHandlesConnectionControl(); }
+TEST_F(FailoverTransportTest, testPriorityBackupConfig) { testPriorityBackupConfig(); }
+TEST_F(FailoverTransportTest, testUriOptionsApplied) { testUriOptionsApplied(); }
+TEST_F(FailoverTransportTest, testConnectedToMockBroker) { testConnectedToMockBroker(); }
+TEST_F(FailoverTransportTest, testMaxReconnectsZeroAttemptsOneConnect) { testMaxReconnectsZeroAttemptsOneConnect(); }
+TEST_F(FailoverTransportTest, testMaxReconnectsHonorsConfiguration) { testMaxReconnectsHonorsConfiguration(); }
+TEST_F(FailoverTransportTest, testStartupMaxReconnectsHonorsConfiguration) { testStartupMaxReconnectsHonorsConfiguration(); }
+TEST_F(FailoverTransportTest, testConnectedToPriorityOnFirstTryThenFailover) { testConnectedToPriorityOnFirstTryThenFailover(); }
+TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOnline) { testFailoverNoRandomizeBothOnline(); }
+TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker1OnlyOnline) { testFailoverNoRandomizeBroker1OnlyOnline(); }
+TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker2OnlyOnline) { testFailoverNoRandomizeBroker2OnlyOnline(); }
+TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOfflineBroker1ComesOnline) { testFailoverNoRandomizeBothOfflineBroker1ComesOnline(); }
+TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOfflineBroker2ComesOnline) { testFailoverNoRandomizeBothOfflineBroker2ComesOnline(); }
+TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOnline) { testFailoverWithRandomizeBothOnline(); }
+TEST_F(FailoverTransportTest, testFailoverWithRandomizeBroker1OnlyOnline) { testFailoverWithRandomizeBroker1OnlyOnline(); }
+TEST_F(FailoverTransportTest, testFailoverWithRandomizeBroker2OnlyOnline) { testFailoverWithRandomizeBroker2OnlyOnline(); }
+TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOfflineBroker1ComesOnline) { testFailoverWithRandomizeBothOfflineBroker1ComesOnline(); }
+TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOfflineBroker2ComesOnline) { testFailoverWithRandomizeBothOfflineBroker2ComesOnline(); }
+TEST_F(FailoverTransportTest, testConnectsToPriorityOnceStarted) { testConnectsToPriorityOnceStarted(); }
+TEST_F(FailoverTransportTest, testPriorityBackupRapidSwitchingOnRestore) { testPriorityBackupRapidSwitchingOnRestore(); }
+TEST_F(FailoverTransportTest, testSimpleBrokerRestart) { testSimpleBrokerRestart(); }
+TEST_F(FailoverTransportTest, testBrokerRestartWithProperSync) { testBrokerRestartWithProperSync(); }
+TEST_F(FailoverTransportTest, testFuzzyBrokerAvailability) { testFuzzyBrokerAvailability(); }
+TEST_F(FailoverTransportTest, testConnectsToPriorityAfterInitialBackupFails) { testConnectsToPriorityAfterInitialBackupFails(); }

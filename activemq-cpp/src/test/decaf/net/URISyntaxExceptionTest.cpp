@@ -15,12 +15,22 @@
  * limitations under the License.
  */
 
-#include "URISyntaxExceptionTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/net/URISyntaxException.h>
 
 using namespace decaf;
 using namespace decaf::net;
+
+    class URISyntaxExceptionTest : public ::testing::Test {
+public:
+
+        URISyntaxExceptionTest();
+        virtual ~URISyntaxExceptionTest() {}
+
+        void test();
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 URISyntaxExceptionTest::URISyntaxExceptionTest() {
@@ -39,3 +49,5 @@ void URISyntaxExceptionTest::test() {
     ASSERT_TRUE(e2.getInput() == "str") << ("returned incorrect input");
     ASSERT_TRUE(-1 == (int)e2.getIndex()) << ("returned incorrect index");
 }
+
+TEST_F(URISyntaxExceptionTest, test) { test(); }

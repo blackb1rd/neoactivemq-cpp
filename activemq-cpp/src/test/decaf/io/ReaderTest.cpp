@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ReaderTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/io/Reader.h>
 #include <decaf/nio/CharBuffer.h>
@@ -29,6 +29,24 @@ using namespace decaf::io;
 using namespace decaf::nio;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class ReaderTest : public ::testing::Test {
+public:
+
+        ReaderTest();
+        virtual ~ReaderTest();
+
+        void testReaderCharBufferNull();
+        void testReaderCharBufferZeroChar();
+        void testReaderCharBufferChar();
+        void testMark();
+        void testRead();
+        void testReady();
+        void testReset();
+        void testSkip();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -208,3 +226,12 @@ void ReaderTest::testSkip() {
     // Should do nothing
     mockReader.skip( length );
 }
+
+TEST_F(ReaderTest, testReaderCharBufferNull) { testReaderCharBufferNull(); }
+TEST_F(ReaderTest, testReaderCharBufferZeroChar) { testReaderCharBufferZeroChar(); }
+TEST_F(ReaderTest, testReaderCharBufferChar) { testReaderCharBufferChar(); }
+TEST_F(ReaderTest, testMark) { testMark(); }
+TEST_F(ReaderTest, testRead) { testRead(); }
+TEST_F(ReaderTest, testReady) { testReady(); }
+TEST_F(ReaderTest, testReset) { testReset(); }
+TEST_F(ReaderTest, testSkip) { testSkip(); }

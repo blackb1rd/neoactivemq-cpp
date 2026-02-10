@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-#include "LinkedBlockingQueueTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/concurrent/Executors.h>
 #include <decaf/util/concurrent/LinkedBlockingQueue.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 using namespace std;
 using namespace decaf;
@@ -29,6 +30,69 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
+
+    class LinkedBlockingQueueTest : public ExecutorsTestSupport {
+public:
+
+        static const int SIZE;
+
+    public:
+
+        LinkedBlockingQueueTest();
+        virtual ~LinkedBlockingQueueTest();
+
+        void testConstructor1();
+        void testConstructor2();
+        void testConstructor3();
+        void testConstructor4();
+        void testEquals();
+        void testEmptyFull();
+        void testRemainingCapacity();
+        void testOffer();
+        void testAdd();
+        void testAddAllSelf();
+        void testAddAll1();
+        void testAddAll2();
+        void testPut();
+        void testTake();
+        void testPoll();
+        void testTimedPoll1();
+        void testTimedPoll2();
+        void testPeek();
+        void testElement();
+        void testRemove();
+        void testRemoveElement();
+        void testRemoveElement2();
+        void testRemoveElementAndAdd();
+        void testContains();
+        void testClear();
+        void testContainsAll();
+        void testRetainAll();
+        void testRemoveAll();
+        void testToArray();
+        void testDrainToSelf();
+        void testDrainTo();
+        void testDrainToSelfN();
+        void testDrainToWithActivePut();
+        void testDrainToN();
+        void testIterator();
+        void testIteratorRemove();
+        void testIteratorOrdering();
+        void testWeaklyConsistentIteration();
+        void testConcurrentPut();
+        void testConcurrentTake();
+        void testConcurrentPutAndTake();
+        void testBlockingPut();
+        void testTimedOffer();
+        void testTakeFromEmpty();
+        void testBlockingTake();
+        void testInterruptedTimedPoll();
+        void testTimedPollWithOffer();
+        void testOfferInExecutor();
+        void testPollInExecutor();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int LinkedBlockingQueueTest::SIZE = 256;
@@ -1399,3 +1463,53 @@ void LinkedBlockingQueueTest::testPollInExecutor() {
 
     joinPool(executor.get());
 }
+
+TEST_F(LinkedBlockingQueueTest, testConstructor1) { testConstructor1(); }
+TEST_F(LinkedBlockingQueueTest, testConstructor2) { testConstructor2(); }
+TEST_F(LinkedBlockingQueueTest, testConstructor3) { testConstructor3(); }
+TEST_F(LinkedBlockingQueueTest, testConstructor4) { testConstructor4(); }
+TEST_F(LinkedBlockingQueueTest, testEquals) { testEquals(); }
+TEST_F(LinkedBlockingQueueTest, testEmptyFull) { testEmptyFull(); }
+TEST_F(LinkedBlockingQueueTest, testRemainingCapacity) { testRemainingCapacity(); }
+TEST_F(LinkedBlockingQueueTest, testOffer) { testOffer(); }
+TEST_F(LinkedBlockingQueueTest, testAdd) { testAdd(); }
+TEST_F(LinkedBlockingQueueTest, testAddAllSelf) { testAddAllSelf(); }
+TEST_F(LinkedBlockingQueueTest, testAddAll1) { testAddAll1(); }
+TEST_F(LinkedBlockingQueueTest, testAddAll2) { testAddAll2(); }
+TEST_F(LinkedBlockingQueueTest, testPut) { testPut(); }
+TEST_F(LinkedBlockingQueueTest, testTake) { testTake(); }
+TEST_F(LinkedBlockingQueueTest, testPoll) { testPoll(); }
+TEST_F(LinkedBlockingQueueTest, testTimedPoll1) { testTimedPoll1(); }
+TEST_F(LinkedBlockingQueueTest, testTimedPoll2) { testTimedPoll2(); }
+TEST_F(LinkedBlockingQueueTest, testPeek) { testPeek(); }
+TEST_F(LinkedBlockingQueueTest, testElement) { testElement(); }
+TEST_F(LinkedBlockingQueueTest, testRemove) { testRemove(); }
+TEST_F(LinkedBlockingQueueTest, testRemoveElement) { testRemoveElement(); }
+TEST_F(LinkedBlockingQueueTest, testRemoveElement2) { testRemoveElement2(); }
+TEST_F(LinkedBlockingQueueTest, testRemoveElementAndAdd) { testRemoveElementAndAdd(); }
+TEST_F(LinkedBlockingQueueTest, testContains) { testContains(); }
+TEST_F(LinkedBlockingQueueTest, testClear) { testClear(); }
+TEST_F(LinkedBlockingQueueTest, testContainsAll) { testContainsAll(); }
+TEST_F(LinkedBlockingQueueTest, testRetainAll) { testRetainAll(); }
+TEST_F(LinkedBlockingQueueTest, testRemoveAll) { testRemoveAll(); }
+TEST_F(LinkedBlockingQueueTest, testToArray) { testToArray(); }
+TEST_F(LinkedBlockingQueueTest, testDrainToSelf) { testDrainToSelf(); }
+TEST_F(LinkedBlockingQueueTest, testDrainTo) { testDrainTo(); }
+TEST_F(LinkedBlockingQueueTest, testDrainToSelfN) { testDrainToSelfN(); }
+TEST_F(LinkedBlockingQueueTest, testDrainToWithActivePut) { testDrainToWithActivePut(); }
+TEST_F(LinkedBlockingQueueTest, testDrainToN) { testDrainToN(); }
+TEST_F(LinkedBlockingQueueTest, testIterator) { testIterator(); }
+TEST_F(LinkedBlockingQueueTest, testIteratorRemove) { testIteratorRemove(); }
+TEST_F(LinkedBlockingQueueTest, testIteratorOrdering) { testIteratorOrdering(); }
+TEST_F(LinkedBlockingQueueTest, testWeaklyConsistentIteration) { testWeaklyConsistentIteration(); }
+TEST_F(LinkedBlockingQueueTest, testConcurrentPut) { testConcurrentPut(); }
+TEST_F(LinkedBlockingQueueTest, testConcurrentTake) { testConcurrentTake(); }
+TEST_F(LinkedBlockingQueueTest, testConcurrentPutAndTake) { testConcurrentPutAndTake(); }
+TEST_F(LinkedBlockingQueueTest, testBlockingPut) { testBlockingPut(); }
+TEST_F(LinkedBlockingQueueTest, testTimedOffer) { testTimedOffer(); }
+TEST_F(LinkedBlockingQueueTest, testTakeFromEmpty) { testTakeFromEmpty(); }
+TEST_F(LinkedBlockingQueueTest, testBlockingTake) { testBlockingTake(); }
+TEST_F(LinkedBlockingQueueTest, testInterruptedTimedPoll) { testInterruptedTimedPoll(); }
+TEST_F(LinkedBlockingQueueTest, testTimedPollWithOffer) { testTimedPollWithOffer(); }
+TEST_F(LinkedBlockingQueueTest, testOfferInExecutor) { testOfferInExecutor(); }
+TEST_F(LinkedBlockingQueueTest, testPollInExecutor) { testPollInExecutor(); }

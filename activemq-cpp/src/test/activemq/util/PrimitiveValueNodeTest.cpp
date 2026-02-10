@@ -15,12 +15,25 @@
  * limitations under the License.
  */
 
-#include "PrimitiveValueNodeTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/util/PrimitiveValueNode.h>
 
 using namespace activemq;
 using namespace activemq::util;
+
+    class PrimitiveValueNodeTest : public ::testing::Test
+    {
+public:
+
+        PrimitiveValueNodeTest(){}
+        virtual ~PrimitiveValueNodeTest(){}
+
+        void testValueNode();
+        void testValueNodeCtors();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void PrimitiveValueNodeTest::testValueNode(){
@@ -120,3 +133,6 @@ void PrimitiveValueNodeTest::testValueNodeCtors(){
     ASSERT_TRUE(strValue.getType() == PrimitiveValueNode::STRING_TYPE);
     ASSERT_TRUE(bArrayValue.getType() == PrimitiveValueNode::BYTE_ARRAY_TYPE);
 }
+
+TEST_F(PrimitiveValueNodeTest, testValueNode) { testValueNode(); }
+TEST_F(PrimitiveValueNodeTest, testValueNodeCtors) { testValueNodeCtors(); }

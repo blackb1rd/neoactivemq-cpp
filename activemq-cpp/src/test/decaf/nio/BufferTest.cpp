@@ -15,12 +15,68 @@
  * limitations under the License.
  */
 
-#include "BufferTest.h"
+#include <gtest/gtest.h>
+#include <decaf/nio/Buffer.h>
 
 using namespace decaf;
 using namespace decaf::nio;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class BufferTest : public ::testing::Test {
+private:
+
+        Buffer* buffer;
+
+        static const int DEFAULT_BUFFER_SIZE;
+
+        class MyBuffer : public Buffer {
+        public:
+
+            MyBuffer( int capacity ) : Buffer( capacity ) {
+            }
+
+            virtual ~MyBuffer() {}
+
+            bool isReadOnly() const { return false; }
+        };
+
+    private:
+
+        BufferTest(const BufferTest&);
+        BufferTest& operator= (const BufferTest&);
+
+    public:
+
+        BufferTest() : buffer() {}
+        virtual ~BufferTest() {}
+
+        void SetUp() override {
+            buffer = new MyBuffer( DEFAULT_BUFFER_SIZE );
+        }
+
+        void TearDown() override {
+            delete buffer;
+            buffer = NULL;
+        }
+
+        void test();
+        void testCapacity();
+        void testClear();
+        void testFlip();
+        void testHasRemaining();
+        void testIsReadOnly();
+        void testLimit();
+        void testLimitInt();
+        void testMark();
+        void testPosition();
+        void testPositionInt();
+        void testRemaining();
+        void testReset();
+        void testRewind();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int BufferTest::DEFAULT_BUFFER_SIZE = 512;
@@ -215,3 +271,18 @@ void BufferTest::testRewind() {
 
     ASSERT_THROW(buffer->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
 }
+
+TEST_F(BufferTest, test) { test(); }
+TEST_F(BufferTest, testCapacity) { testCapacity(); }
+TEST_F(BufferTest, testClear) { testClear(); }
+TEST_F(BufferTest, testFlip) { testFlip(); }
+TEST_F(BufferTest, testHasRemaining) { testHasRemaining(); }
+TEST_F(BufferTest, testIsReadOnly) { testIsReadOnly(); }
+TEST_F(BufferTest, testLimit) { testLimit(); }
+TEST_F(BufferTest, testLimitInt) { testLimitInt(); }
+TEST_F(BufferTest, testMark) { testMark(); }
+TEST_F(BufferTest, testPosition) { testPosition(); }
+TEST_F(BufferTest, testPositionInt) { testPositionInt(); }
+TEST_F(BufferTest, testRemaining) { testRemaining(); }
+TEST_F(BufferTest, testReset) { testReset(); }
+TEST_F(BufferTest, testRewind) { testRewind(); }

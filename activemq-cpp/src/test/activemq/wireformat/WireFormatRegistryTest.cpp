@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "WireFormatRegistryTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/wireformat/WireFormatRegistry.h>
 
@@ -27,6 +27,17 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class WireFormatRegistryTest : public ::testing::Test {
+public:
+
+        WireFormatRegistryTest() {}
+        virtual ~WireFormatRegistryTest() {}
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void WireFormatRegistryTest::test() {
@@ -46,3 +57,5 @@ void WireFormatRegistryTest::test() {
     ASSERT_THROW(registry.registerFactory( "", &factory ), IllegalArgumentException) << ("Should have thrown an IllegalArgumentException");
 
 }
+
+TEST_F(WireFormatRegistryTest, test) { test(); }

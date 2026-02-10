@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "InflaterTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/zip/Deflater.h>
 #include <decaf/util/zip/Inflater.h>
@@ -30,6 +30,39 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
+
+    class InflaterTest : public ::testing::Test {
+public:
+
+        InflaterTest();
+        virtual ~InflaterTest();
+
+        void SetUp() override;
+        void TearDown() override;
+
+        void testEnd();
+        void testFinished();
+        void testGetAdler();
+        void testGetRemaining();
+        void testInflateVector();
+        void testInflateB1();
+        void testInflateBII();
+        void testInflateBII1();
+        void testConstructor();
+        void testConstructorZ();
+        void testNeedsDictionary();
+        void testNeedsInput();
+        void testReset();
+        void testSetInputB();
+        void testSetInputBIII();
+        void testGetBytesRead();
+        void testGetBytesWritten();
+        void testInflate();
+        void testSetDictionaryB();
+        void testSetDictionaryBIII();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 InflaterTest::InflaterTest() {
@@ -903,3 +936,24 @@ void InflaterTest::testSetDictionaryBIII() {
     infl3.end();
     ASSERT_EQ(inputString, std::string( result.begin(), result.begin() + decLen ));
 }
+
+TEST_F(InflaterTest, testEnd) { testEnd(); }
+TEST_F(InflaterTest, testFinished) { testFinished(); }
+TEST_F(InflaterTest, testGetAdler) { testGetAdler(); }
+TEST_F(InflaterTest, testGetRemaining) { testGetRemaining(); }
+TEST_F(InflaterTest, testInflateVector) { testInflateVector(); }
+TEST_F(InflaterTest, testInflateB1) { testInflateB1(); }
+TEST_F(InflaterTest, testInflateBII) { testInflateBII(); }
+TEST_F(InflaterTest, testInflateBII1) { testInflateBII1(); }
+TEST_F(InflaterTest, testConstructor) { testConstructor(); }
+TEST_F(InflaterTest, testConstructorZ) { testConstructorZ(); }
+TEST_F(InflaterTest, testNeedsDictionary) { testNeedsDictionary(); }
+TEST_F(InflaterTest, testNeedsInput) { testNeedsInput(); }
+TEST_F(InflaterTest, testReset) { testReset(); }
+TEST_F(InflaterTest, testSetInputB) { testSetInputB(); }
+TEST_F(InflaterTest, testSetInputBIII) { testSetInputBIII(); }
+TEST_F(InflaterTest, testGetBytesRead) { testGetBytesRead(); }
+TEST_F(InflaterTest, testGetBytesWritten) { testGetBytesWritten(); }
+TEST_F(InflaterTest, testInflate) { testInflate(); }
+TEST_F(InflaterTest, testSetDictionaryB) { testSetDictionaryB(); }
+TEST_F(InflaterTest, testSetDictionaryBIII) { testSetDictionaryBIII(); }

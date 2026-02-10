@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ConsumerStateTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/state/ConsumerState.h>
 #include <activemq/commands/ConsumerInfo.h>
@@ -26,6 +26,17 @@ using namespace activemq;
 using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
+
+    class ConsumerStateTest : public ::testing::Test {
+public:
+
+        ConsumerStateTest() {}
+        virtual ~ConsumerStateTest() {}
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConsumerStateTest::test() {
@@ -42,3 +53,5 @@ void ConsumerStateTest::test() {
     ASSERT_TRUE(state.toString() != "NULL");
     ASSERT_TRUE(info == state.getInfo());
 }
+
+TEST_F(ConsumerStateTest, test) { test(); }

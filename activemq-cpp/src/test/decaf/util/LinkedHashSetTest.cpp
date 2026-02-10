@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "LinkedHashSetTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/LinkedHashSet.h>
 #include <decaf/util/Iterator.h>
@@ -31,6 +31,34 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class LinkedHashSetTest : public ::testing::Test {
+public:
+
+        LinkedHashSetTest();
+        virtual ~LinkedHashSetTest();
+
+        void testConstructor();
+        void testConstructorI();
+        void testConstructorIF();
+        void testConstructorCollection();
+        void testAdd();
+        void testClear();
+        void testContains();
+        void testIsEmpty();
+        void testIterator();
+        void testRemove();
+        void testSize();
+        void testToString();
+        void testToArray();
+        void testCopy1();
+        void testCopy2();
+        void testEquals();
+        void testRemoveAll();
+        void testRetainAll();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -359,3 +387,22 @@ void LinkedHashSetTest::testRetainAll() {
     set3.retainAll(collection);
     ASSERT_EQ(0, set3.size());
 }
+
+TEST_F(LinkedHashSetTest, testConstructor) { testConstructor(); }
+TEST_F(LinkedHashSetTest, testConstructorI) { testConstructorI(); }
+TEST_F(LinkedHashSetTest, testConstructorIF) { testConstructorIF(); }
+TEST_F(LinkedHashSetTest, testConstructorCollection) { testConstructorCollection(); }
+TEST_F(LinkedHashSetTest, testAdd) { testAdd(); }
+TEST_F(LinkedHashSetTest, testClear) { testClear(); }
+TEST_F(LinkedHashSetTest, testContains) { testContains(); }
+TEST_F(LinkedHashSetTest, testIsEmpty) { testIsEmpty(); }
+TEST_F(LinkedHashSetTest, testIterator) { testIterator(); }
+TEST_F(LinkedHashSetTest, testRemove) { testRemove(); }
+TEST_F(LinkedHashSetTest, testSize) { testSize(); }
+TEST_F(LinkedHashSetTest, testToString) { testToString(); }
+TEST_F(LinkedHashSetTest, testToArray) { testToArray(); }
+TEST_F(LinkedHashSetTest, testCopy1) { testCopy1(); }
+TEST_F(LinkedHashSetTest, testCopy2) { testCopy2(); }
+TEST_F(LinkedHashSetTest, testEquals) { testEquals(); }
+TEST_F(LinkedHashSetTest, testRemoveAll) { testRemoveAll(); }
+TEST_F(LinkedHashSetTest, testRetainAll) { testRetainAll(); }

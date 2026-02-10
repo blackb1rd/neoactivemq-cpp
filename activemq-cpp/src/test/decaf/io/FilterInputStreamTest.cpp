@@ -15,8 +15,10 @@
  * limitations under the License.
  */
 
-#include "FilterInputStreamTest.h"
+#include <gtest/gtest.h>
 #include <decaf/io/ByteArrayInputStream.h>
+#include <decaf/lang/Exception.h>
+#include <decaf/io/FilterInputStream.h>
 
 using namespace std;
 using namespace decaf;
@@ -24,6 +26,23 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::io;
 using namespace decaf::util;
+
+    class FilterInputStreamTest : public ::testing::Test {
+public:
+
+        FilterInputStreamTest() {}
+        virtual ~FilterInputStreamTest() {}
+
+        void testAvailable();
+        void testClose();
+        void testRead();
+        void testRead2();
+        void testRead3();
+        void testSkip();
+        void testReadBIIIExceptions();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -252,3 +271,11 @@ void FilterInputStreamTest::testReadBIIIExceptions() {
         ASSERT_THROW(is.read( buf, 1000, 0, 100 ), IOException) << ("should throw IOException");
     }
 }
+
+TEST_F(FilterInputStreamTest, testAvailable) { testAvailable(); }
+TEST_F(FilterInputStreamTest, testClose) { testClose(); }
+TEST_F(FilterInputStreamTest, testRead) { testRead(); }
+TEST_F(FilterInputStreamTest, testRead2) { testRead2(); }
+TEST_F(FilterInputStreamTest, testRead3) { testRead3(); }
+TEST_F(FilterInputStreamTest, testSkip) { testSkip(); }
+TEST_F(FilterInputStreamTest, testReadBIIIExceptions) { testReadBIIIExceptions(); }

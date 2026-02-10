@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "MathTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Math.h>
 #include <decaf/lang/Double.h>
@@ -24,6 +24,67 @@
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
+
+    class MathTest : public ::testing::Test
+    {
+private:
+
+        double HYP;
+        // double OPP;
+        // double ADJ;
+
+    public:
+
+        MathTest();
+        virtual ~MathTest() {}
+
+        virtual void test_absD();
+        virtual void test_absF();
+        virtual void test_absI();
+        virtual void test_absJ();
+//        virtual void test_acosD();
+//        virtual void test_asinD();
+//        virtual void test_atanD();
+//        virtual void test_atan2DD();
+//        virtual void test_cbrt_D();
+        virtual void test_ceilD();
+//        virtual void test_cosD();
+//        virtual void test_cosh_D();
+//        virtual void test_expD();
+//        virtual void test_expm1_D();
+        virtual void test_floorD();
+//        virtual void test_hypot_DD();
+//        virtual void test_IEEEremainderDD();
+//        virtual void test_logD();
+//        virtual void test_log10_D();
+//        virtual void test_log1p_D();
+        virtual void test_maxDD();
+        virtual void test_maxFF();
+        virtual void test_maxII();
+        virtual void test_maxJJ();
+        virtual void test_minDD();
+        virtual void test_minFF();
+        virtual void test_minII();
+        virtual void test_minJJ();
+        virtual void test_powDD();
+//        virtual void test_rintD();
+        virtual void test_roundD();
+        virtual void test_roundF();
+        virtual void test_signum_D();
+        virtual void test_signum_F();
+//        virtual void test_sinD();
+//        virtual void test_sinh_D();
+        virtual void test_sqrtD();
+//        virtual void test_tanD();
+//        virtual void test_tanh_D();
+        virtual void test_random();
+        virtual void test_toRadiansD();
+        virtual void test_toDegreesD();
+//        virtual void test_ulp_D();
+//        virtual void test_ulp_f();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 MathTest::MathTest() : HYP(Math::sqrt(2.0)) { //, OPP(1.0), ADJ(1.0) {
@@ -522,3 +583,27 @@ void MathTest::test_toDegreesD() {
 //    ASSERT_EQ(//            1.2207031E-4f, Math::ulp(1153.0f)) << ("Returned incorrect value");
 //    ASSERT_EQ(//            5.6E-45f, Math::ulp(9.403954E-38f)) << ("Returned incorrect value");
 //}
+
+TEST_F(MathTest, test_absD) { test_absD(); }
+TEST_F(MathTest, test_absF) { test_absF(); }
+TEST_F(MathTest, test_absI) { test_absI(); }
+TEST_F(MathTest, test_absJ) { test_absJ(); }
+TEST_F(MathTest, test_ceilD) { test_ceilD(); }
+TEST_F(MathTest, test_floorD) { test_floorD(); }
+TEST_F(MathTest, test_maxDD) { test_maxDD(); }
+TEST_F(MathTest, test_maxFF) { test_maxFF(); }
+TEST_F(MathTest, test_maxII) { test_maxII(); }
+TEST_F(MathTest, test_maxJJ) { test_maxJJ(); }
+TEST_F(MathTest, test_minDD) { test_minDD(); }
+TEST_F(MathTest, test_minFF) { test_minFF(); }
+TEST_F(MathTest, test_minII) { test_minII(); }
+TEST_F(MathTest, test_minJJ) { test_minJJ(); }
+TEST_F(MathTest, test_powDD) { test_powDD(); }
+TEST_F(MathTest, test_roundD) { test_roundD(); }
+TEST_F(MathTest, test_roundF) { test_roundF(); }
+TEST_F(MathTest, test_signum_D) { test_signum_D(); }
+TEST_F(MathTest, test_signum_F) { test_signum_F(); }
+TEST_F(MathTest, test_sqrtD) { test_sqrtD(); }
+TEST_F(MathTest, test_random) { test_random(); }
+TEST_F(MathTest, test_toRadiansD) { test_toRadiansD(); }
+TEST_F(MathTest, test_toDegreesD) { test_toDegreesD(); }

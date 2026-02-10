@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "TransportRegistryTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/TransportRegistry.h>
 #include <activemq/transport/mock/MockTransportFactory.h>
@@ -26,6 +26,17 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class TransportRegistryTest : public ::testing::Test {
+public:
+
+        TransportRegistryTest() {}
+        virtual ~TransportRegistryTest() {}
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void TransportRegistryTest::test() {
@@ -45,3 +56,5 @@ void TransportRegistryTest::test() {
     ASSERT_THROW(registry.registerFactory( "", &factory ), IllegalArgumentException) << ("Should have thrown an IllegalArgumentException");
 
 }
+
+TEST_F(TransportRegistryTest, test) { test(); }

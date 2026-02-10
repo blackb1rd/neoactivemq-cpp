@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "HashSetTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/HashSet.h>
 #include <decaf/util/Iterator.h>
@@ -31,6 +31,35 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class HashSetTest : public ::testing::Test {
+public:
+
+        HashSetTest();
+        virtual ~HashSetTest();
+
+        void testConstructor();
+        void testConstructorI();
+        void testConstructorIF();
+        void testConstructorCollection();
+        void testCopyConstructor();
+        void testAdd();
+        void testClear();
+        void testContains();
+        void testIsEmpty();
+        void testIterator();
+        void testRemove();
+        void testSize();
+        void testToString();
+        void testToArray();
+        void testCopy1();
+        void testCopy2();
+        void testEquals();
+        void testRemoveAll();
+        void testRetainAll();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -385,4 +414,3 @@ void HashSetTest::testRetainAll() {
     set3.retainAll(collection);
     ASSERT_EQ(0, set3.size());
 }
-

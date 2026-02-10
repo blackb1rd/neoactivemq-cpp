@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "URIHelperTest.h"
+#include <gtest/gtest.h>
 #include <vector>
 
 #include <decaf/internal/net/URIHelper.h>
@@ -27,6 +27,19 @@ using namespace decaf::net;
 using namespace decaf::internal;
 using namespace decaf::internal::net;
 using namespace decaf::lang;
+
+    class URIHelperTest : public ::testing::Test {
+public:
+
+        URIHelperTest();
+        virtual ~URIHelperTest() {}
+
+        void testParseURI();
+        void isValidIPv4Address();
+
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 URIHelperTest::URIHelperTest() {
@@ -178,3 +191,6 @@ void URIHelperTest::isValidIPv4Address() {
         ASSERT_EQ(false, uriHelper.isValidIPv4Address( *address )) << ("Invalid address tested as valid");
     }
 }
+
+TEST_F(URIHelperTest, testParseURI) { testParseURI(); }
+TEST_F(URIHelperTest, isValidIPv4Address) { isValidIPv4Address(); }

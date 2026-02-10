@@ -15,17 +15,134 @@
  * limitations under the License.
  */
 
-#include "FloatArrayBufferTest.h"
+#include <gtest/gtest.h>
+#include <decaf/nio/FloatBuffer.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
 
+
+namespace decaf { namespace internal { namespace nio {} } }
 using namespace std;
 using namespace decaf;
 using namespace decaf::nio;
 using namespace decaf::internal::nio;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class FloatArrayBufferTest : public ::testing::Test {
+decaf::nio::FloatBuffer* testBuffer1;
+        float* testData1;
+
+        static const int testData1Size;
+        static const int SMALL_TEST_LENGTH;
+        static const int BUFFER_LENGTH;
+
+    private:
+
+        FloatArrayBufferTest(const FloatArrayBufferTest&);
+        FloatArrayBufferTest& operator= (const FloatArrayBufferTest&);
+
+    public:
+
+        FloatArrayBufferTest() : testBuffer1(), testData1() {}
+        virtual ~FloatArrayBufferTest() {}
+
+        void SetUp() override {
+            testBuffer1 = decaf::nio::FloatBuffer::allocate( testData1Size );
+
+            testData1 = new float[testData1Size];
+            for( int i = 0; i < testData1Size; ++i ){
+                testData1[i] = (float)i;
+            }
+        }
+
+        void TearDown() override {
+            delete testBuffer1;
+            delete [] testData1;
+        }
+
+        void test();
+        void testArray();
+        void testArrayOffset();
+        void testReadOnlyArray();
+        void testAsReadOnlyBuffer();
+        void testCompact();
+        void testCompareTo();
+        void testDuplicate();
+        void testEquals();
+        void testHasArray();
+        void testGet();
+        void testGet2();
+        void testGetFloatArray();
+        void testGetFloatArray2();
+        void testGetWithIndex();
+        void testPutFloat();
+        void testPutFloatArray();
+        void testPutFloatArray2();
+        void testPutFloatBuffer();
+        void testPutIndexed();
+        void testSlice();
+        void testToString();
+
+    protected:
+
+        void loadTestData1( float* array, int offset, int length ) {
+            for( int i = 0; i < length; i++ ) {
+                array[offset + i] = (float)i;
+            }
+        }
+
+        void loadTestData2( float* array, int offset, int length ) {
+            for( int i = 0; i < length; i++ ) {
+                array[offset + i] = (float)length - (float)i;
+            }
+        }
+
+        void loadTestData1( decaf::nio::FloatBuffer* buf ) {
+            buf->clear();
+            for( int i = 0; i < buf->capacity(); i++ ) {
+                buf->put( i, (float)i );
+            }
+        }
+
+        void loadTestData2( decaf::nio::FloatBuffer* buf ) {
+            buf->clear();
+            for( int i = 0; i < buf->capacity(); i++ ) {
+                buf->put(i, (float) buf->capacity() - (float)i );
+            }
+        }
+
+        void assertContentEquals( decaf::nio::FloatBuffer* buf, float* array,
+                                  int offset, int length) {
+
+            for( int i = 0; i < length; i++ ) {
+                ASSERT_TRUE(buf->get(i) == array[offset + i]);
+            }
+        }
+
+        void assertContentEquals( decaf::nio::FloatBuffer* buf,
+                                  decaf::nio::FloatBuffer* other ) {
+            ASSERT_TRUE(buf->capacity() == other->capacity());
+            for( int i = 0; i < buf->capacity(); i++ ) {
+                ASSERT_TRUE(buf->get(i) == other->get(i));
+            }
+        }
+
+        void assertContentLikeTestData1(
+            decaf::nio::FloatBuffer* buf, int startIndex,
+            float startValue, int length ) {
+
+            float value = startValue;
+            for( int i = 0; i < length; i++ ) {
+                ASSERT_TRUE(buf->get( startIndex + i ) == value);
+                value = value + 1.0f;
+            }
+        }
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int FloatArrayBufferTest::testData1Size = 100;
@@ -533,3 +650,26 @@ void FloatArrayBufferTest::testToString() {
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->limit() ) ) != string::npos);
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->capacity() ) ) != string::npos);
 }
+
+TEST_F(FloatArrayBufferTest, test) { test(); }
+TEST_F(FloatArrayBufferTest, testArray) { testArray(); }
+TEST_F(FloatArrayBufferTest, testArrayOffset) { testArrayOffset(); }
+TEST_F(FloatArrayBufferTest, testReadOnlyArray) { testReadOnlyArray(); }
+TEST_F(FloatArrayBufferTest, testAsReadOnlyBuffer) { testAsReadOnlyBuffer(); }
+TEST_F(FloatArrayBufferTest, testCompact) { testCompact(); }
+TEST_F(FloatArrayBufferTest, testCompareTo) { testCompareTo(); }
+TEST_F(FloatArrayBufferTest, testDuplicate) { testDuplicate(); }
+TEST_F(FloatArrayBufferTest, testEquals) { testEquals(); }
+TEST_F(FloatArrayBufferTest, testHasArray) { testHasArray(); }
+TEST_F(FloatArrayBufferTest, testGet) { testGet(); }
+TEST_F(FloatArrayBufferTest, testGet2) { testGet2(); }
+TEST_F(FloatArrayBufferTest, testGetFloatArray) { testGetFloatArray(); }
+TEST_F(FloatArrayBufferTest, testGetFloatArray2) { testGetFloatArray2(); }
+TEST_F(FloatArrayBufferTest, testGetWithIndex) { testGetWithIndex(); }
+TEST_F(FloatArrayBufferTest, testPutFloat) { testPutFloat(); }
+TEST_F(FloatArrayBufferTest, testPutFloatArray) { testPutFloatArray(); }
+TEST_F(FloatArrayBufferTest, testPutFloatArray2) { testPutFloatArray2(); }
+TEST_F(FloatArrayBufferTest, testPutFloatBuffer) { testPutFloatBuffer(); }
+TEST_F(FloatArrayBufferTest, testPutIndexed) { testPutIndexed(); }
+TEST_F(FloatArrayBufferTest, testSlice) { testSlice(); }
+TEST_F(FloatArrayBufferTest, testToString) { testToString(); }

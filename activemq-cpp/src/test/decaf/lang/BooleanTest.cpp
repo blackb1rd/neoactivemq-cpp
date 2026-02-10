@@ -15,11 +15,24 @@
  * limitations under the License.
  */
 
-#include "BooleanTest.h"
+#include <gtest/gtest.h>
+#include <decaf/lang/Boolean.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
+
+    class BooleanTest : public ::testing::Test
+    {
+public:
+
+        BooleanTest() {}
+        virtual ~BooleanTest() {}
+
+        virtual void test();
+
+    };
+
 
 void BooleanTest::test()
 {
@@ -43,3 +56,5 @@ void BooleanTest::test()
     ASSERT_TRUE(b.booleanValue() == true);
 
 }
+
+TEST_F(BooleanTest, test) { test(); }

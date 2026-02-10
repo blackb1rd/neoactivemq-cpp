@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ActiveMQTextMessageTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/commands/ActiveMQTextMessage.h>
 
@@ -24,6 +24,22 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
+
+    class ActiveMQTextMessageTest : public ::testing::Test {
+public:
+
+        ActiveMQTextMessageTest() {}
+        virtual ~ActiveMQTextMessageTest() {}
+
+        void test();
+        void testClearBody();
+        void testReadOnlyBody();
+        void testWriteOnlyBody();
+        void testShallowCopy();
+        void testGetBytes();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQTextMessageTest::test() {
@@ -126,3 +142,10 @@ void ActiveMQTextMessageTest::testWriteOnlyBody() {
     } catch( MessageNotWriteableException& mnwe ) {
     }
 }
+
+TEST_F(ActiveMQTextMessageTest, test) { test(); }
+TEST_F(ActiveMQTextMessageTest, testClearBody) { testClearBody(); }
+TEST_F(ActiveMQTextMessageTest, testReadOnlyBody) { testReadOnlyBody(); }
+TEST_F(ActiveMQTextMessageTest, testWriteOnlyBody) { testWriteOnlyBody(); }
+TEST_F(ActiveMQTextMessageTest, testShallowCopy) { testShallowCopy(); }
+TEST_F(ActiveMQTextMessageTest, testGetBytes) { testGetBytes(); }

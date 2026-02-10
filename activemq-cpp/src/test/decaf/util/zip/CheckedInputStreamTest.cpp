@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "CheckedInputStreamTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/zip/Deflater.h>
 #include <decaf/util/zip/CheckedOutputStream.h>
@@ -34,6 +34,21 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
+
+    class CheckedInputStreamTest : public ::testing::Test {
+public:
+
+        CheckedInputStreamTest();
+        virtual ~CheckedInputStreamTest();
+
+        void testConstructor();
+        void testGetChecksum();
+        void testSkip();
+        void testRead();
+        void testReadBIII();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 CheckedInputStreamTest::CheckedInputStreamTest() {
@@ -168,3 +183,9 @@ void CheckedInputStreamTest::testReadBIII() {
 
     ASSERT_THROW(checkIn.read( buff, 50, 10, 5 ), IOException) << ("Should have thrown an IOException");
 }
+
+TEST_F(CheckedInputStreamTest, testConstructor) { testConstructor(); }
+TEST_F(CheckedInputStreamTest, testGetChecksum) { testGetChecksum(); }
+TEST_F(CheckedInputStreamTest, testSkip) { testSkip(); }
+TEST_F(CheckedInputStreamTest, testRead) { testRead(); }
+TEST_F(CheckedInputStreamTest, testReadBIII) { testReadBIII(); }

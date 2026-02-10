@@ -15,7 +15,15 @@
  * limitations under the License.
  */
 
-#include "DataInputStreamTest.h"
+#include <gtest/gtest.h>
+#include <decaf/util/Endian.h>
+#include <decaf/lang/Exception.h>
+#include <decaf/io/ByteArrayInputStream.h>
+#include <decaf/io/ByteArrayOutputStream.h>
+#include <decaf/io/DataInputStream.h>
+#include <decaf/io/DataOutputStream.h>
+#include <algorithm>
+#include <memory>
 
 #include <decaf/lang/Integer.h>
 #include <cstring>
@@ -33,6 +41,73 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::io;
 using namespace decaf::util;
+
+    class DataInputStreamTest : public ::testing::Test {
+std::unique_ptr<ByteArrayOutputStream> baos;
+        std::unique_ptr<ByteArrayInputStream> bais;
+
+        std::unique_ptr<DataOutputStream> os;
+        std::unique_ptr<DataInputStream> is;
+
+        std::string testData;
+
+    public:
+
+        DataInputStreamTest() : baos(), bais(), os(), is(), testData() {}
+
+        virtual ~DataInputStreamTest(){}
+        void SetUp() override{
+            testData = "Test_All_Tests\nTest_decaf_io_BufferedInputStream\nTest_BufferedOutputStream\nTest_decaf_io_ByteArrayInputStream\nTest_decaf_io_ByteArrayOutputStream\nTest_decaf_io_DataInputStream\nTest_decaf_io_File\nTest_decaf_io_FileDescriptor\nTest_decaf_io_FileInputStream\nTest_decaf_io_FileNotFoundException\nTest_decaf_io_FileOutputStream\nTest_decaf_io_FilterInputStream\nTest_decaf_io_FilterOutputStream\nTest_decaf_io_InputStream\nTest_decaf_io_IOException\nTest_decaf_io_OutputStream\nTest_decaf_io_PrintStream\nTest_decaf_io_RandomAccessFile\nTest_decaf_io_SyncFailedException\nTest_decaf_lang_AbstractMethodError\nTest_decaf_lang_ArithmeticException\nTest_decaf_lang_ArrayIndexOutOfBoundsException\nTest_decaf_lang_ArrayStoreException\nTest_decaf_lang_Boolean\nTest_decaf_lang_Byte\nTest_decaf_lang_Character\nTest_decaf_lang_Class\nTest_decaf_lang_ClassCastException\nTest_decaf_lang_ClassCircularityError\nTest_decaf_lang_ClassFormatError\nTest_decaf_lang_ClassLoader\nTest_decaf_lang_ClassNotFoundException\nTest_decaf_lang_CloneNotSupportedException\nTest_decaf_lang_Double\nTest_decaf_lang_Error\nTest_decaf_lang_Exception\nTest_decaf_lang_ExceptionInInitializerError\nTest_decaf_lang_Float\nTest_decaf_lang_IllegalAccessError\nTest_decaf_lang_IllegalAccessException\nTest_decaf_lang_IllegalArgumentException\nTest_decaf_lang_IllegalMonitorStateException\nTest_decaf_lang_IllegalThreadStateException\nTest_decaf_lang_IncompatibleClassChangeError\nTest_decaf_lang_IndexOutOfBoundsException\nTest_decaf_lang_InstantiationError\nTest_decaf_lang_InstantiationException\nTest_decaf_lang_Integer\nTest_decaf_lang_InternalError\nTest_decaf_lang_InterruptedException\nTest_decaf_lang_LinkageError\nTest_decaf_lang_Long\nTest_decaf_lang_Math\nTest_decaf_lang_NegativeArraySizeException\nTest_decaf_lang_NoClassDefFoundError\nTest_decaf_lang_NoSuchFieldError\nTest_decaf_lang_NoSuchMethodError\nTest_decaf_lang_NullPointerException\nTest_decaf_lang_Number\nTest_decaf_lang_NumberFormatException\nTest_decaf_lang_Object\nTest_decaf_lang_OutOfMemoryError\nTest_decaf_lang_RuntimeException\nTest_decaf_lang_SecurityManager\nTest_decaf_lang_Short\nTest_decaf_lang_StackOverflowError\nTest_decaf_lang_String\nTest_decaf_lang_StringBuffer\nTest_decaf_lang_StringIndexOutOfBoundsException\nTest_decaf_lang_System\nTest_decaf_lang_Thread\nTest_decaf_lang_ThreadDeath\nTest_decaf_lang_ThreadGroup\nTest_decaf_lang_Throwable\nTest_decaf_lang_UnknownError\nTest_decaf_lang_UnsatisfiedLinkError\nTest_decaf_lang_VerifyError\nTest_decaf_lang_VirtualMachineError\nTest_decaf_lang_vm_Image\nTest_decaf_lang_vm_MemorySegment\nTest_decaf_lang_vm_ROMStoreException\nTest_decaf_lang_vm_VM\nTest_decaf_lang_Void\nTest_decaf_net_BindException\nTest_decaf_net_ConnectException\nTest_decaf_net_DatagramPacket\nTest_decaf_net_DatagramSocket\nTest_decaf_net_DatagramSocketImpl\nTest_decaf_net_InetAddress\nTest_decaf_net_NoRouteToHostException\nTest_decaf_net_PlainDatagramSocketImpl\nTest_decaf_net_PlainSocketImpl\nTest_decaf_net_Socket\nTest_decaf_net_SocketException\nTest_decaf_net_SocketImpl\nTest_decaf_net_SocketInputStream\nTest_decaf_net_SocketOutputStream\nTest_decaf_net_UnknownHostException\nTest_decaf_util_ArrayEnumerator\nTest_decaf_util_Date\nTest_decaf_util_EventObject\nTest_decaf_util_HashEnumerator\nTest_decaf_util_Hashtable\nTest_decaf_util_Properties\nTest_decaf_util_ResourceBundle\nTest_decaf_util_tm\nTest_decaf_util_Vector\n";
+            this->baos.reset( new ByteArrayOutputStream() );
+            this->os.reset( new DataOutputStream( baos.get() ) );
+        }
+        void TearDown() override{
+            try {
+                this->os.reset( NULL );
+                this->baos.reset( NULL );
+                this->is.reset( NULL );
+                this->bais.reset( NULL );
+            } catch(...) {}
+        }
+
+        void test();
+        void testString();
+        void testUTF();
+        void testUTFDecoding();
+        void testConstructor();
+        void testRead1();
+        void testRead2();
+        void test_readBoolean();
+        void test_readByte();
+        void test_readChar();
+        void test_readDouble();
+        void test_readFloat();
+        void test_readFully1();
+        void test_readFully2();
+        void test_readFullyNullArray();
+        void test_readFullyNullStream();
+        void test_readFullyNullStreamNullArray();
+        void test_readInt();
+        void test_readLong();
+        void test_readShort();
+        void test_readUnsignedByte();
+        void test_readUnsignedShort();
+        void test_skipBytes();
+
+    private:
+
+        void testHelper( unsigned char* input, int inputLength,
+                         unsigned char* expect, int expectLength );
+
+        void openDataInputStream() {
+            std::pair<const unsigned char*, int> array = baos->toByteArray();
+            this->bais.reset( new ByteArrayInputStream( array.first, array.second, true ) );
+            this->is.reset( new DataInputStream( bais.get() ) );
+        }
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void DataInputStreamTest::testConstructor() {
@@ -606,3 +681,27 @@ void DataInputStreamTest::testUTFDecoding() {
     }
 
 }
+
+TEST_F(DataInputStreamTest, test) { test(); }
+TEST_F(DataInputStreamTest, testString) { testString(); }
+TEST_F(DataInputStreamTest, testUTF) { testUTF(); }
+TEST_F(DataInputStreamTest, testUTFDecoding) { testUTFDecoding(); }
+TEST_F(DataInputStreamTest, testConstructor) { testConstructor(); }
+TEST_F(DataInputStreamTest, testRead1) { testRead1(); }
+TEST_F(DataInputStreamTest, testRead2) { testRead2(); }
+TEST_F(DataInputStreamTest, test_readBoolean) { test_readBoolean(); }
+TEST_F(DataInputStreamTest, test_readByte) { test_readByte(); }
+TEST_F(DataInputStreamTest, test_readChar) { test_readChar(); }
+TEST_F(DataInputStreamTest, test_readDouble) { test_readDouble(); }
+TEST_F(DataInputStreamTest, test_readFloat) { test_readFloat(); }
+TEST_F(DataInputStreamTest, test_readFully1) { test_readFully1(); }
+TEST_F(DataInputStreamTest, test_readFully2) { test_readFully2(); }
+TEST_F(DataInputStreamTest, test_readFullyNullArray) { test_readFullyNullArray(); }
+TEST_F(DataInputStreamTest, test_readFullyNullStream) { test_readFullyNullStream(); }
+TEST_F(DataInputStreamTest, test_readFullyNullStreamNullArray) { test_readFullyNullStreamNullArray(); }
+TEST_F(DataInputStreamTest, test_readInt) { test_readInt(); }
+TEST_F(DataInputStreamTest, test_readLong) { test_readLong(); }
+TEST_F(DataInputStreamTest, test_readShort) { test_readShort(); }
+TEST_F(DataInputStreamTest, test_readUnsignedByte) { test_readUnsignedByte(); }
+TEST_F(DataInputStreamTest, test_readUnsignedShort) { test_readUnsignedShort(); }
+TEST_F(DataInputStreamTest, test_skipBytes) { test_skipBytes(); }

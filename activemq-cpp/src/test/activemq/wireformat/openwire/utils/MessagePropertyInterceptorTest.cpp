@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "MessagePropertyInterceptorTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/wireformat/openwire/utils/MessagePropertyInterceptor.h>
 #include <activemq/commands/Message.h>
@@ -33,6 +33,17 @@ using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using namespace activemq::wireformat::openwire::utils;
 using namespace activemq::commands;
+
+    class MessagePropertyInterceptorTest : public ::testing::Test {
+public:
+
+        MessagePropertyInterceptorTest() {}
+        virtual ~MessagePropertyInterceptorTest() {}
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void MessagePropertyInterceptorTest::test() {
@@ -65,3 +76,5 @@ void MessagePropertyInterceptorTest::test() {
     ASSERT_THROW(interceptor.setStringProperty( "JMSXGroupSeq", "FOO" ), Exception) << ("Should Throw an Exception");
 
 }
+
+TEST_F(MessagePropertyInterceptorTest, test) { test(); }

@@ -15,13 +15,24 @@
  * limitations under the License.
  */
 
-#include "BrokerInfoTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/commands/BrokerInfo.h>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::commands;
+
+    class BrokerInfoTest : public ::testing::Test {
+public:
+
+        BrokerInfoTest() {}
+        virtual ~BrokerInfoTest() {}
+
+        virtual void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void BrokerInfoTest::test()
@@ -46,3 +57,5 @@ void BrokerInfoTest::test()
 
     delete copy;
 }
+
+TEST_F(BrokerInfoTest, test) { test(); }

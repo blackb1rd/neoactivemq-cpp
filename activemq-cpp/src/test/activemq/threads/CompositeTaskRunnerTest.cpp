@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "CompositeTaskRunnerTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/threads/CompositeTask.h>
 #include <activemq/threads/CompositeTaskRunner.h>
@@ -28,6 +28,18 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::threads;
 using namespace decaf::lang;
+
+    class CompositeTaskRunnerTest : public ::testing::Test {
+public:
+
+        CompositeTaskRunnerTest() {}
+        virtual ~CompositeTaskRunnerTest() {}
+
+        void test();
+        void testCreateButNotStarted();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -98,3 +110,6 @@ void CompositeTaskRunnerTest::testCreateButNotStarted() {
     runner->shutdown();
     runner.reset(NULL);
 }
+
+TEST_F(CompositeTaskRunnerTest, test) { test(); }
+TEST_F(CompositeTaskRunnerTest, testCreateButNotStarted) { testCreateButNotStarted(); }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "Adler32Test.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/zip/Adler32.h>
 
@@ -30,6 +30,22 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
+
+    class Adler32Test : public ::testing::Test {
+public:
+
+        Adler32Test();
+        virtual ~Adler32Test();
+
+        void testConstructor();
+        void testGetValue();
+        void testReset();
+        void testUpdateI();
+        void testUpdateArray();
+        void testUpdateArrayIndexed();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 Adler32Test::Adler32Test() {
@@ -138,3 +154,10 @@ void Adler32Test::testUpdateArrayIndexed() {
 
     ASSERT_THROW(adl.update( byteArray, SIZE, offError, len ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException for offError");
 }
+
+TEST_F(Adler32Test, testConstructor) { testConstructor(); }
+TEST_F(Adler32Test, testGetValue) { testGetValue(); }
+TEST_F(Adler32Test, testReset) { testReset(); }
+TEST_F(Adler32Test, testUpdateI) { testUpdateI(); }
+TEST_F(Adler32Test, testUpdateArray) { testUpdateArray(); }
+TEST_F(Adler32Test, testUpdateArrayIndexed) { testUpdateArrayIndexed(); }

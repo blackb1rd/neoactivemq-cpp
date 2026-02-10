@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "IdGeneratorTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/util/IdGenerator.h>
 
@@ -26,6 +26,20 @@ using namespace activemq::util;
 
 using namespace decaf;
 using namespace decaf::lang;
+
+    class IdGeneratorTest : public ::testing::Test {
+public:
+
+        IdGeneratorTest();
+        virtual ~IdGeneratorTest();
+
+        void testConstructor1();
+        void testConstructor2();
+        void testCompare();
+        void testThreadSafety();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -142,3 +156,8 @@ void IdGeneratorTest::testThreadSafety() {
 
     ASSERT_TRUE(!failed) << ("One of the Thread Tester failed");
 }
+
+TEST_F(IdGeneratorTest, testConstructor1) { testConstructor1(); }
+TEST_F(IdGeneratorTest, testConstructor2) { testConstructor2(); }
+TEST_F(IdGeneratorTest, testCompare) { testCompare(); }
+TEST_F(IdGeneratorTest, testThreadSafety) { testThreadSafety(); }

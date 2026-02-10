@@ -15,15 +15,26 @@
  * limitations under the License.
  */
 
-#include "ActiveMQTempTopicTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/UUID.h>
 #include <activemq/commands/ActiveMQTempTopic.h>
+#include <activemq/commands/ActiveMQDestination.h>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
+
+    class ActiveMQTempTopicTest : public ::testing::Test {
+public:
+
+        ActiveMQTempTopicTest() {}
+        virtual ~ActiveMQTempTopicTest() {}
+
+        void test();
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQTempTopicTest::test()
@@ -47,3 +58,5 @@ void ActiveMQTempTopicTest::test()
     connectionId = myTopic.getConnectionId();
     ASSERT_EQ(std::string(""), myTopic.getConnectionId()) << ("ConnectionId should not have parsed");
 }
+
+TEST_F(ActiveMQTempTopicTest, test) { test(); }

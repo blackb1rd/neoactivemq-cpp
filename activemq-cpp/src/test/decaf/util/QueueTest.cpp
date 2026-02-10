@@ -15,13 +15,22 @@
  * limitations under the License.
  */
 
-#include "QueueTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/StlQueue.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
+
+   class QueueTest : public ::testing::Test {
+public:
+
+       virtual ~QueueTest() {}
+
+       void test();
+   };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void QueueTest::test()
@@ -47,3 +56,5 @@ void QueueTest::test()
    ASSERT_TRUE(q.front() == 'b');
    ASSERT_TRUE(q.back() == 'c');
 }
+
+TEST_F(QueueTest, test) { test(); }

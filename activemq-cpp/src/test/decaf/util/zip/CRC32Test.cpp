@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "CRC32Test.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/zip/CRC32.h>
 #include <decaf/lang/Integer.h>
@@ -29,6 +29,22 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
+
+    class CRC32Test : public ::testing::Test {
+public:
+
+        CRC32Test();
+        virtual ~CRC32Test();
+
+        void testConstructor();
+        void testGetValue();
+        void testReset();
+        void testUpdateI();
+        void testUpdateArray();
+        void testUpdateArrayIndexed();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 CRC32Test::CRC32Test() {
@@ -157,3 +173,10 @@ void CRC32Test::testUpdateArrayIndexed() {
 
     ASSERT_THROW(crc.update( byteArray, SIZE, offError, len ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException for offError");
 }
+
+TEST_F(CRC32Test, testConstructor) { testConstructor(); }
+TEST_F(CRC32Test, testGetValue) { testGetValue(); }
+TEST_F(CRC32Test, testReset) { testReset(); }
+TEST_F(CRC32Test, testUpdateI) { testUpdateI(); }
+TEST_F(CRC32Test, testUpdateArray) { testUpdateArray(); }
+TEST_F(CRC32Test, testUpdateArrayIndexed) { testUpdateArrayIndexed(); }

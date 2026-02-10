@@ -15,13 +15,64 @@
  * limitations under the License.
  */
 
-#include "CmsDestinationAccessorTest.h"
+#include <gtest/gtest.h>
 #include <activemq/cmsutil/DynamicDestinationResolver.h>
 #include <activemq/cmsutil/ResourceLifecycleManager.h>
 #include "DummyConnectionFactory.h"
+#include <activemq/cmsutil/CmsDestinationAccessor.h>
 
 using namespace activemq;
 using namespace activemq::cmsutil;
+
+    class CmsDestinationAccessorTest : public ::testing::Test {
+class MyAccessor : public CmsDestinationAccessor {
+        public:
+
+            virtual ~MyAccessor() {
+                try {
+                    destroy();
+                } catch( ... ) {
+                }
+            }
+
+            virtual cms::Connection* createConnection() {
+                return CmsDestinationAccessor::createConnection();
+            }
+
+            virtual cms::Session* createSession(cms::Connection* con) {
+                return CmsDestinationAccessor::createSession(con);
+            }
+            virtual cms::Destination* resolveDestinationName( cms::Session* session,
+                                                              const std::string& destName ) {
+                return CmsDestinationAccessor::resolveDestinationName(session,destName);
+            }
+            virtual void init() {
+                CmsDestinationAccessor::init();
+            }
+            virtual void destroy() {
+                CmsDestinationAccessor::destroy();
+            }
+        };
+
+        MyAccessor* accessor;
+        DummyConnectionFactory* cf;
+
+    private:
+
+        CmsDestinationAccessorTest(const CmsDestinationAccessorTest&);
+        CmsDestinationAccessorTest& operator= (const CmsDestinationAccessorTest&);
+
+    public:
+
+        CmsDestinationAccessorTest() : accessor(), cf() {}
+        virtual ~CmsDestinationAccessorTest() {}
+
+        void SetUp() override;
+        void TearDown() override;
+
+        void test();
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void CmsDestinationAccessorTest::SetUp() {
@@ -65,4 +116,4 @@ void CmsDestinationAccessorTest::test() {
     ASSERT_TRUE(topic1 != NULL);
 }
 
-
+TEST_F(CmsDestinationAccessorTest, test) { test(); }

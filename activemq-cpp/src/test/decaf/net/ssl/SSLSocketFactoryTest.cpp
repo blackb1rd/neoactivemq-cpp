@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SSLSocketFactoryTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/net/ssl/SSLSocketFactory.h>
 #include <decaf/net/Socket.h>
@@ -25,6 +25,17 @@ using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::net;
 using namespace decaf::net::ssl;
+
+    class SSLSocketFactoryTest : public ::testing::Test {
+public:
+
+        SSLSocketFactoryTest();
+        virtual ~SSLSocketFactoryTest();
+
+        void testGetDefault();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 SSLSocketFactoryTest::SSLSocketFactoryTest() {
@@ -52,3 +63,5 @@ void SSLSocketFactoryTest::testGetDefault() {
 
 #endif
 }
+
+TEST_F(SSLSocketFactoryTest, testGetDefault) { testGetDefault(); }

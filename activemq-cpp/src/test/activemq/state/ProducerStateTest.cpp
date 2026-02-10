@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ProducerStateTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/state/ProducerState.h>
 #include <activemq/commands/ProducerInfo.h>
@@ -26,6 +26,17 @@ using namespace activemq;
 using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
+
+    class ProducerStateTest : public ::testing::Test {
+public:
+
+        ProducerStateTest() {}
+        virtual ~ProducerStateTest() {}
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void ProducerStateTest::test() {
@@ -42,3 +53,4 @@ void ProducerStateTest::test() {
     ASSERT_TRUE(info == state.getInfo());
 }
 
+TEST_F(ProducerStateTest, test) { test(); }

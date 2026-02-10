@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "TcpTransportTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/tcp/TcpTransportFactory.h>
 #include <activemq/transport/tcp/TcpTransport.h>
@@ -31,6 +31,7 @@
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
 #include <decaf/util/Random.h>
+#include <activemq/util/Config.h>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -43,6 +44,20 @@ using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using namespace activemq::transport;
 using namespace activemq::transport::tcp;
+
+    class TcpTransportTest : public ::testing::Test {
+public:
+
+        TcpTransportTest();
+        virtual ~TcpTransportTest();
+
+        void SetUp() override;
+        void TearDown() override;
+
+        void testTransportCreateWithRadomFailures();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 TcpTransportTest::TcpTransportTest() {
@@ -233,3 +248,5 @@ void TcpTransportTest::testTransportCreateWithRadomFailures() {
         } catch (Exception& ex) {}
     }
 }
+
+TEST_F(TcpTransportTest, testTransportCreateWithRadomFailures) { testTransportCreateWithRadomFailures(); }

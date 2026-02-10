@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "PushbackInputStreamTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/io/PushbackInputStream.h>
 #include <decaf/io/ByteArrayInputStream.h>
@@ -25,6 +25,33 @@ using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class PushbackInputStreamTest : public ::testing::Test {
+private:
+
+        static std::string testString;
+
+    public:
+
+        PushbackInputStreamTest();
+        virtual ~PushbackInputStreamTest();
+
+        void testReset();
+        void testMark();
+        void testMarkSupported();
+        void testAvailable();
+        void testConstructor1();
+        void testConstructor2();
+        void testConstructor3();
+        void testRead();
+        void testReadBIII();
+        void testSkip();
+        void testUnreadBI();
+        void testUnreadBIII();
+        void testUnread();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 std::string PushbackInputStreamTest::testString =
@@ -267,3 +294,17 @@ void PushbackInputStreamTest::testUnread() {
         FAIL() << (std::string() + "IOException during read test : " + e.getMessage());
     }
 }
+
+TEST_F(PushbackInputStreamTest, testReset) { testReset(); }
+TEST_F(PushbackInputStreamTest, testMark) { testMark(); }
+TEST_F(PushbackInputStreamTest, testMarkSupported) { testMarkSupported(); }
+TEST_F(PushbackInputStreamTest, testAvailable) { testAvailable(); }
+TEST_F(PushbackInputStreamTest, testConstructor1) { testConstructor1(); }
+TEST_F(PushbackInputStreamTest, testConstructor2) { testConstructor2(); }
+TEST_F(PushbackInputStreamTest, testConstructor3) { testConstructor3(); }
+TEST_F(PushbackInputStreamTest, testRead) { testRead(); }
+TEST_F(PushbackInputStreamTest, testReadBIII) { testReadBIII(); }
+TEST_F(PushbackInputStreamTest, testSkip) { testSkip(); }
+TEST_F(PushbackInputStreamTest, testUnreadBI) { testUnreadBI(); }
+TEST_F(PushbackInputStreamTest, testUnreadBIII) { testUnreadBIII(); }
+TEST_F(PushbackInputStreamTest, testUnread) { testUnread(); }

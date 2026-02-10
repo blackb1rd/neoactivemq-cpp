@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "TimerTaskHeapTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/internal/util/TimerTaskHeap.h>
 #include <decaf/util/TimerTask.h>
@@ -26,6 +26,20 @@ using namespace decaf::internal;
 using namespace decaf::internal::util;
 using namespace decaf::util;
 using namespace decaf::lang;
+
+    class TimerTaskHeapTest : public ::testing::Test {
+public:
+
+        TimerTaskHeapTest() {}
+        virtual ~TimerTaskHeapTest() {}
+
+        void testCreate();
+        void testInsert();
+        void testRemove();
+        void testFind();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 class TestTimerTask : public TimerTask {
@@ -118,3 +132,8 @@ void TimerTaskHeapTest::testFind() {
     pos = heap.find( task1 );
     ASSERT_TRUE(pos == (std::size_t)-1);
 }
+
+TEST_F(TimerTaskHeapTest, testCreate) { testCreate(); }
+TEST_F(TimerTaskHeapTest, testInsert) { testInsert(); }
+TEST_F(TimerTaskHeapTest, testRemove) { testRemove(); }
+TEST_F(TimerTaskHeapTest, testFind) { testFind(); }

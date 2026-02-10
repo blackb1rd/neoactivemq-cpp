@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "DiscoveryTransportFactoryTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/discovery/DiscoveryAgent.h>
 #include <activemq/transport/discovery/DiscoveryAgentFactory.h>
@@ -33,6 +33,19 @@ using namespace decaf::util;
 using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class DiscoveryTransportFactoryTest : public ::testing::Test {
+public:
+
+        DiscoveryTransportFactoryTest();
+        virtual ~DiscoveryTransportFactoryTest();
+
+        void test();
+
+        void SetUp() override;
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {

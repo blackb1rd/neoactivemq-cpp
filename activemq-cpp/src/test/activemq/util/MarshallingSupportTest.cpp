@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "MarshallingSupportTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/util/MarshallingSupport.h>
 #include <activemq/util/PrimitiveValueNode.h>
@@ -33,6 +33,30 @@ using namespace decaf::io;
 using namespace decaf::lang;
 using namespace activemq;
 using namespace activemq::util;
+
+    class MarshallingSupportTest : public ::testing::Test {
+public:
+
+        MarshallingSupportTest();
+        virtual ~MarshallingSupportTest();
+
+        void testWriteString();
+        void testWriteString16();
+        void testWriteString32();
+        void testReadString16();
+        void testReadString32();
+        void testAsciiToModifiedUtf8();
+        void testModifiedUtf8ToAscii();
+
+    private:
+
+        void readTestHelper( unsigned char* input, int inputLength,
+                             unsigned char* expect, int expectLength );
+
+        void writeTestHelper( unsigned char* input, int inputLength,
+                              unsigned char* expect, int expectLength );
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 MarshallingSupportTest::MarshallingSupportTest() {
@@ -317,3 +341,11 @@ void MarshallingSupportTest::testReadString32() {
 
     delete [] array.first;
 }
+
+TEST_F(MarshallingSupportTest, testWriteString) { testWriteString(); }
+TEST_F(MarshallingSupportTest, testWriteString16) { testWriteString16(); }
+TEST_F(MarshallingSupportTest, testWriteString32) { testWriteString32(); }
+TEST_F(MarshallingSupportTest, testReadString16) { testReadString16(); }
+TEST_F(MarshallingSupportTest, testReadString32) { testReadString32(); }
+TEST_F(MarshallingSupportTest, testAsciiToModifiedUtf8) { testAsciiToModifiedUtf8(); }
+TEST_F(MarshallingSupportTest, testModifiedUtf8ToAscii) { testModifiedUtf8ToAscii(); }

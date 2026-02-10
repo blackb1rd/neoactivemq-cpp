@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "HashCodeTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Integer.h>
 #include <decaf/util/HashCode.h>
@@ -24,6 +24,26 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
+
+    class HashCodeTest : public ::testing::Test {
+public:
+
+        HashCodeTest();
+
+        virtual ~HashCodeTest();
+
+        void testHashPointerT();
+        void testHashString();
+        void testHashBool();
+        void testHashChar();
+        void testHashShort();
+        void testHashInteger();
+        void testHashLong();
+        void testHashFloat();
+        void testHashDouble();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 HashCodeTest::HashCodeTest() {
@@ -314,3 +334,13 @@ void HashCodeTest::testHashDouble() {
     ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
     ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
 }
+
+TEST_F(HashCodeTest, testHashPointerT) { testHashPointerT(); }
+TEST_F(HashCodeTest, testHashString) { testHashString(); }
+TEST_F(HashCodeTest, testHashBool) { testHashBool(); }
+TEST_F(HashCodeTest, testHashChar) { testHashChar(); }
+TEST_F(HashCodeTest, testHashShort) { testHashShort(); }
+TEST_F(HashCodeTest, testHashInteger) { testHashInteger(); }
+TEST_F(HashCodeTest, testHashLong) { testHashLong(); }
+TEST_F(HashCodeTest, testHashFloat) { testHashFloat(); }
+TEST_F(HashCodeTest, testHashDouble) { testHashDouble(); }

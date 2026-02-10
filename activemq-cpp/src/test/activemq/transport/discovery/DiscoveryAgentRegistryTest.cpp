@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "DiscoveryAgentRegistryTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/discovery/DiscoveryAgent.h>
 #include <activemq/transport/discovery/DiscoveryAgentFactory.h>
@@ -31,6 +31,17 @@ using namespace decaf::util;
 using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class DiscoveryAgentRegistryTest : public ::testing::Test {
+public:
+
+        DiscoveryAgentRegistryTest();
+        virtual ~DiscoveryAgentRegistryTest();
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {

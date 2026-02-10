@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "TimerTest.h"
+#include <gtest/gtest.h>
 
 #include <string>
 
@@ -35,6 +35,40 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
+
+    class TimerTest : public ::testing::Test {
+    private:
+
+        decaf::util::concurrent::atomic::AtomicInteger timerCounter;
+        decaf::util::concurrent::Mutex gsync;
+
+    private:
+public:
+
+        TimerTest() : timerCounter(), gsync() {}
+        virtual ~TimerTest() {}
+
+        void testConstructor();
+        void testCancel();
+        void testPurge();
+        void testSchedule_TimerTask_Date();
+        void testSchedule_TimerTask_Date2();
+        void testSchedule_TimerTask_Long();
+        void testSchedule_TimerTask_Long2();
+        void testSchedule_TimerTask_Long_Long();
+        void testSchedule_TimerTask_Long_Long2();
+        void testSchedule_TimerTask_Date_Long();
+        void testSchedule_TimerTask_Date_Long2();
+        void testScheduleAtFixedRate_TimerTask_Long_Long();
+        void testScheduleAtFixedRate_TimerTask_Long_Long2();
+        void testScheduleAtFixedRate_TimerTask_Date_Long();
+        void testScheduleAtFixedRate_TimerTask_Date_Long2();
+
+        void SetUp() override;
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace decaf{
@@ -1656,3 +1690,19 @@ void TimerTest::testScheduleAtFixedRate_TimerTask_Date_Long2() {
                             Long::toString( lastDelta ) + " ms");
     t->cancel();
 }
+
+TEST_F(TimerTest, testConstructor) { testConstructor(); }
+TEST_F(TimerTest, testCancel) { testCancel(); }
+TEST_F(TimerTest, testPurge) { testPurge(); }
+TEST_F(TimerTest, testSchedule_TimerTask_Date) { testSchedule_TimerTask_Date(); }
+TEST_F(TimerTest, testSchedule_TimerTask_Date2) { testSchedule_TimerTask_Date2(); }
+TEST_F(TimerTest, testSchedule_TimerTask_Long) { testSchedule_TimerTask_Long(); }
+TEST_F(TimerTest, testSchedule_TimerTask_Long2) { testSchedule_TimerTask_Long2(); }
+TEST_F(TimerTest, testSchedule_TimerTask_Long_Long) { testSchedule_TimerTask_Long_Long(); }
+TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2) { testSchedule_TimerTask_Long_Long2(); }
+TEST_F(TimerTest, testSchedule_TimerTask_Date_Long) { testSchedule_TimerTask_Date_Long(); }
+TEST_F(TimerTest, testSchedule_TimerTask_Date_Long2) { testSchedule_TimerTask_Date_Long2(); }
+TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long) { testScheduleAtFixedRate_TimerTask_Long_Long(); }
+TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long2) { testScheduleAtFixedRate_TimerTask_Long_Long2(); }
+TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long) { testScheduleAtFixedRate_TimerTask_Date_Long(); }
+TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long2) { testScheduleAtFixedRate_TimerTask_Date_Long2(); }

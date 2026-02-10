@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AtomicIntegerTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
 #include <decaf/lang/Integer.h>
@@ -26,6 +26,33 @@ using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
+
+    class AtomicIntegerTest : public ::testing::Test {
+public:
+
+        AtomicIntegerTest() {}
+        virtual ~AtomicIntegerTest() {}
+
+        void testConstructor();
+        void testConstructor2();
+        void testGetSet();
+        void testCompareAndSet();
+        void testCompareAndSetInMultipleThreads();
+        void testGetAndSet();
+        void testToString();
+        void testDoubleValue();
+        void testFloatValue();
+        void testLongValue();
+        void testIntValue();
+        void testIncrementAndGet();
+        void testDecrementAndGet();
+        void testAddAndGet();
+        void testGetAndIncrement();
+        void testGetAndDecrement();
+        void testGetAndAdd();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void AtomicIntegerTest::testConstructor() {
@@ -226,3 +253,21 @@ void AtomicIntegerTest::testDoubleValue() {
         ASSERT_TRUE((double)i == ai.doubleValue());
     }
 }
+
+TEST_F(AtomicIntegerTest, testConstructor) { testConstructor(); }
+TEST_F(AtomicIntegerTest, testConstructor2) { testConstructor2(); }
+TEST_F(AtomicIntegerTest, testGetSet) { testGetSet(); }
+TEST_F(AtomicIntegerTest, testCompareAndSet) { testCompareAndSet(); }
+TEST_F(AtomicIntegerTest, testCompareAndSetInMultipleThreads) { testCompareAndSetInMultipleThreads(); }
+TEST_F(AtomicIntegerTest, testGetAndSet) { testGetAndSet(); }
+TEST_F(AtomicIntegerTest, testToString) { testToString(); }
+TEST_F(AtomicIntegerTest, testDoubleValue) { testDoubleValue(); }
+TEST_F(AtomicIntegerTest, testFloatValue) { testFloatValue(); }
+TEST_F(AtomicIntegerTest, testLongValue) { testLongValue(); }
+TEST_F(AtomicIntegerTest, testIntValue) { testIntValue(); }
+TEST_F(AtomicIntegerTest, testIncrementAndGet) { testIncrementAndGet(); }
+TEST_F(AtomicIntegerTest, testDecrementAndGet) { testDecrementAndGet(); }
+TEST_F(AtomicIntegerTest, testAddAndGet) { testAddAndGet(); }
+TEST_F(AtomicIntegerTest, testGetAndIncrement) { testGetAndIncrement(); }
+TEST_F(AtomicIntegerTest, testGetAndDecrement) { testGetAndDecrement(); }
+TEST_F(AtomicIntegerTest, testGetAndAdd) { testGetAndAdd(); }

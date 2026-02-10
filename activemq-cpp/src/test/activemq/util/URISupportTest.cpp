@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "URISupportTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/util/URISupport.h>
 #include <decaf/util/Properties.h>
@@ -27,6 +27,21 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace activemq;
 using namespace activemq::util;
+
+    class URISupportTest : public ::testing::Test {
+public:
+
+        URISupportTest() {}
+        virtual ~URISupportTest() {}
+
+        void test();
+        void testURIParseEnv();
+        void testParseComposite();
+        void testApplyParameters();
+        void testCreateWithQuery();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -238,3 +253,9 @@ void URISupportTest::testApplyParameters() {
     uri = URISupport::applyParameters(uri, parameters, "t.");
     verifyParams(URISupport::parseParameters(uri));
 }
+
+TEST_F(URISupportTest, test) { test(); }
+TEST_F(URISupportTest, testURIParseEnv) { testURIParseEnv(); }
+TEST_F(URISupportTest, testParseComposite) { testParseComposite(); }
+TEST_F(URISupportTest, testApplyParameters) { testApplyParameters(); }
+TEST_F(URISupportTest, testCreateWithQuery) { testCreateWithQuery(); }

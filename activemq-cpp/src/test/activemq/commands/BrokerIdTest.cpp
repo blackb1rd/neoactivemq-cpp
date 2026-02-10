@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "BrokerIdTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/commands/BrokerId.h>
 #include <decaf/util/StlMap.h>
@@ -23,8 +23,6 @@
 #include <decaf/lang/Comparable.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace commands {
 
     struct BrokerIdComparitor {
         typedef activemq::commands::BrokerId* first_argument_type;
@@ -46,14 +44,24 @@ namespace commands {
         }
     };
 
-}}
-
 using namespace std;
 using namespace activemq;
 using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::util;
+
+    class BrokerIdTest : public ::testing::Test {
+public:
+
+        BrokerIdTest() {}
+        virtual ~BrokerIdTest() {}
+
+        virtual void test();
+        virtual void test2();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void BrokerIdTest::test() {
@@ -110,3 +118,6 @@ void BrokerIdTest::test2() {
     ASSERT_TRUE(keys.at( 0 )->getValue() == "A");
     ASSERT_TRUE(keys.at( 1 )->getValue() == "C");
 }
+
+TEST_F(BrokerIdTest, test) { test(); }
+TEST_F(BrokerIdTest, test2) { test2(); }

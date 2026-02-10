@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "InetAddressTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/net/InetAddress.h>
 #include <decaf/net/UnknownHostException.h>
@@ -25,6 +25,20 @@
 using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::lang;
+
+    class InetAddressTest : public ::testing::Test {
+public:
+
+        InetAddressTest();
+        virtual ~InetAddressTest();
+
+        void testClone();
+        void testGetByAddress();
+        void testGetHostAddress();
+        void testGetLocalHost();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 InetAddressTest::InetAddressTest() {
@@ -81,3 +95,8 @@ void InetAddressTest::testGetLocalHost() {
     ASSERT_TRUE(address.getHostName() != "");
     ASSERT_TRUE(address.getHostAddress() != "");
 }
+
+TEST_F(InetAddressTest, testGetByAddress) { testGetByAddress(); }
+TEST_F(InetAddressTest, testGetHostAddress) { testGetHostAddress(); }
+TEST_F(InetAddressTest, testGetLocalHost) { testGetLocalHost(); }
+TEST_F(InetAddressTest, testClone) { testClone(); }

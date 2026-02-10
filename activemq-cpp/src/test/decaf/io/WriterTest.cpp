@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "WriterTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/io/Writer.h>
 #include <decaf/nio/CharBuffer.h>
@@ -26,6 +26,23 @@ using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::nio;
 using namespace decaf::lang::exceptions;
+
+    class WriterTest : public ::testing::Test {
+public:
+
+        WriterTest();
+        virtual ~WriterTest();
+
+        void testWriteChar();
+        void testWriteVector();
+        void testWriteString();
+        void testWriteStringOffsetCount();
+        void testAppendChar();
+        void testAppendCharSequence();
+        void testAppendCharSequenceIntInt();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -207,3 +224,11 @@ void WriterTest::testAppendCharSequenceIntInt() {
 
     delete buffer;
 }
+
+TEST_F(WriterTest, testWriteChar) { testWriteChar(); }
+TEST_F(WriterTest, testWriteVector) { testWriteVector(); }
+TEST_F(WriterTest, testWriteString) { testWriteString(); }
+TEST_F(WriterTest, testWriteStringOffsetCount) { testWriteStringOffsetCount(); }
+TEST_F(WriterTest, testAppendChar) { testAppendChar(); }
+TEST_F(WriterTest, testAppendCharSequence) { testAppendCharSequence(); }
+TEST_F(WriterTest, testAppendCharSequenceIntInt) { testAppendCharSequenceIntInt(); }

@@ -15,14 +15,149 @@
  * limitations under the License.
  */
 
-#include "CmsTemplateTest.h"
+#include <gtest/gtest.h>
 #include <activemq/cmsutil/DynamicDestinationResolver.h>
 #include <activemq/cmsutil/ResourceLifecycleManager.h>
 #include "DummyConnectionFactory.h"
 #include "DummyMessageCreator.h"
+#include <activemq/cmsutil/CmsTemplate.h>
+#include <activemq/cmsutil/SessionCallback.h>
+#include <activemq/cmsutil/ProducerCallback.h>
+#include <activemq/cmsutil/DummyMessageCreator.h>
+#include <activemq/cmsutil/MessageContext.h>
+#include <activemq/exceptions/ActiveMQException.h>
 
 using namespace activemq;
 using namespace activemq::cmsutil;
+
+    class CmsTemplateTest : public ::testing::Test {
+CmsTemplate* cmsTemplate;
+        DummyConnectionFactory* cf;
+
+        class MySendListener : public MessageContext::SendListener {
+        private:
+
+            MySendListener(const MySendListener&);
+            MySendListener& operator= (const MySendListener&);
+
+        public:
+
+            const cms::Destination* dest;
+            cms::Message* message;
+            int deliveryMode;
+            int priority;
+            long long ttl;
+            std::string selector;
+            bool noLocal;
+            long long timeout;
+
+            MySendListener() : dest(), message(), deliveryMode(0), priority(), ttl(), selector(), noLocal(), timeout() {}
+            virtual ~MySendListener() {}
+
+            virtual void onSend(const cms::Destination* destination,
+                cms::Message* message, int deliveryMode, int priority,
+                long long timeToLive) {
+                this->dest = destination;
+                this->message = message;
+                this->deliveryMode = deliveryMode;
+                this->priority = priority;
+                this->ttl = timeToLive;
+            }
+
+            virtual cms::Message* doReceive(const cms::Destination* dest,
+                    const std::string& selector,
+                    bool noLocal,
+                    long long timeout) {
+                this->dest = dest;
+                this->selector = selector;
+                this->noLocal = noLocal;
+                this->timeout = timeout;
+                return new DummyMessage();
+            }
+        };
+
+        class FailSendListener : public MessageContext::SendListener {
+        public:
+
+            FailSendListener() {}
+            virtual ~FailSendListener() {}
+
+            virtual void onSend(const cms::Destination* destination,
+                    cms::Message* message, int deliveryMode, int priority,
+                    long long timeToLive) {
+                throw cms::CMSException();
+            }
+
+            virtual cms::Message* doReceive(const cms::Destination* dest,
+                    const std::string& selector, bool noLocal, long long timeout) {
+                throw cms::CMSException();
+            }
+        };
+
+        class MySessionCallback : public SessionCallback {
+        private:
+
+            MySessionCallback(const MySessionCallback&);
+            MySessionCallback& operator= (const MySessionCallback&);
+
+        public:
+
+            cms::Session* session;
+            cms::Session::AcknowledgeMode ackMode;
+
+            MySessionCallback() :session(), ackMode() {}
+            virtual ~MySessionCallback() {}
+
+            virtual void doInCms(cms::Session* session) {
+                this->session = session;
+                this->ackMode = session->getAcknowledgeMode();
+            }
+        };
+
+        class MyProducerCallback : public ProducerCallback {
+        private:
+
+            MyProducerCallback(const MyProducerCallback&);
+            MyProducerCallback& operator= (const MyProducerCallback&);
+
+        public:
+
+            cms::Session* session;
+            cms::MessageProducer* producer;
+
+            MyProducerCallback() : session(), producer() {}
+            virtual ~MyProducerCallback() {}
+
+            virtual void doInCms(cms::Session* session, cms::MessageProducer* producer) {
+                this->session = session;
+                this->producer = producer;
+            }
+        };
+
+    private:
+
+        CmsTemplateTest(const CmsTemplateTest&);
+        CmsTemplateTest& operator= (const CmsTemplateTest&);
+
+    public:
+
+        CmsTemplateTest() : cmsTemplate(), cf() {}
+        virtual ~CmsTemplateTest() {}
+
+        void SetUp() override;
+        void TearDown() override;
+
+        void testExecuteSession();
+        void testExecuteProducer();
+        void testSend();
+        void testReceive();
+        void testReceive_Destination();
+        void testReceive_DestinationName();
+        void testReceiveSelected();
+        void testReceiveSelected_Destination();
+        void testReceiveSelected_DestinationName();
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void CmsTemplateTest::SetUp() {
@@ -499,3 +634,12 @@ void CmsTemplateTest::testReceiveSelected_DestinationName() {
     }
 }
 
+TEST_F(CmsTemplateTest, testExecuteSession) { testExecuteSession(); }
+TEST_F(CmsTemplateTest, testExecuteProducer) { testExecuteProducer(); }
+TEST_F(CmsTemplateTest, testSend) { testSend(); }
+TEST_F(CmsTemplateTest, testReceive) { testReceive(); }
+TEST_F(CmsTemplateTest, testReceive_Destination) { testReceive_Destination(); }
+TEST_F(CmsTemplateTest, testReceive_DestinationName) { testReceive_DestinationName(); }
+TEST_F(CmsTemplateTest, testReceiveSelected) { testReceiveSelected(); }
+TEST_F(CmsTemplateTest, testReceiveSelected_Destination) { testReceiveSelected_Destination(); }
+TEST_F(CmsTemplateTest, testReceiveSelected_DestinationName) { testReceiveSelected_DestinationName(); }

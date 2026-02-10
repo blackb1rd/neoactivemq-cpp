@@ -15,17 +15,34 @@
  * limitations under the License.
  */
 
-#include "ActiveMQExceptionTest.h"
+#include <gtest/gtest.h>
 #include <activemq/exceptions/ExceptionDefines.h>
 #include <cms/MessageNotReadableException.h>
 #include <decaf/lang/Exception.h>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <activemq/exceptions/ActiveMQException.h>
+#include <string.h>
 
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class ActiveMQExceptionTest : public ::testing::Test {
+public:
+
+        virtual ~ActiveMQExceptionTest(){}
+
+        void SetUp() override{}
+        void TearDown() override{}
+
+        void testMacros();
+        void testMessage0();
+        void testMessage3();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -107,3 +124,7 @@ void ActiveMQExceptionTest::testMessage3(){
     ASSERT_TRUE(strcmp( ex.getMessage().c_str(),
                     "This is a test 1 100 1000" ) == 0);
 }
+
+TEST_F(ActiveMQExceptionTest, testMessage0) { testMessage0(); }
+TEST_F(ActiveMQExceptionTest, testMessage3) { testMessage3(); }
+TEST_F(ActiveMQExceptionTest, testMacros) { testMacros(); }

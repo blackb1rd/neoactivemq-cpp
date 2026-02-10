@@ -15,12 +15,23 @@
  * limitations under the License.
  */
 
-#include "Inet4AddressTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/net/Inet6Address.h>
 
 using namespace decaf;
 using namespace decaf::net;
+
+    class Inet4AddressTest : public ::testing::Test {
+public:
+
+        Inet4AddressTest();
+        virtual ~Inet4AddressTest();
+
+        void testGetByAddress();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 Inet4AddressTest::Inet4AddressTest() {

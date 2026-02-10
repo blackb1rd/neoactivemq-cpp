@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ActiveMQMessageTransformationTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/commands/ActiveMQDestination.h>
 #include <activemq/commands/ActiveMQTopic.h>
@@ -36,6 +36,17 @@ using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class ActiveMQMessageTransformationTest : public ::testing::Test {
+    private:
+public:
+
+        ActiveMQMessageTransformationTest();
+        virtual ~ActiveMQMessageTransformationTest();
+
+        void testTransformDestination();
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -123,3 +134,5 @@ void ActiveMQMessageTransformationTest::testTransformDestination() {
     ASSERT_TRUE(!transformed->isTopic());
     ASSERT_TRUE(transformed->isQueue());
 }
+
+TEST_F(ActiveMQMessageTransformationTest, testTransformDestination) { testTransformDestination(); }

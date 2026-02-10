@@ -15,12 +15,22 @@
  * limitations under the License.
  */
 
-#include "StringTokenizerTest.h"
+#include <gtest/gtest.h>
 #include <decaf/util/StringTokenizer.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
+
+   class StringTokenizerTest : public ::testing::Test {
+public:
+
+        virtual ~StringTokenizerTest() {}
+
+        void test();
+
+   };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void StringTokenizerTest::test()
@@ -95,3 +105,5 @@ void StringTokenizerTest::test()
     tokenizer6.reset("this$is$a$test", "$", true);
         ASSERT_TRUE(tokenizer6.countTokens() == 7);
 }
+
+TEST_F(StringTokenizerTest, test) { test(); }

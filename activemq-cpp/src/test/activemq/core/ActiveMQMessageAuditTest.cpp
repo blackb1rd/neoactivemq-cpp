@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ActiveMQMessageAuditTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/core/ActiveMQMessageAudit.h>
 #include <activemq/util/IdGenerator.h>
@@ -30,6 +30,23 @@ using namespace activemq::util;
 using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::util;
+
+    class ActiveMQMessageAuditTest : public ::testing::Test {
+public:
+
+        ActiveMQMessageAuditTest();
+        virtual ~ActiveMQMessageAuditTest();
+
+        void testIsDuplicateString();
+        void testIsDuplicateMessageId();
+        void testIsInOrderString();
+        void testIsInOrderMessageId();
+        void testRollbackString();
+        void testRollbackMessageId();
+        void testGetLastSeqId();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQMessageAuditTest::ActiveMQMessageAuditTest() {
@@ -220,3 +237,11 @@ void ActiveMQMessageAuditTest::testGetLastSeqId() {
     }
 
 }
+
+TEST_F(ActiveMQMessageAuditTest, testIsDuplicateString) { testIsDuplicateString(); }
+TEST_F(ActiveMQMessageAuditTest, testIsDuplicateMessageId) { testIsDuplicateMessageId(); }
+TEST_F(ActiveMQMessageAuditTest, testIsInOrderString) { testIsInOrderString(); }
+TEST_F(ActiveMQMessageAuditTest, testIsInOrderMessageId) { testIsInOrderMessageId(); }
+TEST_F(ActiveMQMessageAuditTest, testRollbackString) { testRollbackString(); }
+TEST_F(ActiveMQMessageAuditTest, testRollbackMessageId) { testRollbackMessageId(); }
+TEST_F(ActiveMQMessageAuditTest, testGetLastSeqId) { testGetLastSeqId(); }

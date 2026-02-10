@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "DedicatedTaskRunnerTest.h"
+#include <gtest/gtest.h>
 
 #include <memory>
 
@@ -29,6 +29,17 @@ using namespace activemq;
 using namespace activemq::threads;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class DedicatedTaskRunnerTest : public ::testing::Test {
+public:
+
+        DedicatedTaskRunnerTest() {}
+        virtual ~DedicatedTaskRunnerTest() {}
+
+        void testSimple();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -101,3 +112,5 @@ void DedicatedTaskRunnerTest::testSimple() {
     Thread::sleep( 250 );
     ASSERT_TRUE(infiniteTask.getCount() == count);
 }
+
+TEST_F(DedicatedTaskRunnerTest, testSimple) { testSimple(); }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ArrayListTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/ArrayList.h>
@@ -27,6 +27,54 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class ArrayListTest : public ::testing::Test {
+private:
+
+        static const int SIZE;
+
+    public:
+
+        ArrayListTest();
+        virtual ~ArrayListTest();
+
+        void testConstructor1();
+        void testConstructor2();
+        void testConstructor3();
+        void testAdd1();
+        void testAdd2();
+        void testAdd3();
+        void testAddAll1();
+        void testAddAll2();
+        void testAddAll3();
+        void testAddAll4();
+        void testAddAll5();
+        void testAddAll6();
+        void testAddAll7();
+        void testAddAll8();
+        void testAddAll9();
+        void testClear();
+        void testContains();
+        void testEnsureCapacity();
+        void testGet();
+        void testSet();
+        void testIndexOf();
+        void testIsEmpty();
+        void testLastIndexOf();
+        void testRemove();
+        void testRemoveAt();
+        void testSize();
+        void testToString();
+        void testToArray();
+        void testTrimToSize();
+        void testOverrideSize();
+        void testRemoveAll();
+        void testRetainAll();
+        void testListIterator1IndexOutOfBoundsException();
+        void testListIterator2IndexOutOfBoundsException();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int ArrayListTest::SIZE = 256;
@@ -799,3 +847,38 @@ void ArrayListTest::testListIterator2IndexOutOfBoundsException() {
 
     ASSERT_THROW(std::unique_ptr< ListIterator<int> > it( list.listIterator( 100 ) ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
+
+TEST_F(ArrayListTest, testConstructor1) { testConstructor1(); }
+TEST_F(ArrayListTest, testConstructor2) { testConstructor2(); }
+TEST_F(ArrayListTest, testConstructor3) { testConstructor3(); }
+TEST_F(ArrayListTest, testAdd1) { testAdd1(); }
+TEST_F(ArrayListTest, testAdd2) { testAdd2(); }
+TEST_F(ArrayListTest, testAdd3) { testAdd3(); }
+TEST_F(ArrayListTest, testAddAll1) { testAddAll1(); }
+TEST_F(ArrayListTest, testAddAll2) { testAddAll2(); }
+TEST_F(ArrayListTest, testAddAll3) { testAddAll3(); }
+TEST_F(ArrayListTest, testAddAll4) { testAddAll4(); }
+TEST_F(ArrayListTest, testAddAll5) { testAddAll5(); }
+TEST_F(ArrayListTest, testAddAll6) { testAddAll6(); }
+TEST_F(ArrayListTest, testAddAll7) { testAddAll7(); }
+TEST_F(ArrayListTest, testAddAll8) { testAddAll8(); }
+TEST_F(ArrayListTest, testAddAll9) { testAddAll9(); }
+TEST_F(ArrayListTest, testClear) { testClear(); }
+TEST_F(ArrayListTest, testContains) { testContains(); }
+TEST_F(ArrayListTest, testEnsureCapacity) { testEnsureCapacity(); }
+TEST_F(ArrayListTest, testGet) { testGet(); }
+TEST_F(ArrayListTest, testSet) { testSet(); }
+TEST_F(ArrayListTest, testIndexOf) { testIndexOf(); }
+TEST_F(ArrayListTest, testIsEmpty) { testIsEmpty(); }
+TEST_F(ArrayListTest, testLastIndexOf) { testLastIndexOf(); }
+TEST_F(ArrayListTest, testRemove) { testRemove(); }
+TEST_F(ArrayListTest, testRemoveAt) { testRemoveAt(); }
+TEST_F(ArrayListTest, testSize) { testSize(); }
+TEST_F(ArrayListTest, testToString) { testToString(); }
+TEST_F(ArrayListTest, testToArray) { testToArray(); }
+TEST_F(ArrayListTest, testTrimToSize) { testTrimToSize(); }
+TEST_F(ArrayListTest, testOverrideSize) { testOverrideSize(); }
+TEST_F(ArrayListTest, testRemoveAll) { testRemoveAll(); }
+TEST_F(ArrayListTest, testRetainAll) { testRetainAll(); }
+TEST_F(ArrayListTest, testListIterator1IndexOutOfBoundsException) { testListIterator1IndexOutOfBoundsException(); }
+TEST_F(ArrayListTest, testListIterator2IndexOutOfBoundsException) { testListIterator2IndexOutOfBoundsException(); }

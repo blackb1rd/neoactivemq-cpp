@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SessionStateTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/state/SessionState.h>
 #include <activemq/commands/SessionInfo.h>
@@ -26,6 +26,16 @@ using namespace activemq;
 using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
+
+    class SessionStateTest : public ::testing::Test {
+public:
+
+        SessionStateTest() {}
+        virtual ~SessionStateTest() {}
+
+        void test();
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void SessionStateTest::test() {
@@ -73,3 +83,5 @@ void SessionStateTest::test() {
     ASSERT_TRUE(state.getProducerStates().size() == 1);
 
 }
+
+TEST_F(SessionStateTest, test) { test(); }

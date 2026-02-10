@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "StompWireFormatFactoryTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/Properties.h>
 
@@ -28,6 +28,17 @@ using namespace decaf::util;
 using namespace activemq;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::stomp;
+
+    class StompWireFormatFactoryTest : public ::testing::Test {
+public:
+
+        StompWireFormatFactoryTest();
+        virtual ~StompWireFormatFactoryTest();
+
+        void testCreateWireFormat();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 StompWireFormatFactoryTest::StompWireFormatFactoryTest() {
@@ -57,3 +68,5 @@ void StompWireFormatFactoryTest::testCreateWireFormat() {
     ASSERT_EQ(std::string("/test-temp-topic/"), stomp->getTempTopicPrefix());
     ASSERT_EQ(std::string("/test-temp-queue/"), stomp->getTempQueuePrefix());
 }
+
+TEST_F(StompWireFormatFactoryTest, testCreateWireFormat) { testCreateWireFormat(); }

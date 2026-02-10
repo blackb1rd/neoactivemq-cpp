@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "UUIDTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Long.h>
 #include <decaf/util/UUID.h>
@@ -29,6 +29,32 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class UUIDTest : public ::testing::Test {
+public:
+
+        UUIDTest();
+        virtual ~UUIDTest() {}
+
+        void testConstructor1();
+        void testGetLeastSignificantBits();
+        void testGetMostSignificantBits();
+        void testVersion();
+        void testVariant();
+        void testTimestamp();
+        void testClockSequence();
+        void testNode();
+        void testCompareTo();
+        void testHashCode();
+        void testEquals();
+        void testToString();
+        void testRandomUUID();
+        void testNameUUIDFromBytes();
+        void testFromString();
+        void testFromStringStringException();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 UUIDTest::UUIDTest() {
@@ -327,3 +353,20 @@ void UUIDTest::testFromStringStringException() {
 
     ASSERT_THROW(UUID::fromString("0-0-0-0-8000000000000000"), NumberFormatException) << ("Should throw an IllegalArgumentException exception");
 }
+
+TEST_F(UUIDTest, testConstructor1) { testConstructor1(); }
+TEST_F(UUIDTest, testGetLeastSignificantBits) { testGetLeastSignificantBits(); }
+TEST_F(UUIDTest, testGetMostSignificantBits) { testGetMostSignificantBits(); }
+TEST_F(UUIDTest, testVersion) { testVersion(); }
+TEST_F(UUIDTest, testVariant) { testVariant(); }
+TEST_F(UUIDTest, testTimestamp) { testTimestamp(); }
+TEST_F(UUIDTest, testClockSequence) { testClockSequence(); }
+TEST_F(UUIDTest, testNode) { testNode(); }
+TEST_F(UUIDTest, testCompareTo) { testCompareTo(); }
+TEST_F(UUIDTest, testHashCode) { testHashCode(); }
+TEST_F(UUIDTest, testEquals) { testEquals(); }
+TEST_F(UUIDTest, testToString) { testToString(); }
+TEST_F(UUIDTest, testRandomUUID) { testRandomUUID(); }
+TEST_F(UUIDTest, testNameUUIDFromBytes) { testNameUUIDFromBytes(); }
+TEST_F(UUIDTest, testFromString) { testFromString(); }
+TEST_F(UUIDTest, testFromStringStringException) { testFromStringStringException(); }

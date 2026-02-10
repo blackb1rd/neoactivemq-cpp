@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "LockSupportTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/System.h>
 #include <decaf/lang/Thread.h>
@@ -23,6 +23,7 @@
 #include <decaf/util/Date.h>
 #include <decaf/util/concurrent/TimeUnit.h>
 #include <decaf/util/concurrent/locks/LockSupport.h>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 using namespace std;
 using namespace decaf;
@@ -30,6 +31,23 @@ using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
+
+    class LockSupportTest : public ExecutorsTestSupport {
+public:
+
+        LockSupportTest();
+
+        virtual ~LockSupportTest();
+
+        void testPark1();
+        void testPark2();
+        void testPark3();
+        void testPark4();
+        void testParkNanos();
+        void testParkUntil();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 LockSupportTest::LockSupportTest() {
@@ -313,3 +331,10 @@ void LockSupportTest::testParkUntil() {
         FAIL() << ("Caught an unexpected exception");
     }
 }
+
+TEST_F(LockSupportTest, testPark1) { testPark1(); }
+TEST_F(LockSupportTest, testPark2) { testPark2(); }
+TEST_F(LockSupportTest, testPark3) { testPark3(); }
+TEST_F(LockSupportTest, testPark4) { testPark4(); }
+TEST_F(LockSupportTest, testParkNanos) { testParkNanos(); }
+TEST_F(LockSupportTest, testParkUntil) { testParkUntil(); }

@@ -15,18 +15,135 @@
  * limitations under the License.
  */
 
-#include "LongArrayBufferTest.h"
+#include <gtest/gtest.h>
+#include <decaf/nio/LongBuffer.h>
 #include <decaf/lang/Long.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
 
+
+namespace decaf { namespace internal { namespace nio {} } }
 using namespace std;
 using namespace decaf;
 using namespace decaf::nio;
 using namespace decaf::internal::nio;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class LongArrayBufferTest : public ::testing::Test {
+decaf::nio::LongBuffer* testBuffer1;
+        long long* testData1;
+
+        static const int testData1Size;
+        static const int SMALL_TEST_LENGTH;
+        static const int BUFFER_LENGTH;
+
+    private:
+
+        LongArrayBufferTest(const LongArrayBufferTest&);
+        LongArrayBufferTest& operator= (const LongArrayBufferTest&);
+
+    public:
+
+        LongArrayBufferTest() : testBuffer1(), testData1() {}
+        virtual ~LongArrayBufferTest() {}
+
+        void SetUp() override {
+            testBuffer1 = decaf::nio::LongBuffer::allocate( testData1Size );
+
+            testData1 = new long long[testData1Size];
+            for( int i = 0; i < testData1Size; ++i ){
+                testData1[i] = (long long)i;
+            }
+        }
+
+        void TearDown() override {
+            delete testBuffer1;
+            delete [] testData1;
+        }
+
+        void test();
+        void testArray();
+        void testArrayOffset();
+        void testReadOnlyArray();
+        void testAsReadOnlyBuffer();
+        void testCompact();
+        void testCompareTo();
+        void testDuplicate();
+        void testEquals();
+        void testHasArray();
+        void testGet();
+        void testGet2();
+        void testGetLongArray();
+        void testGetLongArray2();
+        void testGetWithIndex();
+        void testPutLong();
+        void testPutLongArray();
+        void testPutLongArray2();
+        void testPutLongBuffer();
+        void testPutIndexed();
+        void testSlice();
+        void testToString();
+
+    protected:
+
+        void loadTestData1( long long* array, int offset, int length ) {
+            for( int i = 0; i < length; i++ ) {
+                array[offset + i] = (long long)i;
+            }
+        }
+
+        void loadTestData2( long long* array, int offset, int length ) {
+            for( int i = 0; i < length; i++ ) {
+                array[offset + i] = (long long)length - i;
+            }
+        }
+
+        void loadTestData1( decaf::nio::LongBuffer* buf ) {
+            buf->clear();
+            for( int i = 0; i < buf->capacity(); i++ ) {
+                buf->put( i, (long long)i );
+            }
+        }
+
+        void loadTestData2( decaf::nio::LongBuffer* buf ) {
+            buf->clear();
+            for( int i = 0; i < buf->capacity(); i++ ) {
+                buf->put(i, (long long) buf->capacity() - i);
+            }
+        }
+
+        void assertContentEquals( decaf::nio::LongBuffer* buf, long long* array,
+                                  int offset, int length) {
+
+            for( int i = 0; i < length; i++ ) {
+                ASSERT_TRUE(buf->get(i) == array[offset + i]);
+            }
+        }
+
+        void assertContentEquals( decaf::nio::LongBuffer* buf,
+                                  decaf::nio::LongBuffer* other ) {
+            ASSERT_TRUE(buf->capacity() == other->capacity());
+            for( int i = 0; i < buf->capacity(); i++ ) {
+                ASSERT_TRUE(buf->get(i) == other->get(i));
+            }
+        }
+
+        void assertContentLikeTestData1(
+            decaf::nio::LongBuffer* buf, int startIndex,
+            long long startValue, int length ) {
+
+            long long value = startValue;
+            for( int i = 0; i < length; i++ ) {
+                ASSERT_TRUE(buf->get( startIndex + i ) == value);
+                value = value + 1;
+            }
+        }
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int LongArrayBufferTest::testData1Size = 100;
@@ -534,3 +651,26 @@ void LongArrayBufferTest::testToString() {
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->limit() ) ) != string::npos);
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->capacity() ) ) != string::npos);
 }
+
+TEST_F(LongArrayBufferTest, test) { test(); }
+TEST_F(LongArrayBufferTest, testArray) { testArray(); }
+TEST_F(LongArrayBufferTest, testArrayOffset) { testArrayOffset(); }
+TEST_F(LongArrayBufferTest, testReadOnlyArray) { testReadOnlyArray(); }
+TEST_F(LongArrayBufferTest, testAsReadOnlyBuffer) { testAsReadOnlyBuffer(); }
+TEST_F(LongArrayBufferTest, testCompact) { testCompact(); }
+TEST_F(LongArrayBufferTest, testCompareTo) { testCompareTo(); }
+TEST_F(LongArrayBufferTest, testDuplicate) { testDuplicate(); }
+TEST_F(LongArrayBufferTest, testEquals) { testEquals(); }
+TEST_F(LongArrayBufferTest, testHasArray) { testHasArray(); }
+TEST_F(LongArrayBufferTest, testGet) { testGet(); }
+TEST_F(LongArrayBufferTest, testGet2) { testGet2(); }
+TEST_F(LongArrayBufferTest, testGetLongArray) { testGetLongArray(); }
+TEST_F(LongArrayBufferTest, testGetLongArray2) { testGetLongArray2(); }
+TEST_F(LongArrayBufferTest, testGetWithIndex) { testGetWithIndex(); }
+TEST_F(LongArrayBufferTest, testPutLong) { testPutLong(); }
+TEST_F(LongArrayBufferTest, testPutLongArray) { testPutLongArray(); }
+TEST_F(LongArrayBufferTest, testPutLongArray2) { testPutLongArray2(); }
+TEST_F(LongArrayBufferTest, testPutLongBuffer) { testPutLongBuffer(); }
+TEST_F(LongArrayBufferTest, testPutIndexed) { testPutIndexed(); }
+TEST_F(LongArrayBufferTest, testSlice) { testSlice(); }
+TEST_F(LongArrayBufferTest, testToString) { testToString(); }

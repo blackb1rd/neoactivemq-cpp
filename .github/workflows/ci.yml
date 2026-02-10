@@ -85,7 +85,7 @@ jobs:
 
   # Linux unit test jobs (run in parallel after build)
   linux-unit-test:
-    name: Linux Unit Test
+    name: Linux Unit Test (${{ matrix.config.preset }})
     runs-on: ubuntu-latest
     needs: linux-build-test
 
@@ -137,13 +137,15 @@ jobs:
       run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
 
     - name: Run unit tests
-      run: ctest --preset ${{ matrix.config.preset }} -R "^unit/" --output-on-failure --timeout 300
+      run: |
+        ctest --preset ${{ matrix.config.preset }} \
+          -R '^unit/' -j $(nproc) --output-on-failure --timeout 300
 
     - name: Upload test results
       if: failure()
       uses: actions/upload-artifact@v6
       with:
-        name: test-results-${{ matrix.config.preset }}-unit
+        name: test-results-${{ matrix.config.preset }}-unit-${{ strategy.job-index }}
         path: |
           output/build/${{ matrix.config.preset }}/Testing/Temporary/
           output/build/${{ matrix.config.preset }}/**/*.log
@@ -527,9 +529,9 @@ jobs:
           output/build/${{ matrix.config.preset }}/lib/
         retention-days: 1
 
-  # Windows unit test jobs (run in parallel after build, no integration tests - no Docker on Windows CI)
+  # Windows unit test jobs (run in parallel after build, no Docker on Windows CI)
   windows-unit-test:
-    name: Windows Unit Test
+    name: Windows Unit Test (${{ matrix.config.preset }})
     runs-on: windows-latest
     needs: windows-build-test
 
@@ -585,13 +587,14 @@ jobs:
         path: output/build/${{ matrix.config.preset }}/
 
     - name: Run unit tests
-      run: ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -R "^unit/" --output-on-failure --timeout 300
+      run: |
+        ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -R '^unit/' -j $env:NUMBER_OF_PROCESSORS --output-on-failure --timeout 300
 
     - name: Upload test results
       if: failure()
       uses: actions/upload-artifact@v6
       with:
-        name: test-results-${{ matrix.config.preset }}-unit
+        name: test-results-${{ matrix.config.preset }}-unit-${{ strategy.job-index }}
         path: |
           output/build/${{ matrix.config.preset }}/Testing/Temporary/
           output/build/${{ matrix.config.preset }}/**/*.log

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ArrayPointerTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/ArrayPointer.h>
 #include <decaf/lang/Thread.h>
@@ -31,6 +31,28 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util::concurrent;
+
+    class ArrayPointerTest : public ::testing::Test {
+public:
+
+        ArrayPointerTest() {}
+        virtual ~ArrayPointerTest() {}
+
+        void testBasics();
+        void testConstructor1();
+        void testConstructor2();
+        void testClone();
+        void testAssignment();
+        void testComparisons();
+        void testThreaded1();
+        void testThreaded2();
+        void testOperators();
+        void testSTLContainers();
+        void testReturnByValue();
+        void testThreadSafety();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -564,3 +586,16 @@ void ArrayPointerTest::testThreadSafety() {
         delete thread[i];
     }
 }
+
+TEST_F(ArrayPointerTest, testBasics) { testBasics(); }
+TEST_F(ArrayPointerTest, testConstructor1) { testConstructor1(); }
+TEST_F(ArrayPointerTest, testConstructor2) { testConstructor2(); }
+TEST_F(ArrayPointerTest, testClone) { testClone(); }
+TEST_F(ArrayPointerTest, testAssignment) { testAssignment(); }
+TEST_F(ArrayPointerTest, testComparisons) { testComparisons(); }
+TEST_F(ArrayPointerTest, testThreaded1) { testThreaded1(); }
+TEST_F(ArrayPointerTest, testThreaded2) { testThreaded2(); }
+TEST_F(ArrayPointerTest, testOperators) { testOperators(); }
+TEST_F(ArrayPointerTest, testSTLContainers) { testSTLContainers(); }
+TEST_F(ArrayPointerTest, testReturnByValue) { testReturnByValue(); }
+TEST_F(ArrayPointerTest, testThreadSafety) { testThreadSafety(); }

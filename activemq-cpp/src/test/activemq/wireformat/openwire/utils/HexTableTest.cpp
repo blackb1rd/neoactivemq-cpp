@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "HexTableTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/wireformat/openwire/utils/HexTable.h>
 
@@ -23,6 +23,17 @@ using namespace activemq;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using namespace activemq::wireformat::openwire::utils;
+
+    class HexTableTest : public ::testing::Test {
+public:
+
+        HexTableTest() {}
+        virtual ~HexTableTest() {}
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void HexTableTest::test(){
@@ -45,3 +56,5 @@ void HexTableTest::test(){
     }
     catch(...) {}
 }
+
+TEST_F(HexTableTest, test) { test(); }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "LRUCacheTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/LRUCache.h>
 #include <decaf/lang/System.h>
@@ -27,6 +27,19 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class LRUCacheTest : public ::testing::Test {
+public:
+
+        LRUCacheTest();
+        virtual ~LRUCacheTest();
+
+        void testConstructor();
+        void testExceptions();
+        void testChangeMaxCacheSize();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 LRUCacheTest::LRUCacheTest() {
@@ -85,3 +98,6 @@ void LRUCacheTest::testChangeMaxCacheSize() {
     ASSERT_EQ(2000, underTest.size()) << ("size is still in order");
 }
 
+TEST_F(LRUCacheTest, testConstructor) { testConstructor(); }
+TEST_F(LRUCacheTest, testExceptions) { testExceptions(); }
+TEST_F(LRUCacheTest, testChangeMaxCacheSize) { testChangeMaxCacheSize(); }

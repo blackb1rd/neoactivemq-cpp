@@ -15,12 +15,31 @@
  * limitations under the License.
  */
 
-#include "PrimitiveMapTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/util/PrimitiveValueNode.h>
+#include <activemq/util/PrimitiveMap.h>
 
 using namespace activemq;
 using namespace activemq::util;
+
+    class PrimitiveMapTest : public ::testing::Test
+    {
+public:
+
+    	PrimitiveMapTest(){};
+    	virtual ~PrimitiveMapTest(){};
+
+        void testValueNode();
+        void testSetGet();
+        void testRemove();
+        void testCount();
+        void testCopy();
+        void testClear();
+        void testContains();
+        void testGetKeys();
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void PrimitiveMapTest::testValueNode(){
@@ -287,3 +306,12 @@ void PrimitiveMapTest::testGetKeys(){
     ASSERT_TRUE(keys[1] == "int" || keys[1] == "float" || keys[1] == "int2");
     ASSERT_TRUE(keys[2] == "int" || keys[2] == "float" || keys[2] == "int2");
 }
+
+TEST_F(PrimitiveMapTest, testValueNode) { testValueNode(); }
+TEST_F(PrimitiveMapTest, testSetGet) { testSetGet(); }
+TEST_F(PrimitiveMapTest, testRemove) { testRemove(); }
+TEST_F(PrimitiveMapTest, testCount) { testCount(); }
+TEST_F(PrimitiveMapTest, testClear) { testClear(); }
+TEST_F(PrimitiveMapTest, testCopy) { testCopy(); }
+TEST_F(PrimitiveMapTest, testContains) { testContains(); }
+TEST_F(PrimitiveMapTest, testGetKeys) { testGetKeys(); }

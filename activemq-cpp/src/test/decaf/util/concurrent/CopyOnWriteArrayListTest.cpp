@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "CopyOnWriteArrayListTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/concurrent/CopyOnWriteArrayList.h>
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
@@ -29,6 +29,73 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class CopyOnWriteArrayListTest : public ::testing::Test {
+private:
+
+        static const int SIZE;
+
+    public:
+
+        CopyOnWriteArrayListTest();
+        virtual ~CopyOnWriteArrayListTest();
+
+        void testConstructor1();
+        void testConstructor2();
+        void testConstructor3();
+        void testAddAll();
+        void testAddAll1();
+        void testAddAll2();
+        void testAddAll3();
+        void testAddAll4();
+        void testAddAll5();
+        void testAddAll6();
+        void testAddAll7();
+        void testAddAll8();
+        void testAddAll9();
+        void testClear();
+        void testContains();
+        void testContainsAll();
+        void testGet();
+        void testSet();
+        void testSize();
+        void testIsEmpty();
+        void testToArray();
+        void testIndexOf1();
+        void testIndexOf2();
+        void testLastIndexOf1();
+        void testLastIndexOf2();
+        void testAddIndex();
+        void testAddAllIndex();
+        void testEquals();
+        void testRemove();
+        void testRemoveAt();
+        void testRemoveAll();
+        void testRetainAll();
+        void testAddIfAbsent1();
+        void testAddIfAbsent2();
+        void testAddAllAbsent();
+        void testIterator();
+        void testIteratorRemove();
+        void testListIterator1();
+        void testListIterator2();
+        void testAddAll1IndexOutOfBoundsException();
+        void testAddAll2IndexOutOfBoundsException();
+        void testListIterator1IndexOutOfBoundsException();
+        void testListIterator2IndexOutOfBoundsException();
+        void testAdd1IndexOutOfBoundsException();
+        void testAdd2IndexOutOfBoundsException();
+        void testRemoveAt1IndexOutOfBounds();
+        void testRemoveAt2IndexOutOfBounds();
+        void testGet1IndexOutOfBoundsException();
+        void testGet2IndexOutOfBoundsException();
+        void testSet1IndexOutOfBoundsException();
+        void testSet2IndexOutOfBoundsException();
+        void testConcurrentRandomAddRemoveAndIterate();
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int CopyOnWriteArrayListTest::SIZE = 256;
@@ -1007,3 +1074,56 @@ void CopyOnWriteArrayListTest::testConcurrentRandomAddRemoveAndIterate() {
     executor.shutdown();
     ASSERT_TRUE(executor.awaitTermination(45, TimeUnit::SECONDS)) << ("executor terminated");
 }
+
+TEST_F(CopyOnWriteArrayListTest, testConstructor1) { testConstructor1(); }
+TEST_F(CopyOnWriteArrayListTest, testConstructor2) { testConstructor2(); }
+TEST_F(CopyOnWriteArrayListTest, testConstructor3) { testConstructor3(); }
+TEST_F(CopyOnWriteArrayListTest, testAddAll) { testAddAll(); }
+TEST_F(CopyOnWriteArrayListTest, testAddAll1) { testAddAll1(); }
+TEST_F(CopyOnWriteArrayListTest, testAddAll2) { testAddAll2(); }
+TEST_F(CopyOnWriteArrayListTest, testAddAll3) { testAddAll3(); }
+TEST_F(CopyOnWriteArrayListTest, testAddAll4) { testAddAll4(); }
+TEST_F(CopyOnWriteArrayListTest, testAddAll5) { testAddAll5(); }
+TEST_F(CopyOnWriteArrayListTest, testAddAll6) { testAddAll6(); }
+TEST_F(CopyOnWriteArrayListTest, testAddAll7) { testAddAll7(); }
+TEST_F(CopyOnWriteArrayListTest, testAddAll8) { testAddAll8(); }
+TEST_F(CopyOnWriteArrayListTest, testAddAll9) { testAddAll9(); }
+TEST_F(CopyOnWriteArrayListTest, testClear) { testClear(); }
+TEST_F(CopyOnWriteArrayListTest, testContains) { testContains(); }
+TEST_F(CopyOnWriteArrayListTest, testContainsAll) { testContainsAll(); }
+TEST_F(CopyOnWriteArrayListTest, testGet) { testGet(); }
+TEST_F(CopyOnWriteArrayListTest, testSet) { testSet(); }
+TEST_F(CopyOnWriteArrayListTest, testSize) { testSize(); }
+TEST_F(CopyOnWriteArrayListTest, testIsEmpty) { testIsEmpty(); }
+TEST_F(CopyOnWriteArrayListTest, testToArray) { testToArray(); }
+TEST_F(CopyOnWriteArrayListTest, testIndexOf1) { testIndexOf1(); }
+TEST_F(CopyOnWriteArrayListTest, testIndexOf2) { testIndexOf2(); }
+TEST_F(CopyOnWriteArrayListTest, testLastIndexOf1) { testLastIndexOf1(); }
+TEST_F(CopyOnWriteArrayListTest, testLastIndexOf2) { testLastIndexOf2(); }
+TEST_F(CopyOnWriteArrayListTest, testAddIndex) { testAddIndex(); }
+TEST_F(CopyOnWriteArrayListTest, testAddAllIndex) { testAddAllIndex(); }
+TEST_F(CopyOnWriteArrayListTest, testEquals) { testEquals(); }
+TEST_F(CopyOnWriteArrayListTest, testRemove) { testRemove(); }
+TEST_F(CopyOnWriteArrayListTest, testRemoveAt) { testRemoveAt(); }
+TEST_F(CopyOnWriteArrayListTest, testRemoveAll) { testRemoveAll(); }
+TEST_F(CopyOnWriteArrayListTest, testRetainAll) { testRetainAll(); }
+TEST_F(CopyOnWriteArrayListTest, testAddIfAbsent1) { testAddIfAbsent1(); }
+TEST_F(CopyOnWriteArrayListTest, testAddIfAbsent2) { testAddIfAbsent2(); }
+TEST_F(CopyOnWriteArrayListTest, testAddAllAbsent) { testAddAllAbsent(); }
+TEST_F(CopyOnWriteArrayListTest, testIterator) { testIterator(); }
+TEST_F(CopyOnWriteArrayListTest, testIteratorRemove) { testIteratorRemove(); }
+TEST_F(CopyOnWriteArrayListTest, testListIterator1) { testListIterator1(); }
+TEST_F(CopyOnWriteArrayListTest, testListIterator2) { testListIterator2(); }
+TEST_F(CopyOnWriteArrayListTest, testAddAll1IndexOutOfBoundsException) { testAddAll1IndexOutOfBoundsException(); }
+TEST_F(CopyOnWriteArrayListTest, testAddAll2IndexOutOfBoundsException) { testAddAll2IndexOutOfBoundsException(); }
+TEST_F(CopyOnWriteArrayListTest, testListIterator1IndexOutOfBoundsException) { testListIterator1IndexOutOfBoundsException(); }
+TEST_F(CopyOnWriteArrayListTest, testListIterator2IndexOutOfBoundsException) { testListIterator2IndexOutOfBoundsException(); }
+TEST_F(CopyOnWriteArrayListTest, testAdd1IndexOutOfBoundsException) { testAdd1IndexOutOfBoundsException(); }
+TEST_F(CopyOnWriteArrayListTest, testAdd2IndexOutOfBoundsException) { testAdd2IndexOutOfBoundsException(); }
+TEST_F(CopyOnWriteArrayListTest, testRemoveAt1IndexOutOfBounds) { testRemoveAt1IndexOutOfBounds(); }
+TEST_F(CopyOnWriteArrayListTest, testRemoveAt2IndexOutOfBounds) { testRemoveAt2IndexOutOfBounds(); }
+TEST_F(CopyOnWriteArrayListTest, testGet1IndexOutOfBoundsException) { testGet1IndexOutOfBoundsException(); }
+TEST_F(CopyOnWriteArrayListTest, testGet2IndexOutOfBoundsException) { testGet2IndexOutOfBoundsException(); }
+TEST_F(CopyOnWriteArrayListTest, testSet1IndexOutOfBoundsException) { testSet1IndexOutOfBoundsException(); }
+TEST_F(CopyOnWriteArrayListTest, testSet2IndexOutOfBoundsException) { testSet2IndexOutOfBoundsException(); }
+TEST_F(CopyOnWriteArrayListTest, testConcurrentRandomAddRemoveAndIterate) { testConcurrentRandomAddRemoveAndIterate(); }

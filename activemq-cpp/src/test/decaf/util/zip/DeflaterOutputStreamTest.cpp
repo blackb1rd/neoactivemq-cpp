@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "DeflaterOutputStreamTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/zip/DeflaterOutputStream.h>
 #include <decaf/util/zip/InflaterInputStream.h>
@@ -41,6 +41,31 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
+
+    class DeflaterOutputStreamTest : public ::testing::Test {
+private:
+
+        std::vector<unsigned char> outputBuffer;
+
+    public:
+
+        DeflaterOutputStreamTest();
+        virtual ~DeflaterOutputStreamTest();
+
+        void SetUp() override;
+        void TearDown() override;
+
+        void testConstructorOutputStreamDeflater();
+        void testConstructorOutputStream();
+        void testConstructorOutputStreamDeflaterI();
+        void testClose();
+        void testFinish();
+        void testDeflate();
+        void testWriteI();
+        void testWriteBIII();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
     namespace {
@@ -292,3 +317,12 @@ void DeflaterOutputStreamTest::testDeflate() {
     ASSERT_TRUE(dos.getDaflateFlag());
     dos.close();
 }
+
+TEST_F(DeflaterOutputStreamTest, testConstructorOutputStreamDeflater) { testConstructorOutputStreamDeflater(); }
+TEST_F(DeflaterOutputStreamTest, testConstructorOutputStreamDeflaterI) { testConstructorOutputStreamDeflaterI(); }
+TEST_F(DeflaterOutputStreamTest, testConstructorOutputStream) { testConstructorOutputStream(); }
+TEST_F(DeflaterOutputStreamTest, testClose) { testClose(); }
+TEST_F(DeflaterOutputStreamTest, testFinish) { testFinish(); }
+TEST_F(DeflaterOutputStreamTest, testDeflate) { testDeflate(); }
+TEST_F(DeflaterOutputStreamTest, testWriteI) { testWriteI(); }
+TEST_F(DeflaterOutputStreamTest, testWriteBIII) { testWriteBIII(); }

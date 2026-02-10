@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AdvisorySupportTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/util/AdvisorySupport.h>
 #include <activemq/commands/ActiveMQDestination.h>
@@ -33,6 +33,59 @@ using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class AdvisorySupportTest : public ::testing::Test {
+    private:
+public:
+
+        AdvisorySupportTest();
+        virtual ~AdvisorySupportTest();
+
+        void testGetTempDestinationCompositeAdvisoryTopic();
+        void testGetAllDestinationsCompositeAdvisoryTopic();
+        void testGetAllDestinationAdvisoryTopics();
+        void testGetConnectionAdvisoryTopic();
+        void testGetQueueAdvisoryTopic();
+        void testGetTopicAdvisoryTopic();
+        void testGetTempQueueAdvisoryTopic();
+        void testGetTempTopicAdvisoryTopic();
+        void testGetConsumerAdvisoryTopic();
+        void testGetProducerAdvisoryTopic();
+        void testGetExpiredMessageTopic();
+        void testGetExpiredTopicMessageAdvisoryTopic();
+        void testGetExpiredQueueMessageAdvisoryTopic();
+        void testGetNoConsumersAdvisoryTopic();
+        void testGetNoTopicConsumersAdvisoryTopic();
+        void testGetNoQueueConsumersAdvisoryTopic();
+        void testGetSlowConsumerAdvisoryTopic();
+        void testGetFastProducerAdvisoryTopic();
+        void testGetMessageDiscardedAdvisoryTopic();
+        void testGetMessageDeliveredAdvisoryTopic();
+        void testGetMessageConsumedAdvisoryTopic();
+        void testGetMessageDLQdAdvisoryTopic();
+        void testGetMasterBrokerAdvisoryTopic();
+        void testGetNetworkBridgeAdvisoryTopic();
+        void testGetFullAdvisoryTopic();
+        void testGetDestinationAdvisoryTopic();
+
+        void testIsDestinationAdvisoryTopic();
+        void testIsTempDestinationAdvisoryTopic();
+        void testIsAdvisoryTopic();
+        void testIsConnectionAdvisoryTopic();
+        void testIsProducerAdvisoryTopic();
+        void testIsConsumerAdvisoryTopic();
+        void testIsSlowConsumerAdvisoryTopic();
+        void testIsFastProducerAdvisoryTopic();
+        void testIsMessageConsumedAdvisoryTopic();
+        void testIsMasterBrokerAdvisoryTopic();
+        void testIsMessageDeliveredAdvisoryTopic();
+        void testIsMessageDiscardedAdvisoryTopic();
+        void testIsMessageDLQdAdvisoryTopic();
+        void testIsFullAdvisoryTopic();
+        void testIsNetworkBridgeAdvisoryTopic();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 AdvisorySupportTest::AdvisorySupportTest() {
@@ -966,3 +1019,45 @@ void AdvisorySupportTest::testIsNetworkBridgeAdvisoryTopic() {
     ASSERT_THROW(AdvisorySupport::isNetworkBridgeAdvisoryTopic((ActiveMQDestination*)NULL), NullPointerException) << ("Should throw a NullPointerException when passed a NULL destination");
     ASSERT_THROW(AdvisorySupport::isNetworkBridgeAdvisoryTopic((cms::Destination*)NULL), NullPointerException) << ("Should throw a NullPointerException when passed a NULL destination");
 }
+
+TEST_F(AdvisorySupportTest, testGetTempDestinationCompositeAdvisoryTopic) { testGetTempDestinationCompositeAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetAllDestinationsCompositeAdvisoryTopic) { testGetAllDestinationsCompositeAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetAllDestinationAdvisoryTopics) { testGetAllDestinationAdvisoryTopics(); }
+TEST_F(AdvisorySupportTest, testGetConnectionAdvisoryTopic) { testGetConnectionAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetQueueAdvisoryTopic) { testGetQueueAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetTopicAdvisoryTopic) { testGetTopicAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetTempQueueAdvisoryTopic) { testGetTempQueueAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetTempTopicAdvisoryTopic) { testGetTempTopicAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetConsumerAdvisoryTopic) { testGetConsumerAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetProducerAdvisoryTopic) { testGetProducerAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetExpiredMessageTopic) { testGetExpiredMessageTopic(); }
+TEST_F(AdvisorySupportTest, testGetExpiredTopicMessageAdvisoryTopic) { testGetExpiredTopicMessageAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetExpiredQueueMessageAdvisoryTopic) { testGetExpiredQueueMessageAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetNoConsumersAdvisoryTopic) { testGetNoConsumersAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetNoTopicConsumersAdvisoryTopic) { testGetNoTopicConsumersAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetNoQueueConsumersAdvisoryTopic) { testGetNoQueueConsumersAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetSlowConsumerAdvisoryTopic) { testGetSlowConsumerAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetFastProducerAdvisoryTopic) { testGetFastProducerAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetMessageDiscardedAdvisoryTopic) { testGetMessageDiscardedAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetMessageDeliveredAdvisoryTopic) { testGetMessageDeliveredAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetMessageConsumedAdvisoryTopic) { testGetMessageConsumedAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetMessageDLQdAdvisoryTopic) { testGetMessageDLQdAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetMasterBrokerAdvisoryTopic) { testGetMasterBrokerAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetNetworkBridgeAdvisoryTopic) { testGetNetworkBridgeAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetFullAdvisoryTopic) { testGetFullAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testGetDestinationAdvisoryTopic) { testGetDestinationAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testIsDestinationAdvisoryTopic) { testIsDestinationAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testIsTempDestinationAdvisoryTopic) { testIsTempDestinationAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testIsAdvisoryTopic) { testIsAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testIsConnectionAdvisoryTopic) { testIsConnectionAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testIsProducerAdvisoryTopic) { testIsProducerAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testIsConsumerAdvisoryTopic) { testIsConsumerAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testIsSlowConsumerAdvisoryTopic) { testIsSlowConsumerAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testIsFastProducerAdvisoryTopic) { testIsFastProducerAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testIsMessageConsumedAdvisoryTopic) { testIsMessageConsumedAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testIsMasterBrokerAdvisoryTopic) { testIsMasterBrokerAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testIsMessageDeliveredAdvisoryTopic) { testIsMessageDeliveredAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testIsMessageDiscardedAdvisoryTopic) { testIsMessageDiscardedAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testIsMessageDLQdAdvisoryTopic) { testIsMessageDLQdAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testIsFullAdvisoryTopic) { testIsFullAdvisoryTopic(); }
+TEST_F(AdvisorySupportTest, testIsNetworkBridgeAdvisoryTopic) { testIsNetworkBridgeAdvisoryTopic(); }

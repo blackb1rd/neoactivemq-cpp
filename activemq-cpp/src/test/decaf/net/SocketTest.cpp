@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SocketTest.h"
+#include <gtest/gtest.h>
 
 #ifndef _WIN32
 #include <csignal>
@@ -38,6 +38,39 @@ using namespace decaf::net;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class SocketTest : public ::testing::Test {
+public:
+
+        virtual ~SocketTest() {}
+
+        void testConnectUnknownHost();
+        void testConstructor();
+        void testGetReuseAddress();
+        void testClose();
+        void testGetPort();
+        void testGetInputStream();
+        void testGetOutputStream();
+        void testGetKeepAlive();
+        void testGetLocalPort();
+        void testGetSoLinger();
+        void testGetSoTimeout();
+        void testGetTcpNoDelay();
+        void testIsConnected();
+        void testIsClosed();
+        void testIsInputShutdown();
+        void testIsOutputShutdown();
+        void testConnectPortOutOfRange();
+
+        // Old Tests
+        void testConnect();
+        void testTx();
+        void testTrx();
+        void testRxFail();
+        void testTrxNoDelay();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void SocketTest::testConnectUnknownHost() {
@@ -797,3 +830,25 @@ void SocketTest::testTrxNoDelay() {
         printf( "%s\n", ex.getMessage().c_str() );
     }
 }
+
+TEST_F(SocketTest, testConnectUnknownHost) { testConnectUnknownHost(); }
+TEST_F(SocketTest, testConstructor) { testConstructor(); }
+TEST_F(SocketTest, testGetReuseAddress) { testGetReuseAddress(); }
+TEST_F(SocketTest, testClose) { testClose(); }
+TEST_F(SocketTest, testGetPort) { testGetPort(); }
+TEST_F(SocketTest, testGetInputStream) { testGetInputStream(); }
+TEST_F(SocketTest, testGetOutputStream) { testGetOutputStream(); }
+TEST_F(SocketTest, testGetKeepAlive) { testGetKeepAlive(); }
+TEST_F(SocketTest, testGetLocalPort) { testGetLocalPort(); }
+TEST_F(SocketTest, testGetSoLinger) { testGetSoLinger(); }
+TEST_F(SocketTest, testGetSoTimeout) { testGetSoTimeout(); }
+TEST_F(SocketTest, testGetTcpNoDelay) { testGetTcpNoDelay(); }
+TEST_F(SocketTest, testIsConnected) { testIsConnected(); }
+TEST_F(SocketTest, testIsClosed) { testIsClosed(); }
+TEST_F(SocketTest, testIsInputShutdown) { testIsInputShutdown(); }
+TEST_F(SocketTest, testIsOutputShutdown) { testIsOutputShutdown(); }
+TEST_F(SocketTest, testConnectPortOutOfRange) { testConnectPortOutOfRange(); }
+TEST_F(SocketTest, testTx) { testTx(); }
+TEST_F(SocketTest, testTrx) { testTrx(); }
+TEST_F(SocketTest, testTrxNoDelay) { testTrxNoDelay(); }
+TEST_F(SocketTest, testRxFail) { testRxFail(); }

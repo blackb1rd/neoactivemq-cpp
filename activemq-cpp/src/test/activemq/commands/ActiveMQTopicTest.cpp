@@ -15,15 +15,27 @@
  * limitations under the License.
  */
 
-#include "ActiveMQTopicTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/UUID.h>
 #include <activemq/commands/ActiveMQTopic.h>
+#include <activemq/commands/ActiveMQDestination.h>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
+
+    class ActiveMQTopicTest : public ::testing::Test {
+public:
+
+        ActiveMQTopicTest() {}
+        virtual ~ActiveMQTopicTest() {}
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQTopicTest::test()
@@ -32,3 +44,5 @@ void ActiveMQTopicTest::test()
 
     ASSERT_TRUE(myQueue.getDestinationType() == cms::Destination::TOPIC);
 }
+
+TEST_F(ActiveMQTopicTest, test) { test(); }

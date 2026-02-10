@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-#include "ActiveMQDestinationTest2.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/UUID.h>
+#include <activemq/commands/ActiveMQDestination.h>
 
 using namespace std;
 using namespace decaf;
@@ -25,6 +26,18 @@ using namespace decaf::util;
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
+
+    class ActiveMQDestinationTest : public ::testing::Test {
+public:
+
+        ActiveMQDestinationTest() {}
+        virtual ~ActiveMQDestinationTest() {}
+
+        virtual void test();
+        virtual void testOptions();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -128,7 +141,7 @@ void ActiveMQDestinationTest::testOptions(){
 
     dest.setPhysicalName( "test?option1=test1&option2=test2" );
 
-    const util::ActiveMQProperties& properties = dest.getOptions();
+    const activemq::util::ActiveMQProperties& properties = dest.getOptions();
 
     ASSERT_TRUE(properties.hasProperty( "option1" ) == true);
     ASSERT_TRUE(properties.hasProperty( "option2" ) == true);
@@ -136,3 +149,6 @@ void ActiveMQDestinationTest::testOptions(){
     ASSERT_TRUE(std::string( properties.getProperty( "option1" ) ) == "test1");
     ASSERT_TRUE(std::string( properties.getProperty( "option2" ) ) == "test2");
 }
+
+TEST_F(ActiveMQDestinationTest, test) { test(); }
+TEST_F(ActiveMQDestinationTest, testOptions) { testOptions(); }

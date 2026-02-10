@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ConcurrentStlMapTest.h"
+#include <gtest/gtest.h>
 #include <string>
 #include <decaf/util/concurrent/ConcurrentStlMap.h>
 #include <decaf/util/HashMap.h>
@@ -31,6 +31,36 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class ConcurrentStlMapTest : public ::testing::Test
+    {
+public:
+
+        ConcurrentStlMapTest() {}
+        virtual ~ConcurrentStlMapTest() {}
+
+        void testConstructor();
+        void testConstructorMap();
+        void testContainsKey();
+        void testClear();
+        void testCopy();
+        void testSize();
+        void testValue();
+        void testGet();
+        void testPut();
+        void testPutAll();
+        void testRemove();
+        void testContiansValue();
+        void testIsEmpty();
+        void testEntrySet();
+        void testKeySet();
+        void testValues();
+        void testEntrySetIterator();
+        void testKeySetIterator();
+        void testValuesIterator();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -499,3 +529,23 @@ void ConcurrentStlMapTest::testValuesIterator() {
     ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
     ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 }
+
+TEST_F(ConcurrentStlMapTest, testConstructor) { testConstructor(); }
+TEST_F(ConcurrentStlMapTest, testConstructorMap) { testConstructorMap(); }
+TEST_F(ConcurrentStlMapTest, testContainsKey) { testContainsKey(); }
+TEST_F(ConcurrentStlMapTest, testClear) { testClear(); }
+TEST_F(ConcurrentStlMapTest, testCopy) { testCopy(); }
+TEST_F(ConcurrentStlMapTest, testSize) { testSize(); }
+TEST_F(ConcurrentStlMapTest, testValue) { testValue(); }
+TEST_F(ConcurrentStlMapTest, testGet) { testGet(); }
+TEST_F(ConcurrentStlMapTest, testPut) { testPut(); }
+TEST_F(ConcurrentStlMapTest, testPutAll) { testPutAll(); }
+TEST_F(ConcurrentStlMapTest, testRemove) { testRemove(); }
+TEST_F(ConcurrentStlMapTest, testContiansValue) { testContiansValue(); }
+TEST_F(ConcurrentStlMapTest, testIsEmpty) { testIsEmpty(); }
+TEST_F(ConcurrentStlMapTest, testEntrySet) { testEntrySet(); }
+TEST_F(ConcurrentStlMapTest, testKeySet) { testKeySet(); }
+TEST_F(ConcurrentStlMapTest, testValues) { testValues(); }
+TEST_F(ConcurrentStlMapTest, testEntrySetIterator) { testEntrySetIterator(); }
+TEST_F(ConcurrentStlMapTest, testKeySetIterator) { testKeySetIterator(); }
+TEST_F(ConcurrentStlMapTest, testValuesIterator) { testValuesIterator(); }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "TimeUnitTest.h"
+#include <gtest/gtest.h>
 
 #include <string>
 #include <decaf/util/concurrent/TimeUnit.h>
@@ -27,6 +27,31 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
+
+    class TimeUnitTest : public ::testing::Test {
+public:
+
+        TimeUnitTest() {}
+        virtual ~TimeUnitTest() {}
+
+        void testConvert1();
+        void testConvert2();
+        void testToNanos();
+        void testToMicros();
+        void testToMillis();
+        void testToSeconds();
+        void testToMinutes();
+        void testToHours();
+        void testToDays();
+        void testConvertSaturate();
+        void testToNanosSaturate();
+        void testToString();
+        void testTimedWait();
+        void testSleep();
+        void testValueOf();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void TimeUnitTest::testConvert1() {
@@ -211,3 +236,19 @@ void TimeUnitTest::testValueOf() {
 
     ASSERT_THROW(TimeUnit::valueOf( "FOO" ), decaf::lang::exceptions::IllegalArgumentException) << ("Should Throw an IllegalArgumentException");
 }
+
+TEST_F(TimeUnitTest, testConvert1) { testConvert1(); }
+TEST_F(TimeUnitTest, testConvert2) { testConvert2(); }
+TEST_F(TimeUnitTest, testToNanos) { testToNanos(); }
+TEST_F(TimeUnitTest, testToMicros) { testToMicros(); }
+TEST_F(TimeUnitTest, testToMillis) { testToMillis(); }
+TEST_F(TimeUnitTest, testToSeconds) { testToSeconds(); }
+TEST_F(TimeUnitTest, testConvertSaturate) { testConvertSaturate(); }
+TEST_F(TimeUnitTest, testToNanosSaturate) { testToNanosSaturate(); }
+TEST_F(TimeUnitTest, testToString) { testToString(); }
+TEST_F(TimeUnitTest, testTimedWait) { testTimedWait(); }
+TEST_F(TimeUnitTest, testSleep) { testSleep(); }
+TEST_F(TimeUnitTest, testToMinutes) { testToMinutes(); }
+TEST_F(TimeUnitTest, testToHours) { testToHours(); }
+TEST_F(TimeUnitTest, testToDays) { testToDays(); }
+TEST_F(TimeUnitTest, testValueOf) { testValueOf(); }

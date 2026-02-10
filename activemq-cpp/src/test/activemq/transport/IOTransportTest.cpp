@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "IOTransportTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/IOTransport.h>
 #include <activemq/transport/TransportListener.h>
@@ -32,12 +32,28 @@
 #include <decaf/lang/Thread.h>
 #include <decaf/lang/Exception.h>
 #include <decaf/util/Random.h>
+#include <activemq/util/Config.h>
 
 using namespace activemq;
 using namespace activemq::transport;
 using namespace activemq::exceptions;
 using namespace decaf::io;
 using namespace decaf::lang::exceptions;
+
+    class IOTransportTest : public ::testing::Test {
+public:
+
+        virtual ~IOTransportTest(){}
+
+        void testException();
+        void testWrite();
+        void testRead();
+        void testStartClose();
+        void testStressTransportStartClose();
+        void testNarrow();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 class MyCommand : public commands::BaseCommand {
@@ -393,3 +409,10 @@ void IOTransportTest::testNarrow(){
     ASSERT_TRUE(narrowed == &transport);
 
 }
+
+TEST_F(IOTransportTest, testStartClose) { testStartClose(); }
+TEST_F(IOTransportTest, testStressTransportStartClose) { testStressTransportStartClose(); }
+TEST_F(IOTransportTest, testRead) { testRead(); }
+TEST_F(IOTransportTest, testWrite) { testWrite(); }
+TEST_F(IOTransportTest, testException) { testException(); }
+TEST_F(IOTransportTest, testNarrow) { testNarrow(); }

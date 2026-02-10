@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AbstractDiscoveryAgentTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/discovery/DiscoveryListener.h>
 #include <activemq/transport/discovery/AbstractDiscoveryAgent.h>
@@ -34,6 +34,17 @@ using namespace decaf::util::concurrent;
 using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class AbstractDiscoveryAgentTest : public ::testing::Test {
+public:
+
+        AbstractDiscoveryAgentTest();
+        virtual ~AbstractDiscoveryAgentTest();
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {

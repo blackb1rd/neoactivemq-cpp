@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "PointerTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Pointer.h>
 #include <decaf/lang/Thread.h>
@@ -32,6 +32,26 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util::concurrent;
+
+    class PointerTest : public ::testing::Test {
+public:
+
+        PointerTest() {}
+        virtual ~PointerTest() {}
+
+        void testBasics();
+        void testAssignment();
+        void testComparisons();
+        void testThreaded1();
+        void testThreaded2();
+        void testOperators();
+        void testSTLContainers();
+        void testReturnByValue();
+        void testDynamicCast();
+        void testThreadSafety();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 class TestClassBase {
@@ -534,3 +554,14 @@ void PointerTest::testThreadSafety() {
         thread[i]->join();
     }
 }
+
+TEST_F(PointerTest, testBasics) { testBasics(); }
+TEST_F(PointerTest, testAssignment) { testAssignment(); }
+TEST_F(PointerTest, testComparisons) { testComparisons(); }
+TEST_F(PointerTest, testThreaded1) { testThreaded1(); }
+TEST_F(PointerTest, testThreaded2) { testThreaded2(); }
+TEST_F(PointerTest, testOperators) { testOperators(); }
+TEST_F(PointerTest, testSTLContainers) { testSTLContainers(); }
+TEST_F(PointerTest, testReturnByValue) { testReturnByValue(); }
+TEST_F(PointerTest, testDynamicCast) { testDynamicCast(); }
+TEST_F(PointerTest, testThreadSafety) { testThreadSafety(); }

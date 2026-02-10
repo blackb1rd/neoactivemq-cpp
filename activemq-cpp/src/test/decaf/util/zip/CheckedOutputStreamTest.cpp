@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "CheckedOutputStreamTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/zip/CheckedOutputStream.h>
 #include <decaf/util/zip/Adler32.h>
@@ -29,6 +29,20 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
+
+    class CheckedOutputStreamTest : public ::testing::Test {
+public:
+
+        CheckedOutputStreamTest();
+        virtual ~CheckedOutputStreamTest();
+
+        void testConstructor();
+        void testGetChecksum();
+        void testWriteI();
+        void testWriteBIII();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 CheckedOutputStreamTest::CheckedOutputStreamTest() {
@@ -100,3 +114,8 @@ void CheckedOutputStreamTest::testWriteBIII() {
 
     ASSERT_THROW(chkOut.write( byteArray, SIZE, 4, 6 ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 }
+
+TEST_F(CheckedOutputStreamTest, testConstructor) { testConstructor(); }
+TEST_F(CheckedOutputStreamTest, testGetChecksum) { testGetChecksum(); }
+TEST_F(CheckedOutputStreamTest, testWriteI) { testWriteI(); }
+TEST_F(CheckedOutputStreamTest, testWriteBIII) { testWriteBIII(); }

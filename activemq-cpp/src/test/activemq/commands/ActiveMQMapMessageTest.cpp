@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ActiveMQMapMessageTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/commands/ActiveMQMapMessage.h>
 
@@ -26,6 +26,37 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
+
+    class ActiveMQMapMessageTest : public ::testing::Test {
+private:
+
+        std::string name;
+
+    public:
+
+        ActiveMQMapMessageTest() : name("test-name") {}
+        virtual ~ActiveMQMapMessageTest() {}
+
+        void test();
+        void testBytesConversion();
+        void testGetBoolean();
+        void testGetByte();
+        void testGetShort();
+        void testGetChar();
+        void testGetInt();
+        void testGetLong();
+        void testGetFloat();
+        void testGetDouble();
+        void testGetString();
+        void testGetBytes();
+        void testGetMapNames();
+        void testItemExists();
+        void testClearBody();
+        void testReadOnlyBody();
+        void testWriteOnlyBody();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQMapMessageTest::test() {
@@ -475,3 +506,21 @@ void ActiveMQMapMessageTest::testWriteOnlyBody() {
     msg.getShort( "short" );
     msg.getString( "string" );
 }
+
+TEST_F(ActiveMQMapMessageTest, test) { test(); }
+TEST_F(ActiveMQMapMessageTest, testBytesConversion) { testBytesConversion(); }
+TEST_F(ActiveMQMapMessageTest, testGetBoolean) { testGetBoolean(); }
+TEST_F(ActiveMQMapMessageTest, testGetByte) { testGetByte(); }
+TEST_F(ActiveMQMapMessageTest, testGetShort) { testGetShort(); }
+TEST_F(ActiveMQMapMessageTest, testGetChar) { testGetChar(); }
+TEST_F(ActiveMQMapMessageTest, testGetInt) { testGetInt(); }
+TEST_F(ActiveMQMapMessageTest, testGetLong) { testGetLong(); }
+TEST_F(ActiveMQMapMessageTest, testGetFloat) { testGetFloat(); }
+TEST_F(ActiveMQMapMessageTest, testGetDouble) { testGetDouble(); }
+TEST_F(ActiveMQMapMessageTest, testGetString) { testGetString(); }
+TEST_F(ActiveMQMapMessageTest, testGetBytes) { testGetBytes(); }
+TEST_F(ActiveMQMapMessageTest, testGetMapNames) { testGetMapNames(); }
+TEST_F(ActiveMQMapMessageTest, testItemExists) { testItemExists(); }
+TEST_F(ActiveMQMapMessageTest, testClearBody) { testClearBody(); }
+TEST_F(ActiveMQMapMessageTest, testReadOnlyBody) { testReadOnlyBody(); }
+TEST_F(ActiveMQMapMessageTest, testWriteOnlyBody) { testWriteOnlyBody(); }

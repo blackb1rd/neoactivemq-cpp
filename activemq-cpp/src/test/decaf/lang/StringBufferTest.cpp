@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "StringBufferTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/String.h>
 #include <decaf/lang/StringBuffer.h>
@@ -37,6 +37,65 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class StringBufferTest : public ::testing::Test {
+    private:
+public:
+
+        StringBufferTest();
+        virtual ~StringBufferTest();
+
+        void testDefaultConstructor();
+        void testConstructorInt();
+        void testConstructorString();
+        void testAppendBoolean();
+        void testAppendChar();
+        void testAppendCharArray();
+        void testAppendCharArrayIntInt();
+        void testAppendCharSequence();
+        void testAppendCharSequenceIntInt();
+        void testAppendShort();
+        void testAppendInt();
+        void testAppendLong();
+        void testAppendDouble();
+        void testAppendFloat();
+        void testAppendString();
+        void testAppendStringBuilder();
+        void testAppendRawPointer();
+        void testAppendPointer();
+        void testCapacity();
+        void testCharAt();
+        void testDeleteRange();
+        void testDeleteCharAt();
+        void testEnsureCapacity();
+        void testGetChars();
+        void testIndexOfString();
+        void testIndexOfStringInt();
+        void testLastIndexOfString();
+        void testLastIndexOfStringInt();
+        void testReverse();
+        void testSubSequence();
+        void testSubstringInt();
+        void testSubstringIntInt();
+        void testInsertChar();
+        void testInsertBoolean();
+        void testInsertCharArray();
+        void testInsertCharArrayWithOffset();
+        void testInsertString();
+        void testInsertStdString();
+        void testInsertCharSequence();
+        void testInsertCharSequenceIntInt();
+        void testInsertShort();
+        void testInsertInt();
+        void testInsertLong();
+        void testInsertFloat();
+        void testInsertDouble();
+        void testInsertPointer();
+        void testInsertRawPointer();
+        void testReplace();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 StringBufferTest::StringBufferTest() {
@@ -1202,3 +1261,52 @@ void StringBufferTest::testReplace() {
     buffer.replace(2, 6, "XXX");
     ASSERT_EQ(String("12XXX7"), buffer.toString());
 }
+
+TEST_F(StringBufferTest, testDefaultConstructor) { testDefaultConstructor(); }
+TEST_F(StringBufferTest, testConstructorInt) { testConstructorInt(); }
+TEST_F(StringBufferTest, testConstructorString) { testConstructorString(); }
+TEST_F(StringBufferTest, testAppendBoolean) { testAppendBoolean(); }
+TEST_F(StringBufferTest, testAppendChar) { testAppendChar(); }
+TEST_F(StringBufferTest, testAppendCharArray) { testAppendCharArray(); }
+TEST_F(StringBufferTest, testAppendCharArrayIntInt) { testAppendCharArrayIntInt(); }
+TEST_F(StringBufferTest, testAppendCharSequence) { testAppendCharSequence(); }
+TEST_F(StringBufferTest, testAppendCharSequenceIntInt) { testAppendCharSequenceIntInt(); }
+TEST_F(StringBufferTest, testAppendShort) { testAppendShort(); }
+TEST_F(StringBufferTest, testAppendInt) { testAppendInt(); }
+TEST_F(StringBufferTest, testAppendLong) { testAppendLong(); }
+TEST_F(StringBufferTest, testAppendDouble) { testAppendDouble(); }
+TEST_F(StringBufferTest, testAppendFloat) { testAppendFloat(); }
+TEST_F(StringBufferTest, testAppendString) { testAppendString(); }
+TEST_F(StringBufferTest, testAppendStringBuilder) { testAppendStringBuilder(); }
+TEST_F(StringBufferTest, testAppendRawPointer) { testAppendRawPointer(); }
+TEST_F(StringBufferTest, testAppendPointer) { testAppendPointer(); }
+TEST_F(StringBufferTest, testCapacity) { testCapacity(); }
+TEST_F(StringBufferTest, testCharAt) { testCharAt(); }
+TEST_F(StringBufferTest, testDeleteRange) { testDeleteRange(); }
+TEST_F(StringBufferTest, testDeleteCharAt) { testDeleteCharAt(); }
+TEST_F(StringBufferTest, testEnsureCapacity) { testEnsureCapacity(); }
+TEST_F(StringBufferTest, testGetChars) { testGetChars(); }
+TEST_F(StringBufferTest, testIndexOfString) { testIndexOfString(); }
+TEST_F(StringBufferTest, testIndexOfStringInt) { testIndexOfStringInt(); }
+TEST_F(StringBufferTest, testLastIndexOfString) { testLastIndexOfString(); }
+TEST_F(StringBufferTest, testLastIndexOfStringInt) { testLastIndexOfStringInt(); }
+TEST_F(StringBufferTest, testReverse) { testReverse(); }
+TEST_F(StringBufferTest, testSubSequence) { testSubSequence(); }
+TEST_F(StringBufferTest, testSubstringInt) { testSubstringInt(); }
+TEST_F(StringBufferTest, testSubstringIntInt) { testSubstringIntInt(); }
+TEST_F(StringBufferTest, testInsertChar) { testInsertChar(); }
+TEST_F(StringBufferTest, testInsertBoolean) { testInsertBoolean(); }
+TEST_F(StringBufferTest, testInsertCharArray) { testInsertCharArray(); }
+TEST_F(StringBufferTest, testInsertCharArrayWithOffset) { testInsertCharArrayWithOffset(); }
+TEST_F(StringBufferTest, testInsertString) { testInsertString(); }
+TEST_F(StringBufferTest, testInsertStdString) { testInsertStdString(); }
+TEST_F(StringBufferTest, testInsertCharSequence) { testInsertCharSequence(); }
+TEST_F(StringBufferTest, testInsertCharSequenceIntInt) { testInsertCharSequenceIntInt(); }
+TEST_F(StringBufferTest, testInsertShort) { testInsertShort(); }
+TEST_F(StringBufferTest, testInsertInt) { testInsertInt(); }
+TEST_F(StringBufferTest, testInsertLong) { testInsertLong(); }
+TEST_F(StringBufferTest, testInsertFloat) { testInsertFloat(); }
+TEST_F(StringBufferTest, testInsertDouble) { testInsertDouble(); }
+TEST_F(StringBufferTest, testInsertPointer) { testInsertPointer(); }
+TEST_F(StringBufferTest, testInsertRawPointer) { testInsertRawPointer(); }
+TEST_F(StringBufferTest, testReplace) { testReplace(); }

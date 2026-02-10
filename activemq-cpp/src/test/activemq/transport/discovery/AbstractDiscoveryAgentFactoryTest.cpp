@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AbstractDiscoveryAgentFactoryTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/discovery/AbstractDiscoveryAgent.h>
 #include <activemq/transport/discovery/AbstractDiscoveryAgentFactory.h>
@@ -31,6 +31,17 @@ using namespace decaf::util;
 using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class AbstractDiscoveryAgentFactoryTest : public ::testing::Test {
+public:
+
+        AbstractDiscoveryAgentFactoryTest();
+        virtual ~AbstractDiscoveryAgentFactoryTest();
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {

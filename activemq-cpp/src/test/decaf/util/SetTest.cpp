@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SetTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/StlSet.h>
 #include <decaf/util/LinkedList.h>
@@ -24,6 +24,30 @@
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
+
+    class SetTest : public ::testing::Test
+    {
+public:
+
+        SetTest();
+        virtual ~SetTest() {}
+
+        void testConstructor1();
+        void testConstructor2();
+        void testConstructor3();
+        void testContains();
+        void testClear();
+        void testCopy1();
+        void testCopy2();
+        void testSize();
+        void testAdd();
+        void testRemove();
+        void testIsEmpty();
+        void testToArray();
+        void testIterator();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 SetTest::SetTest(){
@@ -252,3 +276,17 @@ void SetTest::testIterator(){
     delete iterator1;
     delete iterator2;
 }
+
+TEST_F(SetTest, testConstructor1) { testConstructor1(); }
+TEST_F(SetTest, testConstructor2) { testConstructor2(); }
+TEST_F(SetTest, testConstructor3) { testConstructor3(); }
+TEST_F(SetTest, testContains) { testContains(); }
+TEST_F(SetTest, testClear) { testClear(); }
+TEST_F(SetTest, testCopy1) { testCopy1(); }
+TEST_F(SetTest, testCopy2) { testCopy2(); }
+TEST_F(SetTest, testSize) { testSize(); }
+TEST_F(SetTest, testAdd) { testAdd(); }
+TEST_F(SetTest, testRemove) { testRemove(); }
+TEST_F(SetTest, testIsEmpty) { testIsEmpty(); }
+TEST_F(SetTest, testToArray) { testToArray(); }
+TEST_F(SetTest, testIterator) { testIterator(); }

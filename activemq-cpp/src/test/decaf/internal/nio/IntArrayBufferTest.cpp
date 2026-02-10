@@ -15,17 +15,134 @@
  * limitations under the License.
  */
 
-#include "IntArrayBufferTest.h"
+#include <gtest/gtest.h>
+#include <decaf/nio/IntBuffer.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
 
+
+namespace decaf { namespace internal { namespace nio {} } }
 using namespace std;
 using namespace decaf;
 using namespace decaf::nio;
 using namespace decaf::internal::nio;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class IntArrayBufferTest : public ::testing::Test {
+decaf::nio::IntBuffer* testBuffer1;
+        int* testData1;
+
+        static const int testData1Size;
+        static const int SMALL_TEST_LENGTH;
+        static const int BUFFER_LENGTH;
+
+    private:
+
+        IntArrayBufferTest(const IntArrayBufferTest&);
+        IntArrayBufferTest& operator= (const IntArrayBufferTest&);
+
+    public:
+
+        IntArrayBufferTest() : testBuffer1(), testData1() {}
+        virtual ~IntArrayBufferTest() {}
+
+        void SetUp() override {
+            testBuffer1 = decaf::nio::IntBuffer::allocate( testData1Size );
+
+            testData1 = new int[testData1Size];
+            for( int i = 0; i < testData1Size; ++i ){
+                testData1[i] = (int)i;
+            }
+        }
+
+        void TearDown() override {
+            delete testBuffer1;
+            delete [] testData1;
+        }
+
+        void test();
+        void testArray();
+        void testArrayOffset();
+        void testReadOnlyArray();
+        void testAsReadOnlyBuffer();
+        void testCompact();
+        void testCompareTo();
+        void testDuplicate();
+        void testEquals();
+        void testHasArray();
+        void testGet();
+        void testGet2();
+        void testGetIntArray();
+        void testGetIntArray2();
+        void testGetWithIndex();
+        void testPutInt();
+        void testPutIntArray();
+        void testPutIntArray2();
+        void testPutIntBuffer();
+        void testPutIndexed();
+        void testSlice();
+        void testToString();
+
+    protected:
+
+        void loadTestData1( int* array, int offset, int length ) {
+            for( int i = 0; i < length; i++ ) {
+                array[offset + i] = (int)i;
+            }
+        }
+
+        void loadTestData2( int* array, int offset, int length ) {
+            for( int i = 0; i < length; i++ ) {
+                array[offset + i] = (int)(length - i);
+            }
+        }
+
+        void loadTestData1( decaf::nio::IntBuffer* buf ) {
+            buf->clear();
+            for( int i = 0; i < buf->capacity(); i++ ) {
+                buf->put( i, (int)i );
+            }
+        }
+
+        void loadTestData2( decaf::nio::IntBuffer* buf ) {
+            buf->clear();
+            for( int i = 0; i < buf->capacity(); i++ ) {
+                buf->put(i, (int)( buf->capacity() - i) );
+            }
+        }
+
+        void assertContentEquals( decaf::nio::IntBuffer* buf, int* array,
+                                  int offset, int length) {
+
+            for( int i = 0; i < length; i++ ) {
+                ASSERT_TRUE(buf->get(i) == array[offset + i]);
+            }
+        }
+
+        void assertContentEquals( decaf::nio::IntBuffer* buf,
+                                  decaf::nio::IntBuffer* other ) {
+            ASSERT_TRUE(buf->capacity() == other->capacity());
+            for( int i = 0; i < buf->capacity(); i++ ) {
+                ASSERT_TRUE(buf->get(i) == other->get(i));
+            }
+        }
+
+        void assertContentLikeTestData1(
+            decaf::nio::IntBuffer* buf, int startIndex,
+            int startValue, int length ) {
+
+            int value = startValue;
+            for( int i = 0; i < length; i++ ) {
+                ASSERT_TRUE(buf->get( startIndex + i ) == value);
+                value = value + 1;
+            }
+        }
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int IntArrayBufferTest::testData1Size = 100;
@@ -533,3 +650,26 @@ void IntArrayBufferTest::testToString() {
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->limit() ) ) != string::npos);
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->capacity() ) ) != string::npos);
 }
+
+TEST_F(IntArrayBufferTest, test) { test(); }
+TEST_F(IntArrayBufferTest, testArray) { testArray(); }
+TEST_F(IntArrayBufferTest, testArrayOffset) { testArrayOffset(); }
+TEST_F(IntArrayBufferTest, testReadOnlyArray) { testReadOnlyArray(); }
+TEST_F(IntArrayBufferTest, testAsReadOnlyBuffer) { testAsReadOnlyBuffer(); }
+TEST_F(IntArrayBufferTest, testCompact) { testCompact(); }
+TEST_F(IntArrayBufferTest, testCompareTo) { testCompareTo(); }
+TEST_F(IntArrayBufferTest, testDuplicate) { testDuplicate(); }
+TEST_F(IntArrayBufferTest, testEquals) { testEquals(); }
+TEST_F(IntArrayBufferTest, testHasArray) { testHasArray(); }
+TEST_F(IntArrayBufferTest, testGet) { testGet(); }
+TEST_F(IntArrayBufferTest, testGet2) { testGet2(); }
+TEST_F(IntArrayBufferTest, testGetIntArray) { testGetIntArray(); }
+TEST_F(IntArrayBufferTest, testGetIntArray2) { testGetIntArray2(); }
+TEST_F(IntArrayBufferTest, testGetWithIndex) { testGetWithIndex(); }
+TEST_F(IntArrayBufferTest, testPutInt) { testPutInt(); }
+TEST_F(IntArrayBufferTest, testPutIntArray) { testPutIntArray(); }
+TEST_F(IntArrayBufferTest, testPutIntArray2) { testPutIntArray2(); }
+TEST_F(IntArrayBufferTest, testPutIntBuffer) { testPutIntBuffer(); }
+TEST_F(IntArrayBufferTest, testPutIndexed) { testPutIndexed(); }
+TEST_F(IntArrayBufferTest, testSlice) { testSlice(); }
+TEST_F(IntArrayBufferTest, testToString) { testToString(); }

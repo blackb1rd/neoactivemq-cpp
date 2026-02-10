@@ -15,12 +15,32 @@
  * limitations under the License.
  */
 
-#include "ExceptionTest.h"
+#include <gtest/gtest.h>
 #include <stdexcept>
+#include <decaf/lang/Exception.h>
+#include <string.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
+
+    class ExceptionTest : public ::testing::Test {
+public:
+
+        virtual ~ExceptionTest(){}
+
+        void SetUp() override{}
+        void TearDown() override{}
+
+        void testCtors();
+        void testAssign();
+        void testClone();
+        void testInitCause();
+        void testMessage0();
+        void testMessage3();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void ExceptionTest::testCtors() {
@@ -128,3 +148,10 @@ void ExceptionTest::testMessage3(){
     ASSERT_TRUE(strcmp( ex.getMessage().c_str(),
                     "This is a test 1 100 1000" ) == 0);
 }
+
+TEST_F(ExceptionTest, testMessage0) { testMessage0(); }
+TEST_F(ExceptionTest, testMessage3) { testMessage3(); }
+TEST_F(ExceptionTest, testClone) { testClone(); }
+TEST_F(ExceptionTest, testInitCause) { testInitCause(); }
+TEST_F(ExceptionTest, testCtors) { testCtors(); }
+TEST_F(ExceptionTest, testAssign) { testAssign(); }

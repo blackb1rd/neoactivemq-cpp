@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "OpenSSLSocketTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/net/ssl/SSLSocketFactory.h>
 #include <decaf/net/ssl/SSLSocket.h>
@@ -24,12 +24,49 @@
 #include <decaf/io/IOException.h>
 #include <decaf/lang/Thread.h>
 
+
+namespace decaf { namespace internal { namespace net { namespace ssl { namespace openssl {} } } } }
 using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::net::ssl;
 using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::internal::net::ssl::openssl;
+
+    class OpenSSLSocketTest : public ::testing::Test {
+public:
+
+        OpenSSLSocketTest();
+        virtual ~OpenSSLSocketTest();
+
+        void SetUp() override;
+        void TearDown() override;
+
+        /**
+         * Tests that SSL handshake is performed immediately after connect()
+         * This verifies the fix for the timeout issue where handshake was
+         * deferred until first read/write operation.
+         */
+        void testHandshakeCalledAfterConnect();
+
+        /**
+         * Tests that calling startHandshake multiple times is safe and idempotent.
+         */
+        void testHandshakeIdempotency();
+
+        /**
+         * Tests connection failure scenarios with invalid hosts.
+         */
+        void testConnectWithInvalidHost();
+
+        /**
+         * Tests that server name (SNI) is properly configured.
+         */
+        void testServerNameConfiguration();
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 OpenSSLSocketTest::OpenSSLSocketTest() {
@@ -171,3 +208,8 @@ void OpenSSLSocketTest::testServerNameConfiguration() {
         FAIL() << (std::string("Unexpected exception: ") + ex.getMessage());
     }
 }
+
+TEST_F(OpenSSLSocketTest, testHandshakeCalledAfterConnect) { testHandshakeCalledAfterConnect(); }
+TEST_F(OpenSSLSocketTest, testHandshakeIdempotency) { testHandshakeIdempotency(); }
+TEST_F(OpenSSLSocketTest, testConnectWithInvalidHost) { testConnectWithInvalidHost(); }
+TEST_F(OpenSSLSocketTest, testServerNameConfiguration) { testServerNameConfiguration(); }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SingleBrokerReconnectTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/tcp/TcpTransportFactory.h>
 #include <activemq/transport/tcp/TcpTransport.h>
@@ -33,6 +33,7 @@
 
 #include <random>
 #include <chrono>
+#include <activemq/util/Config.h>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -46,6 +47,43 @@ using namespace activemq::commands;
 using namespace activemq::mock;
 using namespace activemq::transport;
 using namespace activemq::transport::tcp;
+
+    /**
+     * Tests single broker connection without failover wrapper.
+     * This tests the C# behavior where:
+     * - tcp:// connection has NO auto-reconnect (IsFaultTolerant=false)
+     * - On failure, connection dies permanently
+     * - App must handle reconnection by creating new transport
+     */
+    class SingleBrokerReconnectTest : public ::testing::Test {
+public:
+
+        SingleBrokerReconnectTest();
+        virtual ~SingleBrokerReconnectTest();
+
+        void SetUp() override;
+        void TearDown() override;
+
+        /**
+         * Test that single broker tcp:// connection does NOT auto-reconnect.
+         * When broker goes down, transport fails and stays failed.
+         */
+        void testSingleBrokerNoAutoReconnect();
+
+        /**
+         * Test app-level reconnection: create new transport after broker restarts.
+         * This is the expected usage pattern for non-failover connections.
+         */
+        void testAppLevelReconnectAfterBrokerRestart();
+
+        /**
+         * Fuzzy test with random broker up/down cycles.
+         * Tests app-level reconnection under stress conditions.
+         */
+        void testFuzzyBrokerUpDown();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -322,3 +360,7 @@ void SingleBrokerReconnectTest::testFuzzyBrokerUpDown() {
     // At least some app-level reconnects should succeed
     ASSERT_TRUE(successfulReconnects > 0) << ("Should have at least some successful app-level reconnects");
 }
+
+TEST_F(SingleBrokerReconnectTest, testSingleBrokerNoAutoReconnect) { testSingleBrokerNoAutoReconnect(); }
+TEST_F(SingleBrokerReconnectTest, testAppLevelReconnectAfterBrokerRestart) { testAppLevelReconnectAfterBrokerRestart(); }
+TEST_F(SingleBrokerReconnectTest, testFuzzyBrokerUpDown) { testFuzzyBrokerUpDown(); }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "StlMapTest.h"
+#include <gtest/gtest.h>
 
 #include <string>
 #include <decaf/util/HashMap.h>
@@ -30,6 +30,34 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class StlMapTest : public ::testing::Test
+    {
+public:
+
+        StlMapTest() {}
+        virtual ~StlMapTest() {}
+
+        void testConstructor();
+        void testContainsKey();
+        void testClear();
+        void testCopy();
+        void testSize();
+        void testGet();
+        void testPut();
+        void testPutAll();
+        void testRemove();
+        void testContiansValue();
+        void testIsEmpty();
+        void testEntrySet();
+        void testKeySet();
+        void testValues();
+        void testEntrySetIterator();
+        void testKeySetIterator();
+        void testValuesIterator();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -432,3 +460,21 @@ void StlMapTest::testValuesIterator() {
     ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
     ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 }
+
+TEST_F(StlMapTest, testConstructor) { testConstructor(); }
+TEST_F(StlMapTest, testContainsKey) { testContainsKey(); }
+TEST_F(StlMapTest, testClear) { testClear(); }
+TEST_F(StlMapTest, testCopy) { testCopy(); }
+TEST_F(StlMapTest, testSize) { testSize(); }
+TEST_F(StlMapTest, testGet) { testGet(); }
+TEST_F(StlMapTest, testPut) { testPut(); }
+TEST_F(StlMapTest, testPutAll) { testPutAll(); }
+TEST_F(StlMapTest, testRemove) { testRemove(); }
+TEST_F(StlMapTest, testContiansValue) { testContiansValue(); }
+TEST_F(StlMapTest, testIsEmpty) { testIsEmpty(); }
+TEST_F(StlMapTest, testEntrySet) { testEntrySet(); }
+TEST_F(StlMapTest, testKeySet) { testKeySet(); }
+TEST_F(StlMapTest, testValues) { testValues(); }
+TEST_F(StlMapTest, testEntrySetIterator) { testEntrySetIterator(); }
+TEST_F(StlMapTest, testKeySetIterator) { testKeySetIterator(); }
+TEST_F(StlMapTest, testValuesIterator) { testValuesIterator(); }

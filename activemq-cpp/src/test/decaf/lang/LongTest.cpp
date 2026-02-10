@@ -15,11 +15,25 @@
  * limitations under the License.
  */
 
-#include "LongTest.h"
+#include <gtest/gtest.h>
+#include <decaf/lang/Long.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
+
+    class LongTest : public ::testing::Test
+    {
+public:
+
+        LongTest() {}
+        virtual ~LongTest() {}
+
+        virtual void test();
+        virtual void test2();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void LongTest::test() {
@@ -108,3 +122,6 @@ void LongTest::test2() {
     ASSERT_TRUE(Long::lowestOneBit( 0xFF000000 ) == (long long)0x01000000);
 
 }
+
+TEST_F(LongTest, test) { test(); }
+TEST_F(LongTest, test2) { test2(); }

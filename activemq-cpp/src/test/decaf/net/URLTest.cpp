@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "URLTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/net/URI.h>
 #include <decaf/net/URL.h>
@@ -31,6 +31,107 @@ using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class URLTest : public ::testing::Test {
+public:
+
+        URLTest();
+        virtual ~URLTest();
+
+        void testConstructor1();
+        void testConstructor2();
+        void testConstructor3();
+        void testConstructor4();
+        void testEquals();
+        void testSameFile();
+        void testToString();
+        void testToExternalForm();
+        void testGetFile();
+        void testGetHost();
+        void testGetPort();
+        void testGetDefaultPort();
+        void testGetProtocol();
+        void testGetRef();
+        void testGetAuthority();
+        void testToURI();
+        void testURLStreamHandlerParseURL();
+        void testUrlParts();
+        void testFileEqualsWithEmptyHost();
+        void testOmittedHost();
+        void testNoHost();
+        void testNoPath();
+        void testEmptyHostAndNoPath();
+        void testNoHostAndNoPath();
+        void testAtSignInUserInfo();
+        void testUserNoPassword();
+        void testUserNoPasswordExplicitPort();
+        void testUserPasswordHostPort();
+        void testUserPasswordEmptyHostPort();
+        void testUserPasswordEmptyHostEmptyPort();
+        void testPathOnly();
+        void testQueryOnly();
+        void testFragmentOnly();
+        void testAtSignInPath();
+        void testColonInPath();
+        void testSlashInQuery();
+        void testQuestionMarkInQuery();
+        void testAtSignInQuery();
+        void testColonInQuery();
+        void testQuestionMarkInFragment();
+        void testColonInFragment();
+        void testSlashInFragment();
+        void testSlashInFragmentCombiningConstructor();
+        void testHashInFragment();
+        void testEmptyPort();
+        void testNonNumericPort();
+        void testNegativePort();
+        void testNegativePortEqualsPlaceholder();
+        void testRelativePathOnQuery();
+        void testRelativeFragmentOnQuery();
+        void testPathContainsRelativeParts();
+        void testRelativePathAndFragment();
+        void testRelativeParentDirectory();
+        void testRelativeChildDirectory();
+        void testRelativeRootDirectory();
+        void testRelativeFullUrl();
+        void testRelativeDifferentScheme();
+        void testRelativeDifferentAuthority();
+        void testRelativeWithScheme();
+        void testMalformedUrlsRefusedByFirefoxAndChrome();
+        void testRfc1808NormalExamples();
+        void testRfc1808AbnormalExampleTooManyDotDotSequences();
+        void testRfc1808AbnormalExampleRemoveDotSegments();
+        void testRfc1808AbnormalExampleNonsensicalDots();
+        void testRfc1808AbnormalExampleRelativeScheme();
+        void testRfc1808AbnormalExampleQueryOrFragmentDots();
+        void testSquareBracketsInUserInfo();
+        void testComposeUrl();
+        void testComposeUrlWithNullHost();
+        void testFileUrlExtraLeadingSlashes();
+        void testFileUrlWithAuthority();
+        void testEmptyAuthority();
+        void testHttpUrlExtraLeadingSlashes();
+        void testFileUrlRelativePath();
+        void testFileUrlDottedPath();
+        void testParsingDotAsHostname();
+        void testSquareBracketsWithIPv4();
+        void testSquareBracketsWithHostname();
+        void testIPv6WithoutSquareBrackets();
+        void testIpv6WithSquareBrackets();
+        void testEqualityWithNoPath();
+        void testUrlDoesNotEncodeParts();
+        void testSchemeCaseIsCanonicalized();
+        void testEmptyAuthorityWithPath();
+        void testEmptyAuthorityWithQuery();
+        void testEmptyAuthorityWithFragment();
+        void testCombiningConstructorsMakeRelativePathsAbsolute();
+        void testCombiningConstructorsDoNotMakeEmptyPathsAbsolute();
+        void testPartContainsSpace();
+        void testUnderscore();
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -1133,3 +1234,93 @@ void URLTest::testUnderscore() {
     // The RFC's don't permit underscores in hostnames, but URL accepts them (unlike URI).
     ASSERT_EQ(String("a_b.c.d.net"), url.getHost());
 }
+
+TEST_F(URLTest, testConstructor1) { testConstructor1(); }
+TEST_F(URLTest, testConstructor2) { testConstructor2(); }
+TEST_F(URLTest, testConstructor3) { testConstructor3(); }
+TEST_F(URLTest, testConstructor4) { testConstructor4(); }
+TEST_F(URLTest, testEquals) { testEquals(); }
+TEST_F(URLTest, testSameFile) { testSameFile(); }
+TEST_F(URLTest, testToString) { testToString(); }
+TEST_F(URLTest, testToExternalForm) { testToExternalForm(); }
+TEST_F(URLTest, testGetFile) { testGetFile(); }
+TEST_F(URLTest, testGetHost) { testGetHost(); }
+TEST_F(URLTest, testGetPort) { testGetPort(); }
+TEST_F(URLTest, testGetDefaultPort) { testGetDefaultPort(); }
+TEST_F(URLTest, testGetProtocol) { testGetProtocol(); }
+TEST_F(URLTest, testGetRef) { testGetRef(); }
+TEST_F(URLTest, testGetAuthority) { testGetAuthority(); }
+TEST_F(URLTest, testToURI) { testToURI(); }
+TEST_F(URLTest, testURLStreamHandlerParseURL) { testURLStreamHandlerParseURL(); }
+TEST_F(URLTest, testUrlParts) { testUrlParts(); }
+TEST_F(URLTest, testFileEqualsWithEmptyHost) { testFileEqualsWithEmptyHost(); }
+TEST_F(URLTest, testNoHost) { testNoHost(); }
+TEST_F(URLTest, testNoPath) { testNoPath(); }
+TEST_F(URLTest, testEmptyHostAndNoPath) { testEmptyHostAndNoPath(); }
+TEST_F(URLTest, testNoHostAndNoPath) { testNoHostAndNoPath(); }
+TEST_F(URLTest, testAtSignInUserInfo) { testAtSignInUserInfo(); }
+TEST_F(URLTest, testUserNoPassword) { testUserNoPassword(); }
+TEST_F(URLTest, testUserNoPasswordExplicitPort) { testUserNoPasswordExplicitPort(); }
+TEST_F(URLTest, testUserPasswordHostPort) { testUserPasswordHostPort(); }
+TEST_F(URLTest, testUserPasswordEmptyHostPort) { testUserPasswordEmptyHostPort(); }
+TEST_F(URLTest, testUserPasswordEmptyHostEmptyPort) { testUserPasswordEmptyHostEmptyPort(); }
+TEST_F(URLTest, testPathOnly) { testPathOnly(); }
+TEST_F(URLTest, testQueryOnly) { testQueryOnly(); }
+TEST_F(URLTest, testFragmentOnly) { testFragmentOnly(); }
+TEST_F(URLTest, testAtSignInPath) { testAtSignInPath(); }
+TEST_F(URLTest, testColonInPath) { testColonInPath(); }
+TEST_F(URLTest, testSlashInQuery) { testSlashInQuery(); }
+TEST_F(URLTest, testQuestionMarkInQuery) { testQuestionMarkInQuery(); }
+TEST_F(URLTest, testAtSignInQuery) { testAtSignInQuery(); }
+TEST_F(URLTest, testColonInQuery) { testColonInQuery(); }
+TEST_F(URLTest, testQuestionMarkInFragment) { testQuestionMarkInFragment(); }
+TEST_F(URLTest, testColonInFragment) { testColonInFragment(); }
+TEST_F(URLTest, testSlashInFragment) { testSlashInFragment(); }
+TEST_F(URLTest, testSlashInFragmentCombiningConstructor) { testSlashInFragmentCombiningConstructor(); }
+TEST_F(URLTest, testHashInFragment) { testHashInFragment(); }
+TEST_F(URLTest, testEmptyPort) { testEmptyPort(); }
+TEST_F(URLTest, testNonNumericPort) { testNonNumericPort(); }
+TEST_F(URLTest, testNegativePort) { testNegativePort(); }
+TEST_F(URLTest, testNegativePortEqualsPlaceholder) { testNegativePortEqualsPlaceholder(); }
+TEST_F(URLTest, testRelativePathOnQuery) { testRelativePathOnQuery(); }
+TEST_F(URLTest, testRelativeFragmentOnQuery) { testRelativeFragmentOnQuery(); }
+TEST_F(URLTest, testPathContainsRelativeParts) { testPathContainsRelativeParts(); }
+TEST_F(URLTest, testRelativePathAndFragment) { testRelativePathAndFragment(); }
+TEST_F(URLTest, testRelativeParentDirectory) { testRelativeParentDirectory(); }
+TEST_F(URLTest, testRelativeChildDirectory) { testRelativeChildDirectory(); }
+TEST_F(URLTest, testRelativeRootDirectory) { testRelativeRootDirectory(); }
+TEST_F(URLTest, testRelativeFullUrl) { testRelativeFullUrl(); }
+TEST_F(URLTest, testRelativeDifferentScheme) { testRelativeDifferentScheme(); }
+TEST_F(URLTest, testRelativeDifferentAuthority) { testRelativeDifferentAuthority(); }
+TEST_F(URLTest, testRelativeWithScheme) { testRelativeWithScheme(); }
+TEST_F(URLTest, testMalformedUrlsRefusedByFirefoxAndChrome) { testMalformedUrlsRefusedByFirefoxAndChrome(); }
+TEST_F(URLTest, testRfc1808NormalExamples) { testRfc1808NormalExamples(); }
+TEST_F(URLTest, testRfc1808AbnormalExampleTooManyDotDotSequences) { testRfc1808AbnormalExampleTooManyDotDotSequences(); }
+TEST_F(URLTest, testRfc1808AbnormalExampleRemoveDotSegments) { testRfc1808AbnormalExampleRemoveDotSegments(); }
+TEST_F(URLTest, testRfc1808AbnormalExampleNonsensicalDots) { testRfc1808AbnormalExampleNonsensicalDots(); }
+TEST_F(URLTest, testRfc1808AbnormalExampleRelativeScheme) { testRfc1808AbnormalExampleRelativeScheme(); }
+TEST_F(URLTest, testRfc1808AbnormalExampleQueryOrFragmentDots) { testRfc1808AbnormalExampleQueryOrFragmentDots(); }
+TEST_F(URLTest, testSquareBracketsInUserInfo) { testSquareBracketsInUserInfo(); }
+TEST_F(URLTest, testComposeUrl) { testComposeUrl(); }
+TEST_F(URLTest, testComposeUrlWithNullHost) { testComposeUrlWithNullHost(); }
+TEST_F(URLTest, testFileUrlExtraLeadingSlashes) { testFileUrlExtraLeadingSlashes(); }
+TEST_F(URLTest, testFileUrlWithAuthority) { testFileUrlWithAuthority(); }
+TEST_F(URLTest, testEmptyAuthority) { testEmptyAuthority(); }
+TEST_F(URLTest, testHttpUrlExtraLeadingSlashes) { testHttpUrlExtraLeadingSlashes(); }
+TEST_F(URLTest, testFileUrlRelativePath) { testFileUrlRelativePath(); }
+TEST_F(URLTest, testFileUrlDottedPath) { testFileUrlDottedPath(); }
+TEST_F(URLTest, testParsingDotAsHostname) { testParsingDotAsHostname(); }
+TEST_F(URLTest, testSquareBracketsWithIPv4) { testSquareBracketsWithIPv4(); }
+TEST_F(URLTest, testSquareBracketsWithHostname) { testSquareBracketsWithHostname(); }
+TEST_F(URLTest, testIPv6WithoutSquareBrackets) { testIPv6WithoutSquareBrackets(); }
+TEST_F(URLTest, testIpv6WithSquareBrackets) { testIpv6WithSquareBrackets(); }
+TEST_F(URLTest, testEqualityWithNoPath) { testEqualityWithNoPath(); }
+TEST_F(URLTest, testUrlDoesNotEncodeParts) { testUrlDoesNotEncodeParts(); }
+TEST_F(URLTest, testSchemeCaseIsCanonicalized) { testSchemeCaseIsCanonicalized(); }
+TEST_F(URLTest, testEmptyAuthorityWithPath) { testEmptyAuthorityWithPath(); }
+TEST_F(URLTest, testEmptyAuthorityWithQuery) { testEmptyAuthorityWithQuery(); }
+TEST_F(URLTest, testEmptyAuthorityWithFragment) { testEmptyAuthorityWithFragment(); }
+TEST_F(URLTest, testCombiningConstructorsMakeRelativePathsAbsolute) { testCombiningConstructorsMakeRelativePathsAbsolute(); }
+TEST_F(URLTest, testCombiningConstructorsDoNotMakeEmptyPathsAbsolute) { testCombiningConstructorsDoNotMakeEmptyPathsAbsolute(); }
+TEST_F(URLTest, testPartContainsSpace) { testPartContainsSpace(); }
+TEST_F(URLTest, testUnderscore) { testUnderscore(); }

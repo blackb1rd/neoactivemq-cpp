@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-#include "ExecutorsTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Pointer.h>
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
 #include <decaf/util/concurrent/Executors.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 using namespace std;
 using namespace decaf;
@@ -28,6 +29,31 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
+
+    class ExecutorsTest : public ExecutorsTestSupport {
+public:
+
+        ExecutorsTest();
+        virtual ~ExecutorsTest();
+
+        void testDefaultThreadFactory();
+        void testNewFixedThreadPool1();
+        void testNewFixedThreadPool2();
+        void testNewFixedThreadPool3();
+        void testNewFixedThreadPool4();
+        void testNewSingleThreadExecutor1();
+        void testNewSingleThreadExecutor2();
+        void testNewSingleThreadExecutor3();
+        void testCastNewSingleThreadExecutor();
+        void testUnconfigurableExecutorService();
+        void testUnconfigurableExecutorServiceNPE();
+        void testCallable1();
+        void testCallable2();
+        void testCallableNPE1();
+        void testCallableNPE2();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -210,3 +236,19 @@ void ExecutorsTest::testCallableNPE2() {
 
     ASSERT_THROW(Executors::callable<int>(NULL, 42), NullPointerException) << ("Should throw a NullPointerException");
 }
+
+TEST_F(ExecutorsTest, testDefaultThreadFactory) { testDefaultThreadFactory(); }
+TEST_F(ExecutorsTest, testNewFixedThreadPool1) { testNewFixedThreadPool1(); }
+TEST_F(ExecutorsTest, testNewFixedThreadPool2) { testNewFixedThreadPool2(); }
+TEST_F(ExecutorsTest, testNewFixedThreadPool3) { testNewFixedThreadPool3(); }
+TEST_F(ExecutorsTest, testNewFixedThreadPool4) { testNewFixedThreadPool4(); }
+TEST_F(ExecutorsTest, testNewSingleThreadExecutor1) { testNewSingleThreadExecutor1(); }
+TEST_F(ExecutorsTest, testNewSingleThreadExecutor2) { testNewSingleThreadExecutor2(); }
+TEST_F(ExecutorsTest, testNewSingleThreadExecutor3) { testNewSingleThreadExecutor3(); }
+TEST_F(ExecutorsTest, testCastNewSingleThreadExecutor) { testCastNewSingleThreadExecutor(); }
+TEST_F(ExecutorsTest, testUnconfigurableExecutorService) { testUnconfigurableExecutorService(); }
+TEST_F(ExecutorsTest, testUnconfigurableExecutorServiceNPE) { testUnconfigurableExecutorServiceNPE(); }
+TEST_F(ExecutorsTest, testCallable1) { testCallable1(); }
+TEST_F(ExecutorsTest, testCallable2) { testCallable2(); }
+TEST_F(ExecutorsTest, testCallableNPE1) { testCallableNPE1(); }
+TEST_F(ExecutorsTest, testCallableNPE2) { testCallableNPE2(); }

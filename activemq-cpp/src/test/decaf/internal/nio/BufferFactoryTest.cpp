@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "BufferFactoryTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/nio/ByteBuffer.h>
 #include <decaf/nio/CharBuffer.h>
@@ -24,11 +24,25 @@
 #include <decaf/nio/LongBuffer.h>
 #include <decaf/nio/IntBuffer.h>
 #include <decaf/nio/ShortBuffer.h>
+#include <decaf/internal/nio/BufferFactory.h>
 
 using namespace decaf;
 using namespace decaf::internal;
 using namespace decaf::internal::nio;
 using namespace decaf::nio;
+
+    class BufferFactoryTest : public ::testing::Test {
+public:
+
+        BufferFactoryTest() {}
+        virtual ~BufferFactoryTest() {}
+
+        void testCreateByteBuffer1();
+        void testCreateByteBuffer2();
+        void testCreateByteBuffer3();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void BufferFactoryTest::testCreateByteBuffer1() {
@@ -70,3 +84,7 @@ void BufferFactoryTest::testCreateByteBuffer3() {
 
     delete buffer;
 }
+
+TEST_F(BufferFactoryTest, testCreateByteBuffer1) { testCreateByteBuffer1(); }
+TEST_F(BufferFactoryTest, testCreateByteBuffer2) { testCreateByteBuffer2(); }
+TEST_F(BufferFactoryTest, testCreateByteBuffer3) { testCreateByteBuffer3(); }

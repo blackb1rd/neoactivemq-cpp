@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SecureRandomTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/security/SecureRandom.h>
 
@@ -27,6 +27,24 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::security;
+
+    class SecureRandomTest : public ::testing::Test {
+public:
+
+        SecureRandomTest();
+        virtual ~SecureRandomTest();
+
+        void testConstructor1();
+        void testConstructor2();
+        void testConstructor3();
+        void testNextBytes1();
+        void testNextBytes2();
+        void testSetSeed1();
+        void testSetSeed2();
+        void testSetSeed3();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 SecureRandomTest::SecureRandomTest() {
@@ -171,3 +189,12 @@ void SecureRandomTest::testSetSeed3() {
     SecureRandom srng;
     ASSERT_NO_THROW(srng.setSeed( seed ));
 }
+
+TEST_F(SecureRandomTest, testConstructor1) { testConstructor1(); }
+TEST_F(SecureRandomTest, testConstructor2) { testConstructor2(); }
+TEST_F(SecureRandomTest, testConstructor3) { testConstructor3(); }
+TEST_F(SecureRandomTest, testNextBytes1) { testNextBytes1(); }
+TEST_F(SecureRandomTest, testNextBytes2) { testNextBytes2(); }
+TEST_F(SecureRandomTest, testSetSeed1) { testSetSeed1(); }
+TEST_F(SecureRandomTest, testSetSeed2) { testSetSeed2(); }
+TEST_F(SecureRandomTest, testSetSeed3) { testSetSeed3(); }

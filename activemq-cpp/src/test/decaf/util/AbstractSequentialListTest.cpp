@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AbstractSequentialListTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/AbstractSequentialList.h>
@@ -26,6 +26,22 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class AbstractSequentialListTest : public ::testing::Test {
+public:
+
+        AbstractSequentialListTest();
+
+        virtual ~AbstractSequentialListTest();
+
+        void testAddAll();
+        void testGet();
+        void testSet();
+        void testRemove();
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -217,3 +233,8 @@ void AbstractSequentialListTest::testSet() {
         // expected
     }
 }
+
+TEST_F(AbstractSequentialListTest, testAddAll) { testAddAll(); }
+TEST_F(AbstractSequentialListTest, testGet) { testGet(); }
+TEST_F(AbstractSequentialListTest, testSet) { testSet(); }
+TEST_F(AbstractSequentialListTest, testRemove) { testRemove(); }

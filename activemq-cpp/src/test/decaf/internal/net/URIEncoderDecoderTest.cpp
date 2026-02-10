@@ -15,15 +15,31 @@
  * limitations under the License.
  */
 
-#include "URIEncoderDecoderTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/net/URISyntaxException.h>
+#include <decaf/internal/net/URIEncoderDecoder.h>
 
 using namespace std;
 using namespace decaf::lang;
 using namespace decaf::net;
 using namespace decaf::internal;
 using namespace decaf::internal::net;
+
+    class URIEncoderDecoderTest : public ::testing::Test {
+public:
+
+        URIEncoderDecoderTest();
+        virtual ~URIEncoderDecoderTest() {}
+
+        void testValidate();
+        void testValidateSimple();
+        void testQuoteIllegal();
+        void testEncodeOthers();
+        void testDecode();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 URIEncoderDecoderTest::URIEncoderDecoderTest() {}
@@ -97,3 +113,9 @@ void URIEncoderDecoderTest::testDecode() {
 
     ASSERT_TRUE(URIEncoderDecoder::decode(test) == "A B C $%") << ("1. Result not equal to: 'A B C $%");
 }
+
+TEST_F(URIEncoderDecoderTest, testValidate) { testValidate(); }
+TEST_F(URIEncoderDecoderTest, testValidateSimple) { testValidateSimple(); }
+TEST_F(URIEncoderDecoderTest, testQuoteIllegal) { testQuoteIllegal(); }
+TEST_F(URIEncoderDecoderTest, testEncodeOthers) { testEncodeOthers(); }
+TEST_F(URIEncoderDecoderTest, testDecode) { testDecode(); }

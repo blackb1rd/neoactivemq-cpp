@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SystemTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/System.h>
 #include <decaf/util/StlMap.h>
@@ -25,6 +25,23 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
+
+    class SystemTest : public ::testing::Test {
+public:
+
+        SystemTest();
+        virtual ~SystemTest() {}
+
+        void test_availableProcessors();
+        void test_getenv();
+        void test_getenv2();
+        void test_setenv();
+        void test_unsetenv();
+        void test_currentTimeMillis();
+        void test_nanoTime();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 SystemTest::SystemTest() {
@@ -103,3 +120,11 @@ void SystemTest::test_nanoTime() {
 
     ASSERT_TRUE(start < end) << ("First Read isn't less than the second.");
 }
+
+TEST_F(SystemTest, test_availableProcessors) { test_availableProcessors(); }
+TEST_F(SystemTest, test_getenv) { test_getenv(); }
+TEST_F(SystemTest, test_getenv2) { test_getenv2(); }
+TEST_F(SystemTest, test_setenv) { test_setenv(); }
+TEST_F(SystemTest, test_unsetenv) { test_unsetenv(); }
+TEST_F(SystemTest, test_currentTimeMillis) { test_currentTimeMillis(); }
+TEST_F(SystemTest, test_nanoTime) { test_nanoTime(); }

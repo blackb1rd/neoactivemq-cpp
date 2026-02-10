@@ -15,11 +15,25 @@
  * limitations under the License.
  */
 
-#include "IntegerTest.h"
+#include <gtest/gtest.h>
+#include <decaf/lang/Integer.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
+
+    class IntegerTest : public ::testing::Test
+    {
+public:
+
+        IntegerTest() {}
+        virtual ~IntegerTest() {}
+
+        virtual void test();
+        virtual void test2();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void IntegerTest::test()
@@ -107,3 +121,6 @@ void IntegerTest::test2() {
     ASSERT_TRUE(Integer::lowestOneBit( 255 ) == 1);
     ASSERT_TRUE(Integer::lowestOneBit( 0xFF000000 ) == (int)0x01000000);
 }
+
+TEST_F(IntegerTest, test) { test(); }
+TEST_F(IntegerTest, test2) { test2(); }

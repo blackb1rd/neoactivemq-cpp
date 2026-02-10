@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "FutureTaskTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/concurrent/FutureTask.h>
@@ -25,6 +25,7 @@
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
 
 #include <typeinfo>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 using namespace std;
 using namespace decaf;
@@ -32,6 +33,39 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
+
+    class FutureTaskTest : public ExecutorsTestSupport {
+public:
+
+        FutureTaskTest();
+        virtual ~FutureTaskTest();
+
+        void testConstructor1();
+        void testConstructor2();
+        void testConstructor3();
+        void testConstructor4();
+        void testIsDone();
+        void testRunAndReset();
+        void testResetAfterCancel();
+        void testSet();
+        void testSetException();
+        void testCancelBeforeRun();
+        void testCancelBeforeRun2();
+        void testCancelAfterRun();
+        void testCancelInterrupt();
+        void testCancelNoInterrupt();
+        void testGet1();
+        void testTimedGet1();
+        void testTimedGetCancellation();
+        void testGetCancellation();
+        void testGetExecutionException();
+        void testTimedGetExecutionException2();
+        void testGetInterruptedException();
+        void testTimedGetInterruptedException2();
+        void testGetTimeoutException();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -731,3 +765,27 @@ void FutureTaskTest::testGetTimeoutException() {
         unexpectedException();
     }
 }
+
+TEST_F(FutureTaskTest, testConstructor1) { testConstructor1(); }
+TEST_F(FutureTaskTest, testConstructor2) { testConstructor2(); }
+TEST_F(FutureTaskTest, testConstructor3) { testConstructor3(); }
+TEST_F(FutureTaskTest, testConstructor4) { testConstructor4(); }
+TEST_F(FutureTaskTest, testIsDone) { testIsDone(); }
+TEST_F(FutureTaskTest, testRunAndReset) { testRunAndReset(); }
+TEST_F(FutureTaskTest, testResetAfterCancel) { testResetAfterCancel(); }
+TEST_F(FutureTaskTest, testSet) { testSet(); }
+TEST_F(FutureTaskTest, testSetException) { testSetException(); }
+TEST_F(FutureTaskTest, testCancelBeforeRun) { testCancelBeforeRun(); }
+TEST_F(FutureTaskTest, testCancelBeforeRun2) { testCancelBeforeRun2(); }
+TEST_F(FutureTaskTest, testCancelAfterRun) { testCancelAfterRun(); }
+TEST_F(FutureTaskTest, testCancelInterrupt) { testCancelInterrupt(); }
+TEST_F(FutureTaskTest, testCancelNoInterrupt) { testCancelNoInterrupt(); }
+TEST_F(FutureTaskTest, testGet1) { testGet1(); }
+TEST_F(FutureTaskTest, testTimedGet1) { testTimedGet1(); }
+TEST_F(FutureTaskTest, testTimedGetCancellation) { testTimedGetCancellation(); }
+TEST_F(FutureTaskTest, testGetCancellation) { testGetCancellation(); }
+TEST_F(FutureTaskTest, testGetExecutionException) { testGetExecutionException(); }
+TEST_F(FutureTaskTest, testTimedGetExecutionException2) { testTimedGetExecutionException2(); }
+TEST_F(FutureTaskTest, testGetInterruptedException) { testGetInterruptedException(); }
+TEST_F(FutureTaskTest, testTimedGetInterruptedException2) { testTimedGetInterruptedException2(); }
+TEST_F(FutureTaskTest, testGetTimeoutException) { testGetTimeoutException(); }

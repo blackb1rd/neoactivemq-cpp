@@ -15,15 +15,32 @@
  * limitations under the License.
  */
 
-#include "SynchronousQueueTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/concurrent/SynchronousQueue.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/lang/Runnable.h>
+#include <decaf/util/concurrent/Concurrent.h>
+#include <decaf/util/concurrent/Mutex.h>
+#include <decaf/util/Random.h>
+#include <time.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
+
+    class SynchronousQueueTest : public ::testing::Test {
+public:
+
+        SynchronousQueueTest() {}
+        virtual ~SynchronousQueueTest() {}
+
+        void testConstructor_1();
+
+    };
+
 
 ///////////////////////////////////////////////////////////////////////////////
 void SynchronousQueueTest::testConstructor_1() {

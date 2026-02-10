@@ -15,12 +15,24 @@
  * limitations under the License.
  */
 
-#include "SessionPoolTest.h"
+#include <gtest/gtest.h>
 #include "DummyConnection.h"
 #include <activemq/cmsutil/SessionPool.h>
 #include <activemq/cmsutil/ResourceLifecycleManager.h>
 
 using namespace activemq::cmsutil;
+
+    class SessionPoolTest : public ::testing::Test {
+public:
+
+        SessionPoolTest() {}
+        virtual ~SessionPoolTest() {}
+
+        void testTakeSession();
+        void testReturnSession();
+        void testCloseSession();
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void SessionPoolTest::testTakeSession() {
@@ -87,3 +99,7 @@ void SessionPoolTest::testCloseSession() {
     // Make sure they're the same object.
     ASSERT_TRUE(pooledSession1 == pooledSession2); 
 }
+
+TEST_F(SessionPoolTest, testTakeSession) { testTakeSession(); }
+TEST_F(SessionPoolTest, testReturnSession) { testReturnSession(); }
+TEST_F(SessionPoolTest, testCloseSession) { testCloseSession(); }

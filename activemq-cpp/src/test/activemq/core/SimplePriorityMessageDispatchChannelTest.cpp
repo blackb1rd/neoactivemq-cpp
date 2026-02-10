@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SimplePriorityMessageDispatchChannelTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/core/SimplePriorityMessageDispatchChannel.h>
 #include <activemq/commands/MessageDispatch.h>
@@ -27,6 +27,26 @@ using namespace activemq::core;
 using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
+
+    class SimplePriorityMessageDispatchChannelTest : public ::testing::Test {
+public:
+
+        SimplePriorityMessageDispatchChannelTest() {}
+        virtual ~SimplePriorityMessageDispatchChannelTest() {}
+
+        void testCtor();
+        void testStart();
+        void testStop();
+        void testClose();
+        void testEnqueue();
+        void testEnqueueFront();
+        void testPeek();
+        void testDequeueNoWait();
+        void testDequeue();
+        void testRemoveAll();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimplePriorityMessageDispatchChannelTest::testCtor() {
@@ -284,3 +304,14 @@ void SimplePriorityMessageDispatchChannelTest::testRemoveAll() {
     ASSERT_TRUE(channel.size() == 0);
     ASSERT_TRUE(channel.isEmpty() == true);
 }
+
+TEST_F(SimplePriorityMessageDispatchChannelTest, testCtor) { testCtor(); }
+TEST_F(SimplePriorityMessageDispatchChannelTest, testStart) { testStart(); }
+TEST_F(SimplePriorityMessageDispatchChannelTest, testStop) { testStop(); }
+TEST_F(SimplePriorityMessageDispatchChannelTest, testClose) { testClose(); }
+TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueue) { testEnqueue(); }
+TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueueFront) { testEnqueueFront(); }
+TEST_F(SimplePriorityMessageDispatchChannelTest, testPeek) { testPeek(); }
+TEST_F(SimplePriorityMessageDispatchChannelTest, testDequeueNoWait) { testDequeueNoWait(); }
+TEST_F(SimplePriorityMessageDispatchChannelTest, testDequeue) { testDequeue(); }
+TEST_F(SimplePriorityMessageDispatchChannelTest, testRemoveAll) { testRemoveAll(); }

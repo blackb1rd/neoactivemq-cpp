@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ActiveMQBytesMessageTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/UUID.h>
 #include <decaf/lang/Exception.h>
@@ -28,6 +28,33 @@ using namespace activemq::util;
 using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
+
+    class ActiveMQBytesMessageTest : public ::testing::Test {
+public:
+
+        ActiveMQBytesMessageTest() {}
+        virtual ~ActiveMQBytesMessageTest() {}
+
+        void testGetBodyLength();
+        void testReadBoolean();
+        void testReadByte();
+        void testReadUnsignedByte();
+        void testReadShort();
+        void testReadUnsignedShort();
+        void testReadChar();
+        void testReadInt();
+        void testReadLong();
+        void testReadFloat();
+        void testReadDouble();
+        void testReadUTF();
+        void testReadBytesbyteArray();
+        void testClearBody();
+        void testReset();
+        void testReadOnlyBody();
+        void testWriteOnlyBody();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQBytesMessageTest::testGetBodyLength() {
@@ -456,3 +483,20 @@ void ActiveMQBytesMessageTest::testWriteOnlyBody() {
     } catch( MessageNotReadableException& e ) {
     }
 }
+
+TEST_F(ActiveMQBytesMessageTest, testGetBodyLength) { testGetBodyLength(); }
+TEST_F(ActiveMQBytesMessageTest, testReadBoolean) { testReadBoolean(); }
+TEST_F(ActiveMQBytesMessageTest, testReadByte) { testReadByte(); }
+TEST_F(ActiveMQBytesMessageTest, testReadShort) { testReadShort(); }
+TEST_F(ActiveMQBytesMessageTest, testReadUnsignedShort) { testReadUnsignedShort(); }
+TEST_F(ActiveMQBytesMessageTest, testReadChar) { testReadChar(); }
+TEST_F(ActiveMQBytesMessageTest, testReadInt) { testReadInt(); }
+TEST_F(ActiveMQBytesMessageTest, testReadLong) { testReadLong(); }
+TEST_F(ActiveMQBytesMessageTest, testReadFloat) { testReadFloat(); }
+TEST_F(ActiveMQBytesMessageTest, testReadDouble) { testReadDouble(); }
+TEST_F(ActiveMQBytesMessageTest, testReadUTF) { testReadUTF(); }
+TEST_F(ActiveMQBytesMessageTest, testReadBytesbyteArray) { testReadBytesbyteArray(); }
+TEST_F(ActiveMQBytesMessageTest, testClearBody) { testClearBody(); }
+TEST_F(ActiveMQBytesMessageTest, testReset) { testReset(); }
+TEST_F(ActiveMQBytesMessageTest, testReadOnlyBody) { testReadOnlyBody(); }
+TEST_F(ActiveMQBytesMessageTest, testWriteOnlyBody) { testWriteOnlyBody(); }

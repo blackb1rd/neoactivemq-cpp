@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ActiveMQConnectionTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/Properties.h>
 #include <decaf/util/concurrent/Concurrent.h>
@@ -43,6 +43,20 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
+
+    class ActiveMQConnectionTest : public ::testing::Test {
+public:
+
+        ActiveMQConnectionTest() {}
+        virtual ~ActiveMQConnectionTest() {}
+
+        void test2WithOpenwire();
+        void testCloseCancelsHungStart();
+        void testExceptionInOnException();
+
+    };
+
+
 
 namespace activemq {
 namespace core {
@@ -152,7 +166,7 @@ void ActiveMQConnectionTest::test2WithOpenwire() {
 
         ASSERT_TRUE(connection.getClientID() == "");
 
-    } catch (exceptions::ActiveMQException& ex) {
+    } catch (activemq::exceptions::ActiveMQException& ex) {
         ex.printStackTrace();
         throw ex;
     }
@@ -243,11 +257,15 @@ void ActiveMQConnectionTest::testExceptionInOnException() {
 
         // Trigger the onException callback
         transport->fireException(
-            exceptions::ActiveMQException(__FILE__, __LINE__, "test"));
+            activemq::exceptions::ActiveMQException(__FILE__, __LINE__, "test"));
         ASSERT_TRUE(exListener.waitForException(2000) == true);
         connection->close();
-    } catch (exceptions::ActiveMQException& ex) {
+    } catch (activemq::exceptions::ActiveMQException& ex) {
         ex.printStackTrace();
         throw ex;
     }
 }
+
+TEST_F(ActiveMQConnectionTest, test2WithOpenwire) { test2WithOpenwire(); }
+TEST_F(ActiveMQConnectionTest, testCloseCancelsHungStart) { testCloseCancelsHungStart(); }
+TEST_F(ActiveMQConnectionTest, testExceptionInOnException) { testExceptionInOnException(); }

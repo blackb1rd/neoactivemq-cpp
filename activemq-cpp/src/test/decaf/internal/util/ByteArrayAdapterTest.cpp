@@ -15,10 +15,12 @@
  * limitations under the License.
  */
 
-#include "ByteArrayAdapterTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
+#include <decaf/internal/util/ByteArrayAdapter.h>
+#include <decaf/util/Config.h>
 
 using namespace decaf;
 using namespace decaf::internal;
@@ -26,6 +28,60 @@ using namespace decaf::internal::util;
 using namespace decaf::nio;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class ByteArrayAdapterTest  : public ::testing::Test {
+unsigned char* testData1;
+        static const int testData1Size = 100;
+
+    private:
+
+        ByteArrayAdapterTest(const ByteArrayAdapterTest&);
+        ByteArrayAdapterTest& operator= (const ByteArrayAdapterTest&);
+
+    public:
+
+        ByteArrayAdapterTest() : testData1() {}
+        virtual ~ByteArrayAdapterTest() {}
+
+        void SetUp() override {
+            testData1 = new unsigned char[testData1Size];
+            for( int i = 0; i < testData1Size; ++i ){
+                testData1[i] = (unsigned char)i;
+            }
+        }
+
+        void TearDown() override {
+            delete [] testData1;
+        }
+
+        void testRead();
+        void testWrite();
+        void testCtor1();
+        void testCtor2();
+        void testClear();
+        void testReszie();
+        void testOperators();
+        void testReadExceptions();
+        void testWriteExceptions();
+        void testOperatorsExceptions();
+        void testArray();
+        void testGet();
+        void testGetChar();
+        void testGetShort();
+        void testGetInt();
+        void testGetLong();
+        void testGetDouble();
+        void testGetFloat();
+        void testPut();
+        void testPutChar();
+        void testPutShort();
+        void testPutInt();
+        void testPutLong();
+        void testPutDouble();
+        void testPutFloat();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void ByteArrayAdapterTest::testArray() {
@@ -506,3 +562,29 @@ void ByteArrayAdapterTest::testGetDouble() {
 
     ASSERT_THROW(testBuffer1.getDouble( i ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
+
+TEST_F(ByteArrayAdapterTest, testRead) { testRead(); }
+TEST_F(ByteArrayAdapterTest, testReadExceptions) { testReadExceptions(); }
+TEST_F(ByteArrayAdapterTest, testWrite) { testWrite(); }
+TEST_F(ByteArrayAdapterTest, testWriteExceptions) { testWriteExceptions(); }
+TEST_F(ByteArrayAdapterTest, testCtor1) { testCtor1(); }
+TEST_F(ByteArrayAdapterTest, testCtor2) { testCtor2(); }
+TEST_F(ByteArrayAdapterTest, testClear) { testClear(); }
+TEST_F(ByteArrayAdapterTest, testReszie) { testReszie(); }
+TEST_F(ByteArrayAdapterTest, testOperators) { testOperators(); }
+TEST_F(ByteArrayAdapterTest, testOperatorsExceptions) { testOperatorsExceptions(); }
+TEST_F(ByteArrayAdapterTest, testArray) { testArray(); }
+TEST_F(ByteArrayAdapterTest, testGet) { testGet(); }
+TEST_F(ByteArrayAdapterTest, testGetChar) { testGetChar(); }
+TEST_F(ByteArrayAdapterTest, testGetShort) { testGetShort(); }
+TEST_F(ByteArrayAdapterTest, testGetInt) { testGetInt(); }
+TEST_F(ByteArrayAdapterTest, testGetLong) { testGetLong(); }
+TEST_F(ByteArrayAdapterTest, testGetDouble) { testGetDouble(); }
+TEST_F(ByteArrayAdapterTest, testGetFloat) { testGetFloat(); }
+TEST_F(ByteArrayAdapterTest, testPut) { testPut(); }
+TEST_F(ByteArrayAdapterTest, testPutChar) { testPutChar(); }
+TEST_F(ByteArrayAdapterTest, testPutShort) { testPutShort(); }
+TEST_F(ByteArrayAdapterTest, testPutInt) { testPutInt(); }
+TEST_F(ByteArrayAdapterTest, testPutLong) { testPutLong(); }
+TEST_F(ByteArrayAdapterTest, testPutDouble) { testPutDouble(); }
+TEST_F(ByteArrayAdapterTest, testPutFloat) { testPutFloat(); }

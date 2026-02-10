@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "FloatTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Float.h>
 #include <decaf/lang/Integer.h>
@@ -26,6 +26,59 @@
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
+
+    class FloatTest : public ::testing::Test
+    {
+public:
+
+        static const int rawBitsFor3_4eN38To38[];
+        static const std::string expectedStringFor3_4eN38To38[];
+        static const unsigned int rawBitsFor1_17eN38To38[];
+        static const std::string expectedStringFor1_17eN38To38[];
+
+        FloatTest();
+        virtual ~FloatTest() {}
+
+        void test_ConstructorF();
+        void test_ConstructorString();
+        void test_byteValue();
+        void test_compare();
+        void test_doubleValue();
+        void test_floatToIntBitsF();
+        void test_floatToRawIntBitsF();
+        void test_floatValue();
+        void test_intBitsToFloatI();
+        void test_intValue();
+        void test_isInfinite();
+        void test_isInfiniteF();
+        void test_isNaN();
+        void test_isNaNF();
+        void test_longValue();
+        void test_parseFloatLDecaf_lang_String();
+
+//        void test_byteValue();
+//        void test_byteValue();
+//        void test_byteValue();
+//        void test_byteValue();
+//        void test_byteValue();
+//        void test_byteValue();
+//        void test_byteValue();
+//        void test_byteValue();
+//        void test_byteValue();
+//        void test_byteValue();
+//        void test_byteValue();
+//        void test_byteValue();
+//        void test_byteValue();
+//        void test_byteValue();
+
+    private:
+
+        void doTestCompareRawBits( const std::string& originalFloatString,
+                                   int expectedRawBits,
+                                   const std::string& expectedString );
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int FloatTest::rawBitsFor3_4eN38To38[] = {
@@ -373,3 +426,20 @@ void FloatTest::test_parseFloatLDecaf_lang_String() {
 //    doTestCompareRawBits("1.0E+39", 0x7f800000, "Infinity");
 //    doTestCompareRawBits("-1.0E+39", 0xff800000, "-Infinity");
 }
+
+TEST_F(FloatTest, test_ConstructorF) { test_ConstructorF(); }
+TEST_F(FloatTest, test_ConstructorString) { test_ConstructorString(); }
+TEST_F(FloatTest, test_byteValue) { test_byteValue(); }
+TEST_F(FloatTest, test_compare) { test_compare(); }
+TEST_F(FloatTest, test_doubleValue) { test_doubleValue(); }
+TEST_F(FloatTest, test_floatToIntBitsF) { test_floatToIntBitsF(); }
+TEST_F(FloatTest, test_floatToRawIntBitsF) { test_floatToRawIntBitsF(); }
+TEST_F(FloatTest, test_floatValue) { test_floatValue(); }
+TEST_F(FloatTest, test_intBitsToFloatI) { test_intBitsToFloatI(); }
+TEST_F(FloatTest, test_intValue) { test_intValue(); }
+TEST_F(FloatTest, test_isInfinite) { test_isInfinite(); }
+TEST_F(FloatTest, test_isInfiniteF) { test_isInfiniteF(); }
+TEST_F(FloatTest, test_isNaN) { test_isNaN(); }
+TEST_F(FloatTest, test_isNaNF) { test_isNaNF(); }
+TEST_F(FloatTest, test_longValue) { test_longValue(); }
+TEST_F(FloatTest, test_parseFloatLDecaf_lang_String) { test_parseFloatLDecaf_lang_String(); }

@@ -15,13 +15,65 @@
  * limitations under the License.
  */
 
-#include "CountDownLatchTest.h"
+#include <gtest/gtest.h>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
 
 using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
+
+    class CountDownLatchTest : public ExecutorsTestSupport {
+protected:
+
+        class MyThread : public lang::Thread {
+        public:
+
+            CountDownLatch* latch;
+
+        private:
+
+            MyThread(const MyThread&);
+            MyThread operator= (const MyThread&);
+
+        public:
+
+            MyThread() : latch() {}
+            virtual ~MyThread(){}
+
+            virtual void run(){
+
+                while( latch->getCount() > 0 ) {
+                    latch->countDown();
+
+                    lang::Thread::sleep( 20 );
+                }
+            }
+
+        };
+
+    public:
+
+        CountDownLatchTest() {}
+        virtual ~CountDownLatchTest() {}
+
+        void test();
+        void test2();
+        void testConstructor();
+        void testGetCount();
+        void testCountDown();
+        void testAwait();
+        void testTimedAwait();
+        void testAwaitInterruptedException();
+        void testTimedAwaitInterruptedException();
+        void testAwaitTimeout();
+        void testToString();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void CountDownLatchTest::test()
@@ -348,3 +400,15 @@ void CountDownLatchTest::testToString() {
     std::string s2 = s.toString();
     ASSERT_TRUE((int)s2.find_first_of("Count = 0") >= 0);
 }
+
+TEST_F(CountDownLatchTest, test) { test(); }
+TEST_F(CountDownLatchTest, test2) { test2(); }
+TEST_F(CountDownLatchTest, testConstructor) { testConstructor(); }
+TEST_F(CountDownLatchTest, testGetCount) { testGetCount(); }
+TEST_F(CountDownLatchTest, testCountDown) { testCountDown(); }
+TEST_F(CountDownLatchTest, testAwait) { testAwait(); }
+TEST_F(CountDownLatchTest, testTimedAwait) { testTimedAwait(); }
+TEST_F(CountDownLatchTest, testAwaitInterruptedException) { testAwaitInterruptedException(); }
+TEST_F(CountDownLatchTest, testTimedAwaitInterruptedException) { testTimedAwaitInterruptedException(); }
+TEST_F(CountDownLatchTest, testAwaitTimeout) { testAwaitTimeout(); }
+TEST_F(CountDownLatchTest, testToString) { testToString(); }

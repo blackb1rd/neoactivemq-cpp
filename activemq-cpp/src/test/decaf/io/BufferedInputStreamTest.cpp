@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 
-#include "BufferedInputStreamTest.h"
+#include <gtest/gtest.h>
+#include <decaf/io/BufferedInputStream.h>
+#include <decaf/util/Config.h>
 
 #include <decaf/lang/Integer.h>
 #include <decaf/io/ByteArrayInputStream.h>
@@ -35,6 +37,38 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::io;
 using namespace decaf::util;
+
+    class BufferedInputStreamTest : public ::testing::Test {
+private:
+
+        static const std::string testString;
+
+    public:
+
+        virtual ~BufferedInputStreamTest(){}
+        void SetUp() override{}
+        void TearDown() override{}
+
+        void testSmallerBuffer();
+        void testBiggerBuffer();
+        void testConstructor();
+        void testAvailable();
+        void testClose();
+        void testRead();
+        void testReadException();
+        void testRead2();
+        void testMarkSupported();
+        void testSkipNullInputStream();
+        void testResetScenario1();
+        void testResetScenario2();
+        void testResetException();
+        void testReset();
+        void testMarkI();
+        void testSkipJ();
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const std::string BufferedInputStreamTest::testString =
@@ -627,3 +661,20 @@ void BufferedInputStreamTest::testSkipJ() {
     BufferedInputStream buf( NULL, 5 );
     ASSERT_THROW(buf.skip( 10 ), IOException) << ("should throw IOException");
 }
+
+TEST_F(BufferedInputStreamTest, testSmallerBuffer) { testSmallerBuffer(); }
+TEST_F(BufferedInputStreamTest, testBiggerBuffer) { testBiggerBuffer(); }
+TEST_F(BufferedInputStreamTest, testConstructor) { testConstructor(); }
+TEST_F(BufferedInputStreamTest, testAvailable) { testAvailable(); }
+TEST_F(BufferedInputStreamTest, testClose) { testClose(); }
+TEST_F(BufferedInputStreamTest, testRead) { testRead(); }
+TEST_F(BufferedInputStreamTest, testRead2) { testRead2(); }
+TEST_F(BufferedInputStreamTest, testReadException) { testReadException(); }
+TEST_F(BufferedInputStreamTest, testSkipNullInputStream) { testSkipNullInputStream(); }
+TEST_F(BufferedInputStreamTest, testMarkSupported) { testMarkSupported(); }
+TEST_F(BufferedInputStreamTest, testResetScenario1) { testResetScenario1(); }
+TEST_F(BufferedInputStreamTest, testResetScenario2) { testResetScenario2(); }
+TEST_F(BufferedInputStreamTest, testResetException) { testResetException(); }
+TEST_F(BufferedInputStreamTest, testReset) { testReset(); }
+TEST_F(BufferedInputStreamTest, testMarkI) { testMarkI(); }
+TEST_F(BufferedInputStreamTest, testSkipJ) { testSkipJ(); }

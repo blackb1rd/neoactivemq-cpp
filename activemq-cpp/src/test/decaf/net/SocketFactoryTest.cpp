@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SocketFactoryTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/Properties.h>
 #include <decaf/net/SocketFactory.h>
@@ -26,12 +26,34 @@
 #endif
 
 #include <memory>
+#include <decaf/net/Socket.h>
+#include <decaf/net/ServerSocket.h>
+#include <decaf/util/concurrent/Concurrent.h>
+#include <decaf/util/concurrent/Mutex.h>
+#include <decaf/lang/Thread.h>
+#include <sstream>
 
 using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::util::concurrent;
+
+    class SocketFactoryTest : public ::testing::Test {
+public:
+
+        static const int DEFAULT_PORT;
+
+    public:
+
+        SocketFactoryTest() {}
+        virtual ~SocketFactoryTest() {}
+
+        void test();
+        void testNoDelay();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int SocketFactoryTest::DEFAULT_PORT = 23232;
@@ -212,3 +234,6 @@ void SocketFactoryTest::testNoDelay() {
         ASSERT_TRUE(false);
     }
 }
+
+TEST_F(SocketFactoryTest, test) { test(); }
+TEST_F(SocketFactoryTest, testNoDelay) { testNoDelay(); }

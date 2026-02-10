@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "CopyOnWriteArraySetTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/concurrent/CopyOnWriteArraySet.h>
 #include <decaf/util/StlList.h>
@@ -25,6 +25,38 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class CopyOnWriteArraySetTest : public ::testing::Test {
+private:
+
+        static const int SIZE;
+
+    public:
+
+        CopyOnWriteArraySetTest();
+        virtual ~CopyOnWriteArraySetTest();
+
+        void testConstructor1();
+        void testConstructor2();
+        void testConstructor3();
+        void testAddAll1();
+        void testAddAll2();
+        void testAdd1();
+        void testAdd2();
+        void testClear();
+        void testContains();
+        void testContainsAll();
+        void testEquals();
+        void testIsEmpty();
+        void testIterator();
+        void testIteratorRemove();
+        void testRemoveAll();
+        void testRemove();
+        void testSize();
+        void testToArray();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -296,3 +328,22 @@ void CopyOnWriteArraySetTest::testToArray() {
     ASSERT_EQ(1, array[1]);
     ASSERT_EQ(2, array[2]);
 }
+
+TEST_F(CopyOnWriteArraySetTest, testConstructor1) { testConstructor1(); }
+TEST_F(CopyOnWriteArraySetTest, testConstructor2) { testConstructor2(); }
+TEST_F(CopyOnWriteArraySetTest, testConstructor3) { testConstructor3(); }
+TEST_F(CopyOnWriteArraySetTest, testAddAll1) { testAddAll1(); }
+TEST_F(CopyOnWriteArraySetTest, testAddAll2) { testAddAll2(); }
+TEST_F(CopyOnWriteArraySetTest, testAdd1) { testAdd1(); }
+TEST_F(CopyOnWriteArraySetTest, testAdd2) { testAdd2(); }
+TEST_F(CopyOnWriteArraySetTest, testClear) { testClear(); }
+TEST_F(CopyOnWriteArraySetTest, testContains) { testContains(); }
+TEST_F(CopyOnWriteArraySetTest, testContainsAll) { testContainsAll(); }
+TEST_F(CopyOnWriteArraySetTest, testEquals) { testEquals(); }
+TEST_F(CopyOnWriteArraySetTest, testIsEmpty) { testIsEmpty(); }
+TEST_F(CopyOnWriteArraySetTest, testIterator) { testIterator(); }
+TEST_F(CopyOnWriteArraySetTest, testIteratorRemove) { testIteratorRemove(); }
+TEST_F(CopyOnWriteArraySetTest, testRemoveAll) { testRemoveAll(); }
+TEST_F(CopyOnWriteArraySetTest, testRemove) { testRemove(); }
+TEST_F(CopyOnWriteArraySetTest, testSize) { testSize(); }
+TEST_F(CopyOnWriteArraySetTest, testToArray) { testToArray(); }

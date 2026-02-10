@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-#include "ReentrantReadWriteLockTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/Date.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/util/concurrent/locks/Lock.h>
 #include <decaf/util/concurrent/locks/ReentrantReadWriteLock.h>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -28,6 +29,78 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
+
+    class ReentrantReadWriteLockTest : public ExecutorsTestSupport {
+public:
+
+        ReentrantReadWriteLockTest();
+        virtual ~ReentrantReadWriteLockTest();
+
+        void testConstructor();
+        void testLock();
+        void testFairLock();
+        void testWriteLockInterruptiblyInterrupted();
+        void testGetWriteHoldCount();
+        void testUnlockIllegalMonitorStateException();
+        void testReadHoldingWriteLock();
+        void testReadHoldingWriteLock2();
+        void testReadHoldingWriteLock3();
+        void testReadHoldingWriteLockFair();
+        void testAwaitIllegalMonitor();
+        void testSignalIllegalMonitor();
+        void testAwaitNanosTimeout();
+        void testAwaitTimeout();
+        void testAwaitUntilTimeout();
+        void testHasQueuedThreadNPE();
+        void testHasWaitersNPE();
+        void testGetWaitQueueLengthNPE();
+        void testGetWaitingThreadsNPE();
+        void testHasWaitersIAE();
+        void testHasWaitersIMSE();
+        void testGetWaitQueueLengthIAE();
+        void testGetWaitQueueLengthIMSE();
+        void testGetWaitingThreadsIAE();
+        void testGetWaitingThreadsIMSE();
+        void testToString();
+        void testReadLockToString();
+        void testWriteLockToString();
+        void testWriteTryLockInterrupted();
+        void testReadLockInterruptiblyInterrupted();
+        void testReadTryLockInterrupted();
+        void testWriteTryLockWhenLocked();
+        void testReadTryLockWhenLocked();
+        void testMultipleReadLocks();
+        void testWriteAfterMultipleReadLocks();
+        void testReadAfterWriteLock();
+        void testWriteHoldingWriteLock4();
+        void testReadHoldingWriteLockFair2();
+        void testReadHoldingWriteLockFair3();
+        void testWriteHoldingWriteLockFair4();
+        void testTryLockWhenReadLocked();
+        void testWriteTryLockWhenReadLocked();
+        void testTryLockWhenReadLockedFair();
+        void testWriteTryLockWhenReadLockedFair();
+        void testWriteTryLockTimeout();
+        void testReadTryLockTimeout();
+        void testWriteLockInterruptibly();
+        void testReadLockInterruptibly();
+        void testAwait();
+        void testAwaitUninterruptibly();
+        void testAwaitInterrupt();
+        void testAwaitNanosInterrupt();
+        void testAwaitUntilInterrupt();
+        void testSignalAll();
+        void testHasQueuedThreads();
+        void testHasQueuedThread();
+        void testGetQueueLength();
+        void testGetQueuedThreads();
+        void testHasWaiters();
+        void testGetWaitQueueLength();
+        void testGetWaitingThreads();
+        void testMultipleReaderThreads();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -2338,3 +2411,64 @@ void ReentrantReadWriteLockTest::testMultipleReaderThreads() {
     }
 }
 
+TEST_F(ReentrantReadWriteLockTest, testConstructor) { testConstructor(); }
+TEST_F(ReentrantReadWriteLockTest, testLock) { testLock(); }
+TEST_F(ReentrantReadWriteLockTest, testFairLock) { testFairLock(); }
+TEST_F(ReentrantReadWriteLockTest, testGetWriteHoldCount) { testGetWriteHoldCount(); }
+TEST_F(ReentrantReadWriteLockTest, testUnlockIllegalMonitorStateException) { testUnlockIllegalMonitorStateException(); }
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock) { testReadHoldingWriteLock(); }
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock2) { testReadHoldingWriteLock2(); }
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock3) { testReadHoldingWriteLock3(); }
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair) { testReadHoldingWriteLockFair(); }
+TEST_F(ReentrantReadWriteLockTest, testAwaitIllegalMonitor) { testAwaitIllegalMonitor(); }
+TEST_F(ReentrantReadWriteLockTest, testSignalIllegalMonitor) { testSignalIllegalMonitor(); }
+TEST_F(ReentrantReadWriteLockTest, testAwaitNanosTimeout) { testAwaitNanosTimeout(); }
+TEST_F(ReentrantReadWriteLockTest, testAwaitTimeout) { testAwaitTimeout(); }
+TEST_F(ReentrantReadWriteLockTest, testAwaitUntilTimeout) { testAwaitUntilTimeout(); }
+TEST_F(ReentrantReadWriteLockTest, testHasQueuedThreadNPE) { testHasQueuedThreadNPE(); }
+TEST_F(ReentrantReadWriteLockTest, testHasWaitersNPE) { testHasWaitersNPE(); }
+TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthNPE) { testGetWaitQueueLengthNPE(); }
+TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsNPE) { testGetWaitingThreadsNPE(); }
+TEST_F(ReentrantReadWriteLockTest, testHasWaitersIAE) { testHasWaitersIAE(); }
+TEST_F(ReentrantReadWriteLockTest, testHasWaitersIMSE) { testHasWaitersIMSE(); }
+TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthIAE) { testGetWaitQueueLengthIAE(); }
+TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthIMSE) { testGetWaitQueueLengthIMSE(); }
+TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsIAE) { testGetWaitingThreadsIAE(); }
+TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsIMSE) { testGetWaitingThreadsIMSE(); }
+TEST_F(ReentrantReadWriteLockTest, testToString) { testToString(); }
+TEST_F(ReentrantReadWriteLockTest, testReadLockToString) { testReadLockToString(); }
+TEST_F(ReentrantReadWriteLockTest, testWriteLockToString) { testWriteLockToString(); }
+TEST_F(ReentrantReadWriteLockTest, testWriteLockInterruptiblyInterrupted) { testWriteLockInterruptiblyInterrupted(); }
+TEST_F(ReentrantReadWriteLockTest, testWriteTryLockInterrupted) { testWriteTryLockInterrupted(); }
+TEST_F(ReentrantReadWriteLockTest, testReadLockInterruptiblyInterrupted) { testReadLockInterruptiblyInterrupted(); }
+TEST_F(ReentrantReadWriteLockTest, testReadTryLockInterrupted) { testReadTryLockInterrupted(); }
+TEST_F(ReentrantReadWriteLockTest, testWriteTryLockWhenLocked) { testWriteTryLockWhenLocked(); }
+TEST_F(ReentrantReadWriteLockTest, testReadTryLockWhenLocked) { testReadTryLockWhenLocked(); }
+TEST_F(ReentrantReadWriteLockTest, testMultipleReadLocks) { testMultipleReadLocks(); }
+TEST_F(ReentrantReadWriteLockTest, testReadAfterWriteLock) { testReadAfterWriteLock(); }
+TEST_F(ReentrantReadWriteLockTest, testWriteHoldingWriteLock4) { testWriteHoldingWriteLock4(); }
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair2) { testReadHoldingWriteLockFair2(); }
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair3) { testReadHoldingWriteLockFair3(); }
+TEST_F(ReentrantReadWriteLockTest, testWriteHoldingWriteLockFair4) { testWriteHoldingWriteLockFair4(); }
+TEST_F(ReentrantReadWriteLockTest, testTryLockWhenReadLocked) { testTryLockWhenReadLocked(); }
+TEST_F(ReentrantReadWriteLockTest, testWriteAfterMultipleReadLocks) { testWriteAfterMultipleReadLocks(); }
+TEST_F(ReentrantReadWriteLockTest, testTryLockWhenReadLockedFair) { testTryLockWhenReadLockedFair(); }
+TEST_F(ReentrantReadWriteLockTest, testWriteTryLockWhenReadLockedFair) { testWriteTryLockWhenReadLockedFair(); }
+TEST_F(ReentrantReadWriteLockTest, testWriteTryLockTimeout) { testWriteTryLockTimeout(); }
+TEST_F(ReentrantReadWriteLockTest, testReadTryLockTimeout) { testReadTryLockTimeout(); }
+TEST_F(ReentrantReadWriteLockTest, testWriteLockInterruptibly) { testWriteLockInterruptibly(); }
+TEST_F(ReentrantReadWriteLockTest, testReadLockInterruptibly) { testReadLockInterruptibly(); }
+TEST_F(ReentrantReadWriteLockTest, testAwait) { testAwait(); }
+TEST_F(ReentrantReadWriteLockTest, testAwaitUninterruptibly) { testAwaitUninterruptibly(); }
+TEST_F(ReentrantReadWriteLockTest, testAwaitInterrupt) { testAwaitInterrupt(); }
+TEST_F(ReentrantReadWriteLockTest, testAwaitNanosInterrupt) { testAwaitNanosInterrupt(); }
+TEST_F(ReentrantReadWriteLockTest, testAwaitUntilInterrupt) { testAwaitUntilInterrupt(); }
+TEST_F(ReentrantReadWriteLockTest, testSignalAll) { testSignalAll(); }
+TEST_F(ReentrantReadWriteLockTest, testHasQueuedThreads) { testHasQueuedThreads(); }
+TEST_F(ReentrantReadWriteLockTest, testHasQueuedThread) { testHasQueuedThread(); }
+TEST_F(ReentrantReadWriteLockTest, testGetQueueLength) { testGetQueueLength(); }
+TEST_F(ReentrantReadWriteLockTest, testGetQueuedThreads) { testGetQueuedThreads(); }
+TEST_F(ReentrantReadWriteLockTest, testHasWaiters) { testHasWaiters(); }
+TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLength) { testGetWaitQueueLength(); }
+TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreads) { testGetWaitingThreads(); }
+TEST_F(ReentrantReadWriteLockTest, testMultipleReaderThreads) { testMultipleReaderThreads(); }

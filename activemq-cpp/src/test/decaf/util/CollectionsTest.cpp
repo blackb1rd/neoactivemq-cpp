@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "CollectionsTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/LinkedList.h>
@@ -23,6 +23,17 @@
 
 using namespace decaf;
 using namespace decaf::util;
+
+    class CollectionsTest : public ::testing::Test {
+public:
+
+        CollectionsTest();
+        virtual ~CollectionsTest();
+
+        void testReverseList();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 CollectionsTest::CollectionsTest() {
@@ -61,3 +72,5 @@ void CollectionsTest::testReverseList() {
         ASSERT_EQ(49, list.getFirst());
     }
 }
+
+TEST_F(CollectionsTest, testReverseList) { testReverseList(); }

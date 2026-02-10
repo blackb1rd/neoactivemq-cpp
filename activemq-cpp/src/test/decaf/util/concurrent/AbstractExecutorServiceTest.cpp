@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AbstractExecutorServiceTest.h"
+#include <gtest/gtest.h>
 
 #include <string>
 
@@ -28,6 +28,7 @@
 #include <decaf/util/concurrent/Future.h>
 #include <decaf/util/concurrent/AbstractExecutorService.h>
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 using namespace std;
 using namespace decaf;
@@ -35,6 +36,28 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
+
+    class AbstractExecutorServiceTest : public ExecutorsTestSupport
+    {
+public:
+
+        AbstractExecutorServiceTest();
+        virtual ~AbstractExecutorServiceTest();
+
+        void testExecuteRunnable();
+        void testSubmitCallable();
+        void testSubmitRunnable();
+        void testSubmitRunnable2();
+        void testExecuteNullRunnable();
+        void testSubmitNullCallable();
+        void testExecute1();
+        void testExecute2();
+        void testInterruptedSubmit();
+        void testSubmitIE();
+        void testSubmitEE();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -445,3 +468,15 @@ void AbstractExecutorServiceTest::testSubmitEE() {
 
     joinPool(p);
 }
+
+TEST_F(AbstractExecutorServiceTest, testExecuteRunnable) { testExecuteRunnable(); }
+TEST_F(AbstractExecutorServiceTest, testSubmitCallable) { testSubmitCallable(); }
+TEST_F(AbstractExecutorServiceTest, testSubmitRunnable) { testSubmitRunnable(); }
+TEST_F(AbstractExecutorServiceTest, testSubmitRunnable2) { testSubmitRunnable2(); }
+TEST_F(AbstractExecutorServiceTest, testExecuteNullRunnable) { testExecuteNullRunnable(); }
+TEST_F(AbstractExecutorServiceTest, testSubmitNullCallable) { testSubmitNullCallable(); }
+TEST_F(AbstractExecutorServiceTest, testExecute1) { testExecute1(); }
+TEST_F(AbstractExecutorServiceTest, testExecute2) { testExecute2(); }
+TEST_F(AbstractExecutorServiceTest, testInterruptedSubmit) { testInterruptedSubmit(); }
+TEST_F(AbstractExecutorServiceTest, testSubmitIE) { testSubmitIE(); }
+TEST_F(AbstractExecutorServiceTest, testSubmitEE) { testSubmitEE(); }

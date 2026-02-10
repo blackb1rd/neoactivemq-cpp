@@ -15,16 +15,60 @@
  * limitations under the License.
  */
 
-#include "OutputStreamWriterTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/io/Writer.h>
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 #include <decaf/io/ByteArrayInputStream.h>
+#include <decaf/io/ByteArrayOutputStream.h>
+#include <decaf/io/OutputStreamWriter.h>
+#include <decaf/io/InputStreamReader.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang::exceptions;
+
+    class OutputStreamWriterTest : public ::testing::Test {
+private:
+
+        OutputStreamWriter* writer1;
+
+        ByteArrayOutputStream* buffer1;
+
+        InputStreamReader* reader;
+
+        static const int BUFFER_SIZE;
+        static const std::string TEST_STRING;
+
+    private:
+
+        OutputStreamWriterTest(const OutputStreamWriterTest&);
+        OutputStreamWriterTest& operator= (const OutputStreamWriterTest&);
+
+    public:
+
+        OutputStreamWriterTest();
+
+        virtual ~OutputStreamWriterTest();
+
+        void SetUp() override;
+        void TearDown() override;
+
+        void testClose();
+        void testFlush();
+        void testWriteCharArrayIntIntInt();
+        void testWriteChar();
+        void testWriteStringIntInt();
+        void testOutputStreamWriterOutputStream();
+        void testWriteString();
+
+    private:
+
+        void openInputStream();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int OutputStreamWriterTest::BUFFER_SIZE = 10000;
@@ -174,3 +218,11 @@ void OutputStreamWriterTest::openInputStream() {
     this->reader = new InputStreamReader(
         new ByteArrayInputStream( array.first, array.second, true ), true );
 }
+
+TEST_F(OutputStreamWriterTest, testClose) { testClose(); }
+TEST_F(OutputStreamWriterTest, testFlush) { testFlush(); }
+TEST_F(OutputStreamWriterTest, testWriteCharArrayIntIntInt) { testWriteCharArrayIntIntInt(); }
+TEST_F(OutputStreamWriterTest, testWriteChar) { testWriteChar(); }
+TEST_F(OutputStreamWriterTest, testWriteStringIntInt) { testWriteStringIntInt(); }
+TEST_F(OutputStreamWriterTest, testOutputStreamWriterOutputStream) { testOutputStreamWriterOutputStream(); }
+TEST_F(OutputStreamWriterTest, testWriteString) { testWriteString(); }

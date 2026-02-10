@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "MockTransportFactoryTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/mock/MockTransportFactory.h>
 #include <activemq/transport/mock/MockTransport.h>
@@ -30,6 +30,17 @@ using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class MockTransportFactoryTest : public ::testing::Test {
+public:
+
+        MockTransportFactoryTest() {}
+        virtual ~MockTransportFactoryTest() {}
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void MockTransportFactoryTest::test() {
@@ -49,3 +60,5 @@ void MockTransportFactoryTest::test() {
     transport.reset( NULL );
 
 }
+
+TEST_F(MockTransportFactoryTest, test) { test(); }

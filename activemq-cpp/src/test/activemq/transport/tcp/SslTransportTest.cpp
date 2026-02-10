@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SslTransportTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/tcp/SslTransport.h>
 #include <activemq/transport/IOTransport.h>
@@ -40,6 +40,7 @@
 #include <iostream>
 #include <decaf/lang/Thread.h>
 #include <decaf/lang/Pointer.h>
+#include <activemq/util/Config.h>
 
 using namespace activemq;
 using namespace activemq::io;
@@ -53,6 +54,53 @@ using namespace decaf::net;
 using namespace decaf::net::ssl;
 using namespace decaf::util;
 using namespace decaf::lang;
+
+    /**
+     * Test suite for SSL Transport functionality including connection handling,
+     * SSL handshake, timeout scenarios, and error conditions.
+     */
+    class SslTransportTest : public ::testing::Test {
+public:
+
+        SslTransportTest();
+        virtual ~SslTransportTest();
+
+        void SetUp() override;
+        void TearDown() override;
+
+        /**
+         * Tests basic SSL transport creation and configuration.
+         */
+        void testSslTransportCreate();
+
+        /**
+         * Tests that SSL handshake is performed immediately after TCP connection.
+         * This is the main fix for the timeout issue.
+         */
+        void testSslHandshakeAfterConnect();
+
+        /**
+         * Tests SSL connection timeout scenarios to ensure proper error handling.
+         */
+        void testSslConnectionTimeout();
+
+        /**
+         * Tests SSL connection with SNI (Server Name Indication) configuration.
+         */
+        void testSslConnectionWithServerName();
+
+        /**
+         * Tests that SSL connection failures are properly handled and reported.
+         */
+        void testSslConnectionFailureHandling();
+
+        /**
+         * Tests SSL transport configuration using URI properties.
+         */
+        void testSslTransportWithProperties();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 SslTransportTest::SslTransportTest() {
@@ -288,3 +336,9 @@ void SslTransportTest::testSslTransportWithProperties() {
         FAIL() << (std::string("Caught unexpected exception: ") + ex.getMessage());
     }
 }
+
+TEST_F(SslTransportTest, testSslTransportCreate) { testSslTransportCreate(); }
+TEST_F(SslTransportTest, testSslHandshakeAfterConnect) { testSslHandshakeAfterConnect(); }
+TEST_F(SslTransportTest, testSslConnectionWithServerName) { testSslConnectionWithServerName(); }
+TEST_F(SslTransportTest, testSslConnectionFailureHandling) { testSslConnectionFailureHandling(); }
+TEST_F(SslTransportTest, testSslTransportWithProperties) { testSslTransportWithProperties(); }

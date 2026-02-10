@@ -15,11 +15,23 @@
  * limitations under the License.
  */
 
-#include "RandomTest.h"
+#include <gtest/gtest.h>
+#include <decaf/util/Random.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
+
+    class RandomTest : public ::testing::Test
+    {
+public:
+
+        RandomTest(){}
+        virtual ~RandomTest(){}
+
+        void test();
+    };
+
 
 void RandomTest::test(){
 
@@ -82,3 +94,5 @@ void RandomTest::test(){
     }
     ASSERT_TRUE(ok);
 }
+
+TEST_F(RandomTest, test) { test(); }

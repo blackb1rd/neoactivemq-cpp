@@ -15,12 +15,24 @@
  * limitations under the License.
  */
 
-#include "URLDecoderTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/net/URLEncoder.h>
+#include <decaf/net/URLDecoder.h>
 
 using namespace decaf;
 using namespace decaf::net;
+
+    class URLDecoderTest : public ::testing::Test {
+public:
+
+        URLDecoderTest();
+        virtual ~URLDecoderTest() {}
+
+        void testDecode();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 URLDecoderTest::URLDecoderTest() {
@@ -38,3 +50,5 @@ void URLDecoderTest::testDecode() {
     ASSERT_TRUE(URLDecoder::decode( URLEncoder::encode(URL3) ) == URL3) << ("3. Incorrect encoding/decoding");
 
 }
+
+TEST_F(URLDecoderTest, testDecode) { testDecode(); }

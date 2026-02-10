@@ -15,13 +15,19 @@
  * limitations under the License.
  */
 
-#include "ThreadPoolExecutorTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/Random.h>
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
 #include <decaf/util/concurrent/LinkedBlockingQueue.h>
 
 #include <decaf/lang/exceptions/RuntimeException.h>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
+#include <decaf/util/concurrent/Concurrent.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/util/concurrent/Mutex.h>
+#include <decaf/util/Config.h>
 
 using namespace std;
 using namespace decaf;
@@ -29,6 +35,93 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
+
+    class ThreadPoolExecutorTest : public ExecutorsTestSupport {
+    private:
+private:
+
+        decaf::util::concurrent::Mutex myMutex;
+
+    public:
+
+        ThreadPoolExecutorTest() : myMutex() {}
+        virtual ~ThreadPoolExecutorTest() {}
+
+        void testConstructor();
+        void testSimpleTasks();
+        void testSimpleTasksCallerOwns();
+        void testMoreTasksThanMaxPoolSize();
+        void testTasksThatThrow();
+        void testAwaitTermination();
+        void testPrestartCoreThread();
+        void testPrestartAllCoreThreads();
+        void testGetCompletedTaskCount();
+        void testGetCorePoolSize();
+        void testGetKeepAliveTime();
+        void testGetThreadFactory();
+        void testSetThreadFactory();
+        void testSetThreadFactoryNull();
+        void testGetRejectedExecutionHandler();
+        void testSetRejectedExecutionHandler();
+        void testSetRejectedExecutionHandlerNull();
+        void testGetLargestPoolSize();
+        void testGetMaximumPoolSize();
+        void testGetPoolSize();
+        void testGetTaskCount();
+        void testIsShutdown();
+        void testIsTerminated();
+        void testIsTerminating();
+        void testGetQueue();
+        void testRemove();
+        void testShutDownNow();
+        void testConstructor1();
+        void testConstructor2();
+        void testConstructor3();
+        void testConstructor4();
+        void testConstructor5();
+        void testConstructor6();
+        void testConstructor7();
+        void testConstructor8();
+        void testConstructor9();
+        void testConstructor10();
+        void testConstructor11();
+        void testConstructor12();
+        void testConstructor13();
+        void testConstructor14();
+        void testConstructor15();
+        void testConstructor16();
+        void testConstructor17();
+        void testConstructor18();
+        void testConstructor19();
+        void testConstructor20();
+        void testConstructorNullPointerException1();
+        void testConstructorNullPointerException2();
+        void testConstructorNullPointerException3();
+        void testConstructorNullPointerException4();
+        void testConstructorNullPointerException5();
+        void testConstructorNullPointerException6();
+        void testConstructorNullPointerException7();
+        void testConstructorNullPointerException8();
+        void testSaturatedExecute1();
+        void testSaturatedExecute2();
+        void testSaturatedExecute3();
+        void testSaturatedExecute4();
+        void testRejectedExecutionExceptionOnShutdown();
+        void testCallerRunsOnShutdown();
+        void testDiscardOnShutdown();
+        void testDiscardOldestOnShutdown();
+        void testExecuteNull();
+        void testCorePoolSizeIllegalArgumentException();
+        void testMaximumPoolSizeIllegalArgumentException1();
+        void testMaximumPoolSizeIllegalArgumentException2();
+        void testKeepAliveTimeIllegalArgumentException();
+        void testTerminated();
+        void testBeforeAfter();
+        void testConcurrentRandomDelayedThreads();
+        void testRapidCreateAndDestroyExecutor();
+
+    };
+
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -1284,3 +1377,76 @@ void ThreadPoolExecutorTest::testRapidCreateAndDestroyExecutor() {
         ASSERT_TRUE(executor.awaitTermination(45, TimeUnit::SECONDS)) << ("executor terminated");
     }
 }
+
+TEST_F(ThreadPoolExecutorTest, testConstructor) { testConstructor(); }
+TEST_F(ThreadPoolExecutorTest, testSimpleTasks) { testSimpleTasks(); }
+TEST_F(ThreadPoolExecutorTest, testSimpleTasksCallerOwns) { testSimpleTasksCallerOwns(); }
+TEST_F(ThreadPoolExecutorTest, testMoreTasksThanMaxPoolSize) { testMoreTasksThanMaxPoolSize(); }
+TEST_F(ThreadPoolExecutorTest, testTasksThatThrow) { testTasksThatThrow(); }
+TEST_F(ThreadPoolExecutorTest, testAwaitTermination) { testAwaitTermination(); }
+TEST_F(ThreadPoolExecutorTest, testPrestartCoreThread) { testPrestartCoreThread(); }
+TEST_F(ThreadPoolExecutorTest, testPrestartAllCoreThreads) { testPrestartAllCoreThreads(); }
+TEST_F(ThreadPoolExecutorTest, testGetCompletedTaskCount) { testGetCompletedTaskCount(); }
+TEST_F(ThreadPoolExecutorTest, testGetCorePoolSize) { testGetCorePoolSize(); }
+TEST_F(ThreadPoolExecutorTest, testGetKeepAliveTime) { testGetKeepAliveTime(); }
+TEST_F(ThreadPoolExecutorTest, testGetThreadFactory) { testGetThreadFactory(); }
+TEST_F(ThreadPoolExecutorTest, testSetThreadFactory) { testSetThreadFactory(); }
+TEST_F(ThreadPoolExecutorTest, testSetThreadFactoryNull) { testSetThreadFactoryNull(); }
+TEST_F(ThreadPoolExecutorTest, testGetRejectedExecutionHandler) { testGetRejectedExecutionHandler(); }
+TEST_F(ThreadPoolExecutorTest, testSetRejectedExecutionHandler) { testSetRejectedExecutionHandler(); }
+TEST_F(ThreadPoolExecutorTest, testSetRejectedExecutionHandlerNull) { testSetRejectedExecutionHandlerNull(); }
+TEST_F(ThreadPoolExecutorTest, testGetLargestPoolSize) { testGetLargestPoolSize(); }
+TEST_F(ThreadPoolExecutorTest, testGetMaximumPoolSize) { testGetMaximumPoolSize(); }
+TEST_F(ThreadPoolExecutorTest, testGetPoolSize) { testGetPoolSize(); }
+TEST_F(ThreadPoolExecutorTest, testGetTaskCount) { testGetTaskCount(); }
+TEST_F(ThreadPoolExecutorTest, testIsShutdown) { testIsShutdown(); }
+TEST_F(ThreadPoolExecutorTest, testIsTerminated) { testIsTerminated(); }
+TEST_F(ThreadPoolExecutorTest, testIsTerminating) { testIsTerminating(); }
+TEST_F(ThreadPoolExecutorTest, testGetQueue) { testGetQueue(); }
+TEST_F(ThreadPoolExecutorTest, testRemove) { testRemove(); }
+TEST_F(ThreadPoolExecutorTest, testShutDownNow) { testShutDownNow(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor1) { testConstructor1(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor2) { testConstructor2(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor3) { testConstructor3(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor4) { testConstructor4(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor5) { testConstructor5(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor6) { testConstructor6(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor7) { testConstructor7(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor8) { testConstructor8(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor9) { testConstructor9(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor10) { testConstructor10(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor11) { testConstructor11(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor12) { testConstructor12(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor13) { testConstructor13(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor14) { testConstructor14(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor15) { testConstructor15(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor16) { testConstructor16(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor17) { testConstructor17(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor18) { testConstructor18(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor19) { testConstructor19(); }
+TEST_F(ThreadPoolExecutorTest, testConstructor20) { testConstructor20(); }
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException1) { testConstructorNullPointerException1(); }
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException2) { testConstructorNullPointerException2(); }
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException3) { testConstructorNullPointerException3(); }
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException4) { testConstructorNullPointerException4(); }
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException5) { testConstructorNullPointerException5(); }
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException6) { testConstructorNullPointerException6(); }
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException7) { testConstructorNullPointerException7(); }
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException8) { testConstructorNullPointerException8(); }
+TEST_F(ThreadPoolExecutorTest, testSaturatedExecute1) { testSaturatedExecute1(); }
+TEST_F(ThreadPoolExecutorTest, testSaturatedExecute2) { testSaturatedExecute2(); }
+TEST_F(ThreadPoolExecutorTest, testSaturatedExecute3) { testSaturatedExecute3(); }
+TEST_F(ThreadPoolExecutorTest, testSaturatedExecute4) { testSaturatedExecute4(); }
+TEST_F(ThreadPoolExecutorTest, testRejectedExecutionExceptionOnShutdown) { testRejectedExecutionExceptionOnShutdown(); }
+TEST_F(ThreadPoolExecutorTest, testCallerRunsOnShutdown) { testCallerRunsOnShutdown(); }
+TEST_F(ThreadPoolExecutorTest, testDiscardOnShutdown) { testDiscardOnShutdown(); }
+TEST_F(ThreadPoolExecutorTest, testDiscardOldestOnShutdown) { testDiscardOldestOnShutdown(); }
+TEST_F(ThreadPoolExecutorTest, testExecuteNull) { testExecuteNull(); }
+TEST_F(ThreadPoolExecutorTest, testCorePoolSizeIllegalArgumentException) { testCorePoolSizeIllegalArgumentException(); }
+TEST_F(ThreadPoolExecutorTest, testMaximumPoolSizeIllegalArgumentException1) { testMaximumPoolSizeIllegalArgumentException1(); }
+TEST_F(ThreadPoolExecutorTest, testMaximumPoolSizeIllegalArgumentException2) { testMaximumPoolSizeIllegalArgumentException2(); }
+TEST_F(ThreadPoolExecutorTest, testKeepAliveTimeIllegalArgumentException) { testKeepAliveTimeIllegalArgumentException(); }
+TEST_F(ThreadPoolExecutorTest, testTerminated) { testTerminated(); }
+TEST_F(ThreadPoolExecutorTest, testBeforeAfter) { testBeforeAfter(); }
+TEST_F(ThreadPoolExecutorTest, testConcurrentRandomDelayedThreads) { testConcurrentRandomDelayedThreads(); }
+TEST_F(ThreadPoolExecutorTest, testRapidCreateAndDestroyExecutor) { testRapidCreateAndDestroyExecutor(); }

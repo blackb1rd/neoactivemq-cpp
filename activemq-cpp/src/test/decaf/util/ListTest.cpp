@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ListTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/List.h>
 #include <decaf/util/StlList.h>
@@ -28,6 +28,55 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class ListTest : public ::testing::Test
+    {
+private:
+
+        static const int SIZE;
+
+    public:
+
+        ListTest();
+        virtual ~ListTest() {}
+
+        void testConstructor1();
+        void testConstructor2();
+        void testConstructor3();
+        void testEquals();
+        void testContains();
+        void testIndexOf();
+        void testLastIndexOf();
+        void testClear();
+        void testCopy1();
+        void testCopy2();
+        void testSize();
+        void testGet();
+        void testSet();
+        void testAdd();
+        void testAdd2();
+        void testAdd3();
+        void testRemove();
+        void testRemove2();
+        void testRemove3();
+        void testRemoveAt();
+        void testIsEmpty();
+        void testToArray();
+        void testIterator();
+        void testAddAll1();
+        void testAddAll2();
+        void testAddAll3();
+        void testAddAll4();
+        void testAddAll5();
+        void testAddAll6();
+        void testAddAll7();
+        void testAddAll8();
+        void testAddAll9();
+        void testListIterator1IndexOutOfBoundsException();
+        void testListIterator2IndexOutOfBoundsException();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 const int ListTest::SIZE = 256;
@@ -810,3 +859,38 @@ void ListTest::testListIterator2IndexOutOfBoundsException() {
 
     ASSERT_THROW(std::unique_ptr< ListIterator<int> > it( list.listIterator( 100 ) ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
+
+TEST_F(ListTest, testConstructor1) { testConstructor1(); }
+TEST_F(ListTest, testConstructor2) { testConstructor2(); }
+TEST_F(ListTest, testConstructor3) { testConstructor3(); }
+TEST_F(ListTest, testEquals) { testEquals(); }
+TEST_F(ListTest, testContains) { testContains(); }
+TEST_F(ListTest, testIndexOf) { testIndexOf(); }
+TEST_F(ListTest, testLastIndexOf) { testLastIndexOf(); }
+TEST_F(ListTest, testClear) { testClear(); }
+TEST_F(ListTest, testCopy1) { testCopy1(); }
+TEST_F(ListTest, testCopy2) { testCopy2(); }
+TEST_F(ListTest, testSize) { testSize(); }
+TEST_F(ListTest, testGet) { testGet(); }
+TEST_F(ListTest, testSet) { testSet(); }
+TEST_F(ListTest, testAdd) { testAdd(); }
+TEST_F(ListTest, testAdd2) { testAdd2(); }
+TEST_F(ListTest, testAdd3) { testAdd3(); }
+TEST_F(ListTest, testRemove) { testRemove(); }
+TEST_F(ListTest, testRemove2) { testRemove2(); }
+TEST_F(ListTest, testRemove3) { testRemove3(); }
+TEST_F(ListTest, testRemoveAt) { testRemoveAt(); }
+TEST_F(ListTest, testIsEmpty) { testIsEmpty(); }
+TEST_F(ListTest, testToArray) { testToArray(); }
+TEST_F(ListTest, testIterator) { testIterator(); }
+TEST_F(ListTest, testAddAll1) { testAddAll1(); }
+TEST_F(ListTest, testAddAll2) { testAddAll2(); }
+TEST_F(ListTest, testAddAll3) { testAddAll3(); }
+TEST_F(ListTest, testAddAll4) { testAddAll4(); }
+TEST_F(ListTest, testAddAll5) { testAddAll5(); }
+TEST_F(ListTest, testAddAll6) { testAddAll6(); }
+TEST_F(ListTest, testAddAll7) { testAddAll7(); }
+TEST_F(ListTest, testAddAll8) { testAddAll8(); }
+TEST_F(ListTest, testAddAll9) { testAddAll9(); }
+TEST_F(ListTest, testListIterator1IndexOutOfBoundsException) { testListIterator1IndexOutOfBoundsException(); }
+TEST_F(ListTest, testListIterator2IndexOutOfBoundsException) { testListIterator2IndexOutOfBoundsException(); }

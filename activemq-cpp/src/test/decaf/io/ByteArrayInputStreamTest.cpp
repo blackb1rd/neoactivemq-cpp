@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ByteArrayInputStreamTest.h"
+#include <gtest/gtest.h>
 
 #ifdef HAVE_STRING_H
 #include <string.h>
@@ -25,12 +25,32 @@
 #endif
 
 #include <cstring>
+#include <decaf/io/ByteArrayInputStream.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::io;
 using namespace decaf::util;
+
+   class ByteArrayInputStreamTest : public ::testing::Test {
+public:
+
+       ByteArrayInputStreamTest() {}
+       virtual ~ByteArrayInputStreamTest() {}
+
+       void testStream();
+       void testConstructor();
+       void testConstructor2();
+       void testAvailable();
+       void testClose();
+       void testRead();
+       void testRead2();
+       void testRead3();
+       void testSkip();
+
+   };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void ByteArrayInputStreamTest::testConstructor() {
@@ -233,3 +253,13 @@ void ByteArrayInputStreamTest::testStream()
 
     delete [] buffer;
 }
+
+TEST_F(ByteArrayInputStreamTest, testStream) { testStream(); }
+TEST_F(ByteArrayInputStreamTest, testConstructor) { testConstructor(); }
+TEST_F(ByteArrayInputStreamTest, testConstructor2) { testConstructor2(); }
+TEST_F(ByteArrayInputStreamTest, testAvailable) { testAvailable(); }
+TEST_F(ByteArrayInputStreamTest, testClose) { testClose(); }
+TEST_F(ByteArrayInputStreamTest, testRead) { testRead(); }
+TEST_F(ByteArrayInputStreamTest, testRead2) { testRead2(); }
+TEST_F(ByteArrayInputStreamTest, testRead3) { testRead3(); }
+TEST_F(ByteArrayInputStreamTest, testSkip) { testSkip(); }

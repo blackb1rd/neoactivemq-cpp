@@ -15,10 +15,23 @@
  * limitations under the License.
  */
 
-#include "CharacterTest.h"
+#include <gtest/gtest.h>
+#include <decaf/lang/Character.h>
 
 using namespace decaf;
 using namespace decaf::lang;
+
+    class CharacterTest : public ::testing::Test
+    {
+public:
+
+        CharacterTest();
+        virtual ~CharacterTest() {}
+
+        virtual void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 CharacterTest::CharacterTest() {
@@ -48,3 +61,4 @@ void CharacterTest::test() {
 
 }
 
+TEST_F(CharacterTest, test) { test(); }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ConnectionStateTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/state/ConnectionState.h>
 #include <activemq/state/SessionState.h>
@@ -27,6 +27,17 @@ using namespace activemq;
 using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
+
+    class ConnectionStateTest : public ::testing::Test {
+public:
+
+        ConnectionStateTest() {}
+        virtual ~ConnectionStateTest() {}
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConnectionStateTest::test() {
@@ -54,3 +65,5 @@ void ConnectionStateTest::test() {
     state.addSession(sinfo);
     ASSERT_TRUE(state.getSessionStates().size() == 2);
 }
+
+TEST_F(ConnectionStateTest, test) { test(); }

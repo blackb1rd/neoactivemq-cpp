@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AtomicReferenceTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/concurrent/atomic/AtomicReference.h>
 #include <decaf/lang/Integer.h>
@@ -27,6 +27,23 @@ using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
+
+    class AtomicReferenceTest : public ::testing::Test {
+public:
+
+        AtomicReferenceTest() {}
+        virtual ~AtomicReferenceTest() {}
+
+        void testConstructor();
+        void testConstructor2();
+        void testGetSet();
+        void testCompareAndSet();
+        void testCompareAndSetInMultipleThreads();
+        void testGetAndSet();
+        void testToString();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void AtomicReferenceTest::testConstructor() {
@@ -143,3 +160,11 @@ void AtomicReferenceTest::testToString() {
     ai.set( &value );
     ASSERT_TRUE(ai.toString() == Long::toString( (long long)&value ));
 }
+
+TEST_F(AtomicReferenceTest, testConstructor) { testConstructor(); }
+TEST_F(AtomicReferenceTest, testConstructor2) { testConstructor2(); }
+TEST_F(AtomicReferenceTest, testGetSet) { testGetSet(); }
+TEST_F(AtomicReferenceTest, testCompareAndSet) { testCompareAndSet(); }
+TEST_F(AtomicReferenceTest, testCompareAndSetInMultipleThreads) { testCompareAndSetInMultipleThreads(); }
+TEST_F(AtomicReferenceTest, testGetAndSet) { testGetAndSet(); }
+TEST_F(AtomicReferenceTest, testToString) { testToString(); }

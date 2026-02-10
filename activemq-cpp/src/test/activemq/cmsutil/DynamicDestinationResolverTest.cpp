@@ -15,13 +15,24 @@
  * limitations under the License.
  */
 
-#include "DynamicDestinationResolverTest.h"
+#include <gtest/gtest.h>
 #include <activemq/cmsutil/DynamicDestinationResolver.h>
 #include <activemq/cmsutil/ResourceLifecycleManager.h>
 #include "DummySession.h"
 
 using namespace activemq;
 using namespace activemq::cmsutil;
+
+    class DynamicDestinationResolverTest : public ::testing::Test {
+public:
+
+        DynamicDestinationResolverTest() {}
+        virtual ~DynamicDestinationResolverTest() {}
+
+        void testTopics();
+        void testQueues();
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void DynamicDestinationResolverTest::testTopics() {
@@ -85,3 +96,6 @@ void DynamicDestinationResolverTest::testQueues() {
 
     mgr.destroy();
 }
+
+TEST_F(DynamicDestinationResolverTest, testTopics) { testTopics(); }
+TEST_F(DynamicDestinationResolverTest, testQueues) { testQueues(); }

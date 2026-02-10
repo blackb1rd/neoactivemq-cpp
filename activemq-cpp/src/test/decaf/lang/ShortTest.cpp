@@ -15,11 +15,24 @@
  * limitations under the License.
  */
 
-#include "ShortTest.h"
+#include <gtest/gtest.h>
+#include <decaf/lang/Short.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
+
+    class ShortTest : public ::testing::Test
+    {
+public:
+
+        ShortTest();
+        virtual ~ShortTest() {}
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ShortTest::ShortTest() {
@@ -78,3 +91,4 @@ void ShortTest::test() {
 
 }
 
+TEST_F(ShortTest, test) { test(); }

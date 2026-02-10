@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "PropertiesTest.h"
+#include <gtest/gtest.h>
 
 #include <memory>
 #include <decaf/util/Properties.h>
@@ -26,6 +26,37 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::io;
+
+    class PropertiesTest : public ::testing::Test {
+private:
+
+        Properties testProperties;
+
+    public:
+
+        PropertiesTest() : testProperties() {}
+
+        virtual ~PropertiesTest() {}
+
+        void SetUp() override;
+        void TearDown() override;
+
+        void testPutAndGet();
+        void testAssign();
+        void testCopy();
+        void testClone();
+        void testRemove();
+        void testClear();
+        void testEquals();
+        void testLoadNPE();
+        void testLoadInputStream();
+        void testPropertyNames();
+        void testPropertyNamesOverride();
+        void testPropertyNamesScenario1();
+        void testStoreOutputStream();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void PropertiesTest::SetUp() {
@@ -344,3 +375,17 @@ void PropertiesTest::testStoreOutputStream() {
         ASSERT_TRUE(string( myProps2.getProperty( *iterator ) ) == string( myProps.getProperty( *iterator ) ));
     }
 }
+
+TEST_F(PropertiesTest, testPutAndGet) { testPutAndGet(); }
+TEST_F(PropertiesTest, testAssign) { testAssign(); }
+TEST_F(PropertiesTest, testCopy) { testCopy(); }
+TEST_F(PropertiesTest, testClone) { testClone(); }
+TEST_F(PropertiesTest, testRemove) { testRemove(); }
+TEST_F(PropertiesTest, testClear) { testClear(); }
+TEST_F(PropertiesTest, testEquals) { testEquals(); }
+TEST_F(PropertiesTest, testLoadNPE) { testLoadNPE(); }
+TEST_F(PropertiesTest, testLoadInputStream) { testLoadInputStream(); }
+TEST_F(PropertiesTest, testPropertyNames) { testPropertyNames(); }
+TEST_F(PropertiesTest, testPropertyNamesOverride) { testPropertyNamesOverride(); }
+TEST_F(PropertiesTest, testPropertyNamesScenario1) { testPropertyNamesScenario1(); }
+TEST_F(PropertiesTest, testStoreOutputStream) { testStoreOutputStream(); }

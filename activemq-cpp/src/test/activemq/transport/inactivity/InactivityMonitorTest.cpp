@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "InactivityMonitorTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/inactivity/InactivityMonitor.h>
 #include <activemq/transport/mock/MockTransport.h>
@@ -28,6 +28,8 @@
 #include <decaf/lang/Thread.h>
 
 #include <typeinfo>
+#include <activemq/util/Config.h>
+#include <decaf/lang/Pointer.h>
 
 using namespace activemq;
 using namespace activemq::commands;
@@ -40,6 +42,29 @@ using namespace decaf::net;
 using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class InactivityMonitorTest : public ::testing::Test {
+private:
+
+        decaf::lang::Pointer<mock::MockTransport> transport;
+
+        Pointer<activemq::commands::WireFormatInfo> localWireFormatInfo;
+
+    public:
+
+        InactivityMonitorTest();
+        virtual ~InactivityMonitorTest();
+
+        void SetUp() override;
+        void TearDown() override;
+
+        void testCreate();
+        void testReadTimeout();
+        void testWriteMessageFail();
+        void testNonFailureSendCase();
+
+    };
+
 
 namespace {
 
@@ -185,3 +210,8 @@ void InactivityMonitorTest::testNonFailureSendCase() {
     // Channel should have been inactive for to long.
     ASSERT_TRUE(listener.exceptionFired == false);
 }
+
+TEST_F(InactivityMonitorTest, testCreate) { testCreate(); }
+TEST_F(InactivityMonitorTest, testReadTimeout) { testReadTimeout(); }
+TEST_F(InactivityMonitorTest, testWriteMessageFail) { testWriteMessageFail(); }
+TEST_F(InactivityMonitorTest, testNonFailureSendCase) { testNonFailureSendCase(); }

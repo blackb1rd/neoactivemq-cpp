@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ThreadTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/lang/System.h>
@@ -32,6 +32,48 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
+
+    class ThreadTest : public ::testing::Test {
+public:
+
+        virtual ~ThreadTest(){}
+
+        void SetUp() override{}
+        void TearDown() override{}
+
+        void testConstructor();
+        void testConstructor_1();
+        void testConstructor_2();
+        void testConstructor_3();
+        void testRun();
+        void testDelegate();
+        void testDerived();
+        void testJoin1();
+        void testJoin2();
+        void testJoin3();
+        void testJoin4();
+        void testSetPriority();
+        void testIsAlive();
+        void testGetId();
+        void testGetState();
+        void testSleep();
+        void testSleep2Arg();
+        void testUncaughtExceptionHandler();
+        void testCurrentThread();
+        void testInterrupt();
+        void testInterrupted();
+        void testIsInterrupted();
+        void testSetName();
+        void testInterruptSleep();
+        void testInterruptJoin();
+        void testInterruptWait();
+        void testRapidCreateAndDestroy();
+        void testConcurrentRapidCreateAndDestroy();
+        void testCreatedButNotStarted();
+
+    };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace decaf{
@@ -912,3 +954,33 @@ void ThreadTest::testCreatedButNotStarted() {
 
     threads.clear();
 }
+
+TEST_F(ThreadTest, testConstructor) { testConstructor(); }
+TEST_F(ThreadTest, testConstructor_1) { testConstructor_1(); }
+TEST_F(ThreadTest, testConstructor_2) { testConstructor_2(); }
+TEST_F(ThreadTest, testConstructor_3) { testConstructor_3(); }
+TEST_F(ThreadTest, testRun) { testRun(); }
+TEST_F(ThreadTest, testDelegate) { testDelegate(); }
+TEST_F(ThreadTest, testDerived) { testDerived(); }
+TEST_F(ThreadTest, testJoin1) { testJoin1(); }
+TEST_F(ThreadTest, testJoin2) { testJoin2(); }
+TEST_F(ThreadTest, testJoin3) { testJoin3(); }
+TEST_F(ThreadTest, testJoin4) { testJoin4(); }
+TEST_F(ThreadTest, testSetPriority) { testSetPriority(); }
+TEST_F(ThreadTest, testIsAlive) { testIsAlive(); }
+TEST_F(ThreadTest, testGetId) { testGetId(); }
+TEST_F(ThreadTest, testGetState) { testGetState(); }
+TEST_F(ThreadTest, testSleep) { testSleep(); }
+TEST_F(ThreadTest, testSleep2Arg) { testSleep2Arg(); }
+TEST_F(ThreadTest, testUncaughtExceptionHandler) { testUncaughtExceptionHandler(); }
+TEST_F(ThreadTest, testCurrentThread) { testCurrentThread(); }
+TEST_F(ThreadTest, testInterrupt) { testInterrupt(); }
+TEST_F(ThreadTest, testInterrupted) { testInterrupted(); }
+TEST_F(ThreadTest, testIsInterrupted) { testIsInterrupted(); }
+TEST_F(ThreadTest, testSetName) { testSetName(); }
+TEST_F(ThreadTest, testInterruptSleep) { testInterruptSleep(); }
+TEST_F(ThreadTest, testInterruptJoin) { testInterruptJoin(); }
+TEST_F(ThreadTest, testInterruptWait) { testInterruptWait(); }
+TEST_F(ThreadTest, testRapidCreateAndDestroy) { testRapidCreateAndDestroy(); }
+TEST_F(ThreadTest, testConcurrentRapidCreateAndDestroy) { testConcurrentRapidCreateAndDestroy(); }
+TEST_F(ThreadTest, testCreatedButNotStarted) { testCreatedButNotStarted(); }

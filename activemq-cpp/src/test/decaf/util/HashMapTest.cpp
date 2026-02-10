@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "HashMapTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/Set.h>
 #include <decaf/util/Iterator.h>
@@ -30,6 +30,40 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class HashMapTest : public ::testing::Test {
+public:
+
+        HashMapTest();
+        virtual ~HashMapTest();
+
+        void SetUp() override;
+
+        void testConstructor();
+        void testConstructorI();
+        void testConstructorIF();
+        void testConstructorMap();
+        void testCopyConstructor();
+        void testClear();
+        void testContainsKey();
+        void testContainsValue();
+        void testGet();
+        void testPut();
+        void testRemove();
+        void testIsEmpty();
+        void testPutAll();
+        void testRehash();
+        void testToString();
+        void testSize();
+        void testEntrySet();
+        void testKeySet();
+        void testValues();
+        void testEntrySetIterator();
+        void testKeySetIterator();
+        void testValuesIterator();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -343,8 +377,6 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf {
-namespace util {
 
     template<>
     struct HashCode<MyKey> {
@@ -357,7 +389,6 @@ namespace util {
         }
     };
 
-}}
 
 ////////////////////////////////////////////////////////////////////////////////
 void HashMapTest::testPut() {
@@ -638,3 +669,26 @@ void HashMapTest::testValuesIterator() {
     ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
     ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 }
+
+TEST_F(HashMapTest, testConstructor) { testConstructor(); }
+TEST_F(HashMapTest, testConstructorI) { testConstructorI(); }
+TEST_F(HashMapTest, testConstructorIF) { testConstructorIF(); }
+TEST_F(HashMapTest, testConstructorMap) { testConstructorMap(); }
+TEST_F(HashMapTest, testCopyConstructor) { testCopyConstructor(); }
+TEST_F(HashMapTest, testClear) { testClear(); }
+TEST_F(HashMapTest, testContainsKey) { testContainsKey(); }
+TEST_F(HashMapTest, testContainsValue) { testContainsValue(); }
+TEST_F(HashMapTest, testGet) { testGet(); }
+TEST_F(HashMapTest, testPut) { testPut(); }
+TEST_F(HashMapTest, testRemove) { testRemove(); }
+TEST_F(HashMapTest, testIsEmpty) { testIsEmpty(); }
+TEST_F(HashMapTest, testKeySet) { testKeySet(); }
+TEST_F(HashMapTest, testPutAll) { testPutAll(); }
+TEST_F(HashMapTest, testRehash) { testRehash(); }
+TEST_F(HashMapTest, testSize) { testSize(); }
+TEST_F(HashMapTest, testEntrySet) { testEntrySet(); }
+TEST_F(HashMapTest, testValues) { testValues(); }
+TEST_F(HashMapTest, testToString) { testToString(); }
+TEST_F(HashMapTest, testEntrySetIterator) { testEntrySetIterator(); }
+TEST_F(HashMapTest, testKeySetIterator) { testKeySetIterator(); }
+TEST_F(HashMapTest, testValuesIterator) { testValuesIterator(); }

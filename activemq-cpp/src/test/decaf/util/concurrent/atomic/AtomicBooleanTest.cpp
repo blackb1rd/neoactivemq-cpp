@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AtomicBooleanTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 #include <decaf/lang/Boolean.h>
@@ -26,6 +26,23 @@ using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
+
+    class AtomicBooleanTest : public ::testing::Test {
+public:
+
+        AtomicBooleanTest();
+        virtual ~AtomicBooleanTest() {}
+
+        void testConstructor();
+        void testConstructor2();
+        void testGetSet();
+        void testCompareAndSet();
+        void testCompareAndSetInMultipleThreads();
+        void testGetAndSet();
+        void testToString();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 AtomicBooleanTest::AtomicBooleanTest() {
@@ -121,3 +138,11 @@ void AtomicBooleanTest::testToString() {
     ai.set( true );
     ASSERT_TRUE(ai.toString() == Boolean::toString( true ));
 }
+
+TEST_F(AtomicBooleanTest, testConstructor) { testConstructor(); }
+TEST_F(AtomicBooleanTest, testConstructor2) { testConstructor2(); }
+TEST_F(AtomicBooleanTest, testGetSet) { testGetSet(); }
+TEST_F(AtomicBooleanTest, testCompareAndSet) { testCompareAndSet(); }
+TEST_F(AtomicBooleanTest, testCompareAndSetInMultipleThreads) { testCompareAndSetInMultipleThreads(); }
+TEST_F(AtomicBooleanTest, testGetAndSet) { testGetAndSet(); }
+TEST_F(AtomicBooleanTest, testToString) { testToString(); }

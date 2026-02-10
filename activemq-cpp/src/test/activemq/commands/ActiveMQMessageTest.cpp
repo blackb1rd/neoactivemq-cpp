@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ActiveMQMessageTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/commands/ActiveMQMessage.h>
 #include <activemq/commands/ActiveMQTopic.h>
@@ -24,6 +24,11 @@
 
 #include <decaf/lang/System.h>
 #include <decaf/lang/Pointer.h>
+#include <activemq/core/ActiveMQAckHandler.h>
+#include <activemq/commands/ActiveMQDestination.h>
+#include <activemq/commands/MessageId.h>
+#include <vector>
+#include <memory>
 
 using namespace cms;
 using namespace std;
@@ -32,6 +37,76 @@ using namespace activemq::util;
 using namespace activemq::core;
 using namespace activemq::commands;
 using namespace decaf::lang;
+
+    class ActiveMQMessageTest : public ::testing::Test {
+private:
+
+        bool readOnlyMessage;
+        decaf::lang::Pointer<commands::MessageId> cmsMessageId;
+        std::string cmsCorrelationID;
+        std::unique_ptr<commands::ActiveMQTopic> cmsDestination;
+        std::unique_ptr<commands::ActiveMQTempTopic> cmsReplyTo;
+        int cmsDeliveryMode;
+        bool cmsRedelivered;
+        std::string cmsType;
+        long long cmsExpiration;
+        int cmsPriority;
+        long long cmsTimestamp;
+
+        std::vector<long long> consumerIDs;
+
+    public:
+
+        ActiveMQMessageTest() : readOnlyMessage(), cmsMessageId(), cmsCorrelationID(),
+                                cmsDestination(), cmsReplyTo(), cmsDeliveryMode(), cmsRedelivered(),
+                                cmsType(), cmsExpiration(), cmsPriority(), cmsTimestamp(), consumerIDs() {
+        }
+        virtual ~ActiveMQMessageTest() {}
+
+        void SetUp() override;
+        void TearDown() override;
+
+        void test();
+        void testSetReadOnly();
+        void testSetToForeignJMSID();
+        void testEqualsObject();
+        void testShallowCopy();
+        void testCopy();
+        void testGetAndSetCMSMessageID();
+        void testGetAndSetCMSTimestamp();
+        void testGetAndSetCMSCorrelationID();
+        void testGetAndSetCMSDeliveryMode();
+        void testGetAndSetCMSRedelivered();
+        void testGetAndSetCMSType();
+        void testGetAndSetCMSExpiration();
+        void testGetAndSetCMSPriority();
+        void testClearProperties();
+        void testPropertyExists();
+        void testGetBooleanProperty();
+        void testGetByteProperty();
+        void testGetShortProperty();
+        void testGetIntProperty();
+        void testGetLongProperty();
+        void testGetFloatProperty();
+        void testGetDoubleProperty();
+        void testGetStringProperty();
+        void testGetPropertyNames();
+        void testSetEmptyPropertyName();
+        void testGetAndSetCMSXDeliveryCount();
+        void testClearBody();
+        void testBooleanPropertyConversion();
+        void testBytePropertyConversion();
+        void testShortPropertyConversion();
+        void testIntPropertyConversion();
+        void testLongPropertyConversion();
+        void testFloatPropertyConversion();
+        void testDoublePropertyConversion();
+        void testStringPropertyConversion();
+        void testReadOnlyProperties();
+        void testIsExpired();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace{
@@ -813,3 +888,41 @@ void ActiveMQMessageTest::testIsExpired() {
     msg.setCMSExpiration( System::currentTimeMillis() + 10000 );
     ASSERT_TRUE(!msg.isExpired());
 }
+
+TEST_F(ActiveMQMessageTest, test) { test(); }
+TEST_F(ActiveMQMessageTest, testSetReadOnly) { testSetReadOnly(); }
+TEST_F(ActiveMQMessageTest, testSetToForeignJMSID) { testSetToForeignJMSID(); }
+TEST_F(ActiveMQMessageTest, testEqualsObject) { testEqualsObject(); }
+TEST_F(ActiveMQMessageTest, testShallowCopy) { testShallowCopy(); }
+TEST_F(ActiveMQMessageTest, testCopy) { testCopy(); }
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSMessageID) { testGetAndSetCMSMessageID(); }
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSTimestamp) { testGetAndSetCMSTimestamp(); }
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSCorrelationID) { testGetAndSetCMSCorrelationID(); }
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSDeliveryMode) { testGetAndSetCMSDeliveryMode(); }
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSRedelivered) { testGetAndSetCMSRedelivered(); }
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSType) { testGetAndSetCMSType(); }
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSExpiration) { testGetAndSetCMSExpiration(); }
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSPriority) { testGetAndSetCMSPriority(); }
+TEST_F(ActiveMQMessageTest, testClearProperties) { testClearProperties(); }
+TEST_F(ActiveMQMessageTest, testPropertyExists) { testPropertyExists(); }
+TEST_F(ActiveMQMessageTest, testGetBooleanProperty) { testGetBooleanProperty(); }
+TEST_F(ActiveMQMessageTest, testGetByteProperty) { testGetByteProperty(); }
+TEST_F(ActiveMQMessageTest, testGetShortProperty) { testGetShortProperty(); }
+TEST_F(ActiveMQMessageTest, testGetIntProperty) { testGetIntProperty(); }
+TEST_F(ActiveMQMessageTest, testGetLongProperty) { testGetLongProperty(); }
+TEST_F(ActiveMQMessageTest, testGetFloatProperty) { testGetFloatProperty(); }
+TEST_F(ActiveMQMessageTest, testGetDoubleProperty) { testGetDoubleProperty(); }
+TEST_F(ActiveMQMessageTest, testGetStringProperty) { testGetStringProperty(); }
+TEST_F(ActiveMQMessageTest, testGetPropertyNames) { testGetPropertyNames(); }
+TEST_F(ActiveMQMessageTest, testSetEmptyPropertyName) { testSetEmptyPropertyName(); }
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSXDeliveryCount) { testGetAndSetCMSXDeliveryCount(); }
+TEST_F(ActiveMQMessageTest, testClearBody) { testClearBody(); }
+TEST_F(ActiveMQMessageTest, testBooleanPropertyConversion) { testBooleanPropertyConversion(); }
+TEST_F(ActiveMQMessageTest, testBytePropertyConversion) { testBytePropertyConversion(); }
+TEST_F(ActiveMQMessageTest, testShortPropertyConversion) { testShortPropertyConversion(); }
+TEST_F(ActiveMQMessageTest, testIntPropertyConversion) { testIntPropertyConversion(); }
+TEST_F(ActiveMQMessageTest, testLongPropertyConversion) { testLongPropertyConversion(); }
+TEST_F(ActiveMQMessageTest, testFloatPropertyConversion) { testFloatPropertyConversion(); }
+TEST_F(ActiveMQMessageTest, testDoublePropertyConversion) { testDoublePropertyConversion(); }
+TEST_F(ActiveMQMessageTest, testReadOnlyProperties) { testReadOnlyProperties(); }
+TEST_F(ActiveMQMessageTest, testIsExpired) { testIsExpired(); }

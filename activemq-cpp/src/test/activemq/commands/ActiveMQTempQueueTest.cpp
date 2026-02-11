@@ -26,19 +26,10 @@ using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
 
-    class ActiveMQTempQueueTest : public ::testing::Test {
-public:
-
-        ActiveMQTempQueueTest() {}
-        virtual ~ActiveMQTempQueueTest() {}
-
-        void test();
-    };
-
+class ActiveMQTempQueueTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTempQueueTest::test()
-{
+TEST_F(ActiveMQTempQueueTest, test) {
     ActiveMQTempQueue myQueue;
 
     ASSERT_TRUE(myQueue.getDestinationType() == cms::Destination::TEMPORARY_QUEUE);
@@ -58,5 +49,3 @@ void ActiveMQTempQueueTest::test()
     connectionId = myQueue.getConnectionId();
     ASSERT_EQ(std::string(""), myQueue.getConnectionId()) << ("ConnectionId should not have parsed");
 }
-
-TEST_F(ActiveMQTempQueueTest, test) { test(); }

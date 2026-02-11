@@ -31,19 +31,6 @@ using namespace activemq;
 using namespace activemq::threads;
 
     class SchedulerTest : public ::testing::Test {
-public:
-
-        SchedulerTest();
-        virtual ~SchedulerTest();
-
-        void testConstructor();
-        void testScheduleNullRunnableThrows();
-        void testExecutePeriodically();
-        void testSchedualPeriodically();
-        void testExecuteAfterDelay();
-        void testCancel();
-        void testShutdown();
-
     };
 
 
@@ -75,15 +62,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SchedulerTest::SchedulerTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-SchedulerTest::~SchedulerTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void SchedulerTest::testConstructor() {
+TEST_F(SchedulerTest, testConstructor) {
 
     Scheduler scheduler("testExecutePeriodically");
     ASSERT_EQ(false, scheduler.isStarted());
@@ -104,7 +83,7 @@ void SchedulerTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SchedulerTest::testScheduleNullRunnableThrows() {
+TEST_F(SchedulerTest, testScheduleNullRunnableThrows) {
 
     Scheduler scheduler("testSchedualPeriodically");
     scheduler.start();
@@ -116,7 +95,7 @@ void SchedulerTest::testScheduleNullRunnableThrows() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SchedulerTest::testExecutePeriodically() {
+TEST_F(SchedulerTest, testExecutePeriodically) {
 
     {
         Scheduler scheduler("testExecutePeriodically");
@@ -150,7 +129,7 @@ void SchedulerTest::testExecutePeriodically() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SchedulerTest::testSchedualPeriodically() {
+TEST_F(SchedulerTest, testSchedualPeriodically) {
 
     {
         Scheduler scheduler("testSchedualPeriodically");
@@ -184,7 +163,7 @@ void SchedulerTest::testSchedualPeriodically() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SchedulerTest::testExecuteAfterDelay() {
+TEST_F(SchedulerTest, testExecuteAfterDelay) {
 
     {
         Scheduler scheduler("testExecuteAfterDelay");
@@ -227,7 +206,7 @@ void SchedulerTest::testExecuteAfterDelay() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SchedulerTest::testCancel() {
+TEST_F(SchedulerTest, testCancel) {
 
     Scheduler scheduler("testCancel");
     scheduler.start();
@@ -243,7 +222,7 @@ void SchedulerTest::testCancel() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SchedulerTest::testShutdown() {
+TEST_F(SchedulerTest, testShutdown) {
 
     {
         Scheduler scheduler("testShutdown");
@@ -269,11 +248,3 @@ void SchedulerTest::testShutdown() {
         ASSERT_TRUE(scheduler.isStopped());
     }
 }
-
-TEST_F(SchedulerTest, testConstructor) { testConstructor(); }
-TEST_F(SchedulerTest, testScheduleNullRunnableThrows) { testScheduleNullRunnableThrows(); }
-TEST_F(SchedulerTest, testExecutePeriodically) { testExecutePeriodically(); }
-TEST_F(SchedulerTest, testSchedualPeriodically) { testSchedualPeriodically(); }
-TEST_F(SchedulerTest, testExecuteAfterDelay) { testExecuteAfterDelay(); }
-TEST_F(SchedulerTest, testCancel) { testCancel(); }
-TEST_F(SchedulerTest, testShutdown) { testShutdown(); }

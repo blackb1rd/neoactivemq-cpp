@@ -42,38 +42,13 @@ using namespace decaf::lang::exceptions;
     class SocketTest : public ::testing::Test {
 public:
 
-        virtual ~SocketTest() {}
-
-        void testConnectUnknownHost();
-        void testConstructor();
-        void testGetReuseAddress();
-        void testClose();
-        void testGetPort();
-        void testGetInputStream();
-        void testGetOutputStream();
-        void testGetKeepAlive();
-        void testGetLocalPort();
-        void testGetSoLinger();
-        void testGetSoTimeout();
-        void testGetTcpNoDelay();
-        void testIsConnected();
-        void testIsClosed();
-        void testIsInputShutdown();
-        void testIsOutputShutdown();
-        void testConnectPortOutOfRange();
-
         // Old Tests
         void testConnect();
-        void testTx();
-        void testTrx();
-        void testRxFail();
-        void testTrxNoDelay();
 
     };
 
-
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testConnectUnknownHost() {
+TEST_F(SocketTest, testConnectUnknownHost) {
 
     // TODO - Should throw an UnknownHostException
     Socket s;
@@ -81,7 +56,7 @@ void SocketTest::testConnectUnknownHost() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testConnectPortOutOfRange() {
+TEST_F(SocketTest, testConnectPortOutOfRange) {
 
     Socket s;
 
@@ -91,7 +66,7 @@ void SocketTest::testConnectPortOutOfRange() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testConstructor() {
+TEST_F(SocketTest, testConstructor) {
 
     // create the socket and then validate some basic state
     Socket s;
@@ -103,7 +78,7 @@ void SocketTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetReuseAddress() {
+TEST_F(SocketTest, testGetReuseAddress) {
 
     Socket s;
     s.setReuseAddress( true );
@@ -113,7 +88,7 @@ void SocketTest::testGetReuseAddress() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testClose() {
+TEST_F(SocketTest, testClose) {
 
     ServerSocket ss(0);
     Socket client( "localhost", ss.getLocalPort() );
@@ -126,7 +101,7 @@ void SocketTest::testClose() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetPort() {
+TEST_F(SocketTest, testGetPort) {
 
     ServerSocket server(0);
     int serverPort = server.getLocalPort();
@@ -139,7 +114,7 @@ void SocketTest::testGetPort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetInputStream() {
+TEST_F(SocketTest, testGetInputStream) {
 
     ServerSocket ss(0);
     Socket client( "localhost", ss.getLocalPort() );
@@ -154,7 +129,7 @@ void SocketTest::testGetInputStream() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetKeepAlive() {
+TEST_F(SocketTest, testGetKeepAlive) {
 
     try {
 
@@ -175,7 +150,7 @@ void SocketTest::testGetKeepAlive() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetLocalPort() {
+TEST_F(SocketTest, testGetLocalPort) {
 
     ServerSocket server(0);
     Socket client( "localhost", server.getLocalPort() );
@@ -187,7 +162,7 @@ void SocketTest::testGetLocalPort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetSoLinger() {
+TEST_F(SocketTest, testGetSoLinger) {
 
     try {
 
@@ -208,7 +183,7 @@ void SocketTest::testGetSoLinger() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetSoTimeout() {
+TEST_F(SocketTest, testGetSoTimeout) {
 
     ServerSocket server(0);
     Socket client( "localhost", server.getLocalPort() );
@@ -218,7 +193,7 @@ void SocketTest::testGetSoTimeout() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetTcpNoDelay() {
+TEST_F(SocketTest, testGetTcpNoDelay) {
 
     ServerSocket server(0);
     Socket client( "localhost", server.getLocalPort() );
@@ -231,7 +206,7 @@ void SocketTest::testGetTcpNoDelay() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testIsConnected() {
+TEST_F(SocketTest, testIsConnected) {
 
     ServerSocket server(0);
     Socket client( "localhost", server.getLocalPort() );
@@ -246,7 +221,7 @@ void SocketTest::testIsConnected() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testIsClosed() {
+TEST_F(SocketTest, testIsClosed) {
 
     ServerSocket server(0);
     Socket client( "localhost", server.getLocalPort() );
@@ -271,7 +246,7 @@ void SocketTest::testIsClosed() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testIsInputShutdown() {
+TEST_F(SocketTest, testIsInputShutdown) {
 
     ServerSocket server(0);
     Socket client( "localhost", server.getLocalPort() );
@@ -302,7 +277,7 @@ void SocketTest::testIsInputShutdown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testIsOutputShutdown() {
+TEST_F(SocketTest, testIsOutputShutdown) {
 
     ServerSocket server(0);
     Socket client( "localhost", server.getLocalPort() );
@@ -370,7 +345,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetOutputStream() {
+TEST_F(SocketTest, testGetOutputStream) {
 
     {
         // Simple fetch test
@@ -614,7 +589,7 @@ void SocketTest::testConnect() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testTx() {
+TEST_F(SocketTest, testTx) {
 
     try{
 
@@ -670,7 +645,7 @@ void SocketTest::testTx() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testTrx() {
+TEST_F(SocketTest, testTrx) {
 
     try{
 
@@ -727,7 +702,7 @@ void SocketTest::testTrx() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testRxFail() {
+TEST_F(SocketTest, testRxFail) {
 
     try{
 
@@ -776,7 +751,7 @@ void SocketTest::testRxFail() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testTrxNoDelay() {
+TEST_F(SocketTest, testTrxNoDelay) {
 
     try{
 
@@ -830,25 +805,3 @@ void SocketTest::testTrxNoDelay() {
         printf( "%s\n", ex.getMessage().c_str() );
     }
 }
-
-TEST_F(SocketTest, testConnectUnknownHost) { testConnectUnknownHost(); }
-TEST_F(SocketTest, testConstructor) { testConstructor(); }
-TEST_F(SocketTest, testGetReuseAddress) { testGetReuseAddress(); }
-TEST_F(SocketTest, testClose) { testClose(); }
-TEST_F(SocketTest, testGetPort) { testGetPort(); }
-TEST_F(SocketTest, testGetInputStream) { testGetInputStream(); }
-TEST_F(SocketTest, testGetOutputStream) { testGetOutputStream(); }
-TEST_F(SocketTest, testGetKeepAlive) { testGetKeepAlive(); }
-TEST_F(SocketTest, testGetLocalPort) { testGetLocalPort(); }
-TEST_F(SocketTest, testGetSoLinger) { testGetSoLinger(); }
-TEST_F(SocketTest, testGetSoTimeout) { testGetSoTimeout(); }
-TEST_F(SocketTest, testGetTcpNoDelay) { testGetTcpNoDelay(); }
-TEST_F(SocketTest, testIsConnected) { testIsConnected(); }
-TEST_F(SocketTest, testIsClosed) { testIsClosed(); }
-TEST_F(SocketTest, testIsInputShutdown) { testIsInputShutdown(); }
-TEST_F(SocketTest, testIsOutputShutdown) { testIsOutputShutdown(); }
-TEST_F(SocketTest, testConnectPortOutOfRange) { testConnectPortOutOfRange(); }
-TEST_F(SocketTest, testTx) { testTx(); }
-TEST_F(SocketTest, testTrx) { testTrx(); }
-TEST_F(SocketTest, testTrxNoDelay) { testTrxNoDelay(); }
-TEST_F(SocketTest, testRxFail) { testRxFail(); }

@@ -24,7 +24,6 @@
 #include <decaf/io/IOException.h>
 #include <decaf/lang/Thread.h>
 
-
 namespace decaf { namespace internal { namespace net { namespace ssl { namespace openssl {} } } } }
 using namespace decaf;
 using namespace decaf::net;
@@ -47,26 +46,20 @@ public:
          * This verifies the fix for the timeout issue where handshake was
          * deferred until first read/write operation.
          */
-        void testHandshakeCalledAfterConnect();
 
         /**
          * Tests that calling startHandshake multiple times is safe and idempotent.
          */
-        void testHandshakeIdempotency();
 
         /**
          * Tests connection failure scenarios with invalid hosts.
          */
-        void testConnectWithInvalidHost();
 
         /**
          * Tests that server name (SNI) is properly configured.
          */
-        void testServerNameConfiguration();
 
     };
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 OpenSSLSocketTest::OpenSSLSocketTest() {
@@ -85,7 +78,7 @@ void OpenSSLSocketTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenSSLSocketTest::testHandshakeCalledAfterConnect() {
+TEST_F(OpenSSLSocketTest, testHandshakeCalledAfterConnect) {
 
     // This test validates the critical fix for the SSL timeout issue.
     // Prior to the fix, the SSL handshake was deferred until the first
@@ -117,7 +110,7 @@ void OpenSSLSocketTest::testHandshakeCalledAfterConnect() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenSSLSocketTest::testHandshakeIdempotency() {
+TEST_F(OpenSSLSocketTest, testHandshakeIdempotency) {
 
     // Tests that calling startHandshake() multiple times is safe.
     // After the fix, connect() calls startHandshake(), and subsequent
@@ -141,7 +134,7 @@ void OpenSSLSocketTest::testHandshakeIdempotency() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenSSLSocketTest::testConnectWithInvalidHost() {
+TEST_F(OpenSSLSocketTest, testConnectWithInvalidHost) {
 
     try {
         // Test connection failure with invalid host
@@ -175,7 +168,7 @@ void OpenSSLSocketTest::testConnectWithInvalidHost() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenSSLSocketTest::testServerNameConfiguration() {
+TEST_F(OpenSSLSocketTest, testServerNameConfiguration) {
 
     try {
         // Tests that SNI (Server Name Indication) is properly configured
@@ -208,8 +201,3 @@ void OpenSSLSocketTest::testServerNameConfiguration() {
         FAIL() << (std::string("Unexpected exception: ") + ex.getMessage());
     }
 }
-
-TEST_F(OpenSSLSocketTest, testHandshakeCalledAfterConnect) { testHandshakeCalledAfterConnect(); }
-TEST_F(OpenSSLSocketTest, testHandshakeIdempotency) { testHandshakeIdempotency(); }
-TEST_F(OpenSSLSocketTest, testConnectWithInvalidHost) { testConnectWithInvalidHost(); }
-TEST_F(OpenSSLSocketTest, testServerNameConfiguration) { testServerNameConfiguration(); }

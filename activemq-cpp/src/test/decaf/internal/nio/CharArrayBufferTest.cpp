@@ -22,7 +22,6 @@
 #include <decaf/lang/Float.h>
 #include <string.h>
 
-
 namespace decaf { namespace internal { namespace nio {} } }
 using namespace std;
 using namespace decaf;
@@ -32,6 +31,8 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class CharArrayBufferTest : public ::testing::Test {
+    protected:
+
 decaf::nio::CharBuffer* testBuffer1;
         char* testData1;
 
@@ -39,15 +40,9 @@ decaf::nio::CharBuffer* testBuffer1;
         static const int SMALL_TEST_LENGTH;
         static const int BUFFER_LENGTH;
 
-    private:
-
-        CharArrayBufferTest(const CharArrayBufferTest&);
-        CharArrayBufferTest& operator= (const CharArrayBufferTest&);
-
     public:
 
         CharArrayBufferTest() : testBuffer1(), testData1() {}
-        virtual ~CharArrayBufferTest() {}
 
         void SetUp() override {
             testBuffer1 = decaf::nio::CharBuffer::allocate( testData1Size );
@@ -63,47 +58,7 @@ decaf::nio::CharBuffer* testBuffer1;
             delete [] testData1;
         }
 
-        void test();
-        void testArray();
-        void testArrayOffset();
-        void testReadOnlyArray();
-        void testAsReadOnlyBuffer();
-        void testCompact();
-        void testCompareTo();
-        void testDuplicate();
-        void testEquals();
-        void testGet();
-        void testGetbyteArray();
-        void testGetbyteArray2();
-        void testGetWithIndex();
-        void testPutbyte();
-        void testPutbyteArray();
-        void testPutbyteArray2();
-        void testPutCharBuffer();
-        void testPutIndexed();
-        void testSlice();
-        void testToString();
-        void testWrapNullArray();
-        void testCharAt();
-        void testLength();
-        void testSubSequence();
-        void testPutString();
-        void testPutStringWithArgs();
-        void testAppendSelf();
-        void testAppendOverFlow();
-        void testReadOnlyMap();
-        void testAppendCNormal();
-        void testAppendCharSequenceNormal();
-        void testAppendCharSequenceIINormal();
-        void testAppendCharSequenceII_IllegalArgument();
-        void testReadCharBuffer();
-        void testReadReadOnly();
-        void testReadOverflow();
-        void testReadSelf();
-
     };
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const int CharArrayBufferTest::testData1Size = 100;
@@ -164,7 +119,7 @@ namespace{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::test() {
+TEST_F(CharArrayBufferTest, test) {
 
     // Check that we have setup the array and our initial assumptions on state
     // are correct.  This is the first test run.
@@ -181,7 +136,7 @@ void CharArrayBufferTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testArray() {
+TEST_F(CharArrayBufferTest, testArray) {
 
     testBuffer1->put( testData1, testData1Size, 0, testData1Size );
     testBuffer1->position( 0 );
@@ -203,7 +158,7 @@ void CharArrayBufferTest::testArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testArrayOffset() {
+TEST_F(CharArrayBufferTest, testArrayOffset) {
 
     testBuffer1->put( testData1, testData1Size, 0, testData1Size );
     ASSERT_TRUE(testBuffer1->arrayOffset() == 0);
@@ -217,7 +172,7 @@ void CharArrayBufferTest::testArrayOffset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testReadOnlyArray() {
+TEST_F(CharArrayBufferTest, testReadOnlyArray) {
 
     CharBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
 
@@ -232,7 +187,7 @@ void CharArrayBufferTest::testReadOnlyArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testAsReadOnlyBuffer() {
+TEST_F(CharArrayBufferTest, testAsReadOnlyBuffer) {
 
     testBuffer1->clear();
     testBuffer1->mark();
@@ -261,7 +216,7 @@ void CharArrayBufferTest::testAsReadOnlyBuffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testCompact() {
+TEST_F(CharArrayBufferTest, testCompact) {
 
     // readonly's contents should be the same as buf
     CharBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
@@ -322,7 +277,7 @@ void CharArrayBufferTest::testCompact() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testCompareTo() {
+TEST_F(CharArrayBufferTest, testCompareTo) {
 
     // compare to self
     ASSERT_TRUE(0 == testBuffer1->compareTo( *testBuffer1 ));
@@ -366,7 +321,7 @@ void CharArrayBufferTest::testCompareTo() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testDuplicate() {
+TEST_F(CharArrayBufferTest, testDuplicate) {
 
     testBuffer1->clear();
     testBuffer1->mark();
@@ -399,7 +354,7 @@ void CharArrayBufferTest::testDuplicate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testEquals() {
+TEST_F(CharArrayBufferTest, testEquals) {
 
     // equal to self
     ASSERT_TRUE(testBuffer1->equals( *testBuffer1 ));
@@ -423,7 +378,7 @@ void CharArrayBufferTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testGet() {
+TEST_F(CharArrayBufferTest, testGet) {
 
     testBuffer1->clear();
 
@@ -436,7 +391,7 @@ void CharArrayBufferTest::testGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testGetbyteArray() {
+TEST_F(CharArrayBufferTest, testGetbyteArray) {
 
     std::vector<char> array;
     array.resize( 1 );
@@ -454,7 +409,7 @@ void CharArrayBufferTest::testGetbyteArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testGetbyteArray2() {
+TEST_F(CharArrayBufferTest, testGetbyteArray2) {
 
     testBuffer1->clear();
     char* array = new char[testBuffer1->capacity()];
@@ -500,7 +455,7 @@ void CharArrayBufferTest::testGetbyteArray2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testGetWithIndex() {
+TEST_F(CharArrayBufferTest, testGetWithIndex) {
 
     testBuffer1->clear();
 
@@ -515,7 +470,7 @@ void CharArrayBufferTest::testGetWithIndex() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testPutbyte() {
+TEST_F(CharArrayBufferTest, testPutbyte) {
 
     CharBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
 
@@ -537,7 +492,7 @@ void CharArrayBufferTest::testPutbyte() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testPutbyteArray() {
+TEST_F(CharArrayBufferTest, testPutbyteArray) {
 
     std::vector<char> array;
     array.push_back( 127 );
@@ -560,7 +515,7 @@ void CharArrayBufferTest::testPutbyteArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testPutbyteArray2() {
+TEST_F(CharArrayBufferTest, testPutbyteArray2) {
 
     testBuffer1->clear();
     char* array = new char[testBuffer1->capacity()];
@@ -604,7 +559,7 @@ void CharArrayBufferTest::testPutbyteArray2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testPutCharBuffer() {
+TEST_F(CharArrayBufferTest, testPutCharBuffer) {
 
     CharBuffer* other = CharBuffer::allocate( testBuffer1->capacity() );
 
@@ -638,7 +593,7 @@ void CharArrayBufferTest::testPutCharBuffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testPutIndexed() {
+TEST_F(CharArrayBufferTest, testPutIndexed) {
 
     CharBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -660,7 +615,7 @@ void CharArrayBufferTest::testPutIndexed() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testSlice() {
+TEST_F(CharArrayBufferTest, testSlice) {
 
     ASSERT_TRUE(testBuffer1->capacity() > SMALL_TEST_LENGTH);
     testBuffer1->position( 1 );
@@ -689,7 +644,7 @@ void CharArrayBufferTest::testSlice() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testToString() {
+TEST_F(CharArrayBufferTest, testToString) {
 
     string expected = "";
     for( int i = testBuffer1->position(); i < testBuffer1->limit(); i++ ) {
@@ -700,13 +655,13 @@ void CharArrayBufferTest::testToString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testWrapNullArray() {
+TEST_F(CharArrayBufferTest, testWrapNullArray) {
 
     ASSERT_THROW(testBuffer1->wrap( (char*)NULL, 0, 0, 3 ), NullPointerException) << ("Should throw a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testCharAt() {
+TEST_F(CharArrayBufferTest, testCharAt) {
 
     for( int i = 0; i < testBuffer1->remaining(); i++ ) {
         ASSERT_TRUE(testBuffer1->get( testBuffer1->position() + i ) ==
@@ -719,12 +674,12 @@ void CharArrayBufferTest::testCharAt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testLength() {
+TEST_F(CharArrayBufferTest, testLength) {
     ASSERT_TRUE(testBuffer1->length() == testBuffer1->remaining());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testSubSequence() {
+TEST_F(CharArrayBufferTest, testSubSequence) {
 
     ASSERT_THROW(testBuffer1->subSequence(testBuffer1->length() + 1, testBuffer1->length() + 1), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 
@@ -743,7 +698,7 @@ void CharArrayBufferTest::testSubSequence() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testPutString() {
+TEST_F(CharArrayBufferTest, testPutString) {
 
     testBuffer1->clear();
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
@@ -759,7 +714,7 @@ void CharArrayBufferTest::testPutString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testPutStringWithArgs() {
+TEST_F(CharArrayBufferTest, testPutStringWithArgs) {
 
     testBuffer1->clear();
     string str;
@@ -799,7 +754,7 @@ void CharArrayBufferTest::testPutStringWithArgs() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testAppendSelf() {
+TEST_F(CharArrayBufferTest, testAppendSelf) {
 
     CharBuffer* cb = CharBuffer::allocate(10);
     CharBuffer* cb2 = cb->duplicate();
@@ -833,7 +788,7 @@ void CharArrayBufferTest::testAppendSelf() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testAppendOverFlow() {
+TEST_F(CharArrayBufferTest, testAppendOverFlow) {
 
     CharBuffer* cb = CharBuffer::allocate( 1 );
     CharSequence* cs = testBuffer1->subSequence( 0, 25 );
@@ -851,7 +806,7 @@ void CharArrayBufferTest::testAppendOverFlow() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testReadOnlyMap() {
+TEST_F(CharArrayBufferTest, testReadOnlyMap) {
 
     CharBuffer* cb = testBuffer1->asReadOnlyBuffer();
     MyCharSequence cs( "String" );
@@ -866,7 +821,7 @@ void CharArrayBufferTest::testReadOnlyMap() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testAppendCNormal() {
+TEST_F(CharArrayBufferTest, testAppendCNormal) {
     CharBuffer* cb = CharBuffer::allocate(2);
     cb->put('A');
     ASSERT_TRUE(cb == &( cb->append('B') ));
@@ -875,7 +830,7 @@ void CharArrayBufferTest::testAppendCNormal() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testAppendCharSequenceNormal() {
+TEST_F(CharArrayBufferTest, testAppendCharSequenceNormal) {
 
     CharBuffer* cb = CharBuffer::allocate(10);
     cb->put('A');
@@ -892,7 +847,7 @@ void CharArrayBufferTest::testAppendCharSequenceNormal() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testAppendCharSequenceIINormal() {
+TEST_F(CharArrayBufferTest, testAppendCharSequenceIINormal) {
 
     CharBuffer* cb = CharBuffer::allocate( 10 );
     cb->put( 'A' );
@@ -909,7 +864,7 @@ void CharArrayBufferTest::testAppendCharSequenceIINormal() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testAppendCharSequenceII_IllegalArgument() {
+TEST_F(CharArrayBufferTest, testAppendCharSequenceII_IllegalArgument) {
 
     CharBuffer* cb = CharBuffer::allocate( 10 );
     MyCharSequence cs( "String" );
@@ -927,7 +882,7 @@ void CharArrayBufferTest::testAppendCharSequenceII_IllegalArgument() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testReadCharBuffer() {
+TEST_F(CharArrayBufferTest, testReadCharBuffer) {
 
     std::vector<char> buffer;
     buffer.push_back('S');
@@ -955,7 +910,7 @@ void CharArrayBufferTest::testReadCharBuffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testReadReadOnly() {
+TEST_F(CharArrayBufferTest, testReadReadOnly) {
 
     CharBuffer* source = CharBuffer::wrap( testData1, testData1Size, 0, testData1Size );
     CharBuffer* target = testBuffer1->asReadOnlyBuffer();
@@ -972,7 +927,7 @@ void CharArrayBufferTest::testReadReadOnly() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testReadOverflow() {
+TEST_F(CharArrayBufferTest, testReadOverflow) {
 
     std::vector<char> buffer;
     buffer.push_back('S');
@@ -989,7 +944,7 @@ void CharArrayBufferTest::testReadOverflow() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharArrayBufferTest::testReadSelf() {
+TEST_F(CharArrayBufferTest, testReadSelf) {
 
     CharBuffer* source = CharBuffer::wrap( testData1, testData1Size, 0, testData1Size );
 
@@ -997,41 +952,3 @@ void CharArrayBufferTest::testReadSelf() {
 
     delete source;
 }
-
-TEST_F(CharArrayBufferTest, test) { test(); }
-TEST_F(CharArrayBufferTest, testArray) { testArray(); }
-TEST_F(CharArrayBufferTest, testArrayOffset) { testArrayOffset(); }
-TEST_F(CharArrayBufferTest, testReadOnlyArray) { testReadOnlyArray(); }
-TEST_F(CharArrayBufferTest, testAsReadOnlyBuffer) { testAsReadOnlyBuffer(); }
-TEST_F(CharArrayBufferTest, testCompact) { testCompact(); }
-TEST_F(CharArrayBufferTest, testCompareTo) { testCompareTo(); }
-TEST_F(CharArrayBufferTest, testDuplicate) { testDuplicate(); }
-TEST_F(CharArrayBufferTest, testEquals) { testEquals(); }
-TEST_F(CharArrayBufferTest, testGet) { testGet(); }
-TEST_F(CharArrayBufferTest, testGetbyteArray) { testGetbyteArray(); }
-TEST_F(CharArrayBufferTest, testGetbyteArray2) { testGetbyteArray2(); }
-TEST_F(CharArrayBufferTest, testGetWithIndex) { testGetWithIndex(); }
-TEST_F(CharArrayBufferTest, testPutbyte) { testPutbyte(); }
-TEST_F(CharArrayBufferTest, testPutbyteArray) { testPutbyteArray(); }
-TEST_F(CharArrayBufferTest, testPutbyteArray2) { testPutbyteArray2(); }
-TEST_F(CharArrayBufferTest, testPutCharBuffer) { testPutCharBuffer(); }
-TEST_F(CharArrayBufferTest, testPutIndexed) { testPutIndexed(); }
-TEST_F(CharArrayBufferTest, testSlice) { testSlice(); }
-TEST_F(CharArrayBufferTest, testToString) { testToString(); }
-TEST_F(CharArrayBufferTest, testWrapNullArray) { testWrapNullArray(); }
-TEST_F(CharArrayBufferTest, testCharAt) { testCharAt(); }
-TEST_F(CharArrayBufferTest, testLength) { testLength(); }
-TEST_F(CharArrayBufferTest, testSubSequence) { testSubSequence(); }
-TEST_F(CharArrayBufferTest, testPutString) { testPutString(); }
-TEST_F(CharArrayBufferTest, testPutStringWithArgs) { testPutStringWithArgs(); }
-TEST_F(CharArrayBufferTest, testAppendSelf) { testAppendSelf(); }
-TEST_F(CharArrayBufferTest, testAppendOverFlow) { testAppendOverFlow(); }
-TEST_F(CharArrayBufferTest, testReadOnlyMap) { testReadOnlyMap(); }
-TEST_F(CharArrayBufferTest, testAppendCNormal) { testAppendCNormal(); }
-TEST_F(CharArrayBufferTest, testAppendCharSequenceNormal) { testAppendCharSequenceNormal(); }
-TEST_F(CharArrayBufferTest, testAppendCharSequenceIINormal) { testAppendCharSequenceIINormal(); }
-TEST_F(CharArrayBufferTest, testAppendCharSequenceII_IllegalArgument) { testAppendCharSequenceII_IllegalArgument(); }
-TEST_F(CharArrayBufferTest, testReadCharBuffer) { testReadCharBuffer(); }
-TEST_F(CharArrayBufferTest, testReadReadOnly) { testReadReadOnly(); }
-TEST_F(CharArrayBufferTest, testReadOverflow) { testReadOverflow(); }
-TEST_F(CharArrayBufferTest, testReadSelf) { testReadSelf(); }

@@ -37,17 +37,7 @@ public:
         MessageDigestTest();
         virtual ~MessageDigestTest();
 
-        void testGetInstance1();
-        void testGetInstance2();
-        void testGetInstance3();
-        void testGetInstance4();
-
-        void testResults1();
-        void testResults2();
-        void testResults3();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 MessageDigestTest::MessageDigestTest() {
@@ -58,7 +48,7 @@ MessageDigestTest::~MessageDigestTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDigestTest::testGetInstance1() {
+TEST_F(MessageDigestTest, testGetInstance1) {
 
     MessageDigest* digest = MessageDigest::getInstance("MD5");
 
@@ -70,7 +60,7 @@ void MessageDigestTest::testGetInstance1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDigestTest::testGetInstance2() {
+TEST_F(MessageDigestTest, testGetInstance2) {
 
     MessageDigest* digest = MessageDigest::getInstance("MD4");
 
@@ -82,7 +72,7 @@ void MessageDigestTest::testGetInstance2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDigestTest::testGetInstance3() {
+TEST_F(MessageDigestTest, testGetInstance3) {
 
     MessageDigest* digest = MessageDigest::getInstance("SHA1");
 
@@ -94,7 +84,7 @@ void MessageDigestTest::testGetInstance3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDigestTest::testGetInstance4() {
+TEST_F(MessageDigestTest, testGetInstance4) {
     ASSERT_THROW(MessageDigest::getInstance("MD3"), NoSuchAlgorithmException) << ("Should throw a NoSuchAlgorithmException");
 }
 
@@ -115,7 +105,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDigestTest::testResults1() {
+TEST_F(MessageDigestTest, testResults1) {
 
     Pointer<MessageDigest> digest(MessageDigest::getInstance("MD5"));
 
@@ -152,7 +142,7 @@ void MessageDigestTest::testResults1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDigestTest::testResults2() {
+TEST_F(MessageDigestTest, testResults2) {
 
     Pointer<MessageDigest> digest(MessageDigest::getInstance("MD4"));
 
@@ -189,7 +179,7 @@ void MessageDigestTest::testResults2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDigestTest::testResults3() {
+TEST_F(MessageDigestTest, testResults3) {
 
     Pointer<MessageDigest> digest(MessageDigest::getInstance("SHA1"));
 
@@ -205,11 +195,3 @@ void MessageDigestTest::testResults3() {
 //    result = digest->digest((const unsigned char*)bytes.data(), (int)bytes.size());
 //    ASSERT_EQ(std::string("2fd4e1c67a2d28fced849ee1bb76e7391b93eb12"), toString(result));
 }
-
-TEST_F(MessageDigestTest, testGetInstance1) { testGetInstance1(); }
-TEST_F(MessageDigestTest, testGetInstance2) { testGetInstance2(); }
-TEST_F(MessageDigestTest, testGetInstance3) { testGetInstance3(); }
-TEST_F(MessageDigestTest, testGetInstance4) { testGetInstance4(); }
-TEST_F(MessageDigestTest, testResults1) { testResults1(); }
-TEST_F(MessageDigestTest, testResults2) { testResults2(); }
-TEST_F(MessageDigestTest, testResults3) { testResults3(); }

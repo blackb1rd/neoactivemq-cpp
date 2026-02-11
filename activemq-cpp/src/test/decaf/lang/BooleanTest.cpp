@@ -22,19 +22,9 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
 
-    class BooleanTest : public ::testing::Test
-    {
-public:
+    class BooleanTest : public ::testing::Test {};
 
-        BooleanTest() {}
-        virtual ~BooleanTest() {}
-
-        virtual void test();
-
-    };
-
-
-void BooleanTest::test()
+TEST_F(BooleanTest, test)
 {
     bool x = Boolean::parseBoolean("false");
     bool y = Boolean::parseBoolean("true");
@@ -56,5 +46,3 @@ void BooleanTest::test()
     ASSERT_TRUE(b.booleanValue() == true);
 
 }
-
-TEST_F(BooleanTest, test) { test(); }

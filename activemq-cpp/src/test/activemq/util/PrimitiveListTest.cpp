@@ -24,29 +24,11 @@
 using namespace activemq;
 using namespace activemq::util;
 
-    class PrimitiveListTest : public ::testing::Test
-    {
-public:
-
-        PrimitiveListTest(){}
-        virtual ~PrimitiveListTest(){}
-
-        void testValueNode();
-        void testSetGet();
-        void testAdd();
-        void testRemove();
-        void testCount();
-        void testCopy();
-        void testClear();
-        void testContains();
-        void testListOfLists();
-        void testListOfMaps();
-
-    };
-
+class PrimitiveListTest : public ::testing::Test {
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveListTest::testSetGet(){
+TEST_F(PrimitiveListTest, testSetGet){
 
     PrimitiveList plist;
 
@@ -114,7 +96,7 @@ void PrimitiveListTest::testSetGet(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveListTest::testAdd(){
+TEST_F(PrimitiveListTest, testAdd){
 
     bool boolValue = true;
     unsigned char byteValue = 65;
@@ -160,7 +142,7 @@ void PrimitiveListTest::testAdd(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveListTest::testRemove(){
+TEST_F(PrimitiveListTest, testRemove){
 
     PrimitiveList plist;
     plist.add( 5 );
@@ -177,7 +159,7 @@ void PrimitiveListTest::testRemove(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveListTest::testCount(){
+TEST_F(PrimitiveListTest, testCount){
 
     PrimitiveList plist;
     ASSERT_TRUE(plist.size() == 0);
@@ -194,7 +176,7 @@ void PrimitiveListTest::testCount(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveListTest::testCopy(){
+TEST_F(PrimitiveListTest, testCopy){
 
     PrimitiveList plist;
     plist.add( 5 );
@@ -210,7 +192,7 @@ void PrimitiveListTest::testCopy(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveListTest::testClear(){
+TEST_F(PrimitiveListTest, testClear){
 
     PrimitiveList plist;
     plist.add( 5 );
@@ -228,7 +210,7 @@ void PrimitiveListTest::testClear(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveListTest::testContains(){
+TEST_F(PrimitiveListTest, testContains){
 
     PrimitiveList plist;
 
@@ -248,7 +230,7 @@ void PrimitiveListTest::testContains(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveListTest::testListOfLists() {
+TEST_F(PrimitiveListTest, testListOfLists) {
 
     PrimitiveList list;
     PrimitiveList sublist1;
@@ -270,7 +252,7 @@ void PrimitiveListTest::testListOfLists() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveListTest::testListOfMaps() {
+TEST_F(PrimitiveListTest, testListOfMaps) {
 
     PrimitiveList list;
     PrimitiveMap map1;
@@ -290,13 +272,3 @@ void PrimitiveListTest::testListOfMaps() {
     ASSERT_TRUE(list.get(2).getMap().get("3").getInt() == 3);
 
 }
-
-TEST_F(PrimitiveListTest, testSetGet) { testSetGet(); }
-TEST_F(PrimitiveListTest, testAdd) { testAdd(); }
-TEST_F(PrimitiveListTest, testRemove) { testRemove(); }
-TEST_F(PrimitiveListTest, testCount) { testCount(); }
-TEST_F(PrimitiveListTest, testClear) { testClear(); }
-TEST_F(PrimitiveListTest, testCopy) { testCopy(); }
-TEST_F(PrimitiveListTest, testContains) { testContains(); }
-TEST_F(PrimitiveListTest, testListOfLists) { testListOfLists(); }
-TEST_F(PrimitiveListTest, testListOfMaps) { testListOfMaps(); }

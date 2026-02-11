@@ -24,26 +24,10 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
 
-    class ExceptionTest : public ::testing::Test {
-public:
-
-        virtual ~ExceptionTest(){}
-
-        void SetUp() override{}
-        void TearDown() override{}
-
-        void testCtors();
-        void testAssign();
-        void testClone();
-        void testInitCause();
-        void testMessage0();
-        void testMessage3();
-
-    };
-
+    class ExceptionTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExceptionTest::testCtors() {
+TEST_F(ExceptionTest, testCtors) {
 
     Exception exception1;
 
@@ -75,7 +59,7 @@ void ExceptionTest::testCtors() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExceptionTest::testAssign() {
+TEST_F(ExceptionTest, testAssign) {
 
     Exception exception1;
 
@@ -96,7 +80,7 @@ void ExceptionTest::testAssign() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExceptionTest::testClone() {
+TEST_F(ExceptionTest, testClone) {
 
     const char* text = "This is a test";
     Exception ex( __FILE__, __LINE__, text );
@@ -112,7 +96,7 @@ void ExceptionTest::testClone() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExceptionTest::testInitCause() {
+TEST_F(ExceptionTest, testInitCause) {
 
     const char* text = "This is a test";
     Exception ex( __FILE__, __LINE__, text );
@@ -135,23 +119,16 @@ void ExceptionTest::testInitCause() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExceptionTest::testMessage0(){
+TEST_F(ExceptionTest, testMessage0){
       const char* text = "This is a test";
       Exception ex( __FILE__, __LINE__, text );
       ASSERT_TRUE(strcmp( ex.getMessage().c_str(), text ) == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExceptionTest::testMessage3(){
+TEST_F(ExceptionTest, testMessage3){
     Exception ex( __FILE__, __LINE__,
         "This is a test %d %d %d", 1, 100, 1000 );
     ASSERT_TRUE(strcmp( ex.getMessage().c_str(),
                     "This is a test 1 100 1000" ) == 0);
 }
-
-TEST_F(ExceptionTest, testMessage0) { testMessage0(); }
-TEST_F(ExceptionTest, testMessage3) { testMessage3(); }
-TEST_F(ExceptionTest, testClone) { testClone(); }
-TEST_F(ExceptionTest, testInitCause) { testInitCause(); }
-TEST_F(ExceptionTest, testCtors) { testCtors(); }
-TEST_F(ExceptionTest, testAssign) { testAssign(); }

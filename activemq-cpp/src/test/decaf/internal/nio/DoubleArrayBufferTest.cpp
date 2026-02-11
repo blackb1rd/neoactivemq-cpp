@@ -21,7 +21,6 @@
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
 
-
 namespace decaf { namespace internal { namespace nio {} } }
 using namespace std;
 using namespace decaf;
@@ -31,6 +30,8 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class DoubleArrayBufferTest : public ::testing::Test {
+    protected:
+
 decaf::nio::DoubleBuffer* testBuffer1;
         double* testData1;
 
@@ -38,15 +39,9 @@ decaf::nio::DoubleBuffer* testBuffer1;
         static const int SMALL_TEST_LENGTH;
         static const int BUFFER_LENGTH;
 
-    private:
-
-        DoubleArrayBufferTest(const DoubleArrayBufferTest&);
-        DoubleArrayBufferTest& operator= (const DoubleArrayBufferTest&);
-
     public:
 
         DoubleArrayBufferTest() : testBuffer1(), testData1() {}
-        virtual ~DoubleArrayBufferTest() {}
 
         void SetUp() override {
             testBuffer1 = decaf::nio::DoubleBuffer::allocate( testData1Size );
@@ -61,29 +56,6 @@ decaf::nio::DoubleBuffer* testBuffer1;
             delete testBuffer1;
             delete [] testData1;
         }
-
-        void test();
-        void testArray();
-        void testArrayOffset();
-        void testReadOnlyArray();
-        void testAsReadOnlyBuffer();
-        void testCompact();
-        void testCompareTo();
-        void testDuplicate();
-        void testEquals();
-        void testHasArray();
-        void testGet();
-        void testGet2();
-        void testGetDoubleArray();
-        void testGetDoubleArray2();
-        void testGetWithIndex();
-        void testPutDouble();
-        void testPutDoubleArray();
-        void testPutDoubleArray2();
-        void testPutDoubleBuffer();
-        void testPutIndexed();
-        void testSlice();
-        void testToString();
 
     protected:
 
@@ -142,15 +114,13 @@ decaf::nio::DoubleBuffer* testBuffer1;
 
     };
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 const int DoubleArrayBufferTest::testData1Size = 100;
 const int DoubleArrayBufferTest::SMALL_TEST_LENGTH = 5;
 const int DoubleArrayBufferTest::BUFFER_LENGTH = 250;
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::test() {
+TEST_F(DoubleArrayBufferTest, test) {
 
     // Check that we have setup the array and our initial assumptions on state
     // are correct.  This is the first test run.
@@ -167,7 +137,7 @@ void DoubleArrayBufferTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testArray() {
+TEST_F(DoubleArrayBufferTest, testArray) {
 
     double* array = testBuffer1->array();
 
@@ -195,7 +165,7 @@ void DoubleArrayBufferTest::testArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testArrayOffset() {
+TEST_F(DoubleArrayBufferTest, testArrayOffset) {
 
     double* array = testBuffer1->array();
 
@@ -215,7 +185,7 @@ void DoubleArrayBufferTest::testArrayOffset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testReadOnlyArray() {
+TEST_F(DoubleArrayBufferTest, testReadOnlyArray) {
 
     DoubleBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
 
@@ -230,7 +200,7 @@ void DoubleArrayBufferTest::testReadOnlyArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testAsReadOnlyBuffer() {
+TEST_F(DoubleArrayBufferTest, testAsReadOnlyBuffer) {
 
     testBuffer1->clear();
     testBuffer1->mark();
@@ -259,7 +229,7 @@ void DoubleArrayBufferTest::testAsReadOnlyBuffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testCompact() {
+TEST_F(DoubleArrayBufferTest, testCompact) {
 
     loadTestData1( testBuffer1 );
 
@@ -306,7 +276,7 @@ void DoubleArrayBufferTest::testCompact() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testCompareTo() {
+TEST_F(DoubleArrayBufferTest, testCompareTo) {
 
     DoubleBuffer* other = DoubleBuffer::allocate( testBuffer1->capacity() );
 
@@ -345,7 +315,7 @@ void DoubleArrayBufferTest::testCompareTo() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testDuplicate() {
+TEST_F(DoubleArrayBufferTest, testDuplicate) {
     testBuffer1->clear();
     testBuffer1->mark();
     testBuffer1->position(testBuffer1->limit());
@@ -370,7 +340,7 @@ void DoubleArrayBufferTest::testDuplicate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testEquals() {
+TEST_F(DoubleArrayBufferTest, testEquals) {
 
     // equal to self
     ASSERT_TRUE(testBuffer1->equals( *testBuffer1 ));
@@ -394,7 +364,7 @@ void DoubleArrayBufferTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testGet() {
+TEST_F(DoubleArrayBufferTest, testGet) {
 
     testBuffer1->clear();
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
@@ -406,7 +376,7 @@ void DoubleArrayBufferTest::testGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testGetDoubleArray() {
+TEST_F(DoubleArrayBufferTest, testGetDoubleArray) {
 
     std::vector<double> array(1);
     testBuffer1->clear();
@@ -422,7 +392,7 @@ void DoubleArrayBufferTest::testGetDoubleArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testGetDoubleArray2() {
+TEST_F(DoubleArrayBufferTest, testGetDoubleArray2) {
 
     testBuffer1->clear();
     double* array1 = new double[testBuffer1->capacity()];
@@ -461,7 +431,7 @@ void DoubleArrayBufferTest::testGetDoubleArray2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testGet2() {
+TEST_F(DoubleArrayBufferTest, testGet2) {
 
     testBuffer1->clear();
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
@@ -475,12 +445,12 @@ void DoubleArrayBufferTest::testGet2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testHasArray() {
+TEST_F(DoubleArrayBufferTest, testHasArray) {
     ASSERT_TRUE(testBuffer1->hasArray());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testPutDouble() {
+TEST_F(DoubleArrayBufferTest, testPutDouble) {
 
     testBuffer1->clear();
 
@@ -495,7 +465,7 @@ void DoubleArrayBufferTest::testPutDouble() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testPutDoubleArray() {
+TEST_F(DoubleArrayBufferTest, testPutDoubleArray) {
 
     double* array = new double[1];
 
@@ -514,7 +484,7 @@ void DoubleArrayBufferTest::testPutDoubleArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testPutDoubleArray2() {
+TEST_F(DoubleArrayBufferTest, testPutDoubleArray2) {
 
     testBuffer1->clear();
     double* array1 = new double[ testBuffer1->capacity() ];
@@ -554,7 +524,7 @@ void DoubleArrayBufferTest::testPutDoubleArray2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testPutDoubleBuffer() {
+TEST_F(DoubleArrayBufferTest, testPutDoubleBuffer) {
 
     DoubleBuffer* other = DoubleBuffer::allocate( testBuffer1->capacity() );
     DoubleBuffer* other1 = DoubleBuffer::allocate( testBuffer1->capacity() + 1 );
@@ -578,7 +548,7 @@ void DoubleArrayBufferTest::testPutDoubleBuffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testGetWithIndex() {
+TEST_F(DoubleArrayBufferTest, testGetWithIndex) {
 
     testBuffer1->clear();
 
@@ -595,7 +565,7 @@ void DoubleArrayBufferTest::testGetWithIndex() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testPutIndexed() {
+TEST_F(DoubleArrayBufferTest, testPutIndexed) {
 
     DoubleBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -615,7 +585,7 @@ void DoubleArrayBufferTest::testPutIndexed() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testSlice() {
+TEST_F(DoubleArrayBufferTest, testSlice) {
 
     ASSERT_TRUE(testBuffer1->capacity() > 5);
     testBuffer1->position(1);
@@ -640,7 +610,7 @@ void DoubleArrayBufferTest::testSlice() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void DoubleArrayBufferTest::testToString() {
+TEST_F(DoubleArrayBufferTest, testToString) {
 
     std::string str = testBuffer1->toString();
     ASSERT_TRUE(str.find("Double") != string::npos);
@@ -648,26 +618,3 @@ void DoubleArrayBufferTest::testToString() {
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->limit() ) ) != string::npos);
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->capacity() ) ) != string::npos);
 }
-
-TEST_F(DoubleArrayBufferTest, test) { test(); }
-TEST_F(DoubleArrayBufferTest, testArray) { testArray(); }
-TEST_F(DoubleArrayBufferTest, testArrayOffset) { testArrayOffset(); }
-TEST_F(DoubleArrayBufferTest, testReadOnlyArray) { testReadOnlyArray(); }
-TEST_F(DoubleArrayBufferTest, testAsReadOnlyBuffer) { testAsReadOnlyBuffer(); }
-TEST_F(DoubleArrayBufferTest, testCompact) { testCompact(); }
-TEST_F(DoubleArrayBufferTest, testCompareTo) { testCompareTo(); }
-TEST_F(DoubleArrayBufferTest, testDuplicate) { testDuplicate(); }
-TEST_F(DoubleArrayBufferTest, testEquals) { testEquals(); }
-TEST_F(DoubleArrayBufferTest, testHasArray) { testHasArray(); }
-TEST_F(DoubleArrayBufferTest, testGet) { testGet(); }
-TEST_F(DoubleArrayBufferTest, testGet2) { testGet2(); }
-TEST_F(DoubleArrayBufferTest, testGetDoubleArray) { testGetDoubleArray(); }
-TEST_F(DoubleArrayBufferTest, testGetDoubleArray2) { testGetDoubleArray2(); }
-TEST_F(DoubleArrayBufferTest, testGetWithIndex) { testGetWithIndex(); }
-TEST_F(DoubleArrayBufferTest, testPutDouble) { testPutDouble(); }
-TEST_F(DoubleArrayBufferTest, testPutDoubleArray) { testPutDoubleArray(); }
-TEST_F(DoubleArrayBufferTest, testPutDoubleArray2) { testPutDoubleArray2(); }
-TEST_F(DoubleArrayBufferTest, testPutDoubleBuffer) { testPutDoubleBuffer(); }
-TEST_F(DoubleArrayBufferTest, testPutIndexed) { testPutIndexed(); }
-TEST_F(DoubleArrayBufferTest, testSlice) { testSlice(); }
-TEST_F(DoubleArrayBufferTest, testToString) { testToString(); }

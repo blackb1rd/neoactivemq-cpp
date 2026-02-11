@@ -24,19 +24,10 @@ using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using namespace activemq::wireformat::openwire::utils;
 
-    class HexTableTest : public ::testing::Test {
-public:
-
-        HexTableTest() {}
-        virtual ~HexTableTest() {}
-
-        void test();
-
-    };
-
+class HexTableTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void HexTableTest::test(){
+TEST_F(HexTableTest, test){
 
     HexTable table;
 
@@ -56,5 +47,3 @@ void HexTableTest::test(){
     }
     catch(...) {}
 }
-
-TEST_F(HexTableTest, test) { test(); }

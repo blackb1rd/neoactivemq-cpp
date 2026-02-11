@@ -32,18 +32,7 @@ public:
 
         virtual ~HashCodeTest();
 
-        void testHashPointerT();
-        void testHashString();
-        void testHashBool();
-        void testHashChar();
-        void testHashShort();
-        void testHashInteger();
-        void testHashLong();
-        void testHashFloat();
-        void testHashDouble();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 HashCodeTest::HashCodeTest() {
@@ -54,7 +43,7 @@ HashCodeTest::~HashCodeTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashCodeTest::testHashPointerT() {
+TEST_F(HashCodeTest, testHashPointerT) {
 
     Pointer<std::string> value1(new std::string("This is value1 and value2"));
     Pointer<std::string> value2(new std::string("This is value1 and value2"));
@@ -74,7 +63,7 @@ void HashCodeTest::testHashPointerT() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashCodeTest::testHashString() {
+TEST_F(HashCodeTest, testHashString) {
 
     std::string value1 = "This is value1 and value2";
     std::string value2 = "This is value1 and value2";
@@ -94,7 +83,7 @@ void HashCodeTest::testHashString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashCodeTest::testHashBool() {
+TEST_F(HashCodeTest, testHashBool) {
 
     bool value1 = true;
     bool value2 = true;
@@ -118,7 +107,7 @@ void HashCodeTest::testHashBool() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashCodeTest::testHashChar() {
+TEST_F(HashCodeTest, testHashChar) {
 
     {
         char value1 = 'a';
@@ -176,7 +165,7 @@ void HashCodeTest::testHashChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashCodeTest::testHashShort() {
+TEST_F(HashCodeTest, testHashShort) {
 
     {
         short value1 = 1024;
@@ -216,7 +205,7 @@ void HashCodeTest::testHashShort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashCodeTest::testHashInteger() {
+TEST_F(HashCodeTest, testHashInteger) {
 
     {
         int value1 = 1024;
@@ -256,7 +245,7 @@ void HashCodeTest::testHashInteger() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashCodeTest::testHashLong() {
+TEST_F(HashCodeTest, testHashLong) {
 
     {
         long long value1 = 1024000LL;
@@ -296,7 +285,7 @@ void HashCodeTest::testHashLong() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashCodeTest::testHashFloat() {
+TEST_F(HashCodeTest, testHashFloat) {
 
     float value1 = 4.4f;
     float value2 = 4.4f;
@@ -316,7 +305,7 @@ void HashCodeTest::testHashFloat() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashCodeTest::testHashDouble() {
+TEST_F(HashCodeTest, testHashDouble) {
 
     double value1 = 4.413;
     double value2 = 4.413;
@@ -334,13 +323,3 @@ void HashCodeTest::testHashDouble() {
     ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
     ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
 }
-
-TEST_F(HashCodeTest, testHashPointerT) { testHashPointerT(); }
-TEST_F(HashCodeTest, testHashString) { testHashString(); }
-TEST_F(HashCodeTest, testHashBool) { testHashBool(); }
-TEST_F(HashCodeTest, testHashChar) { testHashChar(); }
-TEST_F(HashCodeTest, testHashShort) { testHashShort(); }
-TEST_F(HashCodeTest, testHashInteger) { testHashInteger(); }
-TEST_F(HashCodeTest, testHashLong) { testHashLong(); }
-TEST_F(HashCodeTest, testHashFloat) { testHashFloat(); }
-TEST_F(HashCodeTest, testHashDouble) { testHashDouble(); }

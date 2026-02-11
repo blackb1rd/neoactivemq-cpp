@@ -41,58 +41,7 @@ public:
         LinkedBlockingQueueTest();
         virtual ~LinkedBlockingQueueTest();
 
-        void testConstructor1();
-        void testConstructor2();
-        void testConstructor3();
-        void testConstructor4();
-        void testEquals();
-        void testEmptyFull();
-        void testRemainingCapacity();
-        void testOffer();
-        void testAdd();
-        void testAddAllSelf();
-        void testAddAll1();
-        void testAddAll2();
-        void testPut();
-        void testTake();
-        void testPoll();
-        void testTimedPoll1();
-        void testTimedPoll2();
-        void testPeek();
-        void testElement();
-        void testRemove();
-        void testRemoveElement();
-        void testRemoveElement2();
-        void testRemoveElementAndAdd();
-        void testContains();
-        void testClear();
-        void testContainsAll();
-        void testRetainAll();
-        void testRemoveAll();
-        void testToArray();
-        void testDrainToSelf();
-        void testDrainTo();
-        void testDrainToSelfN();
-        void testDrainToWithActivePut();
-        void testDrainToN();
-        void testIterator();
-        void testIteratorRemove();
-        void testIteratorOrdering();
-        void testWeaklyConsistentIteration();
-        void testConcurrentPut();
-        void testConcurrentTake();
-        void testConcurrentPutAndTake();
-        void testBlockingPut();
-        void testTimedOffer();
-        void testTakeFromEmpty();
-        void testBlockingTake();
-        void testInterruptedTimedPoll();
-        void testTimedPollWithOffer();
-        void testOfferInExecutor();
-        void testPollInExecutor();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const int LinkedBlockingQueueTest::SIZE = 256;
@@ -158,7 +107,7 @@ LinkedBlockingQueueTest::~LinkedBlockingQueueTest() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testConstructor1() {
+TEST_F(LinkedBlockingQueueTest, testConstructor1) {
 
     LinkedBlockingQueue<int> queue;
 
@@ -168,7 +117,7 @@ void LinkedBlockingQueueTest::testConstructor1() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testConstructor2() {
+TEST_F(LinkedBlockingQueueTest, testConstructor2) {
 
     LinkedBlockingQueue<int> queue(SIZE);
 
@@ -178,7 +127,7 @@ void LinkedBlockingQueueTest::testConstructor2() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testConstructor3() {
+TEST_F(LinkedBlockingQueueTest, testConstructor3) {
 
     LinkedList<int> list;
     populate(list, SIZE);
@@ -193,13 +142,13 @@ void LinkedBlockingQueueTest::testConstructor3() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testConstructor4() {
+TEST_F(LinkedBlockingQueueTest, testConstructor4) {
 
     ASSERT_THROW(LinkedBlockingQueue<int>(-1), IllegalArgumentException) << ("Should have thrown an IllegalArgumentException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testEquals() {
+TEST_F(LinkedBlockingQueueTest, testEquals) {
 
     LinkedBlockingQueue<int> q1;
     populate( q1, 7 );
@@ -218,7 +167,7 @@ void LinkedBlockingQueueTest::testEquals() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testEmptyFull() {
+TEST_F(LinkedBlockingQueueTest, testEmptyFull) {
 
     LinkedBlockingQueue<int> q(2);
     ASSERT_TRUE(q.isEmpty());
@@ -232,7 +181,7 @@ void LinkedBlockingQueueTest::testEmptyFull() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testRemainingCapacity() {
+TEST_F(LinkedBlockingQueueTest, testRemainingCapacity) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -250,7 +199,7 @@ void LinkedBlockingQueueTest::testRemainingCapacity() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testOffer() {
+TEST_F(LinkedBlockingQueueTest, testOffer) {
 
     LinkedBlockingQueue<int> q(1);
     ASSERT_TRUE(q.offer(0));
@@ -258,7 +207,7 @@ void LinkedBlockingQueueTest::testOffer() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testAdd() {
+TEST_F(LinkedBlockingQueueTest, testAdd) {
 
     LinkedBlockingQueue<int> q(SIZE);
     for(int i = 0; i < SIZE; ++i) {
@@ -270,7 +219,7 @@ void LinkedBlockingQueueTest::testAdd() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testAddAllSelf() {
+TEST_F(LinkedBlockingQueueTest, testAddAllSelf) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -279,7 +228,7 @@ void LinkedBlockingQueueTest::testAddAllSelf() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testAddAll1() {
+TEST_F(LinkedBlockingQueueTest, testAddAll1) {
 
     LinkedBlockingQueue<int> q(1);
     LinkedList<int> list;
@@ -290,7 +239,7 @@ void LinkedBlockingQueueTest::testAddAll1() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testAddAll2() {
+TEST_F(LinkedBlockingQueueTest, testAddAll2) {
 
     LinkedBlockingQueue<int> q(SIZE);
     LinkedList<int> empty;
@@ -308,7 +257,7 @@ void LinkedBlockingQueueTest::testAddAll2() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testPut() {
+TEST_F(LinkedBlockingQueueTest, testPut) {
 
     LinkedBlockingQueue<int> q(SIZE);
     for(int i = 0; i < SIZE; ++i) {
@@ -319,7 +268,7 @@ void LinkedBlockingQueueTest::testPut() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testTake() {
+TEST_F(LinkedBlockingQueueTest, testTake) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -330,7 +279,7 @@ void LinkedBlockingQueueTest::testTake() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testPoll() {
+TEST_F(LinkedBlockingQueueTest, testPoll) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -345,7 +294,7 @@ void LinkedBlockingQueueTest::testPoll() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testTimedPoll1() {
+TEST_F(LinkedBlockingQueueTest, testTimedPoll1) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -360,7 +309,7 @@ void LinkedBlockingQueueTest::testTimedPoll1() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testTimedPoll2() {
+TEST_F(LinkedBlockingQueueTest, testTimedPoll2) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -375,7 +324,7 @@ void LinkedBlockingQueueTest::testTimedPoll2() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testPeek() {
+TEST_F(LinkedBlockingQueueTest, testPeek) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -392,7 +341,7 @@ void LinkedBlockingQueueTest::testPeek() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testElement() {
+TEST_F(LinkedBlockingQueueTest, testElement) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -407,7 +356,7 @@ void LinkedBlockingQueueTest::testElement() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testRemove() {
+TEST_F(LinkedBlockingQueueTest, testRemove) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -420,7 +369,7 @@ void LinkedBlockingQueueTest::testRemove() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testRemoveElement() {
+TEST_F(LinkedBlockingQueueTest, testRemoveElement) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -438,7 +387,7 @@ void LinkedBlockingQueueTest::testRemoveElement() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testRemoveElement2() {
+TEST_F(LinkedBlockingQueueTest, testRemoveElement2) {
 
     LinkedBlockingQueue<int> q;
     populate( q, SIZE );
@@ -452,7 +401,7 @@ void LinkedBlockingQueueTest::testRemoveElement2() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testRemoveElementAndAdd() {
+TEST_F(LinkedBlockingQueueTest, testRemoveElementAndAdd) {
 
     LinkedBlockingQueue<int> q;
 
@@ -465,7 +414,7 @@ void LinkedBlockingQueueTest::testRemoveElementAndAdd() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testContains() {
+TEST_F(LinkedBlockingQueueTest, testContains) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -478,7 +427,7 @@ void LinkedBlockingQueueTest::testContains() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testClear() {
+TEST_F(LinkedBlockingQueueTest, testClear) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -495,7 +444,7 @@ void LinkedBlockingQueueTest::testClear() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testContainsAll() {
+TEST_F(LinkedBlockingQueueTest, testContainsAll) {
 
     LinkedBlockingQueue<int> q;
     LinkedBlockingQueue<int> p;
@@ -510,7 +459,7 @@ void LinkedBlockingQueueTest::testContainsAll() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testRetainAll() {
+TEST_F(LinkedBlockingQueueTest, testRetainAll) {
     LinkedBlockingQueue<int> q;
     LinkedBlockingQueue<int> p;
     populate(q, SIZE);
@@ -531,7 +480,7 @@ void LinkedBlockingQueueTest::testRetainAll() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testRemoveAll() {
+TEST_F(LinkedBlockingQueueTest, testRemoveAll) {
 
     for (int i = 1; i < SIZE; ++i) {
         LinkedBlockingQueue<int> q;
@@ -549,7 +498,7 @@ void LinkedBlockingQueueTest::testRemoveAll() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testToArray() {
+TEST_F(LinkedBlockingQueueTest, testToArray) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -561,7 +510,7 @@ void LinkedBlockingQueueTest::testToArray() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testDrainToSelf() {
+TEST_F(LinkedBlockingQueueTest, testDrainToSelf) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -570,7 +519,7 @@ void LinkedBlockingQueueTest::testDrainToSelf() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testDrainTo() {
+TEST_F(LinkedBlockingQueueTest, testDrainTo) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -602,7 +551,7 @@ void LinkedBlockingQueueTest::testDrainTo() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testDrainToSelfN() {
+TEST_F(LinkedBlockingQueueTest, testDrainToSelfN) {
 
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
@@ -611,7 +560,7 @@ void LinkedBlockingQueueTest::testDrainToSelfN() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testDrainToN() {
+TEST_F(LinkedBlockingQueueTest, testDrainToN) {
 
     LinkedBlockingQueue<int> q;
 
@@ -663,7 +612,7 @@ namespace {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testDrainToWithActivePut() {
+TEST_F(LinkedBlockingQueueTest, testDrainToWithActivePut) {
 
     LinkedBlockingQueue<int> q;
     populate(q, SIZE);
@@ -686,7 +635,7 @@ void LinkedBlockingQueueTest::testDrainToWithActivePut() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testIterator() {
+TEST_F(LinkedBlockingQueueTest, testIterator) {
 
     LinkedBlockingQueue<int> q;
     populate(q, SIZE);
@@ -699,7 +648,7 @@ void LinkedBlockingQueueTest::testIterator() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testIteratorRemove () {
+TEST_F(LinkedBlockingQueueTest, testIteratorRemove) {
 
     LinkedBlockingQueue<int> q(3);
 
@@ -719,7 +668,7 @@ void LinkedBlockingQueueTest::testIteratorRemove () {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testIteratorOrdering() {
+TEST_F(LinkedBlockingQueueTest, testIteratorOrdering) {
 
     LinkedBlockingQueue<int> q(3);
     q.add(1);
@@ -739,7 +688,7 @@ void LinkedBlockingQueueTest::testIteratorOrdering() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testWeaklyConsistentIteration () {
+TEST_F(LinkedBlockingQueueTest, testWeaklyConsistentIteration) {
 
     LinkedBlockingQueue<int> q(3);
     q.add(1);
@@ -823,7 +772,7 @@ namespace {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testConcurrentPut() {
+TEST_F(LinkedBlockingQueueTest, testConcurrentPut) {
 
     {
         LinkedBlockingQueue<int> q;
@@ -871,7 +820,7 @@ void LinkedBlockingQueueTest::testConcurrentPut() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testConcurrentTake() {
+TEST_F(LinkedBlockingQueueTest, testConcurrentTake) {
 
     {
         LinkedBlockingQueue<int> q;
@@ -925,7 +874,7 @@ void LinkedBlockingQueueTest::testConcurrentTake() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testConcurrentPutAndTake() {
+TEST_F(LinkedBlockingQueueTest, testConcurrentPutAndTake) {
 
     {
         const int SCOPED_SIZE = SIZE * 5;
@@ -1031,7 +980,7 @@ namespace {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testBlockingPut() {
+TEST_F(LinkedBlockingQueueTest, testBlockingPut) {
     TestBlockingPutRunnable runnable(this);
     Thread t(&runnable);
 
@@ -1082,7 +1031,7 @@ namespace {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testTimedOffer() {
+TEST_F(LinkedBlockingQueueTest, testTimedOffer) {
 
     LinkedBlockingQueue<int> q(2);
     TestTimedOfferRunnable runnable(&q, this);
@@ -1131,7 +1080,7 @@ namespace {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testTakeFromEmpty() {
+TEST_F(LinkedBlockingQueueTest, testTakeFromEmpty) {
 
     LinkedBlockingQueue<int> q(2);
     TestTakeFromEmptyRunnable runnable(&q, this);
@@ -1185,7 +1134,7 @@ namespace {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testBlockingTake() {
+TEST_F(LinkedBlockingQueueTest, testBlockingTake) {
 
     TestBlockingTakeRunnable runnable(this);
     Thread t(&runnable);
@@ -1240,7 +1189,7 @@ namespace {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testInterruptedTimedPoll() {
+TEST_F(LinkedBlockingQueueTest, testInterruptedTimedPoll) {
 
     TestInterruptedTimedPollRunnable runnable(this);
     Thread t(&runnable);
@@ -1291,7 +1240,7 @@ namespace {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testTimedPollWithOffer() {
+TEST_F(LinkedBlockingQueueTest, testTimedPollWithOffer) {
 
     LinkedBlockingQueue<int> q(2);
     TestTimedPollWithOfferRunnable runnable(&q, this);
@@ -1373,7 +1322,7 @@ namespace {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testOfferInExecutor() {
+TEST_F(LinkedBlockingQueueTest, testOfferInExecutor) {
 
     LinkedBlockingQueue<int> q(2);
     TestOfferInExecutor1* runnable1 = new TestOfferInExecutor1(&q, this);
@@ -1452,7 +1401,7 @@ namespace {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LinkedBlockingQueueTest::testPollInExecutor() {
+TEST_F(LinkedBlockingQueueTest, testPollInExecutor) {
 
     LinkedBlockingQueue<int> q(2);
     TestPollInExecutor1* runnable1 = new TestPollInExecutor1(&q, this);
@@ -1463,53 +1412,3 @@ void LinkedBlockingQueueTest::testPollInExecutor() {
 
     joinPool(executor.get());
 }
-
-TEST_F(LinkedBlockingQueueTest, testConstructor1) { testConstructor1(); }
-TEST_F(LinkedBlockingQueueTest, testConstructor2) { testConstructor2(); }
-TEST_F(LinkedBlockingQueueTest, testConstructor3) { testConstructor3(); }
-TEST_F(LinkedBlockingQueueTest, testConstructor4) { testConstructor4(); }
-TEST_F(LinkedBlockingQueueTest, testEquals) { testEquals(); }
-TEST_F(LinkedBlockingQueueTest, testEmptyFull) { testEmptyFull(); }
-TEST_F(LinkedBlockingQueueTest, testRemainingCapacity) { testRemainingCapacity(); }
-TEST_F(LinkedBlockingQueueTest, testOffer) { testOffer(); }
-TEST_F(LinkedBlockingQueueTest, testAdd) { testAdd(); }
-TEST_F(LinkedBlockingQueueTest, testAddAllSelf) { testAddAllSelf(); }
-TEST_F(LinkedBlockingQueueTest, testAddAll1) { testAddAll1(); }
-TEST_F(LinkedBlockingQueueTest, testAddAll2) { testAddAll2(); }
-TEST_F(LinkedBlockingQueueTest, testPut) { testPut(); }
-TEST_F(LinkedBlockingQueueTest, testTake) { testTake(); }
-TEST_F(LinkedBlockingQueueTest, testPoll) { testPoll(); }
-TEST_F(LinkedBlockingQueueTest, testTimedPoll1) { testTimedPoll1(); }
-TEST_F(LinkedBlockingQueueTest, testTimedPoll2) { testTimedPoll2(); }
-TEST_F(LinkedBlockingQueueTest, testPeek) { testPeek(); }
-TEST_F(LinkedBlockingQueueTest, testElement) { testElement(); }
-TEST_F(LinkedBlockingQueueTest, testRemove) { testRemove(); }
-TEST_F(LinkedBlockingQueueTest, testRemoveElement) { testRemoveElement(); }
-TEST_F(LinkedBlockingQueueTest, testRemoveElement2) { testRemoveElement2(); }
-TEST_F(LinkedBlockingQueueTest, testRemoveElementAndAdd) { testRemoveElementAndAdd(); }
-TEST_F(LinkedBlockingQueueTest, testContains) { testContains(); }
-TEST_F(LinkedBlockingQueueTest, testClear) { testClear(); }
-TEST_F(LinkedBlockingQueueTest, testContainsAll) { testContainsAll(); }
-TEST_F(LinkedBlockingQueueTest, testRetainAll) { testRetainAll(); }
-TEST_F(LinkedBlockingQueueTest, testRemoveAll) { testRemoveAll(); }
-TEST_F(LinkedBlockingQueueTest, testToArray) { testToArray(); }
-TEST_F(LinkedBlockingQueueTest, testDrainToSelf) { testDrainToSelf(); }
-TEST_F(LinkedBlockingQueueTest, testDrainTo) { testDrainTo(); }
-TEST_F(LinkedBlockingQueueTest, testDrainToSelfN) { testDrainToSelfN(); }
-TEST_F(LinkedBlockingQueueTest, testDrainToWithActivePut) { testDrainToWithActivePut(); }
-TEST_F(LinkedBlockingQueueTest, testDrainToN) { testDrainToN(); }
-TEST_F(LinkedBlockingQueueTest, testIterator) { testIterator(); }
-TEST_F(LinkedBlockingQueueTest, testIteratorRemove) { testIteratorRemove(); }
-TEST_F(LinkedBlockingQueueTest, testIteratorOrdering) { testIteratorOrdering(); }
-TEST_F(LinkedBlockingQueueTest, testWeaklyConsistentIteration) { testWeaklyConsistentIteration(); }
-TEST_F(LinkedBlockingQueueTest, testConcurrentPut) { testConcurrentPut(); }
-TEST_F(LinkedBlockingQueueTest, testConcurrentTake) { testConcurrentTake(); }
-TEST_F(LinkedBlockingQueueTest, testConcurrentPutAndTake) { testConcurrentPutAndTake(); }
-TEST_F(LinkedBlockingQueueTest, testBlockingPut) { testBlockingPut(); }
-TEST_F(LinkedBlockingQueueTest, testTimedOffer) { testTimedOffer(); }
-TEST_F(LinkedBlockingQueueTest, testTakeFromEmpty) { testTakeFromEmpty(); }
-TEST_F(LinkedBlockingQueueTest, testBlockingTake) { testBlockingTake(); }
-TEST_F(LinkedBlockingQueueTest, testInterruptedTimedPoll) { testInterruptedTimedPoll(); }
-TEST_F(LinkedBlockingQueueTest, testTimedPollWithOffer) { testTimedPollWithOffer(); }
-TEST_F(LinkedBlockingQueueTest, testOfferInExecutor) { testOfferInExecutor(); }
-TEST_F(LinkedBlockingQueueTest, testPollInExecutor) { testPollInExecutor(); }

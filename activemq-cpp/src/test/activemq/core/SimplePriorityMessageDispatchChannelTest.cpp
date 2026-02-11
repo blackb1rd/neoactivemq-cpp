@@ -28,28 +28,11 @@ using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
 
-    class SimplePriorityMessageDispatchChannelTest : public ::testing::Test {
-public:
-
-        SimplePriorityMessageDispatchChannelTest() {}
-        virtual ~SimplePriorityMessageDispatchChannelTest() {}
-
-        void testCtor();
-        void testStart();
-        void testStop();
-        void testClose();
-        void testEnqueue();
-        void testEnqueueFront();
-        void testPeek();
-        void testDequeueNoWait();
-        void testDequeue();
-        void testRemoveAll();
-
-    };
-
+class SimplePriorityMessageDispatchChannelTest : public ::testing::Test {
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testCtor() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testCtor) {
 
     SimplePriorityMessageDispatchChannel channel;
     ASSERT_TRUE(channel.isRunning() == false);
@@ -59,7 +42,7 @@ void SimplePriorityMessageDispatchChannelTest::testCtor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testStart() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testStart) {
 
     SimplePriorityMessageDispatchChannel channel;
     channel.start();
@@ -67,7 +50,7 @@ void SimplePriorityMessageDispatchChannelTest::testStart() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testStop() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testStop) {
 
     SimplePriorityMessageDispatchChannel channel;
     channel.start();
@@ -77,7 +60,7 @@ void SimplePriorityMessageDispatchChannelTest::testStop() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testClose() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testClose) {
 
     SimplePriorityMessageDispatchChannel channel;
     channel.start();
@@ -92,7 +75,7 @@ void SimplePriorityMessageDispatchChannelTest::testClose() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testEnqueue() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueue) {
 
     SimplePriorityMessageDispatchChannel channel;
     Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
@@ -113,7 +96,7 @@ void SimplePriorityMessageDispatchChannelTest::testEnqueue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testEnqueueFront() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueueFront) {
 
     SimplePriorityMessageDispatchChannel channel;
     Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
@@ -148,7 +131,7 @@ void SimplePriorityMessageDispatchChannelTest::testEnqueueFront() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testPeek() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testPeek) {
 
     SimplePriorityMessageDispatchChannel channel;
     Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
@@ -187,7 +170,7 @@ void SimplePriorityMessageDispatchChannelTest::testPeek() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testDequeueNoWait() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testDequeueNoWait) {
 
     SimplePriorityMessageDispatchChannel channel;
 
@@ -229,7 +212,7 @@ void SimplePriorityMessageDispatchChannelTest::testDequeueNoWait() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testDequeue() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testDequeue) {
 
     SimplePriorityMessageDispatchChannel channel;
 
@@ -272,7 +255,7 @@ void SimplePriorityMessageDispatchChannelTest::testDequeue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testRemoveAll() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testRemoveAll) {
 
     SimplePriorityMessageDispatchChannel channel;
 
@@ -304,14 +287,3 @@ void SimplePriorityMessageDispatchChannelTest::testRemoveAll() {
     ASSERT_TRUE(channel.size() == 0);
     ASSERT_TRUE(channel.isEmpty() == true);
 }
-
-TEST_F(SimplePriorityMessageDispatchChannelTest, testCtor) { testCtor(); }
-TEST_F(SimplePriorityMessageDispatchChannelTest, testStart) { testStart(); }
-TEST_F(SimplePriorityMessageDispatchChannelTest, testStop) { testStop(); }
-TEST_F(SimplePriorityMessageDispatchChannelTest, testClose) { testClose(); }
-TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueue) { testEnqueue(); }
-TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueueFront) { testEnqueueFront(); }
-TEST_F(SimplePriorityMessageDispatchChannelTest, testPeek) { testPeek(); }
-TEST_F(SimplePriorityMessageDispatchChannelTest, testDequeueNoWait) { testDequeueNoWait(); }
-TEST_F(SimplePriorityMessageDispatchChannelTest, testDequeue) { testDequeue(); }
-TEST_F(SimplePriorityMessageDispatchChannelTest, testRemoveAll) { testRemoveAll(); }

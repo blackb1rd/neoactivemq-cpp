@@ -43,6 +43,8 @@ using namespace decaf::io;
 using namespace decaf::util;
 
     class DataInputStreamTest : public ::testing::Test {
+    protected:
+
 std::unique_ptr<ByteArrayOutputStream> baos;
         std::unique_ptr<ByteArrayInputStream> bais;
 
@@ -55,7 +57,6 @@ std::unique_ptr<ByteArrayOutputStream> baos;
 
         DataInputStreamTest() : baos(), bais(), os(), is(), testData() {}
 
-        virtual ~DataInputStreamTest(){}
         void SetUp() override{
             testData = "Test_All_Tests\nTest_decaf_io_BufferedInputStream\nTest_BufferedOutputStream\nTest_decaf_io_ByteArrayInputStream\nTest_decaf_io_ByteArrayOutputStream\nTest_decaf_io_DataInputStream\nTest_decaf_io_File\nTest_decaf_io_FileDescriptor\nTest_decaf_io_FileInputStream\nTest_decaf_io_FileNotFoundException\nTest_decaf_io_FileOutputStream\nTest_decaf_io_FilterInputStream\nTest_decaf_io_FilterOutputStream\nTest_decaf_io_InputStream\nTest_decaf_io_IOException\nTest_decaf_io_OutputStream\nTest_decaf_io_PrintStream\nTest_decaf_io_RandomAccessFile\nTest_decaf_io_SyncFailedException\nTest_decaf_lang_AbstractMethodError\nTest_decaf_lang_ArithmeticException\nTest_decaf_lang_ArrayIndexOutOfBoundsException\nTest_decaf_lang_ArrayStoreException\nTest_decaf_lang_Boolean\nTest_decaf_lang_Byte\nTest_decaf_lang_Character\nTest_decaf_lang_Class\nTest_decaf_lang_ClassCastException\nTest_decaf_lang_ClassCircularityError\nTest_decaf_lang_ClassFormatError\nTest_decaf_lang_ClassLoader\nTest_decaf_lang_ClassNotFoundException\nTest_decaf_lang_CloneNotSupportedException\nTest_decaf_lang_Double\nTest_decaf_lang_Error\nTest_decaf_lang_Exception\nTest_decaf_lang_ExceptionInInitializerError\nTest_decaf_lang_Float\nTest_decaf_lang_IllegalAccessError\nTest_decaf_lang_IllegalAccessException\nTest_decaf_lang_IllegalArgumentException\nTest_decaf_lang_IllegalMonitorStateException\nTest_decaf_lang_IllegalThreadStateException\nTest_decaf_lang_IncompatibleClassChangeError\nTest_decaf_lang_IndexOutOfBoundsException\nTest_decaf_lang_InstantiationError\nTest_decaf_lang_InstantiationException\nTest_decaf_lang_Integer\nTest_decaf_lang_InternalError\nTest_decaf_lang_InterruptedException\nTest_decaf_lang_LinkageError\nTest_decaf_lang_Long\nTest_decaf_lang_Math\nTest_decaf_lang_NegativeArraySizeException\nTest_decaf_lang_NoClassDefFoundError\nTest_decaf_lang_NoSuchFieldError\nTest_decaf_lang_NoSuchMethodError\nTest_decaf_lang_NullPointerException\nTest_decaf_lang_Number\nTest_decaf_lang_NumberFormatException\nTest_decaf_lang_Object\nTest_decaf_lang_OutOfMemoryError\nTest_decaf_lang_RuntimeException\nTest_decaf_lang_SecurityManager\nTest_decaf_lang_Short\nTest_decaf_lang_StackOverflowError\nTest_decaf_lang_String\nTest_decaf_lang_StringBuffer\nTest_decaf_lang_StringIndexOutOfBoundsException\nTest_decaf_lang_System\nTest_decaf_lang_Thread\nTest_decaf_lang_ThreadDeath\nTest_decaf_lang_ThreadGroup\nTest_decaf_lang_Throwable\nTest_decaf_lang_UnknownError\nTest_decaf_lang_UnsatisfiedLinkError\nTest_decaf_lang_VerifyError\nTest_decaf_lang_VirtualMachineError\nTest_decaf_lang_vm_Image\nTest_decaf_lang_vm_MemorySegment\nTest_decaf_lang_vm_ROMStoreException\nTest_decaf_lang_vm_VM\nTest_decaf_lang_Void\nTest_decaf_net_BindException\nTest_decaf_net_ConnectException\nTest_decaf_net_DatagramPacket\nTest_decaf_net_DatagramSocket\nTest_decaf_net_DatagramSocketImpl\nTest_decaf_net_InetAddress\nTest_decaf_net_NoRouteToHostException\nTest_decaf_net_PlainDatagramSocketImpl\nTest_decaf_net_PlainSocketImpl\nTest_decaf_net_Socket\nTest_decaf_net_SocketException\nTest_decaf_net_SocketImpl\nTest_decaf_net_SocketInputStream\nTest_decaf_net_SocketOutputStream\nTest_decaf_net_UnknownHostException\nTest_decaf_util_ArrayEnumerator\nTest_decaf_util_Date\nTest_decaf_util_EventObject\nTest_decaf_util_HashEnumerator\nTest_decaf_util_Hashtable\nTest_decaf_util_Properties\nTest_decaf_util_ResourceBundle\nTest_decaf_util_tm\nTest_decaf_util_Vector\n";
             this->baos.reset( new ByteArrayOutputStream() );
@@ -70,31 +71,7 @@ std::unique_ptr<ByteArrayOutputStream> baos;
             } catch(...) {}
         }
 
-        void test();
-        void testString();
-        void testUTF();
-        void testUTFDecoding();
-        void testConstructor();
-        void testRead1();
-        void testRead2();
-        void test_readBoolean();
-        void test_readByte();
-        void test_readChar();
-        void test_readDouble();
-        void test_readFloat();
-        void test_readFully1();
-        void test_readFully2();
-        void test_readFullyNullArray();
-        void test_readFullyNullStream();
-        void test_readFullyNullStreamNullArray();
-        void test_readInt();
-        void test_readLong();
-        void test_readShort();
-        void test_readUnsignedByte();
-        void test_readUnsignedShort();
-        void test_skipBytes();
-
-    private:
+    protected:
 
         void testHelper( unsigned char* input, int inputLength,
                          unsigned char* expect, int expectLength );
@@ -107,10 +84,8 @@ std::unique_ptr<ByteArrayOutputStream> baos;
 
     };
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::testConstructor() {
+TEST_F(DataInputStreamTest, testConstructor) {
 
     try {
 
@@ -129,7 +104,7 @@ void DataInputStreamTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::testRead1() {
+TEST_F(DataInputStreamTest, testRead1) {
 
     try {
 
@@ -147,7 +122,7 @@ void DataInputStreamTest::testRead1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::testRead2() {
+TEST_F(DataInputStreamTest, testRead2) {
     try {
 
         std::vector<unsigned char> temp( testData.begin(), testData.end() );
@@ -165,7 +140,7 @@ void DataInputStreamTest::testRead2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_readBoolean() {
+TEST_F(DataInputStreamTest, test_readBoolean) {
 
     try {
         os->writeBoolean(true);
@@ -178,7 +153,7 @@ void DataInputStreamTest::test_readBoolean() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_readByte() {
+TEST_F(DataInputStreamTest, test_readByte) {
     try {
         os->writeByte( (unsigned char) 127);
         os->close();
@@ -190,7 +165,7 @@ void DataInputStreamTest::test_readByte() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_readChar() {
+TEST_F(DataInputStreamTest, test_readChar) {
     try {
         os->writeChar('t');
         os->close();
@@ -202,7 +177,7 @@ void DataInputStreamTest::test_readChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_readDouble() {
+TEST_F(DataInputStreamTest, test_readDouble) {
     try {
         os->writeDouble(2345.76834720202);
         os->close();
@@ -214,7 +189,7 @@ void DataInputStreamTest::test_readDouble() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_readFloat() {
+TEST_F(DataInputStreamTest, test_readFloat) {
     try {
         os->writeFloat(29.08764f);
         os->close();
@@ -226,7 +201,7 @@ void DataInputStreamTest::test_readFloat() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_readFully1() {
+TEST_F(DataInputStreamTest, test_readFully1) {
 
     std::vector<unsigned char> temp( testData.begin(), testData.end() );
     os->write( &temp[0], (int)temp.size() );
@@ -247,7 +222,7 @@ void DataInputStreamTest::test_readFully1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_readFully2() {
+TEST_F(DataInputStreamTest, test_readFully2) {
 
     std::vector<unsigned char> temp( testData.begin(), testData.end() );
     os->write( &temp[0], (int)temp.size() );
@@ -282,7 +257,7 @@ void DataInputStreamTest::test_readFully2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_readFullyNullArray() {
+TEST_F(DataInputStreamTest, test_readFullyNullArray) {
     std::vector<unsigned char> test( 5000 );
     DataInputStream is( new ByteArrayInputStream( test ), true );
 
@@ -299,7 +274,7 @@ void DataInputStreamTest::test_readFullyNullArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_readFullyNullStream() {
+TEST_F(DataInputStreamTest, test_readFullyNullStream) {
 
     DataInputStream is(NULL);
     unsigned char* byteArray = new unsigned char[testData.length()];
@@ -317,7 +292,7 @@ void DataInputStreamTest::test_readFullyNullStream() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_readFullyNullStreamNullArray() {
+TEST_F(DataInputStreamTest, test_readFullyNullStreamNullArray) {
 
     DataInputStream is(NULL);
     unsigned char* nullByteArray = NULL;
@@ -333,7 +308,7 @@ void DataInputStreamTest::test_readFullyNullStreamNullArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_readInt() {
+TEST_F(DataInputStreamTest, test_readInt) {
     try {
         os->writeInt(768347202);
         os->close();
@@ -345,7 +320,7 @@ void DataInputStreamTest::test_readInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_readLong() {
+TEST_F(DataInputStreamTest, test_readLong) {
     try {
         os->writeLong(9875645283333LL);
         os->close();
@@ -357,7 +332,7 @@ void DataInputStreamTest::test_readLong() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_readShort() {
+TEST_F(DataInputStreamTest, test_readShort) {
     try {
         os->writeShort(9875);
         os->close();
@@ -369,7 +344,7 @@ void DataInputStreamTest::test_readShort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_readUnsignedByte() {
+TEST_F(DataInputStreamTest, test_readUnsignedByte) {
     try {
         os->writeByte((unsigned char) -127);
         os->close();
@@ -381,7 +356,7 @@ void DataInputStreamTest::test_readUnsignedByte() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_readUnsignedShort() {
+TEST_F(DataInputStreamTest, test_readUnsignedShort) {
     os->writeShort(9875);
     os->close();
     openDataInputStream();
@@ -389,7 +364,7 @@ void DataInputStreamTest::test_readUnsignedShort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test_skipBytes() {
+TEST_F(DataInputStreamTest, test_skipBytes) {
     try {
         std::vector<unsigned char> temp( testData.begin(), testData.end() );
         os->write( &temp[0], (int)temp.size() );
@@ -420,7 +395,7 @@ void DataInputStreamTest::test_skipBytes() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::test(){
+TEST_F(DataInputStreamTest, test){
 
     unsigned char buffer[30];
     int ix = 0;
@@ -506,7 +481,7 @@ void DataInputStreamTest::test(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::testString() {
+TEST_F(DataInputStreamTest, testString) {
 
     std::string data1 = "This is a Test";
     std::string data2 = "of the readString method";
@@ -546,7 +521,7 @@ void DataInputStreamTest::testString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::testUTF() {
+TEST_F(DataInputStreamTest, testUTF) {
 
     std::string data1 = "This is a Test";
     std::string data2 = "of the readString method";
@@ -605,7 +580,7 @@ void DataInputStreamTest::testHelper( unsigned char* input, int inputLength,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamTest::testUTFDecoding() {
+TEST_F(DataInputStreamTest, testUTFDecoding) {
 
     // Test data with 1-byte UTF8 encoding.
     {
@@ -681,27 +656,3 @@ void DataInputStreamTest::testUTFDecoding() {
     }
 
 }
-
-TEST_F(DataInputStreamTest, test) { test(); }
-TEST_F(DataInputStreamTest, testString) { testString(); }
-TEST_F(DataInputStreamTest, testUTF) { testUTF(); }
-TEST_F(DataInputStreamTest, testUTFDecoding) { testUTFDecoding(); }
-TEST_F(DataInputStreamTest, testConstructor) { testConstructor(); }
-TEST_F(DataInputStreamTest, testRead1) { testRead1(); }
-TEST_F(DataInputStreamTest, testRead2) { testRead2(); }
-TEST_F(DataInputStreamTest, test_readBoolean) { test_readBoolean(); }
-TEST_F(DataInputStreamTest, test_readByte) { test_readByte(); }
-TEST_F(DataInputStreamTest, test_readChar) { test_readChar(); }
-TEST_F(DataInputStreamTest, test_readDouble) { test_readDouble(); }
-TEST_F(DataInputStreamTest, test_readFloat) { test_readFloat(); }
-TEST_F(DataInputStreamTest, test_readFully1) { test_readFully1(); }
-TEST_F(DataInputStreamTest, test_readFully2) { test_readFully2(); }
-TEST_F(DataInputStreamTest, test_readFullyNullArray) { test_readFullyNullArray(); }
-TEST_F(DataInputStreamTest, test_readFullyNullStream) { test_readFullyNullStream(); }
-TEST_F(DataInputStreamTest, test_readFullyNullStreamNullArray) { test_readFullyNullStreamNullArray(); }
-TEST_F(DataInputStreamTest, test_readInt) { test_readInt(); }
-TEST_F(DataInputStreamTest, test_readLong) { test_readLong(); }
-TEST_F(DataInputStreamTest, test_readShort) { test_readShort(); }
-TEST_F(DataInputStreamTest, test_readUnsignedByte) { test_readUnsignedByte(); }
-TEST_F(DataInputStreamTest, test_readUnsignedShort) { test_readUnsignedShort(); }
-TEST_F(DataInputStreamTest, test_skipBytes) { test_skipBytes(); }

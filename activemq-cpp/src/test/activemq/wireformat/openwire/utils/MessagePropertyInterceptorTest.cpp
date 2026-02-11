@@ -34,19 +34,10 @@ using namespace activemq::wireformat::openwire;
 using namespace activemq::wireformat::openwire::utils;
 using namespace activemq::commands;
 
-    class MessagePropertyInterceptorTest : public ::testing::Test {
-public:
-
-        MessagePropertyInterceptorTest() {}
-        virtual ~MessagePropertyInterceptorTest() {}
-
-        void test();
-
-    };
-
+class MessagePropertyInterceptorTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagePropertyInterceptorTest::test() {
+TEST_F(MessagePropertyInterceptorTest, test) {
 
     PrimitiveMap properties;
     Message message;
@@ -76,5 +67,3 @@ void MessagePropertyInterceptorTest::test() {
     ASSERT_THROW(interceptor.setStringProperty( "JMSXGroupSeq", "FOO" ), Exception) << ("Should Throw an Exception");
 
 }
-
-TEST_F(MessagePropertyInterceptorTest, test) { test(); }

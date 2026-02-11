@@ -29,16 +29,11 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class ServerSocketTest  : public ::testing::Test {
-private:
+protected:
 
         Socket* ssconn;
 
         decaf::lang::Thread* theThread;
-
-    private:
-
-        ServerSocketTest(const ServerSocketTest&);
-        ServerSocketTest& operator= (const ServerSocketTest&);
 
     public:
 
@@ -48,20 +43,11 @@ private:
         void SetUp() override;
         void TearDown() override;
 
-        void testConstructor();
-        void testClose();
-        void testAccept();
-        void testGetLocalPort();
-        void testGetSoTimeout();
-        void testGetReuseAddress();
-        void testGetReceiveBufferSize();
-
     protected:
 
         void startClient( int port );
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -129,7 +115,7 @@ void ServerSocketTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::testConstructor() {
+TEST_F(ServerSocketTest, testConstructor) {
 
     try {
 
@@ -165,7 +151,7 @@ void ServerSocketTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::testClose() {
+TEST_F(ServerSocketTest, testClose) {
 
     ServerSocket s(0);
     s.close();
@@ -204,7 +190,7 @@ namespace{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::testAccept() {
+TEST_F(ServerSocketTest, testAccept) {
 
     ServerSocket s(0);
     try {
@@ -275,7 +261,7 @@ void ServerSocketTest::testAccept() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::testGetLocalPort() {
+TEST_F(ServerSocketTest, testGetLocalPort) {
 
     int port = 23232;
     int actual = 0;
@@ -294,7 +280,7 @@ void ServerSocketTest::testGetLocalPort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::testGetSoTimeout() {
+TEST_F(ServerSocketTest, testGetSoTimeout) {
 
     ServerSocket s(0);
     s.setSoTimeout( 100 );
@@ -303,7 +289,7 @@ void ServerSocketTest::testGetSoTimeout() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::testGetReuseAddress() {
+TEST_F(ServerSocketTest, testGetReuseAddress) {
 
     try{
         ServerSocket s;
@@ -318,7 +304,7 @@ void ServerSocketTest::testGetReuseAddress() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::testGetReceiveBufferSize() {
+TEST_F(ServerSocketTest, testGetReceiveBufferSize) {
 
     try{
         ServerSocket s;
@@ -344,11 +330,3 @@ void ServerSocketTest::startClient( int port ) {
         FAIL() << (std::string( "Exception during startClinet()" ) + e.getMessage());
     }
 }
-
-TEST_F(ServerSocketTest, testConstructor) { testConstructor(); }
-TEST_F(ServerSocketTest, testClose) { testClose(); }
-TEST_F(ServerSocketTest, testAccept) { testAccept(); }
-TEST_F(ServerSocketTest, testGetLocalPort) { testGetLocalPort(); }
-TEST_F(ServerSocketTest, testGetSoTimeout) { testGetSoTimeout(); }
-TEST_F(ServerSocketTest, testGetReuseAddress) { testGetReuseAddress(); }
-TEST_F(ServerSocketTest, testGetReceiveBufferSize) { testGetReceiveBufferSize(); }

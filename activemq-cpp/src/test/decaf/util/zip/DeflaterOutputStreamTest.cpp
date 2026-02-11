@@ -43,7 +43,7 @@ using namespace decaf::util;
 using namespace decaf::util::zip;
 
     class DeflaterOutputStreamTest : public ::testing::Test {
-private:
+protected:
 
         std::vector<unsigned char> outputBuffer;
 
@@ -55,17 +55,7 @@ private:
         void SetUp() override;
         void TearDown() override;
 
-        void testConstructorOutputStreamDeflater();
-        void testConstructorOutputStream();
-        void testConstructorOutputStreamDeflaterI();
-        void testClose();
-        void testFinish();
-        void testDeflate();
-        void testWriteI();
-        void testWriteBIII();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
     namespace {
@@ -148,7 +138,7 @@ void DeflaterOutputStreamTest::SetUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterOutputStreamTest::testConstructorOutputStreamDeflater() {
+TEST_F(DeflaterOutputStreamTest, testConstructorOutputStreamDeflater) {
 
     unsigned char byteArray[] = { 1, 3, 4, 7, 8 };
 
@@ -167,7 +157,7 @@ void DeflaterOutputStreamTest::testConstructorOutputStreamDeflater() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterOutputStreamTest::testConstructorOutputStream() {
+TEST_F(DeflaterOutputStreamTest, testConstructorOutputStream) {
 
     ByteArrayOutputStream baos;
     MyDeflaterOutputStream dos( &baos );
@@ -181,7 +171,7 @@ void DeflaterOutputStreamTest::testConstructorOutputStream() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterOutputStreamTest::testConstructorOutputStreamDeflaterI() {
+TEST_F(DeflaterOutputStreamTest, testConstructorOutputStreamDeflaterI) {
 
     int buf = 5;
     int zeroBuf = 0;
@@ -209,7 +199,7 @@ void DeflaterOutputStreamTest::testConstructorOutputStreamDeflaterI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterOutputStreamTest::testClose() {
+TEST_F(DeflaterOutputStreamTest, testClose) {
 
     ByteArrayOutputStream baos;
     DeflaterOutputStream dos( &baos );
@@ -235,7 +225,7 @@ void DeflaterOutputStreamTest::testClose() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterOutputStreamTest::testFinish() {
+TEST_F(DeflaterOutputStreamTest, testFinish) {
 
     ByteArrayOutputStream baos;
     DeflaterOutputStream dos( &baos );
@@ -249,7 +239,7 @@ void DeflaterOutputStreamTest::testFinish() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterOutputStreamTest::testWriteI() {
+TEST_F(DeflaterOutputStreamTest, testWriteI) {
 
     ByteArrayOutputStream baos;
     DeflaterOutputStream dos( &baos );
@@ -272,7 +262,7 @@ void DeflaterOutputStreamTest::testWriteI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterOutputStreamTest::testWriteBIII() {
+TEST_F(DeflaterOutputStreamTest, testWriteBIII) {
 
     unsigned char byteArray[] = { 1, 3, 4, 7, 8, 3, 6 };
 
@@ -306,7 +296,7 @@ void DeflaterOutputStreamTest::testWriteBIII() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterOutputStreamTest::testDeflate() {
+TEST_F(DeflaterOutputStreamTest, testDeflate) {
 
     ByteArrayOutputStream baos;
     MyDeflaterOutputStream dos( &baos );
@@ -317,12 +307,3 @@ void DeflaterOutputStreamTest::testDeflate() {
     ASSERT_TRUE(dos.getDaflateFlag());
     dos.close();
 }
-
-TEST_F(DeflaterOutputStreamTest, testConstructorOutputStreamDeflater) { testConstructorOutputStreamDeflater(); }
-TEST_F(DeflaterOutputStreamTest, testConstructorOutputStreamDeflaterI) { testConstructorOutputStreamDeflaterI(); }
-TEST_F(DeflaterOutputStreamTest, testConstructorOutputStream) { testConstructorOutputStream(); }
-TEST_F(DeflaterOutputStreamTest, testClose) { testClose(); }
-TEST_F(DeflaterOutputStreamTest, testFinish) { testFinish(); }
-TEST_F(DeflaterOutputStreamTest, testDeflate) { testDeflate(); }
-TEST_F(DeflaterOutputStreamTest, testWriteI) { testWriteI(); }
-TEST_F(DeflaterOutputStreamTest, testWriteBIII) { testWriteBIII(); }

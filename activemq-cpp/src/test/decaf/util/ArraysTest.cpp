@@ -28,8 +28,7 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class ArraysTest : public ::testing::Test {
-    private:
-private:
+protected:
 
         static const int SIZE;
 
@@ -38,11 +37,7 @@ private:
         ArraysTest();
         virtual ~ArraysTest();
 
-        void testFill1();
-        void testFill2();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const int ArraysTest::SIZE = 256;
@@ -56,7 +51,7 @@ ArraysTest::~ArraysTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArraysTest::testFill1() {
+TEST_F(ArraysTest, testFill1) {
 
     bool boolArray[SIZE];
     Arrays::fill( boolArray, SIZE, true );
@@ -84,7 +79,7 @@ void ArraysTest::testFill1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArraysTest::testFill2() {
+TEST_F(ArraysTest, testFill2) {
 
     bool boolArray[SIZE];
     Arrays::fill( boolArray, SIZE, 0, SIZE, true );
@@ -106,6 +101,3 @@ void ArraysTest::testFill2() {
 
     ASSERT_THROW(Arrays::fill( boolArray, SIZE, 0, SIZE + 10, false ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
-
-TEST_F(ArraysTest, testFill1) { testFill1(); }
-TEST_F(ArraysTest, testFill2) { testFill2(); }

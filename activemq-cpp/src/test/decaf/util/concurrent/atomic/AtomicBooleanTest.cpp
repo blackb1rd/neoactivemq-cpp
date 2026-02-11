@@ -31,37 +31,27 @@ using namespace decaf::util::concurrent::atomic;
 public:
 
         AtomicBooleanTest();
-        virtual ~AtomicBooleanTest() {}
-
-        void testConstructor();
-        void testConstructor2();
-        void testGetSet();
-        void testCompareAndSet();
-        void testCompareAndSetInMultipleThreads();
-        void testGetAndSet();
-        void testToString();
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 AtomicBooleanTest::AtomicBooleanTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicBooleanTest::testConstructor() {
+TEST_F(AtomicBooleanTest, testConstructor) {
     AtomicBoolean aboolean;
     ASSERT_TRUE(aboolean.get() == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicBooleanTest::testConstructor2() {
+TEST_F(AtomicBooleanTest, testConstructor2) {
     AtomicBoolean aboolean( true );
     ASSERT_TRUE(aboolean.get() == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicBooleanTest::testGetSet() {
+TEST_F(AtomicBooleanTest, testGetSet) {
     AtomicBoolean ai( true );
     ASSERT_TRUE(true == ai.get());
     ai.set( false );
@@ -71,7 +61,7 @@ void AtomicBooleanTest::testGetSet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicBooleanTest::testCompareAndSet() {
+TEST_F(AtomicBooleanTest, testCompareAndSet) {
     AtomicBoolean ai( true );
     ASSERT_TRUE(ai.compareAndSet( true, false ));
     ASSERT_TRUE(false == ai.get());
@@ -105,7 +95,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicBooleanTest::testCompareAndSetInMultipleThreads() {
+TEST_F(AtomicBooleanTest, testCompareAndSetInMultipleThreads) {
     AtomicBoolean ai(true);
 
     MyRunnable runnable( &ai );
@@ -123,7 +113,7 @@ void AtomicBooleanTest::testCompareAndSetInMultipleThreads() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicBooleanTest::testGetAndSet() {
+TEST_F(AtomicBooleanTest, testGetAndSet) {
     AtomicBoolean ai( true );
     ASSERT_TRUE(true == ai.getAndSet( false ));
     ASSERT_TRUE(false == ai.getAndSet( false ));
@@ -132,17 +122,9 @@ void AtomicBooleanTest::testGetAndSet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicBooleanTest::testToString() {
+TEST_F(AtomicBooleanTest, testToString) {
     AtomicBoolean ai;
     ASSERT_TRUE(ai.toString() == Boolean::toString( false ));
     ai.set( true );
     ASSERT_TRUE(ai.toString() == Boolean::toString( true ));
 }
-
-TEST_F(AtomicBooleanTest, testConstructor) { testConstructor(); }
-TEST_F(AtomicBooleanTest, testConstructor2) { testConstructor2(); }
-TEST_F(AtomicBooleanTest, testGetSet) { testGetSet(); }
-TEST_F(AtomicBooleanTest, testCompareAndSet) { testCompareAndSet(); }
-TEST_F(AtomicBooleanTest, testCompareAndSetInMultipleThreads) { testCompareAndSetInMultipleThreads(); }
-TEST_F(AtomicBooleanTest, testGetAndSet) { testGetAndSet(); }
-TEST_F(AtomicBooleanTest, testToString) { testToString(); }

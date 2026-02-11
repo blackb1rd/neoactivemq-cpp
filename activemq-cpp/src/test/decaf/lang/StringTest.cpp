@@ -37,93 +37,7 @@ public:
         StringTest();
         virtual ~StringTest();
 
-        void testDefaultConstructor();
-        void testConstructorCString();
-        void testConstructorCStringWithSize();
-        void testConstructorCStringOffsetAndLength();
-        void testConstructorCStringSizeOffsetAndLength();
-        void testConstructorStdString();
-        void testConstructorString();
-        void testConstructorCharFill();
-        void testAssignmentString();
-        void testAssignmentStdString();
-        void testAssignmentCString();
-        void testCompact();
-        void testHashCode();
-        void testIsEmpty();
-        void testSubstring1();
-        void testSubstring2();
-        void testSubstringExceptions();
-        void testTrim();
-        void testToString();
-        void testToCharArray();
-        void testCStr();
-        void testRegionMatches();
-        void testRegionMatchesCaseSensitive();
-        void testStartsWith();
-        void testStartsWithI();
-        void testEndsWith();
-        void testEquals();
-        void testEqualsCString();
-        void testEqualsStdString();
-        void testEqualsIgnoreCase();
-        void testEqualsIgnoreCaseCString();
-        void testEqualsIgnoreCaseStdString();
-        void testIndexOfChar();
-        void testIndexOfChar2();
-        void testIndexOfString();
-        void testIndexOfString2();
-        void testFindFirstOf();
-        void testFindFirstOf2();
-        void testFindFirstNotOf();
-        void testFindFirstNotOf2();
-        void testIndexOfStdString();
-        void testIndexOfStdString2();
-        void testIndexOfCString();
-        void testIndexOfCString2();
-        void testLastIndexOfChar();
-        void testLastIndexOfChar2();
-        void testLastIndexOfString();
-        void testLastIndexOfString2();
-        void testLastIndexOfStdString();
-        void testLastIndexOfStdString2();
-        void testLastIndexOfCString();
-        void testLastIndexOfCString2();
-        void testToLowerCase();
-        void testToUpperCase();
-        void testReplaceCharChar();
-        void testContainsString();
-        void testContainsStdString();
-        void testContainsCString();
-        void testConcatString();
-        void testConcatStdString();
-        void testConcatCString();
-        void testCompareToString();
-        void testCompareToStdString();
-        void testCompareToCString();
-        void testCompareToIgnoreCaseString();
-        void testCompareToIgnoreCaseStdString();
-        void testCompareToIgnoreCaseCString();
-        void testIsNullOrEmpty();
-        void testOperatorEqualsString();
-        void testOperatorEqualsStdString();
-        void testOperatorEqualsCString();
-        void testOperatorNotEqualsString();
-        void testOperatorNotEqualsStdString();
-        void testOperatorNotEqualsCString();
-        void testOperatorLessString();
-        void testOperatorLessStdString();
-        void testOperatorLessCString();
-        void testOperatorGreaterString();
-        void testOperatorGreaterStdString();
-        void testOperatorGreaterCString();
-        void testOperatorPlusString();
-        void testOperatorPlusStdString();
-        void testOperatorPlusCString();
-        void testGetChars();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 StringTest::StringTest() {
@@ -134,7 +48,7 @@ StringTest::~StringTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testDefaultConstructor() {
+TEST_F(StringTest, testDefaultConstructor) {
     String test;
     ASSERT_TRUE(test == "") << ("Default string should equal empty");
 
@@ -145,7 +59,7 @@ void StringTest::testDefaultConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testConstructorStdString() {
+TEST_F(StringTest, testConstructorStdString) {
 
     std::string stdString("ABCDE");
 
@@ -160,7 +74,7 @@ void StringTest::testConstructorStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testConstructorCString() {
+TEST_F(StringTest, testConstructorCString) {
 
     const char* cstring("ABCDE");
 
@@ -177,7 +91,7 @@ void StringTest::testConstructorCString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testConstructorCStringWithSize() {
+TEST_F(StringTest, testConstructorCStringWithSize) {
 
     const char* cstring("ABCDEF");
     const char* expected("ABCDE");
@@ -197,7 +111,7 @@ void StringTest::testConstructorCStringWithSize() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testConstructorCStringOffsetAndLength() {
+TEST_F(StringTest, testConstructorCStringOffsetAndLength) {
 
     const char* cstring("1ABCDEF");
     const char* expected("ABCDE");
@@ -219,7 +133,7 @@ void StringTest::testConstructorCStringOffsetAndLength() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testConstructorCStringSizeOffsetAndLength() {
+TEST_F(StringTest, testConstructorCStringSizeOffsetAndLength) {
 
     const char* cstring("1ABCDEF");
     const char* expected("ABCDE");
@@ -243,7 +157,7 @@ void StringTest::testConstructorCStringSizeOffsetAndLength() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testConstructorString() {
+TEST_F(StringTest, testConstructorString) {
 
     String original("ABCDE");
 
@@ -258,7 +172,7 @@ void StringTest::testConstructorString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testConstructorCharFill() {
+TEST_F(StringTest, testConstructorCharFill) {
 
     String expected("AAAAA");
     String input('A', 5);
@@ -271,7 +185,7 @@ void StringTest::testConstructorCharFill() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testAssignmentString() {
+TEST_F(StringTest, testAssignmentString) {
 
     String transient;
     String input("HelloWorld");
@@ -294,7 +208,7 @@ void StringTest::testAssignmentString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testAssignmentStdString() {
+TEST_F(StringTest, testAssignmentStdString) {
 
     String transient;
     String input("HelloWorld");
@@ -317,7 +231,7 @@ void StringTest::testAssignmentStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testAssignmentCString() {
+TEST_F(StringTest, testAssignmentCString) {
 
     String transient;
     String input("HelloWorld");
@@ -340,7 +254,7 @@ void StringTest::testAssignmentCString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testCompact() {
+TEST_F(StringTest, testCompact) {
 
     const String input("HelloWorld");
     const String expected("World");
@@ -360,7 +274,7 @@ void StringTest::testCompact() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testIsEmpty() {
+TEST_F(StringTest, testIsEmpty) {
 
     String hw("HelloWorld");
     ASSERT_TRUE(!hw.isEmpty()) << ("String should not be empty");
@@ -381,7 +295,7 @@ void StringTest::testIsEmpty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testHashCode() {
+TEST_F(StringTest, testHashCode) {
 
     String hw("HelloWorld");
 
@@ -400,7 +314,7 @@ void StringTest::testHashCode() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testSubstring1() {
+TEST_F(StringTest, testSubstring1) {
 
     const String input("HelloWorld");
     const String expected("World");
@@ -410,7 +324,7 @@ void StringTest::testSubstring1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testSubstring2() {
+TEST_F(StringTest, testSubstring2) {
 
     const String input("HelloWorld");
     const String expected("Hello");
@@ -421,7 +335,7 @@ void StringTest::testSubstring2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testRegionMatches() {
+TEST_F(StringTest, testRegionMatches) {
 
     const String input1("HelloWorld");
     const String input2("HelloWorld");
@@ -433,7 +347,7 @@ void StringTest::testRegionMatches() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testRegionMatchesCaseSensitive() {
+TEST_F(StringTest, testRegionMatchesCaseSensitive) {
 
     const String input1("HelloWorld");
     const String input2("HelloWorld");
@@ -447,7 +361,7 @@ void StringTest::testRegionMatchesCaseSensitive() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testStartsWith() {
+TEST_F(StringTest, testStartsWith) {
     const String input("HelloWorld");
 
     ASSERT_TRUE(input.startsWith("Hello")) << ("Failed to find string");
@@ -455,7 +369,7 @@ void StringTest::testStartsWith() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testStartsWithI() {
+TEST_F(StringTest, testStartsWithI) {
     const String input("HelloWorld");
 
     ASSERT_TRUE(input.startsWith("World", 5)) << ("Failed to find string");
@@ -463,7 +377,7 @@ void StringTest::testStartsWithI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testSubstringExceptions() {
+TEST_F(StringTest, testSubstringExceptions) {
 
     const String input("HelloWorld");
 
@@ -475,7 +389,7 @@ void StringTest::testSubstringExceptions() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testTrim() {
+TEST_F(StringTest, testTrim) {
     const String input(" HelloWorld ");
     const String expected("HelloWorld");
 
@@ -483,7 +397,7 @@ void StringTest::testTrim() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testToString() {
+TEST_F(StringTest, testToString) {
     const String input("HelloWorld");
     const std::string helloworld("HelloWorld");
     const std::string expected("World");
@@ -495,7 +409,7 @@ void StringTest::testToString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testToCharArray() {
+TEST_F(StringTest, testToCharArray) {
     String input("ABCDE");
     char* result = input.toCharArray();
 
@@ -507,7 +421,7 @@ void StringTest::testToCharArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testCStr() {
+TEST_F(StringTest, testCStr) {
 
     String input("ABCDE");
     const char* result = input.c_str();
@@ -528,7 +442,7 @@ void StringTest::testCStr() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testEndsWith() {
+TEST_F(StringTest, testEndsWith) {
     const String input("HelloWorld");
 
     ASSERT_TRUE(input.endsWith(String("ld"))) << ("Failed to find ending String");
@@ -542,7 +456,7 @@ void StringTest::testEndsWith() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testEquals() {
+TEST_F(StringTest, testEquals) {
 
     String lower = "helloworld";
     String lower2 = "helloworld";
@@ -554,7 +468,7 @@ void StringTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testEqualsCString() {
+TEST_F(StringTest, testEqualsCString) {
 
     String lower = "helloworld";
     const char* lower2 = "helloworld";
@@ -565,7 +479,7 @@ void StringTest::testEqualsCString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testEqualsStdString() {
+TEST_F(StringTest, testEqualsStdString) {
 
     String lower = "helloworld";
     std::string lower2 = "helloworld";
@@ -576,7 +490,7 @@ void StringTest::testEqualsStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testEqualsIgnoreCase() {
+TEST_F(StringTest, testEqualsIgnoreCase) {
 
     String lower = "helloworld";
     String upper = "HELLOWORLD";
@@ -585,7 +499,7 @@ void StringTest::testEqualsIgnoreCase() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testEqualsIgnoreCaseCString() {
+TEST_F(StringTest, testEqualsIgnoreCaseCString) {
 
     String lower = "helloworld";
     const char* upper = "HELLOWORLD";
@@ -594,7 +508,7 @@ void StringTest::testEqualsIgnoreCaseCString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testEqualsIgnoreCaseStdString() {
+TEST_F(StringTest, testEqualsIgnoreCaseStdString) {
 
     String lower = "helloworld";
     std::string upper = "HELLOWORLD";
@@ -603,7 +517,7 @@ void StringTest::testEqualsIgnoreCaseStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testFindFirstOf() {
+TEST_F(StringTest, testFindFirstOf) {
 
     const String input("HelloWorld");
 
@@ -612,7 +526,7 @@ void StringTest::testFindFirstOf() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testFindFirstOf2() {
+TEST_F(StringTest, testFindFirstOf2) {
 
     const String input("HelloWorld");
 
@@ -623,7 +537,7 @@ void StringTest::testFindFirstOf2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testFindFirstNotOf() {
+TEST_F(StringTest, testFindFirstNotOf) {
 
     const String input("HelloWorld");
 
@@ -632,7 +546,7 @@ void StringTest::testFindFirstNotOf() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testFindFirstNotOf2() {
+TEST_F(StringTest, testFindFirstNotOf2) {
 
     const String input("HelloWorld");
 
@@ -643,7 +557,7 @@ void StringTest::testFindFirstNotOf2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testIndexOfChar() {
+TEST_F(StringTest, testIndexOfChar) {
     const String input("HelloWorld");
 
     ASSERT_EQ(1, input.indexOf('e')) << ("Invalid index returned");
@@ -651,7 +565,7 @@ void StringTest::testIndexOfChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testIndexOfChar2() {
+TEST_F(StringTest, testIndexOfChar2) {
     const String input("HelloWorld");
 
     ASSERT_EQ(5, input.indexOf('W', 2)) << ("Invalid character index returned");
@@ -661,7 +575,7 @@ void StringTest::testIndexOfChar2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testIndexOfString() {
+TEST_F(StringTest, testIndexOfString) {
     const String input("HelloWorld");
 
     ASSERT_TRUE(input.indexOf(String("World")) > 0) << ("Failed to find string");
@@ -669,7 +583,7 @@ void StringTest::testIndexOfString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testIndexOfString2() {
+TEST_F(StringTest, testIndexOfString2) {
 
     const String input("HelloWorld");
     const String hello("Hello");
@@ -682,7 +596,7 @@ void StringTest::testIndexOfString2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testIndexOfStdString() {
+TEST_F(StringTest, testIndexOfStdString) {
     const String input("HelloWorld");
 
     ASSERT_TRUE(input.indexOf(std::string("World")) > 0) << ("Failed to find string");
@@ -690,7 +604,7 @@ void StringTest::testIndexOfStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testIndexOfStdString2() {
+TEST_F(StringTest, testIndexOfStdString2) {
 
     const String input("HelloWorld");
     const String hello("Hello");
@@ -703,7 +617,7 @@ void StringTest::testIndexOfStdString2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testIndexOfCString() {
+TEST_F(StringTest, testIndexOfCString) {
     const String input("HelloWorld");
     const char* nullString = NULL;
 
@@ -713,7 +627,7 @@ void StringTest::testIndexOfCString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testIndexOfCString2() {
+TEST_F(StringTest, testIndexOfCString2) {
 
     const String input("HelloWorld");
     const String hello("Hello");
@@ -728,7 +642,7 @@ void StringTest::testIndexOfCString2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testLastIndexOfChar() {
+TEST_F(StringTest, testLastIndexOfChar) {
     const String input("HelloWorld");
 
     ASSERT_EQ(5, input.lastIndexOf('W')) << ("Failed to return correct index");
@@ -736,7 +650,7 @@ void StringTest::testLastIndexOfChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testLastIndexOfChar2() {
+TEST_F(StringTest, testLastIndexOfChar2) {
     const String input("HelloWorld");
 
     ASSERT_EQ(5, input.lastIndexOf('W', 6)) << ("Failed to return correct index");
@@ -745,7 +659,7 @@ void StringTest::testLastIndexOfChar2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testLastIndexOfString() {
+TEST_F(StringTest, testLastIndexOfString) {
     const String input("HelloWorld");
 
     ASSERT_EQ(5, input.lastIndexOf(String("World"))) << ("Returned incorrect index");
@@ -755,7 +669,7 @@ void StringTest::testLastIndexOfString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testLastIndexOfString2() {
+TEST_F(StringTest, testLastIndexOfString2) {
     const String input("HelloWorld");
     const String hello("Hello");
 
@@ -767,7 +681,7 @@ void StringTest::testLastIndexOfString2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testLastIndexOfStdString() {
+TEST_F(StringTest, testLastIndexOfStdString) {
     const String input("HelloWorld");
 
     ASSERT_EQ(5, input.lastIndexOf(std::string("World"))) << ("Returned incorrect index");
@@ -775,7 +689,7 @@ void StringTest::testLastIndexOfStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testLastIndexOfStdString2() {
+TEST_F(StringTest, testLastIndexOfStdString2) {
     const String input("HelloWorld");
     const String hello("Hello");
 
@@ -787,7 +701,7 @@ void StringTest::testLastIndexOfStdString2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testLastIndexOfCString() {
+TEST_F(StringTest, testLastIndexOfCString) {
     const String input("HelloWorld");
 
     ASSERT_EQ(5, input.lastIndexOf("World")) << ("Returned incorrect index");
@@ -795,7 +709,7 @@ void StringTest::testLastIndexOfCString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testLastIndexOfCString2() {
+TEST_F(StringTest, testLastIndexOfCString2) {
     const String input("HelloWorld");
     const String hello("Hello");
     const char* nullString = NULL;
@@ -809,7 +723,7 @@ void StringTest::testLastIndexOfCString2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testToLowerCase() {
+TEST_F(StringTest, testToLowerCase) {
 
     String lower = "helloworld";
     String upper = "HELLOWORLD";
@@ -821,7 +735,7 @@ void StringTest::testToLowerCase() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testToUpperCase() {
+TEST_F(StringTest, testToUpperCase) {
 
     String lower = "helloworld";
     String upper = "HELLOWORLD";
@@ -831,7 +745,7 @@ void StringTest::testToUpperCase() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testReplaceCharChar() {
+TEST_F(StringTest, testReplaceCharChar) {
 
     const String input("HelloWorld");
     const String expected("HezzoWorzd");
@@ -840,7 +754,7 @@ void StringTest::testReplaceCharChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testContainsString() {
+TEST_F(StringTest, testContainsString) {
 
     String s = "abcdefghijklmnopqrstuvwxyz";
     ASSERT_TRUE(s.contains(String("abc")));
@@ -849,7 +763,7 @@ void StringTest::testContainsString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testContainsStdString() {
+TEST_F(StringTest, testContainsStdString) {
 
     String s = "abcdefghijklmnopqrstuvwxyz";
     ASSERT_TRUE(s.contains(std::string("abc")));
@@ -858,7 +772,7 @@ void StringTest::testContainsStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testContainsCString() {
+TEST_F(StringTest, testContainsCString) {
 
     String s = "abcdefghijklmnopqrstuvwxyz";
     ASSERT_TRUE(s.contains("abc"));
@@ -868,7 +782,7 @@ void StringTest::testContainsCString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testConcatString() {
+TEST_F(StringTest, testConcatString) {
 
     const String expected("HelloWorld");
     const String hello("Hello");
@@ -880,7 +794,7 @@ void StringTest::testConcatString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testConcatStdString() {
+TEST_F(StringTest, testConcatStdString) {
 
     const String expected("HelloWorld");
     const String hello("Hello");
@@ -892,7 +806,7 @@ void StringTest::testConcatStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testConcatCString() {
+TEST_F(StringTest, testConcatCString) {
 
     const String expected("HelloWorld");
     const String hello("Hello");
@@ -904,7 +818,7 @@ void StringTest::testConcatCString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testCompareToString() {
+TEST_F(StringTest, testCompareToString) {
 
     ASSERT_TRUE(String("aaaaab").compareTo(String("aaaaac")) < 0) << ("Returned incorrect value for first < second");
     ASSERT_EQ(0, String("aaaaac").compareTo(String("aaaaac"))) << ("Returned incorrect value for first = second");
@@ -913,7 +827,7 @@ void StringTest::testCompareToString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testCompareToStdString() {
+TEST_F(StringTest, testCompareToStdString) {
 
     ASSERT_TRUE(String("aaaaab").compareTo(std::string("aaaaac")) < 0) << ("Returned incorrect value for first < second");
     ASSERT_EQ(0, String("aaaaac").compareTo(std::string("aaaaac"))) << ("Returned incorrect value for first = second");
@@ -922,7 +836,7 @@ void StringTest::testCompareToStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testCompareToCString() {
+TEST_F(StringTest, testCompareToCString) {
 
     ASSERT_TRUE(String("aaaaab").compareTo("aaaaac") < 0) << ("Returned incorrect value for first < second");
     ASSERT_EQ(0, String("aaaaac").compareTo("aaaaac")) << ("Returned incorrect value for first = second");
@@ -933,7 +847,7 @@ void StringTest::testCompareToCString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testCompareToIgnoreCaseString() {
+TEST_F(StringTest, testCompareToIgnoreCaseString) {
 
     ASSERT_TRUE(String("aaaaab").compareToIgnoreCase(String("aaaaac")) < 0) << ("Returned incorrect value for first < second");
     ASSERT_EQ(0, String("aaaaac").compareToIgnoreCase(String("aaaaac"))) << ("Returned incorrect value for first = second");
@@ -942,7 +856,7 @@ void StringTest::testCompareToIgnoreCaseString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testCompareToIgnoreCaseStdString() {
+TEST_F(StringTest, testCompareToIgnoreCaseStdString) {
 
     ASSERT_TRUE(String("aaaaab").compareToIgnoreCase(std::string("aaaaac")) < 0) << ("Returned incorrect value for first < second");
     ASSERT_EQ(0, String("aaaaac").compareToIgnoreCase(std::string("aaaaac"))) << ("Returned incorrect value for first = second");
@@ -951,7 +865,7 @@ void StringTest::testCompareToIgnoreCaseStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testCompareToIgnoreCaseCString() {
+TEST_F(StringTest, testCompareToIgnoreCaseCString) {
 
     ASSERT_TRUE(String("aaaaab").compareToIgnoreCase("aaaaac") < 0) << ("Returned incorrect value for first < second");
     ASSERT_EQ(0, String("aaaaac").compareToIgnoreCase("aaaaac")) << ("Returned incorrect value for first = second");
@@ -962,7 +876,7 @@ void StringTest::testCompareToIgnoreCaseCString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testIsNullOrEmpty() {
+TEST_F(StringTest, testIsNullOrEmpty) {
 
     ASSERT_TRUE(String::isNullOrEmpty((const char*) NULL)) << ("Failed to detect NULL");
     ASSERT_TRUE(String::isNullOrEmpty("")) << ("Failed to detect empty");
@@ -970,7 +884,7 @@ void StringTest::testIsNullOrEmpty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testOperatorEqualsString() {
+TEST_F(StringTest, testOperatorEqualsString) {
 
     const String input("HelloWorld");
 
@@ -979,7 +893,7 @@ void StringTest::testOperatorEqualsString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testOperatorEqualsStdString() {
+TEST_F(StringTest, testOperatorEqualsStdString) {
 
     const String input("HelloWorld");
 
@@ -991,7 +905,7 @@ void StringTest::testOperatorEqualsStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testOperatorEqualsCString() {
+TEST_F(StringTest, testOperatorEqualsCString) {
 
     const String input("HelloWorld");
 
@@ -1004,7 +918,7 @@ void StringTest::testOperatorEqualsCString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testOperatorNotEqualsString() {
+TEST_F(StringTest, testOperatorNotEqualsString) {
 
     const String input("HelloWorld");
 
@@ -1013,7 +927,7 @@ void StringTest::testOperatorNotEqualsString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testOperatorNotEqualsStdString() {
+TEST_F(StringTest, testOperatorNotEqualsStdString) {
 
     const String input("HelloWorld");
 
@@ -1022,7 +936,7 @@ void StringTest::testOperatorNotEqualsStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testOperatorNotEqualsCString() {
+TEST_F(StringTest, testOperatorNotEqualsCString) {
 
     const String input("HelloWorld");
 
@@ -1032,7 +946,7 @@ void StringTest::testOperatorNotEqualsCString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testOperatorLessString() {
+TEST_F(StringTest, testOperatorLessString) {
 
     String upper = "HELLOWORLD";
     String lower = "helloworld";
@@ -1042,7 +956,7 @@ void StringTest::testOperatorLessString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testOperatorLessStdString() {
+TEST_F(StringTest, testOperatorLessStdString) {
 
     String upper = "HELLOWORLD";
     std::string lower = "helloworld";
@@ -1056,7 +970,7 @@ void StringTest::testOperatorLessStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testOperatorLessCString() {
+TEST_F(StringTest, testOperatorLessCString) {
 
     String upper = "HELLOWORLD";
     const char* lower = "helloworld";
@@ -1072,7 +986,7 @@ void StringTest::testOperatorLessCString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testOperatorGreaterString() {
+TEST_F(StringTest, testOperatorGreaterString) {
 
     String upper = "HELLOWORLD";
     String lower = "helloworld";
@@ -1082,7 +996,7 @@ void StringTest::testOperatorGreaterString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testOperatorGreaterStdString() {
+TEST_F(StringTest, testOperatorGreaterStdString) {
 
     std::string upper = "HELLOWORLD";
     String lower = "helloworld";
@@ -1096,7 +1010,7 @@ void StringTest::testOperatorGreaterStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testOperatorGreaterCString() {
+TEST_F(StringTest, testOperatorGreaterCString) {
 
     String lower = "helloworld";
     const char* upper = "HELLOWORLD";
@@ -1112,7 +1026,7 @@ void StringTest::testOperatorGreaterCString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testOperatorPlusString() {
+TEST_F(StringTest, testOperatorPlusString) {
 
     const String expected("HelloWorld");
     const String hello("Hello");
@@ -1124,7 +1038,7 @@ void StringTest::testOperatorPlusString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testOperatorPlusStdString() {
+TEST_F(StringTest, testOperatorPlusStdString) {
 
     const String expected("HelloWorld");
     const String hello("Hello");
@@ -1136,7 +1050,7 @@ void StringTest::testOperatorPlusStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testOperatorPlusCString() {
+TEST_F(StringTest, testOperatorPlusCString) {
 
     const String expected("HelloWorld");
     const String hello("Hello");
@@ -1149,7 +1063,7 @@ void StringTest::testOperatorPlusCString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTest::testGetChars() {
+TEST_F(StringTest, testGetChars) {
 
     String hello("Hello World");
     char* buffer = new char[10];
@@ -1176,88 +1090,3 @@ void StringTest::testGetChars() {
 
     delete [] buffer;
 }
-
-TEST_F(StringTest, testDefaultConstructor) { testDefaultConstructor(); }
-TEST_F(StringTest, testConstructorCString) { testConstructorCString(); }
-TEST_F(StringTest, testConstructorCStringWithSize) { testConstructorCStringWithSize(); }
-TEST_F(StringTest, testConstructorCStringOffsetAndLength) { testConstructorCStringOffsetAndLength(); }
-TEST_F(StringTest, testConstructorCStringSizeOffsetAndLength) { testConstructorCStringSizeOffsetAndLength(); }
-TEST_F(StringTest, testConstructorStdString) { testConstructorStdString(); }
-TEST_F(StringTest, testConstructorString) { testConstructorString(); }
-TEST_F(StringTest, testConstructorCharFill) { testConstructorCharFill(); }
-TEST_F(StringTest, testAssignmentString) { testAssignmentString(); }
-TEST_F(StringTest, testAssignmentStdString) { testAssignmentStdString(); }
-TEST_F(StringTest, testAssignmentCString) { testAssignmentCString(); }
-TEST_F(StringTest, testCompact) { testCompact(); }
-TEST_F(StringTest, testHashCode) { testHashCode(); }
-TEST_F(StringTest, testIsEmpty) { testIsEmpty(); }
-TEST_F(StringTest, testSubstring1) { testSubstring1(); }
-TEST_F(StringTest, testSubstring2) { testSubstring2(); }
-TEST_F(StringTest, testSubstringExceptions) { testSubstringExceptions(); }
-TEST_F(StringTest, testTrim) { testTrim(); }
-TEST_F(StringTest, testToString) { testToString(); }
-TEST_F(StringTest, testToCharArray) { testToCharArray(); }
-TEST_F(StringTest, testCStr) { testCStr(); }
-TEST_F(StringTest, testRegionMatches) { testRegionMatches(); }
-TEST_F(StringTest, testRegionMatchesCaseSensitive) { testRegionMatchesCaseSensitive(); }
-TEST_F(StringTest, testStartsWith) { testStartsWith(); }
-TEST_F(StringTest, testStartsWithI) { testStartsWithI(); }
-TEST_F(StringTest, testEndsWith) { testEndsWith(); }
-TEST_F(StringTest, testEquals) { testEquals(); }
-TEST_F(StringTest, testEqualsCString) { testEqualsCString(); }
-TEST_F(StringTest, testEqualsStdString) { testEqualsStdString(); }
-TEST_F(StringTest, testEqualsIgnoreCase) { testEqualsIgnoreCase(); }
-TEST_F(StringTest, testEqualsIgnoreCaseCString) { testEqualsIgnoreCaseCString(); }
-TEST_F(StringTest, testEqualsIgnoreCaseStdString) { testEqualsIgnoreCaseStdString(); }
-TEST_F(StringTest, testIndexOfChar) { testIndexOfChar(); }
-TEST_F(StringTest, testIndexOfChar2) { testIndexOfChar2(); }
-TEST_F(StringTest, testIndexOfString) { testIndexOfString(); }
-TEST_F(StringTest, testIndexOfString2) { testIndexOfString2(); }
-TEST_F(StringTest, testIndexOfStdString) { testIndexOfStdString(); }
-TEST_F(StringTest, testIndexOfStdString2) { testIndexOfStdString2(); }
-TEST_F(StringTest, testIndexOfCString) { testIndexOfCString(); }
-TEST_F(StringTest, testIndexOfCString2) { testIndexOfCString2(); }
-TEST_F(StringTest, testLastIndexOfChar) { testLastIndexOfChar(); }
-TEST_F(StringTest, testLastIndexOfChar2) { testLastIndexOfChar2(); }
-TEST_F(StringTest, testLastIndexOfString) { testLastIndexOfString(); }
-TEST_F(StringTest, testLastIndexOfString2) { testLastIndexOfString2(); }
-TEST_F(StringTest, testLastIndexOfStdString) { testLastIndexOfStdString(); }
-TEST_F(StringTest, testLastIndexOfStdString2) { testLastIndexOfStdString2(); }
-TEST_F(StringTest, testLastIndexOfCString) { testLastIndexOfCString(); }
-TEST_F(StringTest, testLastIndexOfCString2) { testLastIndexOfCString2(); }
-TEST_F(StringTest, testToLowerCase) { testToLowerCase(); }
-TEST_F(StringTest, testToUpperCase) { testToUpperCase(); }
-TEST_F(StringTest, testReplaceCharChar) { testReplaceCharChar(); }
-TEST_F(StringTest, testContainsString) { testContainsString(); }
-TEST_F(StringTest, testContainsStdString) { testContainsStdString(); }
-TEST_F(StringTest, testContainsCString) { testContainsCString(); }
-TEST_F(StringTest, testConcatString) { testConcatString(); }
-TEST_F(StringTest, testConcatStdString) { testConcatStdString(); }
-TEST_F(StringTest, testConcatCString) { testConcatCString(); }
-TEST_F(StringTest, testCompareToString) { testCompareToString(); }
-TEST_F(StringTest, testCompareToStdString) { testCompareToStdString(); }
-TEST_F(StringTest, testCompareToCString) { testCompareToCString(); }
-TEST_F(StringTest, testCompareToIgnoreCaseString) { testCompareToIgnoreCaseString(); }
-TEST_F(StringTest, testCompareToIgnoreCaseStdString) { testCompareToIgnoreCaseStdString(); }
-TEST_F(StringTest, testCompareToIgnoreCaseCString) { testCompareToIgnoreCaseCString(); }
-TEST_F(StringTest, testIsNullOrEmpty) { testIsNullOrEmpty(); }
-TEST_F(StringTest, testOperatorEqualsString) { testOperatorEqualsString(); }
-TEST_F(StringTest, testOperatorEqualsStdString) { testOperatorEqualsStdString(); }
-TEST_F(StringTest, testOperatorEqualsCString) { testOperatorEqualsCString(); }
-TEST_F(StringTest, testOperatorLessString) { testOperatorLessString(); }
-TEST_F(StringTest, testOperatorLessStdString) { testOperatorLessStdString(); }
-TEST_F(StringTest, testOperatorLessCString) { testOperatorLessCString(); }
-TEST_F(StringTest, testOperatorGreaterString) { testOperatorGreaterString(); }
-TEST_F(StringTest, testOperatorGreaterStdString) { testOperatorGreaterStdString(); }
-TEST_F(StringTest, testOperatorGreaterCString) { testOperatorGreaterCString(); }
-TEST_F(StringTest, testOperatorNotEqualsString) { testOperatorNotEqualsString(); }
-TEST_F(StringTest, testOperatorNotEqualsStdString) { testOperatorNotEqualsStdString(); }
-TEST_F(StringTest, testOperatorNotEqualsCString) { testOperatorNotEqualsCString(); }
-TEST_F(StringTest, testOperatorPlusString) { testOperatorPlusString(); }
-TEST_F(StringTest, testOperatorPlusStdString) { testOperatorPlusStdString(); }
-TEST_F(StringTest, testOperatorPlusCString) { testOperatorPlusCString(); }
-TEST_F(StringTest, testFindFirstOf) { testFindFirstOf(); }
-TEST_F(StringTest, testFindFirstOf2) { testFindFirstOf2(); }
-TEST_F(StringTest, testFindFirstNotOf) { testFindFirstNotOf(); }
-TEST_F(StringTest, testFindFirstNotOf2) { testFindFirstNotOf2(); }
-TEST_F(StringTest, testGetChars) { testGetChars(); }

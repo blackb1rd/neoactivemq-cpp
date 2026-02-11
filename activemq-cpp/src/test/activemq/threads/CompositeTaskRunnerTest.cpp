@@ -29,16 +29,7 @@ using namespace activemq;
 using namespace activemq::threads;
 using namespace decaf::lang;
 
-    class CompositeTaskRunnerTest : public ::testing::Test {
-public:
-
-        CompositeTaskRunnerTest() {}
-        virtual ~CompositeTaskRunnerTest() {}
-
-        void test();
-        void testCreateButNotStarted();
-
-    };
+    class CompositeTaskRunnerTest : public ::testing::Test {};
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +62,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CompositeTaskRunnerTest::test() {
+TEST_F(CompositeTaskRunnerTest, test) {
 
     int attempts = 0;
 
@@ -103,13 +94,10 @@ void CompositeTaskRunnerTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CompositeTaskRunnerTest::testCreateButNotStarted() {
+TEST_F(CompositeTaskRunnerTest, testCreateButNotStarted) {
     Pointer<CompositeTaskRunner> runner(new CompositeTaskRunner);
     ASSERT_TRUE(!runner->isStarted());
     runner->start();
     runner->shutdown();
     runner.reset(NULL);
 }
-
-TEST_F(CompositeTaskRunnerTest, test) { test(); }
-TEST_F(CompositeTaskRunnerTest, testCreateButNotStarted) { testCreateButNotStarted(); }

@@ -38,29 +38,14 @@ using namespace activemq::transport;
 
     class ActiveMQConnectionFactoryTest : public ::testing::Test
     {
-public:
+    protected:
 
         std::string username;
         std::string password;
         std::string clientId;
 
-        ActiveMQConnectionFactoryTest() : username(), password(), clientId() {
-            username = "timmy";
-            password = "auth";
-            clientId = "12345";
+        ActiveMQConnectionFactoryTest() : username("timmy"), password("auth"), clientId("12345") {
         }
-        virtual ~ActiveMQConnectionFactoryTest() {}
-
-        void test1WithOpenWire();
-        void test2WithOpenWire();
-        void test3WithOpenWire();
-        void test4WithOpenWire();
-        void testExceptionOnCreate();
-        void testExceptionWithPortOutOfRange();
-        void testCreateWithURIOptions();
-        void testTransportListener();
-        void testURIOptionsProcessing();
-
     };
 
 
@@ -101,7 +86,7 @@ public:
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnectionFactoryTest::test1WithOpenWire() {
+TEST_F(ActiveMQConnectionFactoryTest, test1WithOpenWire) {
 
     try
     {
@@ -126,7 +111,7 @@ void ActiveMQConnectionFactoryTest::test1WithOpenWire() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnectionFactoryTest::test2WithOpenWire()
+TEST_F(ActiveMQConnectionFactoryTest, test2WithOpenWire)
 {
     try
     {
@@ -157,7 +142,7 @@ void ActiveMQConnectionFactoryTest::test2WithOpenWire()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnectionFactoryTest::test3WithOpenWire()
+TEST_F(ActiveMQConnectionFactoryTest, test3WithOpenWire)
 {
     try
     {
@@ -188,7 +173,7 @@ void ActiveMQConnectionFactoryTest::test3WithOpenWire()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnectionFactoryTest::test4WithOpenWire()
+TEST_F(ActiveMQConnectionFactoryTest, test4WithOpenWire)
 {
     try
     {
@@ -219,7 +204,7 @@ void ActiveMQConnectionFactoryTest::test4WithOpenWire()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnectionFactoryTest::testExceptionWithPortOutOfRange() {
+TEST_F(ActiveMQConnectionFactoryTest, testExceptionWithPortOutOfRange) {
     try
     {
         std::string URI = "tcp://127.0.0.2:70000";
@@ -236,7 +221,7 @@ void ActiveMQConnectionFactoryTest::testExceptionWithPortOutOfRange() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnectionFactoryTest::testExceptionOnCreate() {
+TEST_F(ActiveMQConnectionFactoryTest, testExceptionOnCreate) {
     try
     {
         std::string URI =
@@ -254,7 +239,7 @@ void ActiveMQConnectionFactoryTest::testExceptionOnCreate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnectionFactoryTest::testCreateWithURIOptions()
+TEST_F(ActiveMQConnectionFactoryTest, testCreateWithURIOptions)
 {
     try
     {
@@ -287,7 +272,7 @@ void ActiveMQConnectionFactoryTest::testCreateWithURIOptions()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnectionFactoryTest::testTransportListener() {
+TEST_F(ActiveMQConnectionFactoryTest, testTransportListener) {
 
     std::string URI = "failover://(mock://localhost:61616?failOnSendMessage=true,"
                       "mock://localhost:61618)?randomize=false";
@@ -323,7 +308,7 @@ void ActiveMQConnectionFactoryTest::testTransportListener() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnectionFactoryTest::testURIOptionsProcessing() {
+TEST_F(ActiveMQConnectionFactoryTest, testURIOptionsProcessing) {
 
     try
     {
@@ -368,13 +353,3 @@ void ActiveMQConnectionFactoryTest::testURIOptionsProcessing() {
 
     ASSERT_TRUE(false);
 }
-
-TEST_F(ActiveMQConnectionFactoryTest, test1WithOpenWire) { test1WithOpenWire(); }
-TEST_F(ActiveMQConnectionFactoryTest, test2WithOpenWire) { test2WithOpenWire(); }
-TEST_F(ActiveMQConnectionFactoryTest, test3WithOpenWire) { test3WithOpenWire(); }
-TEST_F(ActiveMQConnectionFactoryTest, test4WithOpenWire) { test4WithOpenWire(); }
-TEST_F(ActiveMQConnectionFactoryTest, testExceptionOnCreate) { testExceptionOnCreate(); }
-TEST_F(ActiveMQConnectionFactoryTest, testCreateWithURIOptions) { testCreateWithURIOptions(); }
-TEST_F(ActiveMQConnectionFactoryTest, testTransportListener) { testTransportListener(); }
-TEST_F(ActiveMQConnectionFactoryTest, testExceptionWithPortOutOfRange) { testExceptionWithPortOutOfRange(); }
-TEST_F(ActiveMQConnectionFactoryTest, testURIOptionsProcessing) { testURIOptionsProcessing(); }

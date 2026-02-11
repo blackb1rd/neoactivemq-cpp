@@ -37,18 +37,7 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
     class ConnectionAuditTest : public ::testing::Test {
-public:
-
-        ConnectionAuditTest();
-        virtual ~ConnectionAuditTest();
-
-        void testConstructor1();
-        void testConstructor2();
-        void testIsDuplicate();
-        void testRollbackDuplicate();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -70,15 +59,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionAuditTest::ConnectionAuditTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-ConnectionAuditTest::~ConnectionAuditTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ConnectionAuditTest::testConstructor1() {
+TEST_F(ConnectionAuditTest, testConstructor1) {
 
     ConnectionAudit audit;
     ASSERT_TRUE(audit.isCheckForDuplicates());
@@ -87,7 +68,7 @@ void ConnectionAuditTest::testConstructor1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionAuditTest::testConstructor2() {
+TEST_F(ConnectionAuditTest, testConstructor2) {
 
     ConnectionAudit audit(100, 200);
     ASSERT_TRUE(audit.isCheckForDuplicates());
@@ -96,7 +77,7 @@ void ConnectionAuditTest::testConstructor2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionAuditTest::testIsDuplicate() {
+TEST_F(ConnectionAuditTest, testIsDuplicate) {
 
     int count = 10000;
     ConnectionAudit audit;
@@ -132,7 +113,7 @@ void ConnectionAuditTest::testIsDuplicate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionAuditTest::testRollbackDuplicate() {
+TEST_F(ConnectionAuditTest, testRollbackDuplicate) {
 
     int count = 10000;
     ConnectionAudit audit;
@@ -167,8 +148,3 @@ void ConnectionAuditTest::testRollbackDuplicate() {
         ASSERT_TRUE(!audit.isDuplicate(dispatcher.get(), message)) << (std::string() + "duplicate msg:" + id->toString());
     }
 }
-
-TEST_F(ConnectionAuditTest, testConstructor1) { testConstructor1(); }
-TEST_F(ConnectionAuditTest, testConstructor2) { testConstructor2(); }
-TEST_F(ConnectionAuditTest, testIsDuplicate) { testIsDuplicate(); }
-TEST_F(ConnectionAuditTest, testRollbackDuplicate) { testRollbackDuplicate(); }

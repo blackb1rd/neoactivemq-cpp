@@ -30,15 +30,7 @@ using namespace activemq::threads;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class DedicatedTaskRunnerTest : public ::testing::Test {
-public:
-
-        DedicatedTaskRunnerTest() {}
-        virtual ~DedicatedTaskRunnerTest() {}
-
-        void testSimple();
-
-    };
+class DedicatedTaskRunnerTest : public ::testing::Test {};
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,7 +76,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DedicatedTaskRunnerTest::testSimple() {
+TEST_F(DedicatedTaskRunnerTest, testSimple) {
 
     ASSERT_THROW(std::unique_ptr<TaskRunner>( new DedicatedTaskRunner( NULL ) ), NullPointerException) << ("Should throw a NullPointerException");
 
@@ -112,5 +104,3 @@ void DedicatedTaskRunnerTest::testSimple() {
     Thread::sleep( 250 );
     ASSERT_TRUE(infiniteTask.getCount() == count);
 }
-
-TEST_F(DedicatedTaskRunnerTest, testSimple) { testSimple(); }

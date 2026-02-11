@@ -29,19 +29,7 @@ using namespace activemq;
 using namespace activemq::util;
 
     class URISupportTest : public ::testing::Test {
-public:
-
-        URISupportTest() {}
-        virtual ~URISupportTest() {}
-
-        void test();
-        void testURIParseEnv();
-        void testParseComposite();
-        void testApplyParameters();
-        void testCreateWithQuery();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -53,7 +41,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URISupportTest::test() {
+TEST_F(URISupportTest, test) {
 
     string test = "?option1=test1&option2=test2";
 
@@ -112,7 +100,7 @@ void URISupportTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URISupportTest::testURIParseEnv() {
+TEST_F(URISupportTest, testURIParseEnv) {
 
     string test = "tcp://localhost:61616?option1=test1&option2=test2";
 
@@ -151,7 +139,7 @@ void URISupportTest::testURIParseEnv() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URISupportTest::testParseComposite() {
+TEST_F(URISupportTest, testParseComposite) {
 
     CompositeData data = URISupport::parseComposite(
         URI("broker:()/localhost?persistent=false" ) );
@@ -220,7 +208,7 @@ void URISupportTest::testParseComposite() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URISupportTest::testCreateWithQuery() {
+TEST_F(URISupportTest, testCreateWithQuery) {
 
     URI source("vm://localhost");
     URI dest = URISupport::createURIWithQuery(source, "network=true&one=two");
@@ -232,7 +220,7 @@ void URISupportTest::testCreateWithQuery() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URISupportTest::testApplyParameters() {
+TEST_F(URISupportTest, testApplyParameters) {
 
     URI uri("http://0.0.0.0:61616");
     Properties parameters;
@@ -253,9 +241,3 @@ void URISupportTest::testApplyParameters() {
     uri = URISupport::applyParameters(uri, parameters, "t.");
     verifyParams(URISupport::parseParameters(uri));
 }
-
-TEST_F(URISupportTest, test) { test(); }
-TEST_F(URISupportTest, testURIParseEnv) { testURIParseEnv(); }
-TEST_F(URISupportTest, testParseComposite) { testParseComposite(); }
-TEST_F(URISupportTest, testApplyParameters) { testApplyParameters(); }
-TEST_F(URISupportTest, testCreateWithQuery) { testCreateWithQuery(); }

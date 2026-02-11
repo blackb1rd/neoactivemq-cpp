@@ -30,18 +30,14 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class ByteArrayAdapterTest  : public ::testing::Test {
+    protected:
+
 unsigned char* testData1;
         static const int testData1Size = 100;
-
-    private:
-
-        ByteArrayAdapterTest(const ByteArrayAdapterTest&);
-        ByteArrayAdapterTest& operator= (const ByteArrayAdapterTest&);
 
     public:
 
         ByteArrayAdapterTest() : testData1() {}
-        virtual ~ByteArrayAdapterTest() {}
 
         void SetUp() override {
             testData1 = new unsigned char[testData1Size];
@@ -54,37 +50,10 @@ unsigned char* testData1;
             delete [] testData1;
         }
 
-        void testRead();
-        void testWrite();
-        void testCtor1();
-        void testCtor2();
-        void testClear();
-        void testReszie();
-        void testOperators();
-        void testReadExceptions();
-        void testWriteExceptions();
-        void testOperatorsExceptions();
-        void testArray();
-        void testGet();
-        void testGetChar();
-        void testGetShort();
-        void testGetInt();
-        void testGetLong();
-        void testGetDouble();
-        void testGetFloat();
-        void testPut();
-        void testPutChar();
-        void testPutShort();
-        void testPutInt();
-        void testPutLong();
-        void testPutDouble();
-        void testPutFloat();
-
     };
 
-
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testArray() {
+TEST_F(ByteArrayAdapterTest, testArray) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -103,7 +72,7 @@ void ByteArrayAdapterTest::testArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testRead(){
+TEST_F(ByteArrayAdapterTest, testRead){
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -126,7 +95,7 @@ void ByteArrayAdapterTest::testRead(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testWrite(){
+TEST_F(ByteArrayAdapterTest, testWrite){
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -150,7 +119,7 @@ void ByteArrayAdapterTest::testWrite(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testCtor1(){
+TEST_F(ByteArrayAdapterTest, testCtor1){
 
     ByteArrayAdapter array1( 256 );
     ASSERT_TRUE(array1.getCapacity() == 256);
@@ -163,7 +132,7 @@ void ByteArrayAdapterTest::testCtor1(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testCtor2(){
+TEST_F(ByteArrayAdapterTest, testCtor2){
 
     unsigned char* data1 = new unsigned char[256];
     unsigned char* data2 = new unsigned char[999];
@@ -182,7 +151,7 @@ void ByteArrayAdapterTest::testCtor2(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testClear(){
+TEST_F(ByteArrayAdapterTest, testClear){
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -213,7 +182,7 @@ void ByteArrayAdapterTest::testClear(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testReszie(){
+TEST_F(ByteArrayAdapterTest, testReszie){
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -247,7 +216,7 @@ void ByteArrayAdapterTest::testReszie(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testOperators(){
+TEST_F(ByteArrayAdapterTest, testOperators){
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -266,7 +235,7 @@ void ByteArrayAdapterTest::testOperators(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testReadExceptions() {
+TEST_F(ByteArrayAdapterTest, testReadExceptions) {
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -282,11 +251,10 @@ void ByteArrayAdapterTest::testReadExceptions() {
 
     ASSERT_THROW(array.read( result, 5000, 0, 500 ), BufferUnderflowException) << ("Should Throw BufferUnderflowException");
 
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testWriteExceptions() {
+TEST_F(ByteArrayAdapterTest, testWriteExceptions) {
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -303,7 +271,7 @@ void ByteArrayAdapterTest::testWriteExceptions() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testOperatorsExceptions() {
+TEST_F(ByteArrayAdapterTest, testOperatorsExceptions) {
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -315,7 +283,7 @@ void ByteArrayAdapterTest::testOperatorsExceptions() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testPut() {
+TEST_F(ByteArrayAdapterTest, testPut) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -329,7 +297,7 @@ void ByteArrayAdapterTest::testPut() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testPutChar() {
+TEST_F(ByteArrayAdapterTest, testPutChar) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -343,7 +311,7 @@ void ByteArrayAdapterTest::testPutChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testPutLong() {
+TEST_F(ByteArrayAdapterTest, testPutLong) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -357,7 +325,7 @@ void ByteArrayAdapterTest::testPutLong() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testPutInt() {
+TEST_F(ByteArrayAdapterTest, testPutInt) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -371,7 +339,7 @@ void ByteArrayAdapterTest::testPutInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testPutShort() {
+TEST_F(ByteArrayAdapterTest, testPutShort) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -385,7 +353,7 @@ void ByteArrayAdapterTest::testPutShort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testPutDouble() {
+TEST_F(ByteArrayAdapterTest, testPutDouble) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -400,7 +368,7 @@ void ByteArrayAdapterTest::testPutDouble() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testPutFloat() {
+TEST_F(ByteArrayAdapterTest, testPutFloat) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -415,7 +383,7 @@ void ByteArrayAdapterTest::testPutFloat() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testGet() {
+TEST_F(ByteArrayAdapterTest, testGet) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -436,7 +404,7 @@ void ByteArrayAdapterTest::testGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testGetChar() {
+TEST_F(ByteArrayAdapterTest, testGetChar) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -457,7 +425,7 @@ void ByteArrayAdapterTest::testGetChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testGetShort() {
+TEST_F(ByteArrayAdapterTest, testGetShort) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -478,7 +446,7 @@ void ByteArrayAdapterTest::testGetShort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testGetInt() {
+TEST_F(ByteArrayAdapterTest, testGetInt) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -499,7 +467,7 @@ void ByteArrayAdapterTest::testGetInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testGetLong() {
+TEST_F(ByteArrayAdapterTest, testGetLong) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -520,7 +488,7 @@ void ByteArrayAdapterTest::testGetLong() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testGetFloat() {
+TEST_F(ByteArrayAdapterTest, testGetFloat) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -542,7 +510,7 @@ void ByteArrayAdapterTest::testGetFloat() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testGetDouble() {
+TEST_F(ByteArrayAdapterTest, testGetDouble) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -562,29 +530,3 @@ void ByteArrayAdapterTest::testGetDouble() {
 
     ASSERT_THROW(testBuffer1.getDouble( i ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
-
-TEST_F(ByteArrayAdapterTest, testRead) { testRead(); }
-TEST_F(ByteArrayAdapterTest, testReadExceptions) { testReadExceptions(); }
-TEST_F(ByteArrayAdapterTest, testWrite) { testWrite(); }
-TEST_F(ByteArrayAdapterTest, testWriteExceptions) { testWriteExceptions(); }
-TEST_F(ByteArrayAdapterTest, testCtor1) { testCtor1(); }
-TEST_F(ByteArrayAdapterTest, testCtor2) { testCtor2(); }
-TEST_F(ByteArrayAdapterTest, testClear) { testClear(); }
-TEST_F(ByteArrayAdapterTest, testReszie) { testReszie(); }
-TEST_F(ByteArrayAdapterTest, testOperators) { testOperators(); }
-TEST_F(ByteArrayAdapterTest, testOperatorsExceptions) { testOperatorsExceptions(); }
-TEST_F(ByteArrayAdapterTest, testArray) { testArray(); }
-TEST_F(ByteArrayAdapterTest, testGet) { testGet(); }
-TEST_F(ByteArrayAdapterTest, testGetChar) { testGetChar(); }
-TEST_F(ByteArrayAdapterTest, testGetShort) { testGetShort(); }
-TEST_F(ByteArrayAdapterTest, testGetInt) { testGetInt(); }
-TEST_F(ByteArrayAdapterTest, testGetLong) { testGetLong(); }
-TEST_F(ByteArrayAdapterTest, testGetDouble) { testGetDouble(); }
-TEST_F(ByteArrayAdapterTest, testGetFloat) { testGetFloat(); }
-TEST_F(ByteArrayAdapterTest, testPut) { testPut(); }
-TEST_F(ByteArrayAdapterTest, testPutChar) { testPutChar(); }
-TEST_F(ByteArrayAdapterTest, testPutShort) { testPutShort(); }
-TEST_F(ByteArrayAdapterTest, testPutInt) { testPutInt(); }
-TEST_F(ByteArrayAdapterTest, testPutLong) { testPutLong(); }
-TEST_F(ByteArrayAdapterTest, testPutDouble) { testPutDouble(); }
-TEST_F(ByteArrayAdapterTest, testPutFloat) { testPutFloat(); }

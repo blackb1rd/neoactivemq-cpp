@@ -23,17 +23,10 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 
-   class QueueTest : public ::testing::Test {
-public:
-
-       virtual ~QueueTest() {}
-
-       void test();
-   };
-
+   class QueueTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void QueueTest::test()
+TEST_F(QueueTest, test)
 {
    StlQueue<char> q;
 
@@ -56,5 +49,3 @@ void QueueTest::test()
    ASSERT_TRUE(q.front() == 'b');
    ASSERT_TRUE(q.back() == 'c');
 }
-
-TEST_F(QueueTest, test) { test(); }

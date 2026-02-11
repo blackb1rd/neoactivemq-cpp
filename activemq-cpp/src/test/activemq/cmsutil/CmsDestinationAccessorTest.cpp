@@ -25,7 +25,9 @@ using namespace activemq;
 using namespace activemq::cmsutil;
 
     class CmsDestinationAccessorTest : public ::testing::Test {
-class MyAccessor : public CmsDestinationAccessor {
+    protected:
+
+        class MyAccessor : public CmsDestinationAccessor {
         public:
 
             virtual ~MyAccessor() {
@@ -57,20 +59,8 @@ class MyAccessor : public CmsDestinationAccessor {
         MyAccessor* accessor;
         DummyConnectionFactory* cf;
 
-    private:
-
-        CmsDestinationAccessorTest(const CmsDestinationAccessorTest&);
-        CmsDestinationAccessorTest& operator= (const CmsDestinationAccessorTest&);
-
-    public:
-
-        CmsDestinationAccessorTest() : accessor(), cf() {}
-        virtual ~CmsDestinationAccessorTest() {}
-
         void SetUp() override;
         void TearDown() override;
-
-        void test();
     };
 
 
@@ -89,7 +79,7 @@ void CmsDestinationAccessorTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsDestinationAccessorTest::test() {
+TEST_F(CmsDestinationAccessorTest, test) {
 
     DummySession s(NULL);
 
@@ -115,5 +105,3 @@ void CmsDestinationAccessorTest::test() {
     cms::Topic* topic1 = dynamic_cast<cms::Topic*>(d);
     ASSERT_TRUE(topic1 != NULL);
 }
-
-TEST_F(CmsDestinationAccessorTest, test) { test(); }

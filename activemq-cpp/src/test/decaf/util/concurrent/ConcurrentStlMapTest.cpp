@@ -32,35 +32,7 @@ using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class ConcurrentStlMapTest : public ::testing::Test
-    {
-public:
-
-        ConcurrentStlMapTest() {}
-        virtual ~ConcurrentStlMapTest() {}
-
-        void testConstructor();
-        void testConstructorMap();
-        void testContainsKey();
-        void testClear();
-        void testCopy();
-        void testSize();
-        void testValue();
-        void testGet();
-        void testPut();
-        void testPutAll();
-        void testRemove();
-        void testContiansValue();
-        void testIsEmpty();
-        void testEntrySet();
-        void testKeySet();
-        void testValues();
-        void testEntrySetIterator();
-        void testKeySetIterator();
-        void testValuesIterator();
-
-    };
-
+    class ConcurrentStlMapTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -87,7 +59,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testConstructor() {
+TEST_F(ConcurrentStlMapTest, testConstructor) {
 
     ConcurrentStlMap<string, int> map1;
     ASSERT_TRUE(map1.isEmpty());
@@ -108,7 +80,7 @@ void ConcurrentStlMapTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testConstructorMap() {
+TEST_F(ConcurrentStlMapTest, testConstructorMap) {
 
     ConcurrentStlMap<int, int> myMap;
     for (int counter = 0; counter < 125; counter++) {
@@ -122,7 +94,7 @@ void ConcurrentStlMapTest::testConstructorMap() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testContainsKey(){
+TEST_F(ConcurrentStlMapTest, testContainsKey){
 
     ConcurrentStlMap<string, bool> boolMap;
     ASSERT_TRUE(boolMap.containsKey("bob") == false);
@@ -134,7 +106,7 @@ void ConcurrentStlMapTest::testContainsKey(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testClear(){
+TEST_F(ConcurrentStlMapTest, testClear){
 
     ConcurrentStlMap<string, bool> boolMap;
     boolMap.put( "bob", true );
@@ -170,7 +142,7 @@ void ConcurrentStlMapTest::testClear(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testCopy() {
+TEST_F(ConcurrentStlMapTest, testCopy) {
 
     ConcurrentStlMap<string, int> destMap;
     HashMap<string, int> srcMap;
@@ -208,7 +180,7 @@ void ConcurrentStlMapTest::testCopy() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testIsEmpty(){
+TEST_F(ConcurrentStlMapTest, testIsEmpty){
 
     ConcurrentStlMap<string, bool> boolMap;
     boolMap.put( "bob", true );
@@ -220,7 +192,7 @@ void ConcurrentStlMapTest::testIsEmpty(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testSize(){
+TEST_F(ConcurrentStlMapTest, testSize){
 
     ConcurrentStlMap<string, bool> boolMap;
 
@@ -232,7 +204,7 @@ void ConcurrentStlMapTest::testSize(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testGet() {
+TEST_F(ConcurrentStlMapTest, testGet) {
 
     ConcurrentStlMap<string, bool> boolMap;
 
@@ -251,7 +223,7 @@ void ConcurrentStlMapTest::testGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testPut() {
+TEST_F(ConcurrentStlMapTest, testPut) {
 
     ConcurrentStlMap<string, bool> boolMap;
 
@@ -268,7 +240,7 @@ void ConcurrentStlMapTest::testPut() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testPutAll() {
+TEST_F(ConcurrentStlMapTest, testPutAll) {
 
     ConcurrentStlMap<string, int> destMap;
     HashMap<string, int> srcMap;
@@ -292,7 +264,7 @@ void ConcurrentStlMapTest::testPutAll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testValue() {
+TEST_F(ConcurrentStlMapTest, testValue) {
 
     ConcurrentStlMap<string, bool> boolMap;
 
@@ -311,7 +283,7 @@ void ConcurrentStlMapTest::testValue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testRemove(){
+TEST_F(ConcurrentStlMapTest, testRemove){
     ConcurrentStlMap<string, bool> boolMap;
 
     boolMap.put( "fred", true );
@@ -321,7 +293,7 @@ void ConcurrentStlMapTest::testRemove(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testContiansValue(){
+TEST_F(ConcurrentStlMapTest, testContiansValue){
     ConcurrentStlMap<string, bool> boolMap;
 
     boolMap.put( "fred", true );
@@ -332,7 +304,7 @@ void ConcurrentStlMapTest::testContiansValue(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testEntrySet() {
+TEST_F(ConcurrentStlMapTest, testEntrySet) {
 
     ConcurrentStlMap<int, std::string> map;
 
@@ -355,7 +327,7 @@ void ConcurrentStlMapTest::testEntrySet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testKeySet() {
+TEST_F(ConcurrentStlMapTest, testKeySet) {
 
     ConcurrentStlMap<int, std::string> map;
     populateMap(map);
@@ -424,7 +396,7 @@ void ConcurrentStlMapTest::testKeySet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testValues() {
+TEST_F(ConcurrentStlMapTest, testValues) {
 
     ConcurrentStlMap<int, std::string> map;
     populateMap(map);
@@ -440,7 +412,7 @@ void ConcurrentStlMapTest::testValues() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testEntrySetIterator() {
+TEST_F(ConcurrentStlMapTest, testEntrySetIterator) {
 
     ConcurrentStlMap<int, std::string> map;
     populateMap(map);
@@ -471,7 +443,7 @@ void ConcurrentStlMapTest::testEntrySetIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testKeySetIterator() {
+TEST_F(ConcurrentStlMapTest, testKeySetIterator) {
 
     ConcurrentStlMap<int, std::string> map;
     populateMap(map);
@@ -501,7 +473,7 @@ void ConcurrentStlMapTest::testKeySetIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testValuesIterator() {
+TEST_F(ConcurrentStlMapTest, testValuesIterator) {
 
     ConcurrentStlMap<int, std::string> map;
     populateMap(map);
@@ -529,23 +501,3 @@ void ConcurrentStlMapTest::testValuesIterator() {
     ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
     ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 }
-
-TEST_F(ConcurrentStlMapTest, testConstructor) { testConstructor(); }
-TEST_F(ConcurrentStlMapTest, testConstructorMap) { testConstructorMap(); }
-TEST_F(ConcurrentStlMapTest, testContainsKey) { testContainsKey(); }
-TEST_F(ConcurrentStlMapTest, testClear) { testClear(); }
-TEST_F(ConcurrentStlMapTest, testCopy) { testCopy(); }
-TEST_F(ConcurrentStlMapTest, testSize) { testSize(); }
-TEST_F(ConcurrentStlMapTest, testValue) { testValue(); }
-TEST_F(ConcurrentStlMapTest, testGet) { testGet(); }
-TEST_F(ConcurrentStlMapTest, testPut) { testPut(); }
-TEST_F(ConcurrentStlMapTest, testPutAll) { testPutAll(); }
-TEST_F(ConcurrentStlMapTest, testRemove) { testRemove(); }
-TEST_F(ConcurrentStlMapTest, testContiansValue) { testContiansValue(); }
-TEST_F(ConcurrentStlMapTest, testIsEmpty) { testIsEmpty(); }
-TEST_F(ConcurrentStlMapTest, testEntrySet) { testEntrySet(); }
-TEST_F(ConcurrentStlMapTest, testKeySet) { testKeySet(); }
-TEST_F(ConcurrentStlMapTest, testValues) { testValues(); }
-TEST_F(ConcurrentStlMapTest, testEntrySetIterator) { testEntrySetIterator(); }
-TEST_F(ConcurrentStlMapTest, testKeySetIterator) { testKeySetIterator(); }
-TEST_F(ConcurrentStlMapTest, testValuesIterator) { testValuesIterator(); }

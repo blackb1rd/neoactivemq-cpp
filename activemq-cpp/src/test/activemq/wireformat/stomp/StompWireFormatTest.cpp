@@ -26,26 +26,10 @@ using namespace activemq::wireformat;
 using namespace activemq::wireformat::stomp;
 
     class StompWireFormatTest : public ::testing::Test {
-public:
-
-        StompWireFormatTest();
-        virtual ~StompWireFormatTest();
-
-        virtual void testChangeDestinationPrefix();
-
     };
 
-
 ////////////////////////////////////////////////////////////////////////////////
-StompWireFormatTest::StompWireFormatTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-StompWireFormatTest::~StompWireFormatTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void StompWireFormatTest::testChangeDestinationPrefix() {
+TEST_F(StompWireFormatTest, testChangeDestinationPrefix) {
 
     StompWireFormat wireformat;
     wireformat.setTopicPrefix("mytopics://");
@@ -57,5 +41,3 @@ void StompWireFormatTest::testChangeDestinationPrefix() {
     frame.setProperty("subscription", "connection:1:1:0:1");
     frame.setProperty("message-id", "connection:1:1:0:1");
 }
-
-TEST_F(StompWireFormatTest, testChangeDestinationPrefix) { testChangeDestinationPrefix(); }

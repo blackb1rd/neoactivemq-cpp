@@ -32,32 +32,11 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
     class ActiveMQMessageAuditTest : public ::testing::Test {
-public:
-
-        ActiveMQMessageAuditTest();
-        virtual ~ActiveMQMessageAuditTest();
-
-        void testIsDuplicateString();
-        void testIsDuplicateMessageId();
-        void testIsInOrderString();
-        void testIsInOrderMessageId();
-        void testRollbackString();
-        void testRollbackMessageId();
-        void testGetLastSeqId();
-
     };
 
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQMessageAuditTest::ActiveMQMessageAuditTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-ActiveMQMessageAuditTest::~ActiveMQMessageAuditTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageAuditTest::testIsDuplicateString() {
+TEST_F(ActiveMQMessageAuditTest, testIsDuplicateString) {
 
     int count = 10000;
     ActiveMQMessageAudit audit;
@@ -78,7 +57,7 @@ void ActiveMQMessageAuditTest::testIsDuplicateString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageAuditTest::testIsDuplicateMessageId() {
+TEST_F(ActiveMQMessageAuditTest, testIsDuplicateMessageId) {
 
     int count = 10000;
     ActiveMQMessageAudit audit;
@@ -105,7 +84,7 @@ void ActiveMQMessageAuditTest::testIsDuplicateMessageId() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageAuditTest::testRollbackString() {
+TEST_F(ActiveMQMessageAuditTest, testRollbackString) {
 
     int count = 10000;
     ActiveMQMessageAudit audit;
@@ -128,7 +107,7 @@ void ActiveMQMessageAuditTest::testRollbackString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageAuditTest::testRollbackMessageId() {
+TEST_F(ActiveMQMessageAuditTest, testRollbackMessageId) {
 
     int count = 10000;
     ActiveMQMessageAudit audit;
@@ -157,7 +136,7 @@ void ActiveMQMessageAuditTest::testRollbackMessageId() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageAuditTest::testIsInOrderString() {
+TEST_F(ActiveMQMessageAuditTest, testIsInOrderString) {
 
     int count = 10000;
     ActiveMQMessageAudit audit;
@@ -183,7 +162,7 @@ void ActiveMQMessageAuditTest::testIsInOrderString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageAuditTest::testIsInOrderMessageId() {
+TEST_F(ActiveMQMessageAuditTest, testIsInOrderMessageId) {
 
     int count = 10000;
     ActiveMQMessageAudit audit;
@@ -216,7 +195,7 @@ void ActiveMQMessageAuditTest::testIsInOrderMessageId() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageAuditTest::testGetLastSeqId() {
+TEST_F(ActiveMQMessageAuditTest, testGetLastSeqId) {
 
     int count = 10000;
     ActiveMQMessageAudit audit;
@@ -237,11 +216,3 @@ void ActiveMQMessageAuditTest::testGetLastSeqId() {
     }
 
 }
-
-TEST_F(ActiveMQMessageAuditTest, testIsDuplicateString) { testIsDuplicateString(); }
-TEST_F(ActiveMQMessageAuditTest, testIsDuplicateMessageId) { testIsDuplicateMessageId(); }
-TEST_F(ActiveMQMessageAuditTest, testIsInOrderString) { testIsInOrderString(); }
-TEST_F(ActiveMQMessageAuditTest, testIsInOrderMessageId) { testIsInOrderMessageId(); }
-TEST_F(ActiveMQMessageAuditTest, testRollbackString) { testRollbackString(); }
-TEST_F(ActiveMQMessageAuditTest, testRollbackMessageId) { testRollbackMessageId(); }
-TEST_F(ActiveMQMessageAuditTest, testGetLastSeqId) { testGetLastSeqId(); }

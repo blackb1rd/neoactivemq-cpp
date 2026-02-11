@@ -32,53 +32,8 @@ using namespace decaf::lang::exceptions;
 public:
 
         URITest();
-        virtual ~URITest() {}
-
-        void testURIString();
-        void testConstructorOneString();
-        void testConstructorThreeString();
-        void testConstructorFourString();
-        void testConstructorFiveString();
-        void testConstructorFiveString2();
-        void testConstructorStringPlusInts();
-        void testCompareToOne();
-        void testCompareToTwo();
-        void testCreate();
-        void testEquals();
-        void testEquals2();
-        void testGetAuthority();
-        void testGetAuthority2();
-        void testGetFragment();
-        void testGetHost();
-        void testGetPath();
-        void testGetPort();
-        void testGetPort2();
-        void testGetQuery();
-        void testGetRawAuthority();
-        void testGetRawFragment();
-        void testGetRawPath();
-        void testGetRawQuery();
-        void testGetRawSchemeSpecificPart();
-        void testGetRawUserInfo();
-        void testGetScheme();
-        void testGetSchemeSpecificPart();
-        void testGetUserInfo();
-        void testIsAbsolute();
-        void testIsOpaque();
-        void testNormalize();
-        void testNormalize2();
-        void testNormalize3();
-        void testParseServerAuthority();
-        void testRelativizeLURI();
-        void testRelativize2();
-        void testResolveURI();
-        void testResolve();
-        void testToString();
-        void testToURL();
 
     };
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 URITest::URITest() {
@@ -118,7 +73,7 @@ std::vector<URI> getUris() {
 }}
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testConstructorOneString() {
+TEST_F(URITest, testConstructorOneString) {
 
     std::vector<std::string> constructorTests;
     constructorTests.push_back( "http://user@www.google.com:45/search?q=helpinfo#somefragment" );
@@ -249,7 +204,7 @@ void URITest::testConstructorOneString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testURIString() {
+TEST_F(URITest, testURIString) {
 
     ASSERT_NO_THROW(URI uri( "/" )) << ("Should Not Throw an Exception URI( \"\\\" )");
 
@@ -276,7 +231,7 @@ void URITest::testURIString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testConstructorThreeString() {
+TEST_F(URITest, testConstructorThreeString) {
 
     URI uri( "mailto", "mduerst@ifi.unizh.ch", "" );
 
@@ -300,7 +255,7 @@ void URITest::testConstructorThreeString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testConstructorStringPlusInts() {
+TEST_F(URITest, testConstructorStringPlusInts) {
 
     // check for URISyntaxException for invalid Server Authority
     ASSERT_THROW(URI( "http", "user", "host\xC3\x9Fname", -1, "/file", "query", "fragment" ), URISyntaxException) << ("Expected URISyntaxException: ");
@@ -358,7 +313,7 @@ void URITest::testConstructorStringPlusInts() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testConstructorFourString() {
+TEST_F(URITest, testConstructorFourString) {
 
     // relative path
     ASSERT_THROW(URI( "http", "www.joe.com", "relative", "jimmy" ), URISyntaxException) << ("Expected URISyntaxException: ");
@@ -392,7 +347,7 @@ void URITest::testConstructorFourString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testConstructorFiveString() {
+TEST_F(URITest, testConstructorFiveString) {
 
     // URISyntaxException on relative path
     ASSERT_THROW(URI( "http", "www.joe.com", "relative", "query", "jimmy" ), URISyntaxException) << ("Expected URISyntaxException: ");
@@ -415,7 +370,7 @@ void URITest::testConstructorFiveString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testConstructorFiveString2() {
+TEST_F(URITest, testConstructorFiveString2) {
 
     // accept [] as part of valid ipv6 host name
     URI uri( "ftp", "[0001:1234::0001]", "/dir1/dir2", "query", "frag" );
@@ -431,7 +386,7 @@ void URITest::testConstructorFiveString2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testCompareToOne() {
+TEST_F(URITest, testCompareToOne) {
 
     // compareTo tests
     const char* compareToData[34][2] = {
@@ -511,7 +466,7 @@ void URITest::testCompareToOne() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testCompareToTwo() {
+TEST_F(URITest, testCompareToTwo) {
 
     {
         // test URIs with host names with different casing
@@ -539,13 +494,13 @@ void URITest::testCompareToTwo() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testCreate() {
+TEST_F(URITest, testCreate) {
 
     ASSERT_THROW(URI::create( "a scheme://reg/" ), IllegalArgumentException) << ("IllegalArgumentException expected but not received.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testEquals() {
+TEST_F(URITest, testEquals) {
 
     const char* equalsData[30][2] = {
         { "", "" }, // null frags
@@ -608,7 +563,7 @@ void URITest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testEquals2() {
+TEST_F(URITest, testEquals2) {
 
     {
         // test URIs with empty string authority
@@ -637,7 +592,7 @@ void URITest::testEquals2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetAuthority() {
+TEST_F(URITest, testGetAuthority) {
 
     std::vector<URI> uris = getUris();
 
@@ -673,7 +628,7 @@ void URITest::testGetAuthority() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetAuthority2() {
+TEST_F(URITest, testGetAuthority2) {
 
     {
         // tests for URIs with empty string authority component
@@ -710,7 +665,7 @@ void URITest::testGetAuthority2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetFragment() {
+TEST_F(URITest, testGetFragment) {
 
     std::vector<URI> uris = getUris();
 
@@ -734,7 +689,7 @@ void URITest::testGetFragment() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetHost() {
+TEST_F(URITest, testGetHost) {
 
     std::vector<URI> uris = getUris();
 
@@ -756,7 +711,7 @@ void URITest::testGetHost() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetPath() {
+TEST_F(URITest, testGetPath) {
 
     std::vector<URI> uris = getUris();
 
@@ -782,7 +737,7 @@ void URITest::testGetPath() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetPort() {
+TEST_F(URITest, testGetPort) {
 
     std::vector<URI> uris = getUris();
 
@@ -800,7 +755,7 @@ void URITest::testGetPort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetPort2() {
+TEST_F(URITest, testGetPort2) {
 
     // if port value is negative, the authority should be considered registry based.
 
@@ -816,7 +771,7 @@ void URITest::testGetPort2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetQuery() {
+TEST_F(URITest, testGetQuery) {
 
     std::vector<URI> uris = getUris();
 
@@ -842,7 +797,7 @@ void URITest::testGetQuery() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetRawAuthority() {
+TEST_F(URITest, testGetRawAuthority) {
 
     std::vector<URI> uris = getUris();
 
@@ -868,7 +823,7 @@ void URITest::testGetRawAuthority() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetRawFragment() {
+TEST_F(URITest, testGetRawFragment) {
 
     std::vector<URI> uris = getUris();
 
@@ -893,7 +848,7 @@ void URITest::testGetRawFragment() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetRawPath() {
+TEST_F(URITest, testGetRawPath) {
 
     std::vector<URI> uris = getUris();
 
@@ -916,7 +871,7 @@ void URITest::testGetRawPath() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetRawQuery() {
+TEST_F(URITest, testGetRawQuery) {
 
     std::vector<URI> uris = getUris();
 
@@ -940,7 +895,7 @@ void URITest::testGetRawQuery() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetRawSchemeSpecificPart() {
+TEST_F(URITest, testGetRawSchemeSpecificPart) {
 
     std::vector<URI> uris = getUris();
 
@@ -971,7 +926,7 @@ void URITest::testGetRawSchemeSpecificPart() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetRawUserInfo() {
+TEST_F(URITest, testGetRawUserInfo) {
 
     std::vector<URI> uris = getUris();
 
@@ -994,7 +949,7 @@ void URITest::testGetRawUserInfo() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetScheme() {
+TEST_F(URITest, testGetScheme) {
 
     std::vector<URI> uris = getUris();
 
@@ -1019,7 +974,7 @@ void URITest::testGetScheme() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetSchemeSpecificPart() {
+TEST_F(URITest, testGetSchemeSpecificPart) {
 
     std::vector<URI> uris = getUris();
 
@@ -1050,7 +1005,7 @@ void URITest::testGetSchemeSpecificPart() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testGetUserInfo() {
+TEST_F(URITest, testGetUserInfo) {
 
     std::vector<URI> uris = getUris();
 
@@ -1075,7 +1030,7 @@ void URITest::testGetUserInfo() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testIsAbsolute() {
+TEST_F(URITest, testIsAbsolute) {
 
     const char* isAbsoluteData[] = {
         "mailto:user@ca.ibm.com",
@@ -1106,7 +1061,7 @@ void URITest::testIsAbsolute() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testIsOpaque() {
+TEST_F(URITest, testIsOpaque) {
 
     const char* isOpaqueData[] = {
         "mailto:user@ca.ibm.com",
@@ -1133,7 +1088,7 @@ void URITest::testIsOpaque() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testNormalize() {
+TEST_F(URITest, testNormalize) {
 
     const char* normalizeData[] = {
             // normal
@@ -1193,9 +1148,8 @@ void URITest::testNormalize() {
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testNormalize2() {
+TEST_F(URITest, testNormalize2) {
 
     URI uri1( "file:/D:/one/two/../../three" );
     URI uri2 = uri1.normalize();
@@ -1207,7 +1161,7 @@ void URITest::testNormalize2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testNormalize3() {
+TEST_F(URITest, testNormalize3) {
 
     // return same URI if it has a normalized path already
     URI uri1( "http://host/D:/one/two/three" );
@@ -1220,9 +1174,8 @@ void URITest::testNormalize3() {
     ASSERT_TRUE(uri3.toString() == uri4.toString()) << ("Failed to return same URI after normalization");
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testParseServerAuthority() {
+TEST_F(URITest, testParseServerAuthority) {
 
     // registry based uris
     std::vector<URI> uris;
@@ -1300,7 +1253,7 @@ void URITest::testParseServerAuthority() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testRelativizeLURI() {
+TEST_F(URITest, testRelativizeLURI) {
 
     // relativization tests
     const char* relativizeData[][2] = {
@@ -1387,7 +1340,7 @@ void URITest::testRelativizeLURI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testRelativize2() {
+TEST_F(URITest, testRelativize2) {
 
     {
         URI a( "http://host/dir" );
@@ -1437,9 +1390,8 @@ void URITest::testRelativize2() {
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testResolve() {
+TEST_F(URITest, testResolve) {
 
     URI uri1( "file:/D:/one/two/three" );
     URI uri2 = uri1.resolve( URI( ".." ) );
@@ -1452,7 +1404,7 @@ void URITest::testResolve() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testResolveURI() {
+TEST_F(URITest, testResolveURI) {
 
     // resolution tests
     const char* resolveData[12][2] = {
@@ -1523,7 +1475,7 @@ void URITest::testResolveURI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testToString() {
+TEST_F(URITest, testToString) {
 
     std::vector<URI> uris = getUris();
 
@@ -1550,7 +1502,7 @@ void URITest::testToString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URITest::testToURL() {
+TEST_F(URITest, testToURL) {
 
     const char* absoluteuris[] = {
         "mailto:noreply@apache.org",
@@ -1586,45 +1538,3 @@ void URITest::testToURL() {
         }
     }
 }
-
-TEST_F(URITest, testConstructorOneString) { testConstructorOneString(); }
-TEST_F(URITest, testConstructorThreeString) { testConstructorThreeString(); }
-TEST_F(URITest, testConstructorFourString) { testConstructorFourString(); }
-TEST_F(URITest, testConstructorFiveString) { testConstructorFiveString(); }
-TEST_F(URITest, testConstructorFiveString2) { testConstructorFiveString2(); }
-TEST_F(URITest, testConstructorStringPlusInts) { testConstructorStringPlusInts(); }
-TEST_F(URITest, testURIString) { testURIString(); }
-TEST_F(URITest, testCompareToOne) { testCompareToOne(); }
-TEST_F(URITest, testCompareToTwo) { testCompareToTwo(); }
-TEST_F(URITest, testCreate) { testCreate(); }
-TEST_F(URITest, testEquals) { testEquals(); }
-TEST_F(URITest, testEquals2) { testEquals2(); }
-TEST_F(URITest, testGetAuthority) { testGetAuthority(); }
-TEST_F(URITest, testGetAuthority2) { testGetAuthority2(); }
-TEST_F(URITest, testGetFragment) { testGetFragment(); }
-TEST_F(URITest, testGetHost) { testGetHost(); }
-TEST_F(URITest, testGetPath) { testGetPath(); }
-TEST_F(URITest, testGetPort) { testGetPort(); }
-TEST_F(URITest, testGetPort2) { testGetPort2(); }
-TEST_F(URITest, testGetQuery) { testGetQuery(); }
-TEST_F(URITest, testGetRawAuthority) { testGetRawAuthority(); }
-TEST_F(URITest, testGetRawFragment) { testGetRawFragment(); }
-TEST_F(URITest, testGetRawPath) { testGetRawPath(); }
-TEST_F(URITest, testGetRawQuery) { testGetRawQuery(); }
-TEST_F(URITest, testGetRawSchemeSpecificPart) { testGetRawSchemeSpecificPart(); }
-TEST_F(URITest, testGetRawUserInfo) { testGetRawUserInfo(); }
-TEST_F(URITest, testGetScheme) { testGetScheme(); }
-TEST_F(URITest, testGetSchemeSpecificPart) { testGetSchemeSpecificPart(); }
-TEST_F(URITest, testGetUserInfo) { testGetUserInfo(); }
-TEST_F(URITest, testIsAbsolute) { testIsAbsolute(); }
-TEST_F(URITest, testIsOpaque) { testIsOpaque(); }
-TEST_F(URITest, testNormalize) { testNormalize(); }
-TEST_F(URITest, testNormalize2) { testNormalize2(); }
-TEST_F(URITest, testNormalize3) { testNormalize3(); }
-TEST_F(URITest, testParseServerAuthority) { testParseServerAuthority(); }
-TEST_F(URITest, testRelativizeLURI) { testRelativizeLURI(); }
-TEST_F(URITest, testRelativize2) { testRelativize2(); }
-TEST_F(URITest, testResolveURI) { testResolveURI(); }
-TEST_F(URITest, testResolve) { testResolve(); }
-TEST_F(URITest, testToString) { testToString(); }
-TEST_F(URITest, testToURL) { testToURL(); }

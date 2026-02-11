@@ -44,17 +44,7 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 
-    class ActiveMQConnectionTest : public ::testing::Test {
-public:
-
-        ActiveMQConnectionTest() {}
-        virtual ~ActiveMQConnectionTest() {}
-
-        void test2WithOpenwire();
-        void testCloseCancelsHungStart();
-        void testExceptionInOnException();
-
-    };
+    class ActiveMQConnectionTest : public ::testing::Test {};
 
 
 
@@ -135,7 +125,7 @@ namespace core {
 }}
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnectionTest::test2WithOpenwire() {
+TEST_F(ActiveMQConnectionTest, test2WithOpenwire) {
     try {
         MyCommandListener cmdListener;
         MyDispatcher msgListener;
@@ -213,7 +203,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnectionTest::testCloseCancelsHungStart() {
+TEST_F(ActiveMQConnectionTest, testCloseCancelsHungStart) {
 
     TestCloseCancelsHungStartRunnable runnable;
 
@@ -237,7 +227,7 @@ void ActiveMQConnectionTest::testCloseCancelsHungStart() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnectionTest::testExceptionInOnException() {
+TEST_F(ActiveMQConnectionTest, testExceptionInOnException) {
 
     try {
         MyExceptionListener exListener;
@@ -265,7 +255,3 @@ void ActiveMQConnectionTest::testExceptionInOnException() {
         throw ex;
     }
 }
-
-TEST_F(ActiveMQConnectionTest, test2WithOpenwire) { test2WithOpenwire(); }
-TEST_F(ActiveMQConnectionTest, testCloseCancelsHungStart) { testCloseCancelsHungStart(); }
-TEST_F(ActiveMQConnectionTest, testExceptionInOnException) { testExceptionInOnException(); }

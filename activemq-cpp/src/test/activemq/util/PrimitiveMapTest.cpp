@@ -23,26 +23,12 @@
 using namespace activemq;
 using namespace activemq::util;
 
-    class PrimitiveMapTest : public ::testing::Test
-    {
-public:
-
-    	PrimitiveMapTest(){};
-    	virtual ~PrimitiveMapTest(){};
-
-        void testValueNode();
-        void testSetGet();
-        void testRemove();
-        void testCount();
-        void testCopy();
-        void testClear();
-        void testContains();
-        void testGetKeys();
+    class PrimitiveMapTest : public ::testing::Test {
     };
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveMapTest::testValueNode(){
+TEST_F(PrimitiveMapTest, testValueNode){
 
     PrimitiveValueNode node;
 
@@ -106,7 +92,7 @@ void PrimitiveMapTest::testValueNode(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveMapTest::testSetGet(){
+TEST_F(PrimitiveMapTest, testSetGet){
 
     PrimitiveMap pmap;
 
@@ -198,7 +184,7 @@ void PrimitiveMapTest::testSetGet(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveMapTest::testRemove(){
+TEST_F(PrimitiveMapTest, testRemove){
 
     PrimitiveMap pmap;
     pmap.setInt("int", 5 );
@@ -212,7 +198,7 @@ void PrimitiveMapTest::testRemove(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveMapTest::testCount(){
+TEST_F(PrimitiveMapTest, testCount){
 
     PrimitiveMap pmap;
     ASSERT_TRUE(pmap.size() == 0);
@@ -229,7 +215,7 @@ void PrimitiveMapTest::testCount(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveMapTest::testCopy(){
+TEST_F(PrimitiveMapTest, testCopy){
 
     PrimitiveMap pmap;
     pmap.setInt("int", 5 );
@@ -245,7 +231,7 @@ void PrimitiveMapTest::testCopy(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveMapTest::testClear(){
+TEST_F(PrimitiveMapTest, testClear){
 
     PrimitiveMap pmap;
     pmap.setInt("int", 5 );
@@ -272,7 +258,7 @@ void PrimitiveMapTest::testClear(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveMapTest::testContains(){
+TEST_F(PrimitiveMapTest, testContains){
 
     PrimitiveMap pmap;
 
@@ -292,7 +278,7 @@ void PrimitiveMapTest::testContains(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveMapTest::testGetKeys(){
+TEST_F(PrimitiveMapTest, testGetKeys){
 
     PrimitiveMap pmap;
 
@@ -306,12 +292,3 @@ void PrimitiveMapTest::testGetKeys(){
     ASSERT_TRUE(keys[1] == "int" || keys[1] == "float" || keys[1] == "int2");
     ASSERT_TRUE(keys[2] == "int" || keys[2] == "float" || keys[2] == "int2");
 }
-
-TEST_F(PrimitiveMapTest, testValueNode) { testValueNode(); }
-TEST_F(PrimitiveMapTest, testSetGet) { testSetGet(); }
-TEST_F(PrimitiveMapTest, testRemove) { testRemove(); }
-TEST_F(PrimitiveMapTest, testCount) { testCount(); }
-TEST_F(PrimitiveMapTest, testClear) { testClear(); }
-TEST_F(PrimitiveMapTest, testCopy) { testCopy(); }
-TEST_F(PrimitiveMapTest, testContains) { testContains(); }
-TEST_F(PrimitiveMapTest, testGetKeys) { testGetKeys(); }

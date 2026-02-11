@@ -37,16 +37,7 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class ActiveMQMessageTransformationTest : public ::testing::Test {
-    private:
-public:
-
-        ActiveMQMessageTransformationTest();
-        virtual ~ActiveMQMessageTransformationTest();
-
-        void testTransformDestination();
-    };
-
+class ActiveMQMessageTransformationTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -96,15 +87,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQMessageTransformationTest::ActiveMQMessageTransformationTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-ActiveMQMessageTransformationTest::~ActiveMQMessageTransformationTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTransformationTest::testTransformDestination() {
+TEST_F(ActiveMQMessageTransformationTest, testTransformDestination) {
 
     CustomCmsTopic customTopic;
     const ActiveMQDestination* transformed;
@@ -134,5 +117,3 @@ void ActiveMQMessageTransformationTest::testTransformDestination() {
     ASSERT_TRUE(!transformed->isTopic());
     ASSERT_TRUE(transformed->isQueue());
 }
-
-TEST_F(ActiveMQMessageTransformationTest, testTransformDestination) { testTransformDestination(); }

@@ -37,91 +37,15 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
     class ThreadPoolExecutorTest : public ExecutorsTestSupport {
-    private:
-private:
+protected:
 
         decaf::util::concurrent::Mutex myMutex;
 
     public:
 
         ThreadPoolExecutorTest() : myMutex() {}
-        virtual ~ThreadPoolExecutorTest() {}
-
-        void testConstructor();
-        void testSimpleTasks();
-        void testSimpleTasksCallerOwns();
-        void testMoreTasksThanMaxPoolSize();
-        void testTasksThatThrow();
-        void testAwaitTermination();
-        void testPrestartCoreThread();
-        void testPrestartAllCoreThreads();
-        void testGetCompletedTaskCount();
-        void testGetCorePoolSize();
-        void testGetKeepAliveTime();
-        void testGetThreadFactory();
-        void testSetThreadFactory();
-        void testSetThreadFactoryNull();
-        void testGetRejectedExecutionHandler();
-        void testSetRejectedExecutionHandler();
-        void testSetRejectedExecutionHandlerNull();
-        void testGetLargestPoolSize();
-        void testGetMaximumPoolSize();
-        void testGetPoolSize();
-        void testGetTaskCount();
-        void testIsShutdown();
-        void testIsTerminated();
-        void testIsTerminating();
-        void testGetQueue();
-        void testRemove();
-        void testShutDownNow();
-        void testConstructor1();
-        void testConstructor2();
-        void testConstructor3();
-        void testConstructor4();
-        void testConstructor5();
-        void testConstructor6();
-        void testConstructor7();
-        void testConstructor8();
-        void testConstructor9();
-        void testConstructor10();
-        void testConstructor11();
-        void testConstructor12();
-        void testConstructor13();
-        void testConstructor14();
-        void testConstructor15();
-        void testConstructor16();
-        void testConstructor17();
-        void testConstructor18();
-        void testConstructor19();
-        void testConstructor20();
-        void testConstructorNullPointerException1();
-        void testConstructorNullPointerException2();
-        void testConstructorNullPointerException3();
-        void testConstructorNullPointerException4();
-        void testConstructorNullPointerException5();
-        void testConstructorNullPointerException6();
-        void testConstructorNullPointerException7();
-        void testConstructorNullPointerException8();
-        void testSaturatedExecute1();
-        void testSaturatedExecute2();
-        void testSaturatedExecute3();
-        void testSaturatedExecute4();
-        void testRejectedExecutionExceptionOnShutdown();
-        void testCallerRunsOnShutdown();
-        void testDiscardOnShutdown();
-        void testDiscardOldestOnShutdown();
-        void testExecuteNull();
-        void testCorePoolSizeIllegalArgumentException();
-        void testMaximumPoolSizeIllegalArgumentException1();
-        void testMaximumPoolSizeIllegalArgumentException2();
-        void testKeepAliveTimeIllegalArgumentException();
-        void testTerminated();
-        void testBeforeAfter();
-        void testConcurrentRandomDelayedThreads();
-        void testRapidCreateAndDestroyExecutor();
 
     };
-
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -266,7 +190,7 @@ namespace {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor() {
+TEST_F(ThreadPoolExecutorTest, testConstructor) {
 
     ThreadPoolExecutor pool(1, 3, 5, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>());
 
@@ -277,7 +201,7 @@ void ThreadPoolExecutorTest::testConstructor() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testSimpleTasks()
+TEST_F(ThreadPoolExecutorTest, testSimpleTasks)
 {
     CountDownLatch myLatch( 3 );
 
@@ -309,7 +233,7 @@ void ThreadPoolExecutorTest::testSimpleTasks()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testSimpleTasksCallerOwns()
+TEST_F(ThreadPoolExecutorTest, testSimpleTasksCallerOwns)
 {
     CountDownLatch myLatch( 3 );
 
@@ -341,7 +265,7 @@ void ThreadPoolExecutorTest::testSimpleTasksCallerOwns()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testAwaitTermination()
+TEST_F(ThreadPoolExecutorTest, testAwaitTermination)
 {
     CountDownLatch myLatch( 3 );
 
@@ -381,7 +305,7 @@ void ThreadPoolExecutorTest::testAwaitTermination()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testMoreTasksThanMaxPoolSize() {
+TEST_F(ThreadPoolExecutorTest, testMoreTasksThanMaxPoolSize) {
 
     ThreadPoolExecutor pool(3, 3, 5, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>());
 
@@ -431,7 +355,7 @@ void ThreadPoolExecutorTest::testMoreTasksThanMaxPoolSize() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testTasksThatThrow()
+TEST_F(ThreadPoolExecutorTest, testTasksThatThrow)
 {
     CountDownLatch myLatch( 3 );
 
@@ -470,7 +394,7 @@ void ThreadPoolExecutorTest::testTasksThatThrow()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testPrestartCoreThread() {
+TEST_F(ThreadPoolExecutorTest, testPrestartCoreThread) {
 
     ThreadPoolExecutor p2(2, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
 
@@ -486,7 +410,7 @@ void ThreadPoolExecutorTest::testPrestartCoreThread() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testPrestartAllCoreThreads() {
+TEST_F(ThreadPoolExecutorTest, testPrestartAllCoreThreads) {
 
     ThreadPoolExecutor p2(2, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     ASSERT_EQ(0, p2.getPoolSize());
@@ -499,7 +423,7 @@ void ThreadPoolExecutorTest::testPrestartAllCoreThreads() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testGetCompletedTaskCount() {
+TEST_F(ThreadPoolExecutorTest, testGetCompletedTaskCount) {
 
     ThreadPoolExecutor p2(2, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     ASSERT_EQ(0LL, p2.getCompletedTaskCount());
@@ -518,7 +442,7 @@ void ThreadPoolExecutorTest::testGetCompletedTaskCount() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testGetCorePoolSize() {
+TEST_F(ThreadPoolExecutorTest, testGetCorePoolSize) {
 
     ThreadPoolExecutor p1(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     ASSERT_EQ(1, p1.getCorePoolSize());
@@ -526,7 +450,7 @@ void ThreadPoolExecutorTest::testGetCorePoolSize() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testGetKeepAliveTime() {
+TEST_F(ThreadPoolExecutorTest, testGetKeepAliveTime) {
 
     ThreadPoolExecutor p2(2, 2, 1000, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     ASSERT_EQ(1LL, p2.getKeepAliveTime(TimeUnit::SECONDS));
@@ -534,7 +458,7 @@ void ThreadPoolExecutorTest::testGetKeepAliveTime() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testGetThreadFactory() {
+TEST_F(ThreadPoolExecutorTest, testGetThreadFactory) {
 
     ThreadFactory* tf = new SimpleThreadFactory();
     ThreadPoolExecutor p(1,2,LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>(), tf, new NoOpREHandler());
@@ -543,7 +467,7 @@ void ThreadPoolExecutorTest::testGetThreadFactory() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testSetThreadFactory() {
+TEST_F(ThreadPoolExecutorTest, testSetThreadFactory) {
 
     ThreadPoolExecutor p(1,2,LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     ThreadFactory* tf = new SimpleThreadFactory();
@@ -553,7 +477,7 @@ void ThreadPoolExecutorTest::testSetThreadFactory() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testSetThreadFactoryNull() {
+TEST_F(ThreadPoolExecutorTest, testSetThreadFactoryNull) {
 
     ThreadPoolExecutor p(1,2,LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     try {
@@ -566,7 +490,7 @@ void ThreadPoolExecutorTest::testSetThreadFactoryNull() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testGetRejectedExecutionHandler() {
+TEST_F(ThreadPoolExecutorTest, testGetRejectedExecutionHandler) {
 
     RejectedExecutionHandler* h = new NoOpREHandler();
     ThreadPoolExecutor p(1,2,LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>(), h);
@@ -575,7 +499,7 @@ void ThreadPoolExecutorTest::testGetRejectedExecutionHandler() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testSetRejectedExecutionHandler() {
+TEST_F(ThreadPoolExecutorTest, testSetRejectedExecutionHandler) {
 
     ThreadPoolExecutor p(1,2,LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     RejectedExecutionHandler* h = new NoOpREHandler();
@@ -585,7 +509,7 @@ void ThreadPoolExecutorTest::testSetRejectedExecutionHandler() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testSetRejectedExecutionHandlerNull() {
+TEST_F(ThreadPoolExecutorTest, testSetRejectedExecutionHandlerNull) {
 
     ThreadPoolExecutor p(1,2,LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
 
@@ -595,7 +519,7 @@ void ThreadPoolExecutorTest::testSetRejectedExecutionHandlerNull() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testGetLargestPoolSize() {
+TEST_F(ThreadPoolExecutorTest, testGetLargestPoolSize) {
 
     ThreadPoolExecutor p2(2, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     try {
@@ -612,7 +536,7 @@ void ThreadPoolExecutorTest::testGetLargestPoolSize() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testGetMaximumPoolSize() {
+TEST_F(ThreadPoolExecutorTest, testGetMaximumPoolSize) {
 
     ThreadPoolExecutor p2(2, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     ASSERT_EQ(2, p2.getMaximumPoolSize());
@@ -620,7 +544,7 @@ void ThreadPoolExecutorTest::testGetMaximumPoolSize() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testGetPoolSize() {
+TEST_F(ThreadPoolExecutorTest, testGetPoolSize) {
 
     ThreadPoolExecutor p1(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     ASSERT_EQ(0, p1.getPoolSize());
@@ -630,7 +554,7 @@ void ThreadPoolExecutorTest::testGetPoolSize() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testGetTaskCount() {
+TEST_F(ThreadPoolExecutorTest, testGetTaskCount) {
 
     ThreadPoolExecutor p1(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     try {
@@ -645,7 +569,7 @@ void ThreadPoolExecutorTest::testGetTaskCount() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testIsShutdown() {
+TEST_F(ThreadPoolExecutorTest, testIsShutdown) {
 
     ThreadPoolExecutor p1(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     ASSERT_TRUE(!p1.isShutdown());
@@ -655,7 +579,7 @@ void ThreadPoolExecutorTest::testIsShutdown() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testIsTerminated() {
+TEST_F(ThreadPoolExecutorTest, testIsTerminated) {
 
     ThreadPoolExecutor p1(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     ASSERT_TRUE(!p1.isTerminated());
@@ -675,7 +599,7 @@ void ThreadPoolExecutorTest::testIsTerminated() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testIsTerminating() {
+TEST_F(ThreadPoolExecutorTest, testIsTerminating) {
 
     ThreadPoolExecutor p1(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     ASSERT_TRUE(!p1.isTerminating());
@@ -697,7 +621,7 @@ void ThreadPoolExecutorTest::testIsTerminating() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testGetQueue() {
+TEST_F(ThreadPoolExecutorTest, testGetQueue) {
 
     BlockingQueue<Runnable*>* q = new LinkedBlockingQueue<Runnable*>();
     ThreadPoolExecutor p1(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, q);
@@ -721,7 +645,7 @@ void ThreadPoolExecutorTest::testGetQueue() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testRemove() {
+TEST_F(ThreadPoolExecutorTest, testRemove) {
 
     BlockingQueue<Runnable*>* q = new LinkedBlockingQueue<Runnable*>();
     ThreadPoolExecutor p1(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, q);
@@ -755,7 +679,7 @@ void ThreadPoolExecutorTest::testRemove() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testShutDownNow() {
+TEST_F(ThreadPoolExecutorTest, testShutDownNow) {
 
     ThreadPoolExecutor p1(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
     ArrayList<Runnable*> list;
@@ -782,7 +706,7 @@ void ThreadPoolExecutorTest::testShutDownNow() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor1() {
+TEST_F(ThreadPoolExecutorTest, testConstructor1) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
@@ -790,7 +714,7 @@ void ThreadPoolExecutorTest::testConstructor1() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor2() {
+TEST_F(ThreadPoolExecutorTest, testConstructor2) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
@@ -798,7 +722,7 @@ void ThreadPoolExecutorTest::testConstructor2() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor3() {
+TEST_F(ThreadPoolExecutorTest, testConstructor3) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
@@ -806,7 +730,7 @@ void ThreadPoolExecutorTest::testConstructor3() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor4() {
+TEST_F(ThreadPoolExecutorTest, testConstructor4) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
@@ -814,7 +738,7 @@ void ThreadPoolExecutorTest::testConstructor4() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor5() {
+TEST_F(ThreadPoolExecutorTest, testConstructor5) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
@@ -822,7 +746,7 @@ void ThreadPoolExecutorTest::testConstructor5() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor6() {
+TEST_F(ThreadPoolExecutorTest, testConstructor6) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
@@ -831,7 +755,7 @@ void ThreadPoolExecutorTest::testConstructor6() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor7() {
+TEST_F(ThreadPoolExecutorTest, testConstructor7) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
@@ -840,7 +764,7 @@ void ThreadPoolExecutorTest::testConstructor7() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor8() {
+TEST_F(ThreadPoolExecutorTest, testConstructor8) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
@@ -849,7 +773,7 @@ void ThreadPoolExecutorTest::testConstructor8() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor9() {
+TEST_F(ThreadPoolExecutorTest, testConstructor9) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
@@ -858,7 +782,7 @@ void ThreadPoolExecutorTest::testConstructor9() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor10() {
+TEST_F(ThreadPoolExecutorTest, testConstructor10) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
@@ -867,7 +791,7 @@ void ThreadPoolExecutorTest::testConstructor10() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor11() {
+TEST_F(ThreadPoolExecutorTest, testConstructor11) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
@@ -876,7 +800,7 @@ void ThreadPoolExecutorTest::testConstructor11() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor12() {
+TEST_F(ThreadPoolExecutorTest, testConstructor12) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
@@ -885,7 +809,7 @@ void ThreadPoolExecutorTest::testConstructor12() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor13() {
+TEST_F(ThreadPoolExecutorTest, testConstructor13) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
@@ -894,7 +818,7 @@ void ThreadPoolExecutorTest::testConstructor13() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor14() {
+TEST_F(ThreadPoolExecutorTest, testConstructor14) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
@@ -903,7 +827,7 @@ void ThreadPoolExecutorTest::testConstructor14() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor15() {
+TEST_F(ThreadPoolExecutorTest, testConstructor15) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
@@ -912,7 +836,7 @@ void ThreadPoolExecutorTest::testConstructor15() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor16() {
+TEST_F(ThreadPoolExecutorTest, testConstructor16) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
@@ -922,7 +846,7 @@ void ThreadPoolExecutorTest::testConstructor16() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor17() {
+TEST_F(ThreadPoolExecutorTest, testConstructor17) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
@@ -932,7 +856,7 @@ void ThreadPoolExecutorTest::testConstructor17() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor18() {
+TEST_F(ThreadPoolExecutorTest, testConstructor18) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
@@ -942,7 +866,7 @@ void ThreadPoolExecutorTest::testConstructor18() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor19() {
+TEST_F(ThreadPoolExecutorTest, testConstructor19) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
@@ -952,7 +876,7 @@ void ThreadPoolExecutorTest::testConstructor19() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructor20() {
+TEST_F(ThreadPoolExecutorTest, testConstructor20) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
@@ -962,7 +886,7 @@ void ThreadPoolExecutorTest::testConstructor20() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructorNullPointerException1() {
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException1) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
@@ -970,7 +894,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException1() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructorNullPointerException2() {
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException2) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
@@ -979,7 +903,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException2() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructorNullPointerException3() {
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException3) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
@@ -987,7 +911,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException3() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructorNullPointerException4() {
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException4) {
 
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
 
@@ -995,7 +919,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException4() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructorNullPointerException5() {
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException5) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
 
@@ -1003,7 +927,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException5() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructorNullPointerException6() {
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException6) {
 
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
@@ -1012,7 +936,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException6() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructorNullPointerException7() {
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException7) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<ThreadFactory> factory(new SimpleThreadFactory());
@@ -1021,7 +945,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException7() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConstructorNullPointerException8() {
+TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException8) {
 
     Pointer< BlockingQueue<Runnable*> > queue(new LinkedBlockingQueue<Runnable*>());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
@@ -1030,7 +954,7 @@ void ThreadPoolExecutorTest::testConstructorNullPointerException8() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testSaturatedExecute1() {
+TEST_F(ThreadPoolExecutorTest, testSaturatedExecute1) {
 
     ThreadPoolExecutor p(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>(1));
     try {
@@ -1047,7 +971,7 @@ void ThreadPoolExecutorTest::testSaturatedExecute1() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testSaturatedExecute2() {
+TEST_F(ThreadPoolExecutorTest, testSaturatedExecute2) {
 
     RejectedExecutionHandler* h = new ThreadPoolExecutor::CallerRunsPolicy();
     ThreadPoolExecutor p(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>(1), h);
@@ -1082,7 +1006,7 @@ void ThreadPoolExecutorTest::testSaturatedExecute2() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testSaturatedExecute3() {
+TEST_F(ThreadPoolExecutorTest, testSaturatedExecute3) {
 
     RejectedExecutionHandler* h = new ThreadPoolExecutor::DiscardPolicy;
     ThreadPoolExecutor p(1,1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>(1), h);
@@ -1115,7 +1039,7 @@ void ThreadPoolExecutorTest::testSaturatedExecute3() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testSaturatedExecute4() {
+TEST_F(ThreadPoolExecutorTest, testSaturatedExecute4) {
 
     RejectedExecutionHandler* h = new ThreadPoolExecutor::DiscardOldestPolicy();
     ThreadPoolExecutor p(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>(1), h);
@@ -1149,7 +1073,7 @@ void ThreadPoolExecutorTest::testSaturatedExecute4() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testRejectedExecutionExceptionOnShutdown() {
+TEST_F(ThreadPoolExecutorTest, testRejectedExecutionExceptionOnShutdown) {
 
     ThreadPoolExecutor tpe(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>(1));
     tpe.shutdown();
@@ -1160,7 +1084,7 @@ void ThreadPoolExecutorTest::testRejectedExecutionExceptionOnShutdown() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testCallerRunsOnShutdown() {
+TEST_F(ThreadPoolExecutorTest, testCallerRunsOnShutdown) {
 
     RejectedExecutionHandler* h = new ThreadPoolExecutor::CallerRunsPolicy();
     ThreadPoolExecutor p(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>(1), h);
@@ -1180,7 +1104,7 @@ void ThreadPoolExecutorTest::testCallerRunsOnShutdown() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testDiscardOnShutdown() {
+TEST_F(ThreadPoolExecutorTest, testDiscardOnShutdown) {
 
     RejectedExecutionHandler* h = new ThreadPoolExecutor::DiscardPolicy();
     ThreadPoolExecutor p(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>(1), h);
@@ -1200,7 +1124,7 @@ void ThreadPoolExecutorTest::testDiscardOnShutdown() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testDiscardOldestOnShutdown() {
+TEST_F(ThreadPoolExecutorTest, testDiscardOldestOnShutdown) {
 
     RejectedExecutionHandler* h = new ThreadPoolExecutor::DiscardOldestPolicy();
     ThreadPoolExecutor p(1, 1, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>(1), h);
@@ -1220,7 +1144,7 @@ void ThreadPoolExecutorTest::testDiscardOldestOnShutdown() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testExecuteNull() {
+TEST_F(ThreadPoolExecutorTest, testExecuteNull) {
 
     ThreadPoolExecutor tpe(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
 
@@ -1232,7 +1156,7 @@ void ThreadPoolExecutorTest::testExecuteNull() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testCorePoolSizeIllegalArgumentException() {
+TEST_F(ThreadPoolExecutorTest, testCorePoolSizeIllegalArgumentException) {
 
     ThreadPoolExecutor tpe(1, 2, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
 
@@ -1244,7 +1168,7 @@ void ThreadPoolExecutorTest::testCorePoolSizeIllegalArgumentException() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testMaximumPoolSizeIllegalArgumentException1() {
+TEST_F(ThreadPoolExecutorTest, testMaximumPoolSizeIllegalArgumentException1) {
 
     ThreadPoolExecutor tpe(2, 3, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
 
@@ -1256,7 +1180,7 @@ void ThreadPoolExecutorTest::testMaximumPoolSizeIllegalArgumentException1() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testMaximumPoolSizeIllegalArgumentException2() {
+TEST_F(ThreadPoolExecutorTest, testMaximumPoolSizeIllegalArgumentException2) {
 
     ThreadPoolExecutor tpe(2, 3, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
 
@@ -1268,7 +1192,7 @@ void ThreadPoolExecutorTest::testMaximumPoolSizeIllegalArgumentException2() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testKeepAliveTimeIllegalArgumentException() {
+TEST_F(ThreadPoolExecutorTest, testKeepAliveTimeIllegalArgumentException) {
 
     ThreadPoolExecutor tpe(2, 3, LONG_DELAY_MS, TimeUnit::MILLISECONDS, new LinkedBlockingQueue<Runnable*>());
 
@@ -1280,7 +1204,7 @@ void ThreadPoolExecutorTest::testKeepAliveTimeIllegalArgumentException() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testTerminated() {
+TEST_F(ThreadPoolExecutorTest, testTerminated) {
 
     MyThreadPoolExecutor tpe;
 
@@ -1291,7 +1215,7 @@ void ThreadPoolExecutorTest::testTerminated() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testBeforeAfter() {
+TEST_F(ThreadPoolExecutorTest, testBeforeAfter) {
 
     MyThreadPoolExecutor tpe;
 
@@ -1353,7 +1277,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testConcurrentRandomDelayedThreads() {
+TEST_F(ThreadPoolExecutorTest, testConcurrentRandomDelayedThreads) {
 
     ThreadPoolExecutor executor(50, Integer::MAX_VALUE, 60LL, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>());
 
@@ -1369,7 +1293,7 @@ void ThreadPoolExecutorTest::testConcurrentRandomDelayedThreads() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadPoolExecutorTest::testRapidCreateAndDestroyExecutor() {
+TEST_F(ThreadPoolExecutorTest, testRapidCreateAndDestroyExecutor) {
 
     for (int i = 0; i < 100; i++) {
         ThreadPoolExecutor executor(10, Integer::MAX_VALUE, 60LL, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>());
@@ -1377,76 +1301,3 @@ void ThreadPoolExecutorTest::testRapidCreateAndDestroyExecutor() {
         ASSERT_TRUE(executor.awaitTermination(45, TimeUnit::SECONDS)) << ("executor terminated");
     }
 }
-
-TEST_F(ThreadPoolExecutorTest, testConstructor) { testConstructor(); }
-TEST_F(ThreadPoolExecutorTest, testSimpleTasks) { testSimpleTasks(); }
-TEST_F(ThreadPoolExecutorTest, testSimpleTasksCallerOwns) { testSimpleTasksCallerOwns(); }
-TEST_F(ThreadPoolExecutorTest, testMoreTasksThanMaxPoolSize) { testMoreTasksThanMaxPoolSize(); }
-TEST_F(ThreadPoolExecutorTest, testTasksThatThrow) { testTasksThatThrow(); }
-TEST_F(ThreadPoolExecutorTest, testAwaitTermination) { testAwaitTermination(); }
-TEST_F(ThreadPoolExecutorTest, testPrestartCoreThread) { testPrestartCoreThread(); }
-TEST_F(ThreadPoolExecutorTest, testPrestartAllCoreThreads) { testPrestartAllCoreThreads(); }
-TEST_F(ThreadPoolExecutorTest, testGetCompletedTaskCount) { testGetCompletedTaskCount(); }
-TEST_F(ThreadPoolExecutorTest, testGetCorePoolSize) { testGetCorePoolSize(); }
-TEST_F(ThreadPoolExecutorTest, testGetKeepAliveTime) { testGetKeepAliveTime(); }
-TEST_F(ThreadPoolExecutorTest, testGetThreadFactory) { testGetThreadFactory(); }
-TEST_F(ThreadPoolExecutorTest, testSetThreadFactory) { testSetThreadFactory(); }
-TEST_F(ThreadPoolExecutorTest, testSetThreadFactoryNull) { testSetThreadFactoryNull(); }
-TEST_F(ThreadPoolExecutorTest, testGetRejectedExecutionHandler) { testGetRejectedExecutionHandler(); }
-TEST_F(ThreadPoolExecutorTest, testSetRejectedExecutionHandler) { testSetRejectedExecutionHandler(); }
-TEST_F(ThreadPoolExecutorTest, testSetRejectedExecutionHandlerNull) { testSetRejectedExecutionHandlerNull(); }
-TEST_F(ThreadPoolExecutorTest, testGetLargestPoolSize) { testGetLargestPoolSize(); }
-TEST_F(ThreadPoolExecutorTest, testGetMaximumPoolSize) { testGetMaximumPoolSize(); }
-TEST_F(ThreadPoolExecutorTest, testGetPoolSize) { testGetPoolSize(); }
-TEST_F(ThreadPoolExecutorTest, testGetTaskCount) { testGetTaskCount(); }
-TEST_F(ThreadPoolExecutorTest, testIsShutdown) { testIsShutdown(); }
-TEST_F(ThreadPoolExecutorTest, testIsTerminated) { testIsTerminated(); }
-TEST_F(ThreadPoolExecutorTest, testIsTerminating) { testIsTerminating(); }
-TEST_F(ThreadPoolExecutorTest, testGetQueue) { testGetQueue(); }
-TEST_F(ThreadPoolExecutorTest, testRemove) { testRemove(); }
-TEST_F(ThreadPoolExecutorTest, testShutDownNow) { testShutDownNow(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor1) { testConstructor1(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor2) { testConstructor2(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor3) { testConstructor3(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor4) { testConstructor4(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor5) { testConstructor5(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor6) { testConstructor6(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor7) { testConstructor7(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor8) { testConstructor8(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor9) { testConstructor9(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor10) { testConstructor10(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor11) { testConstructor11(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor12) { testConstructor12(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor13) { testConstructor13(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor14) { testConstructor14(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor15) { testConstructor15(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor16) { testConstructor16(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor17) { testConstructor17(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor18) { testConstructor18(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor19) { testConstructor19(); }
-TEST_F(ThreadPoolExecutorTest, testConstructor20) { testConstructor20(); }
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException1) { testConstructorNullPointerException1(); }
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException2) { testConstructorNullPointerException2(); }
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException3) { testConstructorNullPointerException3(); }
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException4) { testConstructorNullPointerException4(); }
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException5) { testConstructorNullPointerException5(); }
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException6) { testConstructorNullPointerException6(); }
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException7) { testConstructorNullPointerException7(); }
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException8) { testConstructorNullPointerException8(); }
-TEST_F(ThreadPoolExecutorTest, testSaturatedExecute1) { testSaturatedExecute1(); }
-TEST_F(ThreadPoolExecutorTest, testSaturatedExecute2) { testSaturatedExecute2(); }
-TEST_F(ThreadPoolExecutorTest, testSaturatedExecute3) { testSaturatedExecute3(); }
-TEST_F(ThreadPoolExecutorTest, testSaturatedExecute4) { testSaturatedExecute4(); }
-TEST_F(ThreadPoolExecutorTest, testRejectedExecutionExceptionOnShutdown) { testRejectedExecutionExceptionOnShutdown(); }
-TEST_F(ThreadPoolExecutorTest, testCallerRunsOnShutdown) { testCallerRunsOnShutdown(); }
-TEST_F(ThreadPoolExecutorTest, testDiscardOnShutdown) { testDiscardOnShutdown(); }
-TEST_F(ThreadPoolExecutorTest, testDiscardOldestOnShutdown) { testDiscardOldestOnShutdown(); }
-TEST_F(ThreadPoolExecutorTest, testExecuteNull) { testExecuteNull(); }
-TEST_F(ThreadPoolExecutorTest, testCorePoolSizeIllegalArgumentException) { testCorePoolSizeIllegalArgumentException(); }
-TEST_F(ThreadPoolExecutorTest, testMaximumPoolSizeIllegalArgumentException1) { testMaximumPoolSizeIllegalArgumentException1(); }
-TEST_F(ThreadPoolExecutorTest, testMaximumPoolSizeIllegalArgumentException2) { testMaximumPoolSizeIllegalArgumentException2(); }
-TEST_F(ThreadPoolExecutorTest, testKeepAliveTimeIllegalArgumentException) { testKeepAliveTimeIllegalArgumentException(); }
-TEST_F(ThreadPoolExecutorTest, testTerminated) { testTerminated(); }
-TEST_F(ThreadPoolExecutorTest, testBeforeAfter) { testBeforeAfter(); }
-TEST_F(ThreadPoolExecutorTest, testConcurrentRandomDelayedThreads) { testConcurrentRandomDelayedThreads(); }
-TEST_F(ThreadPoolExecutorTest, testRapidCreateAndDestroyExecutor) { testRapidCreateAndDestroyExecutor(); }

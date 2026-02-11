@@ -27,19 +27,7 @@ using namespace decaf::internal::util;
 using namespace decaf::util;
 using namespace decaf::lang;
 
-    class TimerTaskHeapTest : public ::testing::Test {
-public:
-
-        TimerTaskHeapTest() {}
-        virtual ~TimerTaskHeapTest() {}
-
-        void testCreate();
-        void testInsert();
-        void testRemove();
-        void testFind();
-
-    };
-
+    class TimerTaskHeapTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
 class TestTimerTask : public TimerTask {
@@ -49,7 +37,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimerTaskHeapTest::testCreate() {
+TEST_F(TimerTaskHeapTest, testCreate) {
 
     TimerTaskHeap heap;
 
@@ -58,7 +46,7 @@ void TimerTaskHeapTest::testCreate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimerTaskHeapTest::testInsert() {
+TEST_F(TimerTaskHeapTest, testInsert) {
 
     TimerTaskHeap heap;
 
@@ -76,7 +64,7 @@ void TimerTaskHeapTest::testInsert() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimerTaskHeapTest::testRemove() {
+TEST_F(TimerTaskHeapTest, testRemove) {
 
     TimerTaskHeap heap;
 
@@ -111,7 +99,7 @@ void TimerTaskHeapTest::testRemove() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimerTaskHeapTest::testFind() {
+TEST_F(TimerTaskHeapTest, testFind) {
 
     TimerTaskHeap heap;
 
@@ -132,8 +120,3 @@ void TimerTaskHeapTest::testFind() {
     pos = heap.find( task1 );
     ASSERT_TRUE(pos == (std::size_t)-1);
 }
-
-TEST_F(TimerTaskHeapTest, testCreate) { testCreate(); }
-TEST_F(TimerTaskHeapTest, testInsert) { testInsert(); }
-TEST_F(TimerTaskHeapTest, testRemove) { testRemove(); }
-TEST_F(TimerTaskHeapTest, testFind) { testFind(); }

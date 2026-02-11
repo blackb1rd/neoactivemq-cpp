@@ -22,7 +22,6 @@
 #include <decaf/lang/Float.h>
 #include <string.h>
 
-
 namespace decaf { namespace internal { namespace nio {} } }
 using namespace std;
 using namespace decaf;
@@ -32,7 +31,7 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class ByteArrayBufferTest : public ::testing::Test {
-private:
+protected:
 
         decaf::nio::ByteBuffer* testBuffer1;
         unsigned char* testData1;
@@ -41,15 +40,9 @@ private:
         static const int SMALL_TEST_LENGTH;
         static const int BUFFER_LENGTH;
 
-    private:
-
-        ByteArrayBufferTest(const ByteArrayBufferTest&);
-        ByteArrayBufferTest& operator= (const ByteArrayBufferTest&);
-
     public:
 
         ByteArrayBufferTest() : testBuffer1(), testData1() {}
-        virtual ~ByteArrayBufferTest() {}
 
         void SetUp() override {
            testBuffer1 = decaf::nio::ByteBuffer::allocate( testData1Size );
@@ -65,55 +58,7 @@ private:
             delete [] testData1;
         }
 
-        void test();
-        void testArray();
-        void testArrayOffset();
-        void testReadOnlyArray();
-        void testAsReadOnlyBuffer();
-        void testCompact();
-        void testCompareTo();
-        void testDuplicate();
-        void testEquals();
-        void testGet();
-        void testGetbyteArray();
-        void testGetbyteArray2();
-        void testGetWithIndex();
-        void testPutbyte();
-        void testPutbyteArray();
-        void testPutbyteArray2();
-        void testPutByteBuffer();
-        void testPutIndexed();
-        void testSlice();
-        void testToString();
-        void testGetChar();
-        void testGetChar2();
-        void testPutChar();
-        void testPutChar2();
-        void testGetDouble();
-        void testGetDouble2();
-        void testPutDouble();
-        void testPutDouble2();
-        void testGetFloat();
-        void testGetFloat2();
-        void testPutFloat();
-        void testPutFloat2();
-        void testGetLong();
-        void testGetLong2();
-        void testPutLong();
-        void testPutLong2();
-        void testGetInt();
-        void testGetInt2();
-        void testPutInt();
-        void testPutInt2();
-        void testGetShort();
-        void testGetShort2();
-        void testPutShort();
-        void testPutShort2();
-        void testWrapNullArray();
-
     };
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const int ByteArrayBufferTest::testData1Size = 100;
@@ -121,7 +66,7 @@ const int ByteArrayBufferTest::SMALL_TEST_LENGTH = 5;
 const int ByteArrayBufferTest::BUFFER_LENGTH = 250;
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::test() {
+TEST_F(ByteArrayBufferTest, test) {
 
     // Check that we have setup the array and our initial assumptions on state
     // are correct.  This is the first test run.
@@ -138,7 +83,7 @@ void ByteArrayBufferTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testArray() {
+TEST_F(ByteArrayBufferTest, testArray) {
 
     testBuffer1->put( testData1, testData1Size, 0, testData1Size );
     testBuffer1->position( 0 );
@@ -160,7 +105,7 @@ void ByteArrayBufferTest::testArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testArrayOffset() {
+TEST_F(ByteArrayBufferTest, testArrayOffset) {
 
     testBuffer1->put( testData1, testData1Size, 0, testData1Size );
     ASSERT_TRUE(testBuffer1->arrayOffset() == 0);
@@ -174,7 +119,7 @@ void ByteArrayBufferTest::testArrayOffset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testReadOnlyArray() {
+TEST_F(ByteArrayBufferTest, testReadOnlyArray) {
 
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
 
@@ -189,7 +134,7 @@ void ByteArrayBufferTest::testReadOnlyArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testAsReadOnlyBuffer() {
+TEST_F(ByteArrayBufferTest, testAsReadOnlyBuffer) {
 
     testBuffer1->clear();
     testBuffer1->mark();
@@ -218,7 +163,7 @@ void ByteArrayBufferTest::testAsReadOnlyBuffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testCompact() {
+TEST_F(ByteArrayBufferTest, testCompact) {
 
     // readonly's contents should be the same as buf
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
@@ -279,7 +224,7 @@ void ByteArrayBufferTest::testCompact() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testCompareTo() {
+TEST_F(ByteArrayBufferTest, testCompareTo) {
 
     // compare to self
     ASSERT_TRUE(0 == testBuffer1->compareTo( *testBuffer1 ));
@@ -323,7 +268,7 @@ void ByteArrayBufferTest::testCompareTo() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testDuplicate() {
+TEST_F(ByteArrayBufferTest, testDuplicate) {
 
     testBuffer1->clear();
     testBuffer1->mark();
@@ -356,7 +301,7 @@ void ByteArrayBufferTest::testDuplicate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testEquals() {
+TEST_F(ByteArrayBufferTest, testEquals) {
 
     // equal to self
     ASSERT_TRUE(testBuffer1->equals( *testBuffer1 ));
@@ -380,7 +325,7 @@ void ByteArrayBufferTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGet() {
+TEST_F(ByteArrayBufferTest, testGet) {
 
     testBuffer1->clear();
 
@@ -393,7 +338,7 @@ void ByteArrayBufferTest::testGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGetbyteArray() {
+TEST_F(ByteArrayBufferTest, testGetbyteArray) {
 
     std::vector<unsigned char> array;
     array.resize( 1 );
@@ -411,7 +356,7 @@ void ByteArrayBufferTest::testGetbyteArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGetbyteArray2() {
+TEST_F(ByteArrayBufferTest, testGetbyteArray2) {
 
     testBuffer1->clear();
     unsigned char* array = new unsigned char[testBuffer1->capacity()];
@@ -443,7 +388,7 @@ void ByteArrayBufferTest::testGetbyteArray2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGetWithIndex() {
+TEST_F(ByteArrayBufferTest, testGetWithIndex) {
 
     testBuffer1->clear();
 
@@ -456,7 +401,7 @@ void ByteArrayBufferTest::testGetWithIndex() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutbyte() {
+TEST_F(ByteArrayBufferTest, testPutbyte) {
 
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
 
@@ -478,7 +423,7 @@ void ByteArrayBufferTest::testPutbyte() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutbyteArray() {
+TEST_F(ByteArrayBufferTest, testPutbyteArray) {
 
     std::vector<unsigned char> array;
     array.push_back( 127 );
@@ -501,7 +446,7 @@ void ByteArrayBufferTest::testPutbyteArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutbyteArray2() {
+TEST_F(ByteArrayBufferTest, testPutbyteArray2) {
 
     testBuffer1->clear();
     unsigned char* array = new unsigned char[testBuffer1->capacity()];
@@ -545,7 +490,7 @@ void ByteArrayBufferTest::testPutbyteArray2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutByteBuffer() {
+TEST_F(ByteArrayBufferTest, testPutByteBuffer) {
 
     ByteBuffer* other = ByteBuffer::allocate( testBuffer1->capacity() );
 
@@ -579,7 +524,7 @@ void ByteArrayBufferTest::testPutByteBuffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutIndexed() {
+TEST_F(ByteArrayBufferTest, testPutIndexed) {
 
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -599,7 +544,7 @@ void ByteArrayBufferTest::testPutIndexed() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testSlice() {
+TEST_F(ByteArrayBufferTest, testSlice) {
 
     ASSERT_TRUE(testBuffer1->capacity() > SMALL_TEST_LENGTH);
     testBuffer1->position( 1 );
@@ -628,7 +573,7 @@ void ByteArrayBufferTest::testSlice() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testToString() {
+TEST_F(ByteArrayBufferTest, testToString) {
 
     std::string str = testBuffer1->toString();
     ASSERT_TRUE(str.find( "Byte" ) == 0 || str.find( "byte" ) == 0);
@@ -638,7 +583,7 @@ void ByteArrayBufferTest::testToString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGetChar() {
+TEST_F(ByteArrayBufferTest, testGetChar) {
 
     std::vector<char> chars;
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
@@ -655,7 +600,7 @@ void ByteArrayBufferTest::testGetChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGetChar2() {
+TEST_F(ByteArrayBufferTest, testGetChar2) {
 
     std::vector<char> chars;
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
@@ -672,7 +617,7 @@ void ByteArrayBufferTest::testGetChar2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutChar() {
+TEST_F(ByteArrayBufferTest, testPutChar) {
 
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -693,7 +638,7 @@ void ByteArrayBufferTest::testPutChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutChar2() {
+TEST_F(ByteArrayBufferTest, testPutChar2) {
 
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -715,7 +660,7 @@ void ByteArrayBufferTest::testPutChar2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGetDouble() {
+TEST_F(ByteArrayBufferTest, testGetDouble) {
 
     std::vector<double> values;
     for( int i = 0; i < testBuffer1->capacity() / (int)sizeof( double ); i++ ) {
@@ -734,7 +679,7 @@ void ByteArrayBufferTest::testGetDouble() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGetDouble2() {
+TEST_F(ByteArrayBufferTest, testGetDouble2) {
 
     std::vector<double> values;
     for( int i = 0; i < testBuffer1->capacity() / (int)sizeof( double ); i++ ) {
@@ -754,7 +699,7 @@ void ByteArrayBufferTest::testGetDouble2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutDouble() {
+TEST_F(ByteArrayBufferTest, testPutDouble) {
 
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -777,7 +722,7 @@ void ByteArrayBufferTest::testPutDouble() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutDouble2() {
+TEST_F(ByteArrayBufferTest, testPutDouble2) {
 
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -800,7 +745,7 @@ void ByteArrayBufferTest::testPutDouble2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGetFloat() {
+TEST_F(ByteArrayBufferTest, testGetFloat) {
 
     std::vector<float> values;
     for( int i = 0; i < testBuffer1->capacity() / (int)sizeof( float ); i++ ) {
@@ -819,7 +764,7 @@ void ByteArrayBufferTest::testGetFloat() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGetFloat2() {
+TEST_F(ByteArrayBufferTest, testGetFloat2) {
 
     std::vector<float> values;
     for( int i = 0; i < testBuffer1->capacity() / (int)sizeof( float ); i++ ) {
@@ -839,7 +784,7 @@ void ByteArrayBufferTest::testGetFloat2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutFloat() {
+TEST_F(ByteArrayBufferTest, testPutFloat) {
 
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -862,7 +807,7 @@ void ByteArrayBufferTest::testPutFloat() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutFloat2() {
+TEST_F(ByteArrayBufferTest, testPutFloat2) {
 
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -885,7 +830,7 @@ void ByteArrayBufferTest::testPutFloat2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGetLong() {
+TEST_F(ByteArrayBufferTest, testGetLong) {
 
     std::vector<long long> values;
     for( int i = 0; i < testBuffer1->capacity() / (int)sizeof( long long ); i++ ) {
@@ -904,7 +849,7 @@ void ByteArrayBufferTest::testGetLong() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGetLong2() {
+TEST_F(ByteArrayBufferTest, testGetLong2) {
 
     std::vector<long long> values;
     for( int i = 0; i < testBuffer1->capacity() / (int)sizeof( long long ); i++ ) {
@@ -924,7 +869,7 @@ void ByteArrayBufferTest::testGetLong2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutLong() {
+TEST_F(ByteArrayBufferTest, testPutLong) {
 
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -946,7 +891,7 @@ void ByteArrayBufferTest::testPutLong() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutLong2() {
+TEST_F(ByteArrayBufferTest, testPutLong2) {
 
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -968,7 +913,7 @@ void ByteArrayBufferTest::testPutLong2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGetInt() {
+TEST_F(ByteArrayBufferTest, testGetInt) {
 
     std::vector<int> values;
     for( int i = 0; i < testBuffer1->capacity() / (int)sizeof( int ); i++ ) {
@@ -987,7 +932,7 @@ void ByteArrayBufferTest::testGetInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGetInt2() {
+TEST_F(ByteArrayBufferTest, testGetInt2) {
 
     std::vector<int> values;
     for( int i = 0; i < testBuffer1->capacity() / (int)sizeof( int ); i++ ) {
@@ -1007,7 +952,7 @@ void ByteArrayBufferTest::testGetInt2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutInt() {
+TEST_F(ByteArrayBufferTest, testPutInt) {
 
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -1029,7 +974,7 @@ void ByteArrayBufferTest::testPutInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutInt2() {
+TEST_F(ByteArrayBufferTest, testPutInt2) {
 
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -1051,7 +996,7 @@ void ByteArrayBufferTest::testPutInt2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGetShort() {
+TEST_F(ByteArrayBufferTest, testGetShort) {
 
     std::vector<short> values;
     for( int i = 0; i < testBuffer1->capacity() / (int)sizeof( short ); i++ ) {
@@ -1070,7 +1015,7 @@ void ByteArrayBufferTest::testGetShort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testGetShort2() {
+TEST_F(ByteArrayBufferTest, testGetShort2) {
 
     std::vector<short> values;
     for( int i = 0; i < testBuffer1->capacity() / (int)sizeof( short ); i++ ) {
@@ -1090,7 +1035,7 @@ void ByteArrayBufferTest::testGetShort2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutShort() {
+TEST_F(ByteArrayBufferTest, testPutShort) {
 
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -1112,7 +1057,7 @@ void ByteArrayBufferTest::testPutShort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testPutShort2() {
+TEST_F(ByteArrayBufferTest, testPutShort2) {
 
     ByteBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -1134,53 +1079,7 @@ void ByteArrayBufferTest::testPutShort2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayBufferTest::testWrapNullArray() {
+TEST_F(ByteArrayBufferTest, testWrapNullArray) {
 
     ASSERT_THROW(testBuffer1->wrap( NULL, 0, 0, 3 ), NullPointerException) << ("Should throw a NullPointerException");
 }
-
-TEST_F(ByteArrayBufferTest, test) { test(); }
-TEST_F(ByteArrayBufferTest, testArray) { testArray(); }
-TEST_F(ByteArrayBufferTest, testArrayOffset) { testArrayOffset(); }
-TEST_F(ByteArrayBufferTest, testReadOnlyArray) { testReadOnlyArray(); }
-TEST_F(ByteArrayBufferTest, testAsReadOnlyBuffer) { testAsReadOnlyBuffer(); }
-TEST_F(ByteArrayBufferTest, testCompact) { testCompact(); }
-TEST_F(ByteArrayBufferTest, testCompareTo) { testCompareTo(); }
-TEST_F(ByteArrayBufferTest, testDuplicate) { testDuplicate(); }
-TEST_F(ByteArrayBufferTest, testEquals) { testEquals(); }
-TEST_F(ByteArrayBufferTest, testGet) { testGet(); }
-TEST_F(ByteArrayBufferTest, testGetbyteArray) { testGetbyteArray(); }
-TEST_F(ByteArrayBufferTest, testGetbyteArray2) { testGetbyteArray2(); }
-TEST_F(ByteArrayBufferTest, testGetWithIndex) { testGetWithIndex(); }
-TEST_F(ByteArrayBufferTest, testPutbyte) { testPutbyte(); }
-TEST_F(ByteArrayBufferTest, testPutbyteArray) { testPutbyteArray(); }
-TEST_F(ByteArrayBufferTest, testPutbyteArray2) { testPutbyteArray2(); }
-TEST_F(ByteArrayBufferTest, testPutByteBuffer) { testPutByteBuffer(); }
-TEST_F(ByteArrayBufferTest, testPutIndexed) { testPutIndexed(); }
-TEST_F(ByteArrayBufferTest, testSlice) { testSlice(); }
-TEST_F(ByteArrayBufferTest, testToString) { testToString(); }
-TEST_F(ByteArrayBufferTest, testGetChar) { testGetChar(); }
-TEST_F(ByteArrayBufferTest, testGetChar2) { testGetChar2(); }
-TEST_F(ByteArrayBufferTest, testPutChar) { testPutChar(); }
-TEST_F(ByteArrayBufferTest, testPutChar2) { testPutChar2(); }
-TEST_F(ByteArrayBufferTest, testGetDouble) { testGetDouble(); }
-TEST_F(ByteArrayBufferTest, testGetDouble2) { testGetDouble2(); }
-TEST_F(ByteArrayBufferTest, testPutDouble) { testPutDouble(); }
-TEST_F(ByteArrayBufferTest, testPutDouble2) { testPutDouble2(); }
-TEST_F(ByteArrayBufferTest, testGetFloat) { testGetFloat(); }
-TEST_F(ByteArrayBufferTest, testGetFloat2) { testGetFloat2(); }
-TEST_F(ByteArrayBufferTest, testPutFloat) { testPutFloat(); }
-TEST_F(ByteArrayBufferTest, testPutFloat2) { testPutFloat2(); }
-TEST_F(ByteArrayBufferTest, testGetLong) { testGetLong(); }
-TEST_F(ByteArrayBufferTest, testGetLong2) { testGetLong2(); }
-TEST_F(ByteArrayBufferTest, testPutLong) { testPutLong(); }
-TEST_F(ByteArrayBufferTest, testPutLong2) { testPutLong2(); }
-TEST_F(ByteArrayBufferTest, testGetInt) { testGetInt(); }
-TEST_F(ByteArrayBufferTest, testGetInt2) { testGetInt2(); }
-TEST_F(ByteArrayBufferTest, testPutInt) { testPutInt(); }
-TEST_F(ByteArrayBufferTest, testPutInt2) { testPutInt2(); }
-TEST_F(ByteArrayBufferTest, testGetShort) { testGetShort(); }
-TEST_F(ByteArrayBufferTest, testGetShort2) { testGetShort2(); }
-TEST_F(ByteArrayBufferTest, testPutShort) { testPutShort(); }
-TEST_F(ByteArrayBufferTest, testPutShort2) { testPutShort2(); }
-TEST_F(ByteArrayBufferTest, testWrapNullArray) { testWrapNullArray(); }

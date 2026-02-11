@@ -26,18 +26,15 @@ using namespace decaf::net;
 public:
 
         URISyntaxExceptionTest();
-        virtual ~URISyntaxExceptionTest() {}
 
-        void test();
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 URISyntaxExceptionTest::URISyntaxExceptionTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URISyntaxExceptionTest::test() {
+TEST_F(URISyntaxExceptionTest, test) {
 
     URISyntaxException e1( __FILE__, __LINE__, "str", "problem", 2);
     ASSERT_TRUE(e1.getReason() == "problem") << ("returned incorrect reason");
@@ -49,5 +46,3 @@ void URISyntaxExceptionTest::test() {
     ASSERT_TRUE(e2.getInput() == "str") << ("returned incorrect input");
     ASSERT_TRUE(-1 == (int)e2.getIndex()) << ("returned incorrect index");
 }
-
-TEST_F(URISyntaxExceptionTest, test) { test(); }

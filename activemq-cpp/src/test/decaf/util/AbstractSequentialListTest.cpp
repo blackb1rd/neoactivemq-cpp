@@ -34,14 +34,7 @@ public:
 
         virtual ~AbstractSequentialListTest();
 
-        void testAddAll();
-        void testGet();
-        void testSet();
-        void testRemove();
-
     };
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -147,7 +140,7 @@ AbstractSequentialListTest::~AbstractSequentialListTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractSequentialListTest::testAddAll() {
+TEST_F(AbstractSequentialListTest, testAddAll) {
 
     LinkedList<int> collection;
     for( int i = 0; i < 50; ++i ) {
@@ -160,7 +153,7 @@ void AbstractSequentialListTest::testAddAll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractSequentialListTest::testGet() {
+TEST_F(AbstractSequentialListTest, testGet) {
 
     SimpleList<int> list;
 
@@ -187,7 +180,7 @@ void AbstractSequentialListTest::testGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractSequentialListTest::testRemove() {
+TEST_F(AbstractSequentialListTest, testRemove) {
 
     SimpleList<int> list;
     list.add(1);
@@ -222,7 +215,7 @@ void AbstractSequentialListTest::testRemove() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractSequentialListTest::testSet() {
+TEST_F(AbstractSequentialListTest, testSet) {
 
     SimpleList<int> list;
 
@@ -233,8 +226,3 @@ void AbstractSequentialListTest::testSet() {
         // expected
     }
 }
-
-TEST_F(AbstractSequentialListTest, testAddAll) { testAddAll(); }
-TEST_F(AbstractSequentialListTest, testGet) { testGet(); }
-TEST_F(AbstractSequentialListTest, testSet) { testSet(); }
-TEST_F(AbstractSequentialListTest, testRemove) { testRemove(); }

@@ -31,33 +31,7 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class StlMapTest : public ::testing::Test
-    {
-public:
-
-        StlMapTest() {}
-        virtual ~StlMapTest() {}
-
-        void testConstructor();
-        void testContainsKey();
-        void testClear();
-        void testCopy();
-        void testSize();
-        void testGet();
-        void testPut();
-        void testPutAll();
-        void testRemove();
-        void testContiansValue();
-        void testIsEmpty();
-        void testEntrySet();
-        void testKeySet();
-        void testValues();
-        void testEntrySetIterator();
-        void testKeySetIterator();
-        void testValuesIterator();
-
-    };
-
+    class StlMapTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -72,7 +46,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testConstructor() {
+TEST_F(StlMapTest, testConstructor) {
 
     StlMap<string, int> map1;
     ASSERT_TRUE(map1.isEmpty());
@@ -93,7 +67,7 @@ void StlMapTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testContainsKey(){
+TEST_F(StlMapTest, testContainsKey){
 
     StlMap<string, bool> boolMap;
     ASSERT_TRUE(boolMap.containsKey("bob") == false);
@@ -105,7 +79,7 @@ void StlMapTest::testContainsKey(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testContiansValue() {
+TEST_F(StlMapTest, testContiansValue) {
 
     StlMap<string, bool> boolMap;
 
@@ -117,7 +91,7 @@ void StlMapTest::testContiansValue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testClear() {
+TEST_F(StlMapTest, testClear) {
 
     StlMap<string, bool> boolMap;
     boolMap.put( "bob", true );
@@ -129,7 +103,7 @@ void StlMapTest::testClear() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testCopy() {
+TEST_F(StlMapTest, testCopy) {
 
     StlMap<string, int> destMap;
     HashMap<string, int> srcMap;
@@ -167,7 +141,7 @@ void StlMapTest::testCopy() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testIsEmpty() {
+TEST_F(StlMapTest, testIsEmpty) {
 
     StlMap<string, bool> boolMap;
     boolMap.put( "bob", true );
@@ -179,7 +153,7 @@ void StlMapTest::testIsEmpty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testSize() {
+TEST_F(StlMapTest, testSize) {
 
     StlMap<string, bool> boolMap;
 
@@ -191,7 +165,7 @@ void StlMapTest::testSize() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testGet() {
+TEST_F(StlMapTest, testGet) {
 
     StlMap<string, bool> boolMap;
 
@@ -210,7 +184,7 @@ void StlMapTest::testGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testPut() {
+TEST_F(StlMapTest, testPut) {
 
     StlMap<string, bool> boolMap;
 
@@ -227,7 +201,7 @@ void StlMapTest::testPut() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testPutAll() {
+TEST_F(StlMapTest, testPutAll) {
 
     StlMap<string, int> destMap;
     HashMap<string, int> srcMap;
@@ -251,7 +225,7 @@ void StlMapTest::testPutAll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testRemove() {
+TEST_F(StlMapTest, testRemove) {
     StlMap<string, bool> boolMap;
 
     boolMap.put( "fred", true );
@@ -263,7 +237,7 @@ void StlMapTest::testRemove() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testEntrySet() {
+TEST_F(StlMapTest, testEntrySet) {
 
     StlMap<int, std::string> map;
 
@@ -286,7 +260,7 @@ void StlMapTest::testEntrySet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testKeySet() {
+TEST_F(StlMapTest, testKeySet) {
 
     StlMap<int, std::string> map;
     populateMap(map);
@@ -355,7 +329,7 @@ void StlMapTest::testKeySet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testValues() {
+TEST_F(StlMapTest, testValues) {
 
     StlMap<int, std::string> map;
     populateMap(map);
@@ -371,7 +345,7 @@ void StlMapTest::testValues() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testEntrySetIterator() {
+TEST_F(StlMapTest, testEntrySetIterator) {
 
     StlMap<int, std::string> map;
     populateMap(map);
@@ -402,7 +376,7 @@ void StlMapTest::testEntrySetIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testKeySetIterator() {
+TEST_F(StlMapTest, testKeySetIterator) {
 
     StlMap<int, std::string> map;
     populateMap(map);
@@ -432,7 +406,7 @@ void StlMapTest::testKeySetIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StlMapTest::testValuesIterator() {
+TEST_F(StlMapTest, testValuesIterator) {
 
     StlMap<int, std::string> map;
     populateMap(map);
@@ -460,21 +434,3 @@ void StlMapTest::testValuesIterator() {
     ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
     ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 }
-
-TEST_F(StlMapTest, testConstructor) { testConstructor(); }
-TEST_F(StlMapTest, testContainsKey) { testContainsKey(); }
-TEST_F(StlMapTest, testClear) { testClear(); }
-TEST_F(StlMapTest, testCopy) { testCopy(); }
-TEST_F(StlMapTest, testSize) { testSize(); }
-TEST_F(StlMapTest, testGet) { testGet(); }
-TEST_F(StlMapTest, testPut) { testPut(); }
-TEST_F(StlMapTest, testPutAll) { testPutAll(); }
-TEST_F(StlMapTest, testRemove) { testRemove(); }
-TEST_F(StlMapTest, testContiansValue) { testContiansValue(); }
-TEST_F(StlMapTest, testIsEmpty) { testIsEmpty(); }
-TEST_F(StlMapTest, testEntrySet) { testEntrySet(); }
-TEST_F(StlMapTest, testKeySet) { testKeySet(); }
-TEST_F(StlMapTest, testValues) { testValues(); }
-TEST_F(StlMapTest, testEntrySetIterator) { testEntrySetIterator(); }
-TEST_F(StlMapTest, testKeySetIterator) { testKeySetIterator(); }
-TEST_F(StlMapTest, testValuesIterator) { testValuesIterator(); }

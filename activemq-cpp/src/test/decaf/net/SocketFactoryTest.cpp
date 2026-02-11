@@ -44,16 +44,7 @@ public:
 
         static const int DEFAULT_PORT;
 
-    public:
-
-        SocketFactoryTest() {}
-        virtual ~SocketFactoryTest() {}
-
-        void test();
-        void testNoDelay();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const int SocketFactoryTest::DEFAULT_PORT = 23232;
@@ -152,7 +143,7 @@ namespace{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketFactoryTest::test() {
+TEST_F(SocketFactoryTest, test) {
     try {
         MyServerThread serverThread;
         serverThread.start();
@@ -193,7 +184,7 @@ void SocketFactoryTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketFactoryTest::testNoDelay() {
+TEST_F(SocketFactoryTest, testNoDelay) {
     try {
         MyServerThread serverThread;
         serverThread.start();
@@ -234,6 +225,3 @@ void SocketFactoryTest::testNoDelay() {
         ASSERT_TRUE(false);
     }
 }
-
-TEST_F(SocketFactoryTest, test) { test(); }
-TEST_F(SocketFactoryTest, testNoDelay) { testNoDelay(); }

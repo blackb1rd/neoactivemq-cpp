@@ -31,52 +31,15 @@ using namespace decaf::lang::exceptions;
 
     class ListTest : public ::testing::Test
     {
-private:
+protected:
 
         static const int SIZE;
 
     public:
 
         ListTest();
-        virtual ~ListTest() {}
-
-        void testConstructor1();
-        void testConstructor2();
-        void testConstructor3();
-        void testEquals();
-        void testContains();
-        void testIndexOf();
-        void testLastIndexOf();
-        void testClear();
-        void testCopy1();
-        void testCopy2();
-        void testSize();
-        void testGet();
-        void testSet();
-        void testAdd();
-        void testAdd2();
-        void testAdd3();
-        void testRemove();
-        void testRemove2();
-        void testRemove3();
-        void testRemoveAt();
-        void testIsEmpty();
-        void testToArray();
-        void testIterator();
-        void testAddAll1();
-        void testAddAll2();
-        void testAddAll3();
-        void testAddAll4();
-        void testAddAll5();
-        void testAddAll6();
-        void testAddAll7();
-        void testAddAll8();
-        void testAddAll9();
-        void testListIterator1IndexOutOfBoundsException();
-        void testListIterator2IndexOutOfBoundsException();
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const int ListTest::SIZE = 256;
@@ -126,7 +89,7 @@ ListTest::ListTest(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testConstructor1(){
+TEST_F(ListTest, testConstructor1){
 
     StlList<int> list;
 
@@ -145,7 +108,7 @@ void ListTest::testConstructor1(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testConstructor2(){
+TEST_F(ListTest, testConstructor2){
 
     StlList<int> list1;
 
@@ -165,7 +128,7 @@ void ListTest::testConstructor2(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testConstructor3(){
+TEST_F(ListTest, testConstructor3){
 
     StlSet<int> collection;
 
@@ -185,7 +148,7 @@ void ListTest::testConstructor3(){
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ListTest::testEquals() {
+TEST_F(ListTest, testEquals) {
 
     StlList<int> list1;
     populate( list1, 7 );
@@ -204,7 +167,7 @@ void ListTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testCopy1() {
+TEST_F(ListTest, testCopy1) {
 
     StlList<int> list1;
 
@@ -226,7 +189,7 @@ void ListTest::testCopy1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testCopy2() {
+TEST_F(ListTest, testCopy2) {
 
     StlSet<int> collection;
 
@@ -248,7 +211,7 @@ void ListTest::testCopy2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testContains(){
+TEST_F(ListTest, testContains){
 
     StlList<string> list;
     ASSERT_TRUE(list.contains( "bob" ) == false);
@@ -260,7 +223,7 @@ void ListTest::testContains(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testIndexOf(){
+TEST_F(ListTest, testIndexOf){
 
     StlList<string> list;
 
@@ -283,7 +246,7 @@ void ListTest::testIndexOf(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testLastIndexOf(){
+TEST_F(ListTest, testLastIndexOf){
 
     StlList<string> list;
 
@@ -307,7 +270,7 @@ void ListTest::testLastIndexOf(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testClear(){
+TEST_F(ListTest, testClear){
 
     StlList<string> list;
     list.add( "bob" );
@@ -319,7 +282,7 @@ void ListTest::testClear(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testIsEmpty(){
+TEST_F(ListTest, testIsEmpty){
 
     StlList<string> list;
     list.add( "bob" );
@@ -331,7 +294,7 @@ void ListTest::testIsEmpty(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testSize(){
+TEST_F(ListTest, testSize){
 
     StlList<string> list;
 
@@ -343,7 +306,7 @@ void ListTest::testSize(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testGet(){
+TEST_F(ListTest, testGet){
     StlList<string> list;
 
     list.add( "fred" );
@@ -360,7 +323,7 @@ void ListTest::testGet(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testSet(){
+TEST_F(ListTest, testSet){
     StlList<string> list;
 
     list.add( "fred" );
@@ -383,7 +346,7 @@ void ListTest::testSet(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testAdd(){
+TEST_F(ListTest, testAdd){
     StlList<string> list;
 
     list.add( "fred" );
@@ -397,7 +360,7 @@ void ListTest::testAdd(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testAdd2(){
+TEST_F(ListTest, testAdd2){
     StlList<string> list;
 
     list.add( "fred" );
@@ -429,7 +392,7 @@ void ListTest::testAdd2(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testAdd3() {
+TEST_F(ListTest, testAdd3) {
 
     StlList<int> array;
     populate( array, SIZE );
@@ -460,7 +423,7 @@ void ListTest::testAdd3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testAddAll1() {
+TEST_F(ListTest, testAddAll1) {
 
     StlList<int> array;
     populate( array, 100 );
@@ -484,7 +447,7 @@ void ListTest::testAddAll1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testAddAll2() {
+TEST_F(ListTest, testAddAll2) {
 
     StlList<int> emptyCollection;
     ASSERT_THROW(StlList<int>().addAll( -1, emptyCollection ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
@@ -544,7 +507,7 @@ void ListTest::testAddAll2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testAddAll3() {
+TEST_F(ListTest, testAddAll3) {
 
     StlList<int> list;
     list.addAll( 0, list );
@@ -556,7 +519,7 @@ void ListTest::testAddAll3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testAddAll4() {
+TEST_F(ListTest, testAddAll4) {
 
     StlList<std::string> array;
     StlList<std::string> blist;
@@ -574,7 +537,7 @@ void ListTest::testAddAll4() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testAddAll5() {
+TEST_F(ListTest, testAddAll5) {
 
     StlList<std::string> array;
     populate( array, 100 );
@@ -609,7 +572,7 @@ void ListTest::testAddAll5() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testAddAll6() {
+TEST_F(ListTest, testAddAll6) {
 
     StlList<int> arrayListA;
     arrayListA.add( 1 );
@@ -624,7 +587,7 @@ void ListTest::testAddAll6() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testAddAll7() {
+TEST_F(ListTest, testAddAll7) {
 
     StlList<int> arrayList;
     arrayList.add( 1 );
@@ -637,7 +600,7 @@ void ListTest::testAddAll7() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testAddAll8() {
+TEST_F(ListTest, testAddAll8) {
 
     StlList<std::string> arrayList;
     arrayList.add( "1" );
@@ -661,7 +624,7 @@ void ListTest::testAddAll8() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testAddAll9() {
+TEST_F(ListTest, testAddAll9) {
 
     StlList<std::string> list;
     list.add( "one" );
@@ -701,7 +664,7 @@ void ListTest::testAddAll9() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testRemove(){
+TEST_F(ListTest, testRemove){
     StlList<string> list;
 
     list.add( "fred" );
@@ -711,7 +674,7 @@ void ListTest::testRemove(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testRemove2(){
+TEST_F(ListTest, testRemove2){
     StlList<string> list;
 
     list.add( "fred" );
@@ -730,7 +693,7 @@ void ListTest::testRemove2(){
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ListTest::testRemove3() {
+TEST_F(ListTest, testRemove3) {
 
     StlList<int> list1;
     populate( list1, SIZE );
@@ -756,7 +719,7 @@ void ListTest::testRemove3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testRemoveAt() {
+TEST_F(ListTest, testRemoveAt) {
 
     StlList<int> array;
     populate( array, SIZE );
@@ -794,7 +757,7 @@ void ListTest::testRemoveAt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testToArray(){
+TEST_F(ListTest, testToArray){
 
     StlList<string> list;
 
@@ -809,7 +772,7 @@ void ListTest::testToArray(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ListTest::testIterator(){
+TEST_F(ListTest, testIterator){
 
     StlList<string> list;
 
@@ -843,7 +806,7 @@ void ListTest::testIterator(){
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ListTest::testListIterator1IndexOutOfBoundsException() {
+TEST_F(ListTest, testListIterator1IndexOutOfBoundsException) {
 
     StlList<int> list;
 
@@ -851,7 +814,7 @@ void ListTest::testListIterator1IndexOutOfBoundsException() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ListTest::testListIterator2IndexOutOfBoundsException() {
+TEST_F(ListTest, testListIterator2IndexOutOfBoundsException) {
 
     StlList<int> list;
     list.add( 1 );
@@ -859,38 +822,3 @@ void ListTest::testListIterator2IndexOutOfBoundsException() {
 
     ASSERT_THROW(std::unique_ptr< ListIterator<int> > it( list.listIterator( 100 ) ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
-
-TEST_F(ListTest, testConstructor1) { testConstructor1(); }
-TEST_F(ListTest, testConstructor2) { testConstructor2(); }
-TEST_F(ListTest, testConstructor3) { testConstructor3(); }
-TEST_F(ListTest, testEquals) { testEquals(); }
-TEST_F(ListTest, testContains) { testContains(); }
-TEST_F(ListTest, testIndexOf) { testIndexOf(); }
-TEST_F(ListTest, testLastIndexOf) { testLastIndexOf(); }
-TEST_F(ListTest, testClear) { testClear(); }
-TEST_F(ListTest, testCopy1) { testCopy1(); }
-TEST_F(ListTest, testCopy2) { testCopy2(); }
-TEST_F(ListTest, testSize) { testSize(); }
-TEST_F(ListTest, testGet) { testGet(); }
-TEST_F(ListTest, testSet) { testSet(); }
-TEST_F(ListTest, testAdd) { testAdd(); }
-TEST_F(ListTest, testAdd2) { testAdd2(); }
-TEST_F(ListTest, testAdd3) { testAdd3(); }
-TEST_F(ListTest, testRemove) { testRemove(); }
-TEST_F(ListTest, testRemove2) { testRemove2(); }
-TEST_F(ListTest, testRemove3) { testRemove3(); }
-TEST_F(ListTest, testRemoveAt) { testRemoveAt(); }
-TEST_F(ListTest, testIsEmpty) { testIsEmpty(); }
-TEST_F(ListTest, testToArray) { testToArray(); }
-TEST_F(ListTest, testIterator) { testIterator(); }
-TEST_F(ListTest, testAddAll1) { testAddAll1(); }
-TEST_F(ListTest, testAddAll2) { testAddAll2(); }
-TEST_F(ListTest, testAddAll3) { testAddAll3(); }
-TEST_F(ListTest, testAddAll4) { testAddAll4(); }
-TEST_F(ListTest, testAddAll5) { testAddAll5(); }
-TEST_F(ListTest, testAddAll6) { testAddAll6(); }
-TEST_F(ListTest, testAddAll7) { testAddAll7(); }
-TEST_F(ListTest, testAddAll8) { testAddAll8(); }
-TEST_F(ListTest, testAddAll9) { testAddAll9(); }
-TEST_F(ListTest, testListIterator1IndexOutOfBoundsException) { testListIterator1IndexOutOfBoundsException(); }
-TEST_F(ListTest, testListIterator2IndexOutOfBoundsException) { testListIterator2IndexOutOfBoundsException(); }

@@ -33,17 +33,7 @@ public:
         AbstractListTest();
         virtual ~AbstractListTest();
 
-        void testIterator();
-        void testListIterator();
-        void testIteratorNext();
-        void testRemove();
-        void testIndexOf();
-        void testLastIndexOf();
-        void testRemoveAt();
-
     };
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -210,7 +200,7 @@ AbstractListTest::~AbstractListTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractListTest::testIterator() {
+TEST_F(AbstractListTest, testIterator) {
 
     SimpleList<int> list;
     list.add( 10 );
@@ -223,7 +213,7 @@ void AbstractListTest::testIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractListTest::testListIterator() {
+TEST_F(AbstractListTest, testListIterator) {
 
     int tempValue;
     SimpleList<int> list;
@@ -258,7 +248,7 @@ void AbstractListTest::testListIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractListTest::testIteratorNext() {
+TEST_F(AbstractListTest, testIteratorNext) {
 
     MockArrayList<std::string> t;
     t.array.push_back( "a" );
@@ -298,7 +288,7 @@ void AbstractListTest::testIteratorNext() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractListTest::testRemove() {
+TEST_F(AbstractListTest, testRemove) {
 
     MockRemoveFailureArrayList<std::string> list;
     std::unique_ptr< Iterator<std::string> > iter( list.iterator() );
@@ -316,7 +306,7 @@ void AbstractListTest::testRemove() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractListTest::testIndexOf() {
+TEST_F(AbstractListTest, testIndexOf) {
 
     SimpleList<int> array;
     for( int i = 1; i < 6; i++ ) {
@@ -331,7 +321,7 @@ void AbstractListTest::testIndexOf() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractListTest::testLastIndexOf() {
+TEST_F(AbstractListTest, testLastIndexOf) {
 
     SimpleList<int> array;
     for( int i = 1; i < 6; i++ ) {
@@ -353,7 +343,7 @@ void AbstractListTest::testLastIndexOf() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractListTest::testRemoveAt() {
+TEST_F(AbstractListTest, testRemoveAt) {
 
     MockList<int> list;
 
@@ -371,11 +361,3 @@ void AbstractListTest::testRemoveAt() {
         // expected
     }
 }
-
-TEST_F(AbstractListTest, testIterator) { testIterator(); }
-TEST_F(AbstractListTest, testListIterator) { testListIterator(); }
-TEST_F(AbstractListTest, testIteratorNext) { testIteratorNext(); }
-TEST_F(AbstractListTest, testRemove) { testRemove(); }
-TEST_F(AbstractListTest, testIndexOf) { testIndexOf(); }
-TEST_F(AbstractListTest, testLastIndexOf) { testLastIndexOf(); }
-TEST_F(AbstractListTest, testRemoveAt) { testRemoveAt(); }

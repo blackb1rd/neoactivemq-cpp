@@ -30,10 +30,7 @@ public:
         CollectionsTest();
         virtual ~CollectionsTest();
 
-        void testReverseList();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 CollectionsTest::CollectionsTest() {
@@ -44,7 +41,7 @@ CollectionsTest::~CollectionsTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CollectionsTest::testReverseList() {
+TEST_F(CollectionsTest, testReverseList) {
 
     {
         ArrayList<int> list;
@@ -72,5 +69,3 @@ void CollectionsTest::testReverseList() {
         ASSERT_EQ(49, list.getFirst());
     }
 }
-
-TEST_F(CollectionsTest, testReverseList) { testReverseList(); }

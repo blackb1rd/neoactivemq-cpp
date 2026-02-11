@@ -26,7 +26,9 @@ using namespace activemq::cmsutil;
 
     class CmsAccessorTest : public ::testing::Test
     {
-class MyAccessor : public CmsAccessor {
+    protected:
+
+        class MyAccessor : public CmsAccessor {
         public:
 
             virtual ~MyAccessor() {}
@@ -43,22 +45,8 @@ class MyAccessor : public CmsAccessor {
         MyAccessor* accessor;
         DummyConnectionFactory* cf;
 
-    private:
-
-        CmsAccessorTest(const CmsAccessorTest&);
-        CmsAccessorTest& operator= (const CmsAccessorTest&);
-
-    public:
-
-        CmsAccessorTest() : accessor(), cf() {}
-        virtual ~CmsAccessorTest() {}
-
         void SetUp() override;
         void TearDown() override;
-
-        void testConnectionFactory();
-        void testAckMode();
-        void testCreateResources();
     };
 
 
@@ -76,13 +64,13 @@ void CmsAccessorTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsAccessorTest::testConnectionFactory() {
+TEST_F(CmsAccessorTest, testConnectionFactory) {
 
     ASSERT_TRUE(accessor->getConnectionFactory() == cf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsAccessorTest::testAckMode() {
+TEST_F(CmsAccessorTest, testAckMode) {
 
     ASSERT_TRUE(accessor->getSessionAcknowledgeMode() == cms::Session::AUTO_ACKNOWLEDGE);
 
@@ -92,7 +80,7 @@ void CmsAccessorTest::testAckMode() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsAccessorTest::testCreateResources() {
+TEST_F(CmsAccessorTest, testCreateResources) {
 
     cms::Connection* c = accessor->createConnection();
     ASSERT_TRUE(c != NULL);
@@ -109,7 +97,3 @@ void CmsAccessorTest::testCreateResources() {
 
     ASSERT_TRUE(s->getAcknowledgeMode() == cms::Session::CLIENT_ACKNOWLEDGE);
 }
-
-TEST_F(CmsAccessorTest, testConnectionFactory) { testConnectionFactory(); }
-TEST_F(CmsAccessorTest, testAckMode) { testAckMode(); }
-TEST_F(CmsAccessorTest, testCreateResources) { testCreateResources(); }

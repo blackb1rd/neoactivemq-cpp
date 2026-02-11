@@ -51,20 +51,11 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::util;
 
-    class BrokerIdTest : public ::testing::Test {
-public:
-
-        BrokerIdTest() {}
-        virtual ~BrokerIdTest() {}
-
-        virtual void test();
-        virtual void test2();
-
-    };
+    class BrokerIdTest : public ::testing::Test {};
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerIdTest::test() {
+TEST_F(BrokerIdTest, test) {
 
     BrokerId myCommand2;
     BrokerId myCommand3;
@@ -89,7 +80,7 @@ void BrokerIdTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerIdTest::test2() {
+TEST_F(BrokerIdTest, test2) {
 
     typedef PointerComparator< BrokerId > COMPARATOR;
 
@@ -118,6 +109,3 @@ void BrokerIdTest::test2() {
     ASSERT_TRUE(keys.at( 0 )->getValue() == "A");
     ASSERT_TRUE(keys.at( 1 )->getValue() == "C");
 }
-
-TEST_F(BrokerIdTest, test) { test(); }
-TEST_F(BrokerIdTest, test2) { test2(); }

@@ -31,19 +31,9 @@ using namespace activemq::wireformat::openwire;
 using namespace activemq::wireformat::openwire::marshal;
 
     class PrimitiveTypesMarshallerTest : public ::testing::Test {
-private:
+    protected:
 
         activemq::util::PrimitiveMap* unmarshaledMap;
-
-    private:
-
-        PrimitiveTypesMarshallerTest(const PrimitiveTypesMarshallerTest&);
-        PrimitiveTypesMarshallerTest& operator= (const PrimitiveTypesMarshallerTest&);
-
-    public:
-
-        PrimitiveTypesMarshallerTest() : unmarshaledMap() {}
-        virtual ~PrimitiveTypesMarshallerTest() {}
 
         void SetUp() override {
             this->unmarshaledMap = NULL;
@@ -54,15 +44,11 @@ private:
             this->unmarshaledMap = NULL;
         }
 
-        void test();
-        void testLists();
-        void testMaps();
-
     };
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveTypesMarshallerTest::test() {
+TEST_F(PrimitiveTypesMarshallerTest, test) {
 
     PrimitiveMap myMap;
 
@@ -121,7 +107,7 @@ void PrimitiveTypesMarshallerTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveTypesMarshallerTest::testLists() {
+TEST_F(PrimitiveTypesMarshallerTest, testLists) {
 
     PrimitiveMap myMap;
 
@@ -156,7 +142,7 @@ void PrimitiveTypesMarshallerTest::testLists() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveTypesMarshallerTest::testMaps() {
+TEST_F(PrimitiveTypesMarshallerTest, testMaps) {
 
     PrimitiveMap myMap;
 
@@ -189,7 +175,3 @@ void PrimitiveTypesMarshallerTest::testMaps() {
     ASSERT_TRUE(newMap.get() != NULL);
     ASSERT_TRUE(newMap->size() == 3);
 }
-
-TEST_F(PrimitiveTypesMarshallerTest, test) { test(); }
-TEST_F(PrimitiveTypesMarshallerTest, testLists) { testLists(); }
-TEST_F(PrimitiveTypesMarshallerTest, testMaps) { testMaps(); }

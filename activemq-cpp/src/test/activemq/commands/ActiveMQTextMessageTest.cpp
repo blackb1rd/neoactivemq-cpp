@@ -26,23 +26,11 @@ using namespace activemq::util;
 using namespace activemq::commands;
 
     class ActiveMQTextMessageTest : public ::testing::Test {
-public:
-
-        ActiveMQTextMessageTest() {}
-        virtual ~ActiveMQTextMessageTest() {}
-
-        void test();
-        void testClearBody();
-        void testReadOnlyBody();
-        void testWriteOnlyBody();
-        void testShallowCopy();
-        void testGetBytes();
-
     };
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTextMessageTest::test() {
+TEST_F(ActiveMQTextMessageTest, test) {
     ActiveMQTextMessage myMessage;
 
     ASSERT_TRUE(myMessage.getDataStructureType() == ActiveMQTextMessage::ID_ACTIVEMQTEXTMESSAGE);
@@ -60,7 +48,7 @@ void ActiveMQTextMessageTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTextMessageTest::testShallowCopy() {
+TEST_F(ActiveMQTextMessageTest, testShallowCopy) {
 
     ActiveMQTextMessage msg;
     std::string string1 = "str";
@@ -73,7 +61,7 @@ void ActiveMQTextMessageTest::testShallowCopy() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTextMessageTest::testGetBytes() {
+TEST_F(ActiveMQTextMessageTest, testGetBytes) {
 
     ActiveMQTextMessage msg;
     std::string str = "testText";
@@ -87,7 +75,7 @@ void ActiveMQTextMessageTest::testGetBytes() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTextMessageTest::testClearBody() {
+TEST_F(ActiveMQTextMessageTest, testClearBody) {
 
     ActiveMQTextMessage textMessage;
     textMessage.setText( "string" );
@@ -105,7 +93,7 @@ void ActiveMQTextMessageTest::testClearBody() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTextMessageTest::testReadOnlyBody() {
+TEST_F(ActiveMQTextMessageTest, testReadOnlyBody) {
     ActiveMQTextMessage textMessage;
     textMessage.setText( "test" );
     textMessage.setReadOnlyBody( true );
@@ -122,7 +110,7 @@ void ActiveMQTextMessageTest::testReadOnlyBody() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTextMessageTest::testWriteOnlyBody() {
+TEST_F(ActiveMQTextMessageTest, testWriteOnlyBody) {
 
     ActiveMQTextMessage textMessage;
     textMessage.setReadOnlyBody( false );
@@ -142,10 +130,3 @@ void ActiveMQTextMessageTest::testWriteOnlyBody() {
     } catch( MessageNotWriteableException& mnwe ) {
     }
 }
-
-TEST_F(ActiveMQTextMessageTest, test) { test(); }
-TEST_F(ActiveMQTextMessageTest, testClearBody) { testClearBody(); }
-TEST_F(ActiveMQTextMessageTest, testReadOnlyBody) { testReadOnlyBody(); }
-TEST_F(ActiveMQTextMessageTest, testWriteOnlyBody) { testWriteOnlyBody(); }
-TEST_F(ActiveMQTextMessageTest, testShallowCopy) { testShallowCopy(); }
-TEST_F(ActiveMQTextMessageTest, testGetBytes) { testGetBytes(); }

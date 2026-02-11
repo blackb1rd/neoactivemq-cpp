@@ -41,33 +41,6 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::util::concurrent;
 
-    class AMQLogTest : public ::testing::Test {
-public:
-
-        AMQLogTest();
-        virtual ~AMQLogTest();
-
-        void SetUp() override;
-        void TearDown() override;
-
-        // Global logging tests
-        void testGlobalLogLevel();
-        void testGlobalLogLevelParsing();
-        void testGlobalLogIsEnabled();
-
-        // Context-specific logging tests
-        void testContextLogLevel();
-        void testMultiConnectionLogging();
-        void testContextOutputHandler();
-        void testHandlerWithRecordOnlyMode();
-        void testMultiThreadContextIsolation();
-
-        // Flight recorder tests
-        void testFlightRecorder();
-
-    };
-
-
 // Use aliases to avoid Windows macro conflicts with enum values
 static const AMQLogLevel LOG_LEVEL_NONE  = AMQLogLevel::NONE;
 static const AMQLogLevel LOG_LEVEL_ERROR = AMQLogLevel::ERROR;
@@ -75,49 +48,43 @@ static const AMQLogLevel LOG_LEVEL_WARN  = AMQLogLevel::WARN;
 static const AMQLogLevel LOG_LEVEL_INFO  = AMQLogLevel::INFO;
 static const AMQLogLevel LOG_LEVEL_DEBUG = AMQLogLevel::DEBUG;
 
-////////////////////////////////////////////////////////////////////////////////
-AMQLogTest::AMQLogTest() {
-}
+class AMQLogTest : public ::testing::Test {
+public:
 
-////////////////////////////////////////////////////////////////////////////////
-AMQLogTest::~AMQLogTest() {
-}
+    void SetUp() override {
+        // Reset logger state before each test
+        AMQLogger::setLevel(LOG_LEVEL_NONE);
+        AMQLogger::clearLogContext();
 
-////////////////////////////////////////////////////////////////////////////////
-void AMQLogTest::SetUp() {
-    // Reset logger state before each test
-    AMQLogger::setLevel(LOG_LEVEL_NONE);
-    AMQLogger::clearLogContext();
+        // Disable record-only mode for tests that need actual log output
+        AMQLogger::setRecordOnlyMode(false);
 
-    // Disable record-only mode for tests that need actual log output
-    AMQLogger::setRecordOnlyMode(false);
+        // Clear any context-specific settings
+        AMQLogger::clearLevel("failover://server1,server2");
+        AMQLogger::clearLevel("tcp://server3:61616");
+        AMQLogger::clearContextOutputHandler("failover://server1,server2");
+        AMQLogger::clearContextOutputHandler("tcp://server3:61616");
 
-    // Clear any context-specific settings
-    AMQLogger::clearLevel("failover://server1,server2");
-    AMQLogger::clearLevel("tcp://server3:61616");
-    AMQLogger::clearContextOutputHandler("failover://server1,server2");
-    AMQLogger::clearContextOutputHandler("tcp://server3:61616");
+        // Shutdown flight recorder if enabled
+        AMQLogger::shutdownFlightRecorder();
+    }
 
-    // Shutdown flight recorder if enabled
-    AMQLogger::shutdownFlightRecorder();
-}
+    void TearDown() override {
+        // Clean up after each test
+        AMQLogger::setLevel(LOG_LEVEL_NONE);
+        AMQLogger::clearLogContext();
+        AMQLogger::shutdownFlightRecorder();
 
-////////////////////////////////////////////////////////////////////////////////
-void AMQLogTest::TearDown() {
-    // Clean up after each test
-    AMQLogger::setLevel(LOG_LEVEL_NONE);
-    AMQLogger::clearLogContext();
-    AMQLogger::shutdownFlightRecorder();
-
-    // Restore record-only mode to default state expected by test main
-    AMQLogger::setRecordOnlyMode(true);
-}
+        // Restore record-only mode to default state expected by test main
+        AMQLogger::setRecordOnlyMode(true);
+    }
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Global Logging Tests
 ////////////////////////////////////////////////////////////////////////////////
 
-void AMQLogTest::testGlobalLogLevel() {
+TEST_F(AMQLogTest, testGlobalLogLevel) {
     // Default should be NONE
     ASSERT_EQ(LOG_LEVEL_NONE, AMQLogger::getLevel());
 
@@ -140,7 +107,7 @@ void AMQLogTest::testGlobalLogLevel() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AMQLogTest::testGlobalLogLevelParsing() {
+TEST_F(AMQLogTest, testGlobalLogLevelParsing) {
     // Test case-insensitive parsing
     ASSERT_EQ(LOG_LEVEL_DEBUG, AMQLogger::parseLevel("debug"));
     ASSERT_EQ(LOG_LEVEL_DEBUG, AMQLogger::parseLevel("DEBUG"));
@@ -161,7 +128,7 @@ void AMQLogTest::testGlobalLogLevelParsing() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AMQLogTest::testGlobalLogIsEnabled() {
+TEST_F(AMQLogTest, testGlobalLogIsEnabled) {
     // With NONE level, nothing should be enabled
     AMQLogger::setLevel(LOG_LEVEL_NONE);
     ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_ERROR));
@@ -202,7 +169,7 @@ void AMQLogTest::testGlobalLogIsEnabled() {
 // Context-Specific Logging Tests
 ////////////////////////////////////////////////////////////////////////////////
 
-void AMQLogTest::testContextLogLevel() {
+TEST_F(AMQLogTest, testContextLogLevel) {
     const std::string context1 = "failover://server1,server2";
     const std::string context2 = "tcp://server3:61616";
 
@@ -233,7 +200,7 @@ void AMQLogTest::testContextLogLevel() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AMQLogTest::testMultiConnectionLogging() {
+TEST_F(AMQLogTest, testMultiConnectionLogging) {
     // Simulates two connections:
     // Connection 1: failover(server1, server2) - DEBUG level
     // Connection 2: server3 - ERROR level only
@@ -279,7 +246,7 @@ void AMQLogTest::testMultiConnectionLogging() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AMQLogTest::testContextOutputHandler() {
+TEST_F(AMQLogTest, testContextOutputHandler) {
     const std::string connection1 = "failover://server1,server2";
     const std::string connection2 = "tcp://server3:61616";
 
@@ -332,7 +299,7 @@ void AMQLogTest::testContextOutputHandler() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AMQLogTest::testHandlerWithRecordOnlyMode() {
+TEST_F(AMQLogTest, testHandlerWithRecordOnlyMode) {
     // Test that handlers are ALWAYS called even when recordOnlyMode is enabled
     // This is important for users who want to capture logs to their own system
 
@@ -439,7 +406,7 @@ namespace {
     };
 }
 
-void AMQLogTest::testMultiThreadContextIsolation() {
+TEST_F(AMQLogTest, testMultiThreadContextIsolation) {
     const std::string connection1 = "failover://server1,server2";
     const std::string connection2 = "tcp://server3:61616";
 
@@ -487,7 +454,7 @@ void AMQLogTest::testMultiThreadContextIsolation() {
 // Flight Recorder Tests
 ////////////////////////////////////////////////////////////////////////////////
 
-void AMQLogTest::testFlightRecorder() {
+TEST_F(AMQLogTest, testFlightRecorder) {
     // Initialize flight recorder with small buffer for testing
     AMQLogger::initializeFlightRecorder(0.001, 100, 1000);
 
@@ -525,13 +492,3 @@ void AMQLogTest::testFlightRecorder() {
     AMQLogger::shutdownFlightRecorder();
     ASSERT_TRUE(!AMQLogger::isFlightRecorderEnabled());
 }
-
-TEST_F(AMQLogTest, testGlobalLogLevel) { testGlobalLogLevel(); }
-TEST_F(AMQLogTest, testGlobalLogLevelParsing) { testGlobalLogLevelParsing(); }
-TEST_F(AMQLogTest, testGlobalLogIsEnabled) { testGlobalLogIsEnabled(); }
-TEST_F(AMQLogTest, testContextLogLevel) { testContextLogLevel(); }
-TEST_F(AMQLogTest, testMultiConnectionLogging) { testMultiConnectionLogging(); }
-TEST_F(AMQLogTest, testContextOutputHandler) { testContextOutputHandler(); }
-TEST_F(AMQLogTest, testHandlerWithRecordOnlyMode) { testHandlerWithRecordOnlyMode(); }
-TEST_F(AMQLogTest, testMultiThreadContextIsolation) { testMultiThreadContextIsolation(); }
-TEST_F(AMQLogTest, testFlightRecorder) { testFlightRecorder(); }

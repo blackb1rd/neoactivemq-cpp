@@ -39,63 +39,12 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class StringBuilderTest : public ::testing::Test {
-    private:
 public:
 
         StringBuilderTest();
         virtual ~StringBuilderTest();
 
-        void testDefaultConstructor();
-        void testConstructorInt();
-        void testConstructorString();
-        void testAppendBoolean();
-        void testAppendChar();
-        void testAppendCharArray();
-        void testAppendCharArrayIntInt();
-        void testAppendCharSequence();
-        void testAppendCharSequenceIntInt();
-        void testAppendShort();
-        void testAppendInt();
-        void testAppendLong();
-        void testAppendDouble();
-        void testAppendFloat();
-        void testAppendString();
-        void testAppendStringBuffer();
-        void testAppendRawPointer();
-        void testAppendPointer();
-        void testCapacity();
-        void testCharAt();
-        void testDeleteRange();
-        void testDeleteCharAt();
-        void testEnsureCapacity();
-        void testGetChars();
-        void testIndexOfString();
-        void testIndexOfStringInt();
-        void testLastIndexOfString();
-        void testLastIndexOfStringInt();
-        void testReverse();
-        void testSubSequence();
-        void testSubstringInt();
-        void testSubstringIntInt();
-        void testInsertChar();
-        void testInsertBoolean();
-        void testInsertCharArray();
-        void testInsertCharArrayWithOffset();
-        void testInsertString();
-        void testInsertStdString();
-        void testInsertCharSequence();
-        void testInsertCharSequenceIntInt();
-        void testInsertShort();
-        void testInsertInt();
-        void testInsertLong();
-        void testInsertFloat();
-        void testInsertDouble();
-        void testInsertPointer();
-        void testInsertRawPointer();
-        void testReplace();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 StringBuilderTest::StringBuilderTest() {
@@ -106,13 +55,13 @@ StringBuilderTest::~StringBuilderTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testDefaultConstructor() {
+TEST_F(StringBuilderTest, testDefaultConstructor) {
     StringBuilder builder;
     ASSERT_EQ(16, builder.capacity());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testConstructorInt() {
+TEST_F(StringBuilderTest, testConstructorInt) {
 
     StringBuilder sb(24);
     ASSERT_EQ(24, sb.capacity());
@@ -123,7 +72,7 @@ void StringBuilderTest::testConstructorInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testConstructorString() {
+TEST_F(StringBuilderTest, testConstructorString) {
 
     StringBuilder sb("fixture");
     ASSERT_EQ(String("fixture"), sb.toString());
@@ -131,7 +80,7 @@ void StringBuilderTest::testConstructorString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testAppendBoolean() {
+TEST_F(StringBuilderTest, testAppendBoolean) {
 
     StringBuilder sb;
     sb.append(true);
@@ -142,7 +91,7 @@ void StringBuilderTest::testAppendBoolean() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testAppendChar() {
+TEST_F(StringBuilderTest, testAppendChar) {
     StringBuilder sb;
     sb.append('a');
     ASSERT_EQ(String("a"), sb.toString());
@@ -152,7 +101,7 @@ void StringBuilderTest::testAppendChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testAppendCharArray() {
+TEST_F(StringBuilderTest, testAppendCharArray) {
 
     StringBuilder sb;
     sb.append("ab");
@@ -165,7 +114,7 @@ void StringBuilderTest::testAppendCharArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testAppendCharArrayIntInt() {
+TEST_F(StringBuilderTest, testAppendCharArrayIntInt) {
 
     StringBuilder sb;
     sb.append("ab", 0, 2);
@@ -196,7 +145,7 @@ void StringBuilderTest::testAppendCharArrayIntInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testAppendCharSequence() {
+TEST_F(StringBuilderTest, testAppendCharSequence) {
 
     String ab("ab");
     String cd("cd");
@@ -213,7 +162,7 @@ void StringBuilderTest::testAppendCharSequence() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testAppendCharSequenceIntInt() {
+TEST_F(StringBuilderTest, testAppendCharSequenceIntInt) {
 
     String ab("ab");
     String cd("cd");
@@ -237,7 +186,7 @@ void StringBuilderTest::testAppendCharSequenceIntInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testAppendShort() {
+TEST_F(StringBuilderTest, testAppendShort) {
 
     short a = 1;
     short b = 0;
@@ -261,7 +210,7 @@ void StringBuilderTest::testAppendShort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testAppendInt() {
+TEST_F(StringBuilderTest, testAppendInt) {
 
     int a = 1;
     int b = 0;
@@ -285,7 +234,7 @@ void StringBuilderTest::testAppendInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testAppendLong() {
+TEST_F(StringBuilderTest, testAppendLong) {
     StringBuilder sb;
     sb.append(1LL);
     ASSERT_EQ(String::valueOf(1LL), sb.toString());
@@ -304,7 +253,7 @@ void StringBuilderTest::testAppendLong() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testAppendDouble() {
+TEST_F(StringBuilderTest, testAppendDouble) {
     StringBuilder sb;
     sb.append(1.0);
     ASSERT_EQ(String::valueOf(1.0), sb.toString());
@@ -332,7 +281,7 @@ void StringBuilderTest::testAppendDouble() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testAppendFloat() {
+TEST_F(StringBuilderTest, testAppendFloat) {
     StringBuilder sb;
     sb.append(1.0f);
     ASSERT_EQ(String::valueOf(1.0f), sb.toString());
@@ -360,7 +309,7 @@ void StringBuilderTest::testAppendFloat() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testAppendString() {
+TEST_F(StringBuilderTest, testAppendString) {
     StringBuilder sb;
     sb.append(String("ab"));
     ASSERT_EQ(String("ab"), sb.toString());
@@ -370,7 +319,7 @@ void StringBuilderTest::testAppendString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testAppendStringBuffer() {
+TEST_F(StringBuilderTest, testAppendStringBuffer) {
 
     StringBuilder sb;
     sb.append(StringBuffer("ab"));
@@ -395,7 +344,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testAppendRawPointer() {
+TEST_F(StringBuilderTest, testAppendRawPointer) {
 
     MyObject obj;
     StringBuilder sb;
@@ -404,7 +353,7 @@ void StringBuilderTest::testAppendRawPointer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testAppendPointer() {
+TEST_F(StringBuilderTest, testAppendPointer) {
 
     Pointer<MyObject> obj(new MyObject);
     StringBuilder sb;
@@ -413,7 +362,7 @@ void StringBuilderTest::testAppendPointer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testCapacity() {
+TEST_F(StringBuilderTest, testCapacity) {
     StringBuilder sb;
     ASSERT_EQ(16, sb.capacity());
     sb.append("0123456789ABCDEF0123456789ABCDEF");
@@ -421,7 +370,7 @@ void StringBuilderTest::testCapacity() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testCharAt() {
+TEST_F(StringBuilderTest, testCharAt) {
 
     String fixture = "0123456789";
     StringBuilder sb(fixture);
@@ -438,7 +387,7 @@ void StringBuilderTest::testCharAt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testDeleteRange() {
+TEST_F(StringBuilderTest, testDeleteRange) {
 
     String fixture = "0123456789";
     StringBuilder sb(fixture);
@@ -479,7 +428,7 @@ void StringBuilderTest::testDeleteRange() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testDeleteCharAt() {
+TEST_F(StringBuilderTest, testDeleteCharAt) {
 
     String fixture = "0123456789";
     StringBuilder sb(fixture);
@@ -508,7 +457,7 @@ void StringBuilderTest::testDeleteCharAt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testEnsureCapacity() {
+TEST_F(StringBuilderTest, testEnsureCapacity) {
 
     StringBuilder sb(5);
     ASSERT_EQ(5, sb.capacity());
@@ -521,7 +470,7 @@ void StringBuilderTest::testEnsureCapacity() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testGetChars() {
+TEST_F(StringBuilderTest, testGetChars) {
 
     String fixture = "0123456789";
     StringBuilder sb(fixture);
@@ -573,7 +522,7 @@ void StringBuilderTest::testGetChars() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testIndexOfString() {
+TEST_F(StringBuilderTest, testIndexOfString) {
 
     String fixture = "0123456789";
     StringBuilder sb(fixture);
@@ -585,7 +534,7 @@ void StringBuilderTest::testIndexOfString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testIndexOfStringInt() {
+TEST_F(StringBuilderTest, testIndexOfStringInt) {
 
     String fixture = "0123456789";
     StringBuilder sb(fixture);
@@ -606,7 +555,7 @@ void StringBuilderTest::testIndexOfStringInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testLastIndexOfString() {
+TEST_F(StringBuilderTest, testLastIndexOfString) {
 
     String fixture = "0123456789";
     StringBuilder sb(fixture);
@@ -617,7 +566,7 @@ void StringBuilderTest::testLastIndexOfString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testLastIndexOfStringInt() {
+TEST_F(StringBuilderTest, testLastIndexOfStringInt) {
 
     String fixture = "0123456789";
     StringBuilder sb(fixture);
@@ -671,7 +620,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testReverse() {
+TEST_F(StringBuilderTest, testReverse) {
 
     String fixture = "0123456789";
     StringBuilder sb1(fixture);
@@ -703,7 +652,7 @@ void StringBuilderTest::testReverse() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testSubSequence() {
+TEST_F(StringBuilderTest, testSubSequence) {
 
     String fixture = "0123456789";
     StringBuilder sb(fixture);
@@ -723,7 +672,7 @@ void StringBuilderTest::testSubSequence() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testSubstringInt() {
+TEST_F(StringBuilderTest, testSubstringInt) {
 
     String fixture = "0123456789";
     StringBuilder sb(fixture);
@@ -741,7 +690,7 @@ void StringBuilderTest::testSubstringInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testSubstringIntInt() {
+TEST_F(StringBuilderTest, testSubstringIntInt) {
 
     String fixture = "0123456789";
     StringBuilder sb(fixture);
@@ -761,7 +710,7 @@ void StringBuilderTest::testSubstringIntInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testInsertChar() {
+TEST_F(StringBuilderTest, testInsertChar) {
 
     String fixture = "0000";
     StringBuilder sb(fixture);
@@ -792,7 +741,7 @@ void StringBuilderTest::testInsertChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testInsertBoolean() {
+TEST_F(StringBuilderTest, testInsertBoolean) {
 
     String fixture = "0000";
     StringBuilder sb(fixture);
@@ -823,7 +772,7 @@ void StringBuilderTest::testInsertBoolean() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testInsertCharArray() {
+TEST_F(StringBuilderTest, testInsertCharArray) {
 
     String fixture = "0000";
     StringBuilder sb(fixture);
@@ -851,7 +800,7 @@ void StringBuilderTest::testInsertCharArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testInsertCharArrayWithOffset() {
+TEST_F(StringBuilderTest, testInsertCharArrayWithOffset) {
 
     String fixture = "0000";
     StringBuilder sb(fixture);
@@ -900,7 +849,7 @@ void StringBuilderTest::testInsertCharArrayWithOffset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testInsertString() {
+TEST_F(StringBuilderTest, testInsertString) {
 
     String fixture = "0000";
     StringBuilder sb(fixture);
@@ -926,7 +875,7 @@ void StringBuilderTest::testInsertString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testInsertStdString() {
+TEST_F(StringBuilderTest, testInsertStdString) {
 
     std::string fixture = "0000";
     StringBuilder sb(fixture);
@@ -952,7 +901,7 @@ void StringBuilderTest::testInsertStdString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testInsertCharSequence() {
+TEST_F(StringBuilderTest, testInsertCharSequence) {
 
     String fixture = "0000";
     String ab("ab");
@@ -984,7 +933,7 @@ void StringBuilderTest::testInsertCharSequence() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testInsertCharSequenceIntInt() {
+TEST_F(StringBuilderTest, testInsertCharSequenceIntInt) {
 
     String fixture = "0000";
     String ab("ab");
@@ -1037,7 +986,7 @@ void StringBuilderTest::testInsertCharSequenceIntInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testInsertDouble() {
+TEST_F(StringBuilderTest, testInsertDouble) {
 
     String fixture = "0000";
     StringBuilder sb(fixture);
@@ -1068,7 +1017,7 @@ void StringBuilderTest::testInsertDouble() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testInsertFloat() {
+TEST_F(StringBuilderTest, testInsertFloat) {
 
     String fixture = "0000";
     StringBuilder sb(fixture);
@@ -1099,7 +1048,7 @@ void StringBuilderTest::testInsertFloat() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testInsertShort() {
+TEST_F(StringBuilderTest, testInsertShort) {
 
     String fixture = "0000";
     StringBuilder sb(fixture);
@@ -1130,7 +1079,7 @@ void StringBuilderTest::testInsertShort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testInsertInt() {
+TEST_F(StringBuilderTest, testInsertInt) {
 
     String fixture = "0000";
     StringBuilder sb(fixture);
@@ -1161,7 +1110,7 @@ void StringBuilderTest::testInsertInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testInsertLong() {
+TEST_F(StringBuilderTest, testInsertLong) {
 
     String fixture = "0000";
     StringBuilder sb(fixture);
@@ -1192,7 +1141,7 @@ void StringBuilderTest::testInsertLong() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testInsertRawPointer() {
+TEST_F(StringBuilderTest, testInsertRawPointer) {
 
     String fixture = "0000";
     MyObject obj;
@@ -1208,7 +1157,7 @@ void StringBuilderTest::testInsertRawPointer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testInsertPointer() {
+TEST_F(StringBuilderTest, testInsertPointer) {
 
     String fixture = "0000";
     Pointer<MyObject> obj(new MyObject);
@@ -1224,7 +1173,7 @@ void StringBuilderTest::testInsertPointer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringBuilderTest::testReplace() {
+TEST_F(StringBuilderTest, testReplace) {
 
     String fixture = "0000";
     StringBuilder sb(fixture);
@@ -1261,52 +1210,3 @@ void StringBuilderTest::testReplace() {
     buffer.replace(2, 6, "XXX");
     ASSERT_EQ(String("12XXX7"), buffer.toString());
 }
-
-TEST_F(StringBuilderTest, testDefaultConstructor) { testDefaultConstructor(); }
-TEST_F(StringBuilderTest, testConstructorInt) { testConstructorInt(); }
-TEST_F(StringBuilderTest, testConstructorString) { testConstructorString(); }
-TEST_F(StringBuilderTest, testAppendBoolean) { testAppendBoolean(); }
-TEST_F(StringBuilderTest, testAppendChar) { testAppendChar(); }
-TEST_F(StringBuilderTest, testAppendCharArray) { testAppendCharArray(); }
-TEST_F(StringBuilderTest, testAppendCharArrayIntInt) { testAppendCharArrayIntInt(); }
-TEST_F(StringBuilderTest, testAppendCharSequence) { testAppendCharSequence(); }
-TEST_F(StringBuilderTest, testAppendCharSequenceIntInt) { testAppendCharSequenceIntInt(); }
-TEST_F(StringBuilderTest, testAppendShort) { testAppendShort(); }
-TEST_F(StringBuilderTest, testAppendInt) { testAppendInt(); }
-TEST_F(StringBuilderTest, testAppendLong) { testAppendLong(); }
-TEST_F(StringBuilderTest, testAppendDouble) { testAppendDouble(); }
-TEST_F(StringBuilderTest, testAppendFloat) { testAppendFloat(); }
-TEST_F(StringBuilderTest, testAppendString) { testAppendString(); }
-TEST_F(StringBuilderTest, testAppendStringBuffer) { testAppendStringBuffer(); }
-TEST_F(StringBuilderTest, testAppendRawPointer) { testAppendRawPointer(); }
-TEST_F(StringBuilderTest, testAppendPointer) { testAppendPointer(); }
-TEST_F(StringBuilderTest, testCapacity) { testCapacity(); }
-TEST_F(StringBuilderTest, testCharAt) { testCharAt(); }
-TEST_F(StringBuilderTest, testDeleteRange) { testDeleteRange(); }
-TEST_F(StringBuilderTest, testDeleteCharAt) { testDeleteCharAt(); }
-TEST_F(StringBuilderTest, testEnsureCapacity) { testEnsureCapacity(); }
-TEST_F(StringBuilderTest, testGetChars) { testGetChars(); }
-TEST_F(StringBuilderTest, testIndexOfString) { testIndexOfString(); }
-TEST_F(StringBuilderTest, testIndexOfStringInt) { testIndexOfStringInt(); }
-TEST_F(StringBuilderTest, testLastIndexOfString) { testLastIndexOfString(); }
-TEST_F(StringBuilderTest, testLastIndexOfStringInt) { testLastIndexOfStringInt(); }
-TEST_F(StringBuilderTest, testReverse) { testReverse(); }
-TEST_F(StringBuilderTest, testSubSequence) { testSubSequence(); }
-TEST_F(StringBuilderTest, testSubstringInt) { testSubstringInt(); }
-TEST_F(StringBuilderTest, testSubstringIntInt) { testSubstringIntInt(); }
-TEST_F(StringBuilderTest, testInsertChar) { testInsertChar(); }
-TEST_F(StringBuilderTest, testInsertBoolean) { testInsertBoolean(); }
-TEST_F(StringBuilderTest, testInsertCharArray) { testInsertCharArray(); }
-TEST_F(StringBuilderTest, testInsertCharArrayWithOffset) { testInsertCharArrayWithOffset(); }
-TEST_F(StringBuilderTest, testInsertString) { testInsertString(); }
-TEST_F(StringBuilderTest, testInsertStdString) { testInsertStdString(); }
-TEST_F(StringBuilderTest, testInsertCharSequence) { testInsertCharSequence(); }
-TEST_F(StringBuilderTest, testInsertCharSequenceIntInt) { testInsertCharSequenceIntInt(); }
-TEST_F(StringBuilderTest, testInsertShort) { testInsertShort(); }
-TEST_F(StringBuilderTest, testInsertInt) { testInsertInt(); }
-TEST_F(StringBuilderTest, testInsertLong) { testInsertLong(); }
-TEST_F(StringBuilderTest, testInsertFloat) { testInsertFloat(); }
-TEST_F(StringBuilderTest, testInsertDouble) { testInsertDouble(); }
-TEST_F(StringBuilderTest, testInsertPointer) { testInsertPointer(); }
-TEST_F(StringBuilderTest, testInsertRawPointer) { testInsertRawPointer(); }
-TEST_F(StringBuilderTest, testReplace) { testReplace(); }

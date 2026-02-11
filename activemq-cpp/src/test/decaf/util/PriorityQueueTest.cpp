@@ -30,37 +30,7 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class PriorityQueueTest : public ::testing::Test {
-public:
-
-        PriorityQueueTest() {}
-        virtual ~PriorityQueueTest() {}
-
-        void testConstructor_1();
-        void testConstructor_2();
-        void testConstructor_3();
-        void testAssignment();
-        void testSize();
-        void testOfferString();
-        void testPoll();
-        void testPollEmpty();
-        void testPeek();
-        void testPeekEmpty();
-        void testClear();
-        void testAdd();
-        void testAddAll();
-        void testRemove();
-        void testRemoveUsingComparator();
-        void testRemoveNotExists();
-        void testComparator();
-        void testIterator();
-        void testIteratorEmpty();
-        void testIteratorOutOfBounds();
-        void testIteratorRemove();
-        void testIteratorRemoveIllegalState();
-
-    };
-
+    class PriorityQueueTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -76,9 +46,8 @@ public:
 
     };
 
-
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testConstructor_1() {
+TEST_F(PriorityQueueTest, testConstructor_1) {
 
     PriorityQueue<int> pqueue;
 
@@ -88,7 +57,7 @@ void PriorityQueueTest::testConstructor_1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testConstructor_2() {
+TEST_F(PriorityQueueTest, testConstructor_2) {
 
     PriorityQueue<int> pqueue( 1024 );
 
@@ -98,7 +67,7 @@ void PriorityQueueTest::testConstructor_2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testConstructor_3() {
+TEST_F(PriorityQueueTest, testConstructor_3) {
 
     PriorityQueue<int> intQueue;
     LinkedList<int> collection;
@@ -123,7 +92,7 @@ void PriorityQueueTest::testConstructor_3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testAssignment() {
+TEST_F(PriorityQueueTest, testAssignment) {
 
     PriorityQueue<int> intQueue;
     LinkedList<int> collection;
@@ -157,7 +126,7 @@ void PriorityQueueTest::testAssignment() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testSize() {
+TEST_F(PriorityQueueTest, testSize) {
 
     PriorityQueue<int> intQueue;
 
@@ -171,7 +140,7 @@ void PriorityQueueTest::testSize() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testOfferString() {
+TEST_F(PriorityQueueTest, testOfferString) {
 
     PriorityQueue<std::string> queue( 10, new MockComparatorStringByLength() );
 
@@ -191,7 +160,7 @@ void PriorityQueueTest::testOfferString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testPoll() {
+TEST_F(PriorityQueueTest, testPoll) {
 
     PriorityQueue<int> intQueue;
     int array[] = { 52, 12, 42, 7, 111 };
@@ -212,7 +181,7 @@ void PriorityQueueTest::testPoll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testPollEmpty() {
+TEST_F(PriorityQueueTest, testPollEmpty) {
 
     double result;
     PriorityQueue<double> queue;
@@ -221,7 +190,7 @@ void PriorityQueueTest::testPollEmpty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testPeek() {
+TEST_F(PriorityQueueTest, testPeek) {
     PriorityQueue<int> integerQueue;
 
     int array[] = { 2, 45, 7, -12, 9 };
@@ -241,7 +210,7 @@ void PriorityQueueTest::testPeek() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testPeekEmpty() {
+TEST_F(PriorityQueueTest, testPeekEmpty) {
 
     float result;
     PriorityQueue<float> queue;
@@ -250,7 +219,7 @@ void PriorityQueueTest::testPeekEmpty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testClear() {
+TEST_F(PriorityQueueTest, testClear) {
     PriorityQueue<int> integerQueue;
 
     int array[] = {2, 45, 7, -12, 9};
@@ -264,7 +233,7 @@ void PriorityQueueTest::testClear() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testAdd() {
+TEST_F(PriorityQueueTest, testAdd) {
     PriorityQueue<int> integerQueue;
 
     int array[] = {2, 45, 7, -12, 9};
@@ -284,7 +253,7 @@ void PriorityQueueTest::testAdd() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testAddAll() {
+TEST_F(PriorityQueueTest, testAddAll) {
     PriorityQueue<int> integerQueue;
 
     LinkedList<int> list;
@@ -308,7 +277,7 @@ void PriorityQueueTest::testAddAll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testRemove() {
+TEST_F(PriorityQueueTest, testRemove) {
 
     int array[] = { 2, 45, 7, -12, 9, 23, 17, 1118, 10, 16, 39 };
 
@@ -332,7 +301,7 @@ void PriorityQueueTest::testRemove() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testRemoveUsingComparator() {
+TEST_F(PriorityQueueTest, testRemoveUsingComparator) {
 
     PriorityQueue<std::string> queue( 10, new MockComparatorStringByLength() );
     std::string array[] = {"AAAAA", "AA", "AAAA", "AAAAAAAA"};
@@ -348,7 +317,7 @@ void PriorityQueueTest::testRemoveUsingComparator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testRemoveNotExists() {
+TEST_F(PriorityQueueTest, testRemoveNotExists) {
 
     int array[] = {2, 45, 7, -12, 9, 23, 17, 1118, 10, 16, 39};
 
@@ -362,7 +331,7 @@ void PriorityQueueTest::testRemoveNotExists() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testComparator() {
+TEST_F(PriorityQueueTest, testComparator) {
 
     PriorityQueue<std::string> queue1;
     ASSERT_TRUE(queue1.comparator() != NULL);
@@ -373,7 +342,7 @@ void PriorityQueueTest::testComparator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testIterator() {
+TEST_F(PriorityQueueTest, testIterator) {
 
     PriorityQueue<int> integerQueue;
 
@@ -403,7 +372,7 @@ void PriorityQueueTest::testIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testIteratorEmpty() {
+TEST_F(PriorityQueueTest, testIteratorEmpty) {
 
     PriorityQueue<int> intQueue;
     std::unique_ptr< Iterator<int> > iter( intQueue.iterator() );
@@ -415,7 +384,7 @@ void PriorityQueueTest::testIteratorEmpty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testIteratorOutOfBounds() {
+TEST_F(PriorityQueueTest, testIteratorOutOfBounds) {
 
     PriorityQueue<int> intQueue;
     intQueue.offer( 0 );
@@ -430,7 +399,7 @@ void PriorityQueueTest::testIteratorOutOfBounds() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testIteratorRemove() {
+TEST_F(PriorityQueueTest, testIteratorRemove) {
 
     PriorityQueue<int> intQueue;
     int array[] = {2, 45, 7, -12, 9};
@@ -470,7 +439,7 @@ void PriorityQueueTest::testIteratorRemove() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testIteratorRemoveIllegalState() {
+TEST_F(PriorityQueueTest, testIteratorRemoveIllegalState) {
 
     PriorityQueue<int> intQueue;
     int array[] = {2, 45, 7, -12, 9};
@@ -485,26 +454,3 @@ void PriorityQueueTest::testIteratorRemoveIllegalState() {
     iter->remove();
     ASSERT_THROW(iter->remove(), IllegalStateException) << ("Should Throw a IllegalStateException");
 }
-
-TEST_F(PriorityQueueTest, testConstructor_1) { testConstructor_1(); }
-TEST_F(PriorityQueueTest, testConstructor_2) { testConstructor_2(); }
-TEST_F(PriorityQueueTest, testConstructor_3) { testConstructor_3(); }
-TEST_F(PriorityQueueTest, testAssignment) { testAssignment(); }
-TEST_F(PriorityQueueTest, testSize) { testSize(); }
-TEST_F(PriorityQueueTest, testOfferString) { testOfferString(); }
-TEST_F(PriorityQueueTest, testPoll) { testPoll(); }
-TEST_F(PriorityQueueTest, testPollEmpty) { testPollEmpty(); }
-TEST_F(PriorityQueueTest, testPeek) { testPeek(); }
-TEST_F(PriorityQueueTest, testPeekEmpty) { testPeekEmpty(); }
-TEST_F(PriorityQueueTest, testClear) { testClear(); }
-TEST_F(PriorityQueueTest, testAdd) { testAdd(); }
-TEST_F(PriorityQueueTest, testAddAll) { testAddAll(); }
-TEST_F(PriorityQueueTest, testRemove) { testRemove(); }
-TEST_F(PriorityQueueTest, testRemoveUsingComparator) { testRemoveUsingComparator(); }
-TEST_F(PriorityQueueTest, testRemoveNotExists) { testRemoveNotExists(); }
-TEST_F(PriorityQueueTest, testComparator) { testComparator(); }
-TEST_F(PriorityQueueTest, testIterator) { testIterator(); }
-TEST_F(PriorityQueueTest, testIteratorEmpty) { testIteratorEmpty(); }
-TEST_F(PriorityQueueTest, testIteratorOutOfBounds) { testIteratorOutOfBounds(); }
-TEST_F(PriorityQueueTest, testIteratorRemove) { testIteratorRemove(); }
-TEST_F(PriorityQueueTest, testIteratorRemoveIllegalState) { testIteratorRemoveIllegalState(); }

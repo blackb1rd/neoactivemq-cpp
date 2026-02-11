@@ -21,7 +21,6 @@
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
 
-
 namespace decaf { namespace internal { namespace nio {} } }
 using namespace std;
 using namespace decaf;
@@ -31,6 +30,8 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class ShortArrayBufferTest : public ::testing::Test {
+    protected:
+
 decaf::nio::ShortBuffer* testBuffer1;
         short* testData1;
 
@@ -38,15 +39,9 @@ decaf::nio::ShortBuffer* testBuffer1;
         static const int SMALL_TEST_LENGTH;
         static const int BUFFER_LENGTH;
 
-    private:
-
-        ShortArrayBufferTest(const ShortArrayBufferTest&);
-        ShortArrayBufferTest& operator= (const ShortArrayBufferTest&);
-
     public:
 
         ShortArrayBufferTest() : testBuffer1(), testData1() {}
-        virtual ~ShortArrayBufferTest() {}
 
         void SetUp() override {
             testBuffer1 = decaf::nio::ShortBuffer::allocate( testData1Size );
@@ -61,29 +56,6 @@ decaf::nio::ShortBuffer* testBuffer1;
             delete testBuffer1;
             delete [] testData1;
         }
-
-        void test();
-        void testArray();
-        void testArrayOffset();
-        void testReadOnlyArray();
-        void testAsReadOnlyBuffer();
-        void testCompact();
-        void testCompareTo();
-        void testDuplicate();
-        void testEquals();
-        void testHasArray();
-        void testGet();
-        void testGet2();
-        void testGetShortArray();
-        void testGetShortArray2();
-        void testGetWithIndex();
-        void testPutShort();
-        void testPutShortArray();
-        void testPutShortArray2();
-        void testPutShortBuffer();
-        void testPutIndexed();
-        void testSlice();
-        void testToString();
 
     protected:
 
@@ -142,15 +114,13 @@ decaf::nio::ShortBuffer* testBuffer1;
 
     };
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 const int ShortArrayBufferTest::testData1Size = 100;
 const int ShortArrayBufferTest::SMALL_TEST_LENGTH = 5;
 const int ShortArrayBufferTest::BUFFER_LENGTH = 250;
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::test() {
+TEST_F(ShortArrayBufferTest, test) {
 
     // Check that we have setup the array and our initial assumptions on state
     // are correct.  This is the first test run.
@@ -167,7 +137,7 @@ void ShortArrayBufferTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testArray() {
+TEST_F(ShortArrayBufferTest, testArray) {
 
     short* array = testBuffer1->array();
 
@@ -195,7 +165,7 @@ void ShortArrayBufferTest::testArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testArrayOffset() {
+TEST_F(ShortArrayBufferTest, testArrayOffset) {
 
     short* array = testBuffer1->array();
 
@@ -215,7 +185,7 @@ void ShortArrayBufferTest::testArrayOffset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testReadOnlyArray() {
+TEST_F(ShortArrayBufferTest, testReadOnlyArray) {
 
     ShortBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
 
@@ -230,7 +200,7 @@ void ShortArrayBufferTest::testReadOnlyArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testAsReadOnlyBuffer() {
+TEST_F(ShortArrayBufferTest, testAsReadOnlyBuffer) {
 
     testBuffer1->clear();
     testBuffer1->mark();
@@ -259,7 +229,7 @@ void ShortArrayBufferTest::testAsReadOnlyBuffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testCompact() {
+TEST_F(ShortArrayBufferTest, testCompact) {
 
     loadTestData1( testBuffer1 );
 
@@ -306,7 +276,7 @@ void ShortArrayBufferTest::testCompact() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testCompareTo() {
+TEST_F(ShortArrayBufferTest, testCompareTo) {
 
     ShortBuffer* other = ShortBuffer::allocate( testBuffer1->capacity() );
 
@@ -345,7 +315,7 @@ void ShortArrayBufferTest::testCompareTo() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testDuplicate() {
+TEST_F(ShortArrayBufferTest, testDuplicate) {
     testBuffer1->clear();
     testBuffer1->mark();
     testBuffer1->position(testBuffer1->limit());
@@ -370,7 +340,7 @@ void ShortArrayBufferTest::testDuplicate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testEquals() {
+TEST_F(ShortArrayBufferTest, testEquals) {
 
     // equal to self
     ASSERT_TRUE(testBuffer1->equals( *testBuffer1 ));
@@ -394,7 +364,7 @@ void ShortArrayBufferTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testGet() {
+TEST_F(ShortArrayBufferTest, testGet) {
 
     testBuffer1->clear();
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
@@ -406,7 +376,7 @@ void ShortArrayBufferTest::testGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testGetShortArray() {
+TEST_F(ShortArrayBufferTest, testGetShortArray) {
 
     std::vector<short> array(1);
     testBuffer1->clear();
@@ -422,7 +392,7 @@ void ShortArrayBufferTest::testGetShortArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testGetShortArray2() {
+TEST_F(ShortArrayBufferTest, testGetShortArray2) {
 
     testBuffer1->clear();
     short* array1 = new short[testBuffer1->capacity()];
@@ -461,7 +431,7 @@ void ShortArrayBufferTest::testGetShortArray2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testGet2() {
+TEST_F(ShortArrayBufferTest, testGet2) {
 
     testBuffer1->clear();
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
@@ -475,12 +445,12 @@ void ShortArrayBufferTest::testGet2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testHasArray() {
+TEST_F(ShortArrayBufferTest, testHasArray) {
     ASSERT_TRUE(testBuffer1->hasArray());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testPutShort() {
+TEST_F(ShortArrayBufferTest, testPutShort) {
 
     testBuffer1->clear();
 
@@ -495,7 +465,7 @@ void ShortArrayBufferTest::testPutShort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testPutShortArray() {
+TEST_F(ShortArrayBufferTest, testPutShortArray) {
 
     short* array = new short[1];
 
@@ -514,7 +484,7 @@ void ShortArrayBufferTest::testPutShortArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testPutShortArray2() {
+TEST_F(ShortArrayBufferTest, testPutShortArray2) {
 
     testBuffer1->clear();
     short* array1 = new short[ testBuffer1->capacity() ];
@@ -554,7 +524,7 @@ void ShortArrayBufferTest::testPutShortArray2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testPutShortBuffer() {
+TEST_F(ShortArrayBufferTest, testPutShortBuffer) {
 
     ShortBuffer* other = ShortBuffer::allocate( testBuffer1->capacity() );
     ShortBuffer* other1 = ShortBuffer::allocate( testBuffer1->capacity() + 1 );
@@ -578,7 +548,7 @@ void ShortArrayBufferTest::testPutShortBuffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testGetWithIndex() {
+TEST_F(ShortArrayBufferTest, testGetWithIndex) {
 
     testBuffer1->clear();
 
@@ -595,7 +565,7 @@ void ShortArrayBufferTest::testGetWithIndex() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testPutIndexed() {
+TEST_F(ShortArrayBufferTest, testPutIndexed) {
 
     ShortBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -617,7 +587,7 @@ void ShortArrayBufferTest::testPutIndexed() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testSlice() {
+TEST_F(ShortArrayBufferTest, testSlice) {
 
     ASSERT_TRUE(testBuffer1->capacity() > 5);
     testBuffer1->position(1);
@@ -642,7 +612,7 @@ void ShortArrayBufferTest::testSlice() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ShortArrayBufferTest::testToString() {
+TEST_F(ShortArrayBufferTest, testToString) {
 
     std::string str = testBuffer1->toString();
     ASSERT_TRUE(str.find("Short") != string::npos);
@@ -650,26 +620,3 @@ void ShortArrayBufferTest::testToString() {
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->limit() ) ) != string::npos);
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->capacity() ) ) != string::npos);
 }
-
-TEST_F(ShortArrayBufferTest, test) { test(); }
-TEST_F(ShortArrayBufferTest, testArray) { testArray(); }
-TEST_F(ShortArrayBufferTest, testArrayOffset) { testArrayOffset(); }
-TEST_F(ShortArrayBufferTest, testReadOnlyArray) { testReadOnlyArray(); }
-TEST_F(ShortArrayBufferTest, testAsReadOnlyBuffer) { testAsReadOnlyBuffer(); }
-TEST_F(ShortArrayBufferTest, testCompact) { testCompact(); }
-TEST_F(ShortArrayBufferTest, testCompareTo) { testCompareTo(); }
-TEST_F(ShortArrayBufferTest, testDuplicate) { testDuplicate(); }
-TEST_F(ShortArrayBufferTest, testEquals) { testEquals(); }
-TEST_F(ShortArrayBufferTest, testHasArray) { testHasArray(); }
-TEST_F(ShortArrayBufferTest, testGet) { testGet(); }
-TEST_F(ShortArrayBufferTest, testGet2) { testGet2(); }
-TEST_F(ShortArrayBufferTest, testGetShortArray) { testGetShortArray(); }
-TEST_F(ShortArrayBufferTest, testGetShortArray2) { testGetShortArray2(); }
-TEST_F(ShortArrayBufferTest, testGetWithIndex) { testGetWithIndex(); }
-TEST_F(ShortArrayBufferTest, testPutShort) { testPutShort(); }
-TEST_F(ShortArrayBufferTest, testPutShortArray) { testPutShortArray(); }
-TEST_F(ShortArrayBufferTest, testPutShortArray2) { testPutShortArray2(); }
-TEST_F(ShortArrayBufferTest, testPutShortBuffer) { testPutShortBuffer(); }
-TEST_F(ShortArrayBufferTest, testPutIndexed) { testPutIndexed(); }
-TEST_F(ShortArrayBufferTest, testSlice) { testSlice(); }
-TEST_F(ShortArrayBufferTest, testToString) { testToString(); }

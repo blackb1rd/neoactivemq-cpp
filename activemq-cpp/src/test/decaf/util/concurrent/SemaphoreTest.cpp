@@ -41,45 +41,7 @@ public:
         SemaphoreTest();
         virtual ~SemaphoreTest();
 
-        void testConstructor();
-        void testConstructor2();
-        void testTryAcquireInSameThread();
-        void testAcquireReleaseInSameThread();
-
-        void testAcquireUninterruptiblyReleaseInSameThread();
-        void testTimedAcquireReleaseInSameThread();
-        void testAcquireReleaseInDifferentThreads();
-        void testUninterruptibleAcquireReleaseInDifferentThreads();
-        void testTimedAcquireReleaseInDifferentThreads();
-        void testAcquireInterruptedException();
-        void testTryAcquireInterruptedException();
-        void testHasQueuedThreads();
-        void testGetQueueLength();
-        void testGetQueuedThreads();
-        void testDrainPermits();
-        void testReducePermits();
-        void testConstructorFair();
-        void testTryAcquireInSameThreadFair();
-        void testTryAcquireNInSameThreadFair();
-        void testAcquireReleaseInSameThreadFair();
-        void testAcquireReleaseNInSameThreadFair();
-        void testAcquireUninterruptiblyReleaseNInSameThreadFair();
-        void testTimedAcquireReleaseNInSameThreadFair();
-        void testTimedAcquireReleaseInSameThreadFair();
-        void testAcquireReleaseInDifferentThreadsFair();
-        void testAcquireReleaseNInDifferentThreadsFair();
-        void testAcquireReleaseNInDifferentThreadsFair2();
-        void testTimedAcquireReleaseInDifferentThreadsFair();
-        void testTimedAcquireReleaseNInDifferentThreadsFair();
-        void testAcquireInterruptedExceptionFair();
-        void testAcquireNInterruptedExceptionFair();
-        void testTryAcquireInterruptedExceptionFair();
-        void testTryAcquireNInterruptedExceptionFair();
-        void testGetQueueLengthFair();
-        void testToString();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -160,7 +122,7 @@ SemaphoreTest::~SemaphoreTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testConstructor() {
+TEST_F(SemaphoreTest, testConstructor) {
     Semaphore s0(0, false);
     ASSERT_EQ(0, s0.availablePermits());
     ASSERT_TRUE(!s0.isFair());
@@ -173,7 +135,7 @@ void SemaphoreTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testConstructor2() {
+TEST_F(SemaphoreTest, testConstructor2) {
 
     Semaphore s0(0);
     ASSERT_EQ(0, s0.availablePermits());
@@ -187,7 +149,7 @@ void SemaphoreTest::testConstructor2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testTryAcquireInSameThread() {
+TEST_F(SemaphoreTest, testTryAcquireInSameThread) {
 
     Semaphore s(2, false);
     ASSERT_EQ(2, s.availablePermits());
@@ -198,7 +160,7 @@ void SemaphoreTest::testTryAcquireInSameThread() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testAcquireReleaseInSameThread() {
+TEST_F(SemaphoreTest, testAcquireReleaseInSameThread) {
 
     Semaphore s(1, false);
     try {
@@ -219,7 +181,7 @@ void SemaphoreTest::testAcquireReleaseInSameThread() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testAcquireUninterruptiblyReleaseInSameThread() {
+TEST_F(SemaphoreTest, testAcquireUninterruptiblyReleaseInSameThread) {
 
     Semaphore s(1, false);
     try {
@@ -239,7 +201,7 @@ void SemaphoreTest::testAcquireUninterruptiblyReleaseInSameThread() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testTimedAcquireReleaseInSameThread() {
+TEST_F(SemaphoreTest, testTimedAcquireReleaseInSameThread) {
 
     Semaphore s(1, false);
     try {
@@ -293,7 +255,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testAcquireReleaseInDifferentThreads() {
+TEST_F(SemaphoreTest, testAcquireReleaseInDifferentThreads) {
 
     Semaphore s(0, false);
     TestAcquireReleaseInDifferentThreadsRunnable runnable(&s, this);
@@ -343,7 +305,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testUninterruptibleAcquireReleaseInDifferentThreads() {
+TEST_F(SemaphoreTest, testUninterruptibleAcquireReleaseInDifferentThreads) {
 
     Semaphore s(0, false);
     TestUninterruptibleAcquireReleaseInDifferentThreadsRunnable runnable(&s, this);
@@ -397,7 +359,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testTimedAcquireReleaseInDifferentThreads() {
+TEST_F(SemaphoreTest, testTimedAcquireReleaseInDifferentThreads) {
 
     Semaphore s(1, false);
     TestTimedAcquireReleaseInDifferentThreadsRunnable runnable(&s, this);
@@ -447,7 +409,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testAcquireInterruptedException() {
+TEST_F(SemaphoreTest, testAcquireInterruptedException) {
 
     Semaphore s(0, false);
     TestAcquireInterruptedExceptionRunnable runnable(&s, this);
@@ -494,7 +456,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testTryAcquireInterruptedException() {
+TEST_F(SemaphoreTest, testTryAcquireInterruptedException) {
 
     Semaphore s(0, false);
     TestAcquireInterruptedExceptionRunnable runnable(&s, this);
@@ -511,7 +473,7 @@ void SemaphoreTest::testTryAcquireInterruptedException() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testHasQueuedThreads() {
+TEST_F(SemaphoreTest, testHasQueuedThreads) {
 
     Semaphore lock(1, false);
     InterruptedLockRunnable runnable1(&lock, this);
@@ -542,7 +504,7 @@ void SemaphoreTest::testHasQueuedThreads() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testGetQueueLength() {
+TEST_F(SemaphoreTest, testGetQueueLength) {
 
     Semaphore lock(1, false);
 
@@ -574,7 +536,7 @@ void SemaphoreTest::testGetQueueLength() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testGetQueuedThreads() {
+TEST_F(SemaphoreTest, testGetQueuedThreads) {
 
     PublicSemaphore lock(1, false);
     InterruptedLockRunnable runnable1(&lock, this);
@@ -608,7 +570,7 @@ void SemaphoreTest::testGetQueuedThreads() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testDrainPermits() {
+TEST_F(SemaphoreTest, testDrainPermits) {
     Semaphore s(0, false);
     ASSERT_EQ(0, s.availablePermits());
     ASSERT_EQ(0, s.drainPermits());
@@ -620,7 +582,7 @@ void SemaphoreTest::testDrainPermits() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testReducePermits() {
+TEST_F(SemaphoreTest, testReducePermits) {
     PublicSemaphore s(10, false);
     ASSERT_EQ(10, s.availablePermits());
     s.reducePermits(1);
@@ -630,7 +592,7 @@ void SemaphoreTest::testReducePermits() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testConstructorFair() {
+TEST_F(SemaphoreTest, testConstructorFair) {
     Semaphore s0(0, true);
     ASSERT_EQ(0, s0.availablePermits());
     ASSERT_TRUE(s0.isFair());
@@ -641,7 +603,7 @@ void SemaphoreTest::testConstructorFair() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testTryAcquireInSameThreadFair() {
+TEST_F(SemaphoreTest, testTryAcquireInSameThreadFair) {
     Semaphore s(2, true);
     ASSERT_EQ(2, s.availablePermits());
     ASSERT_TRUE(s.tryAcquire());
@@ -651,7 +613,7 @@ void SemaphoreTest::testTryAcquireInSameThreadFair() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testTryAcquireNInSameThreadFair() {
+TEST_F(SemaphoreTest, testTryAcquireNInSameThreadFair) {
     Semaphore s(2, true);
     ASSERT_EQ(2, s.availablePermits());
     ASSERT_TRUE(s.tryAcquire(2));
@@ -660,7 +622,7 @@ void SemaphoreTest::testTryAcquireNInSameThreadFair() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testAcquireReleaseInSameThreadFair() {
+TEST_F(SemaphoreTest, testAcquireReleaseInSameThreadFair) {
     Semaphore s(1, true);
     try {
         s.acquire();
@@ -680,7 +642,7 @@ void SemaphoreTest::testAcquireReleaseInSameThreadFair() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testAcquireReleaseNInSameThreadFair() {
+TEST_F(SemaphoreTest, testAcquireReleaseNInSameThreadFair) {
     Semaphore s(1, true);
     try {
         s.release(1);
@@ -700,7 +662,7 @@ void SemaphoreTest::testAcquireReleaseNInSameThreadFair() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testAcquireUninterruptiblyReleaseNInSameThreadFair() {
+TEST_F(SemaphoreTest, testAcquireUninterruptiblyReleaseNInSameThreadFair) {
     Semaphore s(1, true);
     try {
         s.release(1);
@@ -719,7 +681,7 @@ void SemaphoreTest::testAcquireUninterruptiblyReleaseNInSameThreadFair() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testTimedAcquireReleaseNInSameThreadFair() {
+TEST_F(SemaphoreTest, testTimedAcquireReleaseNInSameThreadFair) {
     Semaphore s(1, true);
     try {
         s.release(1);
@@ -739,7 +701,7 @@ void SemaphoreTest::testTimedAcquireReleaseNInSameThreadFair() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testTimedAcquireReleaseInSameThreadFair() {
+TEST_F(SemaphoreTest, testTimedAcquireReleaseInSameThreadFair) {
     Semaphore s(1, true);
     try {
         ASSERT_TRUE(s.tryAcquire(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
@@ -792,7 +754,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testAcquireReleaseInDifferentThreadsFair() {
+TEST_F(SemaphoreTest, testAcquireReleaseInDifferentThreadsFair) {
     Semaphore s(0, true);
     TestAcquireReleaseInDifferentThreadsFairRunnable runnable(&s, this);
     Thread t(&runnable);
@@ -846,7 +808,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testAcquireReleaseNInDifferentThreadsFair() {
+TEST_F(SemaphoreTest, testAcquireReleaseNInDifferentThreadsFair) {
     Semaphore s(0, true);
     TestAcquireReleaseNInDifferentThreadsFairRunnable runnable(&s, this);
     Thread t(&runnable);
@@ -896,7 +858,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testAcquireReleaseNInDifferentThreadsFair2() {
+TEST_F(SemaphoreTest, testAcquireReleaseNInDifferentThreadsFair2) {
     Semaphore s(0, true);
     TestAcquireReleaseNInDifferentThreadsFair2Runnable runnable(&s, this);
     Thread t(&runnable);
@@ -949,7 +911,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testTimedAcquireReleaseInDifferentThreadsFair() {
+TEST_F(SemaphoreTest, testTimedAcquireReleaseInDifferentThreadsFair) {
     Semaphore s(1, true);
     TestTimedAcquireReleaseInDifferentThreadsFairRunnable runnable(&s, this);
     Thread t(&runnable);
@@ -1001,7 +963,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testTimedAcquireReleaseNInDifferentThreadsFair() {
+TEST_F(SemaphoreTest, testTimedAcquireReleaseNInDifferentThreadsFair) {
     Semaphore s(2, true);
     TestTimedAcquireReleaseNInDifferentThreadsFairRunnable runnable(&s, this);
     Thread t(&runnable);
@@ -1048,7 +1010,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testAcquireInterruptedExceptionFair() {
+TEST_F(SemaphoreTest, testAcquireInterruptedExceptionFair) {
     Semaphore s(0, true);
     TestAcquireInterruptedExceptionFairRunnable runnable(&s, this);
     Thread t(&runnable);
@@ -1093,7 +1055,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testAcquireNInterruptedExceptionFair() {
+TEST_F(SemaphoreTest, testAcquireNInterruptedExceptionFair) {
     Semaphore s(2, true);
     TestAcquireNInterruptedExceptionFairRunnable runnable(&s, this);
     Thread t(&runnable);
@@ -1139,7 +1101,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testTryAcquireInterruptedExceptionFair() {
+TEST_F(SemaphoreTest, testTryAcquireInterruptedExceptionFair) {
     Semaphore s(0, true);
     TestTryAcquireInterruptedExceptionFairRunnable runnable(&s, this);
     Thread t(&runnable);
@@ -1185,7 +1147,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testTryAcquireNInterruptedExceptionFair() {
+TEST_F(SemaphoreTest, testTryAcquireNInterruptedExceptionFair) {
     Semaphore s(1, true);
     TestTryAcquireNInterruptedExceptionFairRunnable runnable(&s, this);
     Thread t(&runnable);
@@ -1201,7 +1163,7 @@ void SemaphoreTest::testTryAcquireNInterruptedExceptionFair() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testGetQueueLengthFair() {
+TEST_F(SemaphoreTest, testGetQueueLengthFair) {
     Semaphore lock(1, true);
     InterruptedLockRunnable runnable1(&lock, this);
     InterruptibleLockRunnable runnable2(&lock, this);
@@ -1231,7 +1193,7 @@ void SemaphoreTest::testGetQueueLengthFair() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SemaphoreTest::testToString() {
+TEST_F(SemaphoreTest, testToString) {
 
     Semaphore s(0);
     std::string us = s.toString();
@@ -1243,39 +1205,3 @@ void SemaphoreTest::testToString() {
     std::string s2 = s.toString();
     ASSERT_TRUE((int)s2.find_first_of("Permits = 2") >= 0);
 }
-
-TEST_F(SemaphoreTest, testConstructor) { testConstructor(); }
-TEST_F(SemaphoreTest, testConstructor2) { testConstructor2(); }
-TEST_F(SemaphoreTest, testTryAcquireInSameThread) { testTryAcquireInSameThread(); }
-TEST_F(SemaphoreTest, testAcquireReleaseInSameThread) { testAcquireReleaseInSameThread(); }
-TEST_F(SemaphoreTest, testAcquireUninterruptiblyReleaseInSameThread) { testAcquireUninterruptiblyReleaseInSameThread(); }
-TEST_F(SemaphoreTest, testTimedAcquireReleaseInSameThread) { testTimedAcquireReleaseInSameThread(); }
-TEST_F(SemaphoreTest, testAcquireReleaseInDifferentThreads) { testAcquireReleaseInDifferentThreads(); }
-TEST_F(SemaphoreTest, testUninterruptibleAcquireReleaseInDifferentThreads) { testUninterruptibleAcquireReleaseInDifferentThreads(); }
-TEST_F(SemaphoreTest, testTimedAcquireReleaseInDifferentThreads) { testTimedAcquireReleaseInDifferentThreads(); }
-TEST_F(SemaphoreTest, testAcquireInterruptedException) { testAcquireInterruptedException(); }
-TEST_F(SemaphoreTest, testTryAcquireInterruptedException) { testTryAcquireInterruptedException(); }
-TEST_F(SemaphoreTest, testHasQueuedThreads) { testHasQueuedThreads(); }
-TEST_F(SemaphoreTest, testGetQueueLength) { testGetQueueLength(); }
-TEST_F(SemaphoreTest, testGetQueuedThreads) { testGetQueuedThreads(); }
-TEST_F(SemaphoreTest, testDrainPermits) { testDrainPermits(); }
-TEST_F(SemaphoreTest, testReducePermits) { testReducePermits(); }
-TEST_F(SemaphoreTest, testConstructorFair) { testConstructorFair(); }
-TEST_F(SemaphoreTest, testTryAcquireInSameThreadFair) { testTryAcquireInSameThreadFair(); }
-TEST_F(SemaphoreTest, testTryAcquireNInSameThreadFair) { testTryAcquireNInSameThreadFair(); }
-TEST_F(SemaphoreTest, testAcquireReleaseInSameThreadFair) { testAcquireReleaseInSameThreadFair(); }
-TEST_F(SemaphoreTest, testAcquireReleaseNInSameThreadFair) { testAcquireReleaseNInSameThreadFair(); }
-TEST_F(SemaphoreTest, testAcquireUninterruptiblyReleaseNInSameThreadFair) { testAcquireUninterruptiblyReleaseNInSameThreadFair(); }
-TEST_F(SemaphoreTest, testTimedAcquireReleaseNInSameThreadFair) { testTimedAcquireReleaseNInSameThreadFair(); }
-TEST_F(SemaphoreTest, testTimedAcquireReleaseInSameThreadFair) { testTimedAcquireReleaseInSameThreadFair(); }
-TEST_F(SemaphoreTest, testAcquireReleaseInDifferentThreadsFair) { testAcquireReleaseInDifferentThreadsFair(); }
-TEST_F(SemaphoreTest, testAcquireReleaseNInDifferentThreadsFair) { testAcquireReleaseNInDifferentThreadsFair(); }
-TEST_F(SemaphoreTest, testAcquireReleaseNInDifferentThreadsFair2) { testAcquireReleaseNInDifferentThreadsFair2(); }
-TEST_F(SemaphoreTest, testTimedAcquireReleaseInDifferentThreadsFair) { testTimedAcquireReleaseInDifferentThreadsFair(); }
-TEST_F(SemaphoreTest, testTimedAcquireReleaseNInDifferentThreadsFair) { testTimedAcquireReleaseNInDifferentThreadsFair(); }
-TEST_F(SemaphoreTest, testAcquireInterruptedExceptionFair) { testAcquireInterruptedExceptionFair(); }
-TEST_F(SemaphoreTest, testAcquireNInterruptedExceptionFair) { testAcquireNInterruptedExceptionFair(); }
-TEST_F(SemaphoreTest, testTryAcquireInterruptedExceptionFair) { testTryAcquireInterruptedExceptionFair(); }
-TEST_F(SemaphoreTest, testTryAcquireNInterruptedExceptionFair) { testTryAcquireNInterruptedExceptionFair(); }
-TEST_F(SemaphoreTest, testGetQueueLengthFair) { testGetQueueLengthFair(); }
-TEST_F(SemaphoreTest, testToString) { testToString(); }

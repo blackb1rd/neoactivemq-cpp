@@ -26,23 +26,11 @@ using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
 
-    class ActiveMQTopicTest : public ::testing::Test {
-public:
-
-        ActiveMQTopicTest() {}
-        virtual ~ActiveMQTopicTest() {}
-
-        void test();
-
-    };
-
+class ActiveMQTopicTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTopicTest::test()
-{
+TEST_F(ActiveMQTopicTest, test) {
     ActiveMQTopic myQueue;
 
     ASSERT_TRUE(myQueue.getDestinationType() == cms::Destination::TOPIC);
 }
-
-TEST_F(ActiveMQTopicTest, test) { test(); }

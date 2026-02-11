@@ -36,17 +36,7 @@ public:
         ReaderTest();
         virtual ~ReaderTest();
 
-        void testReaderCharBufferNull();
-        void testReaderCharBufferZeroChar();
-        void testReaderCharBufferChar();
-        void testMark();
-        void testRead();
-        void testReady();
-        void testReset();
-        void testSkip();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -105,7 +95,7 @@ ReaderTest::~ReaderTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReaderTest::testReaderCharBufferNull() {
+TEST_F(ReaderTest, testReaderCharBufferNull) {
 
     std::string s = "MY TEST STRING";
     std::vector<char> srcBuffer( s.begin(), s.end() );
@@ -117,7 +107,7 @@ void ReaderTest::testReaderCharBufferNull() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReaderTest::testReaderCharBufferZeroChar() {
+TEST_F(ReaderTest, testReaderCharBufferZeroChar) {
 
     // the charBuffer has the capacity of 0, then there the number of char read
     // to the CharBuffer is 0. Furthermore, the MockReader is intact in its content.
@@ -137,7 +127,7 @@ void ReaderTest::testReaderCharBufferZeroChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReaderTest::testReaderCharBufferChar() {
+TEST_F(ReaderTest, testReaderCharBufferChar) {
 
     std::string s = "MY TEST STRING";
     std::vector<char> srcBuffer( s.begin(), s.end() );
@@ -167,14 +157,14 @@ void ReaderTest::testReaderCharBufferChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReaderTest::testMark() {
+TEST_F(ReaderTest, testMark) {
 
     MockReader mockReader;
     ASSERT_THROW(mockReader.mark(0), IOException) << ("Should throw IOException for Reader do not support mark");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReaderTest::testRead() {
+TEST_F(ReaderTest, testRead) {
 
     MockReader reader;
 
@@ -198,20 +188,20 @@ void ReaderTest::testRead() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReaderTest::testReady() {
+TEST_F(ReaderTest, testReady) {
     MockReader mockReader;
     ASSERT_TRUE(!mockReader.ready()) << ("Should always return false");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReaderTest::testReset() {
+TEST_F(ReaderTest, testReset) {
 
     MockReader mockReader;
     ASSERT_THROW(mockReader.reset(), IOException) << ("Should throw an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReaderTest::testSkip() {
+TEST_F(ReaderTest, testSkip) {
     std::string s = "MY TEST STRING";
     std::vector<char> srcBuffer( s.begin(), s.end() );
     int length = (int)srcBuffer.size();
@@ -226,12 +216,3 @@ void ReaderTest::testSkip() {
     // Should do nothing
     mockReader.skip( length );
 }
-
-TEST_F(ReaderTest, testReaderCharBufferNull) { testReaderCharBufferNull(); }
-TEST_F(ReaderTest, testReaderCharBufferZeroChar) { testReaderCharBufferZeroChar(); }
-TEST_F(ReaderTest, testReaderCharBufferChar) { testReaderCharBufferChar(); }
-TEST_F(ReaderTest, testMark) { testMark(); }
-TEST_F(ReaderTest, testRead) { testRead(); }
-TEST_F(ReaderTest, testReady) { testReady(); }
-TEST_F(ReaderTest, testReset) { testReset(); }
-TEST_F(ReaderTest, testSkip) { testSkip(); }

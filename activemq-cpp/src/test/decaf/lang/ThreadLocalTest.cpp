@@ -38,13 +38,7 @@ public:
         ThreadLocalTest();
         virtual ~ThreadLocalTest();
 
-        void testConstructor();
-        void testGet();
-        void testRemove();
-        void testSet();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 ThreadLocalTest::ThreadLocalTest() {
@@ -55,7 +49,7 @@ ThreadLocalTest::~ThreadLocalTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadLocalTest::testConstructor() {
+TEST_F(ThreadLocalTest, testConstructor) {
     ThreadLocal<int> local;
     ASSERT_TRUE(local.get() == 0);
 }
@@ -79,7 +73,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadLocalTest::testRemove() {
+TEST_F(ThreadLocalTest, testRemove) {
 
     StringThreadLocal tl;
 
@@ -116,7 +110,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadLocalTest::testGet() {
+TEST_F(ThreadLocalTest, testGet) {
 
     ThreadLocal<long long> l;
     ASSERT_TRUE(l.get() == 0) << ("ThreadLocal's initial value is 0");
@@ -171,7 +165,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadLocalTest::testSet() {
+TEST_F(ThreadLocalTest, testSet) {
 
     StringThreadLocal local;
     ASSERT_TRUE(local.get() == "initial") << (std::string("ThreadLocal's initial value should be 'initial'")
@@ -193,8 +187,3 @@ void ThreadLocalTest::testSet() {
 
     ASSERT_TRUE(local.get() == "updated") << ("ThreadLocal's value in this Thread should be 'updated'");
 }
-
-TEST_F(ThreadLocalTest, testConstructor) { testConstructor(); }
-TEST_F(ThreadLocalTest, testGet) { testGet(); }
-TEST_F(ThreadLocalTest, testRemove) { testRemove(); }
-TEST_F(ThreadLocalTest, testSet) { testSet(); }

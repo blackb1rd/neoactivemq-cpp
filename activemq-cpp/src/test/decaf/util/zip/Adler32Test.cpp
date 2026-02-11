@@ -37,15 +37,7 @@ public:
         Adler32Test();
         virtual ~Adler32Test();
 
-        void testConstructor();
-        void testGetValue();
-        void testReset();
-        void testUpdateI();
-        void testUpdateArray();
-        void testUpdateArrayIndexed();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 Adler32Test::Adler32Test() {
@@ -57,13 +49,13 @@ Adler32Test::~Adler32Test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Adler32Test::testConstructor() {
+TEST_F(Adler32Test, testConstructor) {
     Adler32 adl;
     ASSERT_EQ(1LL, adl.getValue()) << ("Constructor of adl32 failed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Adler32Test::testGetValue() {
+TEST_F(Adler32Test, testGetValue) {
 
     Adler32 adl;
     ASSERT_EQ(1LL, adl.getValue()) << ("GetValue should return a zero as a result of construction an object of Adler32");
@@ -84,7 +76,7 @@ void Adler32Test::testGetValue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Adler32Test::testReset() {
+TEST_F(Adler32Test, testReset) {
 
     Adler32 adl;
     adl.update( 1 );
@@ -96,7 +88,7 @@ void Adler32Test::testReset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Adler32Test::testUpdateI() {
+TEST_F(Adler32Test, testUpdateI) {
 
     Adler32 adl;
     adl.update( 1 );
@@ -117,7 +109,7 @@ void Adler32Test::testUpdateI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Adler32Test::testUpdateArray() {
+TEST_F(Adler32Test, testUpdateArray) {
 
     unsigned char byteArray[] = { 1, 2 };
     Adler32 adl;
@@ -135,7 +127,7 @@ void Adler32Test::testUpdateArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Adler32Test::testUpdateArrayIndexed() {
+TEST_F(Adler32Test, testUpdateArrayIndexed) {
 
     static const int SIZE = 3;
     unsigned char byteArray[] = { 1, 2, 3 };
@@ -154,10 +146,3 @@ void Adler32Test::testUpdateArrayIndexed() {
 
     ASSERT_THROW(adl.update( byteArray, SIZE, offError, len ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException for offError");
 }
-
-TEST_F(Adler32Test, testConstructor) { testConstructor(); }
-TEST_F(Adler32Test, testGetValue) { testGetValue(); }
-TEST_F(Adler32Test, testReset) { testReset(); }
-TEST_F(Adler32Test, testUpdateI) { testUpdateI(); }
-TEST_F(Adler32Test, testUpdateArray) { testUpdateArray(); }
-TEST_F(Adler32Test, testUpdateArrayIndexed) { testUpdateArrayIndexed(); }

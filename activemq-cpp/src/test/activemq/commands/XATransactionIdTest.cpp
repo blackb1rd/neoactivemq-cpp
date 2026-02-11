@@ -29,21 +29,6 @@ using namespace activemq;
 using namespace activemq::commands;
 
     class XATransactionIdTest : public ::testing::Test {
-public:
-
-        XATransactionIdTest();
-        virtual ~XATransactionIdTest();
-
-        void testConstructor();
-        void testConstructor2();
-        void testEquals();
-        void testClone();
-        void testGetFormatId();
-        void testGetBranchQualifier();
-        void testGetGlobalTransactionId();
-        void testGetBranchQualifier1();
-        void testGetGlobalTransactionId1();
-
     };
 
 
@@ -156,15 +141,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-XATransactionIdTest::XATransactionIdTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-XATransactionIdTest::~XATransactionIdTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void XATransactionIdTest::testConstructor() {
+TEST_F(XATransactionIdTest, testConstructor) {
 
     XATransactionId id;
 
@@ -174,7 +151,7 @@ void XATransactionIdTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void XATransactionIdTest::testConstructor2() {
+TEST_F(XATransactionIdTest, testConstructor2) {
 
     DummyXid myXid;
     XATransactionId id( &myXid );
@@ -185,7 +162,7 @@ void XATransactionIdTest::testConstructor2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void XATransactionIdTest::testEquals() {
+TEST_F(XATransactionIdTest, testEquals) {
 
     DummyXid myXid;
     XATransactionId id( &myXid );
@@ -199,7 +176,7 @@ void XATransactionIdTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void XATransactionIdTest::testClone() {
+TEST_F(XATransactionIdTest, testClone) {
 
     DummyXid myXid;
     XATransactionId id( &myXid );
@@ -215,7 +192,7 @@ void XATransactionIdTest::testClone() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void XATransactionIdTest::testGetFormatId() {
+TEST_F(XATransactionIdTest, testGetFormatId) {
 
     XATransactionId id;
 
@@ -227,7 +204,7 @@ void XATransactionIdTest::testGetFormatId() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void XATransactionIdTest::testGetBranchQualifier() {
+TEST_F(XATransactionIdTest, testGetBranchQualifier) {
 
     XATransactionId id;
 
@@ -243,7 +220,7 @@ void XATransactionIdTest::testGetBranchQualifier() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void XATransactionIdTest::testGetGlobalTransactionId() {
+TEST_F(XATransactionIdTest, testGetGlobalTransactionId) {
 
     XATransactionId id;
 
@@ -259,7 +236,7 @@ void XATransactionIdTest::testGetGlobalTransactionId() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void XATransactionIdTest::testGetBranchQualifier1() {
+TEST_F(XATransactionIdTest, testGetBranchQualifier1) {
 
     XATransactionId id;
     std::vector<unsigned char> buffer( Xid::MAXBQUALSIZE );
@@ -282,7 +259,7 @@ void XATransactionIdTest::testGetBranchQualifier1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void XATransactionIdTest::testGetGlobalTransactionId1() {
+TEST_F(XATransactionIdTest, testGetGlobalTransactionId1) {
 
     XATransactionId id;
     std::vector<unsigned char> buffer( Xid::MAXGTRIDSIZE );
@@ -303,13 +280,3 @@ void XATransactionIdTest::testGetGlobalTransactionId1() {
     ASSERT_TRUE(id.getGlobalTransactionId( &buffer[0], Xid::MAXGTRIDSIZE ) == Xid::MAXGTRIDSIZE);
     ASSERT_TRUE(gtx == buffer);
 }
-
-TEST_F(XATransactionIdTest, testConstructor) { testConstructor(); }
-TEST_F(XATransactionIdTest, testConstructor2) { testConstructor2(); }
-TEST_F(XATransactionIdTest, testEquals) { testEquals(); }
-TEST_F(XATransactionIdTest, testClone) { testClone(); }
-TEST_F(XATransactionIdTest, testGetFormatId) { testGetFormatId(); }
-TEST_F(XATransactionIdTest, testGetBranchQualifier) { testGetBranchQualifier(); }
-TEST_F(XATransactionIdTest, testGetGlobalTransactionId) { testGetGlobalTransactionId(); }
-TEST_F(XATransactionIdTest, testGetBranchQualifier1) { testGetBranchQualifier1(); }
-TEST_F(XATransactionIdTest, testGetGlobalTransactionId1) { testGetGlobalTransactionId1(); }

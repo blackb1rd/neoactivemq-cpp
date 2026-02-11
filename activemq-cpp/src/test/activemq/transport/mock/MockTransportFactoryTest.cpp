@@ -31,19 +31,10 @@ using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class MockTransportFactoryTest : public ::testing::Test {
-public:
-
-        MockTransportFactoryTest() {}
-        virtual ~MockTransportFactoryTest() {}
-
-        void test();
-
-    };
-
+class MockTransportFactoryTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void MockTransportFactoryTest::test() {
+TEST_F(MockTransportFactoryTest, test) {
 
     URI uri( "mock://mock?wireformat=openwire" );
 
@@ -60,5 +51,3 @@ void MockTransportFactoryTest::test() {
     transport.reset( NULL );
 
 }
-
-TEST_F(MockTransportFactoryTest, test) { test(); }

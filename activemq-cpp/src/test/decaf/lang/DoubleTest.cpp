@@ -29,19 +29,13 @@ using namespace decaf::lang;
 public:
 
         DoubleTest();
-        virtual ~DoubleTest() {}
-
-        virtual void test();
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 DoubleTest::DoubleTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleTest::test() {
+TEST_F(DoubleTest, test) {
 }
-
-TEST_F(DoubleTest, test) { test(); }

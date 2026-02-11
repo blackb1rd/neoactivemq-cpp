@@ -27,21 +27,11 @@ using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
 
-    class ActiveMQQueueTest : public ::testing::Test {
-public:
-
-        ActiveMQQueueTest() {}
-        virtual ~ActiveMQQueueTest() {}
-
-        void test();
-    };
-
+class ActiveMQQueueTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQQueueTest::test() {
+TEST_F(ActiveMQQueueTest, test) {
 
     ActiveMQQueue myQueue;
     ASSERT_TRUE(myQueue.getDestinationType() == cms::Destination::QUEUE);
 }
-
-TEST_F(ActiveMQQueueTest, test) { test(); }

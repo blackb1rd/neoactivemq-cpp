@@ -32,27 +32,7 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util::concurrent;
 
-    class ArrayPointerTest : public ::testing::Test {
-public:
-
-        ArrayPointerTest() {}
-        virtual ~ArrayPointerTest() {}
-
-        void testBasics();
-        void testConstructor1();
-        void testConstructor2();
-        void testClone();
-        void testAssignment();
-        void testComparisons();
-        void testThreaded1();
-        void testThreaded2();
-        void testOperators();
-        void testSTLContainers();
-        void testReturnByValue();
-        void testThreadSafety();
-
-    };
-
+    class ArrayPointerTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -146,7 +126,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayPointerTest::testBasics() {
+TEST_F(ArrayPointerTest, testBasics) {
 
     TestClassA* anArray = new TestClassA[12];
 
@@ -200,7 +180,7 @@ void ArrayPointerTest::testBasics() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayPointerTest::testConstructor1() {
+TEST_F(ArrayPointerTest, testConstructor1) {
 
     const int SIZE = 50;
 
@@ -211,7 +191,7 @@ void ArrayPointerTest::testConstructor1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayPointerTest::testConstructor2() {
+TEST_F(ArrayPointerTest, testConstructor2) {
 
     const int SIZE = 50;
 
@@ -235,7 +215,7 @@ void ArrayPointerTest::testConstructor2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayPointerTest::testClone() {
+TEST_F(ArrayPointerTest, testClone) {
 
     const int SIZE = 50;
 
@@ -256,7 +236,7 @@ void ArrayPointerTest::testClone() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayPointerTest::testAssignment() {
+TEST_F(ArrayPointerTest, testAssignment) {
 
     const int SIZE = 50;
 
@@ -310,7 +290,7 @@ void ArrayPointerTest::testAssignment() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayPointerTest::testComparisons() {
+TEST_F(ArrayPointerTest, testComparisons) {
 
     const std::size_t SIZE = 50;
 
@@ -369,7 +349,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayPointerTest::testThreaded1() {
+TEST_F(ArrayPointerTest, testThreaded1) {
     ArrayPointer<TestClassA> pointer( 10 );
 
     ArrayPointerTestRunnable runnable( pointer );
@@ -389,11 +369,11 @@ void ArrayPointerTest::testThreaded1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayPointerTest::testThreaded2() {
+TEST_F(ArrayPointerTest, testThreaded2) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayPointerTest::testOperators() {
+TEST_F(ArrayPointerTest, testOperators) {
 
     ArrayPointer<TestClassBase*> pointer1( 1 );
     ArrayPointer<TestClassBase*> pointer2( 1 );
@@ -420,7 +400,7 @@ void ArrayPointerTest::testOperators() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayPointerTest::testSTLContainers() {
+TEST_F(ArrayPointerTest, testSTLContainers) {
 
     ArrayPointer<TestClassA> pointer1( 1 );
     ArrayPointer<TestClassA> pointer2( 1 );
@@ -463,7 +443,7 @@ void ArrayPointerTest::testSTLContainers() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayPointerTest::testReturnByValue() {
+TEST_F(ArrayPointerTest, testReturnByValue) {
     ArrayPointer<TestClassA> result = methodReturnArrayPointer();
     ASSERT_TRUE(result.get() != NULL);
 }
@@ -553,7 +533,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayPointerTest::testThreadSafety() {
+TEST_F(ArrayPointerTest, testThreadSafety) {
 
     const int NUM_THREADS = 1;
     const int ITERATIONS = 1000;
@@ -586,16 +566,3 @@ void ArrayPointerTest::testThreadSafety() {
         delete thread[i];
     }
 }
-
-TEST_F(ArrayPointerTest, testBasics) { testBasics(); }
-TEST_F(ArrayPointerTest, testConstructor1) { testConstructor1(); }
-TEST_F(ArrayPointerTest, testConstructor2) { testConstructor2(); }
-TEST_F(ArrayPointerTest, testClone) { testClone(); }
-TEST_F(ArrayPointerTest, testAssignment) { testAssignment(); }
-TEST_F(ArrayPointerTest, testComparisons) { testComparisons(); }
-TEST_F(ArrayPointerTest, testThreaded1) { testThreaded1(); }
-TEST_F(ArrayPointerTest, testThreaded2) { testThreaded2(); }
-TEST_F(ArrayPointerTest, testOperators) { testOperators(); }
-TEST_F(ArrayPointerTest, testSTLContainers) { testSTLContainers(); }
-TEST_F(ArrayPointerTest, testReturnByValue) { testReturnByValue(); }
-TEST_F(ArrayPointerTest, testThreadSafety) { testThreadSafety(); }

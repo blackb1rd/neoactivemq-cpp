@@ -33,25 +33,7 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util::concurrent;
 
-    class PointerTest : public ::testing::Test {
-public:
-
-        PointerTest() {}
-        virtual ~PointerTest() {}
-
-        void testBasics();
-        void testAssignment();
-        void testComparisons();
-        void testThreaded1();
-        void testThreaded2();
-        void testOperators();
-        void testSTLContainers();
-        void testReturnByValue();
-        void testDynamicCast();
-        void testThreadSafety();
-
-    };
-
+    class PointerTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
 class TestClassBase {
@@ -129,7 +111,7 @@ struct X {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testBasics() {
+TEST_F(PointerTest, testBasics) {
 
     TestClassA* thePointer = new TestClassA();
 
@@ -202,7 +184,7 @@ const Pointer<TestClassA>& ReturnByConstReference() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testAssignment() {
+TEST_F(PointerTest, testAssignment) {
 
     TestClassA* thePointerA = new TestClassA();
     TestClassB* thePointerB = new TestClassB();
@@ -252,7 +234,7 @@ void PointerTest::testAssignment() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testComparisons() {
+TEST_F(PointerTest, testComparisons) {
 
     Pointer<TestClassBase> pointer1( new TestClassA );
     Pointer<TestClassBase> pointer2( new TestClassB );
@@ -307,7 +289,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testThreaded1() {
+TEST_F(PointerTest, testThreaded1) {
     Pointer<TestClassA> pointer( new TestClassA() );
 
     PointerTestRunnable runnable( pointer );
@@ -327,11 +309,11 @@ void PointerTest::testThreaded1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testThreaded2() {
+TEST_F(PointerTest, testThreaded2) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testOperators() {
+TEST_F(PointerTest, testOperators) {
 
     Pointer<TestClassBase> pointer1( new TestClassA );
     Pointer<TestClassBase> pointer2( new TestClassB );
@@ -353,7 +335,7 @@ void PointerTest::testOperators() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testSTLContainers() {
+TEST_F(PointerTest, testSTLContainers) {
 
     Pointer<TestClassBase> pointer1( new TestClassA );
     Pointer<TestClassBase> pointer2( new TestClassB );
@@ -410,13 +392,13 @@ Pointer<TestClassBase> methodReturnPointer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testReturnByValue() {
+TEST_F(PointerTest, testReturnByValue) {
 
     Pointer<TestClassBase> result = methodReturnPointer();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testDynamicCast() {
+TEST_F(PointerTest, testDynamicCast) {
 
     Pointer<TestClassBase> pointer1( new TestClassA );
     Pointer<TestClassBase> pointer2( new TestClassB );
@@ -525,7 +507,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testThreadSafety() {
+TEST_F(PointerTest, testThreadSafety) {
 
     const int NUM_THREADS = 1;
     Pointer<PointerTestThread> thread[NUM_THREADS];
@@ -554,14 +536,3 @@ void PointerTest::testThreadSafety() {
         thread[i]->join();
     }
 }
-
-TEST_F(PointerTest, testBasics) { testBasics(); }
-TEST_F(PointerTest, testAssignment) { testAssignment(); }
-TEST_F(PointerTest, testComparisons) { testComparisons(); }
-TEST_F(PointerTest, testThreaded1) { testThreaded1(); }
-TEST_F(PointerTest, testThreaded2) { testThreaded2(); }
-TEST_F(PointerTest, testOperators) { testOperators(); }
-TEST_F(PointerTest, testSTLContainers) { testSTLContainers(); }
-TEST_F(PointerTest, testReturnByValue) { testReturnByValue(); }
-TEST_F(PointerTest, testDynamicCast) { testDynamicCast(); }
-TEST_F(PointerTest, testThreadSafety) { testThreadSafety(); }

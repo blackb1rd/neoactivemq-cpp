@@ -26,19 +26,10 @@ using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
 
-    class ActiveMQTempTopicTest : public ::testing::Test {
-public:
-
-        ActiveMQTempTopicTest() {}
-        virtual ~ActiveMQTempTopicTest() {}
-
-        void test();
-    };
-
+class ActiveMQTempTopicTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTempTopicTest::test()
-{
+TEST_F(ActiveMQTempTopicTest, test) {
     ActiveMQTempTopic myTopic;
 
     ASSERT_TRUE(myTopic.getDestinationType() == cms::Destination::TEMPORARY_TOPIC);
@@ -58,5 +49,3 @@ void ActiveMQTempTopicTest::test()
     connectionId = myTopic.getConnectionId();
     ASSERT_EQ(std::string(""), myTopic.getConnectionId()) << ("ConnectionId should not have parsed");
 }
-
-TEST_F(ActiveMQTempTopicTest, test) { test(); }

@@ -40,7 +40,7 @@ using namespace activemq::wireformat::openwire::utils;
 using namespace activemq::wireformat::openwire::marshal;
 
     class BaseDataStreamMarshallerTest : public ::testing::Test {
-public:
+    protected:
 
         class SimpleDataStructure : public commands::BaseDataStructure {
         public:
@@ -367,25 +367,10 @@ public:
             }
         };
 
-    private:
-
         ComplexDataStructure* dataStructure;
-
-    private:
-
-        BaseDataStreamMarshallerTest(const BaseDataStreamMarshallerTest&);
-        BaseDataStreamMarshallerTest& operator= (const BaseDataStreamMarshallerTest&);
-
-    public:
-
-        BaseDataStreamMarshallerTest() : dataStructure(NULL) {}
-        virtual ~BaseDataStreamMarshallerTest() {}
 
         void SetUp() override;
         void TearDown() override;
-
-        void testLooseMarshal();
-        void testTightMarshal();
 
     };
 
@@ -420,7 +405,7 @@ void BaseDataStreamMarshallerTest::TearDown(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BaseDataStreamMarshallerTest::testLooseMarshal()
+TEST_F(BaseDataStreamMarshallerTest, testLooseMarshal)
 {
     SimpleDataStructureMarshaller* simpleMarshaller = new SimpleDataStructureMarshaller();
     ComplexDataStructureMarshaller* complexMarshaller = new ComplexDataStructureMarshaller();
@@ -465,7 +450,7 @@ void BaseDataStreamMarshallerTest::testLooseMarshal()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BaseDataStreamMarshallerTest::testTightMarshal()
+TEST_F(BaseDataStreamMarshallerTest, testTightMarshal)
 {
     SimpleDataStructureMarshaller* simpleMarshaller = new SimpleDataStructureMarshaller();
     ComplexDataStructureMarshaller* complexMarshaller = new ComplexDataStructureMarshaller();
@@ -519,6 +504,3 @@ void BaseDataStreamMarshallerTest::testTightMarshal()
 
     delete [] array.first;
 }
-
-TEST_F(BaseDataStreamMarshallerTest, testLooseMarshal) { testLooseMarshal(); }
-TEST_F(BaseDataStreamMarshallerTest, testTightMarshal) { testTightMarshal(); }

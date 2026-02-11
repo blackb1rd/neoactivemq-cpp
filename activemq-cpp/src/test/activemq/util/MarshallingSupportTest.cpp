@@ -35,20 +35,7 @@ using namespace activemq;
 using namespace activemq::util;
 
     class MarshallingSupportTest : public ::testing::Test {
-public:
-
-        MarshallingSupportTest();
-        virtual ~MarshallingSupportTest();
-
-        void testWriteString();
-        void testWriteString16();
-        void testWriteString32();
-        void testReadString16();
-        void testReadString32();
-        void testAsciiToModifiedUtf8();
-        void testModifiedUtf8ToAscii();
-
-    private:
+    protected:
 
         void readTestHelper( unsigned char* input, int inputLength,
                              unsigned char* expect, int expectLength );
@@ -57,14 +44,6 @@ public:
                               unsigned char* expect, int expectLength );
     };
 
-
-////////////////////////////////////////////////////////////////////////////////
-MarshallingSupportTest::MarshallingSupportTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-MarshallingSupportTest::~MarshallingSupportTest() {
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 void MarshallingSupportTest::writeTestHelper( unsigned char* input, int inputLength,
@@ -79,7 +58,19 @@ void MarshallingSupportTest::writeTestHelper( unsigned char* input, int inputLen
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MarshallingSupportTest::testAsciiToModifiedUtf8() {
+void MarshallingSupportTest::readTestHelper( unsigned char* input, int inputLength,
+                                             unsigned char* expect, int expectLength ) {
+
+    std::string inputString( (char*)input, inputLength );
+    std::string result = MarshallingSupport::modifiedUtf8ToAscii( inputString );
+
+    for( std::size_t i = 0; i < result.length(); ++i ) {
+        ASSERT_TRUE((unsigned char)result[i] == expect[i]);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(MarshallingSupportTest, testAsciiToModifiedUtf8) {
 
     // Test data with 1-byte UTF8 encoding.
     {
@@ -110,19 +101,7 @@ void MarshallingSupportTest::testAsciiToModifiedUtf8() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MarshallingSupportTest::readTestHelper( unsigned char* input, int inputLength,
-                                             unsigned char* expect, int expectLength ) {
-
-    std::string inputString( (char*)input, inputLength );
-    std::string result = MarshallingSupport::modifiedUtf8ToAscii( inputString );
-
-    for( std::size_t i = 0; i < result.length(); ++i ) {
-        ASSERT_TRUE((unsigned char)result[i] == expect[i]);
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void MarshallingSupportTest::testModifiedUtf8ToAscii() {
+TEST_F(MarshallingSupportTest, testModifiedUtf8ToAscii) {
 
     // Test data with 1-byte UTF8 encoding.
     {
@@ -192,7 +171,7 @@ void MarshallingSupportTest::testModifiedUtf8ToAscii() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MarshallingSupportTest::testWriteString() {
+TEST_F(MarshallingSupportTest, testWriteString) {
 
     {
         ByteArrayOutputStream baos;
@@ -245,7 +224,7 @@ void MarshallingSupportTest::testWriteString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MarshallingSupportTest::testWriteString16() {
+TEST_F(MarshallingSupportTest, testWriteString16) {
 
     {
         ByteArrayOutputStream baos;
@@ -265,7 +244,7 @@ void MarshallingSupportTest::testWriteString16() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MarshallingSupportTest::testWriteString32() {
+TEST_F(MarshallingSupportTest, testWriteString32) {
 
     {
         ByteArrayOutputStream baos;
@@ -285,7 +264,7 @@ void MarshallingSupportTest::testWriteString32() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MarshallingSupportTest::testReadString16() {
+TEST_F(MarshallingSupportTest, testReadString16) {
 
     ByteArrayInputStream bytesIn;
     ByteArrayOutputStream bytesOut;
@@ -314,7 +293,7 @@ void MarshallingSupportTest::testReadString16() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MarshallingSupportTest::testReadString32() {
+TEST_F(MarshallingSupportTest, testReadString32) {
 
     ByteArrayInputStream bytesIn;
     ByteArrayOutputStream bytesOut;
@@ -341,11 +320,3 @@ void MarshallingSupportTest::testReadString32() {
 
     delete [] array.first;
 }
-
-TEST_F(MarshallingSupportTest, testWriteString) { testWriteString(); }
-TEST_F(MarshallingSupportTest, testWriteString16) { testWriteString16(); }
-TEST_F(MarshallingSupportTest, testWriteString32) { testWriteString32(); }
-TEST_F(MarshallingSupportTest, testReadString16) { testReadString16(); }
-TEST_F(MarshallingSupportTest, testReadString32) { testReadString32(); }
-TEST_F(MarshallingSupportTest, testAsciiToModifiedUtf8) { testAsciiToModifiedUtf8(); }
-TEST_F(MarshallingSupportTest, testModifiedUtf8ToAscii) { testModifiedUtf8ToAscii(); }

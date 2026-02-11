@@ -21,7 +21,6 @@
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
 
-
 namespace decaf { namespace internal { namespace nio {} } }
 using namespace std;
 using namespace decaf;
@@ -31,6 +30,8 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class IntArrayBufferTest : public ::testing::Test {
+    protected:
+
 decaf::nio::IntBuffer* testBuffer1;
         int* testData1;
 
@@ -38,15 +39,9 @@ decaf::nio::IntBuffer* testBuffer1;
         static const int SMALL_TEST_LENGTH;
         static const int BUFFER_LENGTH;
 
-    private:
-
-        IntArrayBufferTest(const IntArrayBufferTest&);
-        IntArrayBufferTest& operator= (const IntArrayBufferTest&);
-
     public:
 
         IntArrayBufferTest() : testBuffer1(), testData1() {}
-        virtual ~IntArrayBufferTest() {}
 
         void SetUp() override {
             testBuffer1 = decaf::nio::IntBuffer::allocate( testData1Size );
@@ -61,29 +56,6 @@ decaf::nio::IntBuffer* testBuffer1;
             delete testBuffer1;
             delete [] testData1;
         }
-
-        void test();
-        void testArray();
-        void testArrayOffset();
-        void testReadOnlyArray();
-        void testAsReadOnlyBuffer();
-        void testCompact();
-        void testCompareTo();
-        void testDuplicate();
-        void testEquals();
-        void testHasArray();
-        void testGet();
-        void testGet2();
-        void testGetIntArray();
-        void testGetIntArray2();
-        void testGetWithIndex();
-        void testPutInt();
-        void testPutIntArray();
-        void testPutIntArray2();
-        void testPutIntBuffer();
-        void testPutIndexed();
-        void testSlice();
-        void testToString();
 
     protected:
 
@@ -142,15 +114,13 @@ decaf::nio::IntBuffer* testBuffer1;
 
     };
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 const int IntArrayBufferTest::testData1Size = 100;
 const int IntArrayBufferTest::SMALL_TEST_LENGTH = 5;
 const int IntArrayBufferTest::BUFFER_LENGTH = 250;
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::test() {
+TEST_F(IntArrayBufferTest, test) {
 
     // Check that we have setup the array and our initial assumptions on state
     // are correct.  This is the first test run.
@@ -167,7 +137,7 @@ void IntArrayBufferTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testArray() {
+TEST_F(IntArrayBufferTest, testArray) {
 
     int* array = testBuffer1->array();
 
@@ -195,7 +165,7 @@ void IntArrayBufferTest::testArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testArrayOffset() {
+TEST_F(IntArrayBufferTest, testArrayOffset) {
 
     int* array = testBuffer1->array();
 
@@ -215,7 +185,7 @@ void IntArrayBufferTest::testArrayOffset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testReadOnlyArray() {
+TEST_F(IntArrayBufferTest, testReadOnlyArray) {
 
     IntBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
 
@@ -230,7 +200,7 @@ void IntArrayBufferTest::testReadOnlyArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testAsReadOnlyBuffer() {
+TEST_F(IntArrayBufferTest, testAsReadOnlyBuffer) {
 
     testBuffer1->clear();
     testBuffer1->mark();
@@ -259,7 +229,7 @@ void IntArrayBufferTest::testAsReadOnlyBuffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testCompact() {
+TEST_F(IntArrayBufferTest, testCompact) {
 
     loadTestData1( testBuffer1 );
 
@@ -306,7 +276,7 @@ void IntArrayBufferTest::testCompact() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testCompareTo() {
+TEST_F(IntArrayBufferTest, testCompareTo) {
 
     IntBuffer* other = IntBuffer::allocate( testBuffer1->capacity() );
 
@@ -345,7 +315,7 @@ void IntArrayBufferTest::testCompareTo() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testDuplicate() {
+TEST_F(IntArrayBufferTest, testDuplicate) {
     testBuffer1->clear();
     testBuffer1->mark();
     testBuffer1->position(testBuffer1->limit());
@@ -370,7 +340,7 @@ void IntArrayBufferTest::testDuplicate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testEquals() {
+TEST_F(IntArrayBufferTest, testEquals) {
 
     // equal to self
     ASSERT_TRUE(testBuffer1->equals( *testBuffer1 ));
@@ -394,7 +364,7 @@ void IntArrayBufferTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testGet() {
+TEST_F(IntArrayBufferTest, testGet) {
 
     testBuffer1->clear();
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
@@ -406,7 +376,7 @@ void IntArrayBufferTest::testGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testGetIntArray() {
+TEST_F(IntArrayBufferTest, testGetIntArray) {
 
     std::vector<int> array(1);
     testBuffer1->clear();
@@ -422,7 +392,7 @@ void IntArrayBufferTest::testGetIntArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testGetIntArray2() {
+TEST_F(IntArrayBufferTest, testGetIntArray2) {
 
     testBuffer1->clear();
     int* array1 = new int[testBuffer1->capacity()];
@@ -461,7 +431,7 @@ void IntArrayBufferTest::testGetIntArray2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testGet2() {
+TEST_F(IntArrayBufferTest, testGet2) {
 
     testBuffer1->clear();
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
@@ -475,12 +445,12 @@ void IntArrayBufferTest::testGet2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testHasArray() {
+TEST_F(IntArrayBufferTest, testHasArray) {
     ASSERT_TRUE(testBuffer1->hasArray());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testPutInt() {
+TEST_F(IntArrayBufferTest, testPutInt) {
 
     testBuffer1->clear();
 
@@ -495,7 +465,7 @@ void IntArrayBufferTest::testPutInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testPutIntArray() {
+TEST_F(IntArrayBufferTest, testPutIntArray) {
 
     int* array = new int[1];
 
@@ -514,7 +484,7 @@ void IntArrayBufferTest::testPutIntArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testPutIntArray2() {
+TEST_F(IntArrayBufferTest, testPutIntArray2) {
 
     testBuffer1->clear();
     int* array1 = new int[ testBuffer1->capacity() ];
@@ -554,7 +524,7 @@ void IntArrayBufferTest::testPutIntArray2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testPutIntBuffer() {
+TEST_F(IntArrayBufferTest, testPutIntBuffer) {
 
     IntBuffer* other = IntBuffer::allocate( testBuffer1->capacity() );
     IntBuffer* other1 = IntBuffer::allocate( testBuffer1->capacity() + 1 );
@@ -578,7 +548,7 @@ void IntArrayBufferTest::testPutIntBuffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testGetWithIndex() {
+TEST_F(IntArrayBufferTest, testGetWithIndex) {
 
     testBuffer1->clear();
 
@@ -595,7 +565,7 @@ void IntArrayBufferTest::testGetWithIndex() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testPutIndexed() {
+TEST_F(IntArrayBufferTest, testPutIndexed) {
 
     IntBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -617,7 +587,7 @@ void IntArrayBufferTest::testPutIndexed() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testSlice() {
+TEST_F(IntArrayBufferTest, testSlice) {
 
     ASSERT_TRUE(testBuffer1->capacity() > 5);
     testBuffer1->position(1);
@@ -642,7 +612,7 @@ void IntArrayBufferTest::testSlice() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testToString() {
+TEST_F(IntArrayBufferTest, testToString) {
 
     std::string str = testBuffer1->toString();
     ASSERT_TRUE(str.find("Int") != string::npos);
@@ -650,26 +620,3 @@ void IntArrayBufferTest::testToString() {
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->limit() ) ) != string::npos);
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->capacity() ) ) != string::npos);
 }
-
-TEST_F(IntArrayBufferTest, test) { test(); }
-TEST_F(IntArrayBufferTest, testArray) { testArray(); }
-TEST_F(IntArrayBufferTest, testArrayOffset) { testArrayOffset(); }
-TEST_F(IntArrayBufferTest, testReadOnlyArray) { testReadOnlyArray(); }
-TEST_F(IntArrayBufferTest, testAsReadOnlyBuffer) { testAsReadOnlyBuffer(); }
-TEST_F(IntArrayBufferTest, testCompact) { testCompact(); }
-TEST_F(IntArrayBufferTest, testCompareTo) { testCompareTo(); }
-TEST_F(IntArrayBufferTest, testDuplicate) { testDuplicate(); }
-TEST_F(IntArrayBufferTest, testEquals) { testEquals(); }
-TEST_F(IntArrayBufferTest, testHasArray) { testHasArray(); }
-TEST_F(IntArrayBufferTest, testGet) { testGet(); }
-TEST_F(IntArrayBufferTest, testGet2) { testGet2(); }
-TEST_F(IntArrayBufferTest, testGetIntArray) { testGetIntArray(); }
-TEST_F(IntArrayBufferTest, testGetIntArray2) { testGetIntArray2(); }
-TEST_F(IntArrayBufferTest, testGetWithIndex) { testGetWithIndex(); }
-TEST_F(IntArrayBufferTest, testPutInt) { testPutInt(); }
-TEST_F(IntArrayBufferTest, testPutIntArray) { testPutIntArray(); }
-TEST_F(IntArrayBufferTest, testPutIntArray2) { testPutIntArray2(); }
-TEST_F(IntArrayBufferTest, testPutIntBuffer) { testPutIntBuffer(); }
-TEST_F(IntArrayBufferTest, testPutIndexed) { testPutIndexed(); }
-TEST_F(IntArrayBufferTest, testSlice) { testSlice(); }
-TEST_F(IntArrayBufferTest, testToString) { testToString(); }

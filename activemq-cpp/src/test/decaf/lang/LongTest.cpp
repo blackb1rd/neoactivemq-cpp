@@ -22,21 +22,10 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
 
-    class LongTest : public ::testing::Test
-    {
-public:
-
-        LongTest() {}
-        virtual ~LongTest() {}
-
-        virtual void test();
-        virtual void test2();
-
-    };
-
+    class LongTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongTest::test() {
+TEST_F(LongTest, test) {
 
     long long x = Long::parseLong("12");
     long long y = Long::parseLong("FF", 16);
@@ -56,7 +45,7 @@ void LongTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongTest::test2() {
+TEST_F(LongTest, test2) {
 
     Long llong( 255 );
 
@@ -122,6 +111,3 @@ void LongTest::test2() {
     ASSERT_TRUE(Long::lowestOneBit( 0xFF000000 ) == (long long)0x01000000);
 
 }
-
-TEST_F(LongTest, test) { test(); }
-TEST_F(LongTest, test2) { test2(); }

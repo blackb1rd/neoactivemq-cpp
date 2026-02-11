@@ -30,19 +30,11 @@ using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using namespace activemq::wireformat::openwire::utils;
 
-    class BooleanStreamTest : public ::testing::Test {
-public:
-
-        BooleanStreamTest() {}
-        virtual ~BooleanStreamTest() {}
-
-        void test();
-        void test2();
-    };
+    class BooleanStreamTest : public ::testing::Test {};
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void BooleanStreamTest::test() {
+TEST_F(BooleanStreamTest, test) {
 
     BooleanStream b1Stream;
 
@@ -80,7 +72,7 @@ void BooleanStreamTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BooleanStreamTest::test2(){
+TEST_F(BooleanStreamTest, test2){
 
     BooleanStream b1Stream;
 
@@ -110,6 +102,3 @@ void BooleanStreamTest::test2(){
 
     delete [] array.first;
 }
-
-TEST_F(BooleanStreamTest, test) { test(); }
-TEST_F(BooleanStreamTest, test2) { test2(); }

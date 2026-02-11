@@ -41,34 +41,12 @@ using namespace decaf;
 using namespace decaf::lang;
 
     class ActiveMQStreamMessageTest : public ::testing::Test {
-private:
+    protected:
 
         std::vector<unsigned char> buffer;
 
-    public:
-
-        ActiveMQStreamMessageTest() : buffer() {}
-        virtual ~ActiveMQStreamMessageTest() {}
-
         void SetUp() override;
         void TearDown() override;
-
-        void testSetAndGet();
-        void testReadBoolean();
-        void testReadByte();
-        void testReadShort();
-        void testReadChar();
-        void testReadInt();
-        void testReadLong();
-        void testReadFloat();
-        void testReadDouble();
-        void testReadString();
-        void testReadBigString();
-        void testReadBytes();
-        void testClearBody();
-        void testReset();
-        void testReadOnlyBody();
-        void testWriteOnlyBody();
 
     };
 
@@ -84,7 +62,7 @@ void ActiveMQStreamMessageTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testSetAndGet() {
+TEST_F(ActiveMQStreamMessageTest, testSetAndGet) {
 
     ActiveMQStreamMessage myMessage;
 
@@ -131,7 +109,7 @@ void ActiveMQStreamMessageTest::testSetAndGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testReadBoolean() {
+TEST_F(ActiveMQStreamMessageTest, testReadBoolean) {
 
     ActiveMQStreamMessage msg;
 
@@ -199,7 +177,7 @@ void ActiveMQStreamMessageTest::testReadBoolean() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testReadByte() {
+TEST_F(ActiveMQStreamMessageTest, testReadByte) {
 
     ActiveMQStreamMessage msg;
     try {
@@ -254,7 +232,7 @@ void ActiveMQStreamMessageTest::testReadByte() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testReadShort() {
+TEST_F(ActiveMQStreamMessageTest, testReadShort) {
     ActiveMQStreamMessage msg;
     try {
 
@@ -312,7 +290,7 @@ void ActiveMQStreamMessageTest::testReadShort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testReadChar() {
+TEST_F(ActiveMQStreamMessageTest, testReadChar) {
     ActiveMQStreamMessage msg;
     try {
         char test = 'z';
@@ -378,7 +356,7 @@ void ActiveMQStreamMessageTest::testReadChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testReadInt() {
+TEST_F(ActiveMQStreamMessageTest, testReadInt) {
 
     ActiveMQStreamMessage msg;
 
@@ -441,7 +419,7 @@ void ActiveMQStreamMessageTest::testReadInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testReadLong() {
+TEST_F(ActiveMQStreamMessageTest, testReadLong) {
 
     ActiveMQStreamMessage msg;
 
@@ -509,7 +487,7 @@ void ActiveMQStreamMessageTest::testReadLong() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testReadFloat() {
+TEST_F(ActiveMQStreamMessageTest, testReadFloat) {
     ActiveMQStreamMessage msg;
     try {
         float test = 4.4f;
@@ -571,7 +549,7 @@ void ActiveMQStreamMessageTest::testReadFloat() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testReadDouble() {
+TEST_F(ActiveMQStreamMessageTest, testReadDouble) {
     ActiveMQStreamMessage msg;
     try {
         double test = 4.4;
@@ -637,7 +615,7 @@ void ActiveMQStreamMessageTest::testReadDouble() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testReadString() {
+TEST_F(ActiveMQStreamMessageTest, testReadString) {
     ActiveMQStreamMessage msg;
     try {
         unsigned char testByte = (unsigned char)2;
@@ -697,7 +675,7 @@ void ActiveMQStreamMessageTest::testReadString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testReadBigString() {
+TEST_F(ActiveMQStreamMessageTest, testReadBigString) {
     ActiveMQStreamMessage msg;
     try {
         // Test with a 1Meg String
@@ -718,7 +696,7 @@ void ActiveMQStreamMessageTest::testReadBigString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testReadBytes() {
+TEST_F(ActiveMQStreamMessageTest, testReadBytes) {
 
     ActiveMQStreamMessage msg;
     try {
@@ -786,7 +764,7 @@ void ActiveMQStreamMessageTest::testReadBytes() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testClearBody() {
+TEST_F(ActiveMQStreamMessageTest, testClearBody) {
 
     ActiveMQStreamMessage streamMessage;
     try {
@@ -805,7 +783,7 @@ void ActiveMQStreamMessageTest::testClearBody() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testReset() {
+TEST_F(ActiveMQStreamMessageTest, testReset) {
 
     ActiveMQStreamMessage streamMessage;
 
@@ -834,7 +812,7 @@ void ActiveMQStreamMessageTest::testReset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testReadOnlyBody() {
+TEST_F(ActiveMQStreamMessageTest, testReadOnlyBody) {
     ActiveMQStreamMessage message;
     try {
         message.writeBoolean( true );
@@ -922,7 +900,7 @@ void ActiveMQStreamMessageTest::testReadOnlyBody() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-void ActiveMQStreamMessageTest::testWriteOnlyBody() {
+TEST_F(ActiveMQStreamMessageTest, testWriteOnlyBody) {
     ActiveMQStreamMessage message;
     message.clearBody();
     try {
@@ -1006,20 +984,3 @@ void ActiveMQStreamMessageTest::testWriteOnlyBody() {
     } catch( MessageNotReadableException& e ) {
     }
 }
-
-TEST_F(ActiveMQStreamMessageTest, testSetAndGet) { testSetAndGet(); }
-TEST_F(ActiveMQStreamMessageTest, testReadBoolean) { testReadBoolean(); }
-TEST_F(ActiveMQStreamMessageTest, testReadByte) { testReadByte(); }
-TEST_F(ActiveMQStreamMessageTest, testReadShort) { testReadShort(); }
-TEST_F(ActiveMQStreamMessageTest, testReadChar) { testReadChar(); }
-TEST_F(ActiveMQStreamMessageTest, testReadInt) { testReadInt(); }
-TEST_F(ActiveMQStreamMessageTest, testReadLong) { testReadLong(); }
-TEST_F(ActiveMQStreamMessageTest, testReadFloat) { testReadFloat(); }
-TEST_F(ActiveMQStreamMessageTest, testReadDouble) { testReadDouble(); }
-TEST_F(ActiveMQStreamMessageTest, testReadString) { testReadString(); }
-TEST_F(ActiveMQStreamMessageTest, testReadBigString) { testReadBigString(); }
-TEST_F(ActiveMQStreamMessageTest, testReadBytes) { testReadBytes(); }
-TEST_F(ActiveMQStreamMessageTest, testClearBody) { testClearBody(); }
-TEST_F(ActiveMQStreamMessageTest, testReset) { testReset(); }
-TEST_F(ActiveMQStreamMessageTest, testReadOnlyBody) { testReadOnlyBody(); }
-TEST_F(ActiveMQStreamMessageTest, testWriteOnlyBody) { testWriteOnlyBody(); }

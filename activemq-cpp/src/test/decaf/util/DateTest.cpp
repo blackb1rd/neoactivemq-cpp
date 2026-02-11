@@ -35,20 +35,10 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 
-    class DateTest : public ::testing::Test {
-public:
-
-        DateTest(){};
-        virtual ~DateTest(){};
-
-        void test();
-        void testToString();
-
-    };
-
+    class DateTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void DateTest::test() {
+TEST_F(DateTest, test) {
 
     Date date1;
     ASSERT_TRUE(date1.getTime() != 0);
@@ -79,7 +69,7 @@ void DateTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DateTest::testToString() {
+TEST_F(DateTest, testToString) {
 
     // Save original timezone to restore later (avoid test pollution)
     const char* originalTz = std::getenv("TZ");
@@ -130,6 +120,3 @@ void DateTest::testToString() {
     // Full string check - date library outputs EST for Eastern Standard Time
     ASSERT_EQ(std::string("Thu Jan 15 15:56:14 EST 2015"), result);
 }
-
-TEST_F(DateTest, test) { test(); }
-TEST_F(DateTest, testToString) { testToString(); }

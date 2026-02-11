@@ -37,34 +37,7 @@ public:
         LinkedHashMapTest();
         virtual ~LinkedHashMapTest();
 
-        void testConstructor();
-        void testConstructorI();
-        void testConstructorIF();
-        void testConstructorMap();
-        void testClear();
-        void testContainsKey();
-        void testContainsValue();
-        void testGet();
-        void testPut();
-        void testRemove();
-        void testIsEmpty();
-        void testPutAll();
-        void testRehash();
-        void testToString();
-        void testSize();
-        void testEntrySet();
-        void testKeySet();
-        void testValues();
-        void testEntrySetIterator();
-        void testKeySetIterator();
-        void testValuesIterator();
-        void testOrderedEntrySet();
-        void testOrderedKeySet();
-        void testOrderedValues();
-        void testRemoveEldest();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -93,7 +66,7 @@ LinkedHashMapTest::~LinkedHashMapTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testConstructor() {
+TEST_F(LinkedHashMapTest, testConstructor) {
 
     LinkedHashMap<int, std::string> map;
     ASSERT_TRUE(map.isEmpty());
@@ -101,7 +74,7 @@ void LinkedHashMapTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testConstructorI() {
+TEST_F(LinkedHashMapTest, testConstructorI) {
 
     LinkedHashMap<int, std::string> map(5);
 
@@ -120,7 +93,7 @@ void LinkedHashMapTest::testConstructorI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testConstructorIF() {
+TEST_F(LinkedHashMapTest, testConstructorIF) {
 
     LinkedHashMap<int, std::string> map(5, 0.5f);
 
@@ -139,7 +112,7 @@ void LinkedHashMapTest::testConstructorIF() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testConstructorMap() {
+TEST_F(LinkedHashMapTest, testConstructorMap) {
 
     LinkedHashMap<int, int> myMap;
     for (int counter = 0; counter < 125; counter++) {
@@ -153,7 +126,7 @@ void LinkedHashMapTest::testConstructorMap() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testClear() {
+TEST_F(LinkedHashMapTest, testClear) {
 
     LinkedHashMap<int, std::string> hashMap;
     hashMap.put(1, "one");
@@ -179,7 +152,7 @@ void LinkedHashMapTest::testClear() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testContainsKey() {
+TEST_F(LinkedHashMapTest, testContainsKey) {
 
     LinkedHashMap<int, std::string> hashMap;
 
@@ -195,7 +168,7 @@ void LinkedHashMapTest::testContainsKey() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testContainsValue() {
+TEST_F(LinkedHashMapTest, testContainsValue) {
 
     LinkedHashMap<int, std::string> hashMap;
 
@@ -206,7 +179,7 @@ void LinkedHashMapTest::testContainsValue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testEntrySet() {
+TEST_F(LinkedHashMapTest, testEntrySet) {
 
     LinkedHashMap<int, std::string> hashMap;
 
@@ -229,7 +202,7 @@ void LinkedHashMapTest::testEntrySet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testGet() {
+TEST_F(LinkedHashMapTest, testGet) {
 
     LinkedHashMap<int, std::string> hashMap;
 
@@ -239,7 +212,7 @@ void LinkedHashMapTest::testGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testIsEmpty() {
+TEST_F(LinkedHashMapTest, testIsEmpty) {
 
     LinkedHashMap<int, std::string> hashMap;
 
@@ -251,7 +224,7 @@ void LinkedHashMapTest::testIsEmpty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testKeySet() {
+TEST_F(LinkedHashMapTest, testKeySet) {
 
     LinkedHashMap<int, std::string> hashMap;
     populateMap(hashMap);
@@ -371,7 +344,7 @@ namespace util {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testPut() {
+TEST_F(LinkedHashMapTest, testPut) {
 
     {
         LinkedHashMap<std::string, std::string> hashMap(101);
@@ -434,7 +407,7 @@ void LinkedHashMapTest::testPut() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testPutAll() {
+TEST_F(LinkedHashMapTest, testPutAll) {
 
     LinkedHashMap<int, std::string> hashMap;
     populateMap(hashMap);
@@ -447,7 +420,7 @@ void LinkedHashMapTest::testPutAll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testRemove() {
+TEST_F(LinkedHashMapTest, testRemove) {
 
     {
         LinkedHashMap<int, std::string> hashMap;
@@ -498,7 +471,7 @@ void LinkedHashMapTest::testRemove() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testRehash() {
+TEST_F(LinkedHashMapTest, testRehash) {
     // This map should rehash on adding the ninth element.
     LinkedHashMap<MyKey, int> hashMap(10, 0.5f);
 
@@ -527,7 +500,7 @@ void LinkedHashMapTest::testRehash() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testSize() {
+TEST_F(LinkedHashMapTest, testSize) {
     LinkedHashMap<int, std::string> hashMap;
     populateMap(hashMap);
 
@@ -535,7 +508,7 @@ void LinkedHashMapTest::testSize() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testValues() {
+TEST_F(LinkedHashMapTest, testValues) {
 
     LinkedHashMap<int, std::string> hashMap;
     populateMap(hashMap);
@@ -551,7 +524,7 @@ void LinkedHashMapTest::testValues() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testToString() {
+TEST_F(LinkedHashMapTest, testToString) {
 
     LinkedHashMap<int, std::string> hashMap;
     populateMap(hashMap);
@@ -560,7 +533,7 @@ void LinkedHashMapTest::testToString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testEntrySetIterator() {
+TEST_F(LinkedHashMapTest, testEntrySetIterator) {
 
     LinkedHashMap<int, std::string> map;
     populateMap(map);
@@ -591,7 +564,7 @@ void LinkedHashMapTest::testEntrySetIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testKeySetIterator() {
+TEST_F(LinkedHashMapTest, testKeySetIterator) {
 
     LinkedHashMap<int, std::string> map;
     populateMap(map);
@@ -621,7 +594,7 @@ void LinkedHashMapTest::testKeySetIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testValuesIterator() {
+TEST_F(LinkedHashMapTest, testValuesIterator) {
 
     LinkedHashMap<int, std::string> map;
     populateMap(map);
@@ -651,7 +624,7 @@ void LinkedHashMapTest::testValuesIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testOrderedEntrySet() {
+TEST_F(LinkedHashMapTest, testOrderedEntrySet) {
 
     int i;
     int size = 100;
@@ -707,7 +680,7 @@ void LinkedHashMapTest::testOrderedEntrySet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testOrderedKeySet() {
+TEST_F(LinkedHashMapTest, testOrderedKeySet) {
 
     int i;
     int size = 100;
@@ -759,7 +732,7 @@ void LinkedHashMapTest::testOrderedKeySet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testOrderedValues() {
+TEST_F(LinkedHashMapTest, testOrderedValues) {
 
     int i;
     int size = 100;
@@ -840,7 +813,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashMapTest::testRemoveEldest() {
+TEST_F(LinkedHashMapTest, testRemoveEldest) {
 
     int i;
     int size = 10;
@@ -861,29 +834,3 @@ void LinkedHashMapTest::testRemoveEldest() {
 
     ASSERT_EQ(5, map.removals) << ("Incorrect number of removals");
 }
-
-TEST_F(LinkedHashMapTest, testConstructor) { testConstructor(); }
-TEST_F(LinkedHashMapTest, testConstructorI) { testConstructorI(); }
-TEST_F(LinkedHashMapTest, testConstructorIF) { testConstructorIF(); }
-TEST_F(LinkedHashMapTest, testConstructorMap) { testConstructorMap(); }
-TEST_F(LinkedHashMapTest, testClear) { testClear(); }
-TEST_F(LinkedHashMapTest, testContainsKey) { testContainsKey(); }
-TEST_F(LinkedHashMapTest, testContainsValue) { testContainsValue(); }
-TEST_F(LinkedHashMapTest, testGet) { testGet(); }
-TEST_F(LinkedHashMapTest, testPut) { testPut(); }
-TEST_F(LinkedHashMapTest, testRemove) { testRemove(); }
-TEST_F(LinkedHashMapTest, testIsEmpty) { testIsEmpty(); }
-TEST_F(LinkedHashMapTest, testKeySet) { testKeySet(); }
-TEST_F(LinkedHashMapTest, testPutAll) { testPutAll(); }
-TEST_F(LinkedHashMapTest, testRehash) { testRehash(); }
-TEST_F(LinkedHashMapTest, testSize) { testSize(); }
-TEST_F(LinkedHashMapTest, testEntrySet) { testEntrySet(); }
-TEST_F(LinkedHashMapTest, testValues) { testValues(); }
-TEST_F(LinkedHashMapTest, testToString) { testToString(); }
-TEST_F(LinkedHashMapTest, testEntrySetIterator) { testEntrySetIterator(); }
-TEST_F(LinkedHashMapTest, testKeySetIterator) { testKeySetIterator(); }
-TEST_F(LinkedHashMapTest, testValuesIterator) { testValuesIterator(); }
-TEST_F(LinkedHashMapTest, testOrderedEntrySet) { testOrderedEntrySet(); }
-TEST_F(LinkedHashMapTest, testOrderedKeySet) { testOrderedKeySet(); }
-TEST_F(LinkedHashMapTest, testOrderedValues) { testOrderedValues(); }
-TEST_F(LinkedHashMapTest, testRemoveEldest) { testRemoveEldest(); }

@@ -39,7 +39,7 @@ using namespace activemq::commands;
 using namespace decaf::lang;
 
     class ActiveMQMessageTest : public ::testing::Test {
-private:
+protected:
 
         bool readOnlyMessage;
         decaf::lang::Pointer<commands::MessageId> cmsMessageId;
@@ -55,55 +55,7 @@ private:
 
         std::vector<long long> consumerIDs;
 
-    public:
-
-        ActiveMQMessageTest() : readOnlyMessage(), cmsMessageId(), cmsCorrelationID(),
-                                cmsDestination(), cmsReplyTo(), cmsDeliveryMode(), cmsRedelivered(),
-                                cmsType(), cmsExpiration(), cmsPriority(), cmsTimestamp(), consumerIDs() {
-        }
-        virtual ~ActiveMQMessageTest() {}
-
         void SetUp() override;
-        void TearDown() override;
-
-        void test();
-        void testSetReadOnly();
-        void testSetToForeignJMSID();
-        void testEqualsObject();
-        void testShallowCopy();
-        void testCopy();
-        void testGetAndSetCMSMessageID();
-        void testGetAndSetCMSTimestamp();
-        void testGetAndSetCMSCorrelationID();
-        void testGetAndSetCMSDeliveryMode();
-        void testGetAndSetCMSRedelivered();
-        void testGetAndSetCMSType();
-        void testGetAndSetCMSExpiration();
-        void testGetAndSetCMSPriority();
-        void testClearProperties();
-        void testPropertyExists();
-        void testGetBooleanProperty();
-        void testGetByteProperty();
-        void testGetShortProperty();
-        void testGetIntProperty();
-        void testGetLongProperty();
-        void testGetFloatProperty();
-        void testGetDoubleProperty();
-        void testGetStringProperty();
-        void testGetPropertyNames();
-        void testSetEmptyPropertyName();
-        void testGetAndSetCMSXDeliveryCount();
-        void testClearBody();
-        void testBooleanPropertyConversion();
-        void testBytePropertyConversion();
-        void testShortPropertyConversion();
-        void testIntPropertyConversion();
-        void testLongPropertyConversion();
-        void testFloatPropertyConversion();
-        void testDoublePropertyConversion();
-        void testStringPropertyConversion();
-        void testReadOnlyProperties();
-        void testIsExpired();
 
     };
 
@@ -165,13 +117,8 @@ void ActiveMQMessageTest::SetUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::TearDown() {
+TEST_F(ActiveMQMessageTest, test) {
 
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::test()
-{
     ActiveMQMessage myMessage;
     Pointer<MyAckHandler> ackHandler( new MyAckHandler() );
 
@@ -213,7 +160,7 @@ void ActiveMQMessageTest::test()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testSetReadOnly() {
+TEST_F(ActiveMQMessageTest, testSetReadOnly) {
 
     ActiveMQMessage msg;
     msg.setReadOnlyProperties( true );
@@ -226,14 +173,14 @@ void ActiveMQMessageTest::testSetReadOnly() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testSetToForeignJMSID() {
+TEST_F(ActiveMQMessageTest, testSetToForeignJMSID) {
 
     ActiveMQMessage msg;
     msg.setCMSMessageID( "ID:EMS-SERVER.8B443C380083:429" );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testEqualsObject() {
+TEST_F(ActiveMQMessageTest, testEqualsObject) {
 
     ActiveMQMessage msg1;
     ActiveMQMessage msg2;
@@ -246,7 +193,7 @@ void ActiveMQMessageTest::testEqualsObject() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testShallowCopy() {
+TEST_F(ActiveMQMessageTest, testShallowCopy) {
 
     ActiveMQMessage msg1;
     msg1.setMessageId( this->cmsMessageId );
@@ -258,7 +205,7 @@ void ActiveMQMessageTest::testShallowCopy() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testCopy() {
+TEST_F(ActiveMQMessageTest, testCopy) {
 
     this->cmsCorrelationID = "testcorrelationid";
     this->cmsDestination.reset( new ActiveMQTopic( "test.topic" ) );
@@ -299,7 +246,7 @@ void ActiveMQMessageTest::testCopy() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSMessageID() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSMessageID) {
 
     ActiveMQMessage msg;
     msg.setMessageId( this->cmsMessageId );
@@ -307,7 +254,7 @@ void ActiveMQMessageTest::testGetAndSetCMSMessageID() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSTimestamp() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSTimestamp) {
 
     ActiveMQMessage msg;
     msg.setCMSTimestamp( this->cmsTimestamp );
@@ -315,7 +262,7 @@ void ActiveMQMessageTest::testGetAndSetCMSTimestamp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSCorrelationID() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSCorrelationID) {
 
     ActiveMQMessage msg;
     msg.setCMSCorrelationID( this->cmsCorrelationID );
@@ -323,7 +270,7 @@ void ActiveMQMessageTest::testGetAndSetCMSCorrelationID() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSDeliveryMode() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSDeliveryMode) {
 
     ActiveMQMessage msg;
     msg.setCMSDeliveryMode( this->cmsDeliveryMode );
@@ -331,7 +278,7 @@ void ActiveMQMessageTest::testGetAndSetCMSDeliveryMode() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSRedelivered() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSRedelivered) {
 
     ActiveMQMessage msg;
     msg.setRedeliveryCounter( 1 );
@@ -339,7 +286,7 @@ void ActiveMQMessageTest::testGetAndSetCMSRedelivered() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSType() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSType) {
 
     ActiveMQMessage msg;
     msg.setCMSType( this->cmsType );
@@ -347,7 +294,7 @@ void ActiveMQMessageTest::testGetAndSetCMSType() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSExpiration() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSExpiration) {
 
     ActiveMQMessage msg;
     msg.setCMSExpiration( this->cmsExpiration );
@@ -355,7 +302,7 @@ void ActiveMQMessageTest::testGetAndSetCMSExpiration() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSPriority() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSPriority) {
 
     ActiveMQMessage msg;
     msg.setCMSPriority( this->cmsPriority );
@@ -363,7 +310,7 @@ void ActiveMQMessageTest::testGetAndSetCMSPriority() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testClearProperties() {
+TEST_F(ActiveMQMessageTest, testClearProperties) {
 
     ActiveMQMessage msg;
 
@@ -380,7 +327,7 @@ void ActiveMQMessageTest::testClearProperties() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testPropertyExists() {
+TEST_F(ActiveMQMessageTest, testPropertyExists) {
 
     ActiveMQMessage msg;
     msg.setStringProperty( "test", "test" );
@@ -388,7 +335,7 @@ void ActiveMQMessageTest::testPropertyExists() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetBooleanProperty() {
+TEST_F(ActiveMQMessageTest, testGetBooleanProperty) {
 
     ActiveMQMessage msg;
     std::string name = "booleanProperty";
@@ -397,7 +344,7 @@ void ActiveMQMessageTest::testGetBooleanProperty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetByteProperty() {
+TEST_F(ActiveMQMessageTest, testGetByteProperty) {
 
     ActiveMQMessage msg;
     std::string name = "byteProperty";
@@ -406,7 +353,7 @@ void ActiveMQMessageTest::testGetByteProperty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetShortProperty() {
+TEST_F(ActiveMQMessageTest, testGetShortProperty) {
 
     ActiveMQMessage msg;
     std::string name = "shortProperty";
@@ -415,7 +362,7 @@ void ActiveMQMessageTest::testGetShortProperty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetIntProperty() {
+TEST_F(ActiveMQMessageTest, testGetIntProperty) {
 
     ActiveMQMessage msg;
     std::string name = "intProperty";
@@ -424,7 +371,7 @@ void ActiveMQMessageTest::testGetIntProperty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetLongProperty() {
+TEST_F(ActiveMQMessageTest, testGetLongProperty) {
 
     ActiveMQMessage msg;
     std::string name = "longProperty";
@@ -433,7 +380,7 @@ void ActiveMQMessageTest::testGetLongProperty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetFloatProperty() {
+TEST_F(ActiveMQMessageTest, testGetFloatProperty) {
 
     ActiveMQMessage msg;
     std::string name = "floatProperty";
@@ -442,7 +389,7 @@ void ActiveMQMessageTest::testGetFloatProperty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetDoubleProperty() {
+TEST_F(ActiveMQMessageTest, testGetDoubleProperty) {
 
     ActiveMQMessage msg;
     std::string name = "doubleProperty";
@@ -451,7 +398,7 @@ void ActiveMQMessageTest::testGetDoubleProperty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetStringProperty() {
+TEST_F(ActiveMQMessageTest, testGetStringProperty) {
 
     ActiveMQMessage msg;
     std::string name = "stringProperty";
@@ -460,7 +407,7 @@ void ActiveMQMessageTest::testGetStringProperty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetPropertyNames() {
+TEST_F(ActiveMQMessageTest, testGetPropertyNames) {
 
     ActiveMQMessage msg;
     std::string name = "floatProperty";
@@ -475,7 +422,7 @@ void ActiveMQMessageTest::testGetPropertyNames() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testSetEmptyPropertyName() {
+TEST_F(ActiveMQMessageTest, testSetEmptyPropertyName) {
 
     ActiveMQMessage msg;
 
@@ -487,7 +434,7 @@ void ActiveMQMessageTest::testSetEmptyPropertyName() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSXDeliveryCount() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSXDeliveryCount) {
 
     ActiveMQMessage msg;
     msg.setIntProperty( "CMSXDeliveryCount", 1 );
@@ -496,7 +443,7 @@ void ActiveMQMessageTest::testGetAndSetCMSXDeliveryCount() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testClearBody() {
+TEST_F(ActiveMQMessageTest, testClearBody) {
 
     ActiveMQMessage message;
     message.clearBody();
@@ -505,7 +452,7 @@ void ActiveMQMessageTest::testClearBody() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testBooleanPropertyConversion() {
+TEST_F(ActiveMQMessageTest, testBooleanPropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
@@ -547,7 +494,7 @@ void ActiveMQMessageTest::testBooleanPropertyConversion() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testBytePropertyConversion() {
+TEST_F(ActiveMQMessageTest, testBytePropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
@@ -577,7 +524,7 @@ void ActiveMQMessageTest::testBytePropertyConversion() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testShortPropertyConversion() {
+TEST_F(ActiveMQMessageTest, testShortPropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
@@ -611,7 +558,7 @@ void ActiveMQMessageTest::testShortPropertyConversion() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testIntPropertyConversion() {
+TEST_F(ActiveMQMessageTest, testIntPropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
@@ -649,7 +596,7 @@ void ActiveMQMessageTest::testIntPropertyConversion() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testLongPropertyConversion() {
+TEST_F(ActiveMQMessageTest, testLongPropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
@@ -691,7 +638,7 @@ void ActiveMQMessageTest::testLongPropertyConversion() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testFloatPropertyConversion() {
+TEST_F(ActiveMQMessageTest, testFloatPropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
@@ -729,7 +676,7 @@ void ActiveMQMessageTest::testFloatPropertyConversion() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testDoublePropertyConversion() {
+TEST_F(ActiveMQMessageTest, testDoublePropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
@@ -771,7 +718,7 @@ void ActiveMQMessageTest::testDoublePropertyConversion() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testStringPropertyConversion() {
+TEST_F(ActiveMQMessageTest, testStringPropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
@@ -831,7 +778,7 @@ void ActiveMQMessageTest::testStringPropertyConversion() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testReadOnlyProperties() {
+TEST_F(ActiveMQMessageTest, testReadOnlyProperties) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
@@ -880,7 +827,7 @@ void ActiveMQMessageTest::testReadOnlyProperties() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testIsExpired() {
+TEST_F(ActiveMQMessageTest, testIsExpired) {
 
     ActiveMQMessage msg;
     msg.setCMSExpiration( System::currentTimeMillis() - 100 );
@@ -888,41 +835,3 @@ void ActiveMQMessageTest::testIsExpired() {
     msg.setCMSExpiration( System::currentTimeMillis() + 10000 );
     ASSERT_TRUE(!msg.isExpired());
 }
-
-TEST_F(ActiveMQMessageTest, test) { test(); }
-TEST_F(ActiveMQMessageTest, testSetReadOnly) { testSetReadOnly(); }
-TEST_F(ActiveMQMessageTest, testSetToForeignJMSID) { testSetToForeignJMSID(); }
-TEST_F(ActiveMQMessageTest, testEqualsObject) { testEqualsObject(); }
-TEST_F(ActiveMQMessageTest, testShallowCopy) { testShallowCopy(); }
-TEST_F(ActiveMQMessageTest, testCopy) { testCopy(); }
-TEST_F(ActiveMQMessageTest, testGetAndSetCMSMessageID) { testGetAndSetCMSMessageID(); }
-TEST_F(ActiveMQMessageTest, testGetAndSetCMSTimestamp) { testGetAndSetCMSTimestamp(); }
-TEST_F(ActiveMQMessageTest, testGetAndSetCMSCorrelationID) { testGetAndSetCMSCorrelationID(); }
-TEST_F(ActiveMQMessageTest, testGetAndSetCMSDeliveryMode) { testGetAndSetCMSDeliveryMode(); }
-TEST_F(ActiveMQMessageTest, testGetAndSetCMSRedelivered) { testGetAndSetCMSRedelivered(); }
-TEST_F(ActiveMQMessageTest, testGetAndSetCMSType) { testGetAndSetCMSType(); }
-TEST_F(ActiveMQMessageTest, testGetAndSetCMSExpiration) { testGetAndSetCMSExpiration(); }
-TEST_F(ActiveMQMessageTest, testGetAndSetCMSPriority) { testGetAndSetCMSPriority(); }
-TEST_F(ActiveMQMessageTest, testClearProperties) { testClearProperties(); }
-TEST_F(ActiveMQMessageTest, testPropertyExists) { testPropertyExists(); }
-TEST_F(ActiveMQMessageTest, testGetBooleanProperty) { testGetBooleanProperty(); }
-TEST_F(ActiveMQMessageTest, testGetByteProperty) { testGetByteProperty(); }
-TEST_F(ActiveMQMessageTest, testGetShortProperty) { testGetShortProperty(); }
-TEST_F(ActiveMQMessageTest, testGetIntProperty) { testGetIntProperty(); }
-TEST_F(ActiveMQMessageTest, testGetLongProperty) { testGetLongProperty(); }
-TEST_F(ActiveMQMessageTest, testGetFloatProperty) { testGetFloatProperty(); }
-TEST_F(ActiveMQMessageTest, testGetDoubleProperty) { testGetDoubleProperty(); }
-TEST_F(ActiveMQMessageTest, testGetStringProperty) { testGetStringProperty(); }
-TEST_F(ActiveMQMessageTest, testGetPropertyNames) { testGetPropertyNames(); }
-TEST_F(ActiveMQMessageTest, testSetEmptyPropertyName) { testSetEmptyPropertyName(); }
-TEST_F(ActiveMQMessageTest, testGetAndSetCMSXDeliveryCount) { testGetAndSetCMSXDeliveryCount(); }
-TEST_F(ActiveMQMessageTest, testClearBody) { testClearBody(); }
-TEST_F(ActiveMQMessageTest, testBooleanPropertyConversion) { testBooleanPropertyConversion(); }
-TEST_F(ActiveMQMessageTest, testBytePropertyConversion) { testBytePropertyConversion(); }
-TEST_F(ActiveMQMessageTest, testShortPropertyConversion) { testShortPropertyConversion(); }
-TEST_F(ActiveMQMessageTest, testIntPropertyConversion) { testIntPropertyConversion(); }
-TEST_F(ActiveMQMessageTest, testLongPropertyConversion) { testLongPropertyConversion(); }
-TEST_F(ActiveMQMessageTest, testFloatPropertyConversion) { testFloatPropertyConversion(); }
-TEST_F(ActiveMQMessageTest, testDoublePropertyConversion) { testDoublePropertyConversion(); }
-TEST_F(ActiveMQMessageTest, testReadOnlyProperties) { testReadOnlyProperties(); }
-TEST_F(ActiveMQMessageTest, testIsExpired) { testIsExpired(); }

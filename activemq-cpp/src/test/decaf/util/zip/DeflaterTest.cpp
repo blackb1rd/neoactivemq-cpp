@@ -53,34 +53,11 @@ public:
         DeflaterTest();
         virtual ~DeflaterTest();
 
-        void testDeflateVector();
-        void testDeflateArray();
-        void testEnd();
-        void testInitialState();
-        void testDeflateBeforeSetInput();
-        void testGetBytesRead();
-        void testGetBytesWritten();
-        void testFinish();
-        void testFinished();
-        void testGetAdler();
-        void testNeedsInput();
-        void testReset();
-        void testConstructor();
-        void testConstructorI();
-        void testConstructorIB();
-        void testSetDictionaryVector();
-        void testSetDictionaryBIII();
-        void testSetInputVector();
-        void testSetInputBIII();
-        void testSetLevel();
-        void testSetStrategy();
-
-    private:
+    protected:
 
         void helperEndTest( Deflater& defl, const std::string& testName );
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 DeflaterTest::DeflaterTest() {
@@ -91,7 +68,7 @@ DeflaterTest::~DeflaterTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testDeflateVector() {
+TEST_F(DeflaterTest, testDeflateVector) {
 
     unsigned char byteArray[5] = { 1, 3, 4, 7, 8 };
 
@@ -141,7 +118,7 @@ void DeflaterTest::testDeflateVector() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testDeflateArray() {
+TEST_F(DeflaterTest, testDeflateArray) {
 
     static const int BUFFER_SIZE = 50;
     static const int INPUT_SIZE = 5;
@@ -214,7 +191,7 @@ void DeflaterTest::testDeflateArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testEnd() {
+TEST_F(DeflaterTest, testEnd) {
 
     unsigned char byteArray[] = { 5, 2, 3, 7, 8 };
     std::vector<unsigned char> outPutBuf(100);
@@ -234,7 +211,7 @@ void DeflaterTest::testEnd() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testFinish() {
+TEST_F(DeflaterTest, testFinish) {
 
     // This test already here, its the same as test_deflate()
     unsigned char byteArray[] = { 5, 2, 3, 7, 8 };
@@ -272,7 +249,7 @@ void DeflaterTest::testFinish() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testFinished() {
+TEST_F(DeflaterTest, testFinished) {
 
     unsigned char byteArray[] = { 5, 2, 3, 7, 8 };
     std::vector<unsigned char> outPutBuf( 100 );
@@ -292,7 +269,7 @@ void DeflaterTest::testFinished() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testGetAdler() {
+TEST_F(DeflaterTest, testGetAdler) {
 
     unsigned char byteArray[] = { 'a', 'b', 'c', 1, 2, 3 };
     std::vector<unsigned char> outPutBuf( 100 );
@@ -318,7 +295,7 @@ void DeflaterTest::testGetAdler() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testNeedsInput() {
+TEST_F(DeflaterTest, testNeedsInput) {
 
     Deflater defl;
     ASSERT_TRUE(defl.needsInput()) << ("needsInput give the wrong boolean value as a result of no input buffer");
@@ -341,7 +318,7 @@ void DeflaterTest::testNeedsInput() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testReset() {
+TEST_F(DeflaterTest, testReset) {
 
     std::vector<unsigned char> outPutBuf( 100 );
     std::vector<unsigned char> outPutInf( 100 );
@@ -407,7 +384,7 @@ void DeflaterTest::testReset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testSetDictionaryVector() {
+TEST_F(DeflaterTest, testSetDictionaryVector) {
 
     static const int DICT_SIZE = 7;
     static const int ARRAY_SIZE = 15;
@@ -454,7 +431,7 @@ void DeflaterTest::testSetDictionaryVector() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testSetDictionaryBIII() {
+TEST_F(DeflaterTest, testSetDictionaryBIII) {
 
     static const int DICT_SIZE = 9;
     static const int ARRAY_SIZE = 23;
@@ -518,7 +495,7 @@ void DeflaterTest::testSetDictionaryBIII() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testSetInputVector() {
+TEST_F(DeflaterTest, testSetInputVector) {
 
     std::vector<unsigned char> byteVector( 3 );
     std::vector<unsigned char> outPutBuf( 100 );
@@ -558,7 +535,7 @@ void DeflaterTest::testSetInputVector() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testSetInputBIII() {
+TEST_F(DeflaterTest, testSetInputBIII) {
 
     static const int SIZE = 5;
 
@@ -620,7 +597,7 @@ void DeflaterTest::testSetInputBIII() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testSetLevel() {
+TEST_F(DeflaterTest, testSetLevel) {
 
     std::vector<unsigned char> byteArray( 100 );
     for( int ix = 0; ix < 100; ++ix ) {
@@ -672,7 +649,7 @@ void DeflaterTest::testSetLevel() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testSetStrategy() {
+TEST_F(DeflaterTest, testSetStrategy) {
 
     std::vector<unsigned char> byteArray( 100 );
     for( int ix = 0; ix < 100; ++ix ) {
@@ -719,7 +696,7 @@ void DeflaterTest::testSetStrategy() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testConstructor() {
+TEST_F(DeflaterTest, testConstructor) {
 
     std::vector<unsigned char> byteArray( 100 );
     for( int ix = 0; ix < 100; ++ix ) {
@@ -755,7 +732,7 @@ void DeflaterTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testConstructorIB() {
+TEST_F(DeflaterTest, testConstructorIB) {
 
     static const int ARRAY_SIZE = 15;
 
@@ -845,7 +822,7 @@ void DeflaterTest::testConstructorIB() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testConstructorI() {
+TEST_F(DeflaterTest, testConstructorI) {
 
     std::vector<unsigned char> byteArray( 100 );
     for( int ix = 0; ix < 100; ++ix ) {
@@ -931,7 +908,7 @@ void DeflaterTest::helperEndTest( Deflater& defl, const std::string& desc ) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testInitialState() {
+TEST_F(DeflaterTest, testInitialState) {
 
     Deflater inf;
     ASSERT_EQ(false, inf.finished());
@@ -940,7 +917,7 @@ void DeflaterTest::testInitialState() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testGetBytesRead() {
+TEST_F(DeflaterTest, testGetBytesRead) {
 
     Deflater def;
     ASSERT_EQ(0LL, def.getBytesRead());
@@ -962,7 +939,7 @@ void DeflaterTest::testGetBytesRead() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testGetBytesWritten() {
+TEST_F(DeflaterTest, testGetBytesWritten) {
 
     Deflater def;
     ASSERT_EQ(0LL, def.getBytesRead());
@@ -984,7 +961,7 @@ void DeflaterTest::testGetBytesWritten() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testDeflateBeforeSetInput() {
+TEST_F(DeflaterTest, testDeflateBeforeSetInput) {
 
     Deflater deflater;
     deflater.finish();
@@ -999,25 +976,3 @@ void DeflaterTest::testDeflateBeforeSetInput() {
         ASSERT_EQ(expectedBytes[i], buffer[i]);
     }
 }
-
-TEST_F(DeflaterTest, testDeflateVector) { testDeflateVector(); }
-TEST_F(DeflaterTest, testDeflateArray) { testDeflateArray(); }
-TEST_F(DeflaterTest, testEnd) { testEnd(); }
-TEST_F(DeflaterTest, testInitialState) { testInitialState(); }
-TEST_F(DeflaterTest, testDeflateBeforeSetInput) { testDeflateBeforeSetInput(); }
-TEST_F(DeflaterTest, testGetBytesRead) { testGetBytesRead(); }
-TEST_F(DeflaterTest, testGetBytesWritten) { testGetBytesWritten(); }
-TEST_F(DeflaterTest, testFinish) { testFinish(); }
-TEST_F(DeflaterTest, testFinished) { testFinished(); }
-TEST_F(DeflaterTest, testGetAdler) { testGetAdler(); }
-TEST_F(DeflaterTest, testNeedsInput) { testNeedsInput(); }
-TEST_F(DeflaterTest, testReset) { testReset(); }
-TEST_F(DeflaterTest, testConstructor) { testConstructor(); }
-TEST_F(DeflaterTest, testConstructorI) { testConstructorI(); }
-TEST_F(DeflaterTest, testConstructorIB) { testConstructorIB(); }
-TEST_F(DeflaterTest, testSetDictionaryVector) { testSetDictionaryVector(); }
-TEST_F(DeflaterTest, testSetDictionaryBIII) { testSetDictionaryBIII(); }
-TEST_F(DeflaterTest, testSetInputVector) { testSetInputVector(); }
-TEST_F(DeflaterTest, testSetInputBIII) { testSetInputBIII(); }
-TEST_F(DeflaterTest, testSetLevel) { testSetLevel(); }
-TEST_F(DeflaterTest, testSetStrategy) { testSetStrategy(); }

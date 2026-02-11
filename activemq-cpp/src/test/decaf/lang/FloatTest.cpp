@@ -37,24 +37,6 @@ public:
         static const std::string expectedStringFor1_17eN38To38[];
 
         FloatTest();
-        virtual ~FloatTest() {}
-
-        void test_ConstructorF();
-        void test_ConstructorString();
-        void test_byteValue();
-        void test_compare();
-        void test_doubleValue();
-        void test_floatToIntBitsF();
-        void test_floatToRawIntBitsF();
-        void test_floatValue();
-        void test_intBitsToFloatI();
-        void test_intValue();
-        void test_isInfinite();
-        void test_isInfiniteF();
-        void test_isNaN();
-        void test_isNaNF();
-        void test_longValue();
-        void test_parseFloatLDecaf_lang_String();
 
 //        void test_byteValue();
 //        void test_byteValue();
@@ -71,14 +53,13 @@ public:
 //        void test_byteValue();
 //        void test_byteValue();
 
-    private:
+    protected:
 
         void doTestCompareRawBits( const std::string& originalFloatString,
                                    int expectedRawBits,
                                    const std::string& expectedString );
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const int FloatTest::rawBitsFor3_4eN38To38[] = {
@@ -171,14 +152,14 @@ void FloatTest::doTestCompareRawBits( const std::string& originalFloatString,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_ConstructorF() {
+TEST_F(FloatTest, test_ConstructorF) {
     // Test for method decaf.lang.Float(float)
     Float f( 900.89f );
     ASSERT_TRUE(f.floatValue() == 900.89f) << ("Created incorrect float");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_ConstructorString() {
+TEST_F(FloatTest, test_ConstructorString) {
     // Test for method decaf.lang.Float(decaf.lang.String)
     // TODO
     //Float f( "900.89" );
@@ -186,7 +167,7 @@ void FloatTest::test_ConstructorString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_byteValue() {
+TEST_F(FloatTest, test_byteValue) {
     // Test for method byte decaf.lang.Float::byteValue()
     Float f( 0.46874f );
     Float f2( 90.8f );
@@ -195,7 +176,7 @@ void FloatTest::test_byteValue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_compare() {
+TEST_F(FloatTest, test_compare) {
 
     float values[] = { Float::NEGATIVE_INFINITY,
                        -Float::MAX_VALUE,
@@ -227,13 +208,13 @@ void FloatTest::test_compare() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_doubleValue() {
+TEST_F(FloatTest, test_doubleValue) {
     // Test for method double decaf.lang.Float::doubleValue()
     ASSERT_TRUE(Math::abs( Float( 999999.999f ).doubleValue() - 999999.999 ) < 1) << ("Incorrect double value returned");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_floatToIntBitsF() {
+TEST_F(FloatTest, test_floatToIntBitsF) {
     float f = 9876.2345f;
     int bits = Float::floatToIntBits( f );
     float r = Float::intBitsToFloat( bits );
@@ -241,14 +222,14 @@ void FloatTest::test_floatToIntBitsF() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_floatToRawIntBitsF() {
+TEST_F(FloatTest, test_floatToRawIntBitsF) {
     int i = 0x7fc004d2;
     float f = Float::intBitsToFloat( i );
     ASSERT_TRUE(Float::floatToRawIntBits(f) == i) << ("Wrong raw bits");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_floatValue() {
+TEST_F(FloatTest, test_floatValue) {
     // Test for method float decaf.lang.Float::floatValue()
     Float f( 87.657f );
     Float f2( -0.876f );
@@ -257,7 +238,7 @@ void FloatTest::test_floatValue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_intBitsToFloatI() {
+TEST_F(FloatTest, test_intBitsToFloatI) {
     float f = 9876.2345f;
     int bits = Float::floatToIntBits(f);
     float r = Float::intBitsToFloat(bits);
@@ -265,7 +246,7 @@ void FloatTest::test_intBitsToFloatI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_intValue() {
+TEST_F(FloatTest, test_intValue) {
     // Test for method int decaf.lang.Float::intValue()
     Float f( 0.46874f );
     Float f2( 90.8f );
@@ -273,7 +254,7 @@ void FloatTest::test_intValue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_isInfinite() {
+TEST_F(FloatTest, test_isInfinite) {
     // Test for method boolean decaf.lang.Float::isInfinite()
     ASSERT_TRUE(Float( Float::POSITIVE_INFINITY ).isInfinite() &&
             Float( Float::NEGATIVE_INFINITY ).isInfinite() &&
@@ -281,7 +262,7 @@ void FloatTest::test_isInfinite() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_isInfiniteF() {
+TEST_F(FloatTest, test_isInfiniteF) {
     // Test for method boolean decaf.lang.Float::isInfinite(float)
 
     ASSERT_TRUE(Float::isInfinite( Float::POSITIVE_INFINITY ) &&
@@ -290,19 +271,19 @@ void FloatTest::test_isInfiniteF() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_isNaN() {
+TEST_F(FloatTest, test_isNaN) {
     // Test for method boolean decaf.lang.Float::isNaN()
     ASSERT_TRUE(Float( Float::NaN ).isNaN() && !( Float( 1.0f ).isNaN() )) << ("NAN check failed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_isNaNF() {
+TEST_F(FloatTest, test_isNaNF) {
     // Test for method boolean decaf.lang.Float::isNaN(float)
     ASSERT_TRUE(Float::isNaN( Float::NaN ) && !( Float::isNaN( 12.09f ) )) << ("NaN check failed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_longValue() {
+TEST_F(FloatTest, test_longValue) {
     // Test for method long decaf.lang.Float::longValue()
     Float f( 0.46874f );
     Float f2( 90.8f );
@@ -310,7 +291,7 @@ void FloatTest::test_longValue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatTest::test_parseFloatLDecaf_lang_String() {
+TEST_F(FloatTest, test_parseFloatLDecaf_lang_String) {
 
     // TODO
 //    ASSERT_TRUE(//            0.0 == Float::parseFloat("7.0064923216240853546186479164495e-46")) << ("Incorrect float returned, expected zero.");
@@ -426,20 +407,3 @@ void FloatTest::test_parseFloatLDecaf_lang_String() {
 //    doTestCompareRawBits("1.0E+39", 0x7f800000, "Infinity");
 //    doTestCompareRawBits("-1.0E+39", 0xff800000, "-Infinity");
 }
-
-TEST_F(FloatTest, test_ConstructorF) { test_ConstructorF(); }
-TEST_F(FloatTest, test_ConstructorString) { test_ConstructorString(); }
-TEST_F(FloatTest, test_byteValue) { test_byteValue(); }
-TEST_F(FloatTest, test_compare) { test_compare(); }
-TEST_F(FloatTest, test_doubleValue) { test_doubleValue(); }
-TEST_F(FloatTest, test_floatToIntBitsF) { test_floatToIntBitsF(); }
-TEST_F(FloatTest, test_floatToRawIntBitsF) { test_floatToRawIntBitsF(); }
-TEST_F(FloatTest, test_floatValue) { test_floatValue(); }
-TEST_F(FloatTest, test_intBitsToFloatI) { test_intBitsToFloatI(); }
-TEST_F(FloatTest, test_intValue) { test_intValue(); }
-TEST_F(FloatTest, test_isInfinite) { test_isInfinite(); }
-TEST_F(FloatTest, test_isInfiniteF) { test_isInfiniteF(); }
-TEST_F(FloatTest, test_isNaN) { test_isNaN(); }
-TEST_F(FloatTest, test_isNaNF) { test_isNaNF(); }
-TEST_F(FloatTest, test_longValue) { test_longValue(); }
-TEST_F(FloatTest, test_parseFloatLDecaf_lang_String) { test_parseFloatLDecaf_lang_String(); }

@@ -39,36 +39,11 @@ using namespace decaf::io;
 using namespace decaf::util;
 
     class BufferedInputStreamTest : public ::testing::Test {
-private:
+protected:
 
         static const std::string testString;
 
-    public:
-
-        virtual ~BufferedInputStreamTest(){}
-        void SetUp() override{}
-        void TearDown() override{}
-
-        void testSmallerBuffer();
-        void testBiggerBuffer();
-        void testConstructor();
-        void testAvailable();
-        void testClose();
-        void testRead();
-        void testReadException();
-        void testRead2();
-        void testMarkSupported();
-        void testSkipNullInputStream();
-        void testResetScenario1();
-        void testResetScenario2();
-        void testResetException();
-        void testReset();
-        void testMarkI();
-        void testSkipJ();
-
     };
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const std::string BufferedInputStreamTest::testString =
@@ -205,7 +180,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testConstructor() {
+TEST_F(BufferedInputStreamTest, testConstructor) {
 
     std::string testStr = "TEST12345678910";
     MyInputStream myStream( testStr );
@@ -234,7 +209,7 @@ void BufferedInputStreamTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testAvailable() {
+TEST_F(BufferedInputStreamTest, testAvailable) {
 
     std::string testStr = "TEST12345678910";
     MyInputStream myStream( testStr );
@@ -273,7 +248,7 @@ void BufferedInputStreamTest::testAvailable() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testClose() {
+TEST_F(BufferedInputStreamTest, testClose) {
 
     try{
         std::string testStr = "TEST12345678910";
@@ -293,13 +268,13 @@ void BufferedInputStreamTest::testClose() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testMarkSupported() {
+TEST_F(BufferedInputStreamTest, testMarkSupported) {
     BufferedInputStream is( NULL );
     ASSERT_TRUE(is.markSupported()) << ("markSupported returned incorrect value");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testRead() {
+TEST_F(BufferedInputStreamTest, testRead) {
 
     try {
         // Test for method int BufferedInputStream.read()
@@ -341,7 +316,7 @@ void BufferedInputStreamTest::testRead() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testRead2() {
+TEST_F(BufferedInputStreamTest, testRead2) {
 
     std::string testStr;
     testStr.append( "A", 3000 );
@@ -364,7 +339,7 @@ void BufferedInputStreamTest::testRead2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testReadException() {
+TEST_F(BufferedInputStreamTest, testReadException) {
 
     unsigned char array[1];
 
@@ -380,7 +355,7 @@ void BufferedInputStreamTest::testReadException() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testSmallerBuffer(){
+TEST_F(BufferedInputStreamTest, testSmallerBuffer){
 
     std::string testStr = "TEST12345678910";
     MyInputStream myStream( testStr );
@@ -421,7 +396,7 @@ void BufferedInputStreamTest::testSmallerBuffer(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testBiggerBuffer(){
+TEST_F(BufferedInputStreamTest, testBiggerBuffer){
 
     std::string testStr = "TEST12345678910";
     MyInputStream myStream( testStr );
@@ -462,14 +437,14 @@ void BufferedInputStreamTest::testBiggerBuffer(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testSkipNullInputStream() {
+TEST_F(BufferedInputStreamTest, testSkipNullInputStream) {
 
     BufferedInputStream buf( NULL, 5 );
     ASSERT_EQ(0LL, buf.skip( 0 ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testMarkI() {
+TEST_F(BufferedInputStreamTest, testMarkI) {
 
     ByteArrayInputStream stream;
     stream.setByteArray( (const unsigned char*)testString.c_str(), (int)testString.length() );
@@ -563,7 +538,7 @@ void BufferedInputStreamTest::testMarkI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testResetScenario1() {
+TEST_F(BufferedInputStreamTest, testResetScenario1) {
 
     unsigned char input[] = { '1','2','3','4','5','6','7','8','9','0','0' };
 
@@ -579,7 +554,7 @@ void BufferedInputStreamTest::testResetScenario1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testResetScenario2() {
+TEST_F(BufferedInputStreamTest, testResetScenario2) {
 
     unsigned char input[] = { '1','2','3','4','5','6','7','8','9','0','0' };
 
@@ -594,7 +569,7 @@ void BufferedInputStreamTest::testResetScenario2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testResetException() {
+TEST_F(BufferedInputStreamTest, testResetException) {
 
     BufferedInputStream bis( NULL );
 
@@ -611,7 +586,7 @@ void BufferedInputStreamTest::testResetException() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testReset() {
+TEST_F(BufferedInputStreamTest, testReset) {
 
     ByteArrayInputStream stream;
     stream.setByteArray( (const unsigned char*)testString.c_str(), (int)testString.length() );
@@ -643,7 +618,7 @@ void BufferedInputStreamTest::testReset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamTest::testSkipJ() {
+TEST_F(BufferedInputStreamTest, testSkipJ) {
 
     ByteArrayInputStream stream;
     stream.setByteArray( (const unsigned char*)testString.c_str(), (int)testString.length() );
@@ -661,20 +636,3 @@ void BufferedInputStreamTest::testSkipJ() {
     BufferedInputStream buf( NULL, 5 );
     ASSERT_THROW(buf.skip( 10 ), IOException) << ("should throw IOException");
 }
-
-TEST_F(BufferedInputStreamTest, testSmallerBuffer) { testSmallerBuffer(); }
-TEST_F(BufferedInputStreamTest, testBiggerBuffer) { testBiggerBuffer(); }
-TEST_F(BufferedInputStreamTest, testConstructor) { testConstructor(); }
-TEST_F(BufferedInputStreamTest, testAvailable) { testAvailable(); }
-TEST_F(BufferedInputStreamTest, testClose) { testClose(); }
-TEST_F(BufferedInputStreamTest, testRead) { testRead(); }
-TEST_F(BufferedInputStreamTest, testRead2) { testRead2(); }
-TEST_F(BufferedInputStreamTest, testReadException) { testReadException(); }
-TEST_F(BufferedInputStreamTest, testSkipNullInputStream) { testSkipNullInputStream(); }
-TEST_F(BufferedInputStreamTest, testMarkSupported) { testMarkSupported(); }
-TEST_F(BufferedInputStreamTest, testResetScenario1) { testResetScenario1(); }
-TEST_F(BufferedInputStreamTest, testResetScenario2) { testResetScenario2(); }
-TEST_F(BufferedInputStreamTest, testResetException) { testResetException(); }
-TEST_F(BufferedInputStreamTest, testReset) { testReset(); }
-TEST_F(BufferedInputStreamTest, testMarkI) { testMarkI(); }
-TEST_F(BufferedInputStreamTest, testSkipJ) { testSkipJ(); }

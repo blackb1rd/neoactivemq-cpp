@@ -30,10 +30,7 @@ public:
         OutputStreamTest();
         virtual ~OutputStreamTest();
 
-        void test();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -69,7 +66,7 @@ OutputStreamTest::~OutputStreamTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStreamTest::test() {
+TEST_F(OutputStreamTest, test) {
 
     MockOutputStream ostream;
 
@@ -81,5 +78,3 @@ void OutputStreamTest::test() {
 
     ASSERT_EQ(std::string( "hello world" ), result) << ("Written string not what was expected");
 }
-
-TEST_F(OutputStreamTest, test) { test(); }

@@ -22,18 +22,9 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 
-    class RandomTest : public ::testing::Test
-    {
-public:
+    class RandomTest : public ::testing::Test {};
 
-        RandomTest(){}
-        virtual ~RandomTest(){}
-
-        void test();
-    };
-
-
-void RandomTest::test(){
+TEST_F(RandomTest, test){
 
     Random rand(122760);
     ASSERT_EQ(-1524104671, rand.nextInt());
@@ -94,5 +85,3 @@ void RandomTest::test(){
     }
     ASSERT_TRUE(ok);
 }
-
-TEST_F(RandomTest, test) { test(); }

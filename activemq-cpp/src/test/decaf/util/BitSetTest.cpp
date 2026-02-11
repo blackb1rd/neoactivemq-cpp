@@ -40,37 +40,7 @@ public:
 
         void SetUp() override;
 
-        void testConstructor();
-        void testConstructorI();
-        void testCopy();
-        void testEquals();
-        void testCardinality();
-        void testClear();
-        void testClearI();
-        void testClearII();
-        void testGetI();
-        void testGetII();
-        void testFlipI();
-        void testFlipII();
-        void testSetI();
-        void testSetIB();
-        void testSetII();
-        void testSetIIB();
-        void testIsEmpty();
-        void testIntersects();
-        void testAnd();
-        void testAndNot();
-        void testOR();
-        void testXOR();
-        void testSize();
-        void testToString();
-        void testLength();
-        void testNextSetBitI();
-        void testNextClearBitI();
-        void testNotModified();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -98,7 +68,6 @@ BitSetTest::BitSetTest() {
 BitSetTest::~BitSetTest() {
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 void BitSetTest::SetUp() {
 
@@ -110,7 +79,7 @@ void BitSetTest::SetUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testConstructor() {
+TEST_F(BitSetTest, testConstructor) {
 
     BitSet bs;
 
@@ -120,7 +89,7 @@ void BitSetTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testConstructorI() {
+TEST_F(BitSetTest, testConstructorI) {
 
     BitSet bs(128);
     // Default size for a BitSet should be 64 elements;
@@ -149,7 +118,7 @@ void BitSetTest::testConstructorI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testCopy() {
+TEST_F(BitSetTest, testCopy) {
     BitSet bs(eightbs);
     ASSERT_TRUE(bs.equals(eightbs)) << ("copy failed to return equal BitSet");
 
@@ -159,7 +128,7 @@ void BitSetTest::testCopy() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testEquals() {
+TEST_F(BitSetTest, testEquals) {
     BitSet bs = eightbs;
 
     ASSERT_TRUE(eightbs.equals(eightbs)) << ("Same BitSet returned false");
@@ -175,7 +144,7 @@ void BitSetTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testClear() {
+TEST_F(BitSetTest, testClear) {
     eightbs.clear();
     for (int i = 0; i < 8; i++) {
         ASSERT_TRUE(!eightbs.get(i)) << ("Clear didn't clear bit " + Integer::toString(i));
@@ -192,7 +161,7 @@ void BitSetTest::testClear() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testClearI() {
+TEST_F(BitSetTest, testClearI) {
 
     eightbs.clear(7);
     ASSERT_TRUE(!eightbs.get(7)) << ("Failed to clear bit");
@@ -250,7 +219,7 @@ void BitSetTest::testClearI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testClearII() {
+TEST_F(BitSetTest, testClearII) {
     BitSet bitset;
     for (int i = 0; i < 20; i++) {
         bitset.set(i);
@@ -452,7 +421,7 @@ void BitSetTest::testClearII() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testGetI() {
+TEST_F(BitSetTest, testGetI) {
 
     BitSet bs;
     bs.set(8);
@@ -501,7 +470,7 @@ void BitSetTest::testGetI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testGetII() {
+TEST_F(BitSetTest, testGetII) {
 
     BitSet bitset(30);
     bitset.get(3, 3);
@@ -644,7 +613,7 @@ void BitSetTest::testGetII() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testFlipI() {
+TEST_F(BitSetTest, testFlipI) {
     BitSet bs;
     bs.clear(8);
     bs.clear(9);
@@ -716,7 +685,7 @@ void BitSetTest::testFlipI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testFlipII() {
+TEST_F(BitSetTest, testFlipII) {
     BitSet bitset;
     for (int i = 0; i < 20; i++) {
         bitset.set(i);
@@ -869,7 +838,7 @@ void BitSetTest::testFlipII() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testSetI() {
+TEST_F(BitSetTest, testSetI) {
 
     BitSet bs;
     bs.set(8);
@@ -910,7 +879,7 @@ void BitSetTest::testSetI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testSetIB() {
+TEST_F(BitSetTest, testSetIB) {
     eightbs.set(5, false);
     ASSERT_TRUE(!eightbs.get(5)) << ("Should have set bit 5 to true");
 
@@ -927,7 +896,7 @@ void BitSetTest::testSetIB() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testSetII() {
+TEST_F(BitSetTest, testSetII) {
 
     BitSet bitset(30);
     bitset.set(29, 29);
@@ -1064,7 +1033,7 @@ void BitSetTest::testSetII() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testSetIIB() {
+TEST_F(BitSetTest, testSetIIB) {
     eightbs.set(3, 6, false);
     ASSERT_TRUE(!eightbs.get(3) && !eightbs.get(4) && !eightbs.get(5)) << ("Should have set bits 3, 4, and 5 to false");
 
@@ -1073,7 +1042,7 @@ void BitSetTest::testSetIIB() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testNotModified() {
+TEST_F(BitSetTest, testNotModified) {
     // BitSet shouldn't be modified by any of the operations below,
     // since the affected bits for these methods are defined as inclusive of
     // pos1, exclusive of pos2.
@@ -1095,7 +1064,7 @@ void BitSetTest::testNotModified() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testIntersects() {
+TEST_F(BitSetTest, testIntersects) {
     BitSet bs(500);
     bs.set(5);
     bs.set(63);
@@ -1150,7 +1119,7 @@ void BitSetTest::testIntersects() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testAnd() {
+TEST_F(BitSetTest, testAnd) {
     BitSet bs(128);
 
     // Initialize the bottom half of the BitSet
@@ -1172,7 +1141,7 @@ void BitSetTest::testAnd() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testAndNot() {
+TEST_F(BitSetTest, testAndNot) {
 
     BitSet bs = eightbs;
     bs.clear(5);
@@ -1197,7 +1166,7 @@ void BitSetTest::testAndNot() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testOR() {
+TEST_F(BitSetTest, testOR) {
     {
         BitSet bs(128);
         bs.OR(eightbs);
@@ -1221,7 +1190,7 @@ void BitSetTest::testOR() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testXOR() {
+TEST_F(BitSetTest, testXOR) {
 
     {
         BitSet bs = eightbs;
@@ -1250,21 +1219,21 @@ void BitSetTest::testXOR() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testSize() {
+TEST_F(BitSetTest, testSize) {
     ASSERT_EQ(64, eightbs.size()) << ("Returned incorrect size");
     eightbs.set(129);
     ASSERT_TRUE(eightbs.size() >= 129) << ("Returned incorrect size");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testToString() {
+TEST_F(BitSetTest, testToString) {
     ASSERT_EQ(std::string("{0, 1, 2, 3, 4, 5, 6, 7}"), eightbs.toString()) << ("Returned incorrect string representation");
     eightbs.clear(2);
     ASSERT_EQ(std::string("{0, 1, 3, 4, 5, 6, 7}"), eightbs.toString()) << ("Returned incorrect string representation");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testLength() {
+TEST_F(BitSetTest, testLength) {
     BitSet bs;
     ASSERT_EQ(0, bs.length()) << ("BitSet returned wrong length");
     bs.set(5);
@@ -1278,7 +1247,7 @@ void BitSetTest::testLength() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testNextSetBitI() {
+TEST_F(BitSetTest, testNextSetBitI) {
     BitSet bs(500);
     bs.set(5);
     bs.set(32);
@@ -1332,7 +1301,7 @@ void BitSetTest::testNextSetBitI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testNextClearBitI() {
+TEST_F(BitSetTest, testNextClearBitI) {
     BitSet bs(500);
 
     // ensure all the bits from 0 to bs.size() - 1 are set to true
@@ -1396,7 +1365,7 @@ void BitSetTest::testNextClearBitI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testIsEmpty() {
+TEST_F(BitSetTest, testIsEmpty) {
     BitSet bs(500);
     ASSERT_TRUE(bs.isEmpty()) << ("Test: isEmpty() returned wrong value");
 
@@ -1425,7 +1394,7 @@ void BitSetTest::testIsEmpty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BitSetTest::testCardinality() {
+TEST_F(BitSetTest, testCardinality) {
 
     BitSet bs(500);
     bs.set(5);
@@ -1452,32 +1421,3 @@ void BitSetTest::testCardinality() {
     bs.set(0, 64);
     ASSERT_EQ(64, bs.cardinality()) << ("cardinality() returned wrong value");
 }
-
-TEST_F(BitSetTest, testConstructor) { testConstructor(); }
-TEST_F(BitSetTest, testConstructorI) { testConstructorI(); }
-TEST_F(BitSetTest, testCopy) { testCopy(); }
-TEST_F(BitSetTest, testCardinality) { testCardinality(); }
-TEST_F(BitSetTest, testEquals) { testEquals(); }
-TEST_F(BitSetTest, testClear) { testClear(); }
-TEST_F(BitSetTest, testClearI) { testClearI(); }
-TEST_F(BitSetTest, testClearII) { testClearII(); }
-TEST_F(BitSetTest, testGetI) { testGetI(); }
-TEST_F(BitSetTest, testGetII) { testGetII(); }
-TEST_F(BitSetTest, testFlipI) { testFlipI(); }
-TEST_F(BitSetTest, testFlipII) { testFlipII(); }
-TEST_F(BitSetTest, testSetI) { testSetI(); }
-TEST_F(BitSetTest, testSetIB) { testSetIB(); }
-TEST_F(BitSetTest, testSetII) { testSetII(); }
-TEST_F(BitSetTest, testSetIIB) { testSetIIB(); }
-TEST_F(BitSetTest, testIsEmpty) { testIsEmpty(); }
-TEST_F(BitSetTest, testIntersects) { testIntersects(); }
-TEST_F(BitSetTest, testAnd) { testAnd(); }
-TEST_F(BitSetTest, testAndNot) { testAndNot(); }
-TEST_F(BitSetTest, testOR) { testOR(); }
-TEST_F(BitSetTest, testXOR) { testXOR(); }
-TEST_F(BitSetTest, testSize) { testSize(); }
-TEST_F(BitSetTest, testLength) { testLength(); }
-TEST_F(BitSetTest, testToString) { testToString(); }
-TEST_F(BitSetTest, testNextSetBitI) { testNextSetBitI(); }
-TEST_F(BitSetTest, testNextClearBitI) { testNextClearBitI(); }
-TEST_F(BitSetTest, testNotModified) { testNotModified(); }

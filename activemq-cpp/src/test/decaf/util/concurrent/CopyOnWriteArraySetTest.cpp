@@ -27,7 +27,7 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class CopyOnWriteArraySetTest : public ::testing::Test {
-private:
+protected:
 
         static const int SIZE;
 
@@ -36,27 +36,7 @@ private:
         CopyOnWriteArraySetTest();
         virtual ~CopyOnWriteArraySetTest();
 
-        void testConstructor1();
-        void testConstructor2();
-        void testConstructor3();
-        void testAddAll1();
-        void testAddAll2();
-        void testAdd1();
-        void testAdd2();
-        void testClear();
-        void testContains();
-        void testContainsAll();
-        void testEquals();
-        void testIsEmpty();
-        void testIterator();
-        void testIteratorRemove();
-        void testRemoveAll();
-        void testRemove();
-        void testSize();
-        void testToArray();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -86,7 +66,7 @@ CopyOnWriteArraySetTest::~CopyOnWriteArraySetTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testConstructor1() {
+TEST_F(CopyOnWriteArraySetTest, testConstructor1) {
 
     CopyOnWriteArraySet<int> set;
     ASSERT_TRUE(set.isEmpty());
@@ -98,7 +78,7 @@ void CopyOnWriteArraySetTest::testConstructor1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testConstructor2() {
+TEST_F(CopyOnWriteArraySetTest, testConstructor2) {
 
     StlList<int> intsList;
 
@@ -116,7 +96,7 @@ void CopyOnWriteArraySetTest::testConstructor2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testConstructor3() {
+TEST_F(CopyOnWriteArraySetTest, testConstructor3) {
 
     int ints[SIZE];
 
@@ -134,7 +114,7 @@ void CopyOnWriteArraySetTest::testConstructor3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testAddAll1() {
+TEST_F(CopyOnWriteArraySetTest, testAddAll1) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -149,7 +129,7 @@ void CopyOnWriteArraySetTest::testAddAll1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testAddAll2() {
+TEST_F(CopyOnWriteArraySetTest, testAddAll2) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -164,7 +144,7 @@ void CopyOnWriteArraySetTest::testAddAll2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testAdd1() {
+TEST_F(CopyOnWriteArraySetTest, testAdd1) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -174,7 +154,7 @@ void CopyOnWriteArraySetTest::testAdd1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testAdd2() {
+TEST_F(CopyOnWriteArraySetTest, testAdd2) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -185,7 +165,7 @@ void CopyOnWriteArraySetTest::testAdd2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testClear() {
+TEST_F(CopyOnWriteArraySetTest, testClear) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -195,7 +175,7 @@ void CopyOnWriteArraySetTest::testClear() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testContains() {
+TEST_F(CopyOnWriteArraySetTest, testContains) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -205,7 +185,7 @@ void CopyOnWriteArraySetTest::testContains() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testEquals() {
+TEST_F(CopyOnWriteArraySetTest, testEquals) {
 
     CopyOnWriteArraySet<int> a;
     populate( a, 3 );
@@ -225,7 +205,7 @@ void CopyOnWriteArraySetTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testContainsAll() {
+TEST_F(CopyOnWriteArraySetTest, testContainsAll) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -241,7 +221,7 @@ void CopyOnWriteArraySetTest::testContainsAll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testIsEmpty() {
+TEST_F(CopyOnWriteArraySetTest, testIsEmpty) {
 
     CopyOnWriteArraySet<int> empty;
     CopyOnWriteArraySet<int> full;
@@ -252,7 +232,7 @@ void CopyOnWriteArraySetTest::testIsEmpty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testIterator() {
+TEST_F(CopyOnWriteArraySetTest, testIterator) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -267,7 +247,7 @@ void CopyOnWriteArraySetTest::testIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testIteratorRemove() {
+TEST_F(CopyOnWriteArraySetTest, testIteratorRemove) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -279,7 +259,7 @@ void CopyOnWriteArraySetTest::testIteratorRemove() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testRemoveAll() {
+TEST_F(CopyOnWriteArraySetTest, testRemoveAll) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -293,7 +273,7 @@ void CopyOnWriteArraySetTest::testRemoveAll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testRemove() {
+TEST_F(CopyOnWriteArraySetTest, testRemove) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -305,7 +285,7 @@ void CopyOnWriteArraySetTest::testRemove() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testSize() {
+TEST_F(CopyOnWriteArraySetTest, testSize) {
 
     CopyOnWriteArraySet<int> empty;
     CopyOnWriteArraySet<int> full;
@@ -316,7 +296,7 @@ void CopyOnWriteArraySetTest::testSize() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testToArray() {
+TEST_F(CopyOnWriteArraySetTest, testToArray) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -328,22 +308,3 @@ void CopyOnWriteArraySetTest::testToArray() {
     ASSERT_EQ(1, array[1]);
     ASSERT_EQ(2, array[2]);
 }
-
-TEST_F(CopyOnWriteArraySetTest, testConstructor1) { testConstructor1(); }
-TEST_F(CopyOnWriteArraySetTest, testConstructor2) { testConstructor2(); }
-TEST_F(CopyOnWriteArraySetTest, testConstructor3) { testConstructor3(); }
-TEST_F(CopyOnWriteArraySetTest, testAddAll1) { testAddAll1(); }
-TEST_F(CopyOnWriteArraySetTest, testAddAll2) { testAddAll2(); }
-TEST_F(CopyOnWriteArraySetTest, testAdd1) { testAdd1(); }
-TEST_F(CopyOnWriteArraySetTest, testAdd2) { testAdd2(); }
-TEST_F(CopyOnWriteArraySetTest, testClear) { testClear(); }
-TEST_F(CopyOnWriteArraySetTest, testContains) { testContains(); }
-TEST_F(CopyOnWriteArraySetTest, testContainsAll) { testContainsAll(); }
-TEST_F(CopyOnWriteArraySetTest, testEquals) { testEquals(); }
-TEST_F(CopyOnWriteArraySetTest, testIsEmpty) { testIsEmpty(); }
-TEST_F(CopyOnWriteArraySetTest, testIterator) { testIterator(); }
-TEST_F(CopyOnWriteArraySetTest, testIteratorRemove) { testIteratorRemove(); }
-TEST_F(CopyOnWriteArraySetTest, testRemoveAll) { testRemoveAll(); }
-TEST_F(CopyOnWriteArraySetTest, testRemove) { testRemove(); }
-TEST_F(CopyOnWriteArraySetTest, testSize) { testSize(); }
-TEST_F(CopyOnWriteArraySetTest, testToArray) { testToArray(); }

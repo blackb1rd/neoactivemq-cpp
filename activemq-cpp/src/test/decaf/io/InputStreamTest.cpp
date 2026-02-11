@@ -30,10 +30,7 @@ public:
         InputStreamTest();
         virtual ~InputStreamTest();
 
-        virtual void test();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace{
@@ -60,11 +57,9 @@ InputStreamTest::~InputStreamTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InputStreamTest::test() {
+TEST_F(InputStreamTest, test) {
 
     MockInputStream stream;
 
     ASSERT_THROW(stream.read( NULL, 0, 0, 1 ), NullPointerException) << ("Should throw a NullPointerException");
 }
-
-TEST_F(InputStreamTest, test) { test(); }

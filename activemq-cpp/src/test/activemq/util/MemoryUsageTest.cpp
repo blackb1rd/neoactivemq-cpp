@@ -26,18 +26,7 @@ using namespace activemq;
 using namespace activemq::util;
 using namespace decaf::lang;
 
-    class MemoryUsageTest  : public ::testing::Test {
-public:
-
-        MemoryUsageTest() {}
-        virtual ~MemoryUsageTest() {}
-
-        void testCTors();
-        void testUsage();
-        void testTimedWait();
-        void testWait();
-
-    };
+    class MemoryUsageTest  : public ::testing::Test {};
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +54,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MemoryUsageTest::testCTors() {
+TEST_F(MemoryUsageTest, testCTors) {
 
     MemoryUsage usage1;
     MemoryUsage usage2( 1024 );
@@ -78,7 +67,7 @@ void MemoryUsageTest::testCTors() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MemoryUsageTest::testUsage() {
+TEST_F(MemoryUsageTest, testUsage) {
 
     MemoryUsage usage1( 2048 );
 
@@ -106,7 +95,7 @@ void MemoryUsageTest::testUsage() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MemoryUsageTest::testTimedWait() {
+TEST_F(MemoryUsageTest, testTimedWait) {
 
     MemoryUsage usage( 2048 );
     usage.increaseUsage( 5072 );
@@ -121,7 +110,7 @@ void MemoryUsageTest::testTimedWait() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MemoryUsageTest::testWait() {
+TEST_F(MemoryUsageTest, testWait) {
 
     MemoryUsage usage( 2048 );
     usage.increaseUsage( 5072 );
@@ -135,8 +124,3 @@ void MemoryUsageTest::testWait() {
 
     myThread.join();
 }
-
-TEST_F(MemoryUsageTest, testCTors) { testCTors(); }
-TEST_F(MemoryUsageTest, testUsage) { testUsage(); }
-TEST_F(MemoryUsageTest, testTimedWait) { testTimedWait(); }
-TEST_F(MemoryUsageTest, testWait) { testWait(); }

@@ -28,18 +28,7 @@ using namespace decaf;
 using namespace decaf::lang;
 
     class IdGeneratorTest : public ::testing::Test {
-public:
-
-        IdGeneratorTest();
-        virtual ~IdGeneratorTest();
-
-        void testConstructor1();
-        void testConstructor2();
-        void testCompare();
-        void testThreadSafety();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -86,15 +75,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IdGeneratorTest::IdGeneratorTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-IdGeneratorTest::~IdGeneratorTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void IdGeneratorTest::testConstructor1() {
+TEST_F(IdGeneratorTest, testConstructor1) {
 
     IdGenerator idGen;
 
@@ -103,7 +84,7 @@ void IdGeneratorTest::testConstructor1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IdGeneratorTest::testConstructor2() {
+TEST_F(IdGeneratorTest, testConstructor2) {
 
     IdGenerator idGen( "TEST-PREFIX" );
 
@@ -114,7 +95,7 @@ void IdGeneratorTest::testConstructor2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IdGeneratorTest::testCompare() {
+TEST_F(IdGeneratorTest, testCompare) {
 
     IdGenerator idGen;
 
@@ -127,7 +108,7 @@ void IdGeneratorTest::testCompare() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IdGeneratorTest::testThreadSafety() {
+TEST_F(IdGeneratorTest, testThreadSafety) {
 
     bool failed = false;
 
@@ -156,8 +137,3 @@ void IdGeneratorTest::testThreadSafety() {
 
     ASSERT_TRUE(!failed) << ("One of the Thread Tester failed");
 }
-
-TEST_F(IdGeneratorTest, testConstructor1) { testConstructor1(); }
-TEST_F(IdGeneratorTest, testConstructor2) { testConstructor2(); }
-TEST_F(IdGeneratorTest, testCompare) { testCompare(); }
-TEST_F(IdGeneratorTest, testThreadSafety) { testThreadSafety(); }

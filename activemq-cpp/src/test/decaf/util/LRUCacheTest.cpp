@@ -34,12 +34,7 @@ public:
         LRUCacheTest();
         virtual ~LRUCacheTest();
 
-        void testConstructor();
-        void testExceptions();
-        void testChangeMaxCacheSize();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 LRUCacheTest::LRUCacheTest() {
@@ -50,7 +45,7 @@ LRUCacheTest::~LRUCacheTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LRUCacheTest::testConstructor() {
+TEST_F(LRUCacheTest, testConstructor) {
 
     LRUCache<int, int> underTest(1000);
 
@@ -63,7 +58,7 @@ void LRUCacheTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LRUCacheTest::testExceptions() {
+TEST_F(LRUCacheTest, testExceptions) {
 
     try {
         LRUCache<int, int> underTest(-1);
@@ -76,7 +71,7 @@ void LRUCacheTest::testExceptions() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LRUCacheTest::testChangeMaxCacheSize() {
+TEST_F(LRUCacheTest, testChangeMaxCacheSize) {
 
     LRUCache<int, int> underTest(1000);
 
@@ -97,7 +92,3 @@ void LRUCacheTest::testChangeMaxCacheSize() {
 
     ASSERT_EQ(2000, underTest.size()) << ("size is still in order");
 }
-
-TEST_F(LRUCacheTest, testConstructor) { testConstructor(); }
-TEST_F(LRUCacheTest, testExceptions) { testExceptions(); }
-TEST_F(LRUCacheTest, testChangeMaxCacheSize) { testChangeMaxCacheSize(); }

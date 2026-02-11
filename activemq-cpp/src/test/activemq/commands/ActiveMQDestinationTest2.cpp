@@ -28,16 +28,7 @@ using namespace activemq::util;
 using namespace activemq::commands;
 
     class ActiveMQDestinationTest : public ::testing::Test {
-public:
-
-        ActiveMQDestinationTest() {}
-        virtual ~ActiveMQDestinationTest() {}
-
-        virtual void test();
-        virtual void testOptions();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -90,7 +81,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQDestinationTest::test()
+TEST_F(ActiveMQDestinationTest, test)
 {
     MyDestination dest;
 
@@ -135,7 +126,7 @@ void ActiveMQDestinationTest::test()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQDestinationTest::testOptions(){
+TEST_F(ActiveMQDestinationTest, testOptions){
 
     MyDestination dest;
 
@@ -149,6 +140,3 @@ void ActiveMQDestinationTest::testOptions(){
     ASSERT_TRUE(std::string( properties.getProperty( "option1" ) ) == "test1");
     ASSERT_TRUE(std::string( properties.getProperty( "option2" ) ) == "test2");
 }
-
-TEST_F(ActiveMQDestinationTest, test) { test(); }
-TEST_F(ActiveMQDestinationTest, testOptions) { testOptions(); }

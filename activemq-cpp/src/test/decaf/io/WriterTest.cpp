@@ -33,16 +33,7 @@ public:
         WriterTest();
         virtual ~WriterTest();
 
-        void testWriteChar();
-        void testWriteVector();
-        void testWriteString();
-        void testWriteStringOffsetCount();
-        void testAppendChar();
-        void testAppendCharSequence();
-        void testAppendCharSequenceIntInt();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -121,7 +112,7 @@ WriterTest::~WriterTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WriterTest::testWriteChar() {
+TEST_F(WriterTest, testWriteChar) {
 
     std::string testString = "My Test String";
     MockWriter writer( 20 );
@@ -136,7 +127,7 @@ void WriterTest::testWriteChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WriterTest::testWriteVector() {
+TEST_F(WriterTest, testWriteVector) {
 
     std::string testString = "My Test String";
     MockWriter writer( 20 );
@@ -149,7 +140,7 @@ void WriterTest::testWriteVector() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WriterTest::testWriteString() {
+TEST_F(WriterTest, testWriteString) {
 
     std::string testString = "My Test String";
     MockWriter writer( 20 );
@@ -161,7 +152,7 @@ void WriterTest::testWriteString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WriterTest::testWriteStringOffsetCount() {
+TEST_F(WriterTest, testWriteStringOffsetCount) {
 
     std::string testString = "My Test String";
     MockWriter writer( 20 );
@@ -173,7 +164,7 @@ void WriterTest::testWriteStringOffsetCount() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WriterTest::testAppendChar() {
+TEST_F(WriterTest, testAppendChar) {
 
     char testChar = ' ';
     MockWriter writer(20);
@@ -186,7 +177,7 @@ void WriterTest::testAppendChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WriterTest::testAppendCharSequence() {
+TEST_F(WriterTest, testAppendCharSequence) {
 
     std::string testString = "My Test String";
     MockWriter writer( 20 );
@@ -206,7 +197,7 @@ void WriterTest::testAppendCharSequence() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WriterTest::testAppendCharSequenceIntInt() {
+TEST_F(WriterTest, testAppendCharSequenceIntInt) {
 
     std::string testString = "My Test String";
     MockWriter writer(20);
@@ -224,11 +215,3 @@ void WriterTest::testAppendCharSequenceIntInt() {
 
     delete buffer;
 }
-
-TEST_F(WriterTest, testWriteChar) { testWriteChar(); }
-TEST_F(WriterTest, testWriteVector) { testWriteVector(); }
-TEST_F(WriterTest, testWriteString) { testWriteString(); }
-TEST_F(WriterTest, testWriteStringOffsetCount) { testWriteStringOffsetCount(); }
-TEST_F(WriterTest, testAppendChar) { testAppendChar(); }
-TEST_F(WriterTest, testAppendCharSequence) { testAppendCharSequence(); }
-TEST_F(WriterTest, testAppendCharSequenceIntInt) { testAppendCharSequenceIntInt(); }

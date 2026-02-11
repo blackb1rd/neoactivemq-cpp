@@ -39,31 +39,7 @@ public:
 
         void SetUp() override;
 
-        void testConstructor();
-        void testConstructorI();
-        void testConstructorIF();
-        void testConstructorMap();
-        void testCopyConstructor();
-        void testClear();
-        void testContainsKey();
-        void testContainsValue();
-        void testGet();
-        void testPut();
-        void testRemove();
-        void testIsEmpty();
-        void testPutAll();
-        void testRehash();
-        void testToString();
-        void testSize();
-        void testEntrySet();
-        void testKeySet();
-        void testValues();
-        void testEntrySetIterator();
-        void testKeySetIterator();
-        void testValuesIterator();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -98,7 +74,7 @@ void HashMapTest::SetUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testConstructor() {
+TEST_F(HashMapTest, testConstructor) {
 
     HashMap<int, std::string> map;
     ASSERT_TRUE(map.isEmpty());
@@ -108,7 +84,7 @@ void HashMapTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testConstructorI() {
+TEST_F(HashMapTest, testConstructorI) {
 
     HashMap<int, std::string> map(5);
 
@@ -127,7 +103,7 @@ void HashMapTest::testConstructorI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testConstructorIF() {
+TEST_F(HashMapTest, testConstructorIF) {
 
     HashMap<int, std::string> map(5, 0.5f);
 
@@ -146,7 +122,7 @@ void HashMapTest::testConstructorIF() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testConstructorMap() {
+TEST_F(HashMapTest, testConstructorMap) {
 
     HashMap<int, int> myMap;
     for (int counter = 0; counter < 125; counter++) {
@@ -160,7 +136,7 @@ void HashMapTest::testConstructorMap() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testCopyConstructor() {
+TEST_F(HashMapTest, testCopyConstructor) {
 
     HashMap<int, std::string> map1;
     HashMap<int, std::string> map2;
@@ -176,7 +152,7 @@ void HashMapTest::testCopyConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testClear() {
+TEST_F(HashMapTest, testClear) {
 
     HashMap<int, std::string> hashMap;
     hashMap.put(1, "one");
@@ -202,7 +178,7 @@ void HashMapTest::testClear() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testContainsKey() {
+TEST_F(HashMapTest, testContainsKey) {
 
     HashMap<int, std::string> hashMap;
 
@@ -218,7 +194,7 @@ void HashMapTest::testContainsKey() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testContainsValue() {
+TEST_F(HashMapTest, testContainsValue) {
 
     HashMap<int, std::string> hashMap;
 
@@ -229,7 +205,7 @@ void HashMapTest::testContainsValue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testEntrySet() {
+TEST_F(HashMapTest, testEntrySet) {
 
     HashMap<int, std::string> hashMap;
 
@@ -252,7 +228,7 @@ void HashMapTest::testEntrySet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testGet() {
+TEST_F(HashMapTest, testGet) {
 
     HashMap<int, std::string> hashMap;
 
@@ -262,7 +238,7 @@ void HashMapTest::testGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testIsEmpty() {
+TEST_F(HashMapTest, testIsEmpty) {
 
     HashMap<int, std::string> hashMap;
 
@@ -274,7 +250,7 @@ void HashMapTest::testIsEmpty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testKeySet() {
+TEST_F(HashMapTest, testKeySet) {
 
     HashMap<int, std::string> hashMap;
     populateMap(hashMap);
@@ -394,7 +370,7 @@ namespace util {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testPut() {
+TEST_F(HashMapTest, testPut) {
 
     {
         HashMap<std::string, std::string> hashMap(101);
@@ -457,7 +433,7 @@ void HashMapTest::testPut() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testPutAll() {
+TEST_F(HashMapTest, testPutAll) {
 
     HashMap<int, std::string> hashMap;
     populateMap(hashMap);
@@ -470,7 +446,7 @@ void HashMapTest::testPutAll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testRemove() {
+TEST_F(HashMapTest, testRemove) {
 
     {
         HashMap<int, std::string> hashMap;
@@ -521,7 +497,7 @@ void HashMapTest::testRemove() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testRehash() {
+TEST_F(HashMapTest, testRehash) {
     // This map should rehash on adding the ninth element.
     HashMap<MyKey, int> hashMap(10, 0.5f);
 
@@ -550,7 +526,7 @@ void HashMapTest::testRehash() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testSize() {
+TEST_F(HashMapTest, testSize) {
     HashMap<int, std::string> hashMap;
     populateMap(hashMap);
 
@@ -558,7 +534,7 @@ void HashMapTest::testSize() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testValues() {
+TEST_F(HashMapTest, testValues) {
 
     HashMap<int, std::string> hashMap;
     populateMap(hashMap);
@@ -574,7 +550,7 @@ void HashMapTest::testValues() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testToString() {
+TEST_F(HashMapTest, testToString) {
 
     HashMap<int, std::string> hashMap;
     populateMap(hashMap);
@@ -583,7 +559,7 @@ void HashMapTest::testToString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testEntrySetIterator() {
+TEST_F(HashMapTest, testEntrySetIterator) {
 
     HashMap<int, std::string> map;
     populateMap(map);
@@ -614,7 +590,7 @@ void HashMapTest::testEntrySetIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testKeySetIterator() {
+TEST_F(HashMapTest, testKeySetIterator) {
 
     HashMap<int, std::string> map;
     populateMap(map);
@@ -644,7 +620,7 @@ void HashMapTest::testKeySetIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::testValuesIterator() {
+TEST_F(HashMapTest, testValuesIterator) {
 
     HashMap<int, std::string> map;
     populateMap(map);
@@ -672,26 +648,3 @@ void HashMapTest::testValuesIterator() {
     ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
     ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 }
-
-TEST_F(HashMapTest, testConstructor) { testConstructor(); }
-TEST_F(HashMapTest, testConstructorI) { testConstructorI(); }
-TEST_F(HashMapTest, testConstructorIF) { testConstructorIF(); }
-TEST_F(HashMapTest, testConstructorMap) { testConstructorMap(); }
-TEST_F(HashMapTest, testCopyConstructor) { testCopyConstructor(); }
-TEST_F(HashMapTest, testClear) { testClear(); }
-TEST_F(HashMapTest, testContainsKey) { testContainsKey(); }
-TEST_F(HashMapTest, testContainsValue) { testContainsValue(); }
-TEST_F(HashMapTest, testGet) { testGet(); }
-TEST_F(HashMapTest, testPut) { testPut(); }
-TEST_F(HashMapTest, testRemove) { testRemove(); }
-TEST_F(HashMapTest, testIsEmpty) { testIsEmpty(); }
-TEST_F(HashMapTest, testKeySet) { testKeySet(); }
-TEST_F(HashMapTest, testPutAll) { testPutAll(); }
-TEST_F(HashMapTest, testRehash) { testRehash(); }
-TEST_F(HashMapTest, testSize) { testSize(); }
-TEST_F(HashMapTest, testEntrySet) { testEntrySet(); }
-TEST_F(HashMapTest, testValues) { testValues(); }
-TEST_F(HashMapTest, testToString) { testToString(); }
-TEST_F(HashMapTest, testEntrySetIterator) { testEntrySetIterator(); }
-TEST_F(HashMapTest, testKeySetIterator) { testKeySetIterator(); }
-TEST_F(HashMapTest, testValuesIterator) { testValuesIterator(); }

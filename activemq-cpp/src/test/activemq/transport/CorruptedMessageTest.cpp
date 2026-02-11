@@ -49,212 +49,7 @@ using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::util::concurrent;
 
-    class CorruptedMessageTest : public ::testing::Test {
-public:
-
-        virtual ~CorruptedMessageTest() {}
-
-        void SetUp() override;
-        void TearDown() override;
-
-        /**
-         * Test Case 1: Corrupted message as the first message
-         *
-         * Scenario: First message in stream is corrupted after MessageId
-         * Expected:
-         * - POISON_ACK is sent with ConsumerId and MessageId
-         * - consecutiveErrors increments to 1
-         * - Connection remains open
-         */
-        void testCorruptedFirstMessage();
-
-        /**
-         * Test Case 2: Corrupted message randomly between valid messages
-         *
-         * Scenario: Valid messages, then corrupted message, then more valid messages
-         * Expected:
-         * - Valid messages before corruption are processed normally
-         * - POISON_ACK sent for corrupted message
-         * - Valid messages after corruption are processed normally
-         * - consecutiveErrors resets to 0 on next valid message
-         */
-        void testCorruptedMessageBetweenValidMessages();
-
-        /**
-         * Test Case 3: Continue processing after corrupted message
-         *
-         * Scenario: Corrupted message followed immediately by valid message
-         * Expected:
-         * - POISON_ACK sent for corrupted message
-         * - Next valid message is read and processed successfully
-         * - consecutiveErrors resets to 0
-         */
-        void testContinueAfterCorruptedMessage();
-
-        /**
-         * Test Case 4: Multiple corrupted messages in sequence
-         *
-         * Scenario: 5 corrupted messages in a row (less than MAX_CONSECUTIVE_ERRORS)
-         * Expected:
-         * - POISON_ACK sent for each corrupted message
-         * - consecutiveErrors increments with each corruption
-         * - Connection remains open (< MAX_CONSECUTIVE_ERRORS)
-         */
-        void testMultipleCorruptedMessages();
-
-        /**
-         * Test Case 5: Corrupted message without MessageId
-         *
-         * Scenario: Corruption occurs before MessageId is unmarshaled
-         * Expected:
-         * - No POISON_ACK sent (missing MessageId)
-         * - Error logged indicating no MessageId available
-         * - consecutiveErrors increments
-         * - Connection remains open
-         */
-        void testCorruptedMessageWithoutMessageId();
-
-        /**
-         * Test Case 6: Reach MAX_CONSECUTIVE_ERRORS
-         *
-         * Scenario: 10 consecutive corrupted messages (MAX_CONSECUTIVE_ERRORS)
-         * Expected:
-         * - First 9 corruptions: POISON_ACK sent, connection open
-         * - 10th corruption: Connection closes and thread exits
-         * - Failover transport should trigger reconnection
-         */
-        void testMaxConsecutiveErrors();
-
-        /**
-         * Test Case 7: Verify POISON_ACK format and content
-         *
-         * Scenario: Corrupted message with valid ConsumerId and MessageId
-         * Expected:
-         * - MessageAck command created with ACK_TYPE_POISON (1)
-         * - ConsumerId matches from MessageDispatch
-         * - MessageId matches from Message
-         * - Command marshaled and written to stream
-         */
-        void testPoisonAckSent();
-
-        /**
-         * Test Case 8: Stream resynchronization after single corruption
-         *
-         * Scenario: Single corrupted message between valid messages
-         * Expected:
-         * - Valid message before: processed successfully
-         * - Corrupted message: POISON_ACK sent
-         * - Valid message after: processed successfully (stream in sync)
-         */
-        void testStreamResyncAfterSingleCorruption();
-
-        /**
-         * Test Case 9: Corrupted message during failover
-         *
-         * Scenario: Connection has backup URI, corruption occurs
-         * Expected:
-         * - POISON_ACK sent for corrupted message
-         * - If MAX_CONSECUTIVE_ERRORS reached, connection closes
-         * - Failover transport triggers reconnection to backup
-         * - After reconnect, consecutiveErrors resets to 0
-         */
-        void testCorruptedMessageDuringFailover();
-
-        /**
-         * Test Case 10: Corruption in different message parts
-         *
-         * Scenario: Test corruption at different unmarshal points:
-         * - During ConsumerId unmarshal (no MessageId yet)
-         * - During MessageId unmarshal (MessageId incomplete)
-         * - After MessageId, during properties (MessageId available)
-         * - During message body (MessageId available)
-         *
-         * Expected:
-         * - POISON_ACK only sent when MessageId successfully unmarshaled
-         * - Appropriate error handling for each corruption point
-         */
-        void testCorruptionInDifferentMessageParts();
-
-        /**
-         * Test Case 11: Corrupted message for non-durable consumer
-         *
-         * Scenario: Non-durable queue/topic consumer receives corrupted message
-         * Expected:
-         * - ConsumerId has standard format (connectionId:sessionId:consumerId)
-         * - POISON_ACK sent with non-durable consumer information
-         * - Message moved to DLQ
-         * - Subscription does NOT persist after disconnect
-         */
-        void testCorruptedMessageNonDurableConsumer();
-
-        /**
-         * Test Case 12: Corrupted message for durable topic subscriber
-         *
-         * Scenario: Durable topic subscriber receives corrupted message
-         * Expected:
-         * - ConsumerId includes subscription name
-         * - POISON_ACK sent with durable subscriber information
-         * - Message moved to DLQ
-         * - Subscription persists even after handling corrupted message
-         * - Client can reconnect and continue from where it left off
-         */
-        void testCorruptedMessageDurableTopicSubscriber();
-
-        /**
-         * Test Case 13: POISON_ACK format for durable subscriber
-         *
-         * Scenario: Verify POISON_ACK structure for durable topic subscriber
-         * Expected:
-         * - MessageAck includes proper durable subscription information
-         * - ConsumerId contains subscription name
-         * - Broker can properly route to DLQ for durable subscription
-         * - Subscription state remains intact
-         */
-        void testPoisonAckForDurableSubscriber();
-
-        /**
-         * Test Case 14: EOF during MessageId read
-         *
-         * Scenario: Stream ends abruptly while reading MessageId field
-         * Simulates: "DataInputStream::readLong - Reached EOF"
-         * Expected:
-         * - EOFException thrown during MessageId unmarshal
-         * - No POISON_ACK sent (MessageId not complete)
-         * - consecutiveErrors increments
-         * - Connection remains open
-         */
-        void testEOFDuringMessageIdRead();
-
-        /**
-         * Test Case 15: EOF during properties read
-         *
-         * Scenario: Stream ends while reading message properties (COMMON case)
-         * Simulates: "DataInputStream::readLong - Reached EOF" after MessageId
-         * Expected:
-         * - EOFException thrown during properties unmarshal
-         * - MessageId was successfully unmarshaled
-         * - POISON_ACK sent with valid MessageId
-         * - consecutiveErrors increments
-         */
-        void testEOFDuringPropertiesRead();
-
-        /**
-         * Test Case 16: EOF during message body read
-         *
-         * Scenario: Stream ends while reading message body content
-         * Expected:
-         * - EOFException thrown during body unmarshal
-         * - MessageId was successfully unmarshaled
-         * - POISON_ACK sent with valid MessageId
-         * - consecutiveErrors increments
-         */
-        void testEOFDuringBodyRead();
-
-    };
-
-
-
-
+class CorruptedMessageTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
 /**
@@ -305,7 +100,7 @@ namespace {
      */
     class CorruptedStreamBuilder {
     public:
-        
+
         /**
          * Create a valid MessageDispatch marshaled to bytes
          *
@@ -362,7 +157,7 @@ namespace {
             delete[] data.first;
             return result;
         }
-        
+
         /**
          * Create a corrupted MessageDispatch where corruption occurs after MessageId
          * This simulates corruption during properties or body unmarshaling
@@ -370,11 +165,11 @@ namespace {
         static std::vector<unsigned char> createCorruptedMessageAfterMessageId(
             const std::string& consumerId,
             const std::string& messageId) {
-            
+
             // First create a valid message
             std::vector<unsigned char> validBytes = createValidMessageDispatch(
                 consumerId, messageId, "Test message");
-            
+
             // Corrupt bytes after MessageId is marshaled
             // MessageId is typically at byte position 40-60 depending on ID lengths
             // Properties/body start after that, so corrupt around byte 70+
@@ -385,35 +180,35 @@ namespace {
                 validBytes[72] = 0xFF;
                 validBytes[73] = 0xFF;
             }
-            
+
             return validBytes;
         }
-        
+
         /**
          * Create a corrupted MessageDispatch where corruption occurs during ConsumerId
          * This means MessageId is never reached
          */
         static std::vector<unsigned char> createCorruptedMessageBeforeMessageId() {
             std::vector<unsigned char> bytes;
-            
+
             // MessageDispatch type (21)
             bytes.push_back(21);
-            
+
             // Command ID
             bytes.push_back(0);
             bytes.push_back(0);
             bytes.push_back(0);
             bytes.push_back(1);
-            
+
             // Response required
             bytes.push_back(0);
-            
+
             // Corrupt ConsumerId - invalid type
             bytes.push_back(255);  // Invalid data type
-            
+
             return bytes;
         }
-        
+
         /**
          * Truncate a valid message stream to simulate EOF
          */
@@ -421,17 +216,17 @@ namespace {
             const std::string& consumerId,
             const std::string& messageId,
             size_t truncateAtByte) {
-            
+
             std::vector<unsigned char> validBytes = createValidMessageDispatch(
                 consumerId, messageId, "Test");
-            
+
             if (truncateAtByte < validBytes.size()) {
                 validBytes.resize(truncateAtByte);
             }
-            
+
             return validBytes;
         }
-        
+
         /**
          * Create a valid MessageDispatch for a durable topic subscriber
          * Durable subscribers have a subscription name in the ConsumerId
@@ -489,7 +284,7 @@ namespace {
             delete[] data.first;
             return result;
         }
-        
+
         /**
          * Create a corrupted MessageDispatch for durable subscriber (corruption after MessageId)
          */
@@ -497,11 +292,11 @@ namespace {
             const std::string& connectionId,
             const std::string& subscriptionName,
             const std::string& messageId) {
-            
+
             // First create a valid durable subscriber message
             std::vector<unsigned char> validBytes = createValidDurableSubscriberMessageDispatch(
                 connectionId, subscriptionName, messageId, "Test message");
-            
+
             // Corrupt bytes after MessageId is marshaled
             if (validBytes.size() > 70) {
                 // Insert invalid size field for properties (0xFFFFFFFF = -1)
@@ -510,11 +305,11 @@ namespace {
                 validBytes[72] = 0xFF;
                 validBytes[73] = 0xFF;
             }
-            
+
             return validBytes;
         }
     };
-    
+
     /**
      * Mock TransportListener to capture delivered commands and errors
      */
@@ -524,61 +319,61 @@ namespace {
         std::vector<std::string> receivedErrors;
         CountDownLatch* expectedCommandLatch;
         CountDownLatch* errorLatch;
-        
+
     public:
-        
-        MockTransportListener() 
+
+        MockTransportListener()
             : expectedCommandLatch(nullptr), errorLatch(nullptr) {}
-        
+
         virtual ~MockTransportListener() {}
-        
+
         void setExpectedCommands(int count) {
             expectedCommandLatch = new CountDownLatch(count);
         }
-        
+
         void setExpectError() {
             errorLatch = new CountDownLatch(1);
         }
-        
+
         bool waitForCommands(int timeoutMs) {
             if (expectedCommandLatch) {
                 return expectedCommandLatch->await(timeoutMs);
             }
             return true;
         }
-        
+
         bool waitForError(int timeoutMs) {
             if (errorLatch) {
                 return errorLatch->await(timeoutMs);
             }
             return true;
         }
-        
+
         virtual void onCommand(const Pointer<Command> command) {
             receivedCommands.push_back(command);
             if (expectedCommandLatch) {
                 expectedCommandLatch->countDown();
             }
         }
-        
+
         virtual void onException(const decaf::lang::Exception& ex) {
             receivedErrors.push_back(ex.getMessage());
             if (errorLatch) {
                 errorLatch->countDown();
             }
         }
-        
+
         virtual void transportInterrupted() {}
         virtual void transportResumed() {}
-        
+
         const std::vector<Pointer<Command>>& getReceivedCommands() const {
             return receivedCommands;
         }
-        
+
         const std::vector<std::string>& getReceivedErrors() const {
             return receivedErrors;
         }
-        
+
         void reset() {
             receivedCommands.clear();
             receivedErrors.clear();
@@ -596,17 +391,16 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::SetUp() {
-    // Setup code if needed
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::TearDown() {
-    // Cleanup code if needed
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testCorruptedFirstMessage() {
+/**
+ * Test Case 1: Corrupted message as the first message
+ *
+ * Scenario: First message in stream is corrupted after MessageId
+ * Expected:
+ * - POISON_ACK is sent with ConsumerId and MessageId
+ * - consecutiveErrors increments to 1
+ * - Connection remains open
+ */
+TEST_F(CorruptedMessageTest, testCorruptedFirstMessage) {
     // Create corrupted message bytes
     std::vector<unsigned char> corruptedBytes =
         CorruptedStreamBuilder::createCorruptedMessageAfterMessageId(
@@ -654,7 +448,17 @@ void CorruptedMessageTest::testCorruptedFirstMessage() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testCorruptedMessageBetweenValidMessages() {
+/**
+ * Test Case 2: Corrupted message randomly between valid messages
+ *
+ * Scenario: Valid messages, then corrupted message, then more valid messages
+ * Expected:
+ * - Valid messages before corruption are processed normally
+ * - POISON_ACK sent for corrupted message
+ * - Valid messages after corruption are processed normally
+ * - consecutiveErrors resets to 0 on next valid message
+ */
+TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages) {
     // Create stream with 3 messages: valid, corrupted, valid
     std::vector<unsigned char> stream;
 
@@ -720,7 +524,16 @@ void CorruptedMessageTest::testCorruptedMessageBetweenValidMessages() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testContinueAfterCorruptedMessage() {
+/**
+ * Test Case 3: Continue processing after corrupted message
+ *
+ * Scenario: Corrupted message followed immediately by valid message
+ * Expected:
+ * - POISON_ACK sent for corrupted message
+ * - Next valid message is read and processed successfully
+ * - consecutiveErrors resets to 0
+ */
+TEST_F(CorruptedMessageTest, testContinueAfterCorruptedMessage) {
     // This test verifies that after a corrupted message, the error handling
     // allows the system to continue (not crash or hang)
 
@@ -761,7 +574,16 @@ void CorruptedMessageTest::testContinueAfterCorruptedMessage() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testMultipleCorruptedMessages() {
+/**
+ * Test Case 4: Multiple corrupted messages in sequence
+ *
+ * Scenario: 5 corrupted messages in a row (less than MAX_CONSECUTIVE_ERRORS)
+ * Expected:
+ * - POISON_ACK sent for each corrupted message
+ * - consecutiveErrors increments with each corruption
+ * - Connection remains open (< MAX_CONSECUTIVE_ERRORS)
+ */
+TEST_F(CorruptedMessageTest, testMultipleCorruptedMessages) {
     // Create 5 corrupted messages
     decaf::util::Properties props;
     Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
@@ -793,7 +615,17 @@ void CorruptedMessageTest::testMultipleCorruptedMessages() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testCorruptedMessageWithoutMessageId() {
+/**
+ * Test Case 5: Corrupted message without MessageId
+ *
+ * Scenario: Corruption occurs before MessageId is unmarshaled
+ * Expected:
+ * - No POISON_ACK sent (missing MessageId)
+ * - Error logged indicating no MessageId available
+ * - consecutiveErrors increments
+ * - Connection remains open
+ */
+TEST_F(CorruptedMessageTest, testCorruptedMessageWithoutMessageId) {
     // Create corrupted message where corruption occurs before MessageId
     std::vector<unsigned char> corruptedBytes =
         CorruptedStreamBuilder::createCorruptedMessageBeforeMessageId();
@@ -824,7 +656,16 @@ void CorruptedMessageTest::testCorruptedMessageWithoutMessageId() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testMaxConsecutiveErrors() {
+/**
+ * Test Case 6: Reach MAX_CONSECUTIVE_ERRORS
+ *
+ * Scenario: 10 consecutive corrupted messages (MAX_CONSECUTIVE_ERRORS)
+ * Expected:
+ * - First 9 corruptions: POISON_ACK sent, connection open
+ * - 10th corruption: Connection closes and thread exits
+ * - Failover transport should trigger reconnection
+ */
+TEST_F(CorruptedMessageTest, testMaxConsecutiveErrors) {
     // Verify that MAX_CONSECUTIVE_ERRORS (10) is defined correctly
     // This test simulates 10 consecutive errors
 
@@ -864,7 +705,17 @@ void CorruptedMessageTest::testMaxConsecutiveErrors() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testPoisonAckSent() {
+/**
+ * Test Case 7: Verify POISON_ACK format and content
+ *
+ * Scenario: Corrupted message with valid ConsumerId and MessageId
+ * Expected:
+ * - MessageAck command created with ACK_TYPE_POISON (1)
+ * - ConsumerId matches from MessageDispatch
+ * - MessageId matches from Message
+ * - Command marshaled and written to stream
+ */
+TEST_F(CorruptedMessageTest, testPoisonAckSent) {
     // This test verifies the POISON_ACK format
     // In production, IOTransport::sendPoisonAck() creates MessageAck with:
     // - ackType = ACK_TYPE_POISON (1)
@@ -921,7 +772,16 @@ void CorruptedMessageTest::testPoisonAckSent() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testStreamResyncAfterSingleCorruption() {
+/**
+ * Test Case 8: Stream resynchronization after single corruption
+ *
+ * Scenario: Single corrupted message between valid messages
+ * Expected:
+ * - Valid message before: processed successfully
+ * - Corrupted message: POISON_ACK sent
+ * - Valid message after: processed successfully (stream in sync)
+ */
+TEST_F(CorruptedMessageTest, testStreamResyncAfterSingleCorruption) {
     // NOTE: Stream resync is NOT guaranteed after corruption!
     // This is why we have MAX_CONSECUTIVE_ERRORS
     // After corruption, stream is likely desynchronized
@@ -960,7 +820,17 @@ void CorruptedMessageTest::testStreamResyncAfterSingleCorruption() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testCorruptedMessageDuringFailover() {
+/**
+ * Test Case 9: Corrupted message during failover
+ *
+ * Scenario: Connection has backup URI, corruption occurs
+ * Expected:
+ * - POISON_ACK sent for corrupted message
+ * - If MAX_CONSECUTIVE_ERRORS reached, connection closes
+ * - Failover transport triggers reconnection to backup
+ * - After reconnect, consecutiveErrors resets to 0
+ */
+TEST_F(CorruptedMessageTest, testCorruptedMessageDuringFailover) {
     // Failover testing requires more complex setup with actual network connections
     // This test documents the expected behavior:
     //
@@ -1006,7 +876,20 @@ void CorruptedMessageTest::testCorruptedMessageDuringFailover() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testCorruptionInDifferentMessageParts() {
+/**
+ * Test Case 10: Corruption in different message parts
+ *
+ * Scenario: Test corruption at different unmarshal points:
+ * - During ConsumerId unmarshal (no MessageId yet)
+ * - During MessageId unmarshal (MessageId incomplete)
+ * - After MessageId, during properties (MessageId available)
+ * - During message body (MessageId available)
+ *
+ * Expected:
+ * - POISON_ACK only sent when MessageId successfully unmarshaled
+ * - Appropriate error handling for each corruption point
+ */
+TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts) {
     // Test corruption at different unmarshal points
     decaf::util::Properties props;
     Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
@@ -1075,7 +958,17 @@ void CorruptedMessageTest::testCorruptionInDifferentMessageParts() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testCorruptedMessageNonDurableConsumer() {
+/**
+ * Test Case 11: Corrupted message for non-durable consumer
+ *
+ * Scenario: Non-durable queue/topic consumer receives corrupted message
+ * Expected:
+ * - ConsumerId has standard format (connectionId:sessionId:consumerId)
+ * - POISON_ACK sent with non-durable consumer information
+ * - Message moved to DLQ
+ * - Subscription does NOT persist after disconnect
+ */
+TEST_F(CorruptedMessageTest, testCorruptedMessageNonDurableConsumer) {
     // Test corrupted message handling for non-durable consumer
     // Non-durable consumers are typical queue/topic consumers without persistence
 
@@ -1086,15 +979,15 @@ void CorruptedMessageTest::testCorruptedMessageNonDurableConsumer() {
     // Create corrupted message for non-durable consumer
     std::string connectionId = "ID:non-durable-connection:1";
     std::string messageId = "ID:producer:1:1:1:100";
-    
-    std::vector<unsigned char> corruptedBytes = 
+
+    std::vector<unsigned char> corruptedBytes =
         CorruptedStreamBuilder::createCorruptedMessageAfterMessageId(
             connectionId, messageId);
-    
+
     Pointer<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
     Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
-    
+
     // Verify corruption detected
     bool caughtException = false;
     try {
@@ -1102,22 +995,33 @@ void CorruptedMessageTest::testCorruptedMessageNonDurableConsumer() {
     } catch (Exception& e) {
         caughtException = true;
     }
-    
+
     ASSERT_TRUE(caughtException) << ("Non-durable consumer corrupted message should throw exception");
-    
+
     // In production, IOTransport would:
     // 1. Extract ConsumerId from partial MessageDispatch (non-durable format)
     // 2. Extract MessageId from partial Message
     // 3. Send POISON_ACK with non-durable consumer info
     // 4. Broker moves message to DLQ
     // 5. If consumer disconnects, subscription does NOT persist
-    
+
     std::cout << "[CorruptedMessageTest] testCorruptedMessageNonDurableConsumer: "
               << "Verified corrupted message handling for non-durable consumer" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testCorruptedMessageDurableTopicSubscriber() {
+/**
+ * Test Case 12: Corrupted message for durable topic subscriber
+ *
+ * Scenario: Durable topic subscriber receives corrupted message
+ * Expected:
+ * - ConsumerId includes subscription name
+ * - POISON_ACK sent with durable subscriber information
+ * - Message moved to DLQ
+ * - Subscription persists even after handling corrupted message
+ * - Client can reconnect and continue from where it left off
+ */
+TEST_F(CorruptedMessageTest, testCorruptedMessageDurableTopicSubscriber) {
     // Test corrupted message handling for durable topic subscriber
     // Durable subscribers maintain their subscription even when disconnected
 
@@ -1129,15 +1033,15 @@ void CorruptedMessageTest::testCorruptedMessageDurableTopicSubscriber() {
     std::string connectionId = "ID:durable-connection:1";
     std::string subscriptionName = "MyDurableSubscription";
     std::string messageId = "ID:producer:1:1:1:200";
-    
-    std::vector<unsigned char> corruptedBytes = 
+
+    std::vector<unsigned char> corruptedBytes =
         CorruptedStreamBuilder::createCorruptedDurableSubscriberMessage(
             connectionId, subscriptionName, messageId);
-    
+
     Pointer<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
     Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
-    
+
     // Verify corruption detected
     bool caughtException = false;
     try {
@@ -1145,9 +1049,9 @@ void CorruptedMessageTest::testCorruptedMessageDurableTopicSubscriber() {
     } catch (Exception& e) {
         caughtException = true;
     }
-    
+
     ASSERT_TRUE(caughtException) << ("Durable subscriber corrupted message should throw exception");
-    
+
     // In production, IOTransport would:
     // 1. Extract ConsumerId from partial MessageDispatch (includes subscription name)
     // 2. Extract MessageId from partial Message
@@ -1155,13 +1059,23 @@ void CorruptedMessageTest::testCorruptedMessageDurableTopicSubscriber() {
     // 4. Broker moves message to DLQ
     // 5. Durable subscription PERSISTS after handling corrupted message
     // 6. Client can disconnect and reconnect, subscription continues
-    
+
     std::cout << "[CorruptedMessageTest] testCorruptedMessageDurableTopicSubscriber: "
               << "Verified corrupted message handling for durable topic subscriber" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testPoisonAckForDurableSubscriber() {
+/**
+ * Test Case 13: POISON_ACK format for durable subscriber
+ *
+ * Scenario: Verify POISON_ACK structure for durable topic subscriber
+ * Expected:
+ * - MessageAck includes proper durable subscription information
+ * - ConsumerId contains subscription name
+ * - Broker can properly route to DLQ for durable subscription
+ * - Subscription state remains intact
+ */
+TEST_F(CorruptedMessageTest, testPoisonAckForDurableSubscriber) {
     // Verify POISON_ACK format for durable topic subscriber
     // This ensures the broker properly handles DLQ routing for durable subscriptions
 
@@ -1223,7 +1137,18 @@ void CorruptedMessageTest::testPoisonAckForDurableSubscriber() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testEOFDuringMessageIdRead() {
+/**
+ * Test Case 14: EOF during MessageId read
+ *
+ * Scenario: Stream ends abruptly while reading MessageId field
+ * Simulates: "DataInputStream::readLong - Reached EOF"
+ * Expected:
+ * - EOFException thrown during MessageId unmarshal
+ * - No POISON_ACK sent (MessageId not complete)
+ * - consecutiveErrors increments
+ * - Connection remains open
+ */
+TEST_F(CorruptedMessageTest, testEOFDuringMessageIdRead) {
     // Simulate EOF while reading MessageId field
     // This is the "DataInputStream::readLong - Reached EOF" error
     // that occurs when MessageId unmarshaling is interrupted
@@ -1234,14 +1159,14 @@ void CorruptedMessageTest::testEOFDuringMessageIdRead() {
 
     // Create a truncated message that ends during MessageId read
     // MessageId typically starts around byte 30-40, so truncate at 35
-    std::vector<unsigned char> truncatedBytes = 
+    std::vector<unsigned char> truncatedBytes =
         CorruptedStreamBuilder::createTruncatedMessage(
             "ID:conn:1", "ID:msg:1", 35);
-    
+
     Pointer<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&truncatedBytes[0], truncatedBytes.size()));
     Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
-    
+
     // Verify EOF exception thrown
     bool caughtException = false;
     std::string exceptionType;
@@ -1258,23 +1183,34 @@ void CorruptedMessageTest::testEOFDuringMessageIdRead() {
         caughtException = true;
         exceptionType = "Exception";
     }
-    
+
     ASSERT_TRUE(caughtException) << ("EOF during MessageId read should throw exception");
-    
+
     // In production, IOTransport would:
     // 1. Catch EOFException
     // 2. Check thread-local for partial Message
     // 3. MessageId NOT complete - no POISON_ACK sent
     // 4. Log: "Cannot send POISON_ACK - no MessageId"
     // 5. Increment consecutiveErrors
-    
+
     std::cout << "[CorruptedMessageTest] testEOFDuringMessageIdRead: "
               << "Verified EOF during MessageId read throws " << exceptionType
               << " (no POISON_ACK - MessageId incomplete)" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testEOFDuringPropertiesRead() {
+/**
+ * Test Case 15: EOF during properties read
+ *
+ * Scenario: Stream ends while reading message properties (COMMON case)
+ * Simulates: "DataInputStream::readLong - Reached EOF" after MessageId
+ * Expected:
+ * - EOFException thrown during properties unmarshal
+ * - MessageId was successfully unmarshaled
+ * - POISON_ACK sent with valid MessageId
+ * - consecutiveErrors increments
+ */
+TEST_F(CorruptedMessageTest, testEOFDuringPropertiesRead) {
     // Simulate EOF while reading message properties
     // This is the MOST COMMON case: MessageId successfully read,
     // but EOF occurs during properties unmarshaling
@@ -1287,14 +1223,14 @@ void CorruptedMessageTest::testEOFDuringPropertiesRead() {
     // Create a truncated message that ends during properties read
     // MessageId completes around byte 60-70, properties start after that
     // Truncate at byte 75 to simulate EOF during properties
-    std::vector<unsigned char> truncatedBytes = 
+    std::vector<unsigned char> truncatedBytes =
         CorruptedStreamBuilder::createTruncatedMessage(
             "ID:conn:1", "ID:producer:1:1:1:100", 75);
-    
+
     Pointer<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&truncatedBytes[0], truncatedBytes.size()));
     Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
-    
+
     // Verify EOF exception thrown
     bool caughtException = false;
     try {
@@ -1307,9 +1243,9 @@ void CorruptedMessageTest::testEOFDuringPropertiesRead() {
     } catch (Exception& e) {
         caughtException = true;
     }
-    
+
     ASSERT_TRUE(caughtException) << ("EOF during properties read should throw exception");
-    
+
     // In production, IOTransport would:
     // 1. Catch EOFException
     // 2. Check thread-local for partial Message
@@ -1318,19 +1254,29 @@ void CorruptedMessageTest::testEOFDuringPropertiesRead() {
     // 5. Send POISON_ACK successfully
     // 6. Log: "[IOTransport] Sending POISON_ACK for corrupted message: messageId=..."
     // 7. Increment consecutiveErrors
-    
+
     // This is the production scenario from your logs:
     // [MessageMarshaller] Successfully unmarshaled MessageId: ID:stm58-20029-1769673005375-1:1:1:1:492
     // [MessageDispatchMarshaller] Failed to unmarshal Message (..., MessageId: ...) - EOF
     // [IOTransport] Sending POISON_ACK for corrupted message: messageId=...
-    
+
     std::cout << "[CorruptedMessageTest] testEOFDuringPropertiesRead: "
               << "Verified EOF during properties read (MOST COMMON case). "
               << "MessageId available, POISON_ACK can be sent." << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CorruptedMessageTest::testEOFDuringBodyRead() {
+/**
+ * Test Case 16: EOF during message body read
+ *
+ * Scenario: Stream ends while reading message body content
+ * Expected:
+ * - EOFException thrown during body unmarshal
+ * - MessageId was successfully unmarshaled
+ * - POISON_ACK sent with valid MessageId
+ * - consecutiveErrors increments
+ */
+TEST_F(CorruptedMessageTest, testEOFDuringBodyRead) {
     // Simulate EOF while reading message body
     // MessageId and properties complete, but body truncated
 
@@ -1341,14 +1287,14 @@ void CorruptedMessageTest::testEOFDuringBodyRead() {
     // Create a truncated message that ends during body read
     // Properties typically complete around byte 80-90
     // Truncate at byte 95 to simulate EOF during body
-    std::vector<unsigned char> truncatedBytes = 
+    std::vector<unsigned char> truncatedBytes =
         CorruptedStreamBuilder::createTruncatedMessage(
             "ID:conn:1", "ID:producer:1:1:1:200", 95);
-    
+
     Pointer<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&truncatedBytes[0], truncatedBytes.size()));
     Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
-    
+
     // Verify EOF exception thrown
     bool caughtException = false;
     try {
@@ -1361,9 +1307,9 @@ void CorruptedMessageTest::testEOFDuringBodyRead() {
     } catch (Exception& e) {
         caughtException = true;
     }
-    
+
     ASSERT_TRUE(caughtException) << ("EOF during body read should throw exception");
-    
+
     // In production, IOTransport would:
     // 1. Catch EOFException
     // 2. Check thread-local for partial Message
@@ -1371,25 +1317,8 @@ void CorruptedMessageTest::testEOFDuringBodyRead() {
     // 4. Extract ConsumerId and MessageId
     // 5. Send POISON_ACK successfully
     // 6. Increment consecutiveErrors
-    
+
     std::cout << "[CorruptedMessageTest] testEOFDuringBodyRead: "
               << "Verified EOF during body read. "
               << "MessageId available, POISON_ACK can be sent." << std::endl;
 }
-
-TEST_F(CorruptedMessageTest, testCorruptedFirstMessage) { testCorruptedFirstMessage(); }
-TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages) { testCorruptedMessageBetweenValidMessages(); }
-TEST_F(CorruptedMessageTest, testContinueAfterCorruptedMessage) { testContinueAfterCorruptedMessage(); }
-TEST_F(CorruptedMessageTest, testMultipleCorruptedMessages) { testMultipleCorruptedMessages(); }
-TEST_F(CorruptedMessageTest, testCorruptedMessageWithoutMessageId) { testCorruptedMessageWithoutMessageId(); }
-TEST_F(CorruptedMessageTest, testMaxConsecutiveErrors) { testMaxConsecutiveErrors(); }
-TEST_F(CorruptedMessageTest, testPoisonAckSent) { testPoisonAckSent(); }
-TEST_F(CorruptedMessageTest, testStreamResyncAfterSingleCorruption) { testStreamResyncAfterSingleCorruption(); }
-TEST_F(CorruptedMessageTest, testCorruptedMessageDuringFailover) { testCorruptedMessageDuringFailover(); }
-TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts) { testCorruptionInDifferentMessageParts(); }
-TEST_F(CorruptedMessageTest, testCorruptedMessageNonDurableConsumer) { testCorruptedMessageNonDurableConsumer(); }
-TEST_F(CorruptedMessageTest, testCorruptedMessageDurableTopicSubscriber) { testCorruptedMessageDurableTopicSubscriber(); }
-TEST_F(CorruptedMessageTest, testPoisonAckForDurableSubscriber) { testPoisonAckForDurableSubscriber(); }
-TEST_F(CorruptedMessageTest, testEOFDuringMessageIdRead) { testEOFDuringMessageIdRead(); }
-TEST_F(CorruptedMessageTest, testEOFDuringPropertiesRead) { testEOFDuringPropertiesRead(); }
-TEST_F(CorruptedMessageTest, testEOFDuringBodyRead) { testEOFDuringBodyRead(); }

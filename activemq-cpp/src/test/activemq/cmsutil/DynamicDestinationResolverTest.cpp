@@ -24,18 +24,10 @@ using namespace activemq;
 using namespace activemq::cmsutil;
 
     class DynamicDestinationResolverTest : public ::testing::Test {
-public:
-
-        DynamicDestinationResolverTest() {}
-        virtual ~DynamicDestinationResolverTest() {}
-
-        void testTopics();
-        void testQueues();
     };
 
-
 ////////////////////////////////////////////////////////////////////////////////
-void DynamicDestinationResolverTest::testTopics() {
+TEST_F(DynamicDestinationResolverTest, testTopics) {
 
     ResourceLifecycleManager mgr;
     DynamicDestinationResolver resolver;
@@ -67,7 +59,7 @@ void DynamicDestinationResolverTest::testTopics() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DynamicDestinationResolverTest::testQueues() {
+TEST_F(DynamicDestinationResolverTest, testQueues) {
 
     ResourceLifecycleManager mgr;
     DynamicDestinationResolver resolver;
@@ -96,6 +88,3 @@ void DynamicDestinationResolverTest::testQueues() {
 
     mgr.destroy();
 }
-
-TEST_F(DynamicDestinationResolverTest, testTopics) { testTopics(); }
-TEST_F(DynamicDestinationResolverTest, testQueues) { testQueues(); }

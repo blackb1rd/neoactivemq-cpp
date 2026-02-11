@@ -21,7 +21,6 @@
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
 
-
 namespace decaf { namespace internal { namespace nio {} } }
 using namespace std;
 using namespace decaf;
@@ -31,6 +30,8 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class FloatArrayBufferTest : public ::testing::Test {
+    protected:
+
 decaf::nio::FloatBuffer* testBuffer1;
         float* testData1;
 
@@ -38,15 +39,9 @@ decaf::nio::FloatBuffer* testBuffer1;
         static const int SMALL_TEST_LENGTH;
         static const int BUFFER_LENGTH;
 
-    private:
-
-        FloatArrayBufferTest(const FloatArrayBufferTest&);
-        FloatArrayBufferTest& operator= (const FloatArrayBufferTest&);
-
     public:
 
         FloatArrayBufferTest() : testBuffer1(), testData1() {}
-        virtual ~FloatArrayBufferTest() {}
 
         void SetUp() override {
             testBuffer1 = decaf::nio::FloatBuffer::allocate( testData1Size );
@@ -61,29 +56,6 @@ decaf::nio::FloatBuffer* testBuffer1;
             delete testBuffer1;
             delete [] testData1;
         }
-
-        void test();
-        void testArray();
-        void testArrayOffset();
-        void testReadOnlyArray();
-        void testAsReadOnlyBuffer();
-        void testCompact();
-        void testCompareTo();
-        void testDuplicate();
-        void testEquals();
-        void testHasArray();
-        void testGet();
-        void testGet2();
-        void testGetFloatArray();
-        void testGetFloatArray2();
-        void testGetWithIndex();
-        void testPutFloat();
-        void testPutFloatArray();
-        void testPutFloatArray2();
-        void testPutFloatBuffer();
-        void testPutIndexed();
-        void testSlice();
-        void testToString();
 
     protected:
 
@@ -142,15 +114,13 @@ decaf::nio::FloatBuffer* testBuffer1;
 
     };
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 const int FloatArrayBufferTest::testData1Size = 100;
 const int FloatArrayBufferTest::SMALL_TEST_LENGTH = 5;
 const int FloatArrayBufferTest::BUFFER_LENGTH = 250;
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::test() {
+TEST_F(FloatArrayBufferTest, test) {
 
     // Check that we have setup the array and our initial assumptions on state
     // are correct.  This is the first test run.
@@ -167,7 +137,7 @@ void FloatArrayBufferTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testArray() {
+TEST_F(FloatArrayBufferTest, testArray) {
 
     float* array = testBuffer1->array();
 
@@ -195,7 +165,7 @@ void FloatArrayBufferTest::testArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testArrayOffset() {
+TEST_F(FloatArrayBufferTest, testArrayOffset) {
 
     float* array = testBuffer1->array();
 
@@ -215,7 +185,7 @@ void FloatArrayBufferTest::testArrayOffset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testReadOnlyArray() {
+TEST_F(FloatArrayBufferTest, testReadOnlyArray) {
 
     FloatBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
 
@@ -230,7 +200,7 @@ void FloatArrayBufferTest::testReadOnlyArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testAsReadOnlyBuffer() {
+TEST_F(FloatArrayBufferTest, testAsReadOnlyBuffer) {
 
     testBuffer1->clear();
     testBuffer1->mark();
@@ -259,7 +229,7 @@ void FloatArrayBufferTest::testAsReadOnlyBuffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testCompact() {
+TEST_F(FloatArrayBufferTest, testCompact) {
 
     loadTestData1( testBuffer1 );
 
@@ -306,7 +276,7 @@ void FloatArrayBufferTest::testCompact() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testCompareTo() {
+TEST_F(FloatArrayBufferTest, testCompareTo) {
 
     FloatBuffer* other = FloatBuffer::allocate( testBuffer1->capacity() );
 
@@ -345,7 +315,7 @@ void FloatArrayBufferTest::testCompareTo() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testDuplicate() {
+TEST_F(FloatArrayBufferTest, testDuplicate) {
     testBuffer1->clear();
     testBuffer1->mark();
     testBuffer1->position(testBuffer1->limit());
@@ -370,7 +340,7 @@ void FloatArrayBufferTest::testDuplicate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testEquals() {
+TEST_F(FloatArrayBufferTest, testEquals) {
 
     // equal to self
     ASSERT_TRUE(testBuffer1->equals( *testBuffer1 ));
@@ -394,7 +364,7 @@ void FloatArrayBufferTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testGet() {
+TEST_F(FloatArrayBufferTest, testGet) {
 
     testBuffer1->clear();
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
@@ -406,7 +376,7 @@ void FloatArrayBufferTest::testGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testGetFloatArray() {
+TEST_F(FloatArrayBufferTest, testGetFloatArray) {
 
     std::vector<float> array(1);
     testBuffer1->clear();
@@ -422,7 +392,7 @@ void FloatArrayBufferTest::testGetFloatArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testGetFloatArray2() {
+TEST_F(FloatArrayBufferTest, testGetFloatArray2) {
 
     testBuffer1->clear();
     float* array1 = new float[testBuffer1->capacity()];
@@ -461,7 +431,7 @@ void FloatArrayBufferTest::testGetFloatArray2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testGet2() {
+TEST_F(FloatArrayBufferTest, testGet2) {
 
     testBuffer1->clear();
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
@@ -475,12 +445,12 @@ void FloatArrayBufferTest::testGet2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testHasArray() {
+TEST_F(FloatArrayBufferTest, testHasArray) {
     ASSERT_TRUE(testBuffer1->hasArray());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testPutFloat() {
+TEST_F(FloatArrayBufferTest, testPutFloat) {
 
     testBuffer1->clear();
 
@@ -495,7 +465,7 @@ void FloatArrayBufferTest::testPutFloat() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testPutFloatArray() {
+TEST_F(FloatArrayBufferTest, testPutFloatArray) {
 
     float* array = new float[1];
 
@@ -514,7 +484,7 @@ void FloatArrayBufferTest::testPutFloatArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testPutFloatArray2() {
+TEST_F(FloatArrayBufferTest, testPutFloatArray2) {
 
     testBuffer1->clear();
     float* array1 = new float[ testBuffer1->capacity() ];
@@ -554,7 +524,7 @@ void FloatArrayBufferTest::testPutFloatArray2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testPutFloatBuffer() {
+TEST_F(FloatArrayBufferTest, testPutFloatBuffer) {
 
     FloatBuffer* other = FloatBuffer::allocate( testBuffer1->capacity() );
     FloatBuffer* other1 = FloatBuffer::allocate( testBuffer1->capacity() + 1 );
@@ -578,7 +548,7 @@ void FloatArrayBufferTest::testPutFloatBuffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testGetWithIndex() {
+TEST_F(FloatArrayBufferTest, testGetWithIndex) {
 
     testBuffer1->clear();
 
@@ -595,7 +565,7 @@ void FloatArrayBufferTest::testGetWithIndex() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testPutIndexed() {
+TEST_F(FloatArrayBufferTest, testPutIndexed) {
 
     FloatBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -617,7 +587,7 @@ void FloatArrayBufferTest::testPutIndexed() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testSlice() {
+TEST_F(FloatArrayBufferTest, testSlice) {
 
     ASSERT_TRUE(testBuffer1->capacity() > 5);
     testBuffer1->position(1);
@@ -642,7 +612,7 @@ void FloatArrayBufferTest::testSlice() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void FloatArrayBufferTest::testToString() {
+TEST_F(FloatArrayBufferTest, testToString) {
 
     std::string str = testBuffer1->toString();
     ASSERT_TRUE(str.find("Float") != string::npos);
@@ -650,26 +620,3 @@ void FloatArrayBufferTest::testToString() {
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->limit() ) ) != string::npos);
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->capacity() ) ) != string::npos);
 }
-
-TEST_F(FloatArrayBufferTest, test) { test(); }
-TEST_F(FloatArrayBufferTest, testArray) { testArray(); }
-TEST_F(FloatArrayBufferTest, testArrayOffset) { testArrayOffset(); }
-TEST_F(FloatArrayBufferTest, testReadOnlyArray) { testReadOnlyArray(); }
-TEST_F(FloatArrayBufferTest, testAsReadOnlyBuffer) { testAsReadOnlyBuffer(); }
-TEST_F(FloatArrayBufferTest, testCompact) { testCompact(); }
-TEST_F(FloatArrayBufferTest, testCompareTo) { testCompareTo(); }
-TEST_F(FloatArrayBufferTest, testDuplicate) { testDuplicate(); }
-TEST_F(FloatArrayBufferTest, testEquals) { testEquals(); }
-TEST_F(FloatArrayBufferTest, testHasArray) { testHasArray(); }
-TEST_F(FloatArrayBufferTest, testGet) { testGet(); }
-TEST_F(FloatArrayBufferTest, testGet2) { testGet2(); }
-TEST_F(FloatArrayBufferTest, testGetFloatArray) { testGetFloatArray(); }
-TEST_F(FloatArrayBufferTest, testGetFloatArray2) { testGetFloatArray2(); }
-TEST_F(FloatArrayBufferTest, testGetWithIndex) { testGetWithIndex(); }
-TEST_F(FloatArrayBufferTest, testPutFloat) { testPutFloat(); }
-TEST_F(FloatArrayBufferTest, testPutFloatArray) { testPutFloatArray(); }
-TEST_F(FloatArrayBufferTest, testPutFloatArray2) { testPutFloatArray2(); }
-TEST_F(FloatArrayBufferTest, testPutFloatBuffer) { testPutFloatBuffer(); }
-TEST_F(FloatArrayBufferTest, testPutIndexed) { testPutIndexed(); }
-TEST_F(FloatArrayBufferTest, testSlice) { testSlice(); }
-TEST_F(FloatArrayBufferTest, testToString) { testToString(); }

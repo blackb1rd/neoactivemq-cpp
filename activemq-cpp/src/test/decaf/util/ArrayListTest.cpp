@@ -29,7 +29,7 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class ArrayListTest : public ::testing::Test {
-private:
+protected:
 
         static const int SIZE;
 
@@ -38,43 +38,7 @@ private:
         ArrayListTest();
         virtual ~ArrayListTest();
 
-        void testConstructor1();
-        void testConstructor2();
-        void testConstructor3();
-        void testAdd1();
-        void testAdd2();
-        void testAdd3();
-        void testAddAll1();
-        void testAddAll2();
-        void testAddAll3();
-        void testAddAll4();
-        void testAddAll5();
-        void testAddAll6();
-        void testAddAll7();
-        void testAddAll8();
-        void testAddAll9();
-        void testClear();
-        void testContains();
-        void testEnsureCapacity();
-        void testGet();
-        void testSet();
-        void testIndexOf();
-        void testIsEmpty();
-        void testLastIndexOf();
-        void testRemove();
-        void testRemoveAt();
-        void testSize();
-        void testToString();
-        void testToArray();
-        void testTrimToSize();
-        void testOverrideSize();
-        void testRemoveAll();
-        void testRetainAll();
-        void testListIterator1IndexOutOfBoundsException();
-        void testListIterator2IndexOutOfBoundsException();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const int ArrayListTest::SIZE = 256;
@@ -143,7 +107,7 @@ ArrayListTest::~ArrayListTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testConstructor1() {
+TEST_F(ArrayListTest, testConstructor1) {
 
     ArrayList<int> array;
     ASSERT_TRUE(array.isEmpty());
@@ -155,7 +119,7 @@ void ArrayListTest::testConstructor1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testConstructor2() {
+TEST_F(ArrayListTest, testConstructor2) {
 
     StlList<int> intsList;
 
@@ -173,7 +137,7 @@ void ArrayListTest::testConstructor2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testClear() {
+TEST_F(ArrayListTest, testClear) {
 
     ArrayList<int> array( 100 );
     ASSERT_TRUE(0 == array.size()) << ("List size should be zero");
@@ -193,7 +157,7 @@ void ArrayListTest::testClear() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testConstructor3() {
+TEST_F(ArrayListTest, testConstructor3) {
 
     ArrayList<int> array( 100 );
     ASSERT_TRUE(array.isEmpty());
@@ -205,7 +169,7 @@ void ArrayListTest::testConstructor3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAdd1() {
+TEST_F(ArrayListTest, testAdd1) {
 
     ArrayList<int> array( 100 );
     array.add( 25 );
@@ -219,7 +183,7 @@ void ArrayListTest::testAdd1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAdd2() {
+TEST_F(ArrayListTest, testAdd2) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -250,7 +214,7 @@ void ArrayListTest::testAdd2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAdd3() {
+TEST_F(ArrayListTest, testAdd3) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -278,7 +242,7 @@ void ArrayListTest::testAdd3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll1() {
+TEST_F(ArrayListTest, testAddAll1) {
 
     ArrayList<int> array;
     populate( array, 100 );
@@ -302,7 +266,7 @@ void ArrayListTest::testAddAll1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll2() {
+TEST_F(ArrayListTest, testAddAll2) {
 
     StlList<int> emptyCollection;
     ASSERT_THROW(ArrayList<int>().addAll( -1, emptyCollection ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
@@ -362,7 +326,7 @@ void ArrayListTest::testAddAll2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll3() {
+TEST_F(ArrayListTest, testAddAll3) {
 
     ArrayList<int> list;
     list.addAll( 0, list );
@@ -374,7 +338,7 @@ void ArrayListTest::testAddAll3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll4() {
+TEST_F(ArrayListTest, testAddAll4) {
 
     ArrayList<std::string> array;
     ArrayList<std::string> blist;
@@ -392,7 +356,7 @@ void ArrayListTest::testAddAll4() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll5() {
+TEST_F(ArrayListTest, testAddAll5) {
 
     ArrayList<std::string> array;
     populate( array, 100 );
@@ -427,7 +391,7 @@ void ArrayListTest::testAddAll5() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll6() {
+TEST_F(ArrayListTest, testAddAll6) {
 
     ArrayList<int> arrayListA;
     arrayListA.add( 1 );
@@ -442,7 +406,7 @@ void ArrayListTest::testAddAll6() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll7() {
+TEST_F(ArrayListTest, testAddAll7) {
 
     ArrayList<int> arrayList;
     arrayList.add( 1 );
@@ -455,7 +419,7 @@ void ArrayListTest::testAddAll7() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll8() {
+TEST_F(ArrayListTest, testAddAll8) {
 
     ArrayList<std::string> arrayList;
     arrayList.add( "1" );
@@ -479,7 +443,7 @@ void ArrayListTest::testAddAll8() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll9() {
+TEST_F(ArrayListTest, testAddAll9) {
 
     ArrayList<std::string> list;
     list.add( "one" );
@@ -519,7 +483,7 @@ void ArrayListTest::testAddAll9() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testContains() {
+TEST_F(ArrayListTest, testContains) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -532,7 +496,7 @@ void ArrayListTest::testContains() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testEnsureCapacity() {
+TEST_F(ArrayListTest, testEnsureCapacity) {
 
     int capacity = 20;
     int testValue = 2048;
@@ -559,7 +523,7 @@ void ArrayListTest::testEnsureCapacity() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testGet() {
+TEST_F(ArrayListTest, testGet) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -571,7 +535,7 @@ void ArrayListTest::testGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testIndexOf() {
+TEST_F(ArrayListTest, testIndexOf) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -583,7 +547,7 @@ void ArrayListTest::testIndexOf() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testIsEmpty() {
+TEST_F(ArrayListTest, testIsEmpty) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -593,7 +557,7 @@ void ArrayListTest::testIsEmpty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testLastIndexOf() {
+TEST_F(ArrayListTest, testLastIndexOf) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -609,7 +573,7 @@ void ArrayListTest::testLastIndexOf() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testRemove() {
+TEST_F(ArrayListTest, testRemove) {
 
     ArrayList<int> list1;
     populate( list1, SIZE );
@@ -635,7 +599,7 @@ void ArrayListTest::testRemove() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testRemoveAt() {
+TEST_F(ArrayListTest, testRemoveAt) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -673,7 +637,7 @@ void ArrayListTest::testRemoveAt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testSet() {
+TEST_F(ArrayListTest, testSet) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -695,7 +659,7 @@ void ArrayListTest::testSet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testSize() {
+TEST_F(ArrayListTest, testSize) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -705,7 +669,7 @@ void ArrayListTest::testSize() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testToString() {
+TEST_F(ArrayListTest, testToString) {
 
     ArrayList<int> l(1);
     l.add( 5 );
@@ -714,7 +678,7 @@ void ArrayListTest::testToString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testToArray() {
+TEST_F(ArrayListTest, testToArray) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -735,7 +699,7 @@ void ArrayListTest::testToArray() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testTrimToSize() {
+TEST_F(ArrayListTest, testTrimToSize) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -764,7 +728,7 @@ void ArrayListTest::testTrimToSize() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testOverrideSize() {
+TEST_F(ArrayListTest, testOverrideSize) {
 
     MockArrayList<std::string> testlist;
 
@@ -779,7 +743,7 @@ void ArrayListTest::testOverrideSize() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testRemoveAll() {
+TEST_F(ArrayListTest, testRemoveAll) {
 
     ArrayList<int> list;
     populate( list, 3 );
@@ -805,7 +769,7 @@ void ArrayListTest::testRemoveAll() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testRetainAll() {
+TEST_F(ArrayListTest, testRetainAll) {
 
     ArrayList<int> list;
     populate( list, 3 );
@@ -831,7 +795,7 @@ void ArrayListTest::testRetainAll() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testListIterator1IndexOutOfBoundsException() {
+TEST_F(ArrayListTest, testListIterator1IndexOutOfBoundsException) {
 
     ArrayList<int> list;
 
@@ -839,7 +803,7 @@ void ArrayListTest::testListIterator1IndexOutOfBoundsException() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testListIterator2IndexOutOfBoundsException() {
+TEST_F(ArrayListTest, testListIterator2IndexOutOfBoundsException) {
 
     ArrayList<int> list;
     list.add( 1 );
@@ -847,38 +811,3 @@ void ArrayListTest::testListIterator2IndexOutOfBoundsException() {
 
     ASSERT_THROW(std::unique_ptr< ListIterator<int> > it( list.listIterator( 100 ) ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
-
-TEST_F(ArrayListTest, testConstructor1) { testConstructor1(); }
-TEST_F(ArrayListTest, testConstructor2) { testConstructor2(); }
-TEST_F(ArrayListTest, testConstructor3) { testConstructor3(); }
-TEST_F(ArrayListTest, testAdd1) { testAdd1(); }
-TEST_F(ArrayListTest, testAdd2) { testAdd2(); }
-TEST_F(ArrayListTest, testAdd3) { testAdd3(); }
-TEST_F(ArrayListTest, testAddAll1) { testAddAll1(); }
-TEST_F(ArrayListTest, testAddAll2) { testAddAll2(); }
-TEST_F(ArrayListTest, testAddAll3) { testAddAll3(); }
-TEST_F(ArrayListTest, testAddAll4) { testAddAll4(); }
-TEST_F(ArrayListTest, testAddAll5) { testAddAll5(); }
-TEST_F(ArrayListTest, testAddAll6) { testAddAll6(); }
-TEST_F(ArrayListTest, testAddAll7) { testAddAll7(); }
-TEST_F(ArrayListTest, testAddAll8) { testAddAll8(); }
-TEST_F(ArrayListTest, testAddAll9) { testAddAll9(); }
-TEST_F(ArrayListTest, testClear) { testClear(); }
-TEST_F(ArrayListTest, testContains) { testContains(); }
-TEST_F(ArrayListTest, testEnsureCapacity) { testEnsureCapacity(); }
-TEST_F(ArrayListTest, testGet) { testGet(); }
-TEST_F(ArrayListTest, testSet) { testSet(); }
-TEST_F(ArrayListTest, testIndexOf) { testIndexOf(); }
-TEST_F(ArrayListTest, testIsEmpty) { testIsEmpty(); }
-TEST_F(ArrayListTest, testLastIndexOf) { testLastIndexOf(); }
-TEST_F(ArrayListTest, testRemove) { testRemove(); }
-TEST_F(ArrayListTest, testRemoveAt) { testRemoveAt(); }
-TEST_F(ArrayListTest, testSize) { testSize(); }
-TEST_F(ArrayListTest, testToString) { testToString(); }
-TEST_F(ArrayListTest, testToArray) { testToArray(); }
-TEST_F(ArrayListTest, testTrimToSize) { testTrimToSize(); }
-TEST_F(ArrayListTest, testOverrideSize) { testOverrideSize(); }
-TEST_F(ArrayListTest, testRemoveAll) { testRemoveAll(); }
-TEST_F(ArrayListTest, testRetainAll) { testRetainAll(); }
-TEST_F(ArrayListTest, testListIterator1IndexOutOfBoundsException) { testListIterator1IndexOutOfBoundsException(); }
-TEST_F(ArrayListTest, testListIterator2IndexOutOfBoundsException) { testListIterator2IndexOutOfBoundsException(); }

@@ -34,69 +34,11 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class AdvisorySupportTest : public ::testing::Test {
-    private:
-public:
-
-        AdvisorySupportTest();
-        virtual ~AdvisorySupportTest();
-
-        void testGetTempDestinationCompositeAdvisoryTopic();
-        void testGetAllDestinationsCompositeAdvisoryTopic();
-        void testGetAllDestinationAdvisoryTopics();
-        void testGetConnectionAdvisoryTopic();
-        void testGetQueueAdvisoryTopic();
-        void testGetTopicAdvisoryTopic();
-        void testGetTempQueueAdvisoryTopic();
-        void testGetTempTopicAdvisoryTopic();
-        void testGetConsumerAdvisoryTopic();
-        void testGetProducerAdvisoryTopic();
-        void testGetExpiredMessageTopic();
-        void testGetExpiredTopicMessageAdvisoryTopic();
-        void testGetExpiredQueueMessageAdvisoryTopic();
-        void testGetNoConsumersAdvisoryTopic();
-        void testGetNoTopicConsumersAdvisoryTopic();
-        void testGetNoQueueConsumersAdvisoryTopic();
-        void testGetSlowConsumerAdvisoryTopic();
-        void testGetFastProducerAdvisoryTopic();
-        void testGetMessageDiscardedAdvisoryTopic();
-        void testGetMessageDeliveredAdvisoryTopic();
-        void testGetMessageConsumedAdvisoryTopic();
-        void testGetMessageDLQdAdvisoryTopic();
-        void testGetMasterBrokerAdvisoryTopic();
-        void testGetNetworkBridgeAdvisoryTopic();
-        void testGetFullAdvisoryTopic();
-        void testGetDestinationAdvisoryTopic();
-
-        void testIsDestinationAdvisoryTopic();
-        void testIsTempDestinationAdvisoryTopic();
-        void testIsAdvisoryTopic();
-        void testIsConnectionAdvisoryTopic();
-        void testIsProducerAdvisoryTopic();
-        void testIsConsumerAdvisoryTopic();
-        void testIsSlowConsumerAdvisoryTopic();
-        void testIsFastProducerAdvisoryTopic();
-        void testIsMessageConsumedAdvisoryTopic();
-        void testIsMasterBrokerAdvisoryTopic();
-        void testIsMessageDeliveredAdvisoryTopic();
-        void testIsMessageDiscardedAdvisoryTopic();
-        void testIsMessageDLQdAdvisoryTopic();
-        void testIsFullAdvisoryTopic();
-        void testIsNetworkBridgeAdvisoryTopic();
-
-    };
-
+class AdvisorySupportTest : public ::testing::Test {
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-AdvisorySupportTest::AdvisorySupportTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-AdvisorySupportTest::~AdvisorySupportTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetTempDestinationCompositeAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetTempDestinationCompositeAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getTempDestinationCompositeAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
@@ -110,7 +52,7 @@ void AdvisorySupportTest::testGetTempDestinationCompositeAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetAllDestinationsCompositeAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetAllDestinationsCompositeAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getAllDestinationsCompositeAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
@@ -126,7 +68,7 @@ void AdvisorySupportTest::testGetAllDestinationsCompositeAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetAllDestinationAdvisoryTopics() {
+TEST_F(AdvisorySupportTest, testGetAllDestinationAdvisoryTopics) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
@@ -163,7 +105,7 @@ void AdvisorySupportTest::testGetAllDestinationAdvisoryTopics() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetConnectionAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetConnectionAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getConnectionAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
@@ -176,7 +118,7 @@ void AdvisorySupportTest::testGetConnectionAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetQueueAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetQueueAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getQueueAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
@@ -189,7 +131,7 @@ void AdvisorySupportTest::testGetQueueAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetTopicAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetTopicAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getTopicAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
@@ -202,7 +144,7 @@ void AdvisorySupportTest::testGetTopicAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetTempQueueAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetTempQueueAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getTempQueueAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
@@ -215,7 +157,7 @@ void AdvisorySupportTest::testGetTempQueueAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetTempTopicAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetTempTopicAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getTempTopicAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
@@ -228,7 +170,7 @@ void AdvisorySupportTest::testGetTempTopicAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetConsumerAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetConsumerAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
@@ -257,7 +199,7 @@ void AdvisorySupportTest::testGetConsumerAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetProducerAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetProducerAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
@@ -286,7 +228,7 @@ void AdvisorySupportTest::testGetProducerAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetExpiredMessageTopic() {
+TEST_F(AdvisorySupportTest, testGetExpiredMessageTopic) {
 
     {
         Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
@@ -340,7 +282,7 @@ void AdvisorySupportTest::testGetExpiredMessageTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetExpiredTopicMessageAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetExpiredTopicMessageAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
@@ -369,7 +311,7 @@ void AdvisorySupportTest::testGetExpiredTopicMessageAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetExpiredQueueMessageAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetExpiredQueueMessageAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQQueue("Test.Queue"));
 
@@ -398,7 +340,7 @@ void AdvisorySupportTest::testGetExpiredQueueMessageAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetNoConsumersAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetNoConsumersAdvisoryTopic) {
 
     {
         Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
@@ -452,7 +394,7 @@ void AdvisorySupportTest::testGetNoConsumersAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetNoTopicConsumersAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetNoTopicConsumersAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
@@ -481,7 +423,7 @@ void AdvisorySupportTest::testGetNoTopicConsumersAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetNoQueueConsumersAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetNoQueueConsumersAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQQueue("Test.Queue"));
 
@@ -510,7 +452,7 @@ void AdvisorySupportTest::testGetNoQueueConsumersAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetSlowConsumerAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetSlowConsumerAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
@@ -539,7 +481,7 @@ void AdvisorySupportTest::testGetSlowConsumerAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetFastProducerAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetFastProducerAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
@@ -568,7 +510,7 @@ void AdvisorySupportTest::testGetFastProducerAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetMessageDiscardedAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetMessageDiscardedAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
@@ -597,7 +539,7 @@ void AdvisorySupportTest::testGetMessageDiscardedAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetMessageDeliveredAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetMessageDeliveredAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
@@ -626,7 +568,7 @@ void AdvisorySupportTest::testGetMessageDeliveredAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetMessageConsumedAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetMessageConsumedAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
@@ -655,7 +597,7 @@ void AdvisorySupportTest::testGetMessageConsumedAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetMessageDLQdAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetMessageDLQdAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
@@ -684,7 +626,7 @@ void AdvisorySupportTest::testGetMessageDLQdAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetMasterBrokerAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetMasterBrokerAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getMasterBrokerAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
@@ -696,7 +638,7 @@ void AdvisorySupportTest::testGetMasterBrokerAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetNetworkBridgeAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetNetworkBridgeAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getNetworkBridgeAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
@@ -708,7 +650,7 @@ void AdvisorySupportTest::testGetNetworkBridgeAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetFullAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetFullAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
@@ -737,7 +679,7 @@ void AdvisorySupportTest::testGetFullAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testGetDestinationAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testGetDestinationAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
@@ -766,7 +708,7 @@ void AdvisorySupportTest::testGetDestinationAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testIsDestinationAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testIsDestinationAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getDestinationAdvisoryTopic(target.get()));
@@ -783,7 +725,7 @@ void AdvisorySupportTest::testIsDestinationAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testIsTempDestinationAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testIsTempDestinationAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getDestinationAdvisoryTopic(target.get()));
@@ -800,7 +742,7 @@ void AdvisorySupportTest::testIsTempDestinationAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testIsAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testIsAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getConsumerAdvisoryTopic(target.get()));
@@ -817,7 +759,7 @@ void AdvisorySupportTest::testIsAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testIsConnectionAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testIsConnectionAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getConnectionAdvisoryTopic());
@@ -834,7 +776,7 @@ void AdvisorySupportTest::testIsConnectionAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testIsProducerAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testIsProducerAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getProducerAdvisoryTopic(target.get()));
@@ -851,7 +793,7 @@ void AdvisorySupportTest::testIsProducerAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testIsConsumerAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testIsConsumerAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getConsumerAdvisoryTopic(target.get()));
@@ -868,7 +810,7 @@ void AdvisorySupportTest::testIsConsumerAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testIsSlowConsumerAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testIsSlowConsumerAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getSlowConsumerAdvisoryTopic(target.get()));
@@ -885,7 +827,7 @@ void AdvisorySupportTest::testIsSlowConsumerAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testIsFastProducerAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testIsFastProducerAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getFastProducerAdvisoryTopic(target.get()));
@@ -902,7 +844,7 @@ void AdvisorySupportTest::testIsFastProducerAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testIsMessageConsumedAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testIsMessageConsumedAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getMessageConsumedAdvisoryTopic(target.get()));
@@ -919,7 +861,7 @@ void AdvisorySupportTest::testIsMessageConsumedAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testIsMasterBrokerAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testIsMasterBrokerAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getMasterBrokerAdvisoryTopic());
@@ -936,7 +878,7 @@ void AdvisorySupportTest::testIsMasterBrokerAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testIsMessageDeliveredAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testIsMessageDeliveredAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getMessageDeliveredAdvisoryTopic(target.get()));
@@ -953,7 +895,7 @@ void AdvisorySupportTest::testIsMessageDeliveredAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testIsMessageDiscardedAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testIsMessageDiscardedAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getMessageDiscardedAdvisoryTopic(target.get()));
@@ -970,7 +912,7 @@ void AdvisorySupportTest::testIsMessageDiscardedAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testIsMessageDLQdAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testIsMessageDLQdAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getMessageDLQdAdvisoryTopic(target.get()));
@@ -987,7 +929,7 @@ void AdvisorySupportTest::testIsMessageDLQdAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testIsFullAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testIsFullAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getFullAdvisoryTopic(target.get()));
@@ -1004,7 +946,7 @@ void AdvisorySupportTest::testIsFullAdvisoryTopic() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisorySupportTest::testIsNetworkBridgeAdvisoryTopic() {
+TEST_F(AdvisorySupportTest, testIsNetworkBridgeAdvisoryTopic) {
 
     Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
     Pointer<ActiveMQDestination> topic(AdvisorySupport::getNetworkBridgeAdvisoryTopic());
@@ -1019,45 +961,3 @@ void AdvisorySupportTest::testIsNetworkBridgeAdvisoryTopic() {
     ASSERT_THROW(AdvisorySupport::isNetworkBridgeAdvisoryTopic((ActiveMQDestination*)NULL), NullPointerException) << ("Should throw a NullPointerException when passed a NULL destination");
     ASSERT_THROW(AdvisorySupport::isNetworkBridgeAdvisoryTopic((cms::Destination*)NULL), NullPointerException) << ("Should throw a NullPointerException when passed a NULL destination");
 }
-
-TEST_F(AdvisorySupportTest, testGetTempDestinationCompositeAdvisoryTopic) { testGetTempDestinationCompositeAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetAllDestinationsCompositeAdvisoryTopic) { testGetAllDestinationsCompositeAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetAllDestinationAdvisoryTopics) { testGetAllDestinationAdvisoryTopics(); }
-TEST_F(AdvisorySupportTest, testGetConnectionAdvisoryTopic) { testGetConnectionAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetQueueAdvisoryTopic) { testGetQueueAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetTopicAdvisoryTopic) { testGetTopicAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetTempQueueAdvisoryTopic) { testGetTempQueueAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetTempTopicAdvisoryTopic) { testGetTempTopicAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetConsumerAdvisoryTopic) { testGetConsumerAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetProducerAdvisoryTopic) { testGetProducerAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetExpiredMessageTopic) { testGetExpiredMessageTopic(); }
-TEST_F(AdvisorySupportTest, testGetExpiredTopicMessageAdvisoryTopic) { testGetExpiredTopicMessageAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetExpiredQueueMessageAdvisoryTopic) { testGetExpiredQueueMessageAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetNoConsumersAdvisoryTopic) { testGetNoConsumersAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetNoTopicConsumersAdvisoryTopic) { testGetNoTopicConsumersAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetNoQueueConsumersAdvisoryTopic) { testGetNoQueueConsumersAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetSlowConsumerAdvisoryTopic) { testGetSlowConsumerAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetFastProducerAdvisoryTopic) { testGetFastProducerAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetMessageDiscardedAdvisoryTopic) { testGetMessageDiscardedAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetMessageDeliveredAdvisoryTopic) { testGetMessageDeliveredAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetMessageConsumedAdvisoryTopic) { testGetMessageConsumedAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetMessageDLQdAdvisoryTopic) { testGetMessageDLQdAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetMasterBrokerAdvisoryTopic) { testGetMasterBrokerAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetNetworkBridgeAdvisoryTopic) { testGetNetworkBridgeAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetFullAdvisoryTopic) { testGetFullAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testGetDestinationAdvisoryTopic) { testGetDestinationAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testIsDestinationAdvisoryTopic) { testIsDestinationAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testIsTempDestinationAdvisoryTopic) { testIsTempDestinationAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testIsAdvisoryTopic) { testIsAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testIsConnectionAdvisoryTopic) { testIsConnectionAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testIsProducerAdvisoryTopic) { testIsProducerAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testIsConsumerAdvisoryTopic) { testIsConsumerAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testIsSlowConsumerAdvisoryTopic) { testIsSlowConsumerAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testIsFastProducerAdvisoryTopic) { testIsFastProducerAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testIsMessageConsumedAdvisoryTopic) { testIsMessageConsumedAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testIsMasterBrokerAdvisoryTopic) { testIsMasterBrokerAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testIsMessageDeliveredAdvisoryTopic) { testIsMessageDeliveredAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testIsMessageDiscardedAdvisoryTopic) { testIsMessageDiscardedAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testIsMessageDLQdAdvisoryTopic) { testIsMessageDLQdAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testIsFullAdvisoryTopic) { testIsFullAdvisoryTopic(); }
-TEST_F(AdvisorySupportTest, testIsNetworkBridgeAdvisoryTopic) { testIsNetworkBridgeAdvisoryTopic(); }

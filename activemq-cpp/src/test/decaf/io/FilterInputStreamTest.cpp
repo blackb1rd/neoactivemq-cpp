@@ -27,22 +27,7 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::io;
 using namespace decaf::util;
 
-    class FilterInputStreamTest : public ::testing::Test {
-public:
-
-        FilterInputStreamTest() {}
-        virtual ~FilterInputStreamTest() {}
-
-        void testAvailable();
-        void testClose();
-        void testRead();
-        void testRead2();
-        void testRead3();
-        void testSkip();
-        void testReadBIIIExceptions();
-
-    };
-
+    class FilterInputStreamTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -149,7 +134,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilterInputStreamTest::testAvailable() {
+TEST_F(FilterInputStreamTest, testAvailable) {
 
     std::string testStr = "TEST12345678910";
     MyInputStream myStream(testStr);
@@ -161,7 +146,7 @@ void FilterInputStreamTest::testAvailable() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilterInputStreamTest::testClose() {
+TEST_F(FilterInputStreamTest, testClose) {
 
     std::string testStr = "TEST12345678910";
     MyInputStream myStream( testStr );
@@ -183,7 +168,7 @@ void FilterInputStreamTest::testClose() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilterInputStreamTest::testRead() {
+TEST_F(FilterInputStreamTest, testRead) {
 
     std::string testStr = "TEST12345678910";
     MyInputStream myStream( testStr );
@@ -194,7 +179,7 @@ void FilterInputStreamTest::testRead() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilterInputStreamTest::testRead2() {
+TEST_F(FilterInputStreamTest, testRead2) {
 
     std::string testStr = "TEST12345678910ABCDEFGHIJKLMNOPQRSTU";
     MyInputStream myStream( testStr );
@@ -206,7 +191,7 @@ void FilterInputStreamTest::testRead2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilterInputStreamTest::testRead3() {
+TEST_F(FilterInputStreamTest, testRead3) {
 
     std::string testStr;
     for( int i = 0; i < 4000; ++i ) {
@@ -226,7 +211,7 @@ void FilterInputStreamTest::testRead3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilterInputStreamTest::testSkip() {
+TEST_F(FilterInputStreamTest, testSkip) {
 
     std::string testStr;
     for( int i = 0; i < 4000; ++i ) {
@@ -242,7 +227,7 @@ void FilterInputStreamTest::testSkip() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilterInputStreamTest::testReadBIIIExceptions() {
+TEST_F(FilterInputStreamTest, testReadBIIIExceptions) {
 
     std::string testStr;
     for( int i = 0; i < 1000; ++i ) {
@@ -271,11 +256,3 @@ void FilterInputStreamTest::testReadBIIIExceptions() {
         ASSERT_THROW(is.read( buf, 1000, 0, 100 ), IOException) << ("should throw IOException");
     }
 }
-
-TEST_F(FilterInputStreamTest, testAvailable) { testAvailable(); }
-TEST_F(FilterInputStreamTest, testClose) { testClose(); }
-TEST_F(FilterInputStreamTest, testRead) { testRead(); }
-TEST_F(FilterInputStreamTest, testRead2) { testRead2(); }
-TEST_F(FilterInputStreamTest, testRead3) { testRead3(); }
-TEST_F(FilterInputStreamTest, testSkip) { testSkip(); }
-TEST_F(FilterInputStreamTest, testReadBIIIExceptions) { testReadBIIIExceptions(); }

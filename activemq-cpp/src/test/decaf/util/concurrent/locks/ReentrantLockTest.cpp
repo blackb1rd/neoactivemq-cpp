@@ -40,52 +40,7 @@ public:
         ReentrantLockTest();
         virtual ~ReentrantLockTest();
 
-        void testConstructor();
-        void testLock();
-        void testFairLock();
-        void testUnlockIllegalMonitorStateException();
-        void testTryLock();
-        void testhasQueuedThreads();
-        void testGetQueueLength();
-        void testGetQueueLengthFair();
-        void testHasQueuedThreadNPE();
-        void testHasQueuedThread();
-        void testGetQueuedThreads();
-        void testInterruptedException2();
-        void testTryLockWhenLocked();
-        void testTryLockTimeout();
-        void testGetHoldCount();
-        void testIsLocked();
-        void testLockInterruptibly1();
-        void testLockInterruptibly2();
-        void testAwaitIllegalMonitor();
-        void testSignalIllegalMonitor();
-        void testAwaitNanosTimeout();
-        void testAwaitTimeout();
-        void testAwaitUntilTimeout();
-        void testAwait();
-        void testHasWaitersNPE();
-        void testGetWaitQueueLengthNPE();
-        void testGetWaitingThreadsNPE();
-        void testHasWaitersIAE();
-        void testHasWaitersIMSE();
-        void testGetWaitQueueLengthIAE();
-        void testGetWaitQueueLengthIMSE();
-        void testGetWaitingThreadsIAE();
-        void testGetWaitingThreadsIMSE();
-        void testHasWaiters();
-        void testGetWaitQueueLength();
-        void testGetWaitingThreads();
-        void testAwaitUninterruptibly();
-        void testAwaitInterrupt();
-        void testAwaitNanosInterrupt();
-        void testAwaitUntilInterrupt();
-        void testSignalAll();
-        void testAwaitLockCount();
-        void testToString();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -203,7 +158,7 @@ ReentrantLockTest::~ReentrantLockTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testConstructor() {
+TEST_F(ReentrantLockTest, testConstructor) {
     ReentrantLock rl;
     ASSERT_TRUE(!rl.isFair());
     ReentrantLock r2(true);
@@ -211,7 +166,7 @@ void ReentrantLockTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testLock() {
+TEST_F(ReentrantLockTest, testLock) {
     ReentrantLock rl;
     rl.lock();
     ASSERT_TRUE(rl.isLocked());
@@ -219,7 +174,7 @@ void ReentrantLockTest::testLock() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testFairLock() {
+TEST_F(ReentrantLockTest, testFairLock) {
     ReentrantLock rl(true);
     rl.lock();
     ASSERT_TRUE(rl.isLocked());
@@ -227,7 +182,7 @@ void ReentrantLockTest::testFairLock() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testUnlockIllegalMonitorStateException() {
+TEST_F(ReentrantLockTest, testUnlockIllegalMonitorStateException) {
     ReentrantLock rl;
     try {
         rl.unlock();
@@ -237,7 +192,7 @@ void ReentrantLockTest::testUnlockIllegalMonitorStateException() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testTryLock() {
+TEST_F(ReentrantLockTest, testTryLock) {
     ReentrantLock rl;
     ASSERT_TRUE(rl.tryLock());
     ASSERT_TRUE(rl.isLocked());
@@ -245,7 +200,7 @@ void ReentrantLockTest::testTryLock() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testhasQueuedThreads() {
+TEST_F(ReentrantLockTest, testhasQueuedThreads) {
 
     ReentrantLock lock;
 
@@ -278,7 +233,7 @@ void ReentrantLockTest::testhasQueuedThreads() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testGetQueueLength() {
+TEST_F(ReentrantLockTest, testGetQueueLength) {
 
     ReentrantLock lock;
 
@@ -311,7 +266,7 @@ void ReentrantLockTest::testGetQueueLength() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testGetQueueLengthFair() {
+TEST_F(ReentrantLockTest, testGetQueueLengthFair) {
 
     ReentrantLock lock(true);
 
@@ -344,7 +299,7 @@ void ReentrantLockTest::testGetQueueLengthFair() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testHasQueuedThreadNPE() {
+TEST_F(ReentrantLockTest, testHasQueuedThreadNPE) {
 
     ReentrantLock sync;
     try {
@@ -355,7 +310,7 @@ void ReentrantLockTest::testHasQueuedThreadNPE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testHasQueuedThread() {
+TEST_F(ReentrantLockTest, testHasQueuedThread) {
 
     ReentrantLock sync;
 
@@ -393,7 +348,7 @@ void ReentrantLockTest::testHasQueuedThread() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testGetQueuedThreads() {
+TEST_F(ReentrantLockTest, testGetQueuedThreads) {
 
     PublicReentrantLock lock;
 
@@ -459,7 +414,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testInterruptedException2() {
+TEST_F(ReentrantLockTest, testInterruptedException2) {
 
     ReentrantLock lock;
     lock.lock();
@@ -503,7 +458,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testTryLockWhenLocked() {
+TEST_F(ReentrantLockTest, testTryLockWhenLocked) {
 
     ReentrantLock lock;
     TestTryLockWhenLockedRunnable runnable(&lock, this);
@@ -551,7 +506,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testTryLockTimeout() {
+TEST_F(ReentrantLockTest, testTryLockTimeout) {
     ReentrantLock lock;
     lock.lock();
     TestTryLockTimeoutRunnable runnable(&lock, this);
@@ -567,7 +522,7 @@ void ReentrantLockTest::testTryLockTimeout() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testGetHoldCount() {
+TEST_F(ReentrantLockTest, testGetHoldCount) {
     ReentrantLock lock;
     const int SIZE = 50;
 
@@ -615,7 +570,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testIsLocked() {
+TEST_F(ReentrantLockTest, testIsLocked) {
 
     ReentrantLock lock;
     lock.lock();
@@ -637,7 +592,7 @@ void ReentrantLockTest::testIsLocked() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testLockInterruptibly1() {
+TEST_F(ReentrantLockTest, testLockInterruptibly1) {
     ReentrantLock lock;
     lock.lock();
     InterruptedLockRunnable runnable(&lock, this);
@@ -656,7 +611,7 @@ void ReentrantLockTest::testLockInterruptibly1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testLockInterruptibly2() {
+TEST_F(ReentrantLockTest, testLockInterruptibly2) {
     ReentrantLock lock;
     try {
         lock.lockInterruptibly();
@@ -679,7 +634,7 @@ void ReentrantLockTest::testLockInterruptibly2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testAwaitIllegalMonitor() {
+TEST_F(ReentrantLockTest, testAwaitIllegalMonitor) {
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
     try {
@@ -692,7 +647,7 @@ void ReentrantLockTest::testAwaitIllegalMonitor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testSignalIllegalMonitor() {
+TEST_F(ReentrantLockTest, testSignalIllegalMonitor) {
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
     try {
@@ -705,7 +660,7 @@ void ReentrantLockTest::testSignalIllegalMonitor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testAwaitNanosTimeout() {
+TEST_F(ReentrantLockTest, testAwaitNanosTimeout) {
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
     try {
@@ -719,7 +674,7 @@ void ReentrantLockTest::testAwaitNanosTimeout() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testAwaitTimeout() {
+TEST_F(ReentrantLockTest, testAwaitTimeout) {
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
     try {
@@ -732,7 +687,7 @@ void ReentrantLockTest::testAwaitTimeout() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testAwaitUntilTimeout() {
+TEST_F(ReentrantLockTest, testAwaitUntilTimeout) {
 
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
@@ -780,7 +735,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testAwait() {
+TEST_F(ReentrantLockTest, testAwait) {
 
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
@@ -801,7 +756,7 @@ void ReentrantLockTest::testAwait() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testHasWaitersNPE() {
+TEST_F(ReentrantLockTest, testHasWaitersNPE) {
     ReentrantLock lock;
     try {
         lock.hasWaiters(NULL);
@@ -813,7 +768,7 @@ void ReentrantLockTest::testHasWaitersNPE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testGetWaitQueueLengthNPE() {
+TEST_F(ReentrantLockTest, testGetWaitQueueLengthNPE) {
     ReentrantLock lock;
     try {
         lock.getWaitQueueLength(NULL);
@@ -825,7 +780,7 @@ void ReentrantLockTest::testGetWaitQueueLengthNPE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testGetWaitingThreadsNPE() {
+TEST_F(ReentrantLockTest, testGetWaitingThreadsNPE) {
     PublicReentrantLock lock;
     try {
         lock.getWaitingThreads(NULL);
@@ -837,7 +792,7 @@ void ReentrantLockTest::testGetWaitingThreadsNPE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testHasWaitersIAE() {
+TEST_F(ReentrantLockTest, testHasWaitersIAE) {
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
     ReentrantLock lock2;
@@ -851,7 +806,7 @@ void ReentrantLockTest::testHasWaitersIAE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testHasWaitersIMSE() {
+TEST_F(ReentrantLockTest, testHasWaitersIMSE) {
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
     try {
@@ -864,7 +819,7 @@ void ReentrantLockTest::testHasWaitersIMSE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testGetWaitQueueLengthIAE() {
+TEST_F(ReentrantLockTest, testGetWaitQueueLengthIAE) {
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
     ReentrantLock lock2;
@@ -878,7 +833,7 @@ void ReentrantLockTest::testGetWaitQueueLengthIAE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testGetWaitQueueLengthIMSE() {
+TEST_F(ReentrantLockTest, testGetWaitQueueLengthIMSE) {
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
     try {
@@ -891,7 +846,7 @@ void ReentrantLockTest::testGetWaitQueueLengthIMSE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testGetWaitingThreadsIAE() {
+TEST_F(ReentrantLockTest, testGetWaitingThreadsIAE) {
 
     PublicReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
@@ -906,7 +861,7 @@ void ReentrantLockTest::testGetWaitingThreadsIAE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testGetWaitingThreadsIMSE() {
+TEST_F(ReentrantLockTest, testGetWaitingThreadsIMSE) {
 
     PublicReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
@@ -955,7 +910,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testHasWaiters() {
+TEST_F(ReentrantLockTest, testHasWaiters) {
 
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
@@ -1049,7 +1004,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testGetWaitQueueLength() {
+TEST_F(ReentrantLockTest, testGetWaitQueueLength) {
 
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
@@ -1147,7 +1102,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testGetWaitingThreads() {
+TEST_F(ReentrantLockTest, testGetWaitingThreads) {
 
     PublicReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
@@ -1185,7 +1140,7 @@ void ReentrantLockTest::testGetWaitingThreads() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testAwaitUninterruptibly() {
+TEST_F(ReentrantLockTest, testAwaitUninterruptibly) {
 
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
@@ -1249,7 +1204,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testAwaitInterrupt() {
+TEST_F(ReentrantLockTest, testAwaitInterrupt) {
 
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
@@ -1301,7 +1256,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testAwaitNanosInterrupt() {
+TEST_F(ReentrantLockTest, testAwaitNanosInterrupt) {
 
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
@@ -1354,7 +1309,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testAwaitUntilInterrupt() {
+TEST_F(ReentrantLockTest, testAwaitUntilInterrupt) {
 
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
@@ -1406,7 +1361,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testSignalAll() {
+TEST_F(ReentrantLockTest, testSignalAll) {
 
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
@@ -1500,7 +1455,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testAwaitLockCount() {
+TEST_F(ReentrantLockTest, testAwaitLockCount) {
 
     ReentrantLock lock;
     std::unique_ptr<Condition> c(lock.newCondition());
@@ -1526,7 +1481,7 @@ void ReentrantLockTest::testAwaitLockCount() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantLockTest::testToString() {
+TEST_F(ReentrantLockTest, testToString) {
 
     ReentrantLock lock;
     std::string us = lock.toString();
@@ -1535,47 +1490,3 @@ void ReentrantLockTest::testToString() {
     std::string ls = lock.toString();
     ASSERT_TRUE((int)ls.find_first_of("Locked") >= 0);
 }
-
-TEST_F(ReentrantLockTest, testConstructor) { testConstructor(); }
-TEST_F(ReentrantLockTest, testLock) { testLock(); }
-TEST_F(ReentrantLockTest, testFairLock) { testFairLock(); }
-TEST_F(ReentrantLockTest, testUnlockIllegalMonitorStateException) { testUnlockIllegalMonitorStateException(); }
-TEST_F(ReentrantLockTest, testTryLock) { testTryLock(); }
-TEST_F(ReentrantLockTest, testhasQueuedThreads) { testhasQueuedThreads(); }
-TEST_F(ReentrantLockTest, testGetQueueLength) { testGetQueueLength(); }
-TEST_F(ReentrantLockTest, testGetQueueLengthFair) { testGetQueueLengthFair(); }
-TEST_F(ReentrantLockTest, testHasQueuedThreadNPE) { testHasQueuedThreadNPE(); }
-TEST_F(ReentrantLockTest, testHasQueuedThread) { testHasQueuedThread(); }
-TEST_F(ReentrantLockTest, testGetQueuedThreads) { testGetQueuedThreads(); }
-TEST_F(ReentrantLockTest, testInterruptedException2) { testInterruptedException2(); }
-TEST_F(ReentrantLockTest, testTryLockWhenLocked) { testTryLockWhenLocked(); }
-TEST_F(ReentrantLockTest, testTryLockTimeout) { testTryLockTimeout(); }
-TEST_F(ReentrantLockTest, testGetHoldCount) { testGetHoldCount(); }
-TEST_F(ReentrantLockTest, testIsLocked) { testIsLocked(); }
-TEST_F(ReentrantLockTest, testLockInterruptibly1) { testLockInterruptibly1(); }
-TEST_F(ReentrantLockTest, testLockInterruptibly2) { testLockInterruptibly2(); }
-TEST_F(ReentrantLockTest, testAwaitIllegalMonitor) { testAwaitIllegalMonitor(); }
-TEST_F(ReentrantLockTest, testSignalIllegalMonitor) { testSignalIllegalMonitor(); }
-TEST_F(ReentrantLockTest, testAwaitNanosTimeout) { testAwaitNanosTimeout(); }
-TEST_F(ReentrantLockTest, testAwaitTimeout) { testAwaitTimeout(); }
-TEST_F(ReentrantLockTest, testAwaitUntilTimeout) { testAwaitUntilTimeout(); }
-TEST_F(ReentrantLockTest, testAwait) { testAwait(); }
-TEST_F(ReentrantLockTest, testHasWaitersNPE) { testHasWaitersNPE(); }
-TEST_F(ReentrantLockTest, testGetWaitQueueLengthNPE) { testGetWaitQueueLengthNPE(); }
-TEST_F(ReentrantLockTest, testGetWaitingThreadsNPE) { testGetWaitingThreadsNPE(); }
-TEST_F(ReentrantLockTest, testHasWaitersIAE) { testHasWaitersIAE(); }
-TEST_F(ReentrantLockTest, testHasWaitersIMSE) { testHasWaitersIMSE(); }
-TEST_F(ReentrantLockTest, testGetWaitQueueLengthIAE) { testGetWaitQueueLengthIAE(); }
-TEST_F(ReentrantLockTest, testGetWaitQueueLengthIMSE) { testGetWaitQueueLengthIMSE(); }
-TEST_F(ReentrantLockTest, testGetWaitingThreadsIAE) { testGetWaitingThreadsIAE(); }
-TEST_F(ReentrantLockTest, testGetWaitingThreadsIMSE) { testGetWaitingThreadsIMSE(); }
-TEST_F(ReentrantLockTest, testHasWaiters) { testHasWaiters(); }
-TEST_F(ReentrantLockTest, testGetWaitQueueLength) { testGetWaitQueueLength(); }
-TEST_F(ReentrantLockTest, testGetWaitingThreads) { testGetWaitingThreads(); }
-TEST_F(ReentrantLockTest, testAwaitUninterruptibly) { testAwaitUninterruptibly(); }
-TEST_F(ReentrantLockTest, testAwaitInterrupt) { testAwaitInterrupt(); }
-TEST_F(ReentrantLockTest, testAwaitNanosInterrupt) { testAwaitNanosInterrupt(); }
-TEST_F(ReentrantLockTest, testAwaitUntilInterrupt) { testAwaitUntilInterrupt(); }
-TEST_F(ReentrantLockTest, testSignalAll) { testSignalAll(); }
-TEST_F(ReentrantLockTest, testAwaitLockCount) { testAwaitLockCount(); }
-TEST_F(ReentrantLockTest, testToString) { testToString(); }

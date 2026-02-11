@@ -23,20 +23,10 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::commands;
 
-    class BrokerInfoTest : public ::testing::Test {
-public:
-
-        BrokerInfoTest() {}
-        virtual ~BrokerInfoTest() {}
-
-        virtual void test();
-
-    };
-
+class BrokerInfoTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfoTest::test()
-{
+TEST_F(BrokerInfoTest, test) {
     BrokerInfo myCommand;
 
     ASSERT_TRUE(myCommand.getDataStructureType() == BrokerInfo::ID_BROKERINFO);
@@ -57,5 +47,3 @@ void BrokerInfoTest::test()
 
     delete copy;
 }
-
-TEST_F(BrokerInfoTest, test) { test(); }

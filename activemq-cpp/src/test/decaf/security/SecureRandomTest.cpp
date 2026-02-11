@@ -34,17 +34,7 @@ public:
         SecureRandomTest();
         virtual ~SecureRandomTest();
 
-        void testConstructor1();
-        void testConstructor2();
-        void testConstructor3();
-        void testNextBytes1();
-        void testNextBytes2();
-        void testSetSeed1();
-        void testSetSeed2();
-        void testSetSeed3();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 SecureRandomTest::SecureRandomTest() {
@@ -55,12 +45,12 @@ SecureRandomTest::~SecureRandomTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SecureRandomTest::testConstructor1() {
+TEST_F(SecureRandomTest, testConstructor1) {
     SecureRandom srng;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SecureRandomTest::testConstructor2() {
+TEST_F(SecureRandomTest, testConstructor2) {
     std::vector<unsigned char> seed;
 
     seed.push_back( 65 );
@@ -75,14 +65,14 @@ void SecureRandomTest::testConstructor2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SecureRandomTest::testConstructor3() {
+TEST_F(SecureRandomTest, testConstructor3) {
     unsigned char seed[] = { 51, 12, 99, 18, 125, 127, 21, 99 };
 
     SecureRandom srng( seed, 8 );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SecureRandomTest::testNextBytes1() {
+TEST_F(SecureRandomTest, testNextBytes1) {
 
     std::vector<unsigned char> buffer1( 255, 0 );
     std::vector<unsigned char> buffer2( 255, 0 );
@@ -116,7 +106,7 @@ void SecureRandomTest::testNextBytes1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SecureRandomTest::testNextBytes2() {
+TEST_F(SecureRandomTest, testNextBytes2) {
 
     unsigned char buffer1[255] = {0};
     unsigned char buffer2[255] = {0};
@@ -151,7 +141,7 @@ void SecureRandomTest::testNextBytes2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SecureRandomTest::testSetSeed1() {
+TEST_F(SecureRandomTest, testSetSeed1) {
 
     std::vector<unsigned char> seed;
 
@@ -171,7 +161,7 @@ void SecureRandomTest::testSetSeed1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SecureRandomTest::testSetSeed2() {
+TEST_F(SecureRandomTest, testSetSeed2) {
     unsigned char seed[] = { 51, 12, 99, 18, 125, 127, 21, 99 };
 
     SecureRandom srng;
@@ -183,18 +173,9 @@ void SecureRandomTest::testSetSeed2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SecureRandomTest::testSetSeed3() {
+TEST_F(SecureRandomTest, testSetSeed3) {
 
     long long seed = 4565143165LL;
     SecureRandom srng;
     ASSERT_NO_THROW(srng.setSeed( seed ));
 }
-
-TEST_F(SecureRandomTest, testConstructor1) { testConstructor1(); }
-TEST_F(SecureRandomTest, testConstructor2) { testConstructor2(); }
-TEST_F(SecureRandomTest, testConstructor3) { testConstructor3(); }
-TEST_F(SecureRandomTest, testNextBytes1) { testNextBytes1(); }
-TEST_F(SecureRandomTest, testNextBytes2) { testNextBytes2(); }
-TEST_F(SecureRandomTest, testSetSeed1) { testSetSeed1(); }
-TEST_F(SecureRandomTest, testSetSeed2) { testSetSeed2(); }
-TEST_F(SecureRandomTest, testSetSeed3) { testSetSeed3(); }

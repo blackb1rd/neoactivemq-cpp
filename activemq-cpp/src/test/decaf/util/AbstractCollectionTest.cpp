@@ -17,7 +17,6 @@
 
 #include <gtest/gtest.h>
 
-
 namespace decaf { namespace util {} }
 using namespace std;
 using namespace decaf;
@@ -29,11 +28,7 @@ public:
         AbstractCollectionTest();
         virtual ~AbstractCollectionTest();
 
-        void testIterator();
-
     };
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 AbstractCollectionTest::AbstractCollectionTest() {
@@ -44,7 +39,5 @@ AbstractCollectionTest::~AbstractCollectionTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractCollectionTest::testIterator() {
+TEST_F(AbstractCollectionTest, testIterator) {
 }
-
-TEST_F(AbstractCollectionTest, testIterator) { testIterator(); }

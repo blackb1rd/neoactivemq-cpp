@@ -36,71 +36,9 @@ public:
         ReentrantReadWriteLockTest();
         virtual ~ReentrantReadWriteLockTest();
 
-        void testConstructor();
-        void testLock();
-        void testFairLock();
-        void testWriteLockInterruptiblyInterrupted();
-        void testGetWriteHoldCount();
-        void testUnlockIllegalMonitorStateException();
-        void testReadHoldingWriteLock();
-        void testReadHoldingWriteLock2();
-        void testReadHoldingWriteLock3();
-        void testReadHoldingWriteLockFair();
-        void testAwaitIllegalMonitor();
-        void testSignalIllegalMonitor();
-        void testAwaitNanosTimeout();
-        void testAwaitTimeout();
-        void testAwaitUntilTimeout();
-        void testHasQueuedThreadNPE();
-        void testHasWaitersNPE();
-        void testGetWaitQueueLengthNPE();
-        void testGetWaitingThreadsNPE();
-        void testHasWaitersIAE();
-        void testHasWaitersIMSE();
-        void testGetWaitQueueLengthIAE();
-        void testGetWaitQueueLengthIMSE();
-        void testGetWaitingThreadsIAE();
-        void testGetWaitingThreadsIMSE();
-        void testToString();
-        void testReadLockToString();
-        void testWriteLockToString();
-        void testWriteTryLockInterrupted();
-        void testReadLockInterruptiblyInterrupted();
-        void testReadTryLockInterrupted();
-        void testWriteTryLockWhenLocked();
-        void testReadTryLockWhenLocked();
-        void testMultipleReadLocks();
-        void testWriteAfterMultipleReadLocks();
-        void testReadAfterWriteLock();
-        void testWriteHoldingWriteLock4();
-        void testReadHoldingWriteLockFair2();
-        void testReadHoldingWriteLockFair3();
-        void testWriteHoldingWriteLockFair4();
-        void testTryLockWhenReadLocked();
         void testWriteTryLockWhenReadLocked();
-        void testTryLockWhenReadLockedFair();
-        void testWriteTryLockWhenReadLockedFair();
-        void testWriteTryLockTimeout();
-        void testReadTryLockTimeout();
-        void testWriteLockInterruptibly();
-        void testReadLockInterruptibly();
-        void testAwait();
-        void testAwaitUninterruptibly();
-        void testAwaitInterrupt();
-        void testAwaitNanosInterrupt();
-        void testAwaitUntilInterrupt();
-        void testSignalAll();
-        void testHasQueuedThreads();
-        void testHasQueuedThread();
-        void testGetQueueLength();
-        void testGetQueuedThreads();
-        void testHasWaiters();
-        void testGetWaitQueueLength();
-        void testGetWaitingThreads();
-        void testMultipleReaderThreads();
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -178,7 +116,7 @@ ReentrantReadWriteLockTest::~ReentrantReadWriteLockTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testConstructor() {
+TEST_F(ReentrantReadWriteLockTest, testConstructor) {
 
     ReentrantReadWriteLock rl;
     ASSERT_TRUE(!rl.isFair());
@@ -192,7 +130,7 @@ void ReentrantReadWriteLockTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testLock() {
+TEST_F(ReentrantReadWriteLockTest, testLock) {
 
     ReentrantReadWriteLock rl;
     rl.writeLock().lock();
@@ -214,7 +152,7 @@ void ReentrantReadWriteLockTest::testLock() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testFairLock() {
+TEST_F(ReentrantReadWriteLockTest, testFairLock) {
 
     ReentrantReadWriteLock rl(true);
     rl.writeLock().lock();
@@ -236,7 +174,7 @@ void ReentrantReadWriteLockTest::testFairLock() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testGetWriteHoldCount() {
+TEST_F(ReentrantReadWriteLockTest, testGetWriteHoldCount) {
     ReentrantReadWriteLock lock;
     for (int i = 1; i <= SIZEVAL; i++) {
         lock.writeLock().lock();
@@ -249,7 +187,7 @@ void ReentrantReadWriteLockTest::testGetWriteHoldCount() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testUnlockIllegalMonitorStateException() {
+TEST_F(ReentrantReadWriteLockTest, testUnlockIllegalMonitorStateException) {
 
     ReentrantReadWriteLock rl;
     try {
@@ -292,7 +230,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testWriteLockInterruptiblyInterrupted() {
+TEST_F(ReentrantReadWriteLockTest, testWriteLockInterruptiblyInterrupted) {
     ReentrantReadWriteLock lock;
     TestWriteLockInterruptiblyInterruptedRunnable runnable(this, &lock);
     Thread t(&runnable);
@@ -340,7 +278,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testWriteTryLockInterrupted() {
+TEST_F(ReentrantReadWriteLockTest, testWriteTryLockInterrupted) {
     ReentrantReadWriteLock lock;
     TestWriteTryLockInterruptedRunnable runnable(this, &lock);
     Thread t(&runnable);
@@ -387,7 +325,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testReadLockInterruptiblyInterrupted() {
+TEST_F(ReentrantReadWriteLockTest, testReadLockInterruptiblyInterrupted) {
     ReentrantReadWriteLock lock;
     TestReadLockInterruptiblyInterruptedRunnable runnable(this, &lock);
     Thread t(&runnable);
@@ -437,7 +375,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testReadTryLockInterrupted() {
+TEST_F(ReentrantReadWriteLockTest, testReadTryLockInterrupted) {
     ReentrantReadWriteLock lock;
     TestReadTryLockInterruptedRunnable runnable(this, &lock);
     Thread t(&runnable);
@@ -480,7 +418,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testWriteTryLockWhenLocked() {
+TEST_F(ReentrantReadWriteLockTest, testWriteTryLockWhenLocked) {
 
     ReentrantReadWriteLock lock;
     TestWriteTryLockWhenLockedRunnable runnable(this, &lock);
@@ -523,7 +461,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testReadTryLockWhenLocked() {
+TEST_F(ReentrantReadWriteLockTest, testReadTryLockWhenLocked) {
     ReentrantReadWriteLock lock;
     TestReadTryLockWhenLockedRunnable runnable(this, &lock);
     Thread t(&runnable);
@@ -567,7 +505,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testMultipleReadLocks() {
+TEST_F(ReentrantReadWriteLockTest, testMultipleReadLocks) {
     ReentrantReadWriteLock lock;
     TestMultipleReadLocksRunnable runnable(this, &lock);
     Thread t(&runnable);
@@ -633,7 +571,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testWriteAfterMultipleReadLocks() {
+TEST_F(ReentrantReadWriteLockTest, testWriteAfterMultipleReadLocks) {
 
     ReentrantReadWriteLock lock;
     TestWriteAfterMultipleReadLocksRunnable1 runnable1(this, &lock);
@@ -685,7 +623,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testReadAfterWriteLock() {
+TEST_F(ReentrantReadWriteLockTest, testReadAfterWriteLock) {
     ReentrantReadWriteLock lock;
     TestReadAfterWriteLockRunnable runnable(this, &lock);
     Thread t1(&runnable);
@@ -708,7 +646,7 @@ void ReentrantReadWriteLockTest::testReadAfterWriteLock() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testReadHoldingWriteLock() {
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock) {
 
     ReentrantReadWriteLock lock;
     lock.writeLock().lock();
@@ -745,7 +683,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testReadHoldingWriteLock2() {
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock2) {
     ReentrantReadWriteLock lock;
     TestReadHoldingWriteLockRunnable2 runnable(this, &lock);
     Thread t1(&runnable);
@@ -799,7 +737,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testReadHoldingWriteLock3() {
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock3) {
     ReentrantReadWriteLock lock;
     TestReadHoldingWriteLockRunnable3 runnable(this, &lock);
     Thread t1(&runnable);
@@ -853,7 +791,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testWriteHoldingWriteLock4() {
+TEST_F(ReentrantReadWriteLockTest, testWriteHoldingWriteLock4) {
     ReentrantReadWriteLock lock;
     TestWriteHoldingWriteLock4Runnable runnable(this, &lock);
     Thread t1(&runnable);
@@ -880,7 +818,7 @@ void ReentrantReadWriteLockTest::testWriteHoldingWriteLock4() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testReadHoldingWriteLockFair() {
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair) {
 
     ReentrantReadWriteLock lock(true);
     lock.writeLock().lock();
@@ -917,7 +855,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testReadHoldingWriteLockFair2() {
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair2) {
     ReentrantReadWriteLock lock(true);
     TestReadHoldingWriteLockFair2Runnable runnable(this, &lock);
     Thread t1(&runnable);
@@ -971,7 +909,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testReadHoldingWriteLockFair3() {
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair3) {
     ReentrantReadWriteLock lock(true);
     TestReadHoldingWriteLockFair3Runnable runnable(this, &lock);
     Thread t1(&runnable);
@@ -1025,7 +963,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testWriteHoldingWriteLockFair4() {
+TEST_F(ReentrantReadWriteLockTest, testWriteHoldingWriteLockFair4) {
     ReentrantReadWriteLock lock(true);
     TestWriteHoldingWriteLockFair4Runnable runnable(this, &lock);
     Thread t1(&runnable);
@@ -1081,7 +1019,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testTryLockWhenReadLocked() {
+TEST_F(ReentrantReadWriteLockTest, testTryLockWhenReadLocked) {
     ReentrantReadWriteLock lock;
     TestTryLockWhenReadLockedRunnable runnable(this, &lock);
     Thread t(&runnable);
@@ -1166,7 +1104,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testTryLockWhenReadLockedFair() {
+TEST_F(ReentrantReadWriteLockTest, testTryLockWhenReadLockedFair) {
     ReentrantReadWriteLock lock(true);
     TestTryLockWhenReadLockedFairRunnable runnable(this, &lock);
     Thread t(&runnable);
@@ -1208,7 +1146,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testWriteTryLockWhenReadLockedFair() {
+TEST_F(ReentrantReadWriteLockTest, testWriteTryLockWhenReadLockedFair) {
     ReentrantReadWriteLock lock(true);
     TestWriteTryLockWhenReadLockedFairRunnable runnable(this, &lock);
     Thread t(&runnable);
@@ -1254,7 +1192,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testWriteTryLockTimeout() {
+TEST_F(ReentrantReadWriteLockTest, testWriteTryLockTimeout) {
     ReentrantReadWriteLock lock;
     TestWriteTryLockTimeoutRunnable runnable(this, &lock);
     Thread t(&runnable);
@@ -1300,7 +1238,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testReadTryLockTimeout() {
+TEST_F(ReentrantReadWriteLockTest, testReadTryLockTimeout) {
     ReentrantReadWriteLock lock;
     TestReadTryLockTimeoutRunnable runnable(this, &lock);
     Thread t(&runnable);
@@ -1346,7 +1284,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testWriteLockInterruptibly() {
+TEST_F(ReentrantReadWriteLockTest, testWriteLockInterruptibly) {
     ReentrantReadWriteLock lock;
     TestWriteLockInterruptiblyRunnable runnable(this, &lock);
     Thread t(&runnable);
@@ -1399,7 +1337,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testReadLockInterruptibly() {
+TEST_F(ReentrantReadWriteLockTest, testReadLockInterruptibly) {
     ReentrantReadWriteLock lock;
     TestReadLockInterruptiblyRunnable runnable(this, &lock);
     Thread t(&runnable);
@@ -1422,7 +1360,7 @@ void ReentrantReadWriteLockTest::testReadLockInterruptibly() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testAwaitIllegalMonitor() {
+TEST_F(ReentrantReadWriteLockTest, testAwaitIllegalMonitor) {
 
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
@@ -1436,7 +1374,7 @@ void ReentrantReadWriteLockTest::testAwaitIllegalMonitor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testSignalIllegalMonitor() {
+TEST_F(ReentrantReadWriteLockTest, testSignalIllegalMonitor) {
 
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
@@ -1450,7 +1388,7 @@ void ReentrantReadWriteLockTest::testSignalIllegalMonitor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testAwaitNanosTimeout() {
+TEST_F(ReentrantReadWriteLockTest, testAwaitNanosTimeout) {
 
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
@@ -1466,7 +1404,7 @@ void ReentrantReadWriteLockTest::testAwaitNanosTimeout() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testAwaitTimeout() {
+TEST_F(ReentrantReadWriteLockTest, testAwaitTimeout) {
 
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
@@ -1480,7 +1418,7 @@ void ReentrantReadWriteLockTest::testAwaitTimeout() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testAwaitUntilTimeout() {
+TEST_F(ReentrantReadWriteLockTest, testAwaitUntilTimeout) {
 
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
@@ -1528,7 +1466,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testAwait() {
+TEST_F(ReentrantReadWriteLockTest, testAwait) {
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
     TestAwaitRunnable runnable(this, &lock, c.get());
@@ -1589,7 +1527,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testAwaitUninterruptibly() {
+TEST_F(ReentrantReadWriteLockTest, testAwaitUninterruptibly) {
 
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
@@ -1655,7 +1593,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testAwaitInterrupt() {
+TEST_F(ReentrantReadWriteLockTest, testAwaitInterrupt) {
 
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
@@ -1707,7 +1645,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testAwaitNanosInterrupt() {
+TEST_F(ReentrantReadWriteLockTest, testAwaitNanosInterrupt) {
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
     TestAwaitNanosInterruptRunnable runnable(this, &lock, c.get());
@@ -1759,7 +1697,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testAwaitUntilInterrupt() {
+TEST_F(ReentrantReadWriteLockTest, testAwaitUntilInterrupt) {
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
     TestAwaitUntilInterruptRunnable runnable(this, &lock, c.get());
@@ -1810,7 +1748,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testSignalAll() {
+TEST_F(ReentrantReadWriteLockTest, testSignalAll) {
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
     TestSignalAllRunnable runnable(this, &lock, c.get());
@@ -1834,7 +1772,7 @@ void ReentrantReadWriteLockTest::testSignalAll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testHasQueuedThreads() {
+TEST_F(ReentrantReadWriteLockTest, testHasQueuedThreads) {
     ReentrantReadWriteLock lock;
     InterruptedLockRunnable interrupted(this, &lock);
     InterruptibleLockRunnable interruptable(this, &lock);
@@ -1864,7 +1802,7 @@ void ReentrantReadWriteLockTest::testHasQueuedThreads() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testHasQueuedThreadNPE() {
+TEST_F(ReentrantReadWriteLockTest, testHasQueuedThreadNPE) {
     ReentrantReadWriteLock sync;
     try {
         sync.hasQueuedThread(NULL);
@@ -1874,7 +1812,7 @@ void ReentrantReadWriteLockTest::testHasQueuedThreadNPE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testHasQueuedThread() {
+TEST_F(ReentrantReadWriteLockTest, testHasQueuedThread) {
     ReentrantReadWriteLock sync;
     InterruptedLockRunnable interrupted(this, &sync);
     InterruptibleLockRunnable interruptable(this, &sync);
@@ -1909,7 +1847,7 @@ void ReentrantReadWriteLockTest::testHasQueuedThread() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testGetQueueLength() {
+TEST_F(ReentrantReadWriteLockTest, testGetQueueLength) {
     ReentrantReadWriteLock lock;
     InterruptedLockRunnable interrupted(this, &lock);
     InterruptibleLockRunnable interruptable(this, &lock);
@@ -1939,7 +1877,7 @@ void ReentrantReadWriteLockTest::testGetQueueLength() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testGetQueuedThreads() {
+TEST_F(ReentrantReadWriteLockTest, testGetQueuedThreads) {
     PublicReentrantReadWriteLock lock;
     InterruptedLockRunnable interrupted(this, &lock);
     InterruptibleLockRunnable interruptable(this, &lock);
@@ -1972,7 +1910,7 @@ void ReentrantReadWriteLockTest::testGetQueuedThreads() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testHasWaitersNPE() {
+TEST_F(ReentrantReadWriteLockTest, testHasWaitersNPE) {
     ReentrantReadWriteLock lock;
     try {
         lock.hasWaiters(NULL);
@@ -1984,7 +1922,7 @@ void ReentrantReadWriteLockTest::testHasWaitersNPE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testGetWaitQueueLengthNPE() {
+TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthNPE) {
 ReentrantReadWriteLock lock;
     try {
         lock.getWaitQueueLength(NULL);
@@ -1996,7 +1934,7 @@ ReentrantReadWriteLock lock;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testGetWaitingThreadsNPE() {
+TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsNPE) {
     PublicReentrantReadWriteLock lock;
     try {
         lock.getWaitingThreadsPublic(NULL);
@@ -2008,7 +1946,7 @@ void ReentrantReadWriteLockTest::testGetWaitingThreadsNPE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testHasWaitersIAE() {
+TEST_F(ReentrantReadWriteLockTest, testHasWaitersIAE) {
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
     ReentrantReadWriteLock lock2;
@@ -2022,7 +1960,7 @@ void ReentrantReadWriteLockTest::testHasWaitersIAE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testHasWaitersIMSE() {
+TEST_F(ReentrantReadWriteLockTest, testHasWaitersIMSE) {
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
     try {
@@ -2035,7 +1973,7 @@ void ReentrantReadWriteLockTest::testHasWaitersIMSE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testGetWaitQueueLengthIAE() {
+TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthIAE) {
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
     ReentrantReadWriteLock lock2;
@@ -2049,7 +1987,7 @@ void ReentrantReadWriteLockTest::testGetWaitQueueLengthIAE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testGetWaitQueueLengthIMSE() {
+TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthIMSE) {
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
     try {
@@ -2062,7 +2000,7 @@ void ReentrantReadWriteLockTest::testGetWaitQueueLengthIMSE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testGetWaitingThreadsIAE() {
+TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsIAE) {
     PublicReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
     PublicReentrantReadWriteLock lock2;
@@ -2076,7 +2014,7 @@ void ReentrantReadWriteLockTest::testGetWaitingThreadsIAE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testGetWaitingThreadsIMSE() {
+TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsIMSE) {
     PublicReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
     try {
@@ -2124,7 +2062,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testHasWaiters() {
+TEST_F(ReentrantReadWriteLockTest, testHasWaiters) {
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
     TestHasWaitersRunnable runnable(this, &lock, c.get());
@@ -2186,7 +2124,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testGetWaitQueueLength() {
+TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLength) {
     ReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
     TestGetWaitQueueLengthRunnable runnable(this, &lock, c.get());
@@ -2279,7 +2217,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testGetWaitingThreads() {
+TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreads) {
     PublicReentrantReadWriteLock lock;
     Pointer<Condition> c(lock.writeLock().newCondition());
     TestGetWaitingThreadsRunnable1 runnable1(this, &lock, c.get());
@@ -2316,7 +2254,7 @@ void ReentrantReadWriteLockTest::testGetWaitingThreads() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testToString() {
+TEST_F(ReentrantReadWriteLockTest, testToString) {
     ReentrantReadWriteLock lock;
     std::string us = lock.toString();
     ASSERT_TRUE(us.find_first_of("Write locks = 0") != std::string::npos);
@@ -2334,7 +2272,7 @@ void ReentrantReadWriteLockTest::testToString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testReadLockToString() {
+TEST_F(ReentrantReadWriteLockTest, testReadLockToString) {
     ReentrantReadWriteLock lock;
     std::string us = lock.readLock().toString();
     ASSERT_TRUE(us.find_first_of("Read locks = 0") != std::string::npos);
@@ -2345,7 +2283,7 @@ void ReentrantReadWriteLockTest::testReadLockToString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testWriteLockToString() {
+TEST_F(ReentrantReadWriteLockTest, testWriteLockToString) {
     ReentrantReadWriteLock lock;
     std::string us = lock.writeLock().toString();
     ASSERT_TRUE(us.find_first_of("Unlocked") != std::string::npos);
@@ -2390,7 +2328,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testMultipleReaderThreads() {
+TEST_F(ReentrantReadWriteLockTest, testMultipleReaderThreads) {
     const int THREAD_QTY = 50;
 
     ReentrantReadWriteLock lock;
@@ -2410,65 +2348,3 @@ void ReentrantReadWriteLockTest::testMultipleReaderThreads() {
         delete threads[i];
     }
 }
-
-TEST_F(ReentrantReadWriteLockTest, testConstructor) { testConstructor(); }
-TEST_F(ReentrantReadWriteLockTest, testLock) { testLock(); }
-TEST_F(ReentrantReadWriteLockTest, testFairLock) { testFairLock(); }
-TEST_F(ReentrantReadWriteLockTest, testGetWriteHoldCount) { testGetWriteHoldCount(); }
-TEST_F(ReentrantReadWriteLockTest, testUnlockIllegalMonitorStateException) { testUnlockIllegalMonitorStateException(); }
-TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock) { testReadHoldingWriteLock(); }
-TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock2) { testReadHoldingWriteLock2(); }
-TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock3) { testReadHoldingWriteLock3(); }
-TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair) { testReadHoldingWriteLockFair(); }
-TEST_F(ReentrantReadWriteLockTest, testAwaitIllegalMonitor) { testAwaitIllegalMonitor(); }
-TEST_F(ReentrantReadWriteLockTest, testSignalIllegalMonitor) { testSignalIllegalMonitor(); }
-TEST_F(ReentrantReadWriteLockTest, testAwaitNanosTimeout) { testAwaitNanosTimeout(); }
-TEST_F(ReentrantReadWriteLockTest, testAwaitTimeout) { testAwaitTimeout(); }
-TEST_F(ReentrantReadWriteLockTest, testAwaitUntilTimeout) { testAwaitUntilTimeout(); }
-TEST_F(ReentrantReadWriteLockTest, testHasQueuedThreadNPE) { testHasQueuedThreadNPE(); }
-TEST_F(ReentrantReadWriteLockTest, testHasWaitersNPE) { testHasWaitersNPE(); }
-TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthNPE) { testGetWaitQueueLengthNPE(); }
-TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsNPE) { testGetWaitingThreadsNPE(); }
-TEST_F(ReentrantReadWriteLockTest, testHasWaitersIAE) { testHasWaitersIAE(); }
-TEST_F(ReentrantReadWriteLockTest, testHasWaitersIMSE) { testHasWaitersIMSE(); }
-TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthIAE) { testGetWaitQueueLengthIAE(); }
-TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthIMSE) { testGetWaitQueueLengthIMSE(); }
-TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsIAE) { testGetWaitingThreadsIAE(); }
-TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsIMSE) { testGetWaitingThreadsIMSE(); }
-TEST_F(ReentrantReadWriteLockTest, testToString) { testToString(); }
-TEST_F(ReentrantReadWriteLockTest, testReadLockToString) { testReadLockToString(); }
-TEST_F(ReentrantReadWriteLockTest, testWriteLockToString) { testWriteLockToString(); }
-TEST_F(ReentrantReadWriteLockTest, testWriteLockInterruptiblyInterrupted) { testWriteLockInterruptiblyInterrupted(); }
-TEST_F(ReentrantReadWriteLockTest, testWriteTryLockInterrupted) { testWriteTryLockInterrupted(); }
-TEST_F(ReentrantReadWriteLockTest, testReadLockInterruptiblyInterrupted) { testReadLockInterruptiblyInterrupted(); }
-TEST_F(ReentrantReadWriteLockTest, testReadTryLockInterrupted) { testReadTryLockInterrupted(); }
-TEST_F(ReentrantReadWriteLockTest, testWriteTryLockWhenLocked) { testWriteTryLockWhenLocked(); }
-TEST_F(ReentrantReadWriteLockTest, testReadTryLockWhenLocked) { testReadTryLockWhenLocked(); }
-TEST_F(ReentrantReadWriteLockTest, testMultipleReadLocks) { testMultipleReadLocks(); }
-TEST_F(ReentrantReadWriteLockTest, testReadAfterWriteLock) { testReadAfterWriteLock(); }
-TEST_F(ReentrantReadWriteLockTest, testWriteHoldingWriteLock4) { testWriteHoldingWriteLock4(); }
-TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair2) { testReadHoldingWriteLockFair2(); }
-TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair3) { testReadHoldingWriteLockFair3(); }
-TEST_F(ReentrantReadWriteLockTest, testWriteHoldingWriteLockFair4) { testWriteHoldingWriteLockFair4(); }
-TEST_F(ReentrantReadWriteLockTest, testTryLockWhenReadLocked) { testTryLockWhenReadLocked(); }
-TEST_F(ReentrantReadWriteLockTest, testWriteAfterMultipleReadLocks) { testWriteAfterMultipleReadLocks(); }
-TEST_F(ReentrantReadWriteLockTest, testTryLockWhenReadLockedFair) { testTryLockWhenReadLockedFair(); }
-TEST_F(ReentrantReadWriteLockTest, testWriteTryLockWhenReadLockedFair) { testWriteTryLockWhenReadLockedFair(); }
-TEST_F(ReentrantReadWriteLockTest, testWriteTryLockTimeout) { testWriteTryLockTimeout(); }
-TEST_F(ReentrantReadWriteLockTest, testReadTryLockTimeout) { testReadTryLockTimeout(); }
-TEST_F(ReentrantReadWriteLockTest, testWriteLockInterruptibly) { testWriteLockInterruptibly(); }
-TEST_F(ReentrantReadWriteLockTest, testReadLockInterruptibly) { testReadLockInterruptibly(); }
-TEST_F(ReentrantReadWriteLockTest, testAwait) { testAwait(); }
-TEST_F(ReentrantReadWriteLockTest, testAwaitUninterruptibly) { testAwaitUninterruptibly(); }
-TEST_F(ReentrantReadWriteLockTest, testAwaitInterrupt) { testAwaitInterrupt(); }
-TEST_F(ReentrantReadWriteLockTest, testAwaitNanosInterrupt) { testAwaitNanosInterrupt(); }
-TEST_F(ReentrantReadWriteLockTest, testAwaitUntilInterrupt) { testAwaitUntilInterrupt(); }
-TEST_F(ReentrantReadWriteLockTest, testSignalAll) { testSignalAll(); }
-TEST_F(ReentrantReadWriteLockTest, testHasQueuedThreads) { testHasQueuedThreads(); }
-TEST_F(ReentrantReadWriteLockTest, testHasQueuedThread) { testHasQueuedThread(); }
-TEST_F(ReentrantReadWriteLockTest, testGetQueueLength) { testGetQueueLength(); }
-TEST_F(ReentrantReadWriteLockTest, testGetQueuedThreads) { testGetQueuedThreads(); }
-TEST_F(ReentrantReadWriteLockTest, testHasWaiters) { testHasWaiters(); }
-TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLength) { testGetWaitQueueLength(); }
-TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreads) { testGetWaitingThreads(); }
-TEST_F(ReentrantReadWriteLockTest, testMultipleReaderThreads) { testMultipleReaderThreads(); }

@@ -40,32 +40,7 @@ public:
         FutureTaskTest();
         virtual ~FutureTaskTest();
 
-        void testConstructor1();
-        void testConstructor2();
-        void testConstructor3();
-        void testConstructor4();
-        void testIsDone();
-        void testRunAndReset();
-        void testResetAfterCancel();
-        void testSet();
-        void testSetException();
-        void testCancelBeforeRun();
-        void testCancelBeforeRun2();
-        void testCancelAfterRun();
-        void testCancelInterrupt();
-        void testCancelNoInterrupt();
-        void testGet1();
-        void testTimedGet1();
-        void testTimedGetCancellation();
-        void testGetCancellation();
-        void testGetExecutionException();
-        void testTimedGetExecutionException2();
-        void testGetInterruptedException();
-        void testTimedGetInterruptedException2();
-        void testGetTimeoutException();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -158,19 +133,19 @@ FutureTaskTest::~FutureTaskTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testConstructor1() {
+TEST_F(FutureTaskTest, testConstructor1) {
 
     ASSERT_THROW(new FutureTask<std::string>(NULL), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testConstructor2() {
+TEST_F(FutureTaskTest, testConstructor2) {
 
     ASSERT_THROW(new FutureTask<std::string>(NULL, std::string("Test")), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testConstructor3() {
+TEST_F(FutureTaskTest, testConstructor3) {
     FutureTask<int> task(new FutureRunnable(), 10);
     ASSERT_TRUE(!task.isCancelled());
     ASSERT_TRUE(!task.isDone());
@@ -182,7 +157,7 @@ void FutureTaskTest::testConstructor3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testConstructor4() {
+TEST_F(FutureTaskTest, testConstructor4) {
 
     FutureTask<std::string> task(new FutureCallable<std::string>());
     ASSERT_TRUE(!task.isCancelled());
@@ -195,7 +170,7 @@ void FutureTaskTest::testConstructor4() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testIsDone() {
+TEST_F(FutureTaskTest, testIsDone) {
 
     FutureTask<int> task(new NoOpCallable<int>());
     task.run();
@@ -204,14 +179,14 @@ void FutureTaskTest::testIsDone() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testRunAndReset() {
+TEST_F(FutureTaskTest, testRunAndReset) {
     PublicFutureTask task(new NoOpCallable<std::string>());
     ASSERT_TRUE(task.runAndReset());
     ASSERT_TRUE(!task.isDone());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testResetAfterCancel() {
+TEST_F(FutureTaskTest, testResetAfterCancel) {
     PublicFutureTask task(new NoOpCallable<std::string>());
     ASSERT_TRUE(task.cancel(false));
     ASSERT_TRUE(!task.runAndReset());
@@ -220,7 +195,7 @@ void FutureTaskTest::testResetAfterCancel() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testSet() {
+TEST_F(FutureTaskTest, testSet) {
     PublicFutureTask task(new NoOpCallable<std::string>());
     task.set("one");
     try {
@@ -231,7 +206,7 @@ void FutureTaskTest::testSet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testSetException() {
+TEST_F(FutureTaskTest, testSetException) {
     NoSuchElementException nse;
     PublicFutureTask task(new NoOpCallable<std::string>());
     task.setException(nse);
@@ -248,7 +223,7 @@ void FutureTaskTest::testSetException() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testCancelBeforeRun() {
+TEST_F(FutureTaskTest, testCancelBeforeRun) {
     PublicFutureTask task(new NoOpCallable<std::string>());
     ASSERT_TRUE(task.cancel(false));
     task.run();
@@ -257,7 +232,7 @@ void FutureTaskTest::testCancelBeforeRun() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testCancelBeforeRun2() {
+TEST_F(FutureTaskTest, testCancelBeforeRun2) {
     PublicFutureTask task(new NoOpCallable<std::string>());
     ASSERT_TRUE(task.cancel(true));
     task.run();
@@ -266,7 +241,7 @@ void FutureTaskTest::testCancelBeforeRun2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testCancelAfterRun() {
+TEST_F(FutureTaskTest, testCancelAfterRun) {
     PublicFutureTask task(new NoOpCallable<std::string>());
     task.run();
     ASSERT_TRUE(!task.cancel(false));
@@ -275,7 +250,7 @@ void FutureTaskTest::testCancelAfterRun() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testCancelInterrupt() {
+TEST_F(FutureTaskTest, testCancelInterrupt) {
 
     FutureTask<std::string> task(new MediumSleepCallable<std::string>(this));
     Thread t(&task);
@@ -327,7 +302,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testCancelNoInterrupt() {
+TEST_F(FutureTaskTest, testCancelNoInterrupt) {
 
     FutureTask<std::string> task(new MediumNoInterruptsSleepCallable<std::string>(this));
     Thread t(&task);
@@ -378,7 +353,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testGet1() {
+TEST_F(FutureTaskTest, testGet1) {
 
     FutureTask<std::string> ft(new MediumNoInterruptsSleepCallable<std::string>(this));
     MediumNoInterruptsSleepRunnable runner(this, &ft);
@@ -433,7 +408,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testTimedGet1() {
+TEST_F(FutureTaskTest, testTimedGet1) {
 
     FutureTask<std::string> ft(new MediumNoInterruptsSleepCallable<std::string>(this));
     GetDelayedFutureTaskRunnable runner(this, &ft);
@@ -518,7 +493,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testTimedGetCancellation() {
+TEST_F(FutureTaskTest, testTimedGetCancellation) {
 
     FutureTask<std::string> ft(new ShortSleepCallable<std::string>(this));
     InterruptedGetDelayedFutureTaskRunnable runner(this, &ft);
@@ -573,7 +548,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testGetCancellation() {
+TEST_F(FutureTaskTest, testGetCancellation) {
 
     FutureTask<std::string> ft(new MediumSleepCallable<std::string>(this));
     CancelledGetFutureTaskRunnable runner(this, &ft);
@@ -622,7 +597,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testGetExecutionException() {
+TEST_F(FutureTaskTest, testGetExecutionException) {
 
     FutureTask<std::string> ft(new ErrorThrowingCallable<std::string>(this));
 
@@ -637,7 +612,7 @@ void FutureTaskTest::testGetExecutionException() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testTimedGetExecutionException2() {
+TEST_F(FutureTaskTest, testTimedGetExecutionException2) {
 
     FutureTask<std::string> ft(new ErrorThrowingCallable<std::string>(this));
 
@@ -688,7 +663,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testGetInterruptedException() {
+TEST_F(FutureTaskTest, testGetInterruptedException) {
 
     FutureTask<std::string> ft(new NoOpCallable<std::string>());
     Thread t(&ft);
@@ -739,7 +714,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testTimedGetInterruptedException2() {
+TEST_F(FutureTaskTest, testTimedGetInterruptedException2) {
     FutureTask<std::string> ft(new NoOpCallable<std::string>());
     InterruptableFutureTaskLongTimeoutGetRunnable runner(this, &ft);
     Thread t(&runner);
@@ -755,7 +730,7 @@ void FutureTaskTest::testTimedGetInterruptedException2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testGetTimeoutException() {
+TEST_F(FutureTaskTest, testGetTimeoutException) {
     try {
         FutureTask<std::string> ft(new NoOpCallable<std::string>());
         ft.get(1, TimeUnit::MILLISECONDS);
@@ -765,27 +740,3 @@ void FutureTaskTest::testGetTimeoutException() {
         unexpectedException();
     }
 }
-
-TEST_F(FutureTaskTest, testConstructor1) { testConstructor1(); }
-TEST_F(FutureTaskTest, testConstructor2) { testConstructor2(); }
-TEST_F(FutureTaskTest, testConstructor3) { testConstructor3(); }
-TEST_F(FutureTaskTest, testConstructor4) { testConstructor4(); }
-TEST_F(FutureTaskTest, testIsDone) { testIsDone(); }
-TEST_F(FutureTaskTest, testRunAndReset) { testRunAndReset(); }
-TEST_F(FutureTaskTest, testResetAfterCancel) { testResetAfterCancel(); }
-TEST_F(FutureTaskTest, testSet) { testSet(); }
-TEST_F(FutureTaskTest, testSetException) { testSetException(); }
-TEST_F(FutureTaskTest, testCancelBeforeRun) { testCancelBeforeRun(); }
-TEST_F(FutureTaskTest, testCancelBeforeRun2) { testCancelBeforeRun2(); }
-TEST_F(FutureTaskTest, testCancelAfterRun) { testCancelAfterRun(); }
-TEST_F(FutureTaskTest, testCancelInterrupt) { testCancelInterrupt(); }
-TEST_F(FutureTaskTest, testCancelNoInterrupt) { testCancelNoInterrupt(); }
-TEST_F(FutureTaskTest, testGet1) { testGet1(); }
-TEST_F(FutureTaskTest, testTimedGet1) { testTimedGet1(); }
-TEST_F(FutureTaskTest, testTimedGetCancellation) { testTimedGetCancellation(); }
-TEST_F(FutureTaskTest, testGetCancellation) { testGetCancellation(); }
-TEST_F(FutureTaskTest, testGetExecutionException) { testGetExecutionException(); }
-TEST_F(FutureTaskTest, testTimedGetExecutionException2) { testTimedGetExecutionException2(); }
-TEST_F(FutureTaskTest, testGetInterruptedException) { testGetInterruptedException(); }
-TEST_F(FutureTaskTest, testTimedGetInterruptedException2) { testTimedGetInterruptedException2(); }
-TEST_F(FutureTaskTest, testGetTimeoutException) { testGetTimeoutException(); }

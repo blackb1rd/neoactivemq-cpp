@@ -28,28 +28,11 @@ using namespace activemq::commands;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::stomp;
 
-    class StompHelperTest : public ::testing::Test {
-public:
-
-        StompHelperTest();
-        virtual ~StompHelperTest();
-
-        void testConvertDestinationFromString();
-        void testConvertDestinationFromCommand();
-
-    };
+    class StompHelperTest : public ::testing::Test {};
 
 
 ////////////////////////////////////////////////////////////////////////////////
-StompHelperTest::StompHelperTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-StompHelperTest::~StompHelperTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void StompHelperTest::testConvertDestinationFromString() {
+TEST_F(StompHelperTest, testConvertDestinationFromString) {
 
     StompWireFormat wireformat;
     wireformat.setTopicPrefix("mytopics://");
@@ -61,7 +44,7 @@ void StompHelperTest::testConvertDestinationFromString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StompHelperTest::testConvertDestinationFromCommand() {
+TEST_F(StompHelperTest, testConvertDestinationFromCommand) {
 
     StompWireFormat wireformat;
     wireformat.setTopicPrefix("mytopics://");
@@ -73,6 +56,3 @@ void StompHelperTest::testConvertDestinationFromCommand() {
 
     ASSERT_EQ(std::string("mytopics://SomeTopic"), result);
 }
-
-TEST_F(StompHelperTest, testConvertDestinationFromString) { testConvertDestinationFromString(); }
-TEST_F(StompHelperTest, testConvertDestinationFromCommand) { testConvertDestinationFromCommand(); }

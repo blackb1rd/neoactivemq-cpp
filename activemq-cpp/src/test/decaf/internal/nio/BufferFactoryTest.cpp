@@ -31,21 +31,10 @@ using namespace decaf::internal;
 using namespace decaf::internal::nio;
 using namespace decaf::nio;
 
-    class BufferFactoryTest : public ::testing::Test {
-public:
-
-        BufferFactoryTest() {}
-        virtual ~BufferFactoryTest() {}
-
-        void testCreateByteBuffer1();
-        void testCreateByteBuffer2();
-        void testCreateByteBuffer3();
-
-    };
-
+    class BufferFactoryTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferFactoryTest::testCreateByteBuffer1() {
+TEST_F(BufferFactoryTest, testCreateByteBuffer1) {
 
     ByteBuffer* buffer = BufferFactory::createByteBuffer( 500 );
     ASSERT_TRUE(buffer != NULL);
@@ -56,7 +45,7 @@ void BufferFactoryTest::testCreateByteBuffer1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferFactoryTest::testCreateByteBuffer2() {
+TEST_F(BufferFactoryTest, testCreateByteBuffer2) {
 
     std::vector<unsigned char> array;
     array.resize( 500 );
@@ -71,7 +60,7 @@ void BufferFactoryTest::testCreateByteBuffer2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferFactoryTest::testCreateByteBuffer3() {
+TEST_F(BufferFactoryTest, testCreateByteBuffer3) {
 
     std::vector<unsigned char> array;
     array.resize( 500 );
@@ -84,7 +73,3 @@ void BufferFactoryTest::testCreateByteBuffer3() {
 
     delete buffer;
 }
-
-TEST_F(BufferFactoryTest, testCreateByteBuffer1) { testCreateByteBuffer1(); }
-TEST_F(BufferFactoryTest, testCreateByteBuffer2) { testCreateByteBuffer2(); }
-TEST_F(BufferFactoryTest, testCreateByteBuffer3) { testCreateByteBuffer3(); }

@@ -28,18 +28,14 @@ using namespace decaf::net;
 public:
 
         URLEncoderTest();
-        virtual ~URLEncoderTest() {}
-
-        void testEncode();
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 URLEncoderTest::URLEncoderTest() {}
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLEncoderTest::testEncode() {
+TEST_F(URLEncoderTest, testEncode) {
 
     const std::string URL = "http://127.0.0.1:80/%24%25";
     const std::string URL2 = "telnet://justWantToHaveFun.com:400";
@@ -50,5 +46,3 @@ void URLEncoderTest::testEncode() {
     ASSERT_TRUE(URLDecoder::decode( URLEncoder::encode( URL3 ) ) == URL3) << ("3. Incorrect encoding/decoding");
 
 }
-
-TEST_F(URLEncoderTest, testEncode) { testEncode(); }

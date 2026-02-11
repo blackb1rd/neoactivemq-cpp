@@ -23,83 +23,70 @@
 using namespace activemq::cmsutil;
 
     class SessionPoolTest : public ::testing::Test {
-public:
-
-        SessionPoolTest() {}
-        virtual ~SessionPoolTest() {}
-
-        void testTakeSession();
-        void testReturnSession();
-        void testCloseSession();
     };
 
-
 ////////////////////////////////////////////////////////////////////////////////
-void SessionPoolTest::testTakeSession() {
-    
+TEST_F(SessionPoolTest, testTakeSession) {
+
     DummyConnection connection(NULL);
     ResourceLifecycleManager mgr;
-    
+
     SessionPool pool(&connection, cms::Session::AUTO_ACKNOWLEDGE, &mgr);
-    
+
     // Take a session.
     PooledSession* pooledSession1 = pool.takeSession();
     ASSERT_TRUE(pooledSession1 != NULL);
-    
+
     // Take a second session.
     PooledSession* pooledSession2 = pool.takeSession();
     ASSERT_TRUE(pooledSession2 != NULL);
-    
+
     // Make sure they're different objects.
-    ASSERT_TRUE(pooledSession1 != pooledSession2);    
+    ASSERT_TRUE(pooledSession1 != pooledSession2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SessionPoolTest::testReturnSession() {
-    
+TEST_F(SessionPoolTest, testReturnSession) {
+
     DummyConnection connection(NULL);
     ResourceLifecycleManager mgr;
-    
+
     SessionPool pool(&connection, cms::Session::AUTO_ACKNOWLEDGE, &mgr);
-    
+
     // Take a session.
     PooledSession* pooledSession1 = pool.takeSession();
     ASSERT_TRUE(pooledSession1 != NULL);
-    
+
     // Return the session to the pool
     pool.returnSession(pooledSession1);
-    
+
     // Take a second session.
     PooledSession* pooledSession2 = pool.takeSession();
     ASSERT_TRUE(pooledSession2 != NULL);
-    
+
     // Make sure they're the same object.
-    ASSERT_TRUE(pooledSession1 == pooledSession2); 
+    ASSERT_TRUE(pooledSession1 == pooledSession2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SessionPoolTest::testCloseSession() {
-    
+TEST_F(SessionPoolTest, testCloseSession) {
+
     DummyConnection connection(NULL);
     ResourceLifecycleManager mgr;
-    
+
     SessionPool pool(&connection, cms::Session::AUTO_ACKNOWLEDGE, &mgr);
-    
+
     // Take a session.
     PooledSession* pooledSession1 = pool.takeSession();
     ASSERT_TRUE(pooledSession1 != NULL);
-    
+
     // Return the session to the pool
     pooledSession1->close();
-    
+
     // Take a second session.
     PooledSession* pooledSession2 = pool.takeSession();
     ASSERT_TRUE(pooledSession2 != NULL);
-    
-    // Make sure they're the same object.
-    ASSERT_TRUE(pooledSession1 == pooledSession2); 
-}
 
-TEST_F(SessionPoolTest, testTakeSession) { testTakeSession(); }
-TEST_F(SessionPoolTest, testReturnSession) { testReturnSession(); }
-TEST_F(SessionPoolTest, testCloseSession) { testCloseSession(); }
+    // Make sure they're the same object.
+    ASSERT_TRUE(pooledSession1 == pooledSession2);
+}

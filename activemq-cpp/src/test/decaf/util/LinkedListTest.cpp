@@ -28,7 +28,7 @@ using namespace decaf::util;
 
     class LinkedListTest : public ::testing::Test
     {
-private:
+protected:
 
         static const int SIZE;
 
@@ -37,63 +37,7 @@ private:
         LinkedListTest();
         virtual ~LinkedListTest();
 
-        void testConstructor1();
-        void testConstructor2();
-        void testConstructor3();
-        void testEquals();
-        void testGet();
-        void testSet();
-        void testAdd1();
-        void testAdd2();
-        void testAddAll1();
-        void testAddAll2();
-        void testAddAll3();
-        void testAddAll4();
-        void testAddAllSelfAsCollection1();
-        void testAddAllSelfAsCollection2();
-        void testAddFirst();
-        void testAddLast();
-        void testRemoveAtIndex();
-        void testRemoveByValue();
-        void testRemoveAll();
-        void testRetainAll();
-        void testGetFirst();
-        void testGetLast();
-        void testClear();
-        void testIndexOf();
-        void testLastIndexOf();
-        void testContains();
-        void testContainsAll();
-        void testToArray();
-        void testOffer();
-        void testPoll();
-        void testPeek();
-        void testElement();
-        void testQRemove();
-        void testOfferFirst();
-        void testOfferLast();
-        void testRemoveFirst();
-        void testRemoveLast();
-        void testPollFirst();
-        void testPollLast();
-        void testPeekFirst();
-        void testPeekLast();
-        void testPop();
-        void testPush();
-        void testIterator1();
-        void testIterator2();
-        void testListIterator1();
-        void testListIterator2();
-        void testListIterator3();
-        void testListIterator4();
-        void testListIterator1IndexOutOfBoundsException();
-        void testListIterator2IndexOutOfBoundsException();
-        void testDescendingIterator();
-        void testRemoveFirstOccurrence();
-        void testRemoveLastOccurrence();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const int LinkedListTest::SIZE = 256;
@@ -147,7 +91,7 @@ LinkedListTest::~LinkedListTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testConstructor1() {
+TEST_F(LinkedListTest, testConstructor1) {
 
     LinkedList<int> list;
 
@@ -156,18 +100,18 @@ void LinkedListTest::testConstructor1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testConstructor2() {
+TEST_F(LinkedListTest, testConstructor2) {
 
     LinkedList<int> mylist;
     populate( mylist, SIZE );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testConstructor3() {
+TEST_F(LinkedListTest, testConstructor3) {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testEquals() {
+TEST_F(LinkedListTest, testEquals) {
 
     LinkedList<int> list1;
     populate( list1, 7 );
@@ -186,7 +130,7 @@ void LinkedListTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testGet() {
+TEST_F(LinkedListTest, testGet) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -201,7 +145,7 @@ void LinkedListTest::testGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testSet() {
+TEST_F(LinkedListTest, testSet) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -222,7 +166,7 @@ void LinkedListTest::testSet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testOffer() {
+TEST_F(LinkedListTest, testOffer) {
 
     LinkedList<int> list;
     ASSERT_EQ(true, list.offer( 42 ));
@@ -238,7 +182,7 @@ void LinkedListTest::testOffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testAddFirst() {
+TEST_F(LinkedListTest, testAddFirst) {
 
     LinkedList<int> list;
     list.addFirst( 42 );
@@ -254,7 +198,7 @@ void LinkedListTest::testAddFirst() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testAddLast() {
+TEST_F(LinkedListTest, testAddLast) {
 
     LinkedList<int> list;
     list.addLast( 42 );
@@ -270,7 +214,7 @@ void LinkedListTest::testAddLast() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testGetFirst() {
+TEST_F(LinkedListTest, testGetFirst) {
 
     LinkedList<int> list;
 
@@ -281,7 +225,7 @@ void LinkedListTest::testGetFirst() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testGetLast() {
+TEST_F(LinkedListTest, testGetLast) {
 
     LinkedList<int> list;
 
@@ -292,7 +236,7 @@ void LinkedListTest::testGetLast() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testAdd1() {
+TEST_F(LinkedListTest, testAdd1) {
 
     LinkedList<int> list;
 
@@ -322,7 +266,7 @@ void LinkedListTest::testAdd1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testAdd2() {
+TEST_F(LinkedListTest, testAdd2) {
 
     LinkedList<int> list;
 
@@ -361,7 +305,7 @@ void LinkedListTest::testAdd2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testAddAll1() {
+TEST_F(LinkedListTest, testAddAll1) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -396,7 +340,7 @@ void LinkedListTest::testAddAll1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testAddAll2() {
+TEST_F(LinkedListTest, testAddAll2) {
 
     LinkedList<int> list;
     ASSERT_THROW(list.addAll( -1, ArrayList<int>() ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
@@ -404,7 +348,7 @@ void LinkedListTest::testAddAll2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testAddAll3() {
+TEST_F(LinkedListTest, testAddAll3) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -438,7 +382,7 @@ void LinkedListTest::testAddAll3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testAddAll4() {
+TEST_F(LinkedListTest, testAddAll4) {
 
     ArrayList<int> emptyCollection;
     ASSERT_THROW(ArrayList<int>().addAll( -1, emptyCollection ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
@@ -498,7 +442,7 @@ void LinkedListTest::testAddAll4() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testAddAllSelfAsCollection1() {
+TEST_F(LinkedListTest, testAddAllSelfAsCollection1) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -509,7 +453,7 @@ void LinkedListTest::testAddAllSelfAsCollection1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testAddAllSelfAsCollection2() {
+TEST_F(LinkedListTest, testAddAllSelfAsCollection2) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -520,7 +464,7 @@ void LinkedListTest::testAddAllSelfAsCollection2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testRemoveAtIndex() {
+TEST_F(LinkedListTest, testRemoveAtIndex) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -535,7 +479,7 @@ void LinkedListTest::testRemoveAtIndex() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testRemoveByValue() {
+TEST_F(LinkedListTest, testRemoveByValue) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -549,7 +493,7 @@ void LinkedListTest::testRemoveByValue() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testRemoveAll() {
+TEST_F(LinkedListTest, testRemoveAll) {
 
     LinkedList<int> list;
     populate( list, 3 );
@@ -575,7 +519,7 @@ void LinkedListTest::testRemoveAll() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testRetainAll() {
+TEST_F(LinkedListTest, testRetainAll) {
 
     LinkedList<int> list;
     populate( list, 3 );
@@ -601,7 +545,7 @@ void LinkedListTest::testRetainAll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testClear() {
+TEST_F(LinkedListTest, testClear) {
 
     LinkedList<int> list;
 
@@ -624,7 +568,7 @@ void LinkedListTest::testClear() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testIndexOf() {
+TEST_F(LinkedListTest, testIndexOf) {
 
     LinkedList<int> list;
 
@@ -648,7 +592,7 @@ void LinkedListTest::testIndexOf() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testLastIndexOf() {
+TEST_F(LinkedListTest, testLastIndexOf) {
 
     LinkedList<int> list;
 
@@ -675,7 +619,7 @@ void LinkedListTest::testLastIndexOf() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testContains() {
+TEST_F(LinkedListTest, testContains) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -687,7 +631,7 @@ void LinkedListTest::testContains() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testContainsAll() {
+TEST_F(LinkedListTest, testContainsAll) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -701,7 +645,7 @@ void LinkedListTest::testContainsAll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testToArray() {
+TEST_F(LinkedListTest, testToArray) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -718,7 +662,7 @@ void LinkedListTest::testToArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testPoll() {
+TEST_F(LinkedListTest, testPoll) {
 
     int result = 0;
     LinkedList<int> list;
@@ -735,7 +679,7 @@ void LinkedListTest::testPoll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testQRemove() {
+TEST_F(LinkedListTest, testQRemove) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -750,7 +694,7 @@ void LinkedListTest::testQRemove() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testPeek() {
+TEST_F(LinkedListTest, testPeek) {
 
     int result = 0;
     LinkedList<int> list;
@@ -768,7 +712,7 @@ void LinkedListTest::testPeek() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testElement() {
+TEST_F(LinkedListTest, testElement) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -784,7 +728,7 @@ void LinkedListTest::testElement() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testOfferFirst() {
+TEST_F(LinkedListTest, testOfferFirst) {
 
     LinkedList<int> list;
     ASSERT_EQ(true, list.offerFirst( 42 ));
@@ -800,7 +744,7 @@ void LinkedListTest::testOfferFirst() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testOfferLast() {
+TEST_F(LinkedListTest, testOfferLast) {
 
     LinkedList<int> list;
     ASSERT_EQ(true, list.offerLast( 42 ));
@@ -816,7 +760,7 @@ void LinkedListTest::testOfferLast() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testRemoveFirst() {
+TEST_F(LinkedListTest, testRemoveFirst) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -831,7 +775,7 @@ void LinkedListTest::testRemoveFirst() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testRemoveLast() {
+TEST_F(LinkedListTest, testRemoveLast) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -846,7 +790,7 @@ void LinkedListTest::testRemoveLast() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testPollFirst() {
+TEST_F(LinkedListTest, testPollFirst) {
 
     int result = 0;
     LinkedList<int> list;
@@ -863,7 +807,7 @@ void LinkedListTest::testPollFirst() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testPollLast() {
+TEST_F(LinkedListTest, testPollLast) {
 
     int result = 0;
     LinkedList<int> list;
@@ -880,7 +824,7 @@ void LinkedListTest::testPollLast() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testPeekFirst() {
+TEST_F(LinkedListTest, testPeekFirst) {
 
     int result = 0;
     LinkedList<int> list;
@@ -898,7 +842,7 @@ void LinkedListTest::testPeekFirst() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testPeekLast() {
+TEST_F(LinkedListTest, testPeekLast) {
 
     int result = 0;
     LinkedList<int> list;
@@ -916,7 +860,7 @@ void LinkedListTest::testPeekLast() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testPop() {
+TEST_F(LinkedListTest, testPop) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -931,7 +875,7 @@ void LinkedListTest::testPop() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testPush() {
+TEST_F(LinkedListTest, testPush) {
 
     LinkedList<int> list;
     list.push( 42 );
@@ -947,7 +891,7 @@ void LinkedListTest::testPush() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testListIterator1IndexOutOfBoundsException() {
+TEST_F(LinkedListTest, testListIterator1IndexOutOfBoundsException) {
 
     LinkedList<std::string> list;
 
@@ -955,7 +899,7 @@ void LinkedListTest::testListIterator1IndexOutOfBoundsException() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testListIterator2IndexOutOfBoundsException() {
+TEST_F(LinkedListTest, testListIterator2IndexOutOfBoundsException) {
 
     LinkedList<std::string> list;
     list.add( "1" );
@@ -965,7 +909,7 @@ void LinkedListTest::testListIterator2IndexOutOfBoundsException() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testIterator1() {
+TEST_F(LinkedListTest, testIterator1) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -985,7 +929,7 @@ void LinkedListTest::testIterator1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testIterator2() {
+TEST_F(LinkedListTest, testIterator2) {
 
     LinkedList<std::string> list;
 
@@ -1016,7 +960,7 @@ void LinkedListTest::testIterator2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testListIterator1() {
+TEST_F(LinkedListTest, testListIterator1) {
 
     LinkedList<int> list;
     populate( list, SIZE );
@@ -1066,7 +1010,7 @@ void LinkedListTest::testListIterator1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testListIterator2() {
+TEST_F(LinkedListTest, testListIterator2) {
 
     LinkedList<int> list;
     list.add(1);
@@ -1096,7 +1040,7 @@ void LinkedListTest::testListIterator2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testListIterator3() {
+TEST_F(LinkedListTest, testListIterator3) {
 
     LinkedList<int> list;
     std::unique_ptr< ListIterator<int> > iter( list.listIterator() );
@@ -1120,7 +1064,7 @@ void LinkedListTest::testListIterator3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testListIterator4() {
+TEST_F(LinkedListTest, testListIterator4) {
 
     LinkedList<int> list;
     std::unique_ptr< ListIterator<int> > iter( list.listIterator( 0 ) );
@@ -1142,7 +1086,7 @@ void LinkedListTest::testListIterator4() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testDescendingIterator() {
+TEST_F(LinkedListTest, testDescendingIterator) {
 
     LinkedList<int> list;
     std::unique_ptr< Iterator<int> > iter( list.descendingIterator() );
@@ -1176,7 +1120,7 @@ void LinkedListTest::testDescendingIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testRemoveFirstOccurrence() {
+TEST_F(LinkedListTest, testRemoveFirstOccurrence) {
 
     LinkedList<int> list;
     std::unique_ptr< Iterator<int> > iter( list.descendingIterator() );
@@ -1204,7 +1148,7 @@ void LinkedListTest::testRemoveFirstOccurrence() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedListTest::testRemoveLastOccurrence() {
+TEST_F(LinkedListTest, testRemoveLastOccurrence) {
 
     LinkedList<int> list;
     std::unique_ptr< Iterator<int> > iter( list.descendingIterator() );
@@ -1230,58 +1174,3 @@ void LinkedListTest::testRemoveLastOccurrence() {
     ASSERT_EQ(3, list.getLast());
     ASSERT_TRUE(!list.removeLastOccurrence(1));
 }
-
-TEST_F(LinkedListTest, testConstructor1) { testConstructor1(); }
-TEST_F(LinkedListTest, testConstructor2) { testConstructor2(); }
-TEST_F(LinkedListTest, testConstructor3) { testConstructor3(); }
-TEST_F(LinkedListTest, testEquals) { testEquals(); }
-TEST_F(LinkedListTest, testGet) { testGet(); }
-TEST_F(LinkedListTest, testSet) { testSet(); }
-TEST_F(LinkedListTest, testAdd1) { testAdd1(); }
-TEST_F(LinkedListTest, testAdd2) { testAdd2(); }
-TEST_F(LinkedListTest, testAddAll1) { testAddAll1(); }
-TEST_F(LinkedListTest, testAddAll2) { testAddAll2(); }
-TEST_F(LinkedListTest, testAddAll3) { testAddAll3(); }
-TEST_F(LinkedListTest, testAddAll4) { testAddAll4(); }
-TEST_F(LinkedListTest, testAddAllSelfAsCollection1) { testAddAllSelfAsCollection1(); }
-TEST_F(LinkedListTest, testAddAllSelfAsCollection2) { testAddAllSelfAsCollection2(); }
-TEST_F(LinkedListTest, testAddFirst) { testAddFirst(); }
-TEST_F(LinkedListTest, testAddLast) { testAddLast(); }
-TEST_F(LinkedListTest, testRemoveAtIndex) { testRemoveAtIndex(); }
-TEST_F(LinkedListTest, testRemoveByValue) { testRemoveByValue(); }
-TEST_F(LinkedListTest, testRemoveAll) { testRemoveAll(); }
-TEST_F(LinkedListTest, testRetainAll) { testRetainAll(); }
-TEST_F(LinkedListTest, testGetFirst) { testGetFirst(); }
-TEST_F(LinkedListTest, testGetLast) { testGetLast(); }
-TEST_F(LinkedListTest, testClear) { testClear(); }
-TEST_F(LinkedListTest, testIndexOf) { testIndexOf(); }
-TEST_F(LinkedListTest, testLastIndexOf) { testLastIndexOf(); }
-TEST_F(LinkedListTest, testContains) { testContains(); }
-TEST_F(LinkedListTest, testContainsAll) { testContainsAll(); }
-TEST_F(LinkedListTest, testToArray) { testToArray(); }
-TEST_F(LinkedListTest, testOffer) { testOffer(); }
-TEST_F(LinkedListTest, testPoll) { testPoll(); }
-TEST_F(LinkedListTest, testPeek) { testPeek(); }
-TEST_F(LinkedListTest, testElement) { testElement(); }
-TEST_F(LinkedListTest, testQRemove) { testQRemove(); }
-TEST_F(LinkedListTest, testOfferFirst) { testOfferFirst(); }
-TEST_F(LinkedListTest, testOfferLast) { testOfferLast(); }
-TEST_F(LinkedListTest, testRemoveFirst) { testRemoveFirst(); }
-TEST_F(LinkedListTest, testRemoveLast) { testRemoveLast(); }
-TEST_F(LinkedListTest, testPollFirst) { testPollFirst(); }
-TEST_F(LinkedListTest, testPollLast) { testPollLast(); }
-TEST_F(LinkedListTest, testPeekFirst) { testPeekFirst(); }
-TEST_F(LinkedListTest, testPeekLast) { testPeekLast(); }
-TEST_F(LinkedListTest, testPop) { testPop(); }
-TEST_F(LinkedListTest, testPush) { testPush(); }
-TEST_F(LinkedListTest, testIterator1) { testIterator1(); }
-TEST_F(LinkedListTest, testIterator2) { testIterator2(); }
-TEST_F(LinkedListTest, testListIterator1) { testListIterator1(); }
-TEST_F(LinkedListTest, testListIterator2) { testListIterator2(); }
-TEST_F(LinkedListTest, testListIterator3) { testListIterator3(); }
-TEST_F(LinkedListTest, testListIterator4) { testListIterator4(); }
-TEST_F(LinkedListTest, testListIterator1IndexOutOfBoundsException) { testListIterator1IndexOutOfBoundsException(); }
-TEST_F(LinkedListTest, testListIterator2IndexOutOfBoundsException) { testListIterator2IndexOutOfBoundsException(); }
-TEST_F(LinkedListTest, testDescendingIterator) { testDescendingIterator(); }
-TEST_F(LinkedListTest, testRemoveFirstOccurrence) { testRemoveFirstOccurrence(); }
-TEST_F(LinkedListTest, testRemoveLastOccurrence) { testRemoveLastOccurrence(); }

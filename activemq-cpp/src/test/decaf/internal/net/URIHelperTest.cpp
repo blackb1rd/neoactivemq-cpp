@@ -32,21 +32,15 @@ using namespace decaf::lang;
 public:
 
         URIHelperTest();
-        virtual ~URIHelperTest() {}
-
-        void testParseURI();
-        void isValidIPv4Address();
-
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 URIHelperTest::URIHelperTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URIHelperTest::testParseURI() {
+TEST_F(URIHelperTest, testParseURI) {
 
     std::vector<std::string> constructorTests;
     constructorTests.push_back( "http://user@www.google.com:45/search?q=helpinfo#somefragment" );
@@ -157,7 +151,7 @@ void URIHelperTest::testParseURI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URIHelperTest::isValidIPv4Address() {
+TEST_F(URIHelperTest, isValidIPv4Address) {
 
     URIHelper uriHelper;
 
@@ -191,6 +185,3 @@ void URIHelperTest::isValidIPv4Address() {
         ASSERT_EQ(false, uriHelper.isValidIPv4Address( *address )) << ("Invalid address tested as valid");
     }
 }
-
-TEST_F(URIHelperTest, testParseURI) { testParseURI(); }
-TEST_F(URIHelperTest, isValidIPv4Address) { isValidIPv4Address(); }

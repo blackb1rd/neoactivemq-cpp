@@ -27,18 +27,10 @@ using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
 
-    class SessionStateTest : public ::testing::Test {
-public:
-
-        SessionStateTest() {}
-        virtual ~SessionStateTest() {}
-
-        void test();
-    };
-
+class SessionStateTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void SessionStateTest::test() {
+TEST_F(SessionStateTest, test) {
 
     // Create a Consumer
     Pointer<ConsumerId> cid( new ConsumerId );
@@ -83,5 +75,3 @@ void SessionStateTest::test() {
     ASSERT_TRUE(state.getProducerStates().size() == 1);
 
 }
-
-TEST_F(SessionStateTest, test) { test(); }

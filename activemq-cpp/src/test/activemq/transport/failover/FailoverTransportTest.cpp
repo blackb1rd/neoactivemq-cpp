@@ -57,49 +57,7 @@ using namespace decaf::util::concurrent;
     using namespace activemq::commands;
 
     class FailoverTransportTest : public ::testing::Test {
-public:
-
-        FailoverTransportTest();
-        virtual ~FailoverTransportTest();
-
-        void testTransportCreate();
-        void testTransportCreateWithBackups();
-        void testTransportCreateFailOnCreate();
-        void testTransportCreateFailOnCreateSendMessage();
-        void testFailingBackupCreation();
-        void testSendOnewayMessage();
-        void testSendRequestMessage();
-        void testSendOnewayMessageFail();
-        void testSendRequestMessageFail();
-        void testWithOpewireCommands();
-        void testTransportHandlesConnectionControl();
-        void testPriorityBackupConfig();
-        void testUriOptionsApplied();
-        void testConnectedToMockBroker();
-        void testMaxReconnectsZeroAttemptsOneConnect();
-        void testMaxReconnectsHonorsConfiguration();
-        void testStartupMaxReconnectsHonorsConfiguration();
-        void testConnectedToPriorityOnFirstTryThenFailover();
-        // Failover tests without randomization
-        void testFailoverNoRandomizeBothOnline();
-        void testFailoverNoRandomizeBroker1OnlyOnline();
-        void testFailoverNoRandomizeBroker2OnlyOnline();
-        void testFailoverNoRandomizeBothOfflineBroker1ComesOnline();
-        void testFailoverNoRandomizeBothOfflineBroker2ComesOnline();
-        // Failover tests with randomization
-        void testFailoverWithRandomizeBothOnline();
-        void testFailoverWithRandomizeBroker1OnlyOnline();
-        void testFailoverWithRandomizeBroker2OnlyOnline();
-        void testFailoverWithRandomizeBothOfflineBroker1ComesOnline();
-        void testFailoverWithRandomizeBothOfflineBroker2ComesOnline();
-        void testConnectsToPriorityOnceStarted();
-        void testPriorityBackupRapidSwitchingOnRestore();
-        void testSimpleBrokerRestart();
-        void testBrokerRestartWithProperSync();
-        void testFuzzyBrokerAvailability();
-        void testConnectsToPriorityAfterInitialBackupFails();
-
-    private:
+    protected:
 
         Pointer<ConnectionInfo> createConnection();
         Pointer<SessionInfo> createSession( const Pointer<ConnectionInfo>& parent );
@@ -115,68 +73,6 @@ public:
 
     };
 
-
-////////////////////////////////////////////////////////////////////////////////
-FailoverTransportTest::FailoverTransportTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-FailoverTransportTest::~FailoverTransportTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testTransportCreate() {
-
-    std::string uri = "failover://(mock://localhost:61616)?randomize=false";
-
-    DefaultTransportListener listener;
-    FailoverTransportFactory factory;
-
-    Pointer<Transport> transport(factory.create(uri));
-    ASSERT_TRUE(transport != NULL);
-    transport->setTransportListener(&listener);
-
-    FailoverTransport* failover =
-        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
-
-    ASSERT_TRUE(failover != NULL);
-    ASSERT_TRUE(failover->isRandomize() == false);
-
-    transport->start();
-
-    Thread::sleep(1000);
-    ASSERT_TRUE(failover->isConnected() == true);
-
-    transport->close();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testTransportCreateWithBackups() {
-
-    std::string uri = "failover://(mock://localhost:61616,mock://localhost:61618)?randomize=false&backup=true";
-
-    DefaultTransportListener listener;
-    FailoverTransportFactory factory;
-
-    Pointer<Transport> transport(factory.create(uri));
-    ASSERT_TRUE(transport != NULL);
-    transport->setTransportListener(&listener);
-
-    FailoverTransport* failover =
-        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
-
-    ASSERT_TRUE(failover != NULL);
-    ASSERT_TRUE(failover->isRandomize() == false);
-    ASSERT_TRUE(failover->isBackup() == true);
-
-    transport->start();
-
-    Thread::sleep(1000);
-    ASSERT_TRUE(failover->isConnected() == true);
-
-    transport->close();
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 class FailToConnectListener : public DefaultTransportListener {
 public:
@@ -189,95 +85,6 @@ public:
         caughtException = true;
     }
 };
-
-////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testTransportCreateFailOnCreate() {
-
-    std::string uri =
-            "failover://(mock://localhost:61616?failOnCreate=true)?useExponentialBackOff=false&maxReconnectAttempts=3&startupMaxReconnectAttempts=3&initialReconnectDelay=100";
-
-    FailToConnectListener listener;
-    FailoverTransportFactory factory;
-
-    Pointer<Transport> transport(factory.create(uri));
-    ASSERT_TRUE(transport != NULL);
-    transport->setTransportListener(&listener);
-
-    FailoverTransport* failover =
-        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
-
-    ASSERT_TRUE(failover != NULL);
-    ASSERT_TRUE(failover->getMaxReconnectAttempts() == 3);
-    ASSERT_TRUE(failover->getStartupMaxReconnectAttempts() == 3);
-
-    transport->start();
-
-    Thread::sleep(1000);
-
-    ASSERT_TRUE(listener.caughtException == true);
-    ASSERT_TRUE(failover->isConnected() == false);
-
-    transport->close();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testTransportCreateFailOnCreateSendMessage() {
-
-    std::string uri =
-            "failover://(mock://localhost:61616?failOnCreate=true)?useExponentialBackOff=false&maxReconnectAttempts=3&startupMaxReconnectAttempts=3&initialReconnectDelay=100";
-
-    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
-
-    FailToConnectListener listener;
-    FailoverTransportFactory factory;
-
-    Pointer<Transport> transport(factory.create(uri));
-    ASSERT_TRUE(transport != NULL);
-    transport->setTransportListener(&listener);
-
-    FailoverTransport* failover =
-        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
-
-    ASSERT_TRUE(failover != NULL);
-    ASSERT_TRUE(failover->getMaxReconnectAttempts() == 3);
-    ASSERT_TRUE(failover->getStartupMaxReconnectAttempts() == 3);
-
-    transport->start();
-
-    ASSERT_THROW(transport->oneway(message), IOException) << ("Should Throw a IOException");
-
-    ASSERT_TRUE(listener.caughtException == true);
-
-    transport->close();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testFailingBackupCreation() {
-
-    std::string uri = "failover://(mock://localhost:61616,"
-            "mock://localhost:61618?failOnCreate=true)?randomize=false&backup=true";
-
-    DefaultTransportListener listener;
-    FailoverTransportFactory factory;
-
-    Pointer<Transport> transport(factory.create(uri));
-    ASSERT_TRUE(transport != NULL);
-    transport->setTransportListener(&listener);
-
-    FailoverTransport* failover =
-        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
-
-    ASSERT_TRUE(failover != NULL);
-    ASSERT_TRUE(failover->isRandomize() == false);
-    ASSERT_TRUE(failover->isBackup() == true);
-
-    transport->start();
-
-    Thread::sleep(2000);
-    ASSERT_TRUE(failover->isConnected() == true);
-
-    transport->close();
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 class MessageCountingListener : public DefaultTransportListener {
@@ -293,236 +100,70 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testSendOnewayMessage() {
-
-    std::string uri = "failover://(mock://localhost:61616)?randomize=false";
-
-    const int numMessages = 1000;
-    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
-
-    MessageCountingListener messageCounter;
-    DefaultTransportListener listener;
-    FailoverTransportFactory factory;
-
-    Pointer<Transport> transport(factory.create(uri));
-    ASSERT_TRUE(transport != NULL);
-    transport->setTransportListener(&listener);
-
-    FailoverTransport* failover =
-        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
-
-    ASSERT_TRUE(failover != NULL);
-    ASSERT_TRUE(failover->isRandomize() == false);
-
-    transport->start();
-
-    Thread::sleep(1000);
-    ASSERT_TRUE(failover->isConnected() == true);
-
-    MockTransport* mock = NULL;
-    while (mock == NULL) {
-        mock = dynamic_cast<MockTransport*>(transport->narrow(typeid(MockTransport)));
-    }
-    mock->setOutgoingListener(&messageCounter);
-
-    for (int i = 0; i < numMessages; ++i) {
-        transport->oneway(message);
-    }
-
-    Thread::sleep(2000);
-
-    ASSERT_TRUE(messageCounter.numMessages = numMessages);
-
-    transport->close();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testSendRequestMessage() {
-
-    std::string uri = "failover://(mock://localhost:61616)?randomize=false";
-
-    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
-
-    MessageCountingListener messageCounter;
-    DefaultTransportListener listener;
-    FailoverTransportFactory factory;
-
-    Pointer<Transport> transport(factory.create(uri));
-    ASSERT_TRUE(transport != NULL);
-    transport->setTransportListener(&listener);
-
-    FailoverTransport* failover =
-        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
-
-    ASSERT_TRUE(failover != NULL);
-    ASSERT_TRUE(failover->isRandomize() == false);
-
-    transport->start();
-
-    Thread::sleep(1000);
-    ASSERT_TRUE(failover->isConnected() == true);
-
-    MockTransport* mock = NULL;
-    while (mock == NULL) {
-        mock = dynamic_cast<MockTransport*>(transport->narrow(typeid(MockTransport)));
-    }
-    mock->setOutgoingListener(&messageCounter);
-
-    transport->request(message);
-    transport->request(message);
-    transport->request(message);
-    transport->request(message);
-    Thread::sleep(1000);
-
-    ASSERT_TRUE(messageCounter.numMessages = 4);
-
-    transport->close();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testSendOnewayMessageFail() {
-
-    std::string uri = "failover://(mock://localhost:61616?failOnSendMessage=true,"
-            "mock://localhost:61618)?randomize=false";
-
-    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
-
-    MessageCountingListener messageCounter;
-    DefaultTransportListener listener;
-    FailoverTransportFactory factory;
-
-    Pointer<Transport> transport(factory.create(uri));
-    ASSERT_TRUE(transport != NULL);
-    transport->setTransportListener(&listener);
-
-    FailoverTransport* failover =
-        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
-
-    ASSERT_TRUE(failover != NULL);
-    ASSERT_TRUE(failover->isRandomize() == false);
-
-    transport->start();
-
-    Thread::sleep(1000);
-    ASSERT_TRUE(failover->isConnected() == true);
-
-    MockTransport* mock = NULL;
-    while (mock == NULL) {
-        mock = dynamic_cast<MockTransport*>(transport->narrow(typeid(MockTransport)));
-    }
-    mock->setOutgoingListener(&messageCounter);
-
-    transport->oneway(message);
-    transport->oneway(message);
-    transport->oneway(message);
-    transport->oneway(message);
-    Thread::sleep(1000);
-
-    ASSERT_TRUE(messageCounter.numMessages = 4);
-
-    transport->close();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testSendRequestMessageFail() {
-
-    std::string uri = "failover://(mock://localhost:61616?failOnSendMessage=true,"
-            "mock://localhost:61618)?randomize=false";
-
-    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
-
-    MessageCountingListener messageCounter;
-    DefaultTransportListener listener;
-    FailoverTransportFactory factory;
-
-    Pointer<Transport> transport(factory.create(uri));
-    ASSERT_TRUE(transport != NULL);
-    transport->setTransportListener(&listener);
-
-    FailoverTransport* failover =
-        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
-
-    ASSERT_TRUE(failover != NULL);
-    ASSERT_TRUE(failover->isRandomize() == false);
-
-    transport->start();
-
-    Thread::sleep(1000);
-    ASSERT_TRUE(failover->isConnected() == true);
-
-    MockTransport* mock = NULL;
-    while (mock == NULL) {
-        mock = dynamic_cast<MockTransport*>(transport->narrow(typeid(MockTransport)));
-    }
-    mock->setOutgoingListener(&messageCounter);
-
-    transport->request(message);
-    transport->request(message);
-    transport->request(message);
-    transport->request(message);
-    Thread::sleep(1000);
-
-    ASSERT_TRUE(messageCounter.numMessages = 4);
-
-    transport->close();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testWithOpewireCommands() {
-
-    std::string uri = "failover://(mock://localhost:61616)?randomize=false";
-
-    DefaultTransportListener listener;
-    FailoverTransportFactory factory;
-
-    Pointer<Transport> transport(factory.create(uri));
-    ASSERT_TRUE(transport != NULL);
-    transport->setTransportListener(&listener);
-
-    FailoverTransport* failover =
-        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
-
-    ASSERT_TRUE(failover != NULL);
-    ASSERT_TRUE(failover->isRandomize() == false);
-
-    transport->start();
-
-    Thread::sleep(1000);
-    ASSERT_TRUE(failover->isConnected() == true);
-
-    Pointer<ConnectionInfo> connection = createConnection();
-    transport->request(connection);
-    Pointer<SessionInfo> session1 = createSession(connection);
-    transport->request(session1);
-    Pointer<SessionInfo> session2 = createSession(connection);
-    transport->request(session2);
-    Pointer<ConsumerInfo> consumer1 = createConsumer(session1);
-    transport->request(consumer1);
-    Pointer<ConsumerInfo> consumer2 = createConsumer(session1);
-    transport->request(consumer2);
-    Pointer<ConsumerInfo> consumer3 = createConsumer(session2);
-    transport->request(consumer3);
-
-    Pointer<ProducerInfo> producer1 = createProducer(session2);
-    transport->request(producer1);
-
-    // Remove the Producers
-    this->disposeOf(producer1, transport);
-
-    // Remove the Consumers
-    this->disposeOf(consumer1, transport);
-    this->disposeOf(consumer2, transport);
-    this->disposeOf(consumer3, transport);
-
-    // Remove the Session instances.
-    this->disposeOf(session1, transport);
-    this->disposeOf(session2, transport);
-
-    // Indicate that we are done.
-    Pointer<ShutdownInfo> shutdown(new ShutdownInfo());
-    transport->oneway(shutdown);
-
-    transport->close();
+namespace {
+
+    class PriorityBackupListener : public DefaultTransportListener {
+    private:
+
+        Pointer<CountDownLatch> interruptedLatch;
+        Pointer<CountDownLatch> resumedLatch;
+
+        Mutex resetMutex;
+
+    public:
+
+        PriorityBackupListener() : interruptedLatch(new CountDownLatch(1)),
+                                   resumedLatch(new CountDownLatch(1)),
+                                   resetMutex() {
+        }
+
+        virtual ~PriorityBackupListener() {}
+
+        virtual void transportInterrupted() {
+            Pointer<CountDownLatch> latch;
+            synchronized(&resetMutex) {
+                latch = interruptedLatch;
+            }
+            if (latch != NULL) {
+                latch->countDown();
+            }
+        }
+
+        virtual void transportResumed() {
+            Pointer<CountDownLatch> latch;
+            synchronized(&resetMutex) {
+                latch = resumedLatch;
+            }
+            if (latch != NULL) {
+                latch->countDown();
+            }
+        }
+
+        void reset() {
+            synchronized(&resetMutex) {
+                interruptedLatch.reset(new CountDownLatch(1));
+                resumedLatch.reset(new CountDownLatch(1));
+            }
+        }
+
+        bool awaitInterruption() {
+            Pointer<CountDownLatch> latch;
+            synchronized(&resetMutex) {
+                latch = interruptedLatch;
+            }
+            bool result = latch->await(60000);
+            return result;
+        }
+
+        bool awaitResumed() {
+            Pointer<CountDownLatch> latch;
+            synchronized(&resetMutex) {
+                latch = resumedLatch;
+            }
+            bool result = latch->await(60000);
+            return result;
+        }
+    };
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -610,7 +251,382 @@ void FailoverTransportTest::disposeOf(const Pointer<ProducerInfo>& producer, Poi
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testTransportHandlesConnectionControl() {
+TEST_F(FailoverTransportTest, testTransportCreate) {
+
+    std::string uri = "failover://(mock://localhost:61616)?randomize=false";
+
+    DefaultTransportListener listener;
+    FailoverTransportFactory factory;
+
+    Pointer<Transport> transport(factory.create(uri));
+    ASSERT_TRUE(transport != NULL);
+    transport->setTransportListener(&listener);
+
+    FailoverTransport* failover =
+        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
+
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
+
+    transport->start();
+
+    Thread::sleep(1000);
+    ASSERT_TRUE(failover->isConnected() == true);
+
+    transport->close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(FailoverTransportTest, testTransportCreateWithBackups) {
+
+    std::string uri = "failover://(mock://localhost:61616,mock://localhost:61618)?randomize=false&backup=true";
+
+    DefaultTransportListener listener;
+    FailoverTransportFactory factory;
+
+    Pointer<Transport> transport(factory.create(uri));
+    ASSERT_TRUE(transport != NULL);
+    transport->setTransportListener(&listener);
+
+    FailoverTransport* failover =
+        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
+
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
+    ASSERT_TRUE(failover->isBackup() == true);
+
+    transport->start();
+
+    Thread::sleep(1000);
+    ASSERT_TRUE(failover->isConnected() == true);
+
+    transport->close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(FailoverTransportTest, testTransportCreateFailOnCreate) {
+
+    std::string uri =
+            "failover://(mock://localhost:61616?failOnCreate=true)?useExponentialBackOff=false&maxReconnectAttempts=3&startupMaxReconnectAttempts=3&initialReconnectDelay=100";
+
+    FailToConnectListener listener;
+    FailoverTransportFactory factory;
+
+    Pointer<Transport> transport(factory.create(uri));
+    ASSERT_TRUE(transport != NULL);
+    transport->setTransportListener(&listener);
+
+    FailoverTransport* failover =
+        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
+
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->getMaxReconnectAttempts() == 3);
+    ASSERT_TRUE(failover->getStartupMaxReconnectAttempts() == 3);
+
+    transport->start();
+
+    Thread::sleep(1000);
+
+    ASSERT_TRUE(listener.caughtException == true);
+    ASSERT_TRUE(failover->isConnected() == false);
+
+    transport->close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(FailoverTransportTest, testTransportCreateFailOnCreateSendMessage) {
+
+    std::string uri =
+            "failover://(mock://localhost:61616?failOnCreate=true)?useExponentialBackOff=false&maxReconnectAttempts=3&startupMaxReconnectAttempts=3&initialReconnectDelay=100";
+
+    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
+
+    FailToConnectListener listener;
+    FailoverTransportFactory factory;
+
+    Pointer<Transport> transport(factory.create(uri));
+    ASSERT_TRUE(transport != NULL);
+    transport->setTransportListener(&listener);
+
+    FailoverTransport* failover =
+        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
+
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->getMaxReconnectAttempts() == 3);
+    ASSERT_TRUE(failover->getStartupMaxReconnectAttempts() == 3);
+
+    transport->start();
+
+    ASSERT_THROW(transport->oneway(message), IOException) << ("Should Throw a IOException");
+
+    ASSERT_TRUE(listener.caughtException == true);
+
+    transport->close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(FailoverTransportTest, testFailingBackupCreation) {
+
+    std::string uri = "failover://(mock://localhost:61616,"
+            "mock://localhost:61618?failOnCreate=true)?randomize=false&backup=true";
+
+    DefaultTransportListener listener;
+    FailoverTransportFactory factory;
+
+    Pointer<Transport> transport(factory.create(uri));
+    ASSERT_TRUE(transport != NULL);
+    transport->setTransportListener(&listener);
+
+    FailoverTransport* failover =
+        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
+
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
+    ASSERT_TRUE(failover->isBackup() == true);
+
+    transport->start();
+
+    Thread::sleep(2000);
+    ASSERT_TRUE(failover->isConnected() == true);
+
+    transport->close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(FailoverTransportTest, testSendOnewayMessage) {
+
+    std::string uri = "failover://(mock://localhost:61616)?randomize=false";
+
+    const int numMessages = 1000;
+    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
+
+    MessageCountingListener messageCounter;
+    DefaultTransportListener listener;
+    FailoverTransportFactory factory;
+
+    Pointer<Transport> transport(factory.create(uri));
+    ASSERT_TRUE(transport != NULL);
+    transport->setTransportListener(&listener);
+
+    FailoverTransport* failover =
+        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
+
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
+
+    transport->start();
+
+    Thread::sleep(1000);
+    ASSERT_TRUE(failover->isConnected() == true);
+
+    MockTransport* mock = NULL;
+    while (mock == NULL) {
+        mock = dynamic_cast<MockTransport*>(transport->narrow(typeid(MockTransport)));
+    }
+    mock->setOutgoingListener(&messageCounter);
+
+    for (int i = 0; i < numMessages; ++i) {
+        transport->oneway(message);
+    }
+
+    Thread::sleep(2000);
+
+    ASSERT_TRUE(messageCounter.numMessages = numMessages);
+
+    transport->close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(FailoverTransportTest, testSendRequestMessage) {
+
+    std::string uri = "failover://(mock://localhost:61616)?randomize=false";
+
+    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
+
+    MessageCountingListener messageCounter;
+    DefaultTransportListener listener;
+    FailoverTransportFactory factory;
+
+    Pointer<Transport> transport(factory.create(uri));
+    ASSERT_TRUE(transport != NULL);
+    transport->setTransportListener(&listener);
+
+    FailoverTransport* failover =
+        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
+
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
+
+    transport->start();
+
+    Thread::sleep(1000);
+    ASSERT_TRUE(failover->isConnected() == true);
+
+    MockTransport* mock = NULL;
+    while (mock == NULL) {
+        mock = dynamic_cast<MockTransport*>(transport->narrow(typeid(MockTransport)));
+    }
+    mock->setOutgoingListener(&messageCounter);
+
+    transport->request(message);
+    transport->request(message);
+    transport->request(message);
+    transport->request(message);
+    Thread::sleep(1000);
+
+    ASSERT_TRUE(messageCounter.numMessages = 4);
+
+    transport->close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(FailoverTransportTest, testSendOnewayMessageFail) {
+
+    std::string uri = "failover://(mock://localhost:61616?failOnSendMessage=true,"
+            "mock://localhost:61618)?randomize=false";
+
+    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
+
+    MessageCountingListener messageCounter;
+    DefaultTransportListener listener;
+    FailoverTransportFactory factory;
+
+    Pointer<Transport> transport(factory.create(uri));
+    ASSERT_TRUE(transport != NULL);
+    transport->setTransportListener(&listener);
+
+    FailoverTransport* failover =
+        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
+
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
+
+    transport->start();
+
+    Thread::sleep(1000);
+    ASSERT_TRUE(failover->isConnected() == true);
+
+    MockTransport* mock = NULL;
+    while (mock == NULL) {
+        mock = dynamic_cast<MockTransport*>(transport->narrow(typeid(MockTransport)));
+    }
+    mock->setOutgoingListener(&messageCounter);
+
+    transport->oneway(message);
+    transport->oneway(message);
+    transport->oneway(message);
+    transport->oneway(message);
+    Thread::sleep(1000);
+
+    ASSERT_TRUE(messageCounter.numMessages = 4);
+
+    transport->close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(FailoverTransportTest, testSendRequestMessageFail) {
+
+    std::string uri = "failover://(mock://localhost:61616?failOnSendMessage=true,"
+            "mock://localhost:61618)?randomize=false";
+
+    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
+
+    MessageCountingListener messageCounter;
+    DefaultTransportListener listener;
+    FailoverTransportFactory factory;
+
+    Pointer<Transport> transport(factory.create(uri));
+    ASSERT_TRUE(transport != NULL);
+    transport->setTransportListener(&listener);
+
+    FailoverTransport* failover =
+        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
+
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
+
+    transport->start();
+
+    Thread::sleep(1000);
+    ASSERT_TRUE(failover->isConnected() == true);
+
+    MockTransport* mock = NULL;
+    while (mock == NULL) {
+        mock = dynamic_cast<MockTransport*>(transport->narrow(typeid(MockTransport)));
+    }
+    mock->setOutgoingListener(&messageCounter);
+
+    transport->request(message);
+    transport->request(message);
+    transport->request(message);
+    transport->request(message);
+    Thread::sleep(1000);
+
+    ASSERT_TRUE(messageCounter.numMessages = 4);
+
+    transport->close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(FailoverTransportTest, testWithOpewireCommands) {
+
+    std::string uri = "failover://(mock://localhost:61616)?randomize=false";
+
+    DefaultTransportListener listener;
+    FailoverTransportFactory factory;
+
+    Pointer<Transport> transport(factory.create(uri));
+    ASSERT_TRUE(transport != NULL);
+    transport->setTransportListener(&listener);
+
+    FailoverTransport* failover =
+        dynamic_cast<FailoverTransport*>(transport->narrow(typeid(FailoverTransport)));
+
+    ASSERT_TRUE(failover != NULL);
+    ASSERT_TRUE(failover->isRandomize() == false);
+
+    transport->start();
+
+    Thread::sleep(1000);
+    ASSERT_TRUE(failover->isConnected() == true);
+
+    Pointer<ConnectionInfo> connection = createConnection();
+    transport->request(connection);
+    Pointer<SessionInfo> session1 = createSession(connection);
+    transport->request(session1);
+    Pointer<SessionInfo> session2 = createSession(connection);
+    transport->request(session2);
+    Pointer<ConsumerInfo> consumer1 = createConsumer(session1);
+    transport->request(consumer1);
+    Pointer<ConsumerInfo> consumer2 = createConsumer(session1);
+    transport->request(consumer2);
+    Pointer<ConsumerInfo> consumer3 = createConsumer(session2);
+    transport->request(consumer3);
+
+    Pointer<ProducerInfo> producer1 = createProducer(session2);
+    transport->request(producer1);
+
+    // Remove the Producers
+    this->disposeOf(producer1, transport);
+
+    // Remove the Consumers
+    this->disposeOf(consumer1, transport);
+    this->disposeOf(consumer2, transport);
+    this->disposeOf(consumer3, transport);
+
+    // Remove the Session instances.
+    this->disposeOf(session1, transport);
+    this->disposeOf(session2, transport);
+
+    // Indicate that we are done.
+    Pointer<ShutdownInfo> shutdown(new ShutdownInfo());
+    transport->oneway(shutdown);
+
+    transport->close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(FailoverTransportTest, testTransportHandlesConnectionControl) {
 
     std::string uri = "failover://(mock://localhost:61618?failOnCreate=true,mock://localhost:61616)?randomize=false";
 
@@ -665,7 +681,7 @@ void FailoverTransportTest::testTransportHandlesConnectionControl() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testPriorityBackupConfig() {
+TEST_F(FailoverTransportTest, testPriorityBackupConfig) {
 
     std::string uri = "failover://(mock://localhost:61616,"
                       "mock://localhost:61618)?randomize=false&priorityBackup=true";
@@ -694,7 +710,7 @@ void FailoverTransportTest::testPriorityBackupConfig() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testUriOptionsApplied() {
+TEST_F(FailoverTransportTest, testUriOptionsApplied) {
 
     std::string uri = "failover://(mock://localhost:61616,mock://localhost:61618)?"
             "randomize=true&"
@@ -741,7 +757,7 @@ void FailoverTransportTest::testUriOptionsApplied() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testConnectedToMockBroker() {
+TEST_F(FailoverTransportTest, testConnectedToMockBroker) {
 
     MockBrokerService broker1(61000);
     MockBrokerService broker2(61001);
@@ -783,7 +799,7 @@ void FailoverTransportTest::testConnectedToMockBroker() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testMaxReconnectsZeroAttemptsOneConnect() {
+TEST_F(FailoverTransportTest, testMaxReconnectsZeroAttemptsOneConnect) {
 
     std::string uri = "failover://(mock://localhost:61616)?maxReconnectAttempts=0";
 
@@ -808,7 +824,7 @@ void FailoverTransportTest::testMaxReconnectsZeroAttemptsOneConnect() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testMaxReconnectsHonorsConfiguration() {
+TEST_F(FailoverTransportTest, testMaxReconnectsHonorsConfiguration) {
 
     // max reconnect attempts of two means one connection attempt followed by
     // two retries.
@@ -842,7 +858,7 @@ void FailoverTransportTest::testMaxReconnectsHonorsConfiguration() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testStartupMaxReconnectsHonorsConfiguration() {
+TEST_F(FailoverTransportTest, testStartupMaxReconnectsHonorsConfiguration) {
 
     // max reconnect attempts of two means one connection attempt followed by
     // two retries.
@@ -879,79 +895,12 @@ void FailoverTransportTest::testStartupMaxReconnectsHonorsConfiguration() {
     transport->close();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-namespace {
-
-    class PriorityBackupListener : public DefaultTransportListener {
-    private:
-
-        Pointer<CountDownLatch> interruptedLatch;
-        Pointer<CountDownLatch> resumedLatch;
-
-        Mutex resetMutex;
-
-    public:
-
-        PriorityBackupListener() : interruptedLatch(new CountDownLatch(1)),
-                                   resumedLatch(new CountDownLatch(1)),
-                                   resetMutex() {
-        }
-
-        virtual ~PriorityBackupListener() {}
-
-        virtual void transportInterrupted() {
-            Pointer<CountDownLatch> latch;
-            synchronized(&resetMutex) {
-                latch = interruptedLatch;
-            }
-            if (latch != NULL) {
-                latch->countDown();
-            }
-        }
-
-        virtual void transportResumed() {
-            Pointer<CountDownLatch> latch;
-            synchronized(&resetMutex) {
-                latch = resumedLatch;
-            }
-            if (latch != NULL) {
-                latch->countDown();
-            }
-        }
-
-        void reset() {
-            synchronized(&resetMutex) {
-                interruptedLatch.reset(new CountDownLatch(1));
-                resumedLatch.reset(new CountDownLatch(1));
-            }
-        }
-
-        bool awaitInterruption() {
-            Pointer<CountDownLatch> latch;
-            synchronized(&resetMutex) {
-                latch = interruptedLatch;
-            }
-            bool result = latch->await(60000);
-            return result;
-        }
-
-        bool awaitResumed() {
-            Pointer<CountDownLatch> latch;
-            synchronized(&resetMutex) {
-                latch = resumedLatch;
-            }
-            bool result = latch->await(60000);
-            return result;
-        }
-    };
-}
-
 // ============================================================================
 // Failover Tests WITHOUT Randomization (randomize=false)
 // ============================================================================
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testFailoverNoRandomizeBothOnline() {
+TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOnline) {
 
     Pointer<MockBrokerService> broker1(new MockBrokerService(61002));
     Pointer<MockBrokerService> broker2(new MockBrokerService(61003));
@@ -1010,7 +959,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOnline() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testFailoverNoRandomizeBroker1OnlyOnline() {
+TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker1OnlyOnline) {
 
     Pointer<MockBrokerService> broker1(new MockBrokerService(61004));
     Pointer<MockBrokerService> broker2(new MockBrokerService(61005));
@@ -1071,7 +1020,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBroker1OnlyOnline() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testFailoverNoRandomizeBroker2OnlyOnline() {
+TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker2OnlyOnline) {
 
     Pointer<MockBrokerService> broker1(new MockBrokerService(61006));
     Pointer<MockBrokerService> broker2(new MockBrokerService(61007));
@@ -1132,7 +1081,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBroker2OnlyOnline() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker1ComesOnline() {
+TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOfflineBroker1ComesOnline) {
 
     Pointer<MockBrokerService> broker1(new MockBrokerService(61008));
     Pointer<MockBrokerService> broker2(new MockBrokerService(61009));
@@ -1180,7 +1129,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker1ComesOnline
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker2ComesOnline() {
+TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOfflineBroker2ComesOnline) {
 
     Pointer<MockBrokerService> broker1(new MockBrokerService(61010));
     Pointer<MockBrokerService> broker2(new MockBrokerService(61011));
@@ -1232,7 +1181,7 @@ void FailoverTransportTest::testFailoverNoRandomizeBothOfflineBroker2ComesOnline
 // ============================================================================
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testFailoverWithRandomizeBothOnline() {
+TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOnline) {
 
     Pointer<MockBrokerService> broker1(new MockBrokerService(61012));
     Pointer<MockBrokerService> broker2(new MockBrokerService(61013));
@@ -1291,7 +1240,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOnline() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testFailoverWithRandomizeBroker1OnlyOnline() {
+TEST_F(FailoverTransportTest, testFailoverWithRandomizeBroker1OnlyOnline) {
 
     // Use dynamic ports (port 0) to avoid port conflicts
     Pointer<MockBrokerService> broker1(new MockBrokerService());
@@ -1363,7 +1312,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBroker1OnlyOnline() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testFailoverWithRandomizeBroker2OnlyOnline() {
+TEST_F(FailoverTransportTest, testFailoverWithRandomizeBroker2OnlyOnline) {
 
     // Use dynamic ports (port 0) to avoid port conflicts
     Pointer<MockBrokerService> broker1(new MockBrokerService());
@@ -1435,7 +1384,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBroker2OnlyOnline() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker1ComesOnline() {
+TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOfflineBroker1ComesOnline) {
 
     Pointer<MockBrokerService> broker1(new MockBrokerService(61018));
     Pointer<MockBrokerService> broker2(new MockBrokerService(61019));
@@ -1481,7 +1430,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker1ComesOnli
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker2ComesOnline() {
+TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOfflineBroker2ComesOnline) {
 
     Pointer<MockBrokerService> broker1(new MockBrokerService(61020));
     Pointer<MockBrokerService> broker2(new MockBrokerService(61021));
@@ -1527,7 +1476,7 @@ void FailoverTransportTest::testFailoverWithRandomizeBothOfflineBroker2ComesOnli
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testConnectedToPriorityOnFirstTryThenFailover() {
+TEST_F(FailoverTransportTest, testConnectedToPriorityOnFirstTryThenFailover) {
 
     Pointer<MockBrokerService> broker1(new MockBrokerService(61022));
     Pointer<MockBrokerService> broker2(new MockBrokerService(61023));
@@ -1584,7 +1533,7 @@ void FailoverTransportTest::testConnectedToPriorityOnFirstTryThenFailover() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testConnectsToPriorityOnceStarted() {
+TEST_F(FailoverTransportTest, testConnectsToPriorityOnceStarted) {
 
     Pointer<MockBrokerService> broker1(new MockBrokerService(61024));
     Pointer<MockBrokerService> broker2(new MockBrokerService(61025));
@@ -1592,8 +1541,8 @@ void FailoverTransportTest::testConnectsToPriorityOnceStarted() {
     broker2->start();
     broker2->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61024?transport.useInactivityMonitor=false,"
-                                  "tcp://localhost:61025?transport.useInactivityMonitor=false)?randomize=false&priorityBackup=true";
+    std::string uri = "failover://(tcp://127.0.0.1:61024?transport.useInactivityMonitor=false,"
+                                  "tcp://127.0.0.1:61025?transport.useInactivityMonitor=false)?randomize=false&priorityBackup=true";
 
     PriorityBackupListener listener;
     FailoverTransportFactory factory;
@@ -1639,7 +1588,7 @@ void FailoverTransportTest::testConnectsToPriorityOnceStarted() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testConnectsToPriorityAfterInitialBackupFails() {
+TEST_F(FailoverTransportTest, testConnectsToPriorityAfterInitialBackupFails) {
 
     Pointer<MockBrokerService> broker1(new MockBrokerService(61026));
     Pointer<MockBrokerService> broker2(new MockBrokerService(61027));
@@ -1714,7 +1663,7 @@ void FailoverTransportTest::testConnectsToPriorityAfterInitialBackupFails() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testPriorityBackupRapidSwitchingOnRestore() {
+TEST_F(FailoverTransportTest, testPriorityBackupRapidSwitchingOnRestore) {
 
     Pointer<MockBrokerService> broker1(new MockBrokerService(61029));
     Pointer<MockBrokerService> broker2(new MockBrokerService(61030));
@@ -1781,7 +1730,7 @@ void FailoverTransportTest::testPriorityBackupRapidSwitchingOnRestore() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testSimpleBrokerRestart() {
+TEST_F(FailoverTransportTest, testSimpleBrokerRestart) {
 
     Pointer<MockBrokerService> broker1(new MockBrokerService(61031));
     Pointer<MockBrokerService> broker2(new MockBrokerService(61032));
@@ -1918,7 +1867,7 @@ void FailoverTransportTest::testSimpleBrokerRestart() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testBrokerRestartWithProperSync() {
+TEST_F(FailoverTransportTest, testBrokerRestartWithProperSync) {
 
     Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
     Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
@@ -2002,7 +1951,7 @@ void FailoverTransportTest::testBrokerRestartWithProperSync() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::testFuzzyBrokerAvailability() {
+TEST_F(FailoverTransportTest, testFuzzyBrokerAvailability) {
 
     Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
     Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
@@ -2153,38 +2102,3 @@ void FailoverTransportTest::testFuzzyBrokerAvailability() {
     broker2->stop();
     broker2->waitUntilStopped();
 }
-
-TEST_F(FailoverTransportTest, testTransportCreate) { testTransportCreate(); }
-TEST_F(FailoverTransportTest, testTransportCreateWithBackups) { testTransportCreateWithBackups(); }
-TEST_F(FailoverTransportTest, testTransportCreateFailOnCreate) { testTransportCreateFailOnCreate(); }
-TEST_F(FailoverTransportTest, testTransportCreateFailOnCreateSendMessage) { testTransportCreateFailOnCreateSendMessage(); }
-TEST_F(FailoverTransportTest, testFailingBackupCreation) { testFailingBackupCreation(); }
-TEST_F(FailoverTransportTest, testSendOnewayMessage) { testSendOnewayMessage(); }
-TEST_F(FailoverTransportTest, testSendRequestMessage) { testSendRequestMessage(); }
-TEST_F(FailoverTransportTest, testSendOnewayMessageFail) { testSendOnewayMessageFail(); }
-TEST_F(FailoverTransportTest, testSendRequestMessageFail) { testSendRequestMessageFail(); }
-TEST_F(FailoverTransportTest, testWithOpewireCommands) { testWithOpewireCommands(); }
-TEST_F(FailoverTransportTest, testTransportHandlesConnectionControl) { testTransportHandlesConnectionControl(); }
-TEST_F(FailoverTransportTest, testPriorityBackupConfig) { testPriorityBackupConfig(); }
-TEST_F(FailoverTransportTest, testUriOptionsApplied) { testUriOptionsApplied(); }
-TEST_F(FailoverTransportTest, testConnectedToMockBroker) { testConnectedToMockBroker(); }
-TEST_F(FailoverTransportTest, testMaxReconnectsZeroAttemptsOneConnect) { testMaxReconnectsZeroAttemptsOneConnect(); }
-TEST_F(FailoverTransportTest, testMaxReconnectsHonorsConfiguration) { testMaxReconnectsHonorsConfiguration(); }
-TEST_F(FailoverTransportTest, testStartupMaxReconnectsHonorsConfiguration) { testStartupMaxReconnectsHonorsConfiguration(); }
-TEST_F(FailoverTransportTest, testConnectedToPriorityOnFirstTryThenFailover) { testConnectedToPriorityOnFirstTryThenFailover(); }
-TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOnline) { testFailoverNoRandomizeBothOnline(); }
-TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker1OnlyOnline) { testFailoverNoRandomizeBroker1OnlyOnline(); }
-TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker2OnlyOnline) { testFailoverNoRandomizeBroker2OnlyOnline(); }
-TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOfflineBroker1ComesOnline) { testFailoverNoRandomizeBothOfflineBroker1ComesOnline(); }
-TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOfflineBroker2ComesOnline) { testFailoverNoRandomizeBothOfflineBroker2ComesOnline(); }
-TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOnline) { testFailoverWithRandomizeBothOnline(); }
-TEST_F(FailoverTransportTest, testFailoverWithRandomizeBroker1OnlyOnline) { testFailoverWithRandomizeBroker1OnlyOnline(); }
-TEST_F(FailoverTransportTest, testFailoverWithRandomizeBroker2OnlyOnline) { testFailoverWithRandomizeBroker2OnlyOnline(); }
-TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOfflineBroker1ComesOnline) { testFailoverWithRandomizeBothOfflineBroker1ComesOnline(); }
-TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOfflineBroker2ComesOnline) { testFailoverWithRandomizeBothOfflineBroker2ComesOnline(); }
-TEST_F(FailoverTransportTest, testConnectsToPriorityOnceStarted) { testConnectsToPriorityOnceStarted(); }
-TEST_F(FailoverTransportTest, testPriorityBackupRapidSwitchingOnRestore) { testPriorityBackupRapidSwitchingOnRestore(); }
-TEST_F(FailoverTransportTest, testSimpleBrokerRestart) { testSimpleBrokerRestart(); }
-TEST_F(FailoverTransportTest, testBrokerRestartWithProperSync) { testBrokerRestartWithProperSync(); }
-TEST_F(FailoverTransportTest, testFuzzyBrokerAvailability) { testFuzzyBrokerAvailability(); }
-TEST_F(FailoverTransportTest, testConnectsToPriorityAfterInitialBackupFails) { testConnectsToPriorityAfterInitialBackupFails(); }

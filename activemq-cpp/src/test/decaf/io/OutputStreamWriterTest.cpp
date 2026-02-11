@@ -30,7 +30,7 @@ using namespace decaf::io;
 using namespace decaf::lang::exceptions;
 
     class OutputStreamWriterTest : public ::testing::Test {
-private:
+protected:
 
         OutputStreamWriter* writer1;
 
@@ -41,11 +41,6 @@ private:
         static const int BUFFER_SIZE;
         static const std::string TEST_STRING;
 
-    private:
-
-        OutputStreamWriterTest(const OutputStreamWriterTest&);
-        OutputStreamWriterTest& operator= (const OutputStreamWriterTest&);
-
     public:
 
         OutputStreamWriterTest();
@@ -55,20 +50,11 @@ private:
         void SetUp() override;
         void TearDown() override;
 
-        void testClose();
-        void testFlush();
-        void testWriteCharArrayIntIntInt();
-        void testWriteChar();
-        void testWriteStringIntInt();
-        void testOutputStreamWriterOutputStream();
-        void testWriteString();
-
-    private:
+    protected:
 
         void openInputStream();
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const int OutputStreamWriterTest::BUFFER_SIZE = 10000;
@@ -104,7 +90,7 @@ void OutputStreamWriterTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStreamWriterTest::testClose() {
+TEST_F(OutputStreamWriterTest, testClose) {
 
     this->writer1->flush();
     this->writer1->close();
@@ -113,7 +99,7 @@ void OutputStreamWriterTest::testClose() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStreamWriterTest::testFlush() {
+TEST_F(OutputStreamWriterTest, testFlush) {
 
     this->writer1->write( TEST_STRING );
     this->writer1->flush();
@@ -123,7 +109,7 @@ void OutputStreamWriterTest::testFlush() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStreamWriterTest::testWriteCharArrayIntIntInt() {
+TEST_F(OutputStreamWriterTest, testWriteCharArrayIntIntInt) {
 
     ASSERT_THROW(this->writer1->write( NULL, 0, 1, 1 ), NullPointerException) << ("Should throw an NullPointerException");
 
@@ -144,7 +130,7 @@ void OutputStreamWriterTest::testWriteCharArrayIntIntInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStreamWriterTest::testWriteChar() {
+TEST_F(OutputStreamWriterTest, testWriteChar) {
 
     this->writer1->write( 'a' );
     this->writer1->flush();
@@ -165,7 +151,7 @@ void OutputStreamWriterTest::testWriteChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStreamWriterTest::testWriteStringIntInt() {
+TEST_F(OutputStreamWriterTest, testWriteStringIntInt) {
 
     ASSERT_THROW(this->writer1->write( string( "" ), 0, 1 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 
@@ -186,7 +172,7 @@ void OutputStreamWriterTest::testWriteStringIntInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStreamWriterTest::testOutputStreamWriterOutputStream() {
+TEST_F(OutputStreamWriterTest, testOutputStreamWriterOutputStream) {
 
     ASSERT_THROW(OutputStreamWriter( NULL ), NullPointerException) << ("Should throw an NullPointerException");
 
@@ -196,7 +182,7 @@ void OutputStreamWriterTest::testOutputStreamWriterOutputStream() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStreamWriterTest::testWriteString() {
+TEST_F(OutputStreamWriterTest, testWriteString) {
 
     this->writer1->write( "abc" );
     this->writer1->flush();
@@ -218,11 +204,3 @@ void OutputStreamWriterTest::openInputStream() {
     this->reader = new InputStreamReader(
         new ByteArrayInputStream( array.first, array.second, true ), true );
 }
-
-TEST_F(OutputStreamWriterTest, testClose) { testClose(); }
-TEST_F(OutputStreamWriterTest, testFlush) { testFlush(); }
-TEST_F(OutputStreamWriterTest, testWriteCharArrayIntIntInt) { testWriteCharArrayIntIntInt(); }
-TEST_F(OutputStreamWriterTest, testWriteChar) { testWriteChar(); }
-TEST_F(OutputStreamWriterTest, testWriteStringIntInt) { testWriteStringIntInt(); }
-TEST_F(OutputStreamWriterTest, testOutputStreamWriterOutputStream) { testOutputStreamWriterOutputStream(); }
-TEST_F(OutputStreamWriterTest, testWriteString) { testWriteString(); }

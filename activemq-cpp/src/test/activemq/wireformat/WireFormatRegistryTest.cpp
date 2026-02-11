@@ -28,19 +28,10 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class WireFormatRegistryTest : public ::testing::Test {
-public:
-
-        WireFormatRegistryTest() {}
-        virtual ~WireFormatRegistryTest() {}
-
-        void test();
-
-    };
-
+class WireFormatRegistryTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void WireFormatRegistryTest::test() {
+TEST_F(WireFormatRegistryTest, test) {
 
     wireformat::openwire::OpenWireFormatFactory factory;
 
@@ -57,5 +48,3 @@ void WireFormatRegistryTest::test() {
     ASSERT_THROW(registry.registerFactory( "", &factory ), IllegalArgumentException) << ("Should have thrown an IllegalArgumentException");
 
 }
-
-TEST_F(WireFormatRegistryTest, test) { test(); }

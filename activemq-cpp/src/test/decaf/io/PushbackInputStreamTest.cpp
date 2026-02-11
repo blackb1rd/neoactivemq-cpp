@@ -27,7 +27,7 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class PushbackInputStreamTest : public ::testing::Test {
-private:
+protected:
 
         static std::string testString;
 
@@ -36,22 +36,7 @@ private:
         PushbackInputStreamTest();
         virtual ~PushbackInputStreamTest();
 
-        void testReset();
-        void testMark();
-        void testMarkSupported();
-        void testAvailable();
-        void testConstructor1();
-        void testConstructor2();
-        void testConstructor3();
-        void testRead();
-        void testReadBIII();
-        void testSkip();
-        void testUnreadBI();
-        void testUnreadBIII();
-        void testUnread();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 std::string PushbackInputStreamTest::testString =
@@ -100,7 +85,7 @@ PushbackInputStreamTest::~PushbackInputStreamTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PushbackInputStreamTest::testReset() {
+TEST_F(PushbackInputStreamTest, testReset) {
 
     std::vector<unsigned char> temp( testString.begin(), testString.end() );
     ByteArrayInputStream bais( temp );
@@ -110,7 +95,7 @@ void PushbackInputStreamTest::testReset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PushbackInputStreamTest::testMark() {
+TEST_F(PushbackInputStreamTest, testMark) {
 
     std::vector<unsigned char> temp( 1 );
     ByteArrayInputStream bais( temp );
@@ -122,7 +107,7 @@ void PushbackInputStreamTest::testMark() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PushbackInputStreamTest::testConstructor1() {
+TEST_F(PushbackInputStreamTest, testConstructor1) {
 
     {
         PushbackInputStream str( NULL );
@@ -140,7 +125,7 @@ void PushbackInputStreamTest::testConstructor1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PushbackInputStreamTest::testConstructor2() {
+TEST_F(PushbackInputStreamTest, testConstructor2) {
 
     std::vector<unsigned char> temp( testString.begin(), testString.end() );
     ByteArrayInputStream bais( temp );
@@ -152,14 +137,14 @@ void PushbackInputStreamTest::testConstructor2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PushbackInputStreamTest::testConstructor3() {
+TEST_F(PushbackInputStreamTest, testConstructor3) {
 
     PushbackInputStream pb( NULL, 1 );
     ASSERT_THROW(pb.read(), IOException) << ("Should Throw an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PushbackInputStreamTest::testAvailable() {
+TEST_F(PushbackInputStreamTest, testAvailable) {
     try {
         std::vector<unsigned char> temp( testString.begin(), testString.end() );
         ByteArrayInputStream bais( temp );
@@ -172,7 +157,7 @@ void PushbackInputStreamTest::testAvailable() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PushbackInputStreamTest::testMarkSupported() {
+TEST_F(PushbackInputStreamTest, testMarkSupported) {
 
     std::vector<unsigned char> temp( testString.begin(), testString.end() );
     ByteArrayInputStream bais( temp );
@@ -181,7 +166,7 @@ void PushbackInputStreamTest::testMarkSupported() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PushbackInputStreamTest::testRead() {
+TEST_F(PushbackInputStreamTest, testRead) {
     try {
         std::vector<unsigned char> temp( testString.begin(), testString.end() );
         ByteArrayInputStream bais( temp );
@@ -194,7 +179,7 @@ void PushbackInputStreamTest::testRead() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PushbackInputStreamTest::testReadBIII() {
+TEST_F(PushbackInputStreamTest, testReadBIII) {
 
     try {
         std::vector<unsigned char> temp( testString.begin(), testString.end() );
@@ -211,7 +196,7 @@ void PushbackInputStreamTest::testReadBIII() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PushbackInputStreamTest::testSkip() {
+TEST_F(PushbackInputStreamTest, testSkip) {
 
     std::vector<unsigned char> temp( testString.begin(), testString.end() );
     ByteArrayInputStream bais( temp );
@@ -230,7 +215,7 @@ void PushbackInputStreamTest::testSkip() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PushbackInputStreamTest::testUnreadBI() {
+TEST_F(PushbackInputStreamTest, testUnreadBI) {
     try {
 
         std::vector<unsigned char> temp( testString.begin(), testString.end() );
@@ -249,7 +234,7 @@ void PushbackInputStreamTest::testUnreadBI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PushbackInputStreamTest::testUnreadBIII() {
+TEST_F(PushbackInputStreamTest, testUnreadBIII) {
 
     std::vector<unsigned char> temp( testString.begin(), testString.end() );
     ByteArrayInputStream bais( temp );
@@ -275,7 +260,7 @@ void PushbackInputStreamTest::testUnreadBIII() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PushbackInputStreamTest::testUnread() {
+TEST_F(PushbackInputStreamTest, testUnread) {
 
     std::vector<unsigned char> temp( testString.begin(), testString.end() );
     ByteArrayInputStream bais( temp );
@@ -294,17 +279,3 @@ void PushbackInputStreamTest::testUnread() {
         FAIL() << (std::string() + "IOException during read test : " + e.getMessage());
     }
 }
-
-TEST_F(PushbackInputStreamTest, testReset) { testReset(); }
-TEST_F(PushbackInputStreamTest, testMark) { testMark(); }
-TEST_F(PushbackInputStreamTest, testMarkSupported) { testMarkSupported(); }
-TEST_F(PushbackInputStreamTest, testAvailable) { testAvailable(); }
-TEST_F(PushbackInputStreamTest, testConstructor1) { testConstructor1(); }
-TEST_F(PushbackInputStreamTest, testConstructor2) { testConstructor2(); }
-TEST_F(PushbackInputStreamTest, testConstructor3) { testConstructor3(); }
-TEST_F(PushbackInputStreamTest, testRead) { testRead(); }
-TEST_F(PushbackInputStreamTest, testReadBIII) { testReadBIII(); }
-TEST_F(PushbackInputStreamTest, testSkip) { testSkip(); }
-TEST_F(PushbackInputStreamTest, testUnreadBI) { testUnreadBI(); }
-TEST_F(PushbackInputStreamTest, testUnreadBIII) { testUnreadBIII(); }
-TEST_F(PushbackInputStreamTest, testUnread) { testUnread(); }

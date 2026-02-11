@@ -30,22 +30,14 @@ using namespace decaf::internal::net;
 public:
 
         URIEncoderDecoderTest();
-        virtual ~URIEncoderDecoderTest() {}
-
-        void testValidate();
-        void testValidateSimple();
-        void testQuoteIllegal();
-        void testEncodeOthers();
-        void testDecode();
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 URIEncoderDecoderTest::URIEncoderDecoderTest() {}
 
 ////////////////////////////////////////////////////////////////////////////////
-void URIEncoderDecoderTest::testValidate() {
+TEST_F(URIEncoderDecoderTest, testValidate) {
 
     string str1 = "ABCDefghIjKlMNOpqrsTuVwXyZ:1234567890:&^";
     string str2 = "ABCDefghIjKlMNOpqrsTuVwXyZ1234567890";
@@ -60,7 +52,7 @@ void URIEncoderDecoderTest::testValidate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URIEncoderDecoderTest::testValidateSimple() {
+TEST_F(URIEncoderDecoderTest, testValidateSimple) {
 
     string str1 = "ABCDefghIjKlMNOpqrsTuVwXyZ:1234567890:&^";
     string str2 = "ABCDefghIjKlMNOpqrsTuVwXyZ1234567890";
@@ -75,7 +67,7 @@ void URIEncoderDecoderTest::testValidateSimple() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URIEncoderDecoderTest::testQuoteIllegal() {
+TEST_F(URIEncoderDecoderTest, testQuoteIllegal) {
 
     std::string pound1 = "#";  // %23
     std::string pound2 = "##"; // %23%23
@@ -92,7 +84,7 @@ void URIEncoderDecoderTest::testQuoteIllegal() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URIEncoderDecoderTest::testEncodeOthers() {
+TEST_F(URIEncoderDecoderTest, testEncodeOthers) {
 
     string test1;
     string test2;
@@ -107,15 +99,9 @@ void URIEncoderDecoderTest::testEncodeOthers() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URIEncoderDecoderTest::testDecode() {
+TEST_F(URIEncoderDecoderTest, testDecode) {
 
     string test = "A%20B%20C %24%25";
 
     ASSERT_TRUE(URIEncoderDecoder::decode(test) == "A B C $%") << ("1. Result not equal to: 'A B C $%");
 }
-
-TEST_F(URIEncoderDecoderTest, testValidate) { testValidate(); }
-TEST_F(URIEncoderDecoderTest, testValidateSimple) { testValidateSimple(); }
-TEST_F(URIEncoderDecoderTest, testQuoteIllegal) { testQuoteIllegal(); }
-TEST_F(URIEncoderDecoderTest, testEncodeOthers) { testEncodeOthers(); }
-TEST_F(URIEncoderDecoderTest, testDecode) { testDecode(); }

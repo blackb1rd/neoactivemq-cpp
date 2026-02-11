@@ -55,34 +55,7 @@ using namespace activemq::transport::tcp;
      * - On failure, connection dies permanently
      * - App must handle reconnection by creating new transport
      */
-    class SingleBrokerReconnectTest : public ::testing::Test {
-public:
-
-        SingleBrokerReconnectTest();
-        virtual ~SingleBrokerReconnectTest();
-
-        void SetUp() override;
-        void TearDown() override;
-
-        /**
-         * Test that single broker tcp:// connection does NOT auto-reconnect.
-         * When broker goes down, transport fails and stays failed.
-         */
-        void testSingleBrokerNoAutoReconnect();
-
-        /**
-         * Test app-level reconnection: create new transport after broker restarts.
-         * This is the expected usage pattern for non-failover connections.
-         */
-        void testAppLevelReconnectAfterBrokerRestart();
-
-        /**
-         * Fuzzy test with random broker up/down cycles.
-         * Tests app-level reconnection under stress conditions.
-         */
-        void testFuzzyBrokerUpDown();
-
-    };
+    class SingleBrokerReconnectTest : public ::testing::Test {};
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,23 +95,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SingleBrokerReconnectTest::SingleBrokerReconnectTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-SingleBrokerReconnectTest::~SingleBrokerReconnectTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void SingleBrokerReconnectTest::SetUp() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void SingleBrokerReconnectTest::TearDown() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void SingleBrokerReconnectTest::testSingleBrokerNoAutoReconnect() {
+TEST_F(SingleBrokerReconnectTest, testSingleBrokerNoAutoReconnect) {
 
     // Start a mock broker
     Pointer<MockBrokerService> broker(new MockBrokerService(61100));
@@ -199,7 +156,7 @@ void SingleBrokerReconnectTest::testSingleBrokerNoAutoReconnect() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SingleBrokerReconnectTest::testAppLevelReconnectAfterBrokerRestart() {
+TEST_F(SingleBrokerReconnectTest, testAppLevelReconnectAfterBrokerRestart) {
 
     // Start a mock broker
     Pointer<MockBrokerService> broker(new MockBrokerService(61101));
@@ -251,7 +208,7 @@ void SingleBrokerReconnectTest::testAppLevelReconnectAfterBrokerRestart() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SingleBrokerReconnectTest::testFuzzyBrokerUpDown() {
+TEST_F(SingleBrokerReconnectTest, testFuzzyBrokerUpDown) {
 
     const int NUM_CYCLES = 10;
 
@@ -360,7 +317,3 @@ void SingleBrokerReconnectTest::testFuzzyBrokerUpDown() {
     // At least some app-level reconnects should succeed
     ASSERT_TRUE(successfulReconnects > 0) << ("Should have at least some successful app-level reconnects");
 }
-
-TEST_F(SingleBrokerReconnectTest, testSingleBrokerNoAutoReconnect) { testSingleBrokerNoAutoReconnect(); }
-TEST_F(SingleBrokerReconnectTest, testAppLevelReconnectAfterBrokerRestart) { testAppLevelReconnectAfterBrokerRestart(); }
-TEST_F(SingleBrokerReconnectTest, testFuzzyBrokerUpDown) { testFuzzyBrokerUpDown(); }

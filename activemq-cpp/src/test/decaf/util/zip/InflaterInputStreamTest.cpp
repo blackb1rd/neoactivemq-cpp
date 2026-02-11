@@ -43,7 +43,7 @@ using namespace decaf::util;
 using namespace decaf::util::zip;
 
     class InflaterInputStreamTest : public ::testing::Test {
-private:
+protected:
 
         static const std::string testString;
 
@@ -57,25 +57,9 @@ private:
 
         void SetUp() override;
 
-        void testConstructorInputStreamInflater();
-        void testConstructorInputStreamInflaterI();
-        void testMark();
-        void testMarkSupported();
-        void testRead();
-        void testAvailableNonEmptySource();
-        void testAvailableSkip();
-        void testAvailableEmptySource();
-        void testReadBIII();
-        void testReadBIII2();
-        void testReadBIII3();
-        void testReset();
-        void testClose();
         void testAvailable();
-        void testSkip();
-        void testSkip2();
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const std::string InflaterInputStreamTest::testString =
@@ -173,7 +157,7 @@ void InflaterInputStreamTest::SetUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::testConstructorInputStreamInflater() {
+TEST_F(InflaterInputStreamTest, testConstructorInputStreamInflater) {
 
     unsigned char byteArray[100];
     ByteArrayInputStream bais( deflatedData );
@@ -186,7 +170,7 @@ void InflaterInputStreamTest::testConstructorInputStreamInflater() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::testConstructorInputStreamInflaterI() {
+TEST_F(InflaterInputStreamTest, testConstructorInputStreamInflaterI) {
 
     int result = 0;
 
@@ -204,7 +188,7 @@ void InflaterInputStreamTest::testConstructorInputStreamInflaterI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::testMark() {
+TEST_F(InflaterInputStreamTest, testMark) {
 
     ByteArrayInputStream bais( deflatedData );
     InflaterInputStream iis( &bais );
@@ -215,7 +199,7 @@ void InflaterInputStreamTest::testMark() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::testMarkSupported() {
+TEST_F(InflaterInputStreamTest, testMarkSupported) {
 
     ByteArrayInputStream bais( deflatedData );
     InflaterInputStream iis( &bais );
@@ -225,7 +209,7 @@ void InflaterInputStreamTest::testMarkSupported() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::testRead() {
+TEST_F(InflaterInputStreamTest, testRead) {
 
     int result = 0;
     ByteArrayInputStream bais( deflatedData );
@@ -242,7 +226,7 @@ void InflaterInputStreamTest::testRead() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::testAvailableNonEmptySource() {
+TEST_F(InflaterInputStreamTest, testAvailableNonEmptySource) {
 
     // this unsigned char[] is a deflation of these bytes: { 1, 3, 4, 6 }
     unsigned char deflated[] = {72, (unsigned char) -119, 99, 100, 102, 97, 3, 0, 0, 31, 0, 15, 0};
@@ -265,7 +249,7 @@ void InflaterInputStreamTest::testAvailableNonEmptySource() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::testAvailableSkip() {
+TEST_F(InflaterInputStreamTest, testAvailableSkip) {
 
     // this unsigned char[] is a deflation of these bytes: { 1, 3, 4, 6 }
     unsigned char deflated[] = { 72, (unsigned char) -119, 99, 100, 102, 97, 3, 0, 0, 31, 0, 15, 0 };
@@ -278,7 +262,7 @@ void InflaterInputStreamTest::testAvailableSkip() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::testAvailableEmptySource() {
+TEST_F(InflaterInputStreamTest, testAvailableEmptySource) {
 
     // this unsigned char[] is a deflation of the empty file
     unsigned char deflated[] = { 120, (unsigned char) -100, 3, 0, 0, 0, 0, 1 };
@@ -291,7 +275,7 @@ void InflaterInputStreamTest::testAvailableEmptySource() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::testReadBIII() {
+TEST_F(InflaterInputStreamTest, testReadBIII) {
 
     unsigned char test[507];
     for( int i = 0; i < 256; i++ ) {
@@ -322,7 +306,7 @@ void InflaterInputStreamTest::testReadBIII() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::testReadBIII2() {
+TEST_F(InflaterInputStreamTest, testReadBIII2) {
 
     ByteArrayInputStream bais( deflatedData );
     InflaterInputStream iis( &bais );
@@ -333,7 +317,7 @@ void InflaterInputStreamTest::testReadBIII2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::testReadBIII3() {
+TEST_F(InflaterInputStreamTest, testReadBIII3) {
 
     unsigned char byteArray[] = { 45, 6, 1, 0, 12, 56, 125 };
     ByteArrayInputStream bais( byteArray, 7 );
@@ -344,7 +328,7 @@ void InflaterInputStreamTest::testReadBIII3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::testReset() {
+TEST_F(InflaterInputStreamTest, testReset) {
 
     ByteArrayInputStream bais( deflatedData );
     InflaterInputStream iis( &bais );
@@ -353,7 +337,7 @@ void InflaterInputStreamTest::testReset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::testSkip() {
+TEST_F(InflaterInputStreamTest, testSkip) {
 
     ByteArrayInputStream bais( this->deflatedData );
     InflaterInputStream iis( &bais );
@@ -378,7 +362,7 @@ void InflaterInputStreamTest::testSkip() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::testSkip2() {
+TEST_F(InflaterInputStreamTest, testSkip2) {
 
     std::vector<unsigned char> buffer( testString.length() );
 
@@ -434,7 +418,7 @@ void InflaterInputStreamTest::testAvailable() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterInputStreamTest::testClose() {
+TEST_F(InflaterInputStreamTest, testClose) {
 
     ByteArrayInputStream bais( deflatedData );
     InflaterInputStream iin( &bais );
@@ -442,19 +426,3 @@ void InflaterInputStreamTest::testClose() {
     // test for exception
     iin.close();
 }
-
-TEST_F(InflaterInputStreamTest, testConstructorInputStreamInflater) { testConstructorInputStreamInflater(); }
-TEST_F(InflaterInputStreamTest, testConstructorInputStreamInflaterI) { testConstructorInputStreamInflaterI(); }
-TEST_F(InflaterInputStreamTest, testMark) { testMark(); }
-TEST_F(InflaterInputStreamTest, testMarkSupported) { testMarkSupported(); }
-TEST_F(InflaterInputStreamTest, testRead) { testRead(); }
-TEST_F(InflaterInputStreamTest, testAvailableNonEmptySource) { testAvailableNonEmptySource(); }
-TEST_F(InflaterInputStreamTest, testAvailableSkip) { testAvailableSkip(); }
-TEST_F(InflaterInputStreamTest, testAvailableEmptySource) { testAvailableEmptySource(); }
-TEST_F(InflaterInputStreamTest, testReadBIII) { testReadBIII(); }
-TEST_F(InflaterInputStreamTest, testReadBIII2) { testReadBIII2(); }
-TEST_F(InflaterInputStreamTest, testReadBIII3) { testReadBIII3(); }
-TEST_F(InflaterInputStreamTest, testReset) { testReset(); }
-TEST_F(InflaterInputStreamTest, testClose) { testClose(); }
-TEST_F(InflaterInputStreamTest, testSkip) { testSkip(); }
-TEST_F(InflaterInputStreamTest, testSkip2) { testSkip2(); }

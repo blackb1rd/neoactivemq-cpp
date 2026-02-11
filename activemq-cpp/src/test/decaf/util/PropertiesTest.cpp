@@ -28,7 +28,7 @@ using namespace decaf::util;
 using namespace decaf::io;
 
     class PropertiesTest : public ::testing::Test {
-private:
+protected:
 
         Properties testProperties;
 
@@ -36,27 +36,10 @@ private:
 
         PropertiesTest() : testProperties() {}
 
-        virtual ~PropertiesTest() {}
-
         void SetUp() override;
         void TearDown() override;
 
-        void testPutAndGet();
-        void testAssign();
-        void testCopy();
-        void testClone();
-        void testRemove();
-        void testClear();
-        void testEquals();
-        void testLoadNPE();
-        void testLoadInputStream();
-        void testPropertyNames();
-        void testPropertyNamesOverride();
-        void testPropertyNamesScenario1();
-        void testStoreOutputStream();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 void PropertiesTest::SetUp() {
@@ -70,7 +53,7 @@ void PropertiesTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PropertiesTest::testPutAndGet() {
+TEST_F(PropertiesTest, testPutAndGet) {
 
     Properties properties;
 
@@ -94,7 +77,7 @@ void PropertiesTest::testPutAndGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PropertiesTest::testAssign() {
+TEST_F(PropertiesTest, testAssign) {
 
     Properties properties1;
     Properties properties2;
@@ -120,7 +103,7 @@ void PropertiesTest::testAssign() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PropertiesTest::testCopy() {
+TEST_F(PropertiesTest, testCopy) {
 
     Properties properties1;
     Properties properties2;
@@ -146,7 +129,7 @@ void PropertiesTest::testCopy() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PropertiesTest::testClone() {
+TEST_F(PropertiesTest, testClone) {
 
     Properties properties1;
     std::unique_ptr<Properties> properties2;
@@ -167,7 +150,7 @@ void PropertiesTest::testClone() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PropertiesTest::testRemove() {
+TEST_F(PropertiesTest, testRemove) {
 
     Properties properties1;
 
@@ -188,7 +171,7 @@ void PropertiesTest::testRemove() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PropertiesTest::testClear() {
+TEST_F(PropertiesTest, testClear) {
 
     Properties properties1;
 
@@ -207,7 +190,7 @@ void PropertiesTest::testClear() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PropertiesTest::testEquals() {
+TEST_F(PropertiesTest, testEquals) {
 
     Properties properties1;
     Properties properties2;
@@ -235,7 +218,7 @@ void PropertiesTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PropertiesTest::testLoadNPE() {
+TEST_F(PropertiesTest, testLoadNPE) {
 
     Properties properties;
     decaf::io::InputStream* nullStream = NULL;
@@ -247,7 +230,7 @@ void PropertiesTest::testLoadNPE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PropertiesTest::testLoadInputStream() {
+TEST_F(PropertiesTest, testLoadInputStream) {
 
     {
         Properties properties;
@@ -284,7 +267,7 @@ void PropertiesTest::testLoadInputStream() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PropertiesTest::testPropertyNames() {
+TEST_F(PropertiesTest, testPropertyNames) {
 
     Properties myProps( this->testProperties );
 
@@ -300,7 +283,7 @@ void PropertiesTest::testPropertyNames() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PropertiesTest::testPropertyNamesOverride() {
+TEST_F(PropertiesTest, testPropertyNamesOverride) {
 
     Properties props( this->testProperties );
     props.setProperty( "test.prop", "anotherValue" );
@@ -313,7 +296,7 @@ void PropertiesTest::testPropertyNamesOverride() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PropertiesTest::testPropertyNamesScenario1() {
+TEST_F(PropertiesTest, testPropertyNamesScenario1) {
 
     string keys[] = { "key1", "key2", "key3" };
     string values[] = { "value1", "value2", "value3" };
@@ -344,7 +327,7 @@ void PropertiesTest::testPropertyNamesScenario1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PropertiesTest::testStoreOutputStream() {
+TEST_F(PropertiesTest, testStoreOutputStream) {
 
     Properties myProps;
     Properties myProps2;
@@ -375,17 +358,3 @@ void PropertiesTest::testStoreOutputStream() {
         ASSERT_TRUE(string( myProps2.getProperty( *iterator ) ) == string( myProps.getProperty( *iterator ) ));
     }
 }
-
-TEST_F(PropertiesTest, testPutAndGet) { testPutAndGet(); }
-TEST_F(PropertiesTest, testAssign) { testAssign(); }
-TEST_F(PropertiesTest, testCopy) { testCopy(); }
-TEST_F(PropertiesTest, testClone) { testClone(); }
-TEST_F(PropertiesTest, testRemove) { testRemove(); }
-TEST_F(PropertiesTest, testClear) { testClear(); }
-TEST_F(PropertiesTest, testEquals) { testEquals(); }
-TEST_F(PropertiesTest, testLoadNPE) { testLoadNPE(); }
-TEST_F(PropertiesTest, testLoadInputStream) { testLoadInputStream(); }
-TEST_F(PropertiesTest, testPropertyNames) { testPropertyNames(); }
-TEST_F(PropertiesTest, testPropertyNamesOverride) { testPropertyNamesOverride(); }
-TEST_F(PropertiesTest, testPropertyNamesScenario1) { testPropertyNamesScenario1(); }
-TEST_F(PropertiesTest, testStoreOutputStream) { testStoreOutputStream(); }

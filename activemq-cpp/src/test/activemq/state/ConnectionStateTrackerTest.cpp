@@ -42,17 +42,7 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class ConnectionStateTrackerTest : public ::testing::Test {
-public:
-
-        ConnectionStateTrackerTest() {}
-        virtual ~ConnectionStateTrackerTest() {}
-
-        void test();
-        void testMessageCache();
-        void testMessagePullCache();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -213,7 +203,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionStateTrackerTest::test() {
+TEST_F(ConnectionStateTrackerTest, test) {
 
     ConnectionStateTracker tracker;
     ConnectionData conn = createConnectionState(tracker);
@@ -221,7 +211,7 @@ void ConnectionStateTrackerTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionStateTrackerTest::testMessageCache() {
+TEST_F(ConnectionStateTrackerTest, testMessageCache) {
 
     Pointer<TrackingTransport> transport(new TrackingTransport);
     ConnectionStateTracker tracker;
@@ -258,7 +248,7 @@ void ConnectionStateTrackerTest::testMessageCache() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionStateTrackerTest::testMessagePullCache() {
+TEST_F(ConnectionStateTrackerTest, testMessagePullCache) {
 
     Pointer<TrackingTransport> transport(new TrackingTransport);
     ConnectionStateTracker tracker;
@@ -279,7 +269,3 @@ void ConnectionStateTrackerTest::testMessagePullCache() {
 
     ASSERT_EQ(10, transport->messagePulls.size()) << ("Should only be three message pulls");
 }
-
-TEST_F(ConnectionStateTrackerTest, test) { test(); }
-TEST_F(ConnectionStateTrackerTest, testMessageCache) { testMessageCache(); }
-TEST_F(ConnectionStateTrackerTest, testMessagePullCache) { testMessagePullCache(); }

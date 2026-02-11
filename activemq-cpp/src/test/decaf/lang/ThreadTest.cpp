@@ -33,47 +33,7 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
-    class ThreadTest : public ::testing::Test {
-public:
-
-        virtual ~ThreadTest(){}
-
-        void SetUp() override{}
-        void TearDown() override{}
-
-        void testConstructor();
-        void testConstructor_1();
-        void testConstructor_2();
-        void testConstructor_3();
-        void testRun();
-        void testDelegate();
-        void testDerived();
-        void testJoin1();
-        void testJoin2();
-        void testJoin3();
-        void testJoin4();
-        void testSetPriority();
-        void testIsAlive();
-        void testGetId();
-        void testGetState();
-        void testSleep();
-        void testSleep2Arg();
-        void testUncaughtExceptionHandler();
-        void testCurrentThread();
-        void testInterrupt();
-        void testInterrupted();
-        void testIsInterrupted();
-        void testSetName();
-        void testInterruptSleep();
-        void testInterruptJoin();
-        void testInterruptWait();
-        void testRapidCreateAndDestroy();
-        void testConcurrentRapidCreateAndDestroy();
-        void testCreatedButNotStarted();
-
-    };
-
-
+    class ThreadTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace decaf{
@@ -374,7 +334,7 @@ namespace lang{
 }}
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testConstructor() {
+TEST_F(ThreadTest, testConstructor) {
 
     Thread ct;
     ct.start();
@@ -382,7 +342,7 @@ void ThreadTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testConstructor_1() {
+TEST_F(ThreadTest, testConstructor_1) {
 
     std::unique_ptr<Runnable> runnable( new SimpleThread( 10 ) );
     Thread ct( runnable.get() );
@@ -391,7 +351,7 @@ void ThreadTest::testConstructor_1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testConstructor_2() {
+TEST_F(ThreadTest, testConstructor_2) {
 
     std::unique_ptr<Runnable> runnable( new SimpleThread( 10 ) );
     Thread ct( runnable.get(), "SimpleThread_1" );
@@ -401,7 +361,7 @@ void ThreadTest::testConstructor_2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testConstructor_3() {
+TEST_F(ThreadTest, testConstructor_3) {
 
     Thread ct( "SimpleThread_1" );
     ASSERT_TRUE(ct.getName() == "SimpleThread_1");
@@ -410,7 +370,7 @@ void ThreadTest::testConstructor_3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testRun() {
+TEST_F(ThreadTest, testRun) {
 
     RunThread rt;
     Thread t(&rt);
@@ -431,7 +391,7 @@ void ThreadTest::testRun() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testDelegate(){
+TEST_F(ThreadTest, testDelegate){
 
     Delegate test;
     int initialValue = test.getStuff();
@@ -448,7 +408,7 @@ void ThreadTest::testDelegate(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testDerived() {
+TEST_F(ThreadTest, testDerived) {
 
     Derived test;
     int initialValue = test.getStuff();
@@ -464,7 +424,7 @@ void ThreadTest::testDerived() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testJoin1() {
+TEST_F(ThreadTest, testJoin1) {
 
     JoinTest test;
 
@@ -490,7 +450,7 @@ void ThreadTest::testJoin1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testJoin2() {
+TEST_F(ThreadTest, testJoin2) {
 
     JoinTest test;
 
@@ -516,7 +476,7 @@ void ThreadTest::testJoin2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testJoin3() {
+TEST_F(ThreadTest, testJoin3) {
 
     JoinTest test;
 
@@ -537,7 +497,7 @@ void ThreadTest::testJoin3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testJoin4() {
+TEST_F(ThreadTest, testJoin4) {
 
     // Start all the threads.
     const unsigned int numThreads = 200;
@@ -556,7 +516,7 @@ void ThreadTest::testJoin4() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testSetPriority() {
+TEST_F(ThreadTest, testSetPriority) {
 
     std::unique_ptr<Runnable> runnable( new SimpleThread( 10 ) );
     Thread ct( runnable.get() );
@@ -568,7 +528,7 @@ void ThreadTest::testSetPriority() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testIsAlive() {
+TEST_F(ThreadTest, testIsAlive) {
 
     std::unique_ptr<SimpleThread> runnable( new SimpleThread( 500 ) );
     Thread ct( runnable.get() );
@@ -595,13 +555,13 @@ void ThreadTest::testIsAlive() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testGetId() {
+TEST_F(ThreadTest, testGetId) {
     // Check that the thread ID is valid (not default-constructed)
     ASSERT_TRUE(Thread::currentThread()->getId() != std::thread::id());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testSleep() {
+TEST_F(ThreadTest, testSleep) {
 
     long long startTime = 0LL;
     long long endTime = 0LL;
@@ -620,7 +580,7 @@ void ThreadTest::testSleep() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testSleep2Arg() {
+TEST_F(ThreadTest, testSleep2Arg) {
 
     long long startTime = 0LL;
     long long endTime = 0LL;
@@ -641,7 +601,7 @@ void ThreadTest::testSleep2Arg() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testGetState() {
+TEST_F(ThreadTest, testGetState) {
     std::unique_ptr<SimpleThread> runnable( new SimpleThread( 1000 ) );
     Thread ct( runnable.get() );
 
@@ -669,7 +629,7 @@ void ThreadTest::testGetState() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testUncaughtExceptionHandler() {
+TEST_F(ThreadTest, testUncaughtExceptionHandler) {
 
     std::unique_ptr<BadRunnable> runnable( new BadRunnable() );
     Thread t1( runnable.get() );
@@ -692,7 +652,7 @@ void ThreadTest::testUncaughtExceptionHandler() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testCurrentThread() {
+TEST_F(ThreadTest, testCurrentThread) {
 
     ASSERT_TRUE(Thread::currentThread() != NULL);
     ASSERT_TRUE(Thread::currentThread()->getName() != "");
@@ -703,7 +663,7 @@ void ThreadTest::testCurrentThread() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testInterrupt() {
+TEST_F(ThreadTest, testInterrupt) {
 
     bool interrupted = false;
     try {
@@ -740,7 +700,7 @@ void ThreadTest::testInterrupt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testInterrupted() {
+TEST_F(ThreadTest, testInterrupted) {
 
     ASSERT_TRUE(!Thread::interrupted()) << ("Interrupted returned true for non-interrupted thread");
     Thread::currentThread()->interrupt();
@@ -749,7 +709,7 @@ void ThreadTest::testInterrupted() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testIsInterrupted() {
+TEST_F(ThreadTest, testIsInterrupted) {
 
     SpinThread spin;
     Thread spinner(&spin);
@@ -770,7 +730,7 @@ void ThreadTest::testIsInterrupted() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testSetName() {
+TEST_F(ThreadTest, testSetName) {
 
     JoinTest st;
     st.setName("Bogus Name");
@@ -781,7 +741,7 @@ void ThreadTest::testSetName() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testInterruptSleep() {
+TEST_F(ThreadTest, testInterruptSleep) {
 
     std::unique_ptr<InterruptibleSleeper> runnable(new InterruptibleSleeper());
     Thread ct( runnable.get() );
@@ -810,7 +770,7 @@ void ThreadTest::testInterruptSleep() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testInterruptJoin() {
+TEST_F(ThreadTest, testInterruptJoin) {
 
     std::unique_ptr<InterruptibleJoiner> runnable(new InterruptibleJoiner(Thread::currentThread()));
     Thread ct( runnable.get() );
@@ -839,7 +799,7 @@ void ThreadTest::testInterruptJoin() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testInterruptWait() {
+TEST_F(ThreadTest, testInterruptWait) {
 
     std::unique_ptr<InterruptibleWaiter> runnable(new InterruptibleWaiter());
     Thread ct( runnable.get() );
@@ -868,7 +828,7 @@ void ThreadTest::testInterruptWait() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testRapidCreateAndDestroy() {
+TEST_F(ThreadTest, testRapidCreateAndDestroy) {
 
     for (int i = 0; i < 200; i++) {
         JoinTest* st = new JoinTest;
@@ -908,7 +868,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testConcurrentRapidCreateAndDestroy() {
+TEST_F(ThreadTest, testConcurrentRapidCreateAndDestroy) {
 
     ArrayList<Thread*> threads;
     const int NUM_THREADS = 32;
@@ -936,7 +896,7 @@ void ThreadTest::testConcurrentRapidCreateAndDestroy() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadTest::testCreatedButNotStarted() {
+TEST_F(ThreadTest, testCreatedButNotStarted) {
 
     RunThread runnable;
 
@@ -954,33 +914,3 @@ void ThreadTest::testCreatedButNotStarted() {
 
     threads.clear();
 }
-
-TEST_F(ThreadTest, testConstructor) { testConstructor(); }
-TEST_F(ThreadTest, testConstructor_1) { testConstructor_1(); }
-TEST_F(ThreadTest, testConstructor_2) { testConstructor_2(); }
-TEST_F(ThreadTest, testConstructor_3) { testConstructor_3(); }
-TEST_F(ThreadTest, testRun) { testRun(); }
-TEST_F(ThreadTest, testDelegate) { testDelegate(); }
-TEST_F(ThreadTest, testDerived) { testDerived(); }
-TEST_F(ThreadTest, testJoin1) { testJoin1(); }
-TEST_F(ThreadTest, testJoin2) { testJoin2(); }
-TEST_F(ThreadTest, testJoin3) { testJoin3(); }
-TEST_F(ThreadTest, testJoin4) { testJoin4(); }
-TEST_F(ThreadTest, testSetPriority) { testSetPriority(); }
-TEST_F(ThreadTest, testIsAlive) { testIsAlive(); }
-TEST_F(ThreadTest, testGetId) { testGetId(); }
-TEST_F(ThreadTest, testGetState) { testGetState(); }
-TEST_F(ThreadTest, testSleep) { testSleep(); }
-TEST_F(ThreadTest, testSleep2Arg) { testSleep2Arg(); }
-TEST_F(ThreadTest, testUncaughtExceptionHandler) { testUncaughtExceptionHandler(); }
-TEST_F(ThreadTest, testCurrentThread) { testCurrentThread(); }
-TEST_F(ThreadTest, testInterrupt) { testInterrupt(); }
-TEST_F(ThreadTest, testInterrupted) { testInterrupted(); }
-TEST_F(ThreadTest, testIsInterrupted) { testIsInterrupted(); }
-TEST_F(ThreadTest, testSetName) { testSetName(); }
-TEST_F(ThreadTest, testInterruptSleep) { testInterruptSleep(); }
-TEST_F(ThreadTest, testInterruptJoin) { testInterruptJoin(); }
-TEST_F(ThreadTest, testInterruptWait) { testInterruptWait(); }
-TEST_F(ThreadTest, testRapidCreateAndDestroy) { testRapidCreateAndDestroy(); }
-TEST_F(ThreadTest, testConcurrentRapidCreateAndDestroy) { testConcurrentRapidCreateAndDestroy(); }
-TEST_F(ThreadTest, testCreatedButNotStarted) { testCreatedButNotStarted(); }

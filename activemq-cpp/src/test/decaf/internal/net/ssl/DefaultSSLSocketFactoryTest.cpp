@@ -36,13 +36,7 @@ public:
         DefaultSSLSocketFactoryTest();
         virtual ~DefaultSSLSocketFactoryTest();
 
-        void testConstructor();
-        void testCreateSocket();
-        void testGetDefaultCipherSuites();
-        void testGetSupportedCipherSuites();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 DefaultSSLSocketFactoryTest::DefaultSSLSocketFactoryTest() {
@@ -53,7 +47,7 @@ DefaultSSLSocketFactoryTest::~DefaultSSLSocketFactoryTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DefaultSSLSocketFactoryTest::testConstructor() {
+TEST_F(DefaultSSLSocketFactoryTest, testConstructor) {
 
     DefaultSSLSocketFactory factory( "Error Message" );
 
@@ -66,7 +60,7 @@ void DefaultSSLSocketFactoryTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DefaultSSLSocketFactoryTest::testCreateSocket() {
+TEST_F(DefaultSSLSocketFactoryTest, testCreateSocket) {
 
     std::unique_ptr<SocketFactory> factory( new DefaultSSLSocketFactory( "Test" ) );
 
@@ -82,20 +76,15 @@ void DefaultSSLSocketFactoryTest::testCreateSocket() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DefaultSSLSocketFactoryTest::testGetDefaultCipherSuites() {
+TEST_F(DefaultSSLSocketFactoryTest, testGetDefaultCipherSuites) {
 
     DefaultSSLSocketFactory factory( "Error Message" );
     ASSERT_TRUE(factory.getDefaultCipherSuites().empty());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DefaultSSLSocketFactoryTest::testGetSupportedCipherSuites() {
+TEST_F(DefaultSSLSocketFactoryTest, testGetSupportedCipherSuites) {
 
     DefaultSSLSocketFactory factory( "Error Message" );
     ASSERT_TRUE(factory.getSupportedCipherSuites().empty());
 }
-
-TEST_F(DefaultSSLSocketFactoryTest, testConstructor) { testConstructor(); }
-TEST_F(DefaultSSLSocketFactoryTest, testCreateSocket) { testCreateSocket(); }
-TEST_F(DefaultSSLSocketFactoryTest, testGetDefaultCipherSuites) { testGetDefaultCipherSuites(); }
-TEST_F(DefaultSSLSocketFactoryTest, testGetSupportedCipherSuites) { testGetSupportedCipherSuites(); }

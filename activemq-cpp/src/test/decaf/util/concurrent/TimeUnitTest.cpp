@@ -28,33 +28,10 @@ using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
-    class TimeUnitTest : public ::testing::Test {
-public:
-
-        TimeUnitTest() {}
-        virtual ~TimeUnitTest() {}
-
-        void testConvert1();
-        void testConvert2();
-        void testToNanos();
-        void testToMicros();
-        void testToMillis();
-        void testToSeconds();
-        void testToMinutes();
-        void testToHours();
-        void testToDays();
-        void testConvertSaturate();
-        void testToNanosSaturate();
-        void testToString();
-        void testTimedWait();
-        void testSleep();
-        void testValueOf();
-
-    };
-
+    class TimeUnitTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testConvert1() {
+TEST_F(TimeUnitTest, testConvert1) {
 
     for( long long t = 0; t < 10; ++t ) {
         ASSERT_TRUE(t == TimeUnit::SECONDS.convert( t, TimeUnit::SECONDS ));
@@ -77,7 +54,7 @@ void TimeUnitTest::testConvert1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testConvert2() {
+TEST_F(TimeUnitTest, testConvert2) {
 
     for( long long t = 0; t < 10; ++t ) {
         ASSERT_TRUE(t == TimeUnit::DAYS.convert( t * 24, TimeUnit::HOURS ));
@@ -96,7 +73,7 @@ void TimeUnitTest::testConvert2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToNanos() {
+TEST_F(TimeUnitTest, testToNanos) {
 
     for( long long t = 0; t < 10; ++t ) {
         ASSERT_TRUE(1000000000 * t == TimeUnit::SECONDS.toNanos( t ));
@@ -107,7 +84,7 @@ void TimeUnitTest::testToNanos() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToMicros() {
+TEST_F(TimeUnitTest, testToMicros) {
 
     for( long long t = 0; t < 10; ++t ) {
         ASSERT_TRUE(1000000 * t == TimeUnit::SECONDS.toMicros( t ));
@@ -118,7 +95,7 @@ void TimeUnitTest::testToMicros() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToMillis() {
+TEST_F(TimeUnitTest, testToMillis) {
 
     for( long long t = 0; t < 10; ++t ) {
         ASSERT_TRUE(1000 * t == TimeUnit::SECONDS.toMillis( t ));
@@ -129,7 +106,7 @@ void TimeUnitTest::testToMillis() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToSeconds() {
+TEST_F(TimeUnitTest, testToSeconds) {
 
     for( long long t = 0; t < 10; ++t ) {
         ASSERT_TRUE(t == TimeUnit::SECONDS.toSeconds( t ));
@@ -140,7 +117,7 @@ void TimeUnitTest::testToSeconds() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToMinutes() {
+TEST_F(TimeUnitTest, testToMinutes) {
 
     for( long long t = 0; t < 10; ++t ) {
         ASSERT_TRUE(t == TimeUnit::MINUTES.toMinutes( t ));
@@ -152,7 +129,7 @@ void TimeUnitTest::testToMinutes() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToHours() {
+TEST_F(TimeUnitTest, testToHours) {
 
     for( long long t = 0; t < 10; ++t ) {
         ASSERT_TRUE(t == TimeUnit::HOURS.toHours( t ));
@@ -165,7 +142,7 @@ void TimeUnitTest::testToHours() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToDays() {
+TEST_F(TimeUnitTest, testToDays) {
 
     for( long long t = 0; t < 10; ++t ) {
         ASSERT_TRUE(t == TimeUnit::DAYS.toDays( t ));
@@ -179,7 +156,7 @@ void TimeUnitTest::testToDays() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testConvertSaturate() {
+TEST_F(TimeUnitTest, testConvertSaturate) {
     ASSERT_TRUE(Long::MAX_VALUE ==
         TimeUnit::NANOSECONDS.convert( Long::MAX_VALUE / 2, TimeUnit::SECONDS ));
     ASSERT_TRUE(Long::MIN_VALUE ==
@@ -187,7 +164,7 @@ void TimeUnitTest::testConvertSaturate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToNanosSaturate() {
+TEST_F(TimeUnitTest, testToNanosSaturate) {
     ASSERT_TRUE(Long::MAX_VALUE ==
         TimeUnit::MILLISECONDS.toNanos( Long::MAX_VALUE / 2 ));
     ASSERT_TRUE(Long::MIN_VALUE ==
@@ -195,13 +172,13 @@ void TimeUnitTest::testToNanosSaturate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToString() {
+TEST_F(TimeUnitTest, testToString) {
     std::string s = TimeUnit::SECONDS.toString();
     ASSERT_TRUE(s.find_first_of( "ECOND" ) != (std::size_t)0);
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testTimedWait() {
+TEST_F(TimeUnitTest, testTimedWait) {
 
     Mutex o;
 
@@ -215,7 +192,7 @@ void TimeUnitTest::testTimedWait() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testSleep() {
+TEST_F(TimeUnitTest, testSleep) {
 
     long long now = System::currentTimeMillis();
     TimeUnit::SECONDS.sleep( 1 );
@@ -224,7 +201,7 @@ void TimeUnitTest::testSleep() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testValueOf() {
+TEST_F(TimeUnitTest, testValueOf) {
 
     ASSERT_TRUE(TimeUnit::NANOSECONDS == TimeUnit::valueOf( "NANOSECONDS" ));
     ASSERT_TRUE(TimeUnit::MICROSECONDS == TimeUnit::valueOf( "MICROSECONDS" ));
@@ -236,19 +213,3 @@ void TimeUnitTest::testValueOf() {
 
     ASSERT_THROW(TimeUnit::valueOf( "FOO" ), decaf::lang::exceptions::IllegalArgumentException) << ("Should Throw an IllegalArgumentException");
 }
-
-TEST_F(TimeUnitTest, testConvert1) { testConvert1(); }
-TEST_F(TimeUnitTest, testConvert2) { testConvert2(); }
-TEST_F(TimeUnitTest, testToNanos) { testToNanos(); }
-TEST_F(TimeUnitTest, testToMicros) { testToMicros(); }
-TEST_F(TimeUnitTest, testToMillis) { testToMillis(); }
-TEST_F(TimeUnitTest, testToSeconds) { testToSeconds(); }
-TEST_F(TimeUnitTest, testConvertSaturate) { testConvertSaturate(); }
-TEST_F(TimeUnitTest, testToNanosSaturate) { testToNanosSaturate(); }
-TEST_F(TimeUnitTest, testToString) { testToString(); }
-TEST_F(TimeUnitTest, testTimedWait) { testTimedWait(); }
-TEST_F(TimeUnitTest, testSleep) { testSleep(); }
-TEST_F(TimeUnitTest, testToMinutes) { testToMinutes(); }
-TEST_F(TimeUnitTest, testToHours) { testToHours(); }
-TEST_F(TimeUnitTest, testToDays) { testToDays(); }
-TEST_F(TimeUnitTest, testValueOf) { testValueOf(); }

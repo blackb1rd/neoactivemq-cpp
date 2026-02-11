@@ -33,16 +33,6 @@ using namespace activemq::transport::correlator;
 using namespace decaf::io;
 
     class ResponseCorrelatorTest : public ::testing::Test {
-public:
-
-        virtual ~ResponseCorrelatorTest(){}
-
-        void testBasics();
-        void testOneway();
-        void testTransportException();
-        void testMultiRequests();
-        void testNarrow();
-
     };
 
 
@@ -337,7 +327,7 @@ public:
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void ResponseCorrelatorTest::testBasics() {
+TEST_F(ResponseCorrelatorTest, testBasics) {
 
     MyListener listener;
     Pointer<MyTransport> transport(new MyTransport());
@@ -371,7 +361,7 @@ void ResponseCorrelatorTest::testBasics() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ResponseCorrelatorTest::testOneway(){
+TEST_F(ResponseCorrelatorTest, testOneway){
 
     MyListener listener;
     Pointer<MyTransport> transport(new MyTransport());
@@ -406,7 +396,7 @@ void ResponseCorrelatorTest::testOneway(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ResponseCorrelatorTest::testTransportException(){
+TEST_F(ResponseCorrelatorTest, testTransportException){
 
     MyListener listener;
     Pointer<MyBrokenTransport> transport(new MyBrokenTransport());
@@ -443,7 +433,7 @@ void ResponseCorrelatorTest::testTransportException(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ResponseCorrelatorTest::testMultiRequests(){
+TEST_F(ResponseCorrelatorTest, testMultiRequests){
 
     MyListener listener;
     Pointer<MyTransport> transport(new MyTransport());
@@ -504,7 +494,7 @@ void ResponseCorrelatorTest::testMultiRequests(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ResponseCorrelatorTest::testNarrow(){
+TEST_F(ResponseCorrelatorTest, testNarrow){
 
     Pointer<MyTransport> transport(new MyTransport());
     ResponseCorrelator correlator(transport);
@@ -524,9 +514,3 @@ void ResponseCorrelatorTest::testNarrow(){
     narrowed = correlator.narrow(typeid( correlator ));
     ASSERT_TRUE(narrowed == &correlator);
 }
-
-TEST_F(ResponseCorrelatorTest, testBasics) { testBasics(); }
-TEST_F(ResponseCorrelatorTest, testOneway) { testOneway(); }
-TEST_F(ResponseCorrelatorTest, testTransportException) { testTransportException(); }
-TEST_F(ResponseCorrelatorTest, testMultiRequests) { testMultiRequests(); }
-TEST_F(ResponseCorrelatorTest, testNarrow) { testNarrow(); }

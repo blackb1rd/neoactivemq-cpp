@@ -26,18 +26,15 @@ using namespace decaf::lang;
 public:
 
         ByteTest();
-        virtual ~ByteTest() {}
 
-        virtual void test();
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 ByteTest::ByteTest(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteTest::test() {
+TEST_F(ByteTest, test) {
 
     Byte ubyte( 'b' );
 
@@ -56,5 +53,3 @@ void ByteTest::test() {
     ASSERT_TRUE(ubyte.decode( "255" ) == 255);
 
 }
-
-TEST_F(ByteTest, test) { test(); }

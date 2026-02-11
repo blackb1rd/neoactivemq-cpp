@@ -30,31 +30,15 @@ using namespace decaf::util;
 public:
 
         SetTest();
-        virtual ~SetTest() {}
-
-        void testConstructor1();
-        void testConstructor2();
-        void testConstructor3();
-        void testContains();
-        void testClear();
-        void testCopy1();
-        void testCopy2();
-        void testSize();
-        void testAdd();
-        void testRemove();
-        void testIsEmpty();
-        void testToArray();
-        void testIterator();
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 SetTest::SetTest(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SetTest::testConstructor1(){
+TEST_F(SetTest, testConstructor1){
 
     StlSet<int> set;
 
@@ -73,7 +57,7 @@ void SetTest::testConstructor1(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SetTest::testConstructor2(){
+TEST_F(SetTest, testConstructor2){
 
     StlSet<int> set1;
 
@@ -93,7 +77,7 @@ void SetTest::testConstructor2(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SetTest::testConstructor3(){
+TEST_F(SetTest, testConstructor3){
 
     LinkedList<int> collection;
 
@@ -113,7 +97,7 @@ void SetTest::testConstructor3(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SetTest::testCopy1() {
+TEST_F(SetTest, testCopy1) {
 
     StlSet<int> set1;
 
@@ -135,7 +119,7 @@ void SetTest::testCopy1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SetTest::testCopy2() {
+TEST_F(SetTest, testCopy2) {
 
     LinkedList<int> collection;
 
@@ -157,7 +141,7 @@ void SetTest::testCopy2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SetTest::testContains(){
+TEST_F(SetTest, testContains){
 
     StlSet<string> set;
     ASSERT_TRUE(set.contains( "bob" ) == false);
@@ -169,7 +153,7 @@ void SetTest::testContains(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SetTest::testClear(){
+TEST_F(SetTest, testClear){
 
     StlSet<string> set;
     set.add( "bob" );
@@ -181,7 +165,7 @@ void SetTest::testClear(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SetTest::testIsEmpty(){
+TEST_F(SetTest, testIsEmpty){
 
     StlSet<string> set;
     set.add( "bob" );
@@ -193,7 +177,7 @@ void SetTest::testIsEmpty(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SetTest::testSize(){
+TEST_F(SetTest, testSize){
 
     StlSet<string> set;
 
@@ -205,7 +189,7 @@ void SetTest::testSize(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SetTest::testAdd(){
+TEST_F(SetTest, testAdd){
     StlSet<string> set;
 
     set.add( "fred" );
@@ -219,7 +203,7 @@ void SetTest::testAdd(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SetTest::testRemove(){
+TEST_F(SetTest, testRemove){
     StlSet<string> set;
 
     set.add( "fred" );
@@ -229,7 +213,7 @@ void SetTest::testRemove(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SetTest::testToArray(){
+TEST_F(SetTest, testToArray){
 
     StlSet<string> set;
 
@@ -244,7 +228,7 @@ void SetTest::testToArray(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SetTest::testIterator(){
+TEST_F(SetTest, testIterator){
 
     StlSet<string> set;
 
@@ -276,17 +260,3 @@ void SetTest::testIterator(){
     delete iterator1;
     delete iterator2;
 }
-
-TEST_F(SetTest, testConstructor1) { testConstructor1(); }
-TEST_F(SetTest, testConstructor2) { testConstructor2(); }
-TEST_F(SetTest, testConstructor3) { testConstructor3(); }
-TEST_F(SetTest, testContains) { testContains(); }
-TEST_F(SetTest, testClear) { testClear(); }
-TEST_F(SetTest, testCopy1) { testCopy1(); }
-TEST_F(SetTest, testCopy2) { testCopy2(); }
-TEST_F(SetTest, testSize) { testSize(); }
-TEST_F(SetTest, testAdd) { testAdd(); }
-TEST_F(SetTest, testRemove) { testRemove(); }
-TEST_F(SetTest, testIsEmpty) { testIsEmpty(); }
-TEST_F(SetTest, testToArray) { testToArray(); }
-TEST_F(SetTest, testIterator) { testIterator(); }

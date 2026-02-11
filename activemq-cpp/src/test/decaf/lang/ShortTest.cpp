@@ -27,19 +27,15 @@ using namespace decaf::lang;
 public:
 
         ShortTest();
-        virtual ~ShortTest() {}
-
-        void test();
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 ShortTest::ShortTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShortTest::test() {
+TEST_F(ShortTest, test) {
 
     Short short1( 65 );
 
@@ -90,5 +86,3 @@ void ShortTest::test() {
     ASSERT_TRUE(Short::toString( 255 ) == "255");
 
 }
-
-TEST_F(ShortTest, test) { test(); }

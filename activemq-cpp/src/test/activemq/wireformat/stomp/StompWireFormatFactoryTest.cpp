@@ -30,26 +30,10 @@ using namespace activemq::wireformat;
 using namespace activemq::wireformat::stomp;
 
     class StompWireFormatFactoryTest : public ::testing::Test {
-public:
-
-        StompWireFormatFactoryTest();
-        virtual ~StompWireFormatFactoryTest();
-
-        void testCreateWireFormat();
-
     };
 
-
 ////////////////////////////////////////////////////////////////////////////////
-StompWireFormatFactoryTest::StompWireFormatFactoryTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-StompWireFormatFactoryTest::~StompWireFormatFactoryTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void StompWireFormatFactoryTest::testCreateWireFormat() {
+TEST_F(StompWireFormatFactoryTest, testCreateWireFormat) {
 
     StompWireFormatFactory factory;
 
@@ -68,5 +52,3 @@ void StompWireFormatFactoryTest::testCreateWireFormat() {
     ASSERT_EQ(std::string("/test-temp-topic/"), stomp->getTempTopicPrefix());
     ASSERT_EQ(std::string("/test-temp-queue/"), stomp->getTempQueuePrefix());
 }
-
-TEST_F(StompWireFormatFactoryTest, testCreateWireFormat) { testCreateWireFormat(); }

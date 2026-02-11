@@ -22,7 +22,6 @@
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
 
-
 namespace decaf { namespace internal { namespace nio {} } }
 using namespace std;
 using namespace decaf;
@@ -32,6 +31,8 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class LongArrayBufferTest : public ::testing::Test {
+    protected:
+
 decaf::nio::LongBuffer* testBuffer1;
         long long* testData1;
 
@@ -39,15 +40,9 @@ decaf::nio::LongBuffer* testBuffer1;
         static const int SMALL_TEST_LENGTH;
         static const int BUFFER_LENGTH;
 
-    private:
-
-        LongArrayBufferTest(const LongArrayBufferTest&);
-        LongArrayBufferTest& operator= (const LongArrayBufferTest&);
-
     public:
 
         LongArrayBufferTest() : testBuffer1(), testData1() {}
-        virtual ~LongArrayBufferTest() {}
 
         void SetUp() override {
             testBuffer1 = decaf::nio::LongBuffer::allocate( testData1Size );
@@ -62,29 +57,6 @@ decaf::nio::LongBuffer* testBuffer1;
             delete testBuffer1;
             delete [] testData1;
         }
-
-        void test();
-        void testArray();
-        void testArrayOffset();
-        void testReadOnlyArray();
-        void testAsReadOnlyBuffer();
-        void testCompact();
-        void testCompareTo();
-        void testDuplicate();
-        void testEquals();
-        void testHasArray();
-        void testGet();
-        void testGet2();
-        void testGetLongArray();
-        void testGetLongArray2();
-        void testGetWithIndex();
-        void testPutLong();
-        void testPutLongArray();
-        void testPutLongArray2();
-        void testPutLongBuffer();
-        void testPutIndexed();
-        void testSlice();
-        void testToString();
 
     protected:
 
@@ -143,15 +115,13 @@ decaf::nio::LongBuffer* testBuffer1;
 
     };
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 const int LongArrayBufferTest::testData1Size = 100;
 const int LongArrayBufferTest::SMALL_TEST_LENGTH = 5;
 const int LongArrayBufferTest::BUFFER_LENGTH = 250;
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::test() {
+TEST_F(LongArrayBufferTest, test) {
 
     // Check that we have setup the array and our initial assumptions on state
     // are correct.  This is the first test run.
@@ -168,7 +138,7 @@ void LongArrayBufferTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testArray() {
+TEST_F(LongArrayBufferTest, testArray) {
 
     long long* array = testBuffer1->array();
 
@@ -196,7 +166,7 @@ void LongArrayBufferTest::testArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testArrayOffset() {
+TEST_F(LongArrayBufferTest, testArrayOffset) {
 
     long long* array = testBuffer1->array();
 
@@ -216,7 +186,7 @@ void LongArrayBufferTest::testArrayOffset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testReadOnlyArray() {
+TEST_F(LongArrayBufferTest, testReadOnlyArray) {
 
     LongBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
 
@@ -231,7 +201,7 @@ void LongArrayBufferTest::testReadOnlyArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testAsReadOnlyBuffer() {
+TEST_F(LongArrayBufferTest, testAsReadOnlyBuffer) {
 
     testBuffer1->clear();
     testBuffer1->mark();
@@ -260,7 +230,7 @@ void LongArrayBufferTest::testAsReadOnlyBuffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testCompact() {
+TEST_F(LongArrayBufferTest, testCompact) {
 
     loadTestData1( testBuffer1 );
 
@@ -307,7 +277,7 @@ void LongArrayBufferTest::testCompact() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testCompareTo() {
+TEST_F(LongArrayBufferTest, testCompareTo) {
 
     LongBuffer* other = LongBuffer::allocate( testBuffer1->capacity() );
 
@@ -346,7 +316,7 @@ void LongArrayBufferTest::testCompareTo() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testDuplicate() {
+TEST_F(LongArrayBufferTest, testDuplicate) {
     testBuffer1->clear();
     testBuffer1->mark();
     testBuffer1->position(testBuffer1->limit());
@@ -371,7 +341,7 @@ void LongArrayBufferTest::testDuplicate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testEquals() {
+TEST_F(LongArrayBufferTest, testEquals) {
 
     // equal to self
     ASSERT_TRUE(testBuffer1->equals( *testBuffer1 ));
@@ -395,7 +365,7 @@ void LongArrayBufferTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testGet() {
+TEST_F(LongArrayBufferTest, testGet) {
 
     testBuffer1->clear();
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
@@ -407,7 +377,7 @@ void LongArrayBufferTest::testGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testGetLongArray() {
+TEST_F(LongArrayBufferTest, testGetLongArray) {
 
     std::vector<long long> array(1);
     testBuffer1->clear();
@@ -423,7 +393,7 @@ void LongArrayBufferTest::testGetLongArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testGetLongArray2() {
+TEST_F(LongArrayBufferTest, testGetLongArray2) {
 
     testBuffer1->clear();
     long long* array1 = new long long[testBuffer1->capacity()];
@@ -462,7 +432,7 @@ void LongArrayBufferTest::testGetLongArray2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testGet2() {
+TEST_F(LongArrayBufferTest, testGet2) {
 
     testBuffer1->clear();
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
@@ -476,12 +446,12 @@ void LongArrayBufferTest::testGet2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testHasArray() {
+TEST_F(LongArrayBufferTest, testHasArray) {
     ASSERT_TRUE(testBuffer1->hasArray());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testPutLong() {
+TEST_F(LongArrayBufferTest, testPutLong) {
 
     testBuffer1->clear();
 
@@ -496,7 +466,7 @@ void LongArrayBufferTest::testPutLong() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testPutLongArray() {
+TEST_F(LongArrayBufferTest, testPutLongArray) {
 
     long long* array = new long long[1];
 
@@ -515,7 +485,7 @@ void LongArrayBufferTest::testPutLongArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testPutLongArray2() {
+TEST_F(LongArrayBufferTest, testPutLongArray2) {
 
     testBuffer1->clear();
     long long* array1 = new long long[ testBuffer1->capacity() ];
@@ -555,7 +525,7 @@ void LongArrayBufferTest::testPutLongArray2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testPutLongBuffer() {
+TEST_F(LongArrayBufferTest, testPutLongBuffer) {
 
     LongBuffer* other = LongBuffer::allocate( testBuffer1->capacity() );
     LongBuffer* other1 = LongBuffer::allocate( testBuffer1->capacity() + 1 );
@@ -579,7 +549,7 @@ void LongArrayBufferTest::testPutLongBuffer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testGetWithIndex() {
+TEST_F(LongArrayBufferTest, testGetWithIndex) {
 
     testBuffer1->clear();
 
@@ -596,7 +566,7 @@ void LongArrayBufferTest::testGetWithIndex() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testPutIndexed() {
+TEST_F(LongArrayBufferTest, testPutIndexed) {
 
     LongBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
@@ -618,7 +588,7 @@ void LongArrayBufferTest::testPutIndexed() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testSlice() {
+TEST_F(LongArrayBufferTest, testSlice) {
 
     ASSERT_TRUE(testBuffer1->capacity() > 5);
     testBuffer1->position(1);
@@ -643,7 +613,7 @@ void LongArrayBufferTest::testSlice() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void LongArrayBufferTest::testToString() {
+TEST_F(LongArrayBufferTest, testToString) {
 
     std::string str = testBuffer1->toString();
     ASSERT_TRUE(str.find("Long") != string::npos);
@@ -651,26 +621,3 @@ void LongArrayBufferTest::testToString() {
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->limit() ) ) != string::npos);
     ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->capacity() ) ) != string::npos);
 }
-
-TEST_F(LongArrayBufferTest, test) { test(); }
-TEST_F(LongArrayBufferTest, testArray) { testArray(); }
-TEST_F(LongArrayBufferTest, testArrayOffset) { testArrayOffset(); }
-TEST_F(LongArrayBufferTest, testReadOnlyArray) { testReadOnlyArray(); }
-TEST_F(LongArrayBufferTest, testAsReadOnlyBuffer) { testAsReadOnlyBuffer(); }
-TEST_F(LongArrayBufferTest, testCompact) { testCompact(); }
-TEST_F(LongArrayBufferTest, testCompareTo) { testCompareTo(); }
-TEST_F(LongArrayBufferTest, testDuplicate) { testDuplicate(); }
-TEST_F(LongArrayBufferTest, testEquals) { testEquals(); }
-TEST_F(LongArrayBufferTest, testHasArray) { testHasArray(); }
-TEST_F(LongArrayBufferTest, testGet) { testGet(); }
-TEST_F(LongArrayBufferTest, testGet2) { testGet2(); }
-TEST_F(LongArrayBufferTest, testGetLongArray) { testGetLongArray(); }
-TEST_F(LongArrayBufferTest, testGetLongArray2) { testGetLongArray2(); }
-TEST_F(LongArrayBufferTest, testGetWithIndex) { testGetWithIndex(); }
-TEST_F(LongArrayBufferTest, testPutLong) { testPutLong(); }
-TEST_F(LongArrayBufferTest, testPutLongArray) { testPutLongArray(); }
-TEST_F(LongArrayBufferTest, testPutLongArray2) { testPutLongArray2(); }
-TEST_F(LongArrayBufferTest, testPutLongBuffer) { testPutLongBuffer(); }
-TEST_F(LongArrayBufferTest, testPutIndexed) { testPutIndexed(); }
-TEST_F(LongArrayBufferTest, testSlice) { testSlice(); }
-TEST_F(LongArrayBufferTest, testToString) { testToString(); }

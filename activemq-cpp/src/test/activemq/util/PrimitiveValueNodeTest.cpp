@@ -22,21 +22,11 @@
 using namespace activemq;
 using namespace activemq::util;
 
-    class PrimitiveValueNodeTest : public ::testing::Test
-    {
-public:
-
-        PrimitiveValueNodeTest(){}
-        virtual ~PrimitiveValueNodeTest(){}
-
-        void testValueNode();
-        void testValueNodeCtors();
-
+    class PrimitiveValueNodeTest : public ::testing::Test {
     };
 
-
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveValueNodeTest::testValueNode(){
+TEST_F(PrimitiveValueNodeTest, testValueNode){
 
     PrimitiveValueNode node;
 
@@ -100,7 +90,7 @@ void PrimitiveValueNodeTest::testValueNode(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveValueNodeTest::testValueNodeCtors(){
+TEST_F(PrimitiveValueNodeTest, testValueNodeCtors){
 
     PrimitiveValueNode tfvalue = true;
     PrimitiveValueNode bvalue = (unsigned char)60;
@@ -133,6 +123,3 @@ void PrimitiveValueNodeTest::testValueNodeCtors(){
     ASSERT_TRUE(strValue.getType() == PrimitiveValueNode::STRING_TYPE);
     ASSERT_TRUE(bArrayValue.getType() == PrimitiveValueNode::BYTE_ARRAY_TYPE);
 }
-
-TEST_F(PrimitiveValueNodeTest, testValueNode) { testValueNode(); }
-TEST_F(PrimitiveValueNodeTest, testValueNodeCtors) { testValueNodeCtors(); }

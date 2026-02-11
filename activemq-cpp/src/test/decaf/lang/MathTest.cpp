@@ -27,7 +27,7 @@ using namespace decaf::lang;
 
     class MathTest : public ::testing::Test
     {
-private:
+protected:
 
         double HYP;
         // double OPP;
@@ -36,62 +36,37 @@ private:
     public:
 
         MathTest();
-        virtual ~MathTest() {}
 
-        virtual void test_absD();
-        virtual void test_absF();
-        virtual void test_absI();
-        virtual void test_absJ();
 //        virtual void test_acosD();
 //        virtual void test_asinD();
 //        virtual void test_atanD();
 //        virtual void test_atan2DD();
 //        virtual void test_cbrt_D();
-        virtual void test_ceilD();
 //        virtual void test_cosD();
 //        virtual void test_cosh_D();
 //        virtual void test_expD();
 //        virtual void test_expm1_D();
-        virtual void test_floorD();
 //        virtual void test_hypot_DD();
 //        virtual void test_IEEEremainderDD();
 //        virtual void test_logD();
 //        virtual void test_log10_D();
 //        virtual void test_log1p_D();
-        virtual void test_maxDD();
-        virtual void test_maxFF();
-        virtual void test_maxII();
-        virtual void test_maxJJ();
-        virtual void test_minDD();
-        virtual void test_minFF();
-        virtual void test_minII();
-        virtual void test_minJJ();
-        virtual void test_powDD();
 //        virtual void test_rintD();
-        virtual void test_roundD();
-        virtual void test_roundF();
-        virtual void test_signum_D();
-        virtual void test_signum_F();
 //        virtual void test_sinD();
 //        virtual void test_sinh_D();
-        virtual void test_sqrtD();
 //        virtual void test_tanD();
 //        virtual void test_tanh_D();
-        virtual void test_random();
-        virtual void test_toRadiansD();
-        virtual void test_toDegreesD();
 //        virtual void test_ulp_D();
 //        virtual void test_ulp_f();
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 MathTest::MathTest() : HYP(Math::sqrt(2.0)) { //, OPP(1.0), ADJ(1.0) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_absD() {
+TEST_F(MathTest, test_absD) {
     // Test for method double decaf.lang.Math.abs(double)
 
     ASSERT_TRUE(( Math::abs(-1908.8976) == 1908.8976)) << ("Incorrect double abs value");
@@ -99,21 +74,21 @@ void MathTest::test_absD() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_absF() {
+TEST_F(MathTest, test_absF) {
     // Test for method float decaf.lang.Math::abs(float)
     ASSERT_TRUE((Math::abs(-1908.8976f) == 1908.8976f)) << ("Incorrect float abs value");
     ASSERT_TRUE((Math::abs(1908.8976f) == 1908.8976f)) << ("Incorrect float abs value");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_absI() {
+TEST_F(MathTest, test_absI) {
     // Test for method int decaf.lang.Math::abs(int)
     ASSERT_TRUE((Math::abs(-1908897) == 1908897)) << ("Incorrect int abs value");
     ASSERT_TRUE((Math::abs(1908897) == 1908897)) << ("Incorrect int abs value");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_absJ() {
+TEST_F(MathTest, test_absJ) {
     // Test for method long decaf.lang.Math::abs(long)
     ASSERT_TRUE((Math::abs(-19088976000089LL) == 19088976000089LL)) << ("Incorrect long abs value");
     ASSERT_TRUE((Math::abs(19088976000089LL) == 19088976000089LL)) << ("Incorrect long abs value");
@@ -173,7 +148,7 @@ void MathTest::test_absJ() {
 //}
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_ceilD() {
+TEST_F(MathTest, test_ceilD) {
     // Test for method double decaf.lang.Math::ceil(double)
     ASSERT_EQ(79.0, Math::ceil(78.89)) << ("Incorrect ceiling for double");
     ASSERT_EQ(-78.0, Math::ceil(-78.89)) << ("Incorrect ceiling for double");
@@ -232,7 +207,7 @@ void MathTest::test_ceilD() {
 //}
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_floorD() {
+TEST_F(MathTest, test_floorD) {
     // Test for method double decaf.lang.Math::floor(double)
     ASSERT_EQ(78.0, Math::floor(78.89)) << ("Incorrect floor for double");
     ASSERT_EQ(-79.0, Math::floor(-78.89)) << ("Incorrect floor for double");
@@ -320,7 +295,7 @@ void MathTest::test_floorD() {
 //}
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_maxDD() {
+TEST_F(MathTest, test_maxDD) {
     // Test for method double decaf.lang.Math::max(double, double)
     ASSERT_EQ(1908897.6000089, Math::max(-1908897.6000089, 1908897.6000089)) << ("Incorrect double max value");
     ASSERT_EQ(1908897.6000089, Math::max(2.0, 1908897.6000089)) << ("Incorrect double max value");
@@ -328,7 +303,7 @@ void MathTest::test_maxDD() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_maxFF() {
+TEST_F(MathTest, test_maxFF) {
     // Test for method float decaf.lang.Math::max(float, float)
     ASSERT_TRUE(Math::max(-1908897.600f,
             1908897.600f) == 1908897.600f) << ("Incorrect float max value");
@@ -337,7 +312,7 @@ void MathTest::test_maxFF() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_maxII() {
+TEST_F(MathTest, test_maxII) {
     // Test for method int decaf.lang.Math::max(int, int)
     ASSERT_EQ(19088976, Math::max(-19088976, 19088976)) << ("Incorrect int max value");
     ASSERT_EQ(19088976, Math::max(20, 19088976)) << ("Incorrect int max value");
@@ -345,7 +320,7 @@ void MathTest::test_maxII() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_maxJJ() {
+TEST_F(MathTest, test_maxJJ) {
     // Test for method long long decaf.lang.Math::max(long long, long long)
     ASSERT_EQ(19088976000089LL, Math::max(-19088976000089LL, 19088976000089LL)) << ("Incorrect long max value");
     ASSERT_EQ(19088976000089LL, Math::max(20LL, 19088976000089LL)) << ("Incorrect long max value");
@@ -353,7 +328,7 @@ void MathTest::test_maxJJ() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_minDD() {
+TEST_F(MathTest, test_minDD) {
     // Test for method double decaf.lang.Math::min(double, double)
     ASSERT_EQ(-1908897.6000089, Math::min(-1908897.6000089, 1908897.6000089)) << ("Incorrect double min value");
     ASSERT_EQ(2.0, Math::min(2.0, 1908897.6000089)) << ("Incorrect double min value");
@@ -361,7 +336,7 @@ void MathTest::test_minDD() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_minFF() {
+TEST_F(MathTest, test_minFF) {
     // Test for method float decaf.lang.Math::min(float, float)
     ASSERT_TRUE(Math::min(-1908897.600f,
             1908897.600f) == -1908897.600f) << ("Incorrect float min value");
@@ -370,7 +345,7 @@ void MathTest::test_minFF() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_minII() {
+TEST_F(MathTest, test_minII) {
     // Test for method int decaf.lang.Math::min(int, int)
     ASSERT_EQ(-19088976, Math::min(-19088976, 19088976)) << ("Incorrect int min value");
     ASSERT_EQ(20, Math::min(20, 19088976)) << ("Incorrect int min value");
@@ -379,7 +354,7 @@ void MathTest::test_minII() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_minJJ() {
+TEST_F(MathTest, test_minJJ) {
     // Test for method long long decaf.lang.Math::min(long long, long long)
     ASSERT_EQ(-19088976000089LL, Math::min(-19088976000089LL, 19088976000089LL)) << ("Incorrect long min value");
     ASSERT_EQ(20LL, Math::min(20LL, 19088976000089LL)) << ("Incorrect long min value");
@@ -387,7 +362,7 @@ void MathTest::test_minJJ() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_powDD() {
+TEST_F(MathTest, test_powDD) {
     // Test for method double decaf.lang.Math::pow(double, double)
     ASSERT_TRUE((long) Math::pow(2, 8) == 256l) << ("pow returned incorrect value");
     ASSERT_TRUE(Math::pow(2, -8) == 0.00390625) << ("pow returned incorrect value");
@@ -404,19 +379,19 @@ void MathTest::test_powDD() {
 //}
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_roundD() {
+TEST_F(MathTest, test_roundD) {
     // Test for method long decaf.lang.Math::round(double)
     ASSERT_EQ(-91LL, Math::round(-90.89)) << ("Incorrect rounding of a float");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_roundF() {
+TEST_F(MathTest, test_roundF) {
     // Test for method int decaf.lang.Math::round(float)
     ASSERT_EQ(-91, Math::round(-90.89f)) << ("Incorrect rounding of a float");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_signum_D() {
+TEST_F(MathTest, test_signum_D) {
     ASSERT_TRUE(Double::isNaN(Math::signum(Double::NaN)));
     ASSERT_TRUE(Double::isNaN(Math::signum(Double::NaN)));
     ASSERT_EQ(Double::doubleToLongBits(0.0), Double::doubleToLongBits(Math::signum(0.0)));
@@ -437,7 +412,7 @@ void MathTest::test_signum_D() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_signum_F() {
+TEST_F(MathTest, test_signum_F) {
     ASSERT_TRUE(Float::isNaN(Math::signum(Float::NaN)));
     ASSERT_EQ(Float::floatToIntBits(0.0f), Float::floatToIntBits(Math::signum(0.0f)));
     ASSERT_EQ(Float::floatToIntBits(+0.0f), Float::floatToIntBits(Math::signum(+0.0f)));
@@ -483,7 +458,7 @@ void MathTest::test_signum_F() {
 //}
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_sqrtD() {
+TEST_F(MathTest, test_sqrtD) {
     // Test for method double decaf.lang.Math::sqrt(double)
     ASSERT_EQ(7.0, Math::sqrt(49.0)) << ("Incorrect root returned2");
 }
@@ -515,7 +490,7 @@ void MathTest::test_sqrtD() {
 //}
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_random() {
+TEST_F(MathTest, test_random) {
     // There isn't a place for these tests so just stick them here
     ASSERT_EQ(4613303445314885481LL, Double::doubleToLongBits(Math::E)) << ("Wrong value E");
     ASSERT_EQ(4614256656552045848LL, Double::doubleToLongBits(Math::PI)) << ("Wrong value PI");
@@ -527,7 +502,7 @@ void MathTest::test_random() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_toRadiansD() {
+TEST_F(MathTest, test_toRadiansD) {
     for (double d = 500; d >= 0; d -= 1.0) {
         double converted = Math::toDegrees(Math::toRadians(d));
         ASSERT_TRUE(converted >= d * 0.99999999 && converted <= d * 1.00000001) << ("Converted number not equal to original. d ");
@@ -535,7 +510,7 @@ void MathTest::test_toRadiansD() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MathTest::test_toDegreesD() {
+TEST_F(MathTest, test_toDegreesD) {
     for (double d = 500; d >= 0; d -= 1.0) {
         double converted = Math::toRadians(Math::toDegrees(d));
         ASSERT_TRUE(converted >= d * 0.99999999 && converted <= d * 1.00000001) << ("Converted number not equal to original. d ");
@@ -583,27 +558,3 @@ void MathTest::test_toDegreesD() {
 //    ASSERT_EQ(//            1.2207031E-4f, Math::ulp(1153.0f)) << ("Returned incorrect value");
 //    ASSERT_EQ(//            5.6E-45f, Math::ulp(9.403954E-38f)) << ("Returned incorrect value");
 //}
-
-TEST_F(MathTest, test_absD) { test_absD(); }
-TEST_F(MathTest, test_absF) { test_absF(); }
-TEST_F(MathTest, test_absI) { test_absI(); }
-TEST_F(MathTest, test_absJ) { test_absJ(); }
-TEST_F(MathTest, test_ceilD) { test_ceilD(); }
-TEST_F(MathTest, test_floorD) { test_floorD(); }
-TEST_F(MathTest, test_maxDD) { test_maxDD(); }
-TEST_F(MathTest, test_maxFF) { test_maxFF(); }
-TEST_F(MathTest, test_maxII) { test_maxII(); }
-TEST_F(MathTest, test_maxJJ) { test_maxJJ(); }
-TEST_F(MathTest, test_minDD) { test_minDD(); }
-TEST_F(MathTest, test_minFF) { test_minFF(); }
-TEST_F(MathTest, test_minII) { test_minII(); }
-TEST_F(MathTest, test_minJJ) { test_minJJ(); }
-TEST_F(MathTest, test_powDD) { test_powDD(); }
-TEST_F(MathTest, test_roundD) { test_roundD(); }
-TEST_F(MathTest, test_roundF) { test_roundF(); }
-TEST_F(MathTest, test_signum_D) { test_signum_D(); }
-TEST_F(MathTest, test_signum_F) { test_signum_F(); }
-TEST_F(MathTest, test_sqrtD) { test_sqrtD(); }
-TEST_F(MathTest, test_random) { test_random(); }
-TEST_F(MathTest, test_toRadiansD) { test_toRadiansD(); }
-TEST_F(MathTest, test_toDegreesD) { test_toDegreesD(); }

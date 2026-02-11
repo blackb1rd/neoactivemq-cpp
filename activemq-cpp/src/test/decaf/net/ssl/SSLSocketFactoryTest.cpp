@@ -32,10 +32,7 @@ public:
         SSLSocketFactoryTest();
         virtual ~SSLSocketFactoryTest();
 
-        void testGetDefault();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 SSLSocketFactoryTest::SSLSocketFactoryTest() {
@@ -46,7 +43,7 @@ SSLSocketFactoryTest::~SSLSocketFactoryTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SSLSocketFactoryTest::testGetDefault() {
+TEST_F(SSLSocketFactoryTest, testGetDefault) {
 
     SocketFactory* factory = SSLSocketFactory::getDefault();
 
@@ -63,5 +60,3 @@ void SSLSocketFactoryTest::testGetDefault() {
 
 #endif
 }
-
-TEST_F(SSLSocketFactoryTest, testGetDefault) { testGetDefault(); }

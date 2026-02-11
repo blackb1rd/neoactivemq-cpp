@@ -44,24 +44,14 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class InactivityMonitorTest : public ::testing::Test {
-private:
+    protected:
 
         decaf::lang::Pointer<mock::MockTransport> transport;
 
         Pointer<activemq::commands::WireFormatInfo> localWireFormatInfo;
 
-    public:
-
-        InactivityMonitorTest();
-        virtual ~InactivityMonitorTest();
-
         void SetUp() override;
         void TearDown() override;
-
-        void testCreate();
-        void testReadTimeout();
-        void testWriteMessageFail();
-        void testNonFailureSendCase();
 
     };
 
@@ -99,14 +89,6 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InactivityMonitorTest::InactivityMonitorTest() : transport(), localWireFormatInfo() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-InactivityMonitorTest::~InactivityMonitorTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
 void InactivityMonitorTest::SetUp() {
 
     URI uri( "mock://mock?wireformat=openwire" );
@@ -127,7 +109,7 @@ void InactivityMonitorTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitorTest::testCreate() {
+TEST_F(InactivityMonitorTest, testCreate) {
 
     InactivityMonitor monitor( this->transport, this->transport->getWireFormat() );
 
@@ -139,7 +121,7 @@ void InactivityMonitorTest::testCreate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitorTest::testReadTimeout() {
+TEST_F(InactivityMonitorTest, testReadTimeout) {
 
     MyTransportListener listener;
     InactivityMonitor monitor( this->transport, this->transport->getWireFormat() );
@@ -161,7 +143,7 @@ void InactivityMonitorTest::testReadTimeout() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitorTest::testWriteMessageFail() {
+TEST_F(InactivityMonitorTest, testWriteMessageFail) {
 
     this->transport->setFailOnKeepAliveSends( true );
     this->transport->setNumSentKeepAlivesBeforeFail( 4 );
@@ -189,7 +171,7 @@ void InactivityMonitorTest::testWriteMessageFail() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitorTest::testNonFailureSendCase() {
+TEST_F(InactivityMonitorTest, testNonFailureSendCase) {
 
     MyTransportListener listener;
     InactivityMonitor monitor( this->transport, this->transport->getWireFormat() );
@@ -210,8 +192,3 @@ void InactivityMonitorTest::testNonFailureSendCase() {
     // Channel should have been inactive for to long.
     ASSERT_TRUE(listener.exceptionFired == false);
 }
-
-TEST_F(InactivityMonitorTest, testCreate) { testCreate(); }
-TEST_F(InactivityMonitorTest, testReadTimeout) { testReadTimeout(); }
-TEST_F(InactivityMonitorTest, testWriteMessageFail) { testWriteMessageFail(); }
-TEST_F(InactivityMonitorTest, testNonFailureSendCase) { testNonFailureSendCase(); }

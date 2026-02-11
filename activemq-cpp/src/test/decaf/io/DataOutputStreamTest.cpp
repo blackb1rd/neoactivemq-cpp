@@ -38,6 +38,8 @@ using namespace decaf::io;
 using namespace decaf::util;
 
     class DataOutputStreamTest : public ::testing::Test {
+    protected:
+
 std::unique_ptr<ByteArrayOutputStream> baos;
         std::unique_ptr<ByteArrayInputStream> bais;
 
@@ -49,7 +51,6 @@ std::unique_ptr<ByteArrayOutputStream> baos;
     public:
 
         DataOutputStreamTest() : baos(), bais(), os(), is(), testData() {}
-        virtual ~DataOutputStreamTest(){}
         void SetUp() override{
             testData = "Test_All_Tests\nTest_decaf_io_BufferedInputStream\nTest_BufferedOutputStream\nTest_decaf_io_ByteArrayInputStream\nTest_decaf_io_ByteArrayOutputStream\nTest_decaf_io_DataInputStream\nTest_decaf_io_File\nTest_decaf_io_FileDescriptor\nTest_decaf_io_FileInputStream\nTest_decaf_io_FileNotFoundException\nTest_decaf_io_FileOutputStream\nTest_decaf_io_FilterInputStream\nTest_decaf_io_FilterOutputStream\nTest_decaf_io_InputStream\nTest_decaf_io_IOException\nTest_decaf_io_OutputStream\nTest_decaf_io_PrintStream\nTest_decaf_io_RandomAccessFile\nTest_decaf_io_SyncFailedException\nTest_decaf_lang_AbstractMethodError\nTest_decaf_lang_ArithmeticException\nTest_decaf_lang_ArrayIndexOutOfBoundsException\nTest_decaf_lang_ArrayStoreException\nTest_decaf_lang_Boolean\nTest_decaf_lang_Byte\nTest_decaf_lang_Character\nTest_decaf_lang_Class\nTest_decaf_lang_ClassCastException\nTest_decaf_lang_ClassCircularityError\nTest_decaf_lang_ClassFormatError\nTest_decaf_lang_ClassLoader\nTest_decaf_lang_ClassNotFoundException\nTest_decaf_lang_CloneNotSupportedException\nTest_decaf_lang_Double\nTest_decaf_lang_Error\nTest_decaf_lang_Exception\nTest_decaf_lang_ExceptionInInitializerError\nTest_decaf_lang_Float\nTest_decaf_lang_IllegalAccessError\nTest_decaf_lang_IllegalAccessException\nTest_decaf_lang_IllegalArgumentException\nTest_decaf_lang_IllegalMonitorStateException\nTest_decaf_lang_IllegalThreadStateException\nTest_decaf_lang_IncompatibleClassChangeError\nTest_decaf_lang_IndexOutOfBoundsException\nTest_decaf_lang_InstantiationError\nTest_decaf_lang_InstantiationException\nTest_decaf_lang_Integer\nTest_decaf_lang_InternalError\nTest_decaf_lang_InterruptedException\nTest_decaf_lang_LinkageError\nTest_decaf_lang_Long\nTest_decaf_lang_Math\nTest_decaf_lang_NegativeArraySizeException\nTest_decaf_lang_NoClassDefFoundError\nTest_decaf_lang_NoSuchFieldError\nTest_decaf_lang_NoSuchMethodError\nTest_decaf_lang_NullPointerException\nTest_decaf_lang_Number\nTest_decaf_lang_NumberFormatException\nTest_decaf_lang_Object\nTest_decaf_lang_OutOfMemoryError\nTest_decaf_lang_RuntimeException\nTest_decaf_lang_SecurityManager\nTest_decaf_lang_Short\nTest_decaf_lang_StackOverflowError\nTest_decaf_lang_String\nTest_decaf_lang_StringBuffer\nTest_decaf_lang_StringIndexOutOfBoundsException\nTest_decaf_lang_System\nTest_decaf_lang_Thread\nTest_decaf_lang_ThreadDeath\nTest_decaf_lang_ThreadGroup\nTest_decaf_lang_Throwable\nTest_decaf_lang_UnknownError\nTest_decaf_lang_UnsatisfiedLinkError\nTest_decaf_lang_VerifyError\nTest_decaf_lang_VirtualMachineError\nTest_decaf_lang_vm_Image\nTest_decaf_lang_vm_MemorySegment\nTest_decaf_lang_vm_ROMStoreException\nTest_decaf_lang_vm_VM\nTest_decaf_lang_Void\nTest_decaf_net_BindException\nTest_decaf_net_ConnectException\nTest_decaf_net_DatagramPacket\nTest_decaf_net_DatagramSocket\nTest_decaf_net_DatagramSocketImpl\nTest_decaf_net_InetAddress\nTest_decaf_net_NoRouteToHostException\nTest_decaf_net_PlainDatagramSocketImpl\nTest_decaf_net_PlainSocketImpl\nTest_decaf_net_Socket\nTest_decaf_net_SocketException\nTest_decaf_net_SocketImpl\nTest_decaf_net_SocketInputStream\nTest_decaf_net_SocketOutputStream\nTest_decaf_net_UnknownHostException\nTest_decaf_util_ArrayEnumerator\nTest_decaf_util_Date\nTest_decaf_util_EventObject\nTest_decaf_util_HashEnumerator\nTest_decaf_util_Hashtable\nTest_decaf_util_Properties\nTest_decaf_util_ResourceBundle\nTest_decaf_util_tm\nTest_decaf_util_Vector\n";
             this->baos.reset( new ByteArrayOutputStream() );
@@ -64,26 +65,7 @@ std::unique_ptr<ByteArrayOutputStream> baos;
             } catch(...) {}
         }
 
-        void test();
-        void testFlush();
-        void testSize();
-        void testWrite1();
-        void testWrite2();
-        void testWriteBoolean();
-        void testWriteByte();
-        void testWriteBytes();
-        void testWriteChar();
-        void testWriteChars();
-        void testWriteDouble();
-        void testWriteFloat();
-        void testWriteInt();
-        void testWriteLong();
-        void testWriteShort();
-        void testWriteUTF();
-        void testWriteUTFStringLength();
-        void testWriteUTFEncoding();
-
-    private:
+    protected:
 
         void testHelper( unsigned char* input, int inputLength,
                          unsigned char* expect, int expectLength );
@@ -96,10 +78,8 @@ std::unique_ptr<ByteArrayOutputStream> baos;
 
     };
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testFlush() {
+TEST_F(DataOutputStreamTest, testFlush) {
 
     try {
         os->writeInt(9087589);
@@ -114,7 +94,7 @@ void DataOutputStreamTest::testFlush() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testSize() {
+TEST_F(DataOutputStreamTest, testSize) {
 
     try {
         os->write( (unsigned char*)&testData[0], (int)testData.size(), 0, 150 );
@@ -130,7 +110,7 @@ void DataOutputStreamTest::testSize() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWrite1() {
+TEST_F(DataOutputStreamTest, testWrite1) {
 
     try {
         os->write( (unsigned char*)&testData[0], (int)testData.size(), 0, 150 );
@@ -147,7 +127,7 @@ void DataOutputStreamTest::testWrite1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWrite2() {
+TEST_F(DataOutputStreamTest, testWrite2) {
 
     try {
         os->write( 't' );
@@ -162,7 +142,7 @@ void DataOutputStreamTest::testWrite2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteBoolean() {
+TEST_F(DataOutputStreamTest, testWriteBoolean) {
 
     try {
         os->writeBoolean(true);
@@ -177,7 +157,7 @@ void DataOutputStreamTest::testWriteBoolean() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteByte() {
+TEST_F(DataOutputStreamTest, testWriteByte) {
     try {
         os->writeByte( (unsigned char) 127 );
         os->close();
@@ -191,7 +171,7 @@ void DataOutputStreamTest::testWriteByte() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteBytes() {
+TEST_F(DataOutputStreamTest, testWriteBytes) {
 
     try {
         os->writeBytes( testData );
@@ -211,7 +191,7 @@ void DataOutputStreamTest::testWriteBytes() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteChar() {
+TEST_F(DataOutputStreamTest, testWriteChar) {
     try {
         os->writeChar('T');
         os->close();
@@ -225,7 +205,7 @@ void DataOutputStreamTest::testWriteChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteChars() {
+TEST_F(DataOutputStreamTest, testWriteChars) {
 
     try {
         os->writeChars( testData );
@@ -241,7 +221,7 @@ void DataOutputStreamTest::testWriteChars() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteDouble() {
+TEST_F(DataOutputStreamTest, testWriteDouble) {
     try {
         os->writeDouble(908755555456.98);
         os->close();
@@ -255,7 +235,7 @@ void DataOutputStreamTest::testWriteDouble() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteFloat() {
+TEST_F(DataOutputStreamTest, testWriteFloat) {
     try {
         os->writeFloat(9087.456f);
         os->close();
@@ -269,7 +249,7 @@ void DataOutputStreamTest::testWriteFloat() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteInt() {
+TEST_F(DataOutputStreamTest, testWriteInt) {
     try {
         os->writeInt(9087589);
         os->close();
@@ -283,7 +263,7 @@ void DataOutputStreamTest::testWriteInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteLong() {
+TEST_F(DataOutputStreamTest, testWriteLong) {
     try {
         os->writeLong(908755555456LL);
         os->close();
@@ -297,7 +277,7 @@ void DataOutputStreamTest::testWriteLong() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteShort() {
+TEST_F(DataOutputStreamTest, testWriteShort) {
     try {
         os->writeShort((short) 9087);
         os->close();
@@ -311,7 +291,7 @@ void DataOutputStreamTest::testWriteShort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteUTF() {
+TEST_F(DataOutputStreamTest, testWriteUTF) {
     string testString = "test string one";
     os->writeUTF( testString );
     os->close();
@@ -321,7 +301,7 @@ void DataOutputStreamTest::testWriteUTF() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteUTFStringLength() {
+TEST_F(DataOutputStreamTest, testWriteUTFStringLength) {
 
     // String of length 65536 of Null Characters.
     // Expect: UTFDataFormatException.
@@ -375,7 +355,7 @@ void DataOutputStreamTest::testHelper( unsigned char* input, int inputLength,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteUTFEncoding() {
+TEST_F(DataOutputStreamTest, testWriteUTFEncoding) {
 
     // Test data with 1-byte UTF8 encoding.
     {
@@ -405,7 +385,7 @@ void DataOutputStreamTest::testWriteUTFEncoding() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::test(){
+TEST_F(DataOutputStreamTest, test){
 
     unsigned char byteVal = (unsigned char)'T';
     unsigned short shortVal = 5;
@@ -468,22 +448,3 @@ void DataOutputStreamTest::test(){
 
     delete [] buffer.first;
 }
-
-TEST_F(DataOutputStreamTest, test) { test(); }
-TEST_F(DataOutputStreamTest, testFlush) { testFlush(); }
-TEST_F(DataOutputStreamTest, testSize) { testSize(); }
-TEST_F(DataOutputStreamTest, testWrite1) { testWrite1(); }
-TEST_F(DataOutputStreamTest, testWrite2) { testWrite2(); }
-TEST_F(DataOutputStreamTest, testWriteBoolean) { testWriteBoolean(); }
-TEST_F(DataOutputStreamTest, testWriteByte) { testWriteByte(); }
-TEST_F(DataOutputStreamTest, testWriteBytes) { testWriteBytes(); }
-TEST_F(DataOutputStreamTest, testWriteChar) { testWriteChar(); }
-TEST_F(DataOutputStreamTest, testWriteChars) { testWriteChars(); }
-TEST_F(DataOutputStreamTest, testWriteDouble) { testWriteDouble(); }
-TEST_F(DataOutputStreamTest, testWriteFloat) { testWriteFloat(); }
-TEST_F(DataOutputStreamTest, testWriteInt) { testWriteInt(); }
-TEST_F(DataOutputStreamTest, testWriteLong) { testWriteLong(); }
-TEST_F(DataOutputStreamTest, testWriteShort) { testWriteShort(); }
-TEST_F(DataOutputStreamTest, testWriteUTF) { testWriteUTF(); }
-TEST_F(DataOutputStreamTest, testWriteUTFStringLength) { testWriteUTFStringLength(); }
-TEST_F(DataOutputStreamTest, testWriteUTFEncoding) { testWriteUTFEncoding(); }

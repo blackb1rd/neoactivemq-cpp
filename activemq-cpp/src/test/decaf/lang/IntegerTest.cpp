@@ -22,21 +22,10 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
 
-    class IntegerTest : public ::testing::Test
-    {
-public:
-
-        IntegerTest() {}
-        virtual ~IntegerTest() {}
-
-        virtual void test();
-        virtual void test2();
-
-    };
-
+    class IntegerTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntegerTest::test()
+TEST_F(IntegerTest, test)
 {
     int x = Integer::parseInt("12");
     int y = Integer::parseInt("FF", 16);
@@ -57,7 +46,7 @@ void IntegerTest::test()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntegerTest::test2() {
+TEST_F(IntegerTest, test2) {
     Integer integer( 255 );
 
     // Test cast functions
@@ -121,6 +110,3 @@ void IntegerTest::test2() {
     ASSERT_TRUE(Integer::lowestOneBit( 255 ) == 1);
     ASSERT_TRUE(Integer::lowestOneBit( 0xFF000000 ) == (int)0x01000000);
 }
-
-TEST_F(IntegerTest, test) { test(); }
-TEST_F(IntegerTest, test2) { test2(); }

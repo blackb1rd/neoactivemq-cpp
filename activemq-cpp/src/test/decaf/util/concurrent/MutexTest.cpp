@@ -35,28 +35,10 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::internal::util::concurrent;
 
-    class MutexTest : public ::testing::Test {
-public:
-
-        virtual ~MutexTest(){}
-        void SetUp() override{}
-        void TearDown() override{}
-
-        void testConstructor();
-        void testTimedWait();
-        void testWait();
-        void testSimpleThread();
-        void testNotify();
-        void testNotifyAll();
-        void testRecursiveLock();
-        void testDoubleLock();
-        void testStressMutex();
-
-    };
-
+    class MutexTest : public ::testing::Test {};
 
 ///////////////////////////////////////////////////////////////////////////////
-void MutexTest::testConstructor() {
+TEST_F(MutexTest, testConstructor) {
 
     Mutex mutex;
 
@@ -95,7 +77,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void MutexTest::testSimpleThread() {
+TEST_F(MutexTest, testSimpleThread) {
     MyThread test;
 
     synchronized(&test){
@@ -138,7 +120,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void MutexTest::testWait(){
+TEST_F(MutexTest, testWait){
 
     try
     {
@@ -194,7 +176,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void MutexTest::testTimedWait(){
+TEST_F(MutexTest, testTimedWait){
 
     try {
 
@@ -308,7 +290,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void MutexTest::testNotify() {
+TEST_F(MutexTest, testNotify) {
 
     try{
 
@@ -395,7 +377,7 @@ void MutexTest::testNotify() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void MutexTest::testNotifyAll()
+TEST_F(MutexTest, testNotifyAll)
 {
     try{
         Mutex mutex;
@@ -543,7 +525,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void MutexTest::testRecursiveLock() {
+TEST_F(MutexTest, testRecursiveLock) {
 
     try {
 
@@ -639,7 +621,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void MutexTest::testDoubleLock() {
+TEST_F(MutexTest, testDoubleLock) {
 
     try {
 
@@ -781,7 +763,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void MutexTest::testStressMutex(){
+TEST_F(MutexTest, testStressMutex){
 
     MyStoppableThread tester;
 
@@ -796,13 +778,3 @@ void MutexTest::testStressMutex(){
 
     ASSERT_TRUE(true);
 }
-
-TEST_F(MutexTest, testConstructor) { testConstructor(); }
-TEST_F(MutexTest, testSimpleThread) { testSimpleThread(); }
-TEST_F(MutexTest, testWait) { testWait(); }
-TEST_F(MutexTest, testTimedWait) { testTimedWait(); }
-TEST_F(MutexTest, testNotify) { testNotify(); }
-TEST_F(MutexTest, testNotifyAll) { testNotifyAll(); }
-TEST_F(MutexTest, testRecursiveLock) { testRecursiveLock(); }
-TEST_F(MutexTest, testDoubleLock) { testDoubleLock(); }
-TEST_F(MutexTest, testStressMutex) { testStressMutex(); }

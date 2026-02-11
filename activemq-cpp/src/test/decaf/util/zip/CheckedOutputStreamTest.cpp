@@ -36,13 +36,7 @@ public:
         CheckedOutputStreamTest();
         virtual ~CheckedOutputStreamTest();
 
-        void testConstructor();
-        void testGetChecksum();
-        void testWriteI();
-        void testWriteBIII();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 CheckedOutputStreamTest::CheckedOutputStreamTest() {
@@ -53,7 +47,7 @@ CheckedOutputStreamTest::~CheckedOutputStreamTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedOutputStreamTest::testConstructor() {
+TEST_F(CheckedOutputStreamTest, testConstructor) {
 
     ByteArrayOutputStream baos;
     CRC32 check;
@@ -62,7 +56,7 @@ void CheckedOutputStreamTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedOutputStreamTest::testGetChecksum() {
+TEST_F(CheckedOutputStreamTest, testGetChecksum) {
 
     unsigned char byteArray[] = { 1, 2, 3, 'e', 'r', 't', 'g', 3, 6 };
 
@@ -83,7 +77,7 @@ void CheckedOutputStreamTest::testGetChecksum() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedOutputStreamTest::testWriteI() {
+TEST_F(CheckedOutputStreamTest, testWriteI) {
 
     static const int SIZE = 9;
     unsigned char byteArray[] = { 1, 2, 3, 'e', 'r', 't', 'g', 3, 6 };
@@ -100,7 +94,7 @@ void CheckedOutputStreamTest::testWriteI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedOutputStreamTest::testWriteBIII() {
+TEST_F(CheckedOutputStreamTest, testWriteBIII) {
 
     static const int SIZE = 9;
     unsigned char byteArray[] = { 1, 2, 3, 'e', 'r', 't', 'g', 3, 6 };
@@ -114,8 +108,3 @@ void CheckedOutputStreamTest::testWriteBIII() {
 
     ASSERT_THROW(chkOut.write( byteArray, SIZE, 4, 6 ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
 }
-
-TEST_F(CheckedOutputStreamTest, testConstructor) { testConstructor(); }
-TEST_F(CheckedOutputStreamTest, testGetChecksum) { testGetChecksum(); }
-TEST_F(CheckedOutputStreamTest, testWriteI) { testWriteI(); }
-TEST_F(CheckedOutputStreamTest, testWriteBIII) { testWriteBIII(); }

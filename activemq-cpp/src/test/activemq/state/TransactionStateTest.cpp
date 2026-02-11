@@ -29,17 +29,11 @@ using namespace activemq::commands;
 using namespace decaf::lang;
 
     class TransactionStateTest : public ::testing::Test {
-public:
-
-        TransactionStateTest() {}
-        virtual ~TransactionStateTest() {}
-
-        void test();
     };
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransactionStateTest::test() {
+TEST_F(TransactionStateTest, test) {
 
     Pointer<ConnectionId> connectionId(new ConnectionId);
     connectionId->setValue("CONNECTION");
@@ -56,5 +50,3 @@ void TransactionStateTest::test() {
     ASSERT_NO_THROW(temp = state.getId().dynamicCast<LocalTransactionId>());
     ASSERT_TRUE(temp->getValue() == id->getValue());
 }
-
-TEST_F(TransactionStateTest, test) { test(); }

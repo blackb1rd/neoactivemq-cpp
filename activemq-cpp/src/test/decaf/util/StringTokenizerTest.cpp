@@ -22,18 +22,10 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 
-   class StringTokenizerTest : public ::testing::Test {
-public:
-
-        virtual ~StringTokenizerTest() {}
-
-        void test();
-
-   };
-
+   class StringTokenizerTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void StringTokenizerTest::test()
+TEST_F(StringTokenizerTest, test)
 {
     StringTokenizer tokenizer("stomp://127.0.0.1:23232", "://");
     ASSERT_TRUE(tokenizer.countTokens() == 3);
@@ -105,5 +97,3 @@ void StringTokenizerTest::test()
     tokenizer6.reset("this$is$a$test", "$", true);
         ASSERT_TRUE(tokenizer6.countTokens() == 7);
 }
-
-TEST_F(StringTokenizerTest, test) { test(); }

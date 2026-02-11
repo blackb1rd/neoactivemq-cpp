@@ -44,20 +44,7 @@ public:
         AbstractExecutorServiceTest();
         virtual ~AbstractExecutorServiceTest();
 
-        void testExecuteRunnable();
-        void testSubmitCallable();
-        void testSubmitRunnable();
-        void testSubmitRunnable2();
-        void testExecuteNullRunnable();
-        void testSubmitNullCallable();
-        void testExecute1();
-        void testExecute2();
-        void testInterruptedSubmit();
-        void testSubmitIE();
-        void testSubmitEE();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -135,7 +122,7 @@ AbstractExecutorServiceTest::~AbstractExecutorServiceTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testExecuteRunnable() {
+TEST_F(AbstractExecutorServiceTest, testExecuteRunnable) {
 
     try {
         bool done = false;
@@ -155,7 +142,7 @@ void AbstractExecutorServiceTest::testExecuteRunnable() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testSubmitCallable() {
+TEST_F(AbstractExecutorServiceTest, testSubmitCallable) {
 
     try {
         DirectExecutorService e;
@@ -171,7 +158,7 @@ void AbstractExecutorServiceTest::testSubmitCallable() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testSubmitRunnable() {
+TEST_F(AbstractExecutorServiceTest, testSubmitRunnable) {
     try {
         DirectExecutorService e;
         Future<int>* future = e.submit<int>(new NoOpRunnable());
@@ -186,7 +173,7 @@ void AbstractExecutorServiceTest::testSubmitRunnable() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testSubmitRunnable2() {
+TEST_F(AbstractExecutorServiceTest, testSubmitRunnable2) {
     try {
         DirectExecutorService e;
         Future<string>* future = e.submit(new NoOpRunnable(), TEST_STRING);
@@ -201,7 +188,7 @@ void AbstractExecutorServiceTest::testSubmitRunnable2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testExecuteNullRunnable() {
+TEST_F(AbstractExecutorServiceTest, testExecuteNullRunnable) {
     try {
         DirectExecutorService e;
         TrackedShortRunnable* task = NULL;
@@ -214,7 +201,7 @@ void AbstractExecutorServiceTest::testExecuteNullRunnable() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testSubmitNullCallable() {
+TEST_F(AbstractExecutorServiceTest, testSubmitNullCallable) {
     try {
         DirectExecutorService e;
         StringTask* t = NULL;
@@ -227,7 +214,7 @@ void AbstractExecutorServiceTest::testSubmitNullCallable() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testExecute1() {
+TEST_F(AbstractExecutorServiceTest, testExecute1) {
     ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>(1));
     MediumRunnable task(this);
 
@@ -244,7 +231,7 @@ void AbstractExecutorServiceTest::testExecute1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testExecute2() {
+TEST_F(AbstractExecutorServiceTest, testExecute2) {
     ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>(1));
     try {
 
@@ -324,7 +311,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testInterruptedSubmit() {
+TEST_F(AbstractExecutorServiceTest, testInterruptedSubmit) {
 
     // TODO
 //    ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>(10));
@@ -413,7 +400,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testSubmitIE() {
+TEST_F(AbstractExecutorServiceTest, testSubmitIE) {
 
     ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>(10));
 
@@ -449,7 +436,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testSubmitEE() {
+TEST_F(AbstractExecutorServiceTest, testSubmitEE) {
     ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>(10));
 
     testSubmitEECallable c;
@@ -468,15 +455,3 @@ void AbstractExecutorServiceTest::testSubmitEE() {
 
     joinPool(p);
 }
-
-TEST_F(AbstractExecutorServiceTest, testExecuteRunnable) { testExecuteRunnable(); }
-TEST_F(AbstractExecutorServiceTest, testSubmitCallable) { testSubmitCallable(); }
-TEST_F(AbstractExecutorServiceTest, testSubmitRunnable) { testSubmitRunnable(); }
-TEST_F(AbstractExecutorServiceTest, testSubmitRunnable2) { testSubmitRunnable2(); }
-TEST_F(AbstractExecutorServiceTest, testExecuteNullRunnable) { testExecuteNullRunnable(); }
-TEST_F(AbstractExecutorServiceTest, testSubmitNullCallable) { testSubmitNullCallable(); }
-TEST_F(AbstractExecutorServiceTest, testExecute1) { testExecute1(); }
-TEST_F(AbstractExecutorServiceTest, testExecute2) { testExecute2(); }
-TEST_F(AbstractExecutorServiceTest, testInterruptedSubmit) { testInterruptedSubmit(); }
-TEST_F(AbstractExecutorServiceTest, testSubmitIE) { testSubmitIE(); }
-TEST_F(AbstractExecutorServiceTest, testSubmitEE) { testSubmitEE(); }

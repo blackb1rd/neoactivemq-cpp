@@ -28,28 +28,11 @@ using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
 
-    class FifoMessageDispatchChannelTest : public ::testing::Test {
-public:
-
-        FifoMessageDispatchChannelTest() {}
-        virtual ~FifoMessageDispatchChannelTest() {}
-
-        void testCtor();
-        void testStart();
-        void testStop();
-        void testClose();
-        void testEnqueue();
-        void testEnqueueFront();
-        void testPeek();
-        void testDequeueNoWait();
-        void testDequeue();
-        void testRemoveAll();
-
-    };
-
+class FifoMessageDispatchChannelTest : public ::testing::Test {
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannelTest::testCtor() {
+TEST_F(FifoMessageDispatchChannelTest, testCtor) {
 
     FifoMessageDispatchChannel channel;
     ASSERT_TRUE(channel.isRunning() == false);
@@ -59,7 +42,7 @@ void FifoMessageDispatchChannelTest::testCtor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannelTest::testStart() {
+TEST_F(FifoMessageDispatchChannelTest, testStart) {
 
     FifoMessageDispatchChannel channel;
     channel.start();
@@ -67,7 +50,7 @@ void FifoMessageDispatchChannelTest::testStart() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannelTest::testStop() {
+TEST_F(FifoMessageDispatchChannelTest, testStop) {
 
     FifoMessageDispatchChannel channel;
     channel.start();
@@ -77,7 +60,7 @@ void FifoMessageDispatchChannelTest::testStop() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannelTest::testClose() {
+TEST_F(FifoMessageDispatchChannelTest, testClose) {
 
     FifoMessageDispatchChannel channel;
     channel.start();
@@ -92,7 +75,7 @@ void FifoMessageDispatchChannelTest::testClose() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannelTest::testEnqueue() {
+TEST_F(FifoMessageDispatchChannelTest, testEnqueue) {
 
     FifoMessageDispatchChannel channel;
     Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
@@ -113,7 +96,7 @@ void FifoMessageDispatchChannelTest::testEnqueue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannelTest::testEnqueueFront() {
+TEST_F(FifoMessageDispatchChannelTest, testEnqueueFront) {
 
     FifoMessageDispatchChannel channel;
     Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
@@ -139,7 +122,7 @@ void FifoMessageDispatchChannelTest::testEnqueueFront() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannelTest::testPeek() {
+TEST_F(FifoMessageDispatchChannelTest, testPeek) {
 
     FifoMessageDispatchChannel channel;
     Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
@@ -169,7 +152,7 @@ void FifoMessageDispatchChannelTest::testPeek() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannelTest::testDequeueNoWait() {
+TEST_F(FifoMessageDispatchChannelTest, testDequeueNoWait) {
 
     FifoMessageDispatchChannel channel;
 
@@ -199,7 +182,7 @@ void FifoMessageDispatchChannelTest::testDequeueNoWait() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannelTest::testDequeue() {
+TEST_F(FifoMessageDispatchChannelTest, testDequeue) {
 
     FifoMessageDispatchChannel channel;
 
@@ -230,7 +213,7 @@ void FifoMessageDispatchChannelTest::testDequeue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannelTest::testRemoveAll() {
+TEST_F(FifoMessageDispatchChannelTest, testRemoveAll) {
 
     FifoMessageDispatchChannel channel;
 
@@ -250,14 +233,3 @@ void FifoMessageDispatchChannelTest::testRemoveAll() {
     ASSERT_TRUE(channel.size() == 0);
     ASSERT_TRUE(channel.isEmpty() == true);
 }
-
-TEST_F(FifoMessageDispatchChannelTest, testCtor) { testCtor(); }
-TEST_F(FifoMessageDispatchChannelTest, testStart) { testStart(); }
-TEST_F(FifoMessageDispatchChannelTest, testStop) { testStop(); }
-TEST_F(FifoMessageDispatchChannelTest, testClose) { testClose(); }
-TEST_F(FifoMessageDispatchChannelTest, testEnqueue) { testEnqueue(); }
-TEST_F(FifoMessageDispatchChannelTest, testEnqueueFront) { testEnqueueFront(); }
-TEST_F(FifoMessageDispatchChannelTest, testPeek) { testPeek(); }
-TEST_F(FifoMessageDispatchChannelTest, testDequeueNoWait) { testDequeueNoWait(); }
-TEST_F(FifoMessageDispatchChannelTest, testDequeue) { testDequeue(); }
-TEST_F(FifoMessageDispatchChannelTest, testRemoveAll) { testRemoveAll(); }

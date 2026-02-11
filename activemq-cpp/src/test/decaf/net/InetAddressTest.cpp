@@ -32,13 +32,7 @@ public:
         InetAddressTest();
         virtual ~InetAddressTest();
 
-        void testClone();
-        void testGetByAddress();
-        void testGetHostAddress();
-        void testGetLocalHost();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 InetAddressTest::InetAddressTest() {
@@ -49,7 +43,7 @@ InetAddressTest::~InetAddressTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InetAddressTest::testClone() {
+TEST_F(InetAddressTest, testClone) {
 
     InetAddress address = InetAddress::getLocalHost();
     ASSERT_TRUE(address.getHostName() != "");
@@ -62,7 +56,7 @@ void InetAddressTest::testClone() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InetAddressTest::testGetByAddress() {
+TEST_F(InetAddressTest, testGetByAddress) {
 
     const unsigned char bytes[] = { 127, 0, 0, 1 };
     InetAddress address = InetAddress::getByAddress( bytes, 4 );
@@ -81,7 +75,7 @@ void InetAddressTest::testGetByAddress() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InetAddressTest::testGetHostAddress() {
+TEST_F(InetAddressTest, testGetHostAddress) {
 
     const unsigned char bytes[] = { 127, 0, 0, 1 };
     InetAddress address = InetAddress::getByAddress( bytes, 4 );
@@ -89,14 +83,9 @@ void InetAddressTest::testGetHostAddress() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InetAddressTest::testGetLocalHost() {
+TEST_F(InetAddressTest, testGetLocalHost) {
 
     InetAddress address = InetAddress::getLocalHost();
     ASSERT_TRUE(address.getHostName() != "");
     ASSERT_TRUE(address.getHostAddress() != "");
 }
-
-TEST_F(InetAddressTest, testGetByAddress) { testGetByAddress(); }
-TEST_F(InetAddressTest, testGetHostAddress) { testGetHostAddress(); }
-TEST_F(InetAddressTest, testGetLocalHost) { testGetLocalHost(); }
-TEST_F(InetAddressTest, testClone) { testClone(); }

@@ -41,14 +41,7 @@ public:
         CheckedInputStreamTest();
         virtual ~CheckedInputStreamTest();
 
-        void testConstructor();
-        void testGetChecksum();
-        void testSkip();
-        void testRead();
-        void testReadBIII();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 CheckedInputStreamTest::CheckedInputStreamTest() {
@@ -59,7 +52,7 @@ CheckedInputStreamTest::~CheckedInputStreamTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedInputStreamTest::testConstructor() {
+TEST_F(CheckedInputStreamTest, testConstructor) {
 
     std::vector<unsigned char> outPutBuf;
     ByteArrayInputStream baos( outPutBuf );
@@ -69,7 +62,7 @@ void CheckedInputStreamTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedInputStreamTest::testGetChecksum() {
+TEST_F(CheckedInputStreamTest, testGetChecksum) {
 
     std::vector<unsigned char> emptyBuf;
     ByteArrayInputStream baos( emptyBuf );
@@ -102,7 +95,7 @@ void CheckedInputStreamTest::testGetChecksum() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedInputStreamTest::testSkip() {
+TEST_F(CheckedInputStreamTest, testSkip) {
 
     static const int SIZE = 256;
     std::vector<unsigned char> byteArray( SIZE );
@@ -130,7 +123,7 @@ void CheckedInputStreamTest::testSkip() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedInputStreamTest::testRead() {
+TEST_F(CheckedInputStreamTest, testRead) {
 
     static const int SIZE = 256;
     std::vector<unsigned char> byteArray( SIZE );
@@ -157,7 +150,7 @@ void CheckedInputStreamTest::testRead() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedInputStreamTest::testReadBIII() {
+TEST_F(CheckedInputStreamTest, testReadBIII) {
 
     static const int SIZE = 256;
     std::vector<unsigned char> byteArray( SIZE );
@@ -183,9 +176,3 @@ void CheckedInputStreamTest::testReadBIII() {
 
     ASSERT_THROW(checkIn.read( buff, 50, 10, 5 ), IOException) << ("Should have thrown an IOException");
 }
-
-TEST_F(CheckedInputStreamTest, testConstructor) { testConstructor(); }
-TEST_F(CheckedInputStreamTest, testGetChecksum) { testGetChecksum(); }
-TEST_F(CheckedInputStreamTest, testSkip) { testSkip(); }
-TEST_F(CheckedInputStreamTest, testRead) { testRead(); }
-TEST_F(CheckedInputStreamTest, testReadBIII) { testReadBIII(); }

@@ -40,29 +40,7 @@ public:
         void SetUp() override;
         void TearDown() override;
 
-        void testEnd();
-        void testFinished();
-        void testGetAdler();
-        void testGetRemaining();
-        void testInflateVector();
-        void testInflateB1();
-        void testInflateBII();
-        void testInflateBII1();
-        void testConstructor();
-        void testConstructorZ();
-        void testNeedsDictionary();
-        void testNeedsInput();
-        void testReset();
-        void testSetInputB();
-        void testSetInputBIII();
-        void testGetBytesRead();
-        void testGetBytesWritten();
-        void testInflate();
-        void testSetDictionaryB();
-        void testSetDictionaryBIII();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 InflaterTest::InflaterTest() {
@@ -81,7 +59,7 @@ void InflaterTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testEnd() {
+TEST_F(InflaterTest, testEnd) {
 
     // test method of java.util.zip.inflater.end()
     unsigned char byteArray[] = { 5, 2, 3, 7, 8 };
@@ -106,7 +84,7 @@ void InflaterTest::testEnd() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testFinished() {
+TEST_F(InflaterTest, testFinished) {
 
     static const std::size_t SIZE = 10;
     unsigned char byteArray[] = { 1, 3, 4, 7, 8, 'e', 'r', 't', 'y', '5' };
@@ -143,7 +121,7 @@ void InflaterTest::testFinished() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testGetAdler() {
+TEST_F(InflaterTest, testGetAdler) {
 
     static const int DICT_SIZE = 7;
     static const int ARRAY_SIZE = 15;
@@ -179,7 +157,7 @@ void InflaterTest::testGetAdler() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testGetRemaining() {
+TEST_F(InflaterTest, testGetRemaining) {
 
     unsigned char byteArray[] = { 1, 3, 5, 6, 7 };
     Inflater inflate;
@@ -189,7 +167,7 @@ void InflaterTest::testGetRemaining() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testInflateVector() {
+TEST_F(InflaterTest, testInflateVector) {
 
     static const std::size_t SIZE = 39;
 
@@ -261,7 +239,7 @@ void InflaterTest::testInflateVector() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testInflateB1() {
+TEST_F(InflaterTest, testInflateB1) {
 
     static const std::size_t CODEDATA_SIZE = 39;
 
@@ -299,7 +277,7 @@ void InflaterTest::testInflateB1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testInflateBII() {
+TEST_F(InflaterTest, testInflateBII) {
 
     static const std::size_t SIZE = 39;
 
@@ -353,7 +331,7 @@ void InflaterTest::testInflateBII() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testInflateBII1() {
+TEST_F(InflaterTest, testInflateBII1) {
 
     static const std::size_t CODEDATA_SIZE = 39;
     unsigned char codedData[] = { 120, (unsigned char) -38, 75, (unsigned char) -54, 73,
@@ -397,14 +375,14 @@ void InflaterTest::testInflateBII1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testConstructor() {
+TEST_F(InflaterTest, testConstructor) {
 
     Inflater inflate;
     ASSERT_TRUE(inflate.getBytesRead() == 0LL) << ("failed to create the instance of inflater");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testConstructorZ() {
+TEST_F(InflaterTest, testConstructorZ) {
 
     static const std::size_t SIZE = 10;
 
@@ -449,7 +427,7 @@ void InflaterTest::testConstructorZ() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testNeedsDictionary() {
+TEST_F(InflaterTest, testNeedsDictionary) {
 
     static const int DICT_SIZE = 7;
     static const int ARRAY_SIZE = 15;
@@ -520,7 +498,7 @@ void InflaterTest::testNeedsDictionary() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testNeedsInput() {
+TEST_F(InflaterTest, testNeedsInput) {
 
     Inflater inflate;
     ASSERT_TRUE(inflate.needsInput()) << ("needsInput give the wrong bool value as a result of no input buffer");
@@ -539,7 +517,7 @@ void InflaterTest::testNeedsInput() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testReset() {
+TEST_F(InflaterTest, testReset) {
 
     static const std::size_t SIZE = 10;
 
@@ -604,7 +582,7 @@ void InflaterTest::testReset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testSetInputB() {
+TEST_F(InflaterTest, testSetInputB) {
 
     static const std::size_t SIZE = 12;
     unsigned char byteArray[] = { 2, 3, 4, 't', 'y', 'u', 'e', 'w', 7, 6, 5, 9 };
@@ -614,7 +592,7 @@ void InflaterTest::testSetInputB() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testSetInputBIII() {
+TEST_F(InflaterTest, testSetInputBIII) {
 
     static const std::size_t SIZE = 12;
     unsigned char byteArray[] = { 2, 3, 4, 't', 'y', 'u', 'e', 'w', 7, 6, 5, 9 };
@@ -637,7 +615,7 @@ void InflaterTest::testSetInputBIII() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testGetBytesRead() {
+TEST_F(InflaterTest, testGetBytesRead) {
 
     Deflater def;
     Inflater inf;
@@ -661,7 +639,7 @@ void InflaterTest::testGetBytesRead() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testGetBytesWritten() {
+TEST_F(InflaterTest, testGetBytesWritten) {
 
     Deflater def;
     Inflater inf;
@@ -685,7 +663,7 @@ void InflaterTest::testGetBytesWritten() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testInflate() {
+TEST_F(InflaterTest, testInflate) {
 
     Inflater inf;
     std::vector<unsigned char> empty(0);
@@ -729,7 +707,7 @@ void InflaterTest::testInflate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testSetDictionaryB() {
+TEST_F(InflaterTest, testSetDictionaryB) {
 
     int i = 0;
     std::string inputString = "blah string contains blahblahblahblah and blah";
@@ -842,7 +820,7 @@ void InflaterTest::testSetDictionaryB() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testSetDictionaryBIII() {
+TEST_F(InflaterTest, testSetDictionaryBIII) {
 
     int i = 0;
     std::string inputString = "blah string contains blahblahblahblah and blah";
@@ -936,24 +914,3 @@ void InflaterTest::testSetDictionaryBIII() {
     infl3.end();
     ASSERT_EQ(inputString, std::string( result.begin(), result.begin() + decLen ));
 }
-
-TEST_F(InflaterTest, testEnd) { testEnd(); }
-TEST_F(InflaterTest, testFinished) { testFinished(); }
-TEST_F(InflaterTest, testGetAdler) { testGetAdler(); }
-TEST_F(InflaterTest, testGetRemaining) { testGetRemaining(); }
-TEST_F(InflaterTest, testInflateVector) { testInflateVector(); }
-TEST_F(InflaterTest, testInflateB1) { testInflateB1(); }
-TEST_F(InflaterTest, testInflateBII) { testInflateBII(); }
-TEST_F(InflaterTest, testInflateBII1) { testInflateBII1(); }
-TEST_F(InflaterTest, testConstructor) { testConstructor(); }
-TEST_F(InflaterTest, testConstructorZ) { testConstructorZ(); }
-TEST_F(InflaterTest, testNeedsDictionary) { testNeedsDictionary(); }
-TEST_F(InflaterTest, testNeedsInput) { testNeedsInput(); }
-TEST_F(InflaterTest, testReset) { testReset(); }
-TEST_F(InflaterTest, testSetInputB) { testSetInputB(); }
-TEST_F(InflaterTest, testSetInputBIII) { testSetInputBIII(); }
-TEST_F(InflaterTest, testGetBytesRead) { testGetBytesRead(); }
-TEST_F(InflaterTest, testGetBytesWritten) { testGetBytesWritten(); }
-TEST_F(InflaterTest, testInflate) { testInflate(); }
-TEST_F(InflaterTest, testSetDictionaryB) { testSetDictionaryB(); }
-TEST_F(InflaterTest, testSetDictionaryBIII) { testSetDictionaryBIII(); }

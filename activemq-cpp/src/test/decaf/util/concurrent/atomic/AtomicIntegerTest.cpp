@@ -27,47 +27,22 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
 
-    class AtomicIntegerTest : public ::testing::Test {
-public:
-
-        AtomicIntegerTest() {}
-        virtual ~AtomicIntegerTest() {}
-
-        void testConstructor();
-        void testConstructor2();
-        void testGetSet();
-        void testCompareAndSet();
-        void testCompareAndSetInMultipleThreads();
-        void testGetAndSet();
-        void testToString();
-        void testDoubleValue();
-        void testFloatValue();
-        void testLongValue();
-        void testIntValue();
-        void testIncrementAndGet();
-        void testDecrementAndGet();
-        void testAddAndGet();
-        void testGetAndIncrement();
-        void testGetAndDecrement();
-        void testGetAndAdd();
-
-    };
-
+    class AtomicIntegerTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testConstructor() {
+TEST_F(AtomicIntegerTest, testConstructor) {
     AtomicInteger ai;
     ASSERT_TRUE(ai.get() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testConstructor2() {
+TEST_F(AtomicIntegerTest, testConstructor2) {
     AtomicInteger ai( 999 );
     ASSERT_TRUE(ai.get() == 999);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testGetSet() {
+TEST_F(AtomicIntegerTest, testGetSet) {
     AtomicInteger ai( 2 );
     ASSERT_TRUE(2 == ai.get());
     ai.set( 5 );
@@ -77,7 +52,7 @@ void AtomicIntegerTest::testGetSet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testCompareAndSet() {
+TEST_F(AtomicIntegerTest, testCompareAndSet) {
     AtomicInteger ai( 25 );
     ASSERT_TRUE(ai.compareAndSet( 25, 50 ));
     ASSERT_TRUE(50 == ai.get());
@@ -124,7 +99,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testCompareAndSetInMultipleThreads() {
+TEST_F(AtomicIntegerTest, testCompareAndSetInMultipleThreads) {
     AtomicInteger ai( 1 );
 
     MyIntRunnable runnable( &ai );
@@ -143,7 +118,7 @@ void AtomicIntegerTest::testCompareAndSetInMultipleThreads() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testGetAndSet() {
+TEST_F(AtomicIntegerTest, testGetAndSet) {
     AtomicInteger ai( 50 );
     ASSERT_TRUE(50 == ai.getAndSet( 75 ));
     ASSERT_TRUE(75 == ai.getAndSet( 25 ));
@@ -152,7 +127,7 @@ void AtomicIntegerTest::testGetAndSet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testToString() {
+TEST_F(AtomicIntegerTest, testToString) {
     AtomicInteger ai;
     ASSERT_TRUE(ai.toString() == Integer::toString( 0 ));
     ai.set( 999 );
@@ -160,7 +135,7 @@ void AtomicIntegerTest::testToString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testGetAndAdd() {
+TEST_F(AtomicIntegerTest, testGetAndAdd) {
     AtomicInteger ai( 1 );
     ASSERT_TRUE(1 == ai.getAndAdd(2));
     ASSERT_TRUE(3 == ai.get());
@@ -169,7 +144,7 @@ void AtomicIntegerTest::testGetAndAdd() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testGetAndDecrement() {
+TEST_F(AtomicIntegerTest, testGetAndDecrement) {
     AtomicInteger ai( 1 );
     ASSERT_TRUE(1 == ai.getAndDecrement());
     ASSERT_TRUE(0 == ai.getAndDecrement());
@@ -177,7 +152,7 @@ void AtomicIntegerTest::testGetAndDecrement() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testGetAndIncrement() {
+TEST_F(AtomicIntegerTest, testGetAndIncrement) {
     AtomicInteger ai( 1 );
     ASSERT_TRUE(1 == ai.getAndIncrement());
     ASSERT_TRUE(2 == ai.get());
@@ -189,7 +164,7 @@ void AtomicIntegerTest::testGetAndIncrement() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testAddAndGet() {
+TEST_F(AtomicIntegerTest, testAddAndGet) {
     AtomicInteger ai( 1 );
     ASSERT_TRUE(3 == ai.addAndGet(2));
     ASSERT_TRUE(3 == ai.get());
@@ -198,7 +173,7 @@ void AtomicIntegerTest::testAddAndGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testDecrementAndGet() {
+TEST_F(AtomicIntegerTest, testDecrementAndGet) {
     AtomicInteger ai( 1 );
     ASSERT_TRUE(0 == ai.decrementAndGet());
     ASSERT_TRUE(-1 == ai.decrementAndGet());
@@ -207,7 +182,7 @@ void AtomicIntegerTest::testDecrementAndGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testIncrementAndGet() {
+TEST_F(AtomicIntegerTest, testIncrementAndGet) {
     AtomicInteger ai( 1 );
     ASSERT_TRUE(2 == ai.incrementAndGet());
     ASSERT_TRUE(2 == ai.get());
@@ -219,7 +194,7 @@ void AtomicIntegerTest::testIncrementAndGet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testIntValue() {
+TEST_F(AtomicIntegerTest, testIntValue) {
     AtomicInteger ai;
     for( int i = -12; i < 6; ++i ) {
         ai.set( i );
@@ -228,7 +203,7 @@ void AtomicIntegerTest::testIntValue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testLongValue() {
+TEST_F(AtomicIntegerTest, testLongValue) {
     AtomicInteger ai;
     for( int i = -12; i < 6; ++i ) {
         ai.set( i );
@@ -237,7 +212,7 @@ void AtomicIntegerTest::testLongValue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testFloatValue() {
+TEST_F(AtomicIntegerTest, testFloatValue) {
     AtomicInteger ai;
     for( int i = -12; i < 6; ++i ) {
         ai.set( i );
@@ -246,28 +221,10 @@ void AtomicIntegerTest::testFloatValue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testDoubleValue() {
+TEST_F(AtomicIntegerTest, testDoubleValue) {
     AtomicInteger ai;
     for( int i = -12; i < 6; ++i ) {
         ai.set( i );
         ASSERT_TRUE((double)i == ai.doubleValue());
     }
 }
-
-TEST_F(AtomicIntegerTest, testConstructor) { testConstructor(); }
-TEST_F(AtomicIntegerTest, testConstructor2) { testConstructor2(); }
-TEST_F(AtomicIntegerTest, testGetSet) { testGetSet(); }
-TEST_F(AtomicIntegerTest, testCompareAndSet) { testCompareAndSet(); }
-TEST_F(AtomicIntegerTest, testCompareAndSetInMultipleThreads) { testCompareAndSetInMultipleThreads(); }
-TEST_F(AtomicIntegerTest, testGetAndSet) { testGetAndSet(); }
-TEST_F(AtomicIntegerTest, testToString) { testToString(); }
-TEST_F(AtomicIntegerTest, testDoubleValue) { testDoubleValue(); }
-TEST_F(AtomicIntegerTest, testFloatValue) { testFloatValue(); }
-TEST_F(AtomicIntegerTest, testLongValue) { testLongValue(); }
-TEST_F(AtomicIntegerTest, testIntValue) { testIntValue(); }
-TEST_F(AtomicIntegerTest, testIncrementAndGet) { testIncrementAndGet(); }
-TEST_F(AtomicIntegerTest, testDecrementAndGet) { testDecrementAndGet(); }
-TEST_F(AtomicIntegerTest, testAddAndGet) { testAddAndGet(); }
-TEST_F(AtomicIntegerTest, testGetAndIncrement) { testGetAndIncrement(); }
-TEST_F(AtomicIntegerTest, testGetAndDecrement) { testGetAndDecrement(); }
-TEST_F(AtomicIntegerTest, testGetAndAdd) { testGetAndAdd(); }

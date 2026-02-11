@@ -24,7 +24,7 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class BufferTest : public ::testing::Test {
-private:
+protected:
 
         Buffer* buffer;
 
@@ -41,15 +41,9 @@ private:
             bool isReadOnly() const { return false; }
         };
 
-    private:
-
-        BufferTest(const BufferTest&);
-        BufferTest& operator= (const BufferTest&);
-
     public:
 
         BufferTest() : buffer() {}
-        virtual ~BufferTest() {}
 
         void SetUp() override {
             buffer = new MyBuffer( DEFAULT_BUFFER_SIZE );
@@ -60,29 +54,13 @@ private:
             buffer = NULL;
         }
 
-        void test();
-        void testCapacity();
-        void testClear();
-        void testFlip();
-        void testHasRemaining();
-        void testIsReadOnly();
-        void testLimit();
-        void testLimitInt();
-        void testMark();
-        void testPosition();
-        void testPositionInt();
-        void testRemaining();
-        void testReset();
-        void testRewind();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const int BufferTest::DEFAULT_BUFFER_SIZE = 512;
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferTest::test() {
+TEST_F(BufferTest, test) {
 
     // Check that we have setup the array and our initial assumptions on state
     // are correct.  This is the first test run.
@@ -95,7 +73,7 @@ void BufferTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferTest::testCapacity() {
+TEST_F(BufferTest, testCapacity) {
 
     ASSERT_TRUE(0 == buffer->position() &&
                     buffer->position() <= buffer->limit() &&
@@ -103,7 +81,7 @@ void BufferTest::testCapacity() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferTest::testClear() {
+TEST_F(BufferTest, testClear) {
 
     Buffer& ret = buffer->clear();
 
@@ -115,7 +93,7 @@ void BufferTest::testClear() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferTest::testFlip() {
+TEST_F(BufferTest, testFlip) {
 
     int oldPosition = buffer->position();
 
@@ -128,7 +106,7 @@ void BufferTest::testFlip() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferTest::testHasRemaining() {
+TEST_F(BufferTest, testHasRemaining) {
 
     ASSERT_TRUE(buffer->hasRemaining() == ( buffer->position() < buffer->limit() ));
     buffer->position( buffer->limit() );
@@ -136,13 +114,13 @@ void BufferTest::testHasRemaining() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferTest::testIsReadOnly() {
+TEST_F(BufferTest, testIsReadOnly) {
 
     ASSERT_TRUE(!buffer->isReadOnly());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferTest::testLimit() {
+TEST_F(BufferTest, testLimit) {
 
     ASSERT_TRUE(0 == buffer->position() &&
                     buffer->position() <= buffer->limit() &&
@@ -150,7 +128,7 @@ void BufferTest::testLimit() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferTest::testLimitInt() {
+TEST_F(BufferTest, testLimitInt) {
 
     int oldPosition = buffer->position();
     Buffer& ret = buffer->limit(buffer->limit());
@@ -178,7 +156,7 @@ void BufferTest::testLimitInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferTest::testMark() {
+TEST_F(BufferTest, testMark) {
 
     int oldPosition = buffer->position();
     Buffer& ret = buffer->mark();
@@ -196,7 +174,7 @@ void BufferTest::testMark() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferTest::testPosition() {
+TEST_F(BufferTest, testPosition) {
 
     ASSERT_TRUE(0 == buffer->position() &&
                     buffer->position() <= buffer->limit() &&
@@ -204,7 +182,7 @@ void BufferTest::testPosition() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferTest::testPositionInt() {
+TEST_F(BufferTest, testPositionInt) {
 
     int oldPosition = buffer->position();
 
@@ -236,12 +214,12 @@ void BufferTest::testPositionInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferTest::testRemaining() {
+TEST_F(BufferTest, testRemaining) {
     ASSERT_TRUE(buffer->remaining() == ( buffer->limit() - buffer->position() ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferTest::testReset() {
+TEST_F(BufferTest, testReset) {
 
     int oldPosition = buffer->position();
 
@@ -263,7 +241,7 @@ void BufferTest::testReset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferTest::testRewind() {
+TEST_F(BufferTest, testRewind) {
 
     Buffer& ret = buffer->rewind();
     ASSERT_TRUE(buffer->position() == 0);
@@ -271,18 +249,3 @@ void BufferTest::testRewind() {
 
     ASSERT_THROW(buffer->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
 }
-
-TEST_F(BufferTest, test) { test(); }
-TEST_F(BufferTest, testCapacity) { testCapacity(); }
-TEST_F(BufferTest, testClear) { testClear(); }
-TEST_F(BufferTest, testFlip) { testFlip(); }
-TEST_F(BufferTest, testHasRemaining) { testHasRemaining(); }
-TEST_F(BufferTest, testIsReadOnly) { testIsReadOnly(); }
-TEST_F(BufferTest, testLimit) { testLimit(); }
-TEST_F(BufferTest, testLimitInt) { testLimitInt(); }
-TEST_F(BufferTest, testMark) { testMark(); }
-TEST_F(BufferTest, testPosition) { testPosition(); }
-TEST_F(BufferTest, testPositionInt) { testPositionInt(); }
-TEST_F(BufferTest, testRemaining) { testRemaining(); }
-TEST_F(BufferTest, testReset) { testReset(); }
-TEST_F(BufferTest, testRewind) { testRewind(); }

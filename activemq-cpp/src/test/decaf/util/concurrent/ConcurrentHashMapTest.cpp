@@ -17,7 +17,6 @@
 
 #include <gtest/gtest.h>
 
-
 namespace decaf { namespace util { namespace concurrent {} } }
 using namespace std;
 using namespace decaf;
@@ -30,10 +29,7 @@ public:
         ConcurrentHashMapTest();
         virtual ~ConcurrentHashMapTest();
 
-        void testConstructor();
     };
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 ConcurrentHashMapTest::ConcurrentHashMapTest() {
@@ -44,8 +40,6 @@ ConcurrentHashMapTest::~ConcurrentHashMapTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentHashMapTest::testConstructor() {
+TEST_F(ConcurrentHashMapTest, testConstructor) {
 
 }
-
-TEST_F(ConcurrentHashMapTest, testConstructor) { testConstructor(); }

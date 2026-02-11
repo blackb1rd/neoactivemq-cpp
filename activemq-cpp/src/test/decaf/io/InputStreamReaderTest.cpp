@@ -30,18 +30,13 @@ using namespace decaf::io;
 using namespace decaf::lang::exceptions;
 
     class InputStreamReaderTest : public ::testing::Test {
-private:
+protected:
 
         ByteArrayInputStream* buffer1;
 
         InputStreamReader* reader1;
 
         static const std::string TEST_STRING;
-
-    private:
-
-        InputStreamReaderTest(const InputStreamReaderTest&);
-        InputStreamReaderTest& operator= (const InputStreamReaderTest&);
 
     public:
 
@@ -51,13 +46,7 @@ private:
         void SetUp() override;
         void TearDown() override;
 
-        void testClose();
-        void testConstructorInputStream();
-        void testRead();
-        void testReady();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const std::string InputStreamReaderTest::TEST_STRING = "This is a test message with some simple text in it.";
@@ -87,7 +76,7 @@ void InputStreamReaderTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InputStreamReaderTest::testClose() {
+TEST_F(InputStreamReaderTest, testClose) {
 
     this->reader1->close();
 
@@ -99,7 +88,7 @@ void InputStreamReaderTest::testClose() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InputStreamReaderTest::testConstructorInputStream() {
+TEST_F(InputStreamReaderTest, testConstructorInputStream) {
 
     ASSERT_THROW(InputStreamReader( NULL ), NullPointerException) << ("Should throw an NullPointerException");
 
@@ -109,7 +98,7 @@ void InputStreamReaderTest::testConstructorInputStream() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InputStreamReaderTest::testRead() {
+TEST_F(InputStreamReaderTest, testRead) {
 
     ASSERT_EQ('T', (char) this->reader1->read());
     ASSERT_EQ('h', (char) this->reader1->read());
@@ -127,7 +116,7 @@ void InputStreamReaderTest::testRead() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InputStreamReaderTest::testReady() {
+TEST_F(InputStreamReaderTest, testReady) {
 
     ASSERT_TRUE(this->reader1->ready()) << ("Ready test failed");
     this->reader1->read();
@@ -138,8 +127,3 @@ void InputStreamReaderTest::testReady() {
     this->reader1->read( buffer );
     ASSERT_TRUE(!this->reader1->ready());
 }
-
-TEST_F(InputStreamReaderTest, testClose) { testClose(); }
-TEST_F(InputStreamReaderTest, testConstructorInputStream) { testConstructorInputStream(); }
-TEST_F(InputStreamReaderTest, testRead) { testRead(); }
-TEST_F(InputStreamReaderTest, testReady) { testReady(); }

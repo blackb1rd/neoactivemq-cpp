@@ -31,7 +31,7 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
     class CopyOnWriteArrayListTest : public ::testing::Test {
-private:
+protected:
 
         static const int SIZE;
 
@@ -40,62 +40,7 @@ private:
         CopyOnWriteArrayListTest();
         virtual ~CopyOnWriteArrayListTest();
 
-        void testConstructor1();
-        void testConstructor2();
-        void testConstructor3();
-        void testAddAll();
-        void testAddAll1();
-        void testAddAll2();
-        void testAddAll3();
-        void testAddAll4();
-        void testAddAll5();
-        void testAddAll6();
-        void testAddAll7();
-        void testAddAll8();
-        void testAddAll9();
-        void testClear();
-        void testContains();
-        void testContainsAll();
-        void testGet();
-        void testSet();
-        void testSize();
-        void testIsEmpty();
-        void testToArray();
-        void testIndexOf1();
-        void testIndexOf2();
-        void testLastIndexOf1();
-        void testLastIndexOf2();
-        void testAddIndex();
-        void testAddAllIndex();
-        void testEquals();
-        void testRemove();
-        void testRemoveAt();
-        void testRemoveAll();
-        void testRetainAll();
-        void testAddIfAbsent1();
-        void testAddIfAbsent2();
-        void testAddAllAbsent();
-        void testIterator();
-        void testIteratorRemove();
-        void testListIterator1();
-        void testListIterator2();
-        void testAddAll1IndexOutOfBoundsException();
-        void testAddAll2IndexOutOfBoundsException();
-        void testListIterator1IndexOutOfBoundsException();
-        void testListIterator2IndexOutOfBoundsException();
-        void testAdd1IndexOutOfBoundsException();
-        void testAdd2IndexOutOfBoundsException();
-        void testRemoveAt1IndexOutOfBounds();
-        void testRemoveAt2IndexOutOfBounds();
-        void testGet1IndexOutOfBoundsException();
-        void testGet2IndexOutOfBoundsException();
-        void testSet1IndexOutOfBoundsException();
-        void testSet2IndexOutOfBoundsException();
-        void testConcurrentRandomAddRemoveAndIterate();
-
     };
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const int CopyOnWriteArrayListTest::SIZE = 256;
@@ -149,7 +94,7 @@ CopyOnWriteArrayListTest::~CopyOnWriteArrayListTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testConstructor1() {
+TEST_F(CopyOnWriteArrayListTest, testConstructor1) {
 
     CopyOnWriteArrayList<int> array;
     ASSERT_TRUE(array.isEmpty());
@@ -161,7 +106,7 @@ void CopyOnWriteArrayListTest::testConstructor1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testConstructor2() {
+TEST_F(CopyOnWriteArrayListTest, testConstructor2) {
 
     StlList<int> intsList;
 
@@ -179,7 +124,7 @@ void CopyOnWriteArrayListTest::testConstructor2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testConstructor3() {
+TEST_F(CopyOnWriteArrayListTest, testConstructor3) {
 
     int ints[SIZE];
 
@@ -197,7 +142,7 @@ void CopyOnWriteArrayListTest::testConstructor3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll) {
 
     CopyOnWriteArrayList<int> list;
     for( int i = 0; i < 3; ++i ) {
@@ -214,7 +159,7 @@ void CopyOnWriteArrayListTest::testAddAll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll1() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll1) {
 
     CopyOnWriteArrayList<int> array;
     populate( array, 100 );
@@ -238,7 +183,7 @@ void CopyOnWriteArrayListTest::testAddAll1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll2() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll2) {
 
     StlList<int> emptyCollection;
     ASSERT_THROW(CopyOnWriteArrayList<int>().addAll( -1, emptyCollection ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
@@ -298,7 +243,7 @@ void CopyOnWriteArrayListTest::testAddAll2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll3() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll3) {
 
     CopyOnWriteArrayList<int> list;
     list.addAll( 0, list );
@@ -310,7 +255,7 @@ void CopyOnWriteArrayListTest::testAddAll3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll4() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll4) {
 
     CopyOnWriteArrayList<std::string> array;
     CopyOnWriteArrayList<std::string> blist;
@@ -328,7 +273,7 @@ void CopyOnWriteArrayListTest::testAddAll4() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll5() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll5) {
 
     CopyOnWriteArrayList<std::string> array;
     populate( array, 100 );
@@ -363,7 +308,7 @@ void CopyOnWriteArrayListTest::testAddAll5() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll6() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll6) {
 
     CopyOnWriteArrayList<int> arrayListA;
     arrayListA.add( 1 );
@@ -378,7 +323,7 @@ void CopyOnWriteArrayListTest::testAddAll6() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll7() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll7) {
 
     CopyOnWriteArrayList<int> arrayList;
     arrayList.add( 1 );
@@ -391,7 +336,7 @@ void CopyOnWriteArrayListTest::testAddAll7() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll8() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll8) {
 
     CopyOnWriteArrayList<std::string> arrayList;
     arrayList.add( "1" );
@@ -415,7 +360,7 @@ void CopyOnWriteArrayListTest::testAddAll8() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll9() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll9) {
 
     CopyOnWriteArrayList<std::string> list;
     list.add( "one" );
@@ -455,7 +400,7 @@ void CopyOnWriteArrayListTest::testAddAll9() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testClear() {
+TEST_F(CopyOnWriteArrayListTest, testClear) {
 
     CopyOnWriteArrayList<int> list;
 
@@ -470,7 +415,7 @@ void CopyOnWriteArrayListTest::testClear() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testContains() {
+TEST_F(CopyOnWriteArrayListTest, testContains) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
@@ -480,7 +425,7 @@ void CopyOnWriteArrayListTest::testContains() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testGet() {
+TEST_F(CopyOnWriteArrayListTest, testGet) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
@@ -489,7 +434,7 @@ void CopyOnWriteArrayListTest::testGet() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testIsEmpty() {
+TEST_F(CopyOnWriteArrayListTest, testIsEmpty) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
@@ -501,7 +446,7 @@ void CopyOnWriteArrayListTest::testIsEmpty() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testIndexOf1() {
+TEST_F(CopyOnWriteArrayListTest, testIndexOf1) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
@@ -511,7 +456,7 @@ void CopyOnWriteArrayListTest::testIndexOf1() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testLastIndexOf1() {
+TEST_F(CopyOnWriteArrayListTest, testLastIndexOf1) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
@@ -522,7 +467,7 @@ void CopyOnWriteArrayListTest::testLastIndexOf1() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddIndex() {
+TEST_F(CopyOnWriteArrayListTest, testAddIndex) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
@@ -543,7 +488,7 @@ void CopyOnWriteArrayListTest::testAddIndex() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAllIndex() {
+TEST_F(CopyOnWriteArrayListTest, testAddAllIndex) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
@@ -569,7 +514,7 @@ void CopyOnWriteArrayListTest::testAddAllIndex() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testContainsAll() {
+TEST_F(CopyOnWriteArrayListTest, testContainsAll) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 7 );
@@ -585,7 +530,7 @@ void CopyOnWriteArrayListTest::testContainsAll() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testEquals() {
+TEST_F(CopyOnWriteArrayListTest, testEquals) {
 
     CopyOnWriteArrayList<int> list1;
     populate( list1, 7 );
@@ -604,7 +549,7 @@ void CopyOnWriteArrayListTest::testEquals() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testRemove() {
+TEST_F(CopyOnWriteArrayListTest, testRemove) {
 
     CopyOnWriteArrayList<int> list1;
     populate( list1, SIZE );
@@ -630,7 +575,7 @@ void CopyOnWriteArrayListTest::testRemove() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testRemoveAt() {
+TEST_F(CopyOnWriteArrayListTest, testRemoveAt) {
 
     CopyOnWriteArrayList<int> list1;
     populate( list1, 7 );
@@ -659,7 +604,7 @@ void CopyOnWriteArrayListTest::testRemoveAt() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddIfAbsent1() {
+TEST_F(CopyOnWriteArrayListTest, testAddIfAbsent1) {
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
 
@@ -669,7 +614,7 @@ void CopyOnWriteArrayListTest::testAddIfAbsent1() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddIfAbsent2() {
+TEST_F(CopyOnWriteArrayListTest, testAddIfAbsent2) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
@@ -680,7 +625,7 @@ void CopyOnWriteArrayListTest::testAddIfAbsent2() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testIterator() {
+TEST_F(CopyOnWriteArrayListTest, testIterator) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
@@ -695,7 +640,7 @@ void CopyOnWriteArrayListTest::testIterator() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testIteratorRemove() {
+TEST_F(CopyOnWriteArrayListTest, testIteratorRemove) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
@@ -708,7 +653,7 @@ void CopyOnWriteArrayListTest::testIteratorRemove() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testListIterator1() {
+TEST_F(CopyOnWriteArrayListTest, testListIterator1) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
@@ -723,7 +668,7 @@ void CopyOnWriteArrayListTest::testListIterator1() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testListIterator2() {
+TEST_F(CopyOnWriteArrayListTest, testListIterator2) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
@@ -738,7 +683,7 @@ void CopyOnWriteArrayListTest::testListIterator2() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testSet() {
+TEST_F(CopyOnWriteArrayListTest, testSet) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
@@ -748,7 +693,7 @@ void CopyOnWriteArrayListTest::testSet() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testSize() {
+TEST_F(CopyOnWriteArrayListTest, testSize) {
 
     CopyOnWriteArrayList<int> empty;
     CopyOnWriteArrayList<int> list;
@@ -759,7 +704,7 @@ void CopyOnWriteArrayListTest::testSize() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll1IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll1IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
     StlList<int> collection;
@@ -768,7 +713,7 @@ void CopyOnWriteArrayListTest::testAddAll1IndexOutOfBoundsException() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll2IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll2IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
     list.add( 1 );
@@ -780,7 +725,7 @@ void CopyOnWriteArrayListTest::testAddAll2IndexOutOfBoundsException() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testListIterator1IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testListIterator1IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
 
@@ -788,7 +733,7 @@ void CopyOnWriteArrayListTest::testListIterator1IndexOutOfBoundsException() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testListIterator2IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testListIterator2IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
     list.add( 1 );
@@ -798,7 +743,7 @@ void CopyOnWriteArrayListTest::testListIterator2IndexOutOfBoundsException() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAdd1IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testAdd1IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
 
@@ -806,7 +751,7 @@ void CopyOnWriteArrayListTest::testAdd1IndexOutOfBoundsException() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAdd2IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testAdd2IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
     list.add( 1 );
@@ -816,7 +761,7 @@ void CopyOnWriteArrayListTest::testAdd2IndexOutOfBoundsException() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testRemoveAt1IndexOutOfBounds() {
+TEST_F(CopyOnWriteArrayListTest, testRemoveAt1IndexOutOfBounds) {
 
     CopyOnWriteArrayList<int> list;
 
@@ -824,7 +769,7 @@ void CopyOnWriteArrayListTest::testRemoveAt1IndexOutOfBounds() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testRemoveAt2IndexOutOfBounds() {
+TEST_F(CopyOnWriteArrayListTest, testRemoveAt2IndexOutOfBounds) {
 
     CopyOnWriteArrayList<int> list;
     list.add( 1 );
@@ -834,7 +779,7 @@ void CopyOnWriteArrayListTest::testRemoveAt2IndexOutOfBounds() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testGet1IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testGet1IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
 
@@ -842,7 +787,7 @@ void CopyOnWriteArrayListTest::testGet1IndexOutOfBoundsException() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testGet2IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testGet2IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
     list.add( 1 );
@@ -852,7 +797,7 @@ void CopyOnWriteArrayListTest::testGet2IndexOutOfBoundsException() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testSet1IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testSet1IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
 
@@ -860,7 +805,7 @@ void CopyOnWriteArrayListTest::testSet1IndexOutOfBoundsException() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testSet2IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testSet2IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
     list.add( 1 );
@@ -870,7 +815,7 @@ void CopyOnWriteArrayListTest::testSet2IndexOutOfBoundsException() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testToArray() {
+TEST_F(CopyOnWriteArrayListTest, testToArray) {
 
     CopyOnWriteArrayList<int> list;
     list.add( 1 );
@@ -886,7 +831,7 @@ void CopyOnWriteArrayListTest::testToArray() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testLastIndexOf2() {
+TEST_F(CopyOnWriteArrayListTest, testLastIndexOf2) {
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
     list.add( 1 );
@@ -897,7 +842,7 @@ void CopyOnWriteArrayListTest::testLastIndexOf2() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testIndexOf2() {
+TEST_F(CopyOnWriteArrayListTest, testIndexOf2) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
@@ -907,7 +852,7 @@ void CopyOnWriteArrayListTest::testIndexOf2() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAllAbsent() {
+TEST_F(CopyOnWriteArrayListTest, testAddAllAbsent) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
@@ -923,7 +868,7 @@ void CopyOnWriteArrayListTest::testAddAllAbsent() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testRemoveAll() {
+TEST_F(CopyOnWriteArrayListTest, testRemoveAll) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
@@ -949,7 +894,7 @@ void CopyOnWriteArrayListTest::testRemoveAll() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testRetainAll() {
+TEST_F(CopyOnWriteArrayListTest, testRetainAll) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
@@ -1055,7 +1000,7 @@ namespace copyonwritearraylisttest {
 }  // namespace copyonwritearraylisttest
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testConcurrentRandomAddRemoveAndIterate() {
+TEST_F(CopyOnWriteArrayListTest, testConcurrentRandomAddRemoveAndIterate) {
 
     using copyonwritearraylisttest::Target;
     using copyonwritearraylisttest::AddRemoveItemRunnable;
@@ -1074,56 +1019,3 @@ void CopyOnWriteArrayListTest::testConcurrentRandomAddRemoveAndIterate() {
     executor.shutdown();
     ASSERT_TRUE(executor.awaitTermination(45, TimeUnit::SECONDS)) << ("executor terminated");
 }
-
-TEST_F(CopyOnWriteArrayListTest, testConstructor1) { testConstructor1(); }
-TEST_F(CopyOnWriteArrayListTest, testConstructor2) { testConstructor2(); }
-TEST_F(CopyOnWriteArrayListTest, testConstructor3) { testConstructor3(); }
-TEST_F(CopyOnWriteArrayListTest, testAddAll) { testAddAll(); }
-TEST_F(CopyOnWriteArrayListTest, testAddAll1) { testAddAll1(); }
-TEST_F(CopyOnWriteArrayListTest, testAddAll2) { testAddAll2(); }
-TEST_F(CopyOnWriteArrayListTest, testAddAll3) { testAddAll3(); }
-TEST_F(CopyOnWriteArrayListTest, testAddAll4) { testAddAll4(); }
-TEST_F(CopyOnWriteArrayListTest, testAddAll5) { testAddAll5(); }
-TEST_F(CopyOnWriteArrayListTest, testAddAll6) { testAddAll6(); }
-TEST_F(CopyOnWriteArrayListTest, testAddAll7) { testAddAll7(); }
-TEST_F(CopyOnWriteArrayListTest, testAddAll8) { testAddAll8(); }
-TEST_F(CopyOnWriteArrayListTest, testAddAll9) { testAddAll9(); }
-TEST_F(CopyOnWriteArrayListTest, testClear) { testClear(); }
-TEST_F(CopyOnWriteArrayListTest, testContains) { testContains(); }
-TEST_F(CopyOnWriteArrayListTest, testContainsAll) { testContainsAll(); }
-TEST_F(CopyOnWriteArrayListTest, testGet) { testGet(); }
-TEST_F(CopyOnWriteArrayListTest, testSet) { testSet(); }
-TEST_F(CopyOnWriteArrayListTest, testSize) { testSize(); }
-TEST_F(CopyOnWriteArrayListTest, testIsEmpty) { testIsEmpty(); }
-TEST_F(CopyOnWriteArrayListTest, testToArray) { testToArray(); }
-TEST_F(CopyOnWriteArrayListTest, testIndexOf1) { testIndexOf1(); }
-TEST_F(CopyOnWriteArrayListTest, testIndexOf2) { testIndexOf2(); }
-TEST_F(CopyOnWriteArrayListTest, testLastIndexOf1) { testLastIndexOf1(); }
-TEST_F(CopyOnWriteArrayListTest, testLastIndexOf2) { testLastIndexOf2(); }
-TEST_F(CopyOnWriteArrayListTest, testAddIndex) { testAddIndex(); }
-TEST_F(CopyOnWriteArrayListTest, testAddAllIndex) { testAddAllIndex(); }
-TEST_F(CopyOnWriteArrayListTest, testEquals) { testEquals(); }
-TEST_F(CopyOnWriteArrayListTest, testRemove) { testRemove(); }
-TEST_F(CopyOnWriteArrayListTest, testRemoveAt) { testRemoveAt(); }
-TEST_F(CopyOnWriteArrayListTest, testRemoveAll) { testRemoveAll(); }
-TEST_F(CopyOnWriteArrayListTest, testRetainAll) { testRetainAll(); }
-TEST_F(CopyOnWriteArrayListTest, testAddIfAbsent1) { testAddIfAbsent1(); }
-TEST_F(CopyOnWriteArrayListTest, testAddIfAbsent2) { testAddIfAbsent2(); }
-TEST_F(CopyOnWriteArrayListTest, testAddAllAbsent) { testAddAllAbsent(); }
-TEST_F(CopyOnWriteArrayListTest, testIterator) { testIterator(); }
-TEST_F(CopyOnWriteArrayListTest, testIteratorRemove) { testIteratorRemove(); }
-TEST_F(CopyOnWriteArrayListTest, testListIterator1) { testListIterator1(); }
-TEST_F(CopyOnWriteArrayListTest, testListIterator2) { testListIterator2(); }
-TEST_F(CopyOnWriteArrayListTest, testAddAll1IndexOutOfBoundsException) { testAddAll1IndexOutOfBoundsException(); }
-TEST_F(CopyOnWriteArrayListTest, testAddAll2IndexOutOfBoundsException) { testAddAll2IndexOutOfBoundsException(); }
-TEST_F(CopyOnWriteArrayListTest, testListIterator1IndexOutOfBoundsException) { testListIterator1IndexOutOfBoundsException(); }
-TEST_F(CopyOnWriteArrayListTest, testListIterator2IndexOutOfBoundsException) { testListIterator2IndexOutOfBoundsException(); }
-TEST_F(CopyOnWriteArrayListTest, testAdd1IndexOutOfBoundsException) { testAdd1IndexOutOfBoundsException(); }
-TEST_F(CopyOnWriteArrayListTest, testAdd2IndexOutOfBoundsException) { testAdd2IndexOutOfBoundsException(); }
-TEST_F(CopyOnWriteArrayListTest, testRemoveAt1IndexOutOfBounds) { testRemoveAt1IndexOutOfBounds(); }
-TEST_F(CopyOnWriteArrayListTest, testRemoveAt2IndexOutOfBounds) { testRemoveAt2IndexOutOfBounds(); }
-TEST_F(CopyOnWriteArrayListTest, testGet1IndexOutOfBoundsException) { testGet1IndexOutOfBoundsException(); }
-TEST_F(CopyOnWriteArrayListTest, testGet2IndexOutOfBoundsException) { testGet2IndexOutOfBoundsException(); }
-TEST_F(CopyOnWriteArrayListTest, testSet1IndexOutOfBoundsException) { testSet1IndexOutOfBoundsException(); }
-TEST_F(CopyOnWriteArrayListTest, testSet2IndexOutOfBoundsException) { testSet2IndexOutOfBoundsException(); }
-TEST_F(CopyOnWriteArrayListTest, testConcurrentRandomAddRemoveAndIterate) { testConcurrentRandomAddRemoveAndIterate(); }

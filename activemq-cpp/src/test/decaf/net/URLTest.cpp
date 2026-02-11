@@ -38,100 +38,9 @@ public:
         URLTest();
         virtual ~URLTest();
 
-        void testConstructor1();
-        void testConstructor2();
-        void testConstructor3();
-        void testConstructor4();
-        void testEquals();
-        void testSameFile();
-        void testToString();
-        void testToExternalForm();
-        void testGetFile();
-        void testGetHost();
-        void testGetPort();
-        void testGetDefaultPort();
-        void testGetProtocol();
-        void testGetRef();
-        void testGetAuthority();
-        void testToURI();
-        void testURLStreamHandlerParseURL();
-        void testUrlParts();
-        void testFileEqualsWithEmptyHost();
         void testOmittedHost();
-        void testNoHost();
-        void testNoPath();
-        void testEmptyHostAndNoPath();
-        void testNoHostAndNoPath();
-        void testAtSignInUserInfo();
-        void testUserNoPassword();
-        void testUserNoPasswordExplicitPort();
-        void testUserPasswordHostPort();
-        void testUserPasswordEmptyHostPort();
-        void testUserPasswordEmptyHostEmptyPort();
-        void testPathOnly();
-        void testQueryOnly();
-        void testFragmentOnly();
-        void testAtSignInPath();
-        void testColonInPath();
-        void testSlashInQuery();
-        void testQuestionMarkInQuery();
-        void testAtSignInQuery();
-        void testColonInQuery();
-        void testQuestionMarkInFragment();
-        void testColonInFragment();
-        void testSlashInFragment();
-        void testSlashInFragmentCombiningConstructor();
-        void testHashInFragment();
-        void testEmptyPort();
-        void testNonNumericPort();
-        void testNegativePort();
-        void testNegativePortEqualsPlaceholder();
-        void testRelativePathOnQuery();
-        void testRelativeFragmentOnQuery();
-        void testPathContainsRelativeParts();
-        void testRelativePathAndFragment();
-        void testRelativeParentDirectory();
-        void testRelativeChildDirectory();
-        void testRelativeRootDirectory();
-        void testRelativeFullUrl();
-        void testRelativeDifferentScheme();
-        void testRelativeDifferentAuthority();
-        void testRelativeWithScheme();
-        void testMalformedUrlsRefusedByFirefoxAndChrome();
-        void testRfc1808NormalExamples();
-        void testRfc1808AbnormalExampleTooManyDotDotSequences();
-        void testRfc1808AbnormalExampleRemoveDotSegments();
-        void testRfc1808AbnormalExampleNonsensicalDots();
-        void testRfc1808AbnormalExampleRelativeScheme();
-        void testRfc1808AbnormalExampleQueryOrFragmentDots();
-        void testSquareBracketsInUserInfo();
-        void testComposeUrl();
-        void testComposeUrlWithNullHost();
-        void testFileUrlExtraLeadingSlashes();
-        void testFileUrlWithAuthority();
-        void testEmptyAuthority();
-        void testHttpUrlExtraLeadingSlashes();
-        void testFileUrlRelativePath();
-        void testFileUrlDottedPath();
-        void testParsingDotAsHostname();
-        void testSquareBracketsWithIPv4();
-        void testSquareBracketsWithHostname();
-        void testIPv6WithoutSquareBrackets();
-        void testIpv6WithSquareBrackets();
-        void testEqualityWithNoPath();
-        void testUrlDoesNotEncodeParts();
-        void testSchemeCaseIsCanonicalized();
-        void testEmptyAuthorityWithPath();
-        void testEmptyAuthorityWithQuery();
-        void testEmptyAuthorityWithFragment();
-        void testCombiningConstructorsMakeRelativePathsAbsolute();
-        void testCombiningConstructorsDoNotMakeEmptyPathsAbsolute();
-        void testPartContainsSpace();
-        void testUnderscore();
 
     };
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -171,7 +80,7 @@ URLTest::~URLTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testConstructor1() {
+TEST_F(URLTest, testConstructor1) {
 
     // Tests for multiple URL instantiation basic parsing test
     URL a("http://www.yahoo1.com:8080/dir1/dir2/test.cgi?point1.html#anchor1");
@@ -322,7 +231,7 @@ void URLTest::testConstructor1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testConstructor2() {
+TEST_F(URLTest, testConstructor2) {
 
     URL u("http", "www.yahoo.com", "test.html#foo");
     ASSERT_TRUE(u.getProtocol().equals("http"));
@@ -344,7 +253,7 @@ void URLTest::testConstructor2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testConstructor3() {
+TEST_F(URLTest, testConstructor3) {
 
     URL u("http", "www.yahoo.com", 8080, "test.html#foo");
     ASSERT_EQ(String("http"), u.getProtocol()) << ("SSIS returns a wrong protocol");
@@ -360,7 +269,7 @@ void URLTest::testConstructor3() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testConstructor4() {
+TEST_F(URLTest, testConstructor4) {
 
     URL context("http://www.yahoo.com");
 
@@ -402,7 +311,7 @@ void URLTest::testConstructor4() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testEquals() {
+TEST_F(URLTest, testEquals) {
 
     URL u("http://www.apache.org:8080/dir::23??????????test.html");
     URL u1("http://www.apache.org:8080/dir::23??????????test.html");
@@ -426,7 +335,7 @@ void URLTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testSameFile() {
+TEST_F(URLTest, testSameFile) {
 
     URL a("http://www.yahoo.com");
     URL b("http", "www.yahoo.com", "");
@@ -456,7 +365,7 @@ void URLTest::testSameFile() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testToString() {
+TEST_F(URLTest, testToString) {
 
     URL a("http://www.yahoo2.com:9999");
     URL b("http://www.yahoo1.com:8080/dir1/dir2/test.cgi?point1.html#anchor1");
@@ -469,7 +378,7 @@ void URLTest::testToString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testToExternalForm() {
+TEST_F(URLTest, testToExternalForm) {
     URL b("http://www.yahoo2.com:9999");
     URL a("http://www.yahoo1.com:8080/dir1/dir2/test.cgi?point1.html#anchor1");
 
@@ -487,7 +396,7 @@ void URLTest::testToExternalForm() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testGetFile() {
+TEST_F(URLTest, testGetFile) {
 
     // TODO
 //    URL a("http", "www.yahoo.com:8080", 1233, "test/!@$%^&*/test.html#foo");
@@ -497,7 +406,7 @@ void URLTest::testGetFile() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testGetHost() {
+TEST_F(URLTest, testGetHost) {
 
     String ipv6Host = "FEDC:BA98:7654:3210:FEDC:BA98:7654:3210";
     URL url("http", ipv6Host, -1, "myfile");
@@ -505,7 +414,7 @@ void URLTest::testGetHost() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testGetPort() {
+TEST_F(URLTest, testGetPort) {
     URL a("http://member12.c++.com:9999");
     ASSERT_TRUE(a.getPort() == 9999) << ("return wrong port number");
     URL b("http://member12.c++.com:9999/");
@@ -513,7 +422,7 @@ void URLTest::testGetPort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testGetDefaultPort() {
+TEST_F(URLTest, testGetDefaultPort) {
     URL a("http://member12.c++.com:9999");
     ASSERT_EQ(80, a.getDefaultPort());
 
@@ -527,13 +436,13 @@ void URLTest::testGetDefaultPort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testGetProtocol() {
+TEST_F(URLTest, testGetProtocol) {
     URL a("http://www.yahoo2.com:9999");
     ASSERT_TRUE(a.getProtocol().equals("http")) << ("u returns a wrong protocol: ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testGetRef() {
+TEST_F(URLTest, testGetRef) {
     URL b("http://www.yahoo2.com:9999");
     URL a("http://www.yahoo1.com:8080/dir1/dir2/test.cgi?point1.html#anchor1");
 
@@ -547,7 +456,7 @@ void URLTest::testGetRef() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testGetAuthority() {
+TEST_F(URLTest, testGetAuthority) {
 
     URL a("http", "hostname", 80, "/java?q1#ref");
     ASSERT_EQ(String("hostname:80"), a.getAuthority());
@@ -578,14 +487,14 @@ void URLTest::testGetAuthority() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testToURI() {
+TEST_F(URLTest, testToURI) {
     URL a("http://www.apache.org");
     URI uri = a.toURI();
     ASSERT_TRUE(a.equals(uri.toURL()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testURLStreamHandlerParseURL() {
+TEST_F(URLTest, testURLStreamHandlerParseURL) {
 
     URL url("http://localhost");
     MyURLStreamHandler handler;
@@ -614,7 +523,7 @@ void URLTest::testURLStreamHandlerParseURL() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testUrlParts() {
+TEST_F(URLTest, testUrlParts) {
     URL url("http://username:password@host:8080/directory/file?query#ref");
     ASSERT_EQ(String("http"), url.getProtocol());
     ASSERT_EQ(String("username:password@host:8080"), url.getAuthority());
@@ -629,7 +538,7 @@ void URLTest::testUrlParts() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testFileEqualsWithEmptyHost() {
+TEST_F(URLTest, testFileEqualsWithEmptyHost) {
     URL a("file", "", -1, "/a/");
     URL b("file:/a/");
     ASSERT_TRUE(a.equals(b));
@@ -644,7 +553,7 @@ void URLTest::testOmittedHost() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testNoHost() {
+TEST_F(URLTest, testNoHost) {
     URL url("http:/path");
     ASSERT_EQ(String("http"), url.getProtocol());
     ASSERT_EQ(String(), url.getAuthority());
@@ -659,7 +568,7 @@ void URLTest::testNoHost() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testNoPath() {
+TEST_F(URLTest, testNoPath) {
     URL url("http://host");
     ASSERT_EQ(String("host"), url.getHost());
     ASSERT_EQ(String(), url.getFile());
@@ -667,7 +576,7 @@ void URLTest::testNoPath() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testEmptyHostAndNoPath() {
+TEST_F(URLTest, testEmptyHostAndNoPath) {
     URL url("http://");
     ASSERT_EQ(String("http"), url.getProtocol());
     ASSERT_EQ(String(), url.getAuthority());
@@ -682,7 +591,7 @@ void URLTest::testEmptyHostAndNoPath() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testNoHostAndNoPath() {
+TEST_F(URLTest, testNoHostAndNoPath) {
     URL url("http:");
     ASSERT_EQ(String("http"), url.getProtocol());
     ASSERT_EQ(String(), url.getAuthority());
@@ -697,12 +606,12 @@ void URLTest::testNoHostAndNoPath() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testAtSignInUserInfo() {
+TEST_F(URLTest, testAtSignInUserInfo) {
     ASSERT_THROW(URL("http://user@userhost.com:password@host"), MalformedURLException) << ("Should have thrown an MalformedURLException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testUserNoPassword() {
+TEST_F(URLTest, testUserNoPassword) {
     URL url("http://user@host");
     ASSERT_EQ(String("user@host"), url.getAuthority());
     ASSERT_EQ(String("user"), url.getUserInfo());
@@ -710,7 +619,7 @@ void URLTest::testUserNoPassword() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testUserNoPasswordExplicitPort() {
+TEST_F(URLTest, testUserNoPasswordExplicitPort) {
     URL url("http://user@host:8080");
     ASSERT_EQ(String("user@host:8080"), url.getAuthority());
     ASSERT_EQ(String("user"), url.getUserInfo());
@@ -719,7 +628,7 @@ void URLTest::testUserNoPasswordExplicitPort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testUserPasswordHostPort() {
+TEST_F(URLTest, testUserPasswordHostPort) {
     URL url("http://user:password@host:8080");
     ASSERT_EQ(String("user:password@host:8080"), url.getAuthority());
     ASSERT_EQ(String("user:password"), url.getUserInfo());
@@ -728,7 +637,7 @@ void URLTest::testUserPasswordHostPort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testUserPasswordEmptyHostPort() {
+TEST_F(URLTest, testUserPasswordEmptyHostPort) {
     URL url("http://user:password@:8080");
     ASSERT_EQ(String("user:password@:8080"), url.getAuthority());
     ASSERT_EQ(String("user:password"), url.getUserInfo());
@@ -737,7 +646,7 @@ void URLTest::testUserPasswordEmptyHostPort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testUserPasswordEmptyHostEmptyPort() {
+TEST_F(URLTest, testUserPasswordEmptyHostEmptyPort) {
     URL url("http://user:password@");
     ASSERT_EQ(String("user:password@"), url.getAuthority());
     ASSERT_EQ(String("user:password"), url.getUserInfo());
@@ -746,14 +655,14 @@ void URLTest::testUserPasswordEmptyHostEmptyPort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testPathOnly() {
+TEST_F(URLTest, testPathOnly) {
     URL url("http://host/path");
     ASSERT_EQ(String("/path"), url.getFile());
     ASSERT_EQ(String("/path"), url.getPath());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testQueryOnly() {
+TEST_F(URLTest, testQueryOnly) {
     URL url("http://host?query");
     ASSERT_EQ(String("?query"), url.getFile());
     ASSERT_EQ(String(), url.getPath());
@@ -761,7 +670,7 @@ void URLTest::testQueryOnly() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testFragmentOnly() {
+TEST_F(URLTest, testFragmentOnly) {
     URL url("http://host#fragment");
     ASSERT_EQ(String(), url.getFile());
     ASSERT_EQ(String(), url.getPath());
@@ -769,7 +678,7 @@ void URLTest::testFragmentOnly() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testAtSignInPath() {
+TEST_F(URLTest, testAtSignInPath) {
     URL url("http://host/file@foo");
     ASSERT_EQ(String("/file@foo"), url.getFile());
     ASSERT_EQ(String("/file@foo"), url.getPath());
@@ -777,14 +686,14 @@ void URLTest::testAtSignInPath() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testColonInPath() {
+TEST_F(URLTest, testColonInPath) {
     URL url("http://host/file:colon");
     ASSERT_EQ(String("/file:colon"), url.getFile());
     ASSERT_EQ(String("/file:colon"), url.getPath());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testSlashInQuery() {
+TEST_F(URLTest, testSlashInQuery) {
     URL url("http://host/file?query/path");
     ASSERT_EQ(String("/file?query/path"), url.getFile());
     ASSERT_EQ(String("/file"), url.getPath());
@@ -792,7 +701,7 @@ void URLTest::testSlashInQuery() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testQuestionMarkInQuery() {
+TEST_F(URLTest, testQuestionMarkInQuery) {
     URL url("http://host/file?query?another");
     ASSERT_EQ(String("/file?query?another"), url.getFile());
     ASSERT_EQ(String("/file"), url.getPath());
@@ -800,7 +709,7 @@ void URLTest::testQuestionMarkInQuery() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testAtSignInQuery() {
+TEST_F(URLTest, testAtSignInQuery) {
     URL url("http://host/file?query@at");
     ASSERT_EQ(String("/file?query@at"), url.getFile());
     ASSERT_EQ(String("/file"), url.getPath());
@@ -808,7 +717,7 @@ void URLTest::testAtSignInQuery() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testColonInQuery() {
+TEST_F(URLTest, testColonInQuery) {
     URL url("http://host/file?query:colon");
     ASSERT_EQ(String("/file?query:colon"), url.getFile());
     ASSERT_EQ(String("/file"), url.getPath());
@@ -816,7 +725,7 @@ void URLTest::testColonInQuery() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testQuestionMarkInFragment() {
+TEST_F(URLTest, testQuestionMarkInFragment) {
     URL url("http://host/file#fragment?query");
     ASSERT_EQ(String("/file"), url.getFile());
     ASSERT_EQ(String("/file"), url.getPath());
@@ -825,7 +734,7 @@ void URLTest::testQuestionMarkInFragment() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testColonInFragment() {
+TEST_F(URLTest, testColonInFragment) {
     URL url("http://host/file#fragment:80");
     ASSERT_EQ(String("/file"), url.getFile());
     ASSERT_EQ(String("/file"), url.getPath());
@@ -834,7 +743,7 @@ void URLTest::testColonInFragment() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testSlashInFragment() {
+TEST_F(URLTest, testSlashInFragment) {
     URL url("http://host/file#fragment/path");
     ASSERT_EQ(String("/file"), url.getFile());
     ASSERT_EQ(String("/file"), url.getPath());
@@ -842,7 +751,7 @@ void URLTest::testSlashInFragment() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testSlashInFragmentCombiningConstructor() {
+TEST_F(URLTest, testSlashInFragmentCombiningConstructor) {
     URL url("http", "host", "/file#fragment/path");
     ASSERT_EQ(String("/file"), url.getFile());
     ASSERT_EQ(String("/file"), url.getPath());
@@ -850,7 +759,7 @@ void URLTest::testSlashInFragmentCombiningConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testHashInFragment() {
+TEST_F(URLTest, testHashInFragment) {
     URL url("http://host/file#fragment#another");
     ASSERT_EQ(String("/file"), url.getFile());
     ASSERT_EQ(String("/file"), url.getPath());
@@ -858,28 +767,28 @@ void URLTest::testHashInFragment() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testEmptyPort() {
+TEST_F(URLTest, testEmptyPort) {
     URL url("http://host:/");
     ASSERT_EQ(-1, url.getPort());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testNonNumericPort() {
+TEST_F(URLTest, testNonNumericPort) {
     ASSERT_THROW(URL("http://host:x/"), MalformedURLException) << ("Should have thrown an MalformedURLException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testNegativePort() {
+TEST_F(URLTest, testNegativePort) {
     ASSERT_THROW(URL("http://host:-2/"), MalformedURLException) << ("Should have thrown an MalformedURLException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testNegativePortEqualsPlaceholder() {
+TEST_F(URLTest, testNegativePortEqualsPlaceholder) {
     ASSERT_THROW(URL("http://host:-1/"), MalformedURLException) << ("Should have thrown an MalformedURLException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRelativePathOnQuery() {
+TEST_F(URLTest, testRelativePathOnQuery) {
     URL base("http://host/file?query/x");
     URL url(base, "another");
     ASSERT_EQ(std::string("http://host/another"), url.toString());
@@ -890,7 +799,7 @@ void URLTest::testRelativePathOnQuery() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRelativeFragmentOnQuery() {
+TEST_F(URLTest, testRelativeFragmentOnQuery) {
     URL base("http://host/file?query/x#fragment");
     URL url(base, "#another");
     ASSERT_EQ(std::string("http://host/file?query/x#another"), url.toString());
@@ -901,63 +810,63 @@ void URLTest::testRelativeFragmentOnQuery() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testPathContainsRelativeParts() {
+TEST_F(URLTest, testPathContainsRelativeParts) {
     URL url("http://host/a/b/../c");
     ASSERT_EQ(std::string("http://host/a/c"), url.toString()); // RI doesn't canonicalize
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRelativePathAndFragment() {
+TEST_F(URLTest, testRelativePathAndFragment) {
     URL base("http://host/file");
     ASSERT_EQ(std::string("http://host/another#fragment"), URL(base, "another#fragment").toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRelativeParentDirectory() {
+TEST_F(URLTest, testRelativeParentDirectory) {
     URL base("http://host/a/b/c");
     ASSERT_EQ(std::string("http://host/a/d"), URL(base, "../d").toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRelativeChildDirectory() {
+TEST_F(URLTest, testRelativeChildDirectory) {
     URL base("http://host/a/b/c");
     ASSERT_EQ(std::string("http://host/a/b/d/e"), URL(base, "d/e").toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRelativeRootDirectory()  {
+TEST_F(URLTest, testRelativeRootDirectory)  {
     URL base("http://host/a/b/c");
     ASSERT_EQ(std::string("http://host/d"), URL(base, "/d").toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRelativeFullUrl()  {
+TEST_F(URLTest, testRelativeFullUrl)  {
     URL base("http://host/a/b/c");
     ASSERT_EQ(std::string("http://host2/d/e"), URL(base, "http://host2/d/e").toString());
     ASSERT_EQ(std::string("https://host2/d/e"), URL(base, "https://host2/d/e").toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRelativeDifferentScheme()  {
+TEST_F(URLTest, testRelativeDifferentScheme)  {
     URL base("http://host/a/b/c");
     ASSERT_EQ(std::string("https://host2/d/e"), URL(base, "https://host2/d/e").toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRelativeDifferentAuthority()  {
+TEST_F(URLTest, testRelativeDifferentAuthority)  {
     URL base("http://host/a/b/c");
     ASSERT_EQ(std::string("http://another/d/e"), URL(base, "//another/d/e").toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRelativeWithScheme()  {
+TEST_F(URLTest, testRelativeWithScheme)  {
     URL base("http://host/a/b/c");
     ASSERT_EQ(std::string("http://host/a/b/c"), URL(base, "http:").toString());
     ASSERT_EQ(std::string("http://host/"), URL(base, "http:/").toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testMalformedUrlsRefusedByFirefoxAndChrome()  {
+TEST_F(URLTest, testMalformedUrlsRefusedByFirefoxAndChrome)  {
     URL base("http://host/a/b/c");
     // TODO
 //    ASSERT_EQ(std::string("http://"), URL(base, "http://").toString()); // fails on RI; path retained
@@ -968,7 +877,7 @@ void URLTest::testMalformedUrlsRefusedByFirefoxAndChrome()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRfc1808NormalExamples()  {
+TEST_F(URLTest, testRfc1808NormalExamples)  {
     URL base("http://a/b/c/d;p?q");
     ASSERT_EQ(std::string("https:h"), URL(base, "https:h").toString());
     ASSERT_EQ(std::string("http://a/b/c/g"), URL(base, "g").toString());
@@ -996,14 +905,14 @@ void URLTest::testRfc1808NormalExamples()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRfc1808AbnormalExampleTooManyDotDotSequences()  {
+TEST_F(URLTest, testRfc1808AbnormalExampleTooManyDotDotSequences)  {
     URL base("http://a/b/c/d;p?q");
     ASSERT_EQ(std::string("http://a/g"), URL(base, "../../../g").toString()); // RI doesn't normalize
     ASSERT_EQ(std::string("http://a/g"), URL(base, "../../../../g").toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRfc1808AbnormalExampleRemoveDotSegments()  {
+TEST_F(URLTest, testRfc1808AbnormalExampleRemoveDotSegments)  {
     URL base("http://a/b/c/d;p?q");
     ASSERT_EQ(std::string("http://a/g"), URL(base, "/./g").toString()); // RI doesn't normalize
     ASSERT_EQ(std::string("http://a/g"), URL(base, "/../g").toString()); // RI doesn't normalize
@@ -1014,7 +923,7 @@ void URLTest::testRfc1808AbnormalExampleRemoveDotSegments()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRfc1808AbnormalExampleNonsensicalDots()  {
+TEST_F(URLTest, testRfc1808AbnormalExampleNonsensicalDots)  {
     URL base("http://a/b/c/d;p?q");
     ASSERT_EQ(std::string("http://a/b/g"), URL(base, "./../g").toString());
     ASSERT_EQ(std::string("http://a/b/c/g/"), URL(base, "./g/.").toString());
@@ -1025,14 +934,14 @@ void URLTest::testRfc1808AbnormalExampleNonsensicalDots()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRfc1808AbnormalExampleRelativeScheme()  {
+TEST_F(URLTest, testRfc1808AbnormalExampleRelativeScheme)  {
     URL base("http://a/b/c/d;p?q");
     // this result is permitted; strict parsers prefer "http:g"
     ASSERT_EQ(std::string("http://a/b/c/g"), URL(base, "http:g").toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testRfc1808AbnormalExampleQueryOrFragmentDots()  {
+TEST_F(URLTest, testRfc1808AbnormalExampleQueryOrFragmentDots)  {
     URL base("http://a/b/c/d;p?q");
     ASSERT_EQ(std::string("http://a/b/c/g?y/./x"), URL(base, "g?y/./x").toString());
     ASSERT_EQ(std::string("http://a/b/c/g?y/../x"), URL(base, "g?y/../x").toString());
@@ -1041,14 +950,14 @@ void URLTest::testRfc1808AbnormalExampleQueryOrFragmentDots()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testSquareBracketsInUserInfo()  {
+TEST_F(URLTest, testSquareBracketsInUserInfo)  {
     URL url("http://user:[::1]@host");
     ASSERT_EQ(String("user:[::1]"), url.getUserInfo());
     ASSERT_EQ(String("host"), url.getHost());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testComposeUrl()  {
+TEST_F(URLTest, testComposeUrl)  {
     URL url("http", "host", "a");
     ASSERT_EQ(String("http"), url.getProtocol());
     ASSERT_EQ(String("host"), url.getAuthority());
@@ -1058,7 +967,7 @@ void URLTest::testComposeUrl()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testComposeUrlWithNullHost()  {
+TEST_F(URLTest, testComposeUrlWithNullHost)  {
     URL url("http", String(), "a");
     ASSERT_EQ(String("http"), url.getProtocol());
     ASSERT_EQ(String(), url.getAuthority());
@@ -1068,7 +977,7 @@ void URLTest::testComposeUrlWithNullHost()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testFileUrlExtraLeadingSlashes()  {
+TEST_F(URLTest, testFileUrlExtraLeadingSlashes)  {
     URL url("file:////foo");
     ASSERT_EQ(String(), url.getAuthority()); // RI returns String()
     ASSERT_EQ(String("//foo"), url.getPath());
@@ -1076,7 +985,7 @@ void URLTest::testFileUrlExtraLeadingSlashes()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testFileUrlWithAuthority()  {
+TEST_F(URLTest, testFileUrlWithAuthority)  {
     URL url("file://x/foo");
     ASSERT_EQ(String("x"), url.getAuthority());
     ASSERT_EQ(String("/foo"), url.getPath());
@@ -1084,7 +993,7 @@ void URLTest::testFileUrlWithAuthority()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testEmptyAuthority()  {
+TEST_F(URLTest, testEmptyAuthority)  {
     URL url("http:///foo");
     ASSERT_EQ(String(), url.getAuthority());
     ASSERT_EQ(String("/foo"), url.getPath());
@@ -1092,7 +1001,7 @@ void URLTest::testEmptyAuthority()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testHttpUrlExtraLeadingSlashes() {
+TEST_F(URLTest, testHttpUrlExtraLeadingSlashes) {
     URL url("http:////foo");
     ASSERT_EQ(String(), url.getAuthority()); // RI returns String()
     ASSERT_EQ(String("//foo"), url.getPath());
@@ -1100,27 +1009,27 @@ void URLTest::testHttpUrlExtraLeadingSlashes() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testFileUrlRelativePath() {
+TEST_F(URLTest, testFileUrlRelativePath) {
     URL base("file:a/b/c");
     ASSERT_EQ(std::string("file:a/b/d"), URL(base, "d").toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testFileUrlDottedPath()  {
+TEST_F(URLTest, testFileUrlDottedPath)  {
     URL url("file:../a/b");
     ASSERT_EQ(String("../a/b"), url.getPath());
     ASSERT_EQ(std::string("file:../a/b"), url.toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testParsingDotAsHostname()  {
+TEST_F(URLTest, testParsingDotAsHostname)  {
     URL url("http://./");
     ASSERT_EQ(String("."), url.getAuthority());
     ASSERT_EQ(String("."), url.getHost());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testSquareBracketsWithIPv4()  {
+TEST_F(URLTest, testSquareBracketsWithIPv4)  {
 
     ASSERT_THROW(URL("http://[192.168.0.1]/"), MalformedURLException) << ("Should have thrown an MalformedURLException");
 
@@ -1129,7 +1038,7 @@ void URLTest::testSquareBracketsWithIPv4()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testSquareBracketsWithHostname()  {
+TEST_F(URLTest, testSquareBracketsWithHostname)  {
 
     ASSERT_THROW(URL("http://[www.android.com]/"), MalformedURLException) << ("Should have thrown an MalformedURLException");
 
@@ -1138,7 +1047,7 @@ void URLTest::testSquareBracketsWithHostname()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testIPv6WithoutSquareBrackets()  {
+TEST_F(URLTest, testIPv6WithoutSquareBrackets)  {
 
     ASSERT_THROW(URL("http://fe80::1234/"), MalformedURLException) << ("Should have thrown an MalformedURLException");
 
@@ -1147,19 +1056,19 @@ void URLTest::testIPv6WithoutSquareBrackets()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testIpv6WithSquareBrackets()  {
+TEST_F(URLTest, testIpv6WithSquareBrackets)  {
     URL url("http://[::1]:2/");
     ASSERT_EQ(String("[::1]"), url.getHost());
     ASSERT_EQ(2, url.getPort());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testEqualityWithNoPath()  {
+TEST_F(URLTest, testEqualityWithNoPath)  {
     ASSERT_TRUE(!URL("http://android.com").equals(URL("http://android.com/")));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testUrlDoesNotEncodeParts()  {
+TEST_F(URLTest, testUrlDoesNotEncodeParts)  {
     URL url("http", "host", 80, "/doc|search?q=green robots#over 6\"");
     ASSERT_EQ(String("http"), url.getProtocol());
     ASSERT_EQ(String("host:80"), url.getAuthority());
@@ -1170,20 +1079,20 @@ void URLTest::testUrlDoesNotEncodeParts()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testSchemeCaseIsCanonicalized()  {
+TEST_F(URLTest, testSchemeCaseIsCanonicalized)  {
     URL url("HTTP://host/path");
     ASSERT_EQ(String("http"), url.getProtocol());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testEmptyAuthorityWithPath()  {
+TEST_F(URLTest, testEmptyAuthorityWithPath)  {
     URL url("http:///path");
     ASSERT_EQ(String(), url.getAuthority());
     ASSERT_EQ(String("/path"), url.getPath());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testEmptyAuthorityWithQuery()  {
+TEST_F(URLTest, testEmptyAuthorityWithQuery)  {
     URL url("http://?query");
     ASSERT_EQ(String(), url.getAuthority());
     ASSERT_EQ(String(), url.getPath());
@@ -1191,7 +1100,7 @@ void URLTest::testEmptyAuthorityWithQuery()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testEmptyAuthorityWithFragment()  {
+TEST_F(URLTest, testEmptyAuthorityWithFragment)  {
     URL url("http://#fragment");
     ASSERT_EQ(String(), url.getAuthority());
     ASSERT_EQ(String(), url.getPath());
@@ -1199,21 +1108,21 @@ void URLTest::testEmptyAuthorityWithFragment()  {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testCombiningConstructorsMakeRelativePathsAbsolute()  {
+TEST_F(URLTest, testCombiningConstructorsMakeRelativePathsAbsolute)  {
     ASSERT_EQ(String("/relative"), URL("http", "host", "relative").getPath());
     ASSERT_EQ(String("/relative"), URL("http", "host", -1, "relative").getPath());
     ASSERT_EQ(String("/relative"), URL("http", "host", -1, "relative", NULL).getPath());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testCombiningConstructorsDoNotMakeEmptyPathsAbsolute()  {
+TEST_F(URLTest, testCombiningConstructorsDoNotMakeEmptyPathsAbsolute)  {
     ASSERT_EQ(String(), URL("http", "host", "").getPath());
     ASSERT_EQ(String(), URL("http", "host", -1, "").getPath());
     ASSERT_EQ(String(), URL("http", "host", -1, "", NULL).getPath());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testPartContainsSpace() {
+TEST_F(URLTest, testPartContainsSpace) {
 
     ASSERT_THROW(URL("ht tp://host/"), MalformedURLException) << ("Should have thrown an MalformedURLException");
 
@@ -1228,99 +1137,9 @@ void URLTest::testPartContainsSpace() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLTest::testUnderscore() {
+TEST_F(URLTest, testUnderscore) {
     URL url("http://a_b.c.d.net/");
     ASSERT_EQ(String("a_b.c.d.net"), url.getAuthority());
     // The RFC's don't permit underscores in hostnames, but URL accepts them (unlike URI).
     ASSERT_EQ(String("a_b.c.d.net"), url.getHost());
 }
-
-TEST_F(URLTest, testConstructor1) { testConstructor1(); }
-TEST_F(URLTest, testConstructor2) { testConstructor2(); }
-TEST_F(URLTest, testConstructor3) { testConstructor3(); }
-TEST_F(URLTest, testConstructor4) { testConstructor4(); }
-TEST_F(URLTest, testEquals) { testEquals(); }
-TEST_F(URLTest, testSameFile) { testSameFile(); }
-TEST_F(URLTest, testToString) { testToString(); }
-TEST_F(URLTest, testToExternalForm) { testToExternalForm(); }
-TEST_F(URLTest, testGetFile) { testGetFile(); }
-TEST_F(URLTest, testGetHost) { testGetHost(); }
-TEST_F(URLTest, testGetPort) { testGetPort(); }
-TEST_F(URLTest, testGetDefaultPort) { testGetDefaultPort(); }
-TEST_F(URLTest, testGetProtocol) { testGetProtocol(); }
-TEST_F(URLTest, testGetRef) { testGetRef(); }
-TEST_F(URLTest, testGetAuthority) { testGetAuthority(); }
-TEST_F(URLTest, testToURI) { testToURI(); }
-TEST_F(URLTest, testURLStreamHandlerParseURL) { testURLStreamHandlerParseURL(); }
-TEST_F(URLTest, testUrlParts) { testUrlParts(); }
-TEST_F(URLTest, testFileEqualsWithEmptyHost) { testFileEqualsWithEmptyHost(); }
-TEST_F(URLTest, testNoHost) { testNoHost(); }
-TEST_F(URLTest, testNoPath) { testNoPath(); }
-TEST_F(URLTest, testEmptyHostAndNoPath) { testEmptyHostAndNoPath(); }
-TEST_F(URLTest, testNoHostAndNoPath) { testNoHostAndNoPath(); }
-TEST_F(URLTest, testAtSignInUserInfo) { testAtSignInUserInfo(); }
-TEST_F(URLTest, testUserNoPassword) { testUserNoPassword(); }
-TEST_F(URLTest, testUserNoPasswordExplicitPort) { testUserNoPasswordExplicitPort(); }
-TEST_F(URLTest, testUserPasswordHostPort) { testUserPasswordHostPort(); }
-TEST_F(URLTest, testUserPasswordEmptyHostPort) { testUserPasswordEmptyHostPort(); }
-TEST_F(URLTest, testUserPasswordEmptyHostEmptyPort) { testUserPasswordEmptyHostEmptyPort(); }
-TEST_F(URLTest, testPathOnly) { testPathOnly(); }
-TEST_F(URLTest, testQueryOnly) { testQueryOnly(); }
-TEST_F(URLTest, testFragmentOnly) { testFragmentOnly(); }
-TEST_F(URLTest, testAtSignInPath) { testAtSignInPath(); }
-TEST_F(URLTest, testColonInPath) { testColonInPath(); }
-TEST_F(URLTest, testSlashInQuery) { testSlashInQuery(); }
-TEST_F(URLTest, testQuestionMarkInQuery) { testQuestionMarkInQuery(); }
-TEST_F(URLTest, testAtSignInQuery) { testAtSignInQuery(); }
-TEST_F(URLTest, testColonInQuery) { testColonInQuery(); }
-TEST_F(URLTest, testQuestionMarkInFragment) { testQuestionMarkInFragment(); }
-TEST_F(URLTest, testColonInFragment) { testColonInFragment(); }
-TEST_F(URLTest, testSlashInFragment) { testSlashInFragment(); }
-TEST_F(URLTest, testSlashInFragmentCombiningConstructor) { testSlashInFragmentCombiningConstructor(); }
-TEST_F(URLTest, testHashInFragment) { testHashInFragment(); }
-TEST_F(URLTest, testEmptyPort) { testEmptyPort(); }
-TEST_F(URLTest, testNonNumericPort) { testNonNumericPort(); }
-TEST_F(URLTest, testNegativePort) { testNegativePort(); }
-TEST_F(URLTest, testNegativePortEqualsPlaceholder) { testNegativePortEqualsPlaceholder(); }
-TEST_F(URLTest, testRelativePathOnQuery) { testRelativePathOnQuery(); }
-TEST_F(URLTest, testRelativeFragmentOnQuery) { testRelativeFragmentOnQuery(); }
-TEST_F(URLTest, testPathContainsRelativeParts) { testPathContainsRelativeParts(); }
-TEST_F(URLTest, testRelativePathAndFragment) { testRelativePathAndFragment(); }
-TEST_F(URLTest, testRelativeParentDirectory) { testRelativeParentDirectory(); }
-TEST_F(URLTest, testRelativeChildDirectory) { testRelativeChildDirectory(); }
-TEST_F(URLTest, testRelativeRootDirectory) { testRelativeRootDirectory(); }
-TEST_F(URLTest, testRelativeFullUrl) { testRelativeFullUrl(); }
-TEST_F(URLTest, testRelativeDifferentScheme) { testRelativeDifferentScheme(); }
-TEST_F(URLTest, testRelativeDifferentAuthority) { testRelativeDifferentAuthority(); }
-TEST_F(URLTest, testRelativeWithScheme) { testRelativeWithScheme(); }
-TEST_F(URLTest, testMalformedUrlsRefusedByFirefoxAndChrome) { testMalformedUrlsRefusedByFirefoxAndChrome(); }
-TEST_F(URLTest, testRfc1808NormalExamples) { testRfc1808NormalExamples(); }
-TEST_F(URLTest, testRfc1808AbnormalExampleTooManyDotDotSequences) { testRfc1808AbnormalExampleTooManyDotDotSequences(); }
-TEST_F(URLTest, testRfc1808AbnormalExampleRemoveDotSegments) { testRfc1808AbnormalExampleRemoveDotSegments(); }
-TEST_F(URLTest, testRfc1808AbnormalExampleNonsensicalDots) { testRfc1808AbnormalExampleNonsensicalDots(); }
-TEST_F(URLTest, testRfc1808AbnormalExampleRelativeScheme) { testRfc1808AbnormalExampleRelativeScheme(); }
-TEST_F(URLTest, testRfc1808AbnormalExampleQueryOrFragmentDots) { testRfc1808AbnormalExampleQueryOrFragmentDots(); }
-TEST_F(URLTest, testSquareBracketsInUserInfo) { testSquareBracketsInUserInfo(); }
-TEST_F(URLTest, testComposeUrl) { testComposeUrl(); }
-TEST_F(URLTest, testComposeUrlWithNullHost) { testComposeUrlWithNullHost(); }
-TEST_F(URLTest, testFileUrlExtraLeadingSlashes) { testFileUrlExtraLeadingSlashes(); }
-TEST_F(URLTest, testFileUrlWithAuthority) { testFileUrlWithAuthority(); }
-TEST_F(URLTest, testEmptyAuthority) { testEmptyAuthority(); }
-TEST_F(URLTest, testHttpUrlExtraLeadingSlashes) { testHttpUrlExtraLeadingSlashes(); }
-TEST_F(URLTest, testFileUrlRelativePath) { testFileUrlRelativePath(); }
-TEST_F(URLTest, testFileUrlDottedPath) { testFileUrlDottedPath(); }
-TEST_F(URLTest, testParsingDotAsHostname) { testParsingDotAsHostname(); }
-TEST_F(URLTest, testSquareBracketsWithIPv4) { testSquareBracketsWithIPv4(); }
-TEST_F(URLTest, testSquareBracketsWithHostname) { testSquareBracketsWithHostname(); }
-TEST_F(URLTest, testIPv6WithoutSquareBrackets) { testIPv6WithoutSquareBrackets(); }
-TEST_F(URLTest, testIpv6WithSquareBrackets) { testIpv6WithSquareBrackets(); }
-TEST_F(URLTest, testEqualityWithNoPath) { testEqualityWithNoPath(); }
-TEST_F(URLTest, testUrlDoesNotEncodeParts) { testUrlDoesNotEncodeParts(); }
-TEST_F(URLTest, testSchemeCaseIsCanonicalized) { testSchemeCaseIsCanonicalized(); }
-TEST_F(URLTest, testEmptyAuthorityWithPath) { testEmptyAuthorityWithPath(); }
-TEST_F(URLTest, testEmptyAuthorityWithQuery) { testEmptyAuthorityWithQuery(); }
-TEST_F(URLTest, testEmptyAuthorityWithFragment) { testEmptyAuthorityWithFragment(); }
-TEST_F(URLTest, testCombiningConstructorsMakeRelativePathsAbsolute) { testCombiningConstructorsMakeRelativePathsAbsolute(); }
-TEST_F(URLTest, testCombiningConstructorsDoNotMakeEmptyPathsAbsolute) { testCombiningConstructorsDoNotMakeEmptyPathsAbsolute(); }
-TEST_F(URLTest, testPartContainsSpace) { testPartContainsSpace(); }
-TEST_F(URLTest, testUnderscore) { testUnderscore(); }

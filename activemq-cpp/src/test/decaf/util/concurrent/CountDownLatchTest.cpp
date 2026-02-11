@@ -34,7 +34,7 @@ protected:
 
             CountDownLatch* latch;
 
-        private:
+        protected:
 
             MyThread(const MyThread&);
             MyThread operator= (const MyThread&);
@@ -55,28 +55,10 @@ protected:
 
         };
 
-    public:
-
-        CountDownLatchTest() {}
-        virtual ~CountDownLatchTest() {}
-
-        void test();
-        void test2();
-        void testConstructor();
-        void testGetCount();
-        void testCountDown();
-        void testAwait();
-        void testTimedAwait();
-        void testAwaitInterruptedException();
-        void testTimedAwaitInterruptedException();
-        void testAwaitTimeout();
-        void testToString();
-
     };
 
-
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::test()
+TEST_F(CountDownLatchTest, test)
 {
     CountDownLatch latch( 50 );
 
@@ -96,7 +78,7 @@ void CountDownLatchTest::test()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::test2()
+TEST_F(CountDownLatchTest, test2)
 {
     CountDownLatch latch( 75 );
 
@@ -118,7 +100,7 @@ void CountDownLatchTest::test2()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testConstructor() {
+TEST_F(CountDownLatchTest, testConstructor) {
     try {
         CountDownLatch l(-1);
         shouldThrow();
@@ -126,7 +108,7 @@ void CountDownLatchTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testGetCount() {
+TEST_F(CountDownLatchTest, testGetCount) {
     CountDownLatch l(2);
     ASSERT_EQ(2, l.getCount());
     l.countDown();
@@ -134,7 +116,7 @@ void CountDownLatchTest::testGetCount() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testCountDown() {
+TEST_F(CountDownLatchTest, testCountDown) {
     CountDownLatch l(1);
     ASSERT_EQ(1, l.getCount());
     l.countDown();
@@ -176,7 +158,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testAwait() {
+TEST_F(CountDownLatchTest, testAwait) {
     CountDownLatch l(2);
     TestAwaitRunnable runnable(&l, this);
     Thread t(&runnable);
@@ -227,7 +209,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testTimedAwait() {
+TEST_F(CountDownLatchTest, testTimedAwait) {
     CountDownLatch l(2);
     TestTimedAwaitRunnable runnable(&l, this);
     Thread t(&runnable);
@@ -278,7 +260,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testAwaitInterruptedException() {
+TEST_F(CountDownLatchTest, testAwaitInterruptedException) {
     CountDownLatch l(1);
     TestAwaitInterruptedExceptionRunnable runnable(&l, this);
     Thread t(&runnable);
@@ -325,7 +307,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testTimedAwaitInterruptedException() {
+TEST_F(CountDownLatchTest, testTimedAwaitInterruptedException) {
     CountDownLatch l(1);
     TestTimedAwaitInterruptedExceptionRunnable runnable(&l, this);
     Thread t(&runnable);
@@ -374,7 +356,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testAwaitTimeout() {
+TEST_F(CountDownLatchTest, testAwaitTimeout) {
     CountDownLatch l(1);
     TestAwaitTimeoutRunnable runnable(&l, this);
     Thread t(&runnable);
@@ -389,7 +371,7 @@ void CountDownLatchTest::testAwaitTimeout() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testToString() {
+TEST_F(CountDownLatchTest, testToString) {
     CountDownLatch s(2);
     std::string us = s.toString();
     ASSERT_TRUE((int)us.find_first_of("Count = 2") >= 0);
@@ -400,15 +382,3 @@ void CountDownLatchTest::testToString() {
     std::string s2 = s.toString();
     ASSERT_TRUE((int)s2.find_first_of("Count = 0") >= 0);
 }
-
-TEST_F(CountDownLatchTest, test) { test(); }
-TEST_F(CountDownLatchTest, test2) { test2(); }
-TEST_F(CountDownLatchTest, testConstructor) { testConstructor(); }
-TEST_F(CountDownLatchTest, testGetCount) { testGetCount(); }
-TEST_F(CountDownLatchTest, testCountDown) { testCountDown(); }
-TEST_F(CountDownLatchTest, testAwait) { testAwait(); }
-TEST_F(CountDownLatchTest, testTimedAwait) { testTimedAwait(); }
-TEST_F(CountDownLatchTest, testAwaitInterruptedException) { testAwaitInterruptedException(); }
-TEST_F(CountDownLatchTest, testTimedAwaitInterruptedException) { testTimedAwaitInterruptedException(); }
-TEST_F(CountDownLatchTest, testAwaitTimeout) { testAwaitTimeout(); }
-TEST_F(CountDownLatchTest, testToString) { testToString(); }

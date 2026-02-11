@@ -39,15 +39,7 @@ public:
 
         virtual ~LockSupportTest();
 
-        void testPark1();
-        void testPark2();
-        void testPark3();
-        void testPark4();
-        void testParkNanos();
-        void testParkUntil();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 LockSupportTest::LockSupportTest() {
@@ -86,7 +78,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupportTest::testPark1() {
+TEST_F(LockSupportTest, testPark1) {
 
     ParkTestThread t(this);
 
@@ -133,7 +125,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupportTest::testPark2() {
+TEST_F(LockSupportTest, testPark2) {
 
     ParkTest2Thread t(this);
 
@@ -183,7 +175,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupportTest::testPark3() {
+TEST_F(LockSupportTest, testPark3) {
 
     Park3TestThread t(this);
 
@@ -231,7 +223,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupportTest::testPark4() {
+TEST_F(LockSupportTest, testPark4) {
 
     Mutex lock;
     Park4TestThread t(this, &lock);
@@ -277,7 +269,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupportTest::testParkNanos() {
+TEST_F(LockSupportTest, testParkNanos) {
 
     ParkNanosTestThread t(this);
 
@@ -320,7 +312,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupportTest::testParkUntil() {
+TEST_F(LockSupportTest, testParkUntil) {
 
     ParkUntilTestThread t(this);
 
@@ -331,10 +323,3 @@ void LockSupportTest::testParkUntil() {
         FAIL() << ("Caught an unexpected exception");
     }
 }
-
-TEST_F(LockSupportTest, testPark1) { testPark1(); }
-TEST_F(LockSupportTest, testPark2) { testPark2(); }
-TEST_F(LockSupportTest, testPark3) { testPark3(); }
-TEST_F(LockSupportTest, testPark4) { testPark4(); }
-TEST_F(LockSupportTest, testParkNanos) { testParkNanos(); }
-TEST_F(LockSupportTest, testParkUntil) { testParkUntil(); }

@@ -27,19 +27,10 @@ using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
 
-    class ProducerStateTest : public ::testing::Test {
-public:
-
-        ProducerStateTest() {}
-        virtual ~ProducerStateTest() {}
-
-        void test();
-
-    };
-
+class ProducerStateTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void ProducerStateTest::test() {
+TEST_F(ProducerStateTest, test) {
     Pointer<ProducerId> id( new ProducerId );
     id->setConnectionId( "CONNECTION" );
     id->setSessionId( 42 );
@@ -52,5 +43,3 @@ void ProducerStateTest::test() {
     ASSERT_TRUE(state.toString() != "NULL");
     ASSERT_TRUE(info == state.getInfo());
 }
-
-TEST_F(ProducerStateTest, test) { test(); }

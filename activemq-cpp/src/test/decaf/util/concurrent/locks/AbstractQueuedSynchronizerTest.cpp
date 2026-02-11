@@ -40,58 +40,7 @@ public:
         AbstractQueuedSynchronizerTest();
         virtual ~AbstractQueuedSynchronizerTest();
 
-        void testIsHeldExclusively();
-        void testAcquire();
-        void testTryAcquire();
-        void testhasQueuedThreads();
-        void testIsQueuedNPE();
-        void testIsQueued();
-        void testGetFirstQueuedThread();
-        void testHasContended();
-        void testGetQueuedThreads();
-        void testGetExclusiveQueuedThreads();
-        void testGetSharedQueuedThreads();
-        void testInterruptedException2();
-        void testTryAcquireWhenSynced();
-        void testAcquireNanosTimeout();
-        void testGetState();
-        void testAcquireInterruptibly1();
-        void testAcquireInterruptibly2();
-        void testOwns();
-        void testAwaitIllegalMonitor();
-        void testSignalIllegalMonitor();
-        void testAwaitNanosTimeout();
-        void testAwaitTimeout();
-        void testAwaitUntilTimeout();
-        void testAwait();
-        void testHasWaitersNPE();
-        void testGetWaitQueueLengthNPE();
-        void testGetWaitingThreadsNPE();
-        void testHasWaitersIAE();
-        void testHasWaitersIMSE();
-        void testGetWaitQueueLengthIAE();
-        void testGetWaitQueueLengthIMSE();
-        void testGetWaitingThreadsIAE();
-        void testGetWaitingThreadsIMSE();
-        void testHasWaiters();
-        void testGetWaitQueueLength();
-        void testGetWaitingThreads();
-        void testAwaitUninterruptibly();
-        void testAwaitInterrupt();
-        void testAwaitNanosInterrupt();
-        void testAwaitUntilInterrupt();
-        void testSignalAll();
-        void testToString();
-        void testGetStateWithReleaseShared();
-        void testReleaseShared();
-        void testAcquireSharedInterruptibly();
-        void testAsquireSharedTimed();
-        void testAcquireSharedInterruptiblyInterruptedException();
-        void testAcquireSharedNanosInterruptedException();
-        void testAcquireSharedNanosTimeout();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -214,13 +163,13 @@ AbstractQueuedSynchronizerTest::~AbstractQueuedSynchronizerTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testIsHeldExclusively() {
+TEST_F(AbstractQueuedSynchronizerTest, testIsHeldExclusively) {
     TestMutex rl;
     ASSERT_TRUE(!rl.isHeldExclusively());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAcquire() {
+TEST_F(AbstractQueuedSynchronizerTest, testAcquire) {
     TestMutex rl;
     rl.acquire(1);
     ASSERT_TRUE(rl.isHeldExclusively());
@@ -229,7 +178,7 @@ void AbstractQueuedSynchronizerTest::testAcquire() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testTryAcquire() {
+TEST_F(AbstractQueuedSynchronizerTest, testTryAcquire) {
     TestMutex rl;
     ASSERT_TRUE(rl.tryAcquire(1));
     ASSERT_TRUE(rl.isHeldExclusively());
@@ -237,7 +186,7 @@ void AbstractQueuedSynchronizerTest::testTryAcquire() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testhasQueuedThreads() {
+TEST_F(AbstractQueuedSynchronizerTest, testhasQueuedThreads) {
 
     TestMutex mutex;
 
@@ -270,7 +219,7 @@ void AbstractQueuedSynchronizerTest::testhasQueuedThreads() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testIsQueuedNPE() {
+TEST_F(AbstractQueuedSynchronizerTest, testIsQueuedNPE) {
     TestMutex mutex;
     try {
         mutex.isQueued(NULL);
@@ -280,7 +229,7 @@ void AbstractQueuedSynchronizerTest::testIsQueuedNPE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testIsQueued() {
+TEST_F(AbstractQueuedSynchronizerTest, testIsQueued) {
     TestMutex mutex;
 
     InterruptedSyncRunnable iSyncRun1(this, &mutex);
@@ -321,7 +270,7 @@ void AbstractQueuedSynchronizerTest::testIsQueued() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testGetFirstQueuedThread() {
+TEST_F(AbstractQueuedSynchronizerTest, testGetFirstQueuedThread) {
     TestMutex mutex;
 
     InterruptedSyncRunnable iSyncRun1(this, &mutex);
@@ -354,7 +303,7 @@ void AbstractQueuedSynchronizerTest::testGetFirstQueuedThread() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testHasContended() {
+TEST_F(AbstractQueuedSynchronizerTest, testHasContended) {
     TestMutex mutex;
 
     InterruptedSyncRunnable iSyncRun1(this, &mutex);
@@ -386,7 +335,7 @@ void AbstractQueuedSynchronizerTest::testHasContended() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testGetQueuedThreads() {
+TEST_F(AbstractQueuedSynchronizerTest, testGetQueuedThreads) {
     TestMutex mutex;
 
     InterruptedSyncRunnable iSyncRun1(this, &mutex);
@@ -420,7 +369,7 @@ void AbstractQueuedSynchronizerTest::testGetQueuedThreads() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testGetExclusiveQueuedThreads() {
+TEST_F(AbstractQueuedSynchronizerTest, testGetExclusiveQueuedThreads) {
     TestMutex mutex;
 
     InterruptedSyncRunnable iSyncRun1(this, &mutex);
@@ -455,7 +404,7 @@ void AbstractQueuedSynchronizerTest::testGetExclusiveQueuedThreads() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testGetSharedQueuedThreads() {
+TEST_F(AbstractQueuedSynchronizerTest, testGetSharedQueuedThreads) {
     TestMutex mutex;
 
     InterruptedSyncRunnable iSyncRun1(this, &mutex);
@@ -518,7 +467,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testInterruptedException2() {
+TEST_F(AbstractQueuedSynchronizerTest, testInterruptedException2) {
 
     TestMutex mutex;
     mutex.acquire(1);
@@ -560,7 +509,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testTryAcquireWhenSynced() {
+TEST_F(AbstractQueuedSynchronizerTest, testTryAcquireWhenSynced) {
     TestMutex mutex;
     mutex.acquire(1);
     TestTryAcquireWhenSyncedRunnable run(this, &mutex);
@@ -606,7 +555,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAcquireNanosTimeout() {
+TEST_F(AbstractQueuedSynchronizerTest, testAcquireNanosTimeout) {
     TestMutex mutex;
     mutex.acquire(1);
     TestAcquireNanosTimeoutRunnable run(this, &mutex);
@@ -654,7 +603,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testGetState() {
+TEST_F(AbstractQueuedSynchronizerTest, testGetState) {
     TestMutex mutex;
     mutex.acquire(1);
     ASSERT_TRUE(mutex.isHeldExclusively());
@@ -675,7 +624,7 @@ void AbstractQueuedSynchronizerTest::testGetState() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAcquireInterruptibly1() {
+TEST_F(AbstractQueuedSynchronizerTest, testAcquireInterruptibly1) {
     TestMutex mutex;
     mutex.acquire(1);
     InterruptedSyncRunnable iSyncRun(this, &mutex);
@@ -694,7 +643,7 @@ void AbstractQueuedSynchronizerTest::testAcquireInterruptibly1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAcquireInterruptibly2() {
+TEST_F(AbstractQueuedSynchronizerTest, testAcquireInterruptibly2) {
     TestMutex mutex;
     try {
         mutex.acquireInterruptibly(1);
@@ -716,7 +665,7 @@ void AbstractQueuedSynchronizerTest::testAcquireInterruptibly2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testOwns() {
+TEST_F(AbstractQueuedSynchronizerTest, testOwns) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     TestMutex mutex2;
@@ -726,7 +675,7 @@ void AbstractQueuedSynchronizerTest::testOwns() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAwaitIllegalMonitor() {
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitIllegalMonitor) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     try {
@@ -740,7 +689,7 @@ void AbstractQueuedSynchronizerTest::testAwaitIllegalMonitor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testSignalIllegalMonitor() {
+TEST_F(AbstractQueuedSynchronizerTest, testSignalIllegalMonitor) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     try {
@@ -754,7 +703,7 @@ void AbstractQueuedSynchronizerTest::testSignalIllegalMonitor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAwaitNanosTimeout() {
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitNanosTimeout) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     try {
@@ -769,7 +718,7 @@ void AbstractQueuedSynchronizerTest::testAwaitNanosTimeout() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAwaitTimeout() {
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitTimeout) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     try {
@@ -783,7 +732,7 @@ void AbstractQueuedSynchronizerTest::testAwaitTimeout() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAwaitUntilTimeout() {
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitUntilTimeout) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     try {
@@ -832,7 +781,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAwait() {
+TEST_F(AbstractQueuedSynchronizerTest, testAwait) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     TestAwaitRunnable run(this, &mutex, c);
@@ -854,7 +803,7 @@ void AbstractQueuedSynchronizerTest::testAwait() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testHasWaitersNPE() {
+TEST_F(AbstractQueuedSynchronizerTest, testHasWaitersNPE) {
     TestMutex mutex;
     try {
         mutex.hasWaiters(NULL);
@@ -866,7 +815,7 @@ void AbstractQueuedSynchronizerTest::testHasWaitersNPE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testGetWaitQueueLengthNPE() {
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitQueueLengthNPE) {
     TestMutex mutex;
     try {
         mutex.getWaitQueueLength(NULL);
@@ -878,7 +827,7 @@ void AbstractQueuedSynchronizerTest::testGetWaitQueueLengthNPE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testGetWaitingThreadsNPE() {
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitingThreadsNPE) {
     TestMutex mutex;
     try {
         mutex.getWaitingThreads(NULL);
@@ -890,7 +839,7 @@ void AbstractQueuedSynchronizerTest::testGetWaitingThreadsNPE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testHasWaitersIAE() {
+TEST_F(AbstractQueuedSynchronizerTest, testHasWaitersIAE) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = (mutex.newCondition());
     TestMutex mutex2;
@@ -905,7 +854,7 @@ void AbstractQueuedSynchronizerTest::testHasWaitersIAE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testHasWaitersIMSE() {
+TEST_F(AbstractQueuedSynchronizerTest, testHasWaitersIMSE) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = (mutex.newCondition());
     try {
@@ -919,7 +868,7 @@ void AbstractQueuedSynchronizerTest::testHasWaitersIMSE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testGetWaitQueueLengthIAE() {
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitQueueLengthIAE) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = (mutex.newCondition());
     TestMutex mutex2;
@@ -934,7 +883,7 @@ void AbstractQueuedSynchronizerTest::testGetWaitQueueLengthIAE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testGetWaitQueueLengthIMSE() {
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitQueueLengthIMSE) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = (mutex.newCondition());
     try {
@@ -948,7 +897,7 @@ void AbstractQueuedSynchronizerTest::testGetWaitQueueLengthIMSE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testGetWaitingThreadsIAE() {
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitingThreadsIAE) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = (mutex.newCondition());
     TestMutex mutex2;
@@ -963,7 +912,7 @@ void AbstractQueuedSynchronizerTest::testGetWaitingThreadsIAE() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testGetWaitingThreadsIMSE() {
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitingThreadsIMSE) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = (mutex.newCondition());
     try {
@@ -1013,7 +962,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testHasWaiters() {
+TEST_F(AbstractQueuedSynchronizerTest, testHasWaiters) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     TestHasWaitersRunnable run(this, &mutex, c);
@@ -1109,7 +1058,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testGetWaitQueueLength() {
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitQueueLength) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     testGetWaitQueueLengthRunnable1 run1(this, &mutex, c);
@@ -1212,7 +1161,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testGetWaitingThreads() {
+TEST_F(AbstractQueuedSynchronizerTest, testGetWaitingThreads) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     TestGetWaitingThreadsRunnable1 run1(this, &mutex, c);
@@ -1280,7 +1229,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAwaitUninterruptibly() {
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitUninterruptibly) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     TestAwaitUninterruptiblyRunnable run(this, &mutex, c);
@@ -1345,7 +1294,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAwaitInterrupt() {
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitInterrupt) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     TestAwaitInterruptRunnable run(this, &mutex, c);
@@ -1398,7 +1347,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAwaitNanosInterrupt() {
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitNanosInterrupt) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     TestAwaitNanosInterruptRunnable run(this, &mutex, c);
@@ -1452,7 +1401,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAwaitUntilInterrupt() {
+TEST_F(AbstractQueuedSynchronizerTest, testAwaitUntilInterrupt) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     TestAwaitNanosInterruptRunnable run(this, &mutex, c);
@@ -1506,7 +1455,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testSignalAll() {
+TEST_F(AbstractQueuedSynchronizerTest, testSignalAll) {
     TestMutex mutex;
     AbstractQueuedSynchronizer::ConditionObject* c = mutex.newCondition();
     TestSignalAllRunnable run1(this, &mutex, c);
@@ -1533,7 +1482,7 @@ void AbstractQueuedSynchronizerTest::testSignalAll() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testToString() {
+TEST_F(AbstractQueuedSynchronizerTest, testToString) {
     TestMutex mutex;
     std::string us = mutex.toString();
     ASSERT_TRUE((int)(us.find("State = 0")) >= 0);
@@ -1543,7 +1492,7 @@ void AbstractQueuedSynchronizerTest::testToString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testGetStateWithReleaseShared() {
+TEST_F(AbstractQueuedSynchronizerTest, testGetStateWithReleaseShared) {
     BooleanLatch l;
     ASSERT_TRUE(!l.isSignalled());
     l.releaseShared(0);
@@ -1551,7 +1500,7 @@ void AbstractQueuedSynchronizerTest::testGetStateWithReleaseShared() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testReleaseShared() {
+TEST_F(AbstractQueuedSynchronizerTest, testReleaseShared) {
     BooleanLatch l;
     ASSERT_TRUE(!l.isSignalled());
     l.releaseShared(0);
@@ -1593,7 +1542,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAcquireSharedInterruptibly() {
+TEST_F(AbstractQueuedSynchronizerTest, testAcquireSharedInterruptibly) {
     BooleanLatch l;
     TestAcquireSharedInterruptiblyRunnable run(this, &l);
     Thread t(&run);
@@ -1643,7 +1592,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAsquireSharedTimed() {
+TEST_F(AbstractQueuedSynchronizerTest, testAsquireSharedTimed) {
     BooleanLatch l;
     TestAsquireSharedTimedRunnable run(this, &l);
     Thread t(&run);
@@ -1692,7 +1641,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAcquireSharedInterruptiblyInterruptedException() {
+TEST_F(AbstractQueuedSynchronizerTest, testAcquireSharedInterruptiblyInterruptedException) {
     BooleanLatch l;
     TestAcquireSharedInterruptiblyInterruptedExceptionRunnable run(this, &l);
     Thread t(&run);
@@ -1739,7 +1688,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAcquireSharedNanosInterruptedException() {
+TEST_F(AbstractQueuedSynchronizerTest, testAcquireSharedNanosInterruptedException) {
     BooleanLatch l;
     TestAcquireSharedNanosInterruptedExceptionRunnable run(this, &l);
     Thread t(&run);
@@ -1787,7 +1736,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractQueuedSynchronizerTest::testAcquireSharedNanosTimeout() {
+TEST_F(AbstractQueuedSynchronizerTest, testAcquireSharedNanosTimeout) {
     BooleanLatch l;
     TestAcquireSharedNanosTimeoutRunnable run(this, &l);
     Thread t(&run);
@@ -1801,53 +1750,3 @@ void AbstractQueuedSynchronizerTest::testAcquireSharedNanosTimeout() {
         unexpectedException();
     }
 }
-
-TEST_F(AbstractQueuedSynchronizerTest, testIsHeldExclusively) { testIsHeldExclusively(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAcquire) { testAcquire(); }
-TEST_F(AbstractQueuedSynchronizerTest, testTryAcquire) { testTryAcquire(); }
-TEST_F(AbstractQueuedSynchronizerTest, testhasQueuedThreads) { testhasQueuedThreads(); }
-TEST_F(AbstractQueuedSynchronizerTest, testIsQueuedNPE) { testIsQueuedNPE(); }
-TEST_F(AbstractQueuedSynchronizerTest, testIsQueued) { testIsQueued(); }
-TEST_F(AbstractQueuedSynchronizerTest, testGetFirstQueuedThread) { testGetFirstQueuedThread(); }
-TEST_F(AbstractQueuedSynchronizerTest, testHasContended) { testHasContended(); }
-TEST_F(AbstractQueuedSynchronizerTest, testGetQueuedThreads) { testGetQueuedThreads(); }
-TEST_F(AbstractQueuedSynchronizerTest, testGetExclusiveQueuedThreads) { testGetExclusiveQueuedThreads(); }
-TEST_F(AbstractQueuedSynchronizerTest, testGetSharedQueuedThreads) { testGetSharedQueuedThreads(); }
-TEST_F(AbstractQueuedSynchronizerTest, testInterruptedException2) { testInterruptedException2(); }
-TEST_F(AbstractQueuedSynchronizerTest, testTryAcquireWhenSynced) { testTryAcquireWhenSynced(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAcquireNanosTimeout) { testAcquireNanosTimeout(); }
-TEST_F(AbstractQueuedSynchronizerTest, testGetState) { testGetState(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAcquireInterruptibly1) { testAcquireInterruptibly1(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAcquireInterruptibly2) { testAcquireInterruptibly2(); }
-TEST_F(AbstractQueuedSynchronizerTest, testOwns) { testOwns(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAwaitIllegalMonitor) { testAwaitIllegalMonitor(); }
-TEST_F(AbstractQueuedSynchronizerTest, testSignalIllegalMonitor) { testSignalIllegalMonitor(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAwaitNanosTimeout) { testAwaitNanosTimeout(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAwaitTimeout) { testAwaitTimeout(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAwaitUntilTimeout) { testAwaitUntilTimeout(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAwait) { testAwait(); }
-TEST_F(AbstractQueuedSynchronizerTest, testHasWaitersNPE) { testHasWaitersNPE(); }
-TEST_F(AbstractQueuedSynchronizerTest, testGetWaitQueueLengthNPE) { testGetWaitQueueLengthNPE(); }
-TEST_F(AbstractQueuedSynchronizerTest, testGetWaitingThreadsNPE) { testGetWaitingThreadsNPE(); }
-TEST_F(AbstractQueuedSynchronizerTest, testHasWaitersIAE) { testHasWaitersIAE(); }
-TEST_F(AbstractQueuedSynchronizerTest, testHasWaitersIMSE) { testHasWaitersIMSE(); }
-TEST_F(AbstractQueuedSynchronizerTest, testGetWaitQueueLengthIAE) { testGetWaitQueueLengthIAE(); }
-TEST_F(AbstractQueuedSynchronizerTest, testGetWaitQueueLengthIMSE) { testGetWaitQueueLengthIMSE(); }
-TEST_F(AbstractQueuedSynchronizerTest, testGetWaitingThreadsIAE) { testGetWaitingThreadsIAE(); }
-TEST_F(AbstractQueuedSynchronizerTest, testGetWaitingThreadsIMSE) { testGetWaitingThreadsIMSE(); }
-TEST_F(AbstractQueuedSynchronizerTest, testHasWaiters) { testHasWaiters(); }
-TEST_F(AbstractQueuedSynchronizerTest, testGetWaitQueueLength) { testGetWaitQueueLength(); }
-TEST_F(AbstractQueuedSynchronizerTest, testGetWaitingThreads) { testGetWaitingThreads(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAwaitUninterruptibly) { testAwaitUninterruptibly(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAwaitInterrupt) { testAwaitInterrupt(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAwaitNanosInterrupt) { testAwaitNanosInterrupt(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAwaitUntilInterrupt) { testAwaitUntilInterrupt(); }
-TEST_F(AbstractQueuedSynchronizerTest, testSignalAll) { testSignalAll(); }
-TEST_F(AbstractQueuedSynchronizerTest, testToString) { testToString(); }
-TEST_F(AbstractQueuedSynchronizerTest, testGetStateWithReleaseShared) { testGetStateWithReleaseShared(); }
-TEST_F(AbstractQueuedSynchronizerTest, testReleaseShared) { testReleaseShared(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAcquireSharedInterruptibly) { testAcquireSharedInterruptibly(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAsquireSharedTimed) { testAsquireSharedTimed(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAcquireSharedInterruptiblyInterruptedException) { testAcquireSharedInterruptiblyInterruptedException(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAcquireSharedNanosInterruptedException) { testAcquireSharedNanosInterruptedException(); }
-TEST_F(AbstractQueuedSynchronizerTest, testAcquireSharedNanosTimeout) { testAcquireSharedNanosTimeout(); }

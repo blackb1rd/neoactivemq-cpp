@@ -38,27 +38,7 @@ public:
         LinkedHashSetTest();
         virtual ~LinkedHashSetTest();
 
-        void testConstructor();
-        void testConstructorI();
-        void testConstructorIF();
-        void testConstructorCollection();
-        void testAdd();
-        void testClear();
-        void testContains();
-        void testIsEmpty();
-        void testIterator();
-        void testRemove();
-        void testSize();
-        void testToString();
-        void testToArray();
-        void testCopy1();
-        void testCopy2();
-        void testEquals();
-        void testRemoveAll();
-        void testRetainAll();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -87,7 +67,7 @@ LinkedHashSetTest::~LinkedHashSetTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testConstructor() {
+TEST_F(LinkedHashSetTest, testConstructor) {
 
     LinkedHashSet<int> set;
     ASSERT_TRUE(set.isEmpty());
@@ -96,7 +76,7 @@ void LinkedHashSetTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testConstructorI() {
+TEST_F(LinkedHashSetTest, testConstructorI) {
 
     LinkedHashSet<int> set;
     ASSERT_EQ(0, set.size()) << ("Created incorrect LinkedHashSet");
@@ -111,7 +91,7 @@ void LinkedHashSetTest::testConstructorI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testConstructorIF() {
+TEST_F(LinkedHashSetTest, testConstructorIF) {
 
     LinkedHashSet<int> set(5, 0.5);
     ASSERT_EQ(0, set.size()) << ("Created incorrect LinkedHashSet");
@@ -126,7 +106,7 @@ void LinkedHashSetTest::testConstructorIF() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testConstructorCollection() {
+TEST_F(LinkedHashSetTest, testConstructorCollection) {
 
     ArrayList<int> intList;
     intList.add(1);
@@ -144,7 +124,7 @@ void LinkedHashSetTest::testConstructorCollection() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testEquals() {
+TEST_F(LinkedHashSetTest, testEquals) {
 
     LinkedHashSet<int> set1;
     populateSet(set1);
@@ -163,7 +143,7 @@ void LinkedHashSetTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testAdd() {
+TEST_F(LinkedHashSetTest, testAdd) {
 
     LinkedHashSet<int> set;
     populateSet(set);
@@ -177,7 +157,7 @@ void LinkedHashSetTest::testAdd() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testClear() {
+TEST_F(LinkedHashSetTest, testClear) {
 
     LinkedHashSet<int> set;
     populateSet(set);
@@ -189,7 +169,7 @@ void LinkedHashSetTest::testClear() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testContains() {
+TEST_F(LinkedHashSetTest, testContains) {
 
     LinkedHashSet<int> set;
     populateSet(set);
@@ -199,7 +179,7 @@ void LinkedHashSetTest::testContains() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testIsEmpty() {
+TEST_F(LinkedHashSetTest, testIsEmpty) {
     LinkedHashSet<int> set;
     ASSERT_TRUE(set.isEmpty()) << ("Empty set returned true");
     set.add(1);
@@ -209,7 +189,7 @@ void LinkedHashSetTest::testIsEmpty() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testIterator() {
+TEST_F(LinkedHashSetTest, testIterator) {
 
     LinkedHashSet<int> set;
     populateSet(set);
@@ -254,7 +234,7 @@ void LinkedHashSetTest::testIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testRemove() {
+TEST_F(LinkedHashSetTest, testRemove) {
 
     LinkedHashSet<int> set;
     populateSet(set);
@@ -265,7 +245,7 @@ void LinkedHashSetTest::testRemove() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testSize() {
+TEST_F(LinkedHashSetTest, testSize) {
 
     LinkedHashSet<int> set;
     populateSet(set);
@@ -276,14 +256,14 @@ void LinkedHashSetTest::testSize() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testToString() {
+TEST_F(LinkedHashSetTest, testToString) {
     LinkedHashSet<std::string> s;
     std::string result = s.toString();
     ASSERT_TRUE(result.find("LinkedHashSet") != std::string::npos) << ("toString returned bad value");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testToArray() {
+TEST_F(LinkedHashSetTest, testToArray) {
 
     LinkedHashSet<int> set;
     populateSet(set);
@@ -293,7 +273,7 @@ void LinkedHashSetTest::testToArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testCopy1() {
+TEST_F(LinkedHashSetTest, testCopy1) {
 
     LinkedHashSet<int> set1;
 
@@ -315,7 +295,7 @@ void LinkedHashSetTest::testCopy1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testCopy2() {
+TEST_F(LinkedHashSetTest, testCopy2) {
 
     LinkedList<int> collection;
 
@@ -337,7 +317,7 @@ void LinkedHashSetTest::testCopy2() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testRemoveAll() {
+TEST_F(LinkedHashSetTest, testRemoveAll) {
 
     LinkedHashSet<int> set;
     populateSet(set, 3);
@@ -363,7 +343,7 @@ void LinkedHashSetTest::testRemoveAll() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void LinkedHashSetTest::testRetainAll() {
+TEST_F(LinkedHashSetTest, testRetainAll) {
 
     LinkedHashSet<int> set;
     populateSet(set, 3);
@@ -387,22 +367,3 @@ void LinkedHashSetTest::testRetainAll() {
     set3.retainAll(collection);
     ASSERT_EQ(0, set3.size());
 }
-
-TEST_F(LinkedHashSetTest, testConstructor) { testConstructor(); }
-TEST_F(LinkedHashSetTest, testConstructorI) { testConstructorI(); }
-TEST_F(LinkedHashSetTest, testConstructorIF) { testConstructorIF(); }
-TEST_F(LinkedHashSetTest, testConstructorCollection) { testConstructorCollection(); }
-TEST_F(LinkedHashSetTest, testAdd) { testAdd(); }
-TEST_F(LinkedHashSetTest, testClear) { testClear(); }
-TEST_F(LinkedHashSetTest, testContains) { testContains(); }
-TEST_F(LinkedHashSetTest, testIsEmpty) { testIsEmpty(); }
-TEST_F(LinkedHashSetTest, testIterator) { testIterator(); }
-TEST_F(LinkedHashSetTest, testRemove) { testRemove(); }
-TEST_F(LinkedHashSetTest, testSize) { testSize(); }
-TEST_F(LinkedHashSetTest, testToString) { testToString(); }
-TEST_F(LinkedHashSetTest, testToArray) { testToArray(); }
-TEST_F(LinkedHashSetTest, testCopy1) { testCopy1(); }
-TEST_F(LinkedHashSetTest, testCopy2) { testCopy2(); }
-TEST_F(LinkedHashSetTest, testEquals) { testEquals(); }
-TEST_F(LinkedHashSetTest, testRemoveAll) { testRemoveAll(); }
-TEST_F(LinkedHashSetTest, testRetainAll) { testRetainAll(); }

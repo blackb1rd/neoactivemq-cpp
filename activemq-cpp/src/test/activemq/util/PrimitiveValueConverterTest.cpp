@@ -24,27 +24,11 @@ using namespace activemq;
 using namespace activemq::util;
 using namespace decaf::lang::exceptions;
 
-    class PrimitiveValueConverterTest  : public ::testing::Test {
-public:
-
-        PrimitiveValueConverterTest() {}
-        virtual ~PrimitiveValueConverterTest() {}
-
-        void testConvertToBoolean();
-        void testConvertToChar();
-        void testConvertToByte();
-        void testConvertToShort();
-        void testConvertToInt();
-        void testConvertToLong();
-        void testConvertToFloat();
-        void testConvertToDouble();
-        void testConvertToString();
-
-    };
-
+class PrimitiveValueConverterTest : public ::testing::Test {
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveValueConverterTest::testConvertToBoolean() {
+TEST_F(PrimitiveValueConverterTest, testConvertToBoolean) {
 
     PrimitiveValueConverter converter;
     PrimitiveValueNode input1( true );
@@ -67,7 +51,7 @@ void PrimitiveValueConverterTest::testConvertToBoolean() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveValueConverterTest::testConvertToChar() {
+TEST_F(PrimitiveValueConverterTest, testConvertToChar) {
 
     PrimitiveValueConverter converter;
     PrimitiveValueNode input1( (char)127 );
@@ -89,7 +73,7 @@ void PrimitiveValueConverterTest::testConvertToChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveValueConverterTest::testConvertToByte() {
+TEST_F(PrimitiveValueConverterTest, testConvertToByte) {
 
     PrimitiveValueConverter converter;
     PrimitiveValueNode input1( (unsigned char)127 );
@@ -111,7 +95,7 @@ void PrimitiveValueConverterTest::testConvertToByte() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveValueConverterTest::testConvertToShort() {
+TEST_F(PrimitiveValueConverterTest, testConvertToShort) {
 
     PrimitiveValueConverter converter;
     PrimitiveValueNode input1( (unsigned char)127 );
@@ -133,7 +117,7 @@ void PrimitiveValueConverterTest::testConvertToShort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveValueConverterTest::testConvertToInt() {
+TEST_F(PrimitiveValueConverterTest, testConvertToInt) {
 
     PrimitiveValueConverter converter;
     PrimitiveValueNode input1( (unsigned char)127 );
@@ -158,7 +142,7 @@ void PrimitiveValueConverterTest::testConvertToInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveValueConverterTest::testConvertToLong() {
+TEST_F(PrimitiveValueConverterTest, testConvertToLong) {
 
     PrimitiveValueConverter converter;
     PrimitiveValueNode input1( (unsigned char)127 );
@@ -186,7 +170,7 @@ void PrimitiveValueConverterTest::testConvertToLong() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveValueConverterTest::testConvertToFloat() {
+TEST_F(PrimitiveValueConverterTest, testConvertToFloat) {
 
     PrimitiveValueConverter converter;
     PrimitiveValueNode input1( 12.1f );
@@ -208,7 +192,7 @@ void PrimitiveValueConverterTest::testConvertToFloat() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveValueConverterTest::testConvertToDouble() {
+TEST_F(PrimitiveValueConverterTest, testConvertToDouble) {
 
     PrimitiveValueConverter converter;
     PrimitiveValueNode input1( 12.1 );
@@ -230,7 +214,7 @@ void PrimitiveValueConverterTest::testConvertToDouble() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveValueConverterTest::testConvertToString() {
+TEST_F(PrimitiveValueConverterTest, testConvertToString) {
 
     PrimitiveValueConverter converter;
     PrimitiveValueNode input1( (unsigned char)9 );
@@ -259,13 +243,3 @@ void PrimitiveValueConverterTest::testConvertToString() {
 
     ASSERT_THROW(converter.convert<unsigned int>( 24567 ), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
 }
-
-TEST_F(PrimitiveValueConverterTest, testConvertToBoolean) { testConvertToBoolean(); }
-TEST_F(PrimitiveValueConverterTest, testConvertToChar) { testConvertToChar(); }
-TEST_F(PrimitiveValueConverterTest, testConvertToByte) { testConvertToByte(); }
-TEST_F(PrimitiveValueConverterTest, testConvertToShort) { testConvertToShort(); }
-TEST_F(PrimitiveValueConverterTest, testConvertToInt) { testConvertToInt(); }
-TEST_F(PrimitiveValueConverterTest, testConvertToLong) { testConvertToLong(); }
-TEST_F(PrimitiveValueConverterTest, testConvertToFloat) { testConvertToFloat(); }
-TEST_F(PrimitiveValueConverterTest, testConvertToDouble) { testConvertToDouble(); }
-TEST_F(PrimitiveValueConverterTest, testConvertToString) { testConvertToString(); }

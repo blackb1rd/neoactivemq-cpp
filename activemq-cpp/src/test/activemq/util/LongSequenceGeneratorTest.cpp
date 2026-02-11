@@ -21,20 +21,10 @@
 using namespace activemq;
 using namespace activemq::util;
 
-    class LongSequenceGeneratorTest : public ::testing::Test
-    {
-public:
-
-        LongSequenceGeneratorTest() {}
-        virtual ~LongSequenceGeneratorTest() {}
-
-        void test();
-
-    };
-
+class LongSequenceGeneratorTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void LongSequenceGeneratorTest::test() {
+TEST_F(LongSequenceGeneratorTest, test) {
 
     LongSequenceGenerator sequence;
 
@@ -46,5 +36,3 @@ void LongSequenceGeneratorTest::test() {
     ASSERT_TRUE(result2 < sequence.getNextSequenceId());
 
 }
-
-TEST_F(LongSequenceGeneratorTest, test) { test(); }

@@ -36,15 +36,7 @@ public:
         CRC32Test();
         virtual ~CRC32Test();
 
-        void testConstructor();
-        void testGetValue();
-        void testReset();
-        void testUpdateI();
-        void testUpdateArray();
-        void testUpdateArrayIndexed();
-
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 CRC32Test::CRC32Test() {
@@ -55,14 +47,14 @@ CRC32Test::~CRC32Test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CRC32Test::testConstructor() {
+TEST_F(CRC32Test, testConstructor) {
 
     CRC32 crc;
     ASSERT_EQ(0LL, crc.getValue()) << ("Constructor of CRC32 failed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CRC32Test::testGetValue() {
+TEST_F(CRC32Test, testGetValue) {
 
     // test methods of java.util.zip.crc32.getValue()
     CRC32 crc;
@@ -95,7 +87,7 @@ void CRC32Test::testGetValue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CRC32Test::testReset() {
+TEST_F(CRC32Test, testReset) {
 
     CRC32 crc;
     crc.update( 1 );
@@ -108,7 +100,7 @@ void CRC32Test::testReset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CRC32Test::testUpdateI() {
+TEST_F(CRC32Test, testUpdateI) {
 
     CRC32 crc;
     crc.update( 1 );
@@ -133,7 +125,7 @@ void CRC32Test::testUpdateI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CRC32Test::testUpdateArray() {
+TEST_F(CRC32Test, testUpdateArray) {
 
     unsigned char byteArray[] = { 1, 2 };
     CRC32 crc;
@@ -153,7 +145,7 @@ void CRC32Test::testUpdateArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CRC32Test::testUpdateArrayIndexed() {
+TEST_F(CRC32Test, testUpdateArrayIndexed) {
 
     static const int SIZE = 3;
     unsigned char byteArray[] = {1, 2, 3};
@@ -173,10 +165,3 @@ void CRC32Test::testUpdateArrayIndexed() {
 
     ASSERT_THROW(crc.update( byteArray, SIZE, offError, len ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException for offError");
 }
-
-TEST_F(CRC32Test, testConstructor) { testConstructor(); }
-TEST_F(CRC32Test, testGetValue) { testGetValue(); }
-TEST_F(CRC32Test, testReset) { testReset(); }
-TEST_F(CRC32Test, testUpdateI) { testUpdateI(); }
-TEST_F(CRC32Test, testUpdateArray) { testUpdateArray(); }
-TEST_F(CRC32Test, testUpdateArrayIndexed) { testUpdateArrayIndexed(); }

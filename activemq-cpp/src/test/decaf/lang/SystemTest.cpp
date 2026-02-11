@@ -30,31 +30,21 @@ using namespace decaf::lang;
 public:
 
         SystemTest();
-        virtual ~SystemTest() {}
-
-        void test_availableProcessors();
-        void test_getenv();
-        void test_getenv2();
-        void test_setenv();
-        void test_unsetenv();
-        void test_currentTimeMillis();
-        void test_nanoTime();
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 SystemTest::SystemTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SystemTest::test_availableProcessors() {
+TEST_F(SystemTest, test_availableProcessors) {
 
     ASSERT_TRUE(System::availableProcessors() >= 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SystemTest::test_getenv() {
+TEST_F(SystemTest, test_getenv) {
 
     ASSERT_TRUE(System::getenv( "PATH" ) != "");
 
@@ -66,7 +56,7 @@ void SystemTest::test_getenv() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SystemTest::test_getenv2() {
+TEST_F(SystemTest, test_getenv2) {
 
     StlMap<std::string, std::string> values = System::getenv();
 
@@ -76,7 +66,7 @@ void SystemTest::test_getenv2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SystemTest::test_setenv() {
+TEST_F(SystemTest, test_setenv) {
 
     StlMap<std::string, std::string> values1 = System::getenv();
     ASSERT_TRUE(!values1.containsKey( "PATH_ASDFGHJKL" ));
@@ -87,7 +77,7 @@ void SystemTest::test_setenv() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SystemTest::test_unsetenv() {
+TEST_F(SystemTest, test_unsetenv) {
 
     StlMap<std::string, std::string> values1 = System::getenv();
     ASSERT_TRUE(!values1.containsKey( "PATH_ASDFGHJKL" ));
@@ -100,7 +90,7 @@ void SystemTest::test_unsetenv() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SystemTest::test_currentTimeMillis() {
+TEST_F(SystemTest, test_currentTimeMillis) {
     ASSERT_TRUE(System::currentTimeMillis() != 0);
 
     long long start = System::currentTimeMillis();
@@ -111,7 +101,7 @@ void SystemTest::test_currentTimeMillis() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SystemTest::test_nanoTime() {
+TEST_F(SystemTest, test_nanoTime) {
     ASSERT_TRUE(System::nanoTime() != 0);
 
     long long start = System::nanoTime();
@@ -120,11 +110,3 @@ void SystemTest::test_nanoTime() {
 
     ASSERT_TRUE(start < end) << ("First Read isn't less than the second.");
 }
-
-TEST_F(SystemTest, test_availableProcessors) { test_availableProcessors(); }
-TEST_F(SystemTest, test_getenv) { test_getenv(); }
-TEST_F(SystemTest, test_getenv2) { test_getenv2(); }
-TEST_F(SystemTest, test_setenv) { test_setenv(); }
-TEST_F(SystemTest, test_unsetenv) { test_unsetenv(); }
-TEST_F(SystemTest, test_currentTimeMillis) { test_currentTimeMillis(); }
-TEST_F(SystemTest, test_nanoTime) { test_nanoTime(); }

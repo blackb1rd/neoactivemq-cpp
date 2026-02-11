@@ -27,19 +27,10 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class TransportRegistryTest : public ::testing::Test {
-public:
-
-        TransportRegistryTest() {}
-        virtual ~TransportRegistryTest() {}
-
-        void test();
-
-    };
-
+class TransportRegistryTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransportRegistryTest::test() {
+TEST_F(TransportRegistryTest, test) {
 
     transport::mock::MockTransportFactory factory;
 
@@ -56,5 +47,3 @@ void TransportRegistryTest::test() {
     ASSERT_THROW(registry.registerFactory( "", &factory ), IllegalArgumentException) << ("Should have thrown an IllegalArgumentException");
 
 }
-
-TEST_F(TransportRegistryTest, test) { test(); }

@@ -41,17 +41,6 @@ using namespace decaf::io;
 using namespace decaf::lang::exceptions;
 
     class IOTransportTest : public ::testing::Test {
-public:
-
-        virtual ~IOTransportTest(){}
-
-        void testException();
-        void testWrite();
-        void testRead();
-        void testStartClose();
-        void testStressTransportStartClose();
-        void testNarrow();
-
     };
 
 
@@ -223,7 +212,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // This will just test that we can start and stop the
 // transport without any exceptions.
-void IOTransportTest::testStartClose(){
+TEST_F(IOTransportTest, testStartClose){
 
     decaf::io::BlockingByteArrayInputStream is;
     decaf::io::ByteArrayOutputStream os;
@@ -242,7 +231,7 @@ void IOTransportTest::testStartClose(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IOTransportTest::testStressTransportStartClose(){
+TEST_F(IOTransportTest, testStressTransportStartClose){
 
     decaf::io::BlockingByteArrayInputStream is;
     decaf::io::ByteArrayOutputStream os;
@@ -277,7 +266,7 @@ void IOTransportTest::testStressTransportStartClose(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IOTransportTest::testRead(){
+TEST_F(IOTransportTest, testRead){
 
     decaf::io::BlockingByteArrayInputStream is;
     decaf::io::ByteArrayOutputStream os;
@@ -313,7 +302,7 @@ void IOTransportTest::testRead(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IOTransportTest::testWrite(){
+TEST_F(IOTransportTest, testWrite){
 
     decaf::io::BlockingByteArrayInputStream is;
     decaf::io::ByteArrayOutputStream os;
@@ -358,7 +347,7 @@ void IOTransportTest::testWrite(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IOTransportTest::testException(){
+TEST_F(IOTransportTest, testException){
 
     decaf::io::BlockingByteArrayInputStream is;
     decaf::io::ByteArrayOutputStream os;
@@ -395,7 +384,7 @@ void IOTransportTest::testException(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IOTransportTest::testNarrow(){
+TEST_F(IOTransportTest, testNarrow){
 
     IOTransport transport;
 
@@ -409,10 +398,3 @@ void IOTransportTest::testNarrow(){
     ASSERT_TRUE(narrowed == &transport);
 
 }
-
-TEST_F(IOTransportTest, testStartClose) { testStartClose(); }
-TEST_F(IOTransportTest, testStressTransportStartClose) { testStressTransportStartClose(); }
-TEST_F(IOTransportTest, testRead) { testRead(); }
-TEST_F(IOTransportTest, testWrite) { testWrite(); }
-TEST_F(IOTransportTest, testException) { testException(); }
-TEST_F(IOTransportTest, testNarrow) { testNarrow(); }

@@ -67,16 +67,11 @@ private:
             }
         };
 
+    protected:
+
         std::unique_ptr<ActiveMQConnection> connection;
         transport::mock::MockTransport* dTransport;
         MyExceptionListener exListener;
-
-    private:
-
-        ActiveMQSessionTest(const ActiveMQSessionTest&);
-        ActiveMQSessionTest& operator= (const ActiveMQSessionTest&);
-
-    public:
 
         void SetUp() override;
         void TearDown() override;
@@ -86,24 +81,6 @@ private:
                                const commands::ConsumerId& id,
                                const long long timeStamp = -1,
                                const long long timeToLive = -1);
-
-    public:
-
-        ActiveMQSessionTest();
-        virtual ~ActiveMQSessionTest();
-
-        void testAutoAcking();
-        void testClientAck();
-        void testCreateManyConsumersAndSetListeners();
-        void testTransactionCommitOneConsumer();
-        void testTransactionCommitTwoConsumer();
-        void testTransactionRollbackOneConsumer();
-        void testTransactionRollbackTwoConsumer();
-        void testTransactionCloseWithoutCommit();
-        void testTransactionCommitAfterConsumerClosed();
-        void testExpiration();
-        void testCreateTempQueueByName();
-        void testCreateTempTopicByName();
 
     };
 
@@ -166,597 +143,6 @@ private:
             AMQ_CATCHALL_THROW( activemq::exceptions::ActiveMQException )
         }
     };
-
-////////////////////////////////////////////////////////////////////////////////
-ActiveMQSessionTest::ActiveMQSessionTest() : connection(), dTransport(), exListener() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-ActiveMQSessionTest::~ActiveMQSessionTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionTest::testCreateManyConsumersAndSetListeners() {
-
-    MyCMSMessageListener msgListener1;
-
-    ASSERT_TRUE(connection.get() != NULL);
-    ASSERT_TRUE(connection->isStarted() == true);
-
-    // Create an Auto Ack Session
-    std::unique_ptr<cms::Session> session( connection->createSession() );
-
-    // Create a Topic
-    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
-
-    ASSERT_TRUE(topic1.get() != NULL);
-
-    std::list<cms::MessageConsumer*> consumers;
-    for( int ix = 0; ix < 100; ++ix ) {
-        cms::MessageConsumer* consumer = session->createConsumer( topic1.get() );
-        consumer->setMessageListener( &msgListener1 );
-        consumers.push_back( consumer );
-    }
-
-    std::list<cms::MessageConsumer*>::iterator iter = consumers.begin();
-    for( ; iter != consumers.end(); ++iter ) {
-        (*iter)->close();
-        delete *iter;
-    }
-    consumers.clear();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionTest::testAutoAcking() {
-
-    MyCMSMessageListener msgListener1;
-    MyCMSMessageListener msgListener2;
-
-    ASSERT_TRUE(connection.get() != NULL);
-
-    // Create an Auto Ack Session
-    std::unique_ptr<cms::Session> session( connection->createSession() );
-
-    // Create a Topic
-    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
-    std::unique_ptr<cms::Topic> topic2( session->createTopic( "TestTopic2" ) );
-
-    ASSERT_TRUE(topic1.get() != NULL);
-    ASSERT_TRUE(topic2.get() != NULL);
-
-    // Create a consumer
-    std::unique_ptr<ActiveMQConsumer> consumer1(
-        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
-    std::unique_ptr<ActiveMQConsumer> consumer2(
-        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic2.get() ) ) );
-
-    ASSERT_TRUE(consumer1.get() != NULL);
-    ASSERT_TRUE(consumer2.get() != NULL);
-
-    ASSERT_TRUE(consumer1->getMessageSelector() == "");
-    ASSERT_TRUE(consumer2->getMessageSelector() == "");
-
-    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
-    ASSERT_TRUE(consumer1->receive( 5 ) == NULL);
-    ASSERT_TRUE(consumer2->receiveNoWait() == NULL);
-    ASSERT_TRUE(consumer2->receive( 5 ) == NULL);
-
-    consumer1->setMessageListener( &msgListener1 );
-    consumer2->setMessageListener( &msgListener2 );
-
-    injectTextMessage( "This is a Test 1" , *topic1, *( consumer1->getConsumerId() ) );
-
-    msgListener1.asyncWaitForMessages( 1 );
-
-    ASSERT_TRUE(msgListener1.messages.size() == 1);
-
-    injectTextMessage( "This is a Test 2" , *topic2, *( consumer2->getConsumerId() ) );
-
-    msgListener2.asyncWaitForMessages( 1 );
-
-    ASSERT_TRUE(msgListener2.messages.size() == 1);
-
-    Pointer<cms::TextMessage> msg1 = msgListener1.messages[0].dynamicCast<cms::TextMessage>();
-    Pointer<cms::TextMessage> msg2 = msgListener2.messages[0].dynamicCast<cms::TextMessage>();
-
-    std::string text1 = msg1->getText();
-    std::string text2 = msg2->getText();
-
-    ASSERT_TRUE(text1 == "This is a Test 1");
-    ASSERT_TRUE(text2 == "This is a Test 2");
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionTest::testClientAck() {
-
-    MyCMSMessageListener msgListener1( true );
-    MyCMSMessageListener msgListener2( true );
-
-    ASSERT_TRUE(connection.get() != NULL);
-
-    // Create an Client Ack Session
-    std::unique_ptr<cms::Session> session(
-        connection->createSession( cms::Session::CLIENT_ACKNOWLEDGE ) );
-
-    // Create a Topic
-    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
-    std::unique_ptr<cms::Topic> topic2( session->createTopic( "TestTopic2" ) );
-
-    ASSERT_TRUE(topic1.get() != NULL);
-    ASSERT_TRUE(topic2.get() != NULL);
-
-    // Create a consumer
-    std::unique_ptr<ActiveMQConsumer> consumer1(
-        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
-    std::unique_ptr<ActiveMQConsumer> consumer2(
-        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic2.get() ) ) );
-
-    ASSERT_TRUE(consumer1.get() != NULL);
-    ASSERT_TRUE(consumer2.get() != NULL);
-
-    ASSERT_TRUE(consumer1->getMessageSelector() == "");
-    ASSERT_TRUE(consumer2->getMessageSelector() == "");
-
-    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
-    ASSERT_TRUE(consumer1->receive( 5 ) == NULL);
-    ASSERT_TRUE(consumer2->receiveNoWait() == NULL);
-    ASSERT_TRUE(consumer2->receive( 5 ) == NULL);
-
-    consumer1->setMessageListener( &msgListener1 );
-    consumer2->setMessageListener( &msgListener2 );
-
-    injectTextMessage( "This is a Test 1" , *topic1, *( consumer1->getConsumerId() ) );
-
-    msgListener1.asyncWaitForMessages( 1 );
-
-    ASSERT_EQ(1, (int)msgListener1.messages.size());
-
-    msgListener1.messages[0]->acknowledge();
-
-    injectTextMessage( "This is a Test 2" , *topic2, *( consumer2->getConsumerId() ) );
-
-    msgListener2.asyncWaitForMessages( 1 );
-
-    ASSERT_EQ(1, (int)msgListener2.messages.size());
-
-    msgListener2.messages[0]->acknowledge();
-
-    Pointer<cms::TextMessage> msg1 = msgListener1.messages[0].dynamicCast<cms::TextMessage>();
-    Pointer<cms::TextMessage> msg2 = msgListener2.messages[0].dynamicCast<cms::TextMessage>();
-
-    std::string text1 = msg1->getText();
-    std::string text2 = msg2->getText();
-
-    ASSERT_TRUE(text1 == "This is a Test 1");
-    ASSERT_TRUE(text2 == "This is a Test 2");
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionTest::testTransactionCommitOneConsumer() {
-
-    static const int MSG_COUNT = 50;
-
-    MyCMSMessageListener msgListener1;
-
-    ASSERT_TRUE(connection.get() != NULL);
-
-    // Create an Transacted Session
-    std::unique_ptr<cms::Session> session(
-        connection->createSession( cms::Session::SESSION_TRANSACTED ) );
-
-    // Create a Topic
-    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
-
-    ASSERT_TRUE(topic1.get() != NULL);
-
-    // Create a consumer
-    std::unique_ptr<ActiveMQConsumer> consumer1(
-        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
-
-    ASSERT_TRUE(consumer1.get() != NULL);
-
-    ASSERT_TRUE(consumer1->getMessageSelector() == "");
-
-    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
-    ASSERT_TRUE(consumer1->receive( 5 ) == NULL);
-
-    consumer1->setMessageListener( &msgListener1 );
-
-    for( int i = 0; i < MSG_COUNT; ++i ) {
-        injectTextMessage( "This is a Test 1" , *topic1, *( consumer1->getConsumerId() ) );
-    }
-
-    msgListener1.asyncWaitForMessages( MSG_COUNT );
-
-    ASSERT_EQ(MSG_COUNT, (int)msgListener1.messages.size());
-
-    session->commit();
-
-    Pointer<cms::TextMessage> msg1 = msgListener1.messages[0].dynamicCast<cms::TextMessage>();
-
-    std::string text1 = msg1->getText();
-
-    ASSERT_TRUE(text1 == "This is a Test 1");
-
-    msgListener1.clear();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionTest::testTransactionCommitTwoConsumer() {
-
-    MyCMSMessageListener msgListener1;
-    MyCMSMessageListener msgListener2;
-
-    ASSERT_TRUE(connection.get() != NULL);
-
-    // Create an Auto Ack Session
-    std::unique_ptr<cms::Session> session(
-        connection->createSession( cms::Session::SESSION_TRANSACTED ) );
-
-    // Create a Topic
-    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
-    std::unique_ptr<cms::Topic> topic2( session->createTopic( "TestTopic2" ) );
-
-    ASSERT_TRUE(topic1.get() != NULL);
-    ASSERT_TRUE(topic2.get() != NULL);
-
-    // Create a consumer
-    std::unique_ptr<ActiveMQConsumer> consumer1(
-        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
-    std::unique_ptr<ActiveMQConsumer> consumer2(
-        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic2.get() ) ) );
-
-    ASSERT_TRUE(consumer1.get() != NULL);
-    ASSERT_TRUE(consumer2.get() != NULL);
-
-    ASSERT_TRUE(consumer1->getMessageSelector() == "");
-    ASSERT_TRUE(consumer2->getMessageSelector() == "");
-
-    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
-    ASSERT_TRUE(consumer1->receive( 5 ) == NULL);
-    ASSERT_TRUE(consumer2->receiveNoWait() == NULL);
-    ASSERT_TRUE(consumer2->receive( 5 ) == NULL);
-
-    consumer1->setMessageListener( &msgListener1 );
-    consumer2->setMessageListener( &msgListener2 );
-
-    injectTextMessage( "This is a Test 1" , *topic1, *( consumer1->getConsumerId() ) );
-
-    msgListener1.asyncWaitForMessages( 1 );
-
-    ASSERT_EQ(1, (int)msgListener1.messages.size());
-
-    injectTextMessage( "This is a Test 2" , *topic2, *( consumer2->getConsumerId() ) );
-
-    msgListener2.asyncWaitForMessages( 1 );
-
-    ASSERT_TRUE(msgListener2.messages.size() == 1);
-
-    session->commit();
-
-    Pointer<cms::TextMessage> msg1 = msgListener1.messages[0].dynamicCast<cms::TextMessage>();
-    Pointer<cms::TextMessage> msg2 = msgListener2.messages[0].dynamicCast<cms::TextMessage>();
-
-    std::string text1 = msg1->getText();
-    std::string text2 = msg2->getText();
-
-    ASSERT_TRUE(text1 == "This is a Test 1");
-    ASSERT_TRUE(text2 == "This is a Test 2");
-
-    msgListener1.clear();
-    msgListener2.clear();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionTest::testTransactionRollbackOneConsumer() {
-
-    MyCMSMessageListener msgListener1;
-
-    ASSERT_TRUE(connection.get() != NULL);
-
-    std::unique_ptr<cms::Session> session(
-        connection->createSession( cms::Session::SESSION_TRANSACTED ) );
-
-    // Create a Topic
-    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
-
-    ASSERT_TRUE(topic1.get() != NULL);
-
-    // Create a consumer
-    std::unique_ptr<ActiveMQConsumer> consumer1(
-        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
-
-    ASSERT_TRUE(consumer1.get() != NULL);
-
-    ASSERT_TRUE(consumer1->getMessageSelector() == "");
-
-    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
-    ASSERT_TRUE(consumer1->receive( 5 ) == NULL);
-
-    consumer1->setMessageListener( &msgListener1 );
-
-    const unsigned int msgCount = 50;
-
-    for( unsigned int i = 0; i < msgCount; ++i ) {
-        std::ostringstream stream;
-        stream << "This is test message #" << i << std::ends;
-        injectTextMessage( stream.str() , *topic1, *( consumer1->getConsumerId() ) );
-    }
-
-    msgListener1.asyncWaitForMessages( msgCount );
-
-    ASSERT_TRUE(msgListener1.messages.size() == msgCount);
-
-    msgListener1.clear();
-
-    session->rollback();
-
-    msgListener1.asyncWaitForMessages( msgCount );
-
-    ASSERT_TRUE(msgListener1.messages.size() == msgCount);
-
-    session->commit();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionTest::testTransactionRollbackTwoConsumer() {
-
-    MyCMSMessageListener msgListener1;
-    MyCMSMessageListener msgListener2;
-
-    ASSERT_TRUE(connection.get() != NULL);
-
-    std::unique_ptr<cms::Session> session(
-        connection->createSession( cms::Session::SESSION_TRANSACTED ) );
-
-    // Create a Topic
-    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
-    std::unique_ptr<cms::Topic> topic2( session->createTopic( "TestTopic2" ) );
-
-    ASSERT_TRUE(topic1.get() != NULL);
-    ASSERT_TRUE(topic2.get() != NULL);
-
-    // Create a consumer
-    std::unique_ptr<ActiveMQConsumer> consumer1(
-        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
-    std::unique_ptr<ActiveMQConsumer> consumer2(
-        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic2.get() ) ) );
-
-    ASSERT_TRUE(consumer1.get() != NULL);
-    ASSERT_TRUE(consumer2.get() != NULL);
-
-    ASSERT_TRUE(consumer1->getMessageSelector() == "");
-    ASSERT_TRUE(consumer2->getMessageSelector() == "");
-
-    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
-    ASSERT_TRUE(consumer1->receive( 5 ) == NULL);
-    ASSERT_TRUE(consumer2->receiveNoWait() == NULL);
-    ASSERT_TRUE(consumer2->receive( 5 ) == NULL);
-
-    consumer1->setMessageListener( &msgListener1 );
-    consumer2->setMessageListener( &msgListener2 );
-
-    const unsigned int msgCount = 50;
-
-    for( unsigned int i = 0; i < msgCount; ++i ) {
-        std::ostringstream stream;
-        stream << "This is test message #" << i << std::ends;
-        injectTextMessage( stream.str() , *topic1, *( consumer1->getConsumerId() ) );
-    }
-
-    for( unsigned int i = 0; i < msgCount; ++i ) {
-        std::ostringstream stream;
-        stream << "This is test message #" << i << std::ends;
-        injectTextMessage( stream.str() , *topic2, *( consumer2->getConsumerId() ) );
-    }
-
-    msgListener1.asyncWaitForMessages( msgCount );
-
-    ASSERT_TRUE(msgListener1.messages.size() == msgCount);
-
-    msgListener2.asyncWaitForMessages( msgCount );
-
-    ASSERT_TRUE(msgListener2.messages.size() == msgCount);
-
-    msgListener1.clear();
-    msgListener2.clear();
-
-    session->rollback();
-
-    msgListener1.asyncWaitForMessages( msgCount );
-
-    ASSERT_TRUE(msgListener1.messages.size() == msgCount);
-
-    msgListener2.asyncWaitForMessages( msgCount );
-
-    ASSERT_TRUE(msgListener2.messages.size() == msgCount);
-
-    session->commit();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionTest::testTransactionCloseWithoutCommit() {
-
-    static const int MSG_COUNT = 50;
-
-    MyCMSMessageListener msgListener1;
-
-    ASSERT_TRUE(connection.get() != NULL);
-
-    // Create an Transacted Session
-    std::unique_ptr<cms::Session> session(connection->createSession(cms::Session::SESSION_TRANSACTED));
-
-    // Create a Topic
-    std::unique_ptr<cms::Topic> topic1(session->createTopic("TestTopic1"));
-
-    ASSERT_TRUE(topic1.get() != NULL);
-
-    // Create a consumer
-    std::unique_ptr<ActiveMQConsumer> consumer1(
-        dynamic_cast<ActiveMQConsumer*> (session->createConsumer(topic1.get())));
-
-    ASSERT_TRUE(consumer1.get() != NULL);
-
-    ASSERT_TRUE(consumer1->getMessageSelector() == "");
-
-    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
-    ASSERT_TRUE(consumer1->receive( 5 ) == NULL);
-
-    consumer1->setMessageListener(&msgListener1);
-
-    for (int i = 0; i < MSG_COUNT; ++i) {
-        injectTextMessage("This is a Test 1", *topic1, *(consumer1->getConsumerId()));
-    }
-
-    msgListener1.asyncWaitForMessages(MSG_COUNT);
-
-    ASSERT_EQ(MSG_COUNT, (int)msgListener1.messages.size());
-
-    // This is what we are testing, since there was no commit, the session
-    // will rollback the transaction when this is closed.
-    // session->commit();
-
-    consumer1->close();
-    session->close();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionTest::testExpiration() {
-
-    MyCMSMessageListener msgListener1;
-    MyCMSMessageListener msgListener2;
-
-    ASSERT_TRUE(connection.get() != NULL);
-
-    // Create an Auto Ack Session
-    std::unique_ptr<cms::Session> session( connection->createSession() );
-
-    // Create a Topic
-    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
-    std::unique_ptr<cms::Topic> topic2( session->createTopic( "TestTopic2" ) );
-
-    ASSERT_TRUE(topic1.get() != NULL);
-    ASSERT_TRUE(topic2.get() != NULL);
-
-    // Create a consumer
-    std::unique_ptr<ActiveMQConsumer> consumer1(
-        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
-    std::unique_ptr<ActiveMQConsumer> consumer2(
-        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic2.get() ) ) );
-
-    ASSERT_TRUE(consumer1.get() != NULL);
-    ASSERT_TRUE(consumer2.get() != NULL);
-
-    consumer1->setMessageListener( &msgListener1 );
-    consumer2->setMessageListener( &msgListener2 );
-
-    injectTextMessage( "This is a Test 1" ,
-                       *topic1,
-                       *( consumer1->getConsumerId() ),
-                       decaf::lang::System::currentTimeMillis(),
-                       50 );
-
-    msgListener1.asyncWaitForMessages( 1 );
-
-    ASSERT_TRUE(msgListener1.messages.size() == 1);
-
-    injectTextMessage( "This is a Test 2" ,
-                       *topic2,
-                       *( consumer2->getConsumerId() ),
-                       decaf::lang::System::currentTimeMillis() - 100,
-                       1 );
-
-    msgListener2.asyncWaitForMessages( 1 );
-
-    ASSERT_TRUE(msgListener2.messages.size() == 0);
-
-    Pointer<cms::TextMessage> msg1 = msgListener1.messages[0].dynamicCast<cms::TextMessage>();
-
-    std::string text1 = msg1->getText();
-
-    ASSERT_TRUE(text1 == "This is a Test 1");
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionTest::testTransactionCommitAfterConsumerClosed() {
-
-    static const int MSG_COUNT = 50;
-    MyCMSMessageListener msgListener1;
-
-    ASSERT_TRUE(connection.get() != NULL);
-
-    // Create an Transacted Session
-    std::unique_ptr<cms::Session> session(connection->createSession(cms::Session::SESSION_TRANSACTED));
-
-    // Create a Topic
-    std::unique_ptr<cms::Topic> topic1(session->createTopic("TestTopic1"));
-
-    ASSERT_TRUE(topic1.get() != NULL);
-
-    // Create a consumer
-    std::unique_ptr<ActiveMQConsumer> consumer1(
-        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
-
-    ASSERT_TRUE(consumer1.get() != NULL);
-    ASSERT_TRUE(consumer1->getMessageSelector() == "");
-    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
-    ASSERT_TRUE(consumer1->receive(5) == NULL);
-
-    consumer1->setMessageListener(&msgListener1);
-
-    for (int i = 0; i < MSG_COUNT; ++i) {
-        injectTextMessage("This is a Test 1", *topic1, *(consumer1->getConsumerId()));
-    }
-
-    msgListener1.asyncWaitForMessages(MSG_COUNT);
-    ASSERT_EQ(MSG_COUNT, (int)msgListener1.messages.size());
-
-    consumer1->close();
-    consumer1.reset();
-    session->commit();
-
-    Pointer<cms::TextMessage> msg1 = msgListener1.messages[0].dynamicCast<cms::TextMessage>();
-    std::string text1 = msg1->getText();
-
-    ASSERT_TRUE(text1 == "This is a Test 1");
-    msgListener1.clear();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionTest::testCreateTempQueueByName() {
-
-    MyCMSMessageListener msgListener1;
-
-    ASSERT_TRUE(connection.get() != NULL);
-    ASSERT_TRUE(connection->isStarted() == true);
-
-    // Create an Auto Ack Session
-    std::unique_ptr<cms::Session> session(connection->createSession());
-
-    // Create a Topic
-    std::unique_ptr<cms::Queue> queue(session->createQueue("ID:TestQueue"));
-
-    ASSERT_TRUE(queue.get() != NULL);
-    ASSERT_TRUE(queue->getDestinationType() == cms::Destination::TEMPORARY_QUEUE);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionTest::testCreateTempTopicByName() {
-
-    MyCMSMessageListener msgListener1;
-
-    ASSERT_TRUE(connection.get() != NULL);
-    ASSERT_TRUE(connection->isStarted() == true);
-
-    // Create an Auto Ack Session
-    std::unique_ptr<cms::Session> session(connection->createSession());
-
-    // Create a Topic
-    std::unique_ptr<cms::Topic> topic(session->createTopic("ID:TestTopic"));
-
-    ASSERT_TRUE(topic.get() != NULL);
-    ASSERT_TRUE(topic->getDestinationType() == cms::Destination::TEMPORARY_TOPIC);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQSessionTest::SetUp() {
@@ -838,15 +224,585 @@ void ActiveMQSessionTest::injectTextMessage(const std::string message,
     dTransport->fireCommand(dispatch);
 }
 
-TEST_F(ActiveMQSessionTest, testAutoAcking) { testAutoAcking(); }
-TEST_F(ActiveMQSessionTest, testClientAck) { testClientAck(); }
-TEST_F(ActiveMQSessionTest, testTransactionCommitOneConsumer) { testTransactionCommitOneConsumer(); }
-TEST_F(ActiveMQSessionTest, testTransactionCommitTwoConsumer) { testTransactionCommitTwoConsumer(); }
-TEST_F(ActiveMQSessionTest, testTransactionCommitAfterConsumerClosed) { testTransactionCommitAfterConsumerClosed(); }
-TEST_F(ActiveMQSessionTest, testTransactionRollbackOneConsumer) { testTransactionRollbackOneConsumer(); }
-TEST_F(ActiveMQSessionTest, testTransactionRollbackTwoConsumer) { testTransactionRollbackTwoConsumer(); }
-TEST_F(ActiveMQSessionTest, testTransactionCloseWithoutCommit) { testTransactionCloseWithoutCommit(); }
-TEST_F(ActiveMQSessionTest, testExpiration) { testExpiration(); }
-TEST_F(ActiveMQSessionTest, testCreateManyConsumersAndSetListeners) { testCreateManyConsumersAndSetListeners(); }
-TEST_F(ActiveMQSessionTest, testCreateTempQueueByName) { testCreateTempQueueByName(); }
-TEST_F(ActiveMQSessionTest, testCreateTempTopicByName) { testCreateTempTopicByName(); }
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQSessionTest, testCreateManyConsumersAndSetListeners) {
+
+    MyCMSMessageListener msgListener1;
+
+    ASSERT_TRUE(connection.get() != NULL);
+    ASSERT_TRUE(connection->isStarted() == true);
+
+    // Create an Auto Ack Session
+    std::unique_ptr<cms::Session> session( connection->createSession() );
+
+    // Create a Topic
+    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
+
+    ASSERT_TRUE(topic1.get() != NULL);
+
+    std::list<cms::MessageConsumer*> consumers;
+    for( int ix = 0; ix < 100; ++ix ) {
+        cms::MessageConsumer* consumer = session->createConsumer( topic1.get() );
+        consumer->setMessageListener( &msgListener1 );
+        consumers.push_back( consumer );
+    }
+
+    std::list<cms::MessageConsumer*>::iterator iter = consumers.begin();
+    for( ; iter != consumers.end(); ++iter ) {
+        (*iter)->close();
+        delete *iter;
+    }
+    consumers.clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQSessionTest, testAutoAcking) {
+
+    MyCMSMessageListener msgListener1;
+    MyCMSMessageListener msgListener2;
+
+    ASSERT_TRUE(connection.get() != NULL);
+
+    // Create an Auto Ack Session
+    std::unique_ptr<cms::Session> session( connection->createSession() );
+
+    // Create a Topic
+    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
+    std::unique_ptr<cms::Topic> topic2( session->createTopic( "TestTopic2" ) );
+
+    ASSERT_TRUE(topic1.get() != NULL);
+    ASSERT_TRUE(topic2.get() != NULL);
+
+    // Create a consumer
+    std::unique_ptr<ActiveMQConsumer> consumer1(
+        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
+    std::unique_ptr<ActiveMQConsumer> consumer2(
+        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic2.get() ) ) );
+
+    ASSERT_TRUE(consumer1.get() != NULL);
+    ASSERT_TRUE(consumer2.get() != NULL);
+
+    ASSERT_TRUE(consumer1->getMessageSelector() == "");
+    ASSERT_TRUE(consumer2->getMessageSelector() == "");
+
+    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
+    ASSERT_TRUE(consumer1->receive( 5 ) == NULL);
+    ASSERT_TRUE(consumer2->receiveNoWait() == NULL);
+    ASSERT_TRUE(consumer2->receive( 5 ) == NULL);
+
+    consumer1->setMessageListener( &msgListener1 );
+    consumer2->setMessageListener( &msgListener2 );
+
+    injectTextMessage( "This is a Test 1" , *topic1, *( consumer1->getConsumerId() ) );
+
+    msgListener1.asyncWaitForMessages( 1 );
+
+    ASSERT_TRUE(msgListener1.messages.size() == 1);
+
+    injectTextMessage( "This is a Test 2" , *topic2, *( consumer2->getConsumerId() ) );
+
+    msgListener2.asyncWaitForMessages( 1 );
+
+    ASSERT_TRUE(msgListener2.messages.size() == 1);
+
+    Pointer<cms::TextMessage> msg1 = msgListener1.messages[0].dynamicCast<cms::TextMessage>();
+    Pointer<cms::TextMessage> msg2 = msgListener2.messages[0].dynamicCast<cms::TextMessage>();
+
+    std::string text1 = msg1->getText();
+    std::string text2 = msg2->getText();
+
+    ASSERT_TRUE(text1 == "This is a Test 1");
+    ASSERT_TRUE(text2 == "This is a Test 2");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQSessionTest, testClientAck) {
+
+    MyCMSMessageListener msgListener1( true );
+    MyCMSMessageListener msgListener2( true );
+
+    ASSERT_TRUE(connection.get() != NULL);
+
+    // Create an Client Ack Session
+    std::unique_ptr<cms::Session> session(
+        connection->createSession( cms::Session::CLIENT_ACKNOWLEDGE ) );
+
+    // Create a Topic
+    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
+    std::unique_ptr<cms::Topic> topic2( session->createTopic( "TestTopic2" ) );
+
+    ASSERT_TRUE(topic1.get() != NULL);
+    ASSERT_TRUE(topic2.get() != NULL);
+
+    // Create a consumer
+    std::unique_ptr<ActiveMQConsumer> consumer1(
+        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
+    std::unique_ptr<ActiveMQConsumer> consumer2(
+        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic2.get() ) ) );
+
+    ASSERT_TRUE(consumer1.get() != NULL);
+    ASSERT_TRUE(consumer2.get() != NULL);
+
+    ASSERT_TRUE(consumer1->getMessageSelector() == "");
+    ASSERT_TRUE(consumer2->getMessageSelector() == "");
+
+    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
+    ASSERT_TRUE(consumer1->receive( 5 ) == NULL);
+    ASSERT_TRUE(consumer2->receiveNoWait() == NULL);
+    ASSERT_TRUE(consumer2->receive( 5 ) == NULL);
+
+    consumer1->setMessageListener( &msgListener1 );
+    consumer2->setMessageListener( &msgListener2 );
+
+    injectTextMessage( "This is a Test 1" , *topic1, *( consumer1->getConsumerId() ) );
+
+    msgListener1.asyncWaitForMessages( 1 );
+
+    ASSERT_EQ(1, (int)msgListener1.messages.size());
+
+    msgListener1.messages[0]->acknowledge();
+
+    injectTextMessage( "This is a Test 2" , *topic2, *( consumer2->getConsumerId() ) );
+
+    msgListener2.asyncWaitForMessages( 1 );
+
+    ASSERT_EQ(1, (int)msgListener2.messages.size());
+
+    msgListener2.messages[0]->acknowledge();
+
+    Pointer<cms::TextMessage> msg1 = msgListener1.messages[0].dynamicCast<cms::TextMessage>();
+    Pointer<cms::TextMessage> msg2 = msgListener2.messages[0].dynamicCast<cms::TextMessage>();
+
+    std::string text1 = msg1->getText();
+    std::string text2 = msg2->getText();
+
+    ASSERT_TRUE(text1 == "This is a Test 1");
+    ASSERT_TRUE(text2 == "This is a Test 2");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQSessionTest, testTransactionCommitOneConsumer) {
+
+    static const int MSG_COUNT = 50;
+
+    MyCMSMessageListener msgListener1;
+
+    ASSERT_TRUE(connection.get() != NULL);
+
+    // Create an Transacted Session
+    std::unique_ptr<cms::Session> session(
+        connection->createSession( cms::Session::SESSION_TRANSACTED ) );
+
+    // Create a Topic
+    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
+
+    ASSERT_TRUE(topic1.get() != NULL);
+
+    // Create a consumer
+    std::unique_ptr<ActiveMQConsumer> consumer1(
+        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
+
+    ASSERT_TRUE(consumer1.get() != NULL);
+
+    ASSERT_TRUE(consumer1->getMessageSelector() == "");
+
+    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
+    ASSERT_TRUE(consumer1->receive( 5 ) == NULL);
+
+    consumer1->setMessageListener( &msgListener1 );
+
+    for( int i = 0; i < MSG_COUNT; ++i ) {
+        injectTextMessage( "This is a Test 1" , *topic1, *( consumer1->getConsumerId() ) );
+    }
+
+    msgListener1.asyncWaitForMessages( MSG_COUNT );
+
+    ASSERT_EQ(MSG_COUNT, (int)msgListener1.messages.size());
+
+    session->commit();
+
+    Pointer<cms::TextMessage> msg1 = msgListener1.messages[0].dynamicCast<cms::TextMessage>();
+
+    std::string text1 = msg1->getText();
+
+    ASSERT_TRUE(text1 == "This is a Test 1");
+
+    msgListener1.clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQSessionTest, testTransactionCommitTwoConsumer) {
+
+    MyCMSMessageListener msgListener1;
+    MyCMSMessageListener msgListener2;
+
+    ASSERT_TRUE(connection.get() != NULL);
+
+    // Create an Auto Ack Session
+    std::unique_ptr<cms::Session> session(
+        connection->createSession( cms::Session::SESSION_TRANSACTED ) );
+
+    // Create a Topic
+    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
+    std::unique_ptr<cms::Topic> topic2( session->createTopic( "TestTopic2" ) );
+
+    ASSERT_TRUE(topic1.get() != NULL);
+    ASSERT_TRUE(topic2.get() != NULL);
+
+    // Create a consumer
+    std::unique_ptr<ActiveMQConsumer> consumer1(
+        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
+    std::unique_ptr<ActiveMQConsumer> consumer2(
+        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic2.get() ) ) );
+
+    ASSERT_TRUE(consumer1.get() != NULL);
+    ASSERT_TRUE(consumer2.get() != NULL);
+
+    ASSERT_TRUE(consumer1->getMessageSelector() == "");
+    ASSERT_TRUE(consumer2->getMessageSelector() == "");
+
+    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
+    ASSERT_TRUE(consumer1->receive( 5 ) == NULL);
+    ASSERT_TRUE(consumer2->receiveNoWait() == NULL);
+    ASSERT_TRUE(consumer2->receive( 5 ) == NULL);
+
+    consumer1->setMessageListener( &msgListener1 );
+    consumer2->setMessageListener( &msgListener2 );
+
+    injectTextMessage( "This is a Test 1" , *topic1, *( consumer1->getConsumerId() ) );
+
+    msgListener1.asyncWaitForMessages( 1 );
+
+    ASSERT_EQ(1, (int)msgListener1.messages.size());
+
+    injectTextMessage( "This is a Test 2" , *topic2, *( consumer2->getConsumerId() ) );
+
+    msgListener2.asyncWaitForMessages( 1 );
+
+    ASSERT_TRUE(msgListener2.messages.size() == 1);
+
+    session->commit();
+
+    Pointer<cms::TextMessage> msg1 = msgListener1.messages[0].dynamicCast<cms::TextMessage>();
+    Pointer<cms::TextMessage> msg2 = msgListener2.messages[0].dynamicCast<cms::TextMessage>();
+
+    std::string text1 = msg1->getText();
+    std::string text2 = msg2->getText();
+
+    ASSERT_TRUE(text1 == "This is a Test 1");
+    ASSERT_TRUE(text2 == "This is a Test 2");
+
+    msgListener1.clear();
+    msgListener2.clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQSessionTest, testTransactionRollbackOneConsumer) {
+
+    MyCMSMessageListener msgListener1;
+
+    ASSERT_TRUE(connection.get() != NULL);
+
+    std::unique_ptr<cms::Session> session(
+        connection->createSession( cms::Session::SESSION_TRANSACTED ) );
+
+    // Create a Topic
+    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
+
+    ASSERT_TRUE(topic1.get() != NULL);
+
+    // Create a consumer
+    std::unique_ptr<ActiveMQConsumer> consumer1(
+        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
+
+    ASSERT_TRUE(consumer1.get() != NULL);
+
+    ASSERT_TRUE(consumer1->getMessageSelector() == "");
+
+    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
+    ASSERT_TRUE(consumer1->receive( 5 ) == NULL);
+
+    consumer1->setMessageListener( &msgListener1 );
+
+    const unsigned int msgCount = 50;
+
+    for( unsigned int i = 0; i < msgCount; ++i ) {
+        std::ostringstream stream;
+        stream << "This is test message #" << i << std::ends;
+        injectTextMessage( stream.str() , *topic1, *( consumer1->getConsumerId() ) );
+    }
+
+    msgListener1.asyncWaitForMessages( msgCount );
+
+    ASSERT_TRUE(msgListener1.messages.size() == msgCount);
+
+    msgListener1.clear();
+
+    session->rollback();
+
+    msgListener1.asyncWaitForMessages( msgCount );
+
+    ASSERT_TRUE(msgListener1.messages.size() == msgCount);
+
+    session->commit();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQSessionTest, testTransactionRollbackTwoConsumer) {
+
+    MyCMSMessageListener msgListener1;
+    MyCMSMessageListener msgListener2;
+
+    ASSERT_TRUE(connection.get() != NULL);
+
+    std::unique_ptr<cms::Session> session(
+        connection->createSession( cms::Session::SESSION_TRANSACTED ) );
+
+    // Create a Topic
+    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
+    std::unique_ptr<cms::Topic> topic2( session->createTopic( "TestTopic2" ) );
+
+    ASSERT_TRUE(topic1.get() != NULL);
+    ASSERT_TRUE(topic2.get() != NULL);
+
+    // Create a consumer
+    std::unique_ptr<ActiveMQConsumer> consumer1(
+        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
+    std::unique_ptr<ActiveMQConsumer> consumer2(
+        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic2.get() ) ) );
+
+    ASSERT_TRUE(consumer1.get() != NULL);
+    ASSERT_TRUE(consumer2.get() != NULL);
+
+    ASSERT_TRUE(consumer1->getMessageSelector() == "");
+    ASSERT_TRUE(consumer2->getMessageSelector() == "");
+
+    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
+    ASSERT_TRUE(consumer1->receive( 5 ) == NULL);
+    ASSERT_TRUE(consumer2->receiveNoWait() == NULL);
+    ASSERT_TRUE(consumer2->receive( 5 ) == NULL);
+
+    consumer1->setMessageListener( &msgListener1 );
+    consumer2->setMessageListener( &msgListener2 );
+
+    const unsigned int msgCount = 50;
+
+    for( unsigned int i = 0; i < msgCount; ++i ) {
+        std::ostringstream stream;
+        stream << "This is test message #" << i << std::ends;
+        injectTextMessage( stream.str() , *topic1, *( consumer1->getConsumerId() ) );
+    }
+
+    for( unsigned int i = 0; i < msgCount; ++i ) {
+        std::ostringstream stream;
+        stream << "This is test message #" << i << std::ends;
+        injectTextMessage( stream.str() , *topic2, *( consumer2->getConsumerId() ) );
+    }
+
+    msgListener1.asyncWaitForMessages( msgCount );
+
+    ASSERT_TRUE(msgListener1.messages.size() == msgCount);
+
+    msgListener2.asyncWaitForMessages( msgCount );
+
+    ASSERT_TRUE(msgListener2.messages.size() == msgCount);
+
+    msgListener1.clear();
+    msgListener2.clear();
+
+    session->rollback();
+
+    msgListener1.asyncWaitForMessages( msgCount );
+
+    ASSERT_TRUE(msgListener1.messages.size() == msgCount);
+
+    msgListener2.asyncWaitForMessages( msgCount );
+
+    ASSERT_TRUE(msgListener2.messages.size() == msgCount);
+
+    session->commit();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQSessionTest, testTransactionCloseWithoutCommit) {
+
+    static const int MSG_COUNT = 50;
+
+    MyCMSMessageListener msgListener1;
+
+    ASSERT_TRUE(connection.get() != NULL);
+
+    // Create an Transacted Session
+    std::unique_ptr<cms::Session> session(connection->createSession(cms::Session::SESSION_TRANSACTED));
+
+    // Create a Topic
+    std::unique_ptr<cms::Topic> topic1(session->createTopic("TestTopic1"));
+
+    ASSERT_TRUE(topic1.get() != NULL);
+
+    // Create a consumer
+    std::unique_ptr<ActiveMQConsumer> consumer1(
+        dynamic_cast<ActiveMQConsumer*> (session->createConsumer(topic1.get())));
+
+    ASSERT_TRUE(consumer1.get() != NULL);
+
+    ASSERT_TRUE(consumer1->getMessageSelector() == "");
+
+    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
+    ASSERT_TRUE(consumer1->receive( 5 ) == NULL);
+
+    consumer1->setMessageListener(&msgListener1);
+
+    for (int i = 0; i < MSG_COUNT; ++i) {
+        injectTextMessage("This is a Test 1", *topic1, *(consumer1->getConsumerId()));
+    }
+
+    msgListener1.asyncWaitForMessages(MSG_COUNT);
+
+    ASSERT_EQ(MSG_COUNT, (int)msgListener1.messages.size());
+
+    // This is what we are testing, since there was no commit, the session
+    // will rollback the transaction when this is closed.
+    // session->commit();
+
+    consumer1->close();
+    session->close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQSessionTest, testExpiration) {
+
+    MyCMSMessageListener msgListener1;
+    MyCMSMessageListener msgListener2;
+
+    ASSERT_TRUE(connection.get() != NULL);
+
+    // Create an Auto Ack Session
+    std::unique_ptr<cms::Session> session( connection->createSession() );
+
+    // Create a Topic
+    std::unique_ptr<cms::Topic> topic1( session->createTopic( "TestTopic1" ) );
+    std::unique_ptr<cms::Topic> topic2( session->createTopic( "TestTopic2" ) );
+
+    ASSERT_TRUE(topic1.get() != NULL);
+    ASSERT_TRUE(topic2.get() != NULL);
+
+    // Create a consumer
+    std::unique_ptr<ActiveMQConsumer> consumer1(
+        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
+    std::unique_ptr<ActiveMQConsumer> consumer2(
+        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic2.get() ) ) );
+
+    ASSERT_TRUE(consumer1.get() != NULL);
+    ASSERT_TRUE(consumer2.get() != NULL);
+
+    consumer1->setMessageListener( &msgListener1 );
+    consumer2->setMessageListener( &msgListener2 );
+
+    injectTextMessage( "This is a Test 1" ,
+                       *topic1,
+                       *( consumer1->getConsumerId() ),
+                       decaf::lang::System::currentTimeMillis(),
+                       50 );
+
+    msgListener1.asyncWaitForMessages( 1 );
+
+    ASSERT_TRUE(msgListener1.messages.size() == 1);
+
+    injectTextMessage( "This is a Test 2" ,
+                       *topic2,
+                       *( consumer2->getConsumerId() ),
+                       decaf::lang::System::currentTimeMillis() - 100,
+                       1 );
+
+    msgListener2.asyncWaitForMessages( 1 );
+
+    ASSERT_TRUE(msgListener2.messages.size() == 0);
+
+    Pointer<cms::TextMessage> msg1 = msgListener1.messages[0].dynamicCast<cms::TextMessage>();
+
+    std::string text1 = msg1->getText();
+
+    ASSERT_TRUE(text1 == "This is a Test 1");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQSessionTest, testTransactionCommitAfterConsumerClosed) {
+
+    static const int MSG_COUNT = 50;
+    MyCMSMessageListener msgListener1;
+
+    ASSERT_TRUE(connection.get() != NULL);
+
+    // Create an Transacted Session
+    std::unique_ptr<cms::Session> session(connection->createSession(cms::Session::SESSION_TRANSACTED));
+
+    // Create a Topic
+    std::unique_ptr<cms::Topic> topic1(session->createTopic("TestTopic1"));
+
+    ASSERT_TRUE(topic1.get() != NULL);
+
+    // Create a consumer
+    std::unique_ptr<ActiveMQConsumer> consumer1(
+        dynamic_cast<ActiveMQConsumer*>( session->createConsumer( topic1.get() ) ) );
+
+    ASSERT_TRUE(consumer1.get() != NULL);
+    ASSERT_TRUE(consumer1->getMessageSelector() == "");
+    ASSERT_TRUE(consumer1->receiveNoWait() == NULL);
+    ASSERT_TRUE(consumer1->receive(5) == NULL);
+
+    consumer1->setMessageListener(&msgListener1);
+
+    for (int i = 0; i < MSG_COUNT; ++i) {
+        injectTextMessage("This is a Test 1", *topic1, *(consumer1->getConsumerId()));
+    }
+
+    msgListener1.asyncWaitForMessages(MSG_COUNT);
+    ASSERT_EQ(MSG_COUNT, (int)msgListener1.messages.size());
+
+    consumer1->close();
+    consumer1.reset();
+    session->commit();
+
+    Pointer<cms::TextMessage> msg1 = msgListener1.messages[0].dynamicCast<cms::TextMessage>();
+    std::string text1 = msg1->getText();
+
+    ASSERT_TRUE(text1 == "This is a Test 1");
+    msgListener1.clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQSessionTest, testCreateTempQueueByName) {
+
+    MyCMSMessageListener msgListener1;
+
+    ASSERT_TRUE(connection.get() != NULL);
+    ASSERT_TRUE(connection->isStarted() == true);
+
+    // Create an Auto Ack Session
+    std::unique_ptr<cms::Session> session(connection->createSession());
+
+    // Create a Topic
+    std::unique_ptr<cms::Queue> queue(session->createQueue("ID:TestQueue"));
+
+    ASSERT_TRUE(queue.get() != NULL);
+    ASSERT_TRUE(queue->getDestinationType() == cms::Destination::TEMPORARY_QUEUE);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQSessionTest, testCreateTempTopicByName) {
+
+    MyCMSMessageListener msgListener1;
+
+    ASSERT_TRUE(connection.get() != NULL);
+    ASSERT_TRUE(connection->isStarted() == true);
+
+    // Create an Auto Ack Session
+    std::unique_ptr<cms::Session> session(connection->createSession());
+
+    // Create a Topic
+    std::unique_ptr<cms::Topic> topic(session->createTopic("ID:TestTopic"));
+
+    ASSERT_TRUE(topic.get() != NULL);
+    ASSERT_TRUE(topic->getDestinationType() == cms::Destination::TEMPORARY_TOPIC);
+}

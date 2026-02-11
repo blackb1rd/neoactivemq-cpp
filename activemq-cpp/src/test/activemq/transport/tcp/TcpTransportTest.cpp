@@ -46,26 +46,10 @@ using namespace activemq::transport;
 using namespace activemq::transport::tcp;
 
     class TcpTransportTest : public ::testing::Test {
-public:
-
-        TcpTransportTest();
-        virtual ~TcpTransportTest();
-
+    protected:
         void SetUp() override;
         void TearDown() override;
-
-        void testTransportCreateWithRadomFailures();
-
     };
-
-
-////////////////////////////////////////////////////////////////////////////////
-TcpTransportTest::TcpTransportTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-TcpTransportTest::~TcpTransportTest() {
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -222,7 +206,7 @@ void TcpTransportTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TcpTransportTest::testTransportCreateWithRadomFailures() {
+TEST_F(TcpTransportTest, testTransportCreateWithRadomFailures) {
 
     Properties properties;
     OpenWireFormat wireFormat(properties);
@@ -248,5 +232,3 @@ void TcpTransportTest::testTransportCreateWithRadomFailures() {
         } catch (Exception& ex) {}
     }
 }
-
-TEST_F(TcpTransportTest, testTransportCreateWithRadomFailures) { testTransportCreateWithRadomFailures(); }

@@ -28,38 +28,15 @@ using namespace activemq::util;
 using namespace activemq::commands;
 
     class ActiveMQMapMessageTest : public ::testing::Test {
-private:
+    protected:
 
-        std::string name;
-
-    public:
-
-        ActiveMQMapMessageTest() : name("test-name") {}
-        virtual ~ActiveMQMapMessageTest() {}
-
-        void test();
-        void testBytesConversion();
-        void testGetBoolean();
-        void testGetByte();
-        void testGetShort();
-        void testGetChar();
-        void testGetInt();
-        void testGetLong();
-        void testGetFloat();
-        void testGetDouble();
-        void testGetString();
-        void testGetBytes();
-        void testGetMapNames();
-        void testItemExists();
-        void testClearBody();
-        void testReadOnlyBody();
-        void testWriteOnlyBody();
+        std::string name = "test-name";
 
     };
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::test() {
+TEST_F(ActiveMQMapMessageTest, test) {
     ActiveMQMapMessage myMessage;
 
     ASSERT_TRUE(myMessage.getDataStructureType() == ActiveMQMapMessage::ID_ACTIVEMQMAPMESSAGE);
@@ -97,7 +74,7 @@ void ActiveMQMapMessageTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testBytesConversion() {
+TEST_F(ActiveMQMapMessageTest, testBytesConversion) {
 
     ActiveMQMapMessage msg;
 
@@ -141,7 +118,7 @@ void ActiveMQMapMessageTest::testBytesConversion() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testGetBoolean() {
+TEST_F(ActiveMQMapMessageTest, testGetBoolean) {
 
     ActiveMQMapMessage msg;
     msg.setBoolean( name, true );
@@ -157,7 +134,7 @@ void ActiveMQMapMessageTest::testGetBoolean() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testGetByte() {
+TEST_F(ActiveMQMapMessageTest, testGetByte) {
     ActiveMQMapMessage msg;
     msg.setByte( name, (unsigned char)1 );
 
@@ -168,7 +145,7 @@ void ActiveMQMapMessageTest::testGetByte() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testGetShort() {
+TEST_F(ActiveMQMapMessageTest, testGetShort) {
     ActiveMQMapMessage msg;
     try {
         msg.setShort( name, (short)1 );
@@ -185,7 +162,7 @@ void ActiveMQMapMessageTest::testGetShort() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testGetChar() {
+TEST_F(ActiveMQMapMessageTest, testGetChar) {
     ActiveMQMapMessage msg;
     try {
         msg.setChar( name, 'a' );
@@ -202,7 +179,7 @@ void ActiveMQMapMessageTest::testGetChar() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testGetInt() {
+TEST_F(ActiveMQMapMessageTest, testGetInt) {
     ActiveMQMapMessage msg;
     try {
         msg.setInt( name, 1 );
@@ -219,7 +196,7 @@ void ActiveMQMapMessageTest::testGetInt() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testGetLong() {
+TEST_F(ActiveMQMapMessageTest, testGetLong) {
     ActiveMQMapMessage msg;
     try {
         msg.setLong( name, 1 );
@@ -236,7 +213,7 @@ void ActiveMQMapMessageTest::testGetLong() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testGetFloat() {
+TEST_F(ActiveMQMapMessageTest, testGetFloat) {
     ActiveMQMapMessage msg;
     try {
         msg.setFloat( name, 1.5f );
@@ -253,7 +230,7 @@ void ActiveMQMapMessageTest::testGetFloat() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testGetDouble() {
+TEST_F(ActiveMQMapMessageTest, testGetDouble) {
     ActiveMQMapMessage msg;
     try {
         msg.setDouble( name, 1.5 );
@@ -270,7 +247,7 @@ void ActiveMQMapMessageTest::testGetDouble() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testGetString() {
+TEST_F(ActiveMQMapMessageTest, testGetString) {
     ActiveMQMapMessage msg;
     try {
         std::string str = "test";
@@ -288,7 +265,7 @@ void ActiveMQMapMessageTest::testGetString() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testGetBytes() {
+TEST_F(ActiveMQMapMessageTest, testGetBytes) {
     ActiveMQMapMessage msg;
     try {
 
@@ -315,7 +292,7 @@ void ActiveMQMapMessageTest::testGetBytes() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testGetMapNames() {
+TEST_F(ActiveMQMapMessageTest, testGetMapNames) {
 
     ActiveMQMapMessage msg;
 
@@ -354,7 +331,7 @@ void ActiveMQMapMessageTest::testGetMapNames() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testItemExists() {
+TEST_F(ActiveMQMapMessageTest, testItemExists) {
     ActiveMQMapMessage mapMessage;
 
     mapMessage.setString( "exists", "test" );
@@ -367,7 +344,7 @@ void ActiveMQMapMessageTest::testItemExists() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testClearBody() {
+TEST_F(ActiveMQMapMessageTest, testClearBody) {
 
     ActiveMQMapMessage mapMessage;
     mapMessage.setString( "String", "String" );
@@ -387,7 +364,7 @@ void ActiveMQMapMessageTest::testClearBody() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testReadOnlyBody() {
+TEST_F(ActiveMQMapMessageTest, testReadOnlyBody) {
 
     ActiveMQMapMessage msg;
     std::vector<unsigned char> buffer(2);
@@ -472,7 +449,7 @@ void ActiveMQMapMessageTest::testReadOnlyBody() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessageTest::testWriteOnlyBody() {
+TEST_F(ActiveMQMapMessageTest, testWriteOnlyBody) {
 
     ActiveMQMapMessage msg;
 
@@ -506,21 +483,3 @@ void ActiveMQMapMessageTest::testWriteOnlyBody() {
     msg.getShort( "short" );
     msg.getString( "string" );
 }
-
-TEST_F(ActiveMQMapMessageTest, test) { test(); }
-TEST_F(ActiveMQMapMessageTest, testBytesConversion) { testBytesConversion(); }
-TEST_F(ActiveMQMapMessageTest, testGetBoolean) { testGetBoolean(); }
-TEST_F(ActiveMQMapMessageTest, testGetByte) { testGetByte(); }
-TEST_F(ActiveMQMapMessageTest, testGetShort) { testGetShort(); }
-TEST_F(ActiveMQMapMessageTest, testGetChar) { testGetChar(); }
-TEST_F(ActiveMQMapMessageTest, testGetInt) { testGetInt(); }
-TEST_F(ActiveMQMapMessageTest, testGetLong) { testGetLong(); }
-TEST_F(ActiveMQMapMessageTest, testGetFloat) { testGetFloat(); }
-TEST_F(ActiveMQMapMessageTest, testGetDouble) { testGetDouble(); }
-TEST_F(ActiveMQMapMessageTest, testGetString) { testGetString(); }
-TEST_F(ActiveMQMapMessageTest, testGetBytes) { testGetBytes(); }
-TEST_F(ActiveMQMapMessageTest, testGetMapNames) { testGetMapNames(); }
-TEST_F(ActiveMQMapMessageTest, testItemExists) { testItemExists(); }
-TEST_F(ActiveMQMapMessageTest, testClearBody) { testClearBody(); }
-TEST_F(ActiveMQMapMessageTest, testReadOnlyBody) { testReadOnlyBody(); }
-TEST_F(ActiveMQMapMessageTest, testWriteOnlyBody) { testWriteOnlyBody(); }

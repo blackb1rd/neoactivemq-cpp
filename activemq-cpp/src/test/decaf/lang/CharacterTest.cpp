@@ -26,19 +26,15 @@ using namespace decaf::lang;
 public:
 
         CharacterTest();
-        virtual ~CharacterTest() {}
-
-        virtual void test();
 
     };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 CharacterTest::CharacterTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharacterTest::test() {
+TEST_F(CharacterTest, test) {
 
     Character character( 'b' );
 
@@ -60,5 +56,3 @@ void CharacterTest::test() {
     ASSERT_TRUE(Character::digit( '9', 10 ) == 9);
 
 }
-
-TEST_F(CharacterTest, test) { test(); }

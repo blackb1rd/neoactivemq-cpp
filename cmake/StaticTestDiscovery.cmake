@@ -32,7 +32,7 @@ function(static_discover_tests TARGET)
     endif()
 
     if(NOT ARG_GROUP_MODE)
-        set(ARG_GROUP_MODE "SUITE")
+        set(ARG_GROUP_MODE "INDIVIDUAL")
     endif()
 
     # Collect all suites with their namespace groups.

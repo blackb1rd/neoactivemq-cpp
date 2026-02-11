@@ -1143,6 +1143,9 @@ bool FailoverTransport::iterate() {
                     if (backupTransport != NULL) {
                         transport = backupTransport->getTransport();
                         uri = backupTransport->getUri();
+                        // Take ownership of the transport: clear the backup's reference
+                        // so its destructor won't close the transport we're about to use.
+                        backupTransport->setTransport(Pointer<Transport>());
                         transportAlreadyStarted = true;
                     }
                 }
@@ -1269,6 +1272,8 @@ bool FailoverTransport::iterate() {
                     } catch (Exception& e) {
                         e.setMark(__FILE__, __LINE__);
                         AMQ_LOG_DEBUG("FailoverTransport", "Connection attempt to " << uri.toString() << " failed: " << e.getMessage());
+                        // Reset so next iteration creates and starts a fresh transport
+                        transportAlreadyStarted = false;
                         if (transport != NULL) {
                             if (this->impl->disposedListener != NULL) {
                                 transport->setTransportListener(this->impl->disposedListener.get());

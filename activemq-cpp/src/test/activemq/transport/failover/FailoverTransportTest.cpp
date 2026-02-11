@@ -1478,8 +1478,8 @@ TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOfflineBroker2ComesOn
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testConnectedToPriorityOnFirstTryThenFailover) {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61022));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61023));
+    Pointer<MockBrokerService> broker1(new MockBrokerService());
+    Pointer<MockBrokerService> broker2(new MockBrokerService());
 
     broker1->start();
     broker1->waitUntilStarted();
@@ -1487,8 +1487,12 @@ TEST_F(FailoverTransportTest, testConnectedToPriorityOnFirstTryThenFailover) {
     broker2->start();
     broker2->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61022,"
-                                  "tcp://localhost:61023)?randomize=false&priorityBackup=true";
+    int port1 = broker1->getPort();
+    int port2 = broker2->getPort();
+
+    std::string uri = std::string("failover://(tcp://localhost:") +
+                      Integer::toString(port1) + ",tcp://localhost:" +
+                      Integer::toString(port2) + ")?randomize=false&priorityBackup=true";
 
     PriorityBackupListener listener;
     FailoverTransportFactory factory;

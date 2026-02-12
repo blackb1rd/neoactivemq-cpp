@@ -40,6 +40,7 @@
 #include <activemq/commands/ProducerInfo.h>
 #include <activemq/commands/ConsumerInfo.h>
 #include <activemq/transport/Transport.h>
+#include <decaf/net/ServerSocket.h>
 
 using namespace activemq;
 using namespace activemq::mock;
@@ -759,14 +760,24 @@ TEST_F(FailoverTransportTest, testUriOptionsApplied) {
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testConnectedToMockBroker) {
 
-    MockBrokerService broker1(61000);
-    MockBrokerService broker2(61001);
+    MockBrokerService broker1;
 
     broker1.start();
     broker1.waitUntilStarted();
+    int port1 = broker1.getPort();
 
-    std::string uri = "failover://(tcp://localhost:61000,"
-            "tcp://localhost:61001)";
+    // Pre-allocate a port for broker2 (never started, just in URI for failover list)
+    int port2;
+    {
+        decaf::net::ServerSocket tempSocket;
+        tempSocket.setReuseAddress(true);
+        tempSocket.bind("0.0.0.0", 0);
+        port2 = tempSocket.getLocalPort();
+        tempSocket.close();
+    }
+
+    std::string uri = "failover://(tcp://localhost:" + Integer::toString(port1) + ","
+            "tcp://localhost:" + Integer::toString(port2) + ")";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -902,8 +913,8 @@ TEST_F(FailoverTransportTest, testStartupMaxReconnectsHonorsConfiguration) {
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOnline) {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61002));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61003));
+    Pointer<MockBrokerService> broker1(new MockBrokerService());
+    Pointer<MockBrokerService> broker2(new MockBrokerService());
 
     // Both brokers online
     broker1->start();
@@ -912,8 +923,11 @@ TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOnline) {
     broker2->start();
     broker2->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61002,"
-                                  "tcp://localhost:61003)?randomize=false";
+    int port1 = broker1->getPort();
+    int port2 = broker2->getPort();
+
+    std::string uri = "failover://(tcp://localhost:" + Integer::toString(port1) + ","
+                                  "tcp://localhost:" + Integer::toString(port2) + ")?randomize=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -961,16 +975,25 @@ TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOnline) {
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker1OnlyOnline) {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61004));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61005));
+    Pointer<MockBrokerService> broker1(new MockBrokerService());
+    Pointer<MockBrokerService> broker2(new MockBrokerService());
 
-    // Only broker1 online
+    // Start both to get dynamic ports, then stop broker2
     broker1->start();
     broker1->waitUntilStarted();
+    broker2->start();
+    broker2->waitUntilStarted();
+
+    int port1 = broker1->getPort();
+    int port2 = broker2->getPort();
+
+    // Only broker1 online
+    broker2->stop();
+    broker2->waitUntilStopped();
 
     // Use 127.0.0.1 instead of localhost to force IPv4 (MockBrokerService binds to 0.0.0.0)
-    std::string uri = "failover://(tcp://127.0.0.1:61004,"
-                                  "tcp://127.0.0.1:61005)?randomize=false&maxReconnectAttempts=-1";
+    std::string uri = "failover://(tcp://127.0.0.1:" + Integer::toString(port1) + ","
+                                  "tcp://127.0.0.1:" + Integer::toString(port2) + ")?randomize=false&maxReconnectAttempts=-1";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1022,15 +1045,24 @@ TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker1OnlyOnline) {
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker2OnlyOnline) {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61006));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61007));
+    Pointer<MockBrokerService> broker1(new MockBrokerService());
+    Pointer<MockBrokerService> broker2(new MockBrokerService());
 
-    // Only broker2 online
+    // Start both to get dynamic ports, then stop broker1
+    broker1->start();
+    broker1->waitUntilStarted();
     broker2->start();
     broker2->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61006,"
-                                  "tcp://localhost:61007)?randomize=false";
+    int port1 = broker1->getPort();
+    int port2 = broker2->getPort();
+
+    // Only broker2 online
+    broker1->stop();
+    broker1->waitUntilStopped();
+
+    std::string uri = "failover://(tcp://localhost:" + Integer::toString(port1) + ","
+                                  "tcp://localhost:" + Integer::toString(port2) + ")?randomize=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1083,14 +1115,30 @@ TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker2OnlyOnline) {
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOfflineBroker1ComesOnline) {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61008));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61009));
+    // Pre-allocate ports for both brokers (both offline initially)
+    int port1, port2;
+    {
+        decaf::net::ServerSocket tempSocket1;
+        tempSocket1.setReuseAddress(true);
+        tempSocket1.bind("0.0.0.0", 0);
+        port1 = tempSocket1.getLocalPort();
+        tempSocket1.close();
+
+        decaf::net::ServerSocket tempSocket2;
+        tempSocket2.setReuseAddress(true);
+        tempSocket2.bind("0.0.0.0", 0);
+        port2 = tempSocket2.getLocalPort();
+        tempSocket2.close();
+    }
+
+    Pointer<MockBrokerService> broker1(new MockBrokerService(port1));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(port2));
 
     // Both brokers offline initially
     // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
     // Use longer reconnect delay and more attempts to ensure broker has time to start
-    std::string uri = "failover://(tcp://127.0.0.1:61008,"
-                                  "tcp://127.0.0.1:61009)?randomize=false&startupMaxReconnectAttempts=100&initialReconnectDelay=50&maxReconnectDelay=50&useExponentialBackOff=false";
+    std::string uri = "failover://(tcp://127.0.0.1:" + Integer::toString(port1) + ","
+                                  "tcp://127.0.0.1:" + Integer::toString(port2) + ")?randomize=false&startupMaxReconnectAttempts=100&initialReconnectDelay=50&maxReconnectDelay=50&useExponentialBackOff=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1131,14 +1179,30 @@ TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOfflineBroker1ComesOnli
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOfflineBroker2ComesOnline) {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61010));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61011));
+    // Pre-allocate ports for both brokers (both offline initially)
+    int port1, port2;
+    {
+        decaf::net::ServerSocket tempSocket1;
+        tempSocket1.setReuseAddress(true);
+        tempSocket1.bind("0.0.0.0", 0);
+        port1 = tempSocket1.getLocalPort();
+        tempSocket1.close();
+
+        decaf::net::ServerSocket tempSocket2;
+        tempSocket2.setReuseAddress(true);
+        tempSocket2.bind("0.0.0.0", 0);
+        port2 = tempSocket2.getLocalPort();
+        tempSocket2.close();
+    }
+
+    Pointer<MockBrokerService> broker1(new MockBrokerService(port1));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(port2));
 
     // Both brokers offline initially
     // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
     // Use longer reconnect delay and more attempts to ensure broker has time to start
-    std::string uri = "failover://(tcp://127.0.0.1:61010,"
-                                  "tcp://127.0.0.1:61011)?randomize=false&startupMaxReconnectAttempts=100&initialReconnectDelay=50&maxReconnectDelay=50&useExponentialBackOff=false";
+    std::string uri = "failover://(tcp://127.0.0.1:" + Integer::toString(port1) + ","
+                                  "tcp://127.0.0.1:" + Integer::toString(port2) + ")?randomize=false&startupMaxReconnectAttempts=100&initialReconnectDelay=50&maxReconnectDelay=50&useExponentialBackOff=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1183,8 +1247,8 @@ TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOfflineBroker2ComesOnli
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOnline) {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61012));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61013));
+    Pointer<MockBrokerService> broker1(new MockBrokerService());
+    Pointer<MockBrokerService> broker2(new MockBrokerService());
 
     // Both brokers online
     broker1->start();
@@ -1193,8 +1257,11 @@ TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOnline) {
     broker2->start();
     broker2->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61012,"
-                                  "tcp://localhost:61013)";
+    int port1 = broker1->getPort();
+    int port2 = broker2->getPort();
+
+    std::string uri = "failover://(tcp://localhost:" + Integer::toString(port1) + ","
+                                  "tcp://localhost:" + Integer::toString(port2) + ")";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1386,13 +1453,29 @@ TEST_F(FailoverTransportTest, testFailoverWithRandomizeBroker2OnlyOnline) {
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOfflineBroker1ComesOnline) {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61018));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61019));
+    // Pre-allocate ports for both brokers (both offline initially)
+    int port1, port2;
+    {
+        decaf::net::ServerSocket tempSocket1;
+        tempSocket1.setReuseAddress(true);
+        tempSocket1.bind("0.0.0.0", 0);
+        port1 = tempSocket1.getLocalPort();
+        tempSocket1.close();
+
+        decaf::net::ServerSocket tempSocket2;
+        tempSocket2.setReuseAddress(true);
+        tempSocket2.bind("0.0.0.0", 0);
+        port2 = tempSocket2.getLocalPort();
+        tempSocket2.close();
+    }
+
+    Pointer<MockBrokerService> broker1(new MockBrokerService(port1));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(port2));
 
     // Both brokers offline initially
     // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
-    std::string uri = "failover://(tcp://127.0.0.1:61018,"
-                                  "tcp://127.0.0.1:61019)?startupMaxReconnectAttempts=50&initialReconnectDelay=50&useExponentialBackOff=false";
+    std::string uri = "failover://(tcp://127.0.0.1:" + Integer::toString(port1) + ","
+                                  "tcp://127.0.0.1:" + Integer::toString(port2) + ")?startupMaxReconnectAttempts=50&initialReconnectDelay=50&useExponentialBackOff=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1432,13 +1515,29 @@ TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOfflineBroker1ComesOn
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOfflineBroker2ComesOnline) {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61020));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61021));
+    // Pre-allocate ports for both brokers (both offline initially)
+    int port1, port2;
+    {
+        decaf::net::ServerSocket tempSocket1;
+        tempSocket1.setReuseAddress(true);
+        tempSocket1.bind("0.0.0.0", 0);
+        port1 = tempSocket1.getLocalPort();
+        tempSocket1.close();
+
+        decaf::net::ServerSocket tempSocket2;
+        tempSocket2.setReuseAddress(true);
+        tempSocket2.bind("0.0.0.0", 0);
+        port2 = tempSocket2.getLocalPort();
+        tempSocket2.close();
+    }
+
+    Pointer<MockBrokerService> broker1(new MockBrokerService(port1));
+    Pointer<MockBrokerService> broker2(new MockBrokerService(port2));
 
     // Both brokers offline initially
     // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
-    std::string uri = "failover://(tcp://127.0.0.1:61020,"
-                                  "tcp://127.0.0.1:61021)?startupMaxReconnectAttempts=50&initialReconnectDelay=50&useExponentialBackOff=false";
+    std::string uri = "failover://(tcp://127.0.0.1:" + Integer::toString(port1) + ","
+                                  "tcp://127.0.0.1:" + Integer::toString(port2) + ")?startupMaxReconnectAttempts=50&initialReconnectDelay=50&useExponentialBackOff=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1539,14 +1638,29 @@ TEST_F(FailoverTransportTest, testConnectedToPriorityOnFirstTryThenFailover) {
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testConnectsToPriorityOnceStarted) {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61024));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61025));
+    // Allocate a port for broker1 without starting a mock broker.
+    // This avoids the start-stop pattern which can leave the port in a
+    // transient state on Windows where connections briefly succeed.
+    int port1;
+    {
+        decaf::net::ServerSocket tempSocket;
+        tempSocket.setReuseAddress(true);
+        tempSocket.bind("0.0.0.0", 0);
+        port1 = tempSocket.getLocalPort();
+        tempSocket.close();
+    }
+
+    Pointer<MockBrokerService> broker1(new MockBrokerService(port1));
+    Pointer<MockBrokerService> broker2(new MockBrokerService());
 
     broker2->start();
     broker2->waitUntilStarted();
+    int port2 = broker2->getPort();
 
-    std::string uri = "failover://(tcp://127.0.0.1:61024?transport.useInactivityMonitor=false,"
-                                  "tcp://127.0.0.1:61025?transport.useInactivityMonitor=false)?randomize=false&priorityBackup=true";
+    std::string uri = std::string("failover://(tcp://127.0.0.1:") +
+                      Integer::toString(port1) + "?transport.useInactivityMonitor=false," +
+                      "tcp://127.0.0.1:" + Integer::toString(port2) +
+                      "?transport.useInactivityMonitor=false)?randomize=false&priorityBackup=true";
 
     PriorityBackupListener listener;
     FailoverTransportFactory factory;
@@ -1594,19 +1708,33 @@ TEST_F(FailoverTransportTest, testConnectsToPriorityOnceStarted) {
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testConnectsToPriorityAfterInitialBackupFails) {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61026));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61027));
-    Pointer<MockBrokerService> broker3(new MockBrokerService(61028));
+    // Allocate a port for broker1 without starting a mock broker.
+    int port1;
+    {
+        decaf::net::ServerSocket tempSocket;
+        tempSocket.setReuseAddress(true);
+        tempSocket.bind("0.0.0.0", 0);
+        port1 = tempSocket.getLocalPort();
+        tempSocket.close();
+    }
+
+    Pointer<MockBrokerService> broker1(new MockBrokerService(port1));
+    Pointer<MockBrokerService> broker2(new MockBrokerService());
+    Pointer<MockBrokerService> broker3(new MockBrokerService());
 
     broker2->start();
     broker2->waitUntilStarted();
+    int port2 = broker2->getPort();
 
     broker3->start();
     broker3->waitUntilStarted();
+    int port3 = broker3->getPort();
 
-    std::string uri = "failover://(tcp://localhost:61026?transport.useInactivityMonitor=false,"
-                                  "tcp://localhost:61027?transport.useInactivityMonitor=false,"
-                                  "tcp://localhost:61028?transport.useInactivityMonitor=false)?randomize=false&priorityBackup=true";
+    std::string uri = std::string("failover://(tcp://localhost:") +
+                      Integer::toString(port1) + "?transport.useInactivityMonitor=false," +
+                      "tcp://localhost:" + Integer::toString(port2) + "?transport.useInactivityMonitor=false," +
+                      "tcp://localhost:" + Integer::toString(port3) +
+                      "?transport.useInactivityMonitor=false)?randomize=false&priorityBackup=true";
 
     PriorityBackupListener listener;
     FailoverTransportFactory factory;
@@ -1669,8 +1797,8 @@ TEST_F(FailoverTransportTest, testConnectsToPriorityAfterInitialBackupFails) {
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testPriorityBackupRapidSwitchingOnRestore) {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61029));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61030));
+    Pointer<MockBrokerService> broker1(new MockBrokerService());
+    Pointer<MockBrokerService> broker2(new MockBrokerService());
 
     broker1->start();
     broker1->waitUntilStarted();
@@ -1678,8 +1806,12 @@ TEST_F(FailoverTransportTest, testPriorityBackupRapidSwitchingOnRestore) {
     broker2->start();
     broker2->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61029,"
-                                  "tcp://localhost:61030)?randomize=false&priorityBackup=true";
+    int port1 = broker1->getPort();
+    int port2 = broker2->getPort();
+
+    std::string uri = std::string("failover://(tcp://localhost:") +
+                      Integer::toString(port1) + ",tcp://localhost:" +
+                      Integer::toString(port2) + ")?randomize=false&priorityBackup=true";
 
     PriorityBackupListener listener;
     FailoverTransportFactory factory;
@@ -1736,8 +1868,8 @@ TEST_F(FailoverTransportTest, testPriorityBackupRapidSwitchingOnRestore) {
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testSimpleBrokerRestart) {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61031));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61032));
+    Pointer<MockBrokerService> broker1(new MockBrokerService());
+    Pointer<MockBrokerService> broker2(new MockBrokerService());
 
     // Start both brokers
     broker1->start();
@@ -1746,9 +1878,13 @@ TEST_F(FailoverTransportTest, testSimpleBrokerRestart) {
     broker2->start();
     broker2->waitUntilStarted();
 
+    int port1 = broker1->getPort();
+    int port2 = broker2->getPort();
+
     // Use aggressive retry settings for faster failover in tests
-    std::string uri = "failover://(tcp://localhost:61031,"
-                                  "tcp://localhost:61032)?maxReconnectDelay=500&initialReconnectDelay=100&timeout=30000";
+    std::string uri = std::string("failover://(tcp://localhost:") +
+                      Integer::toString(port1) + ",tcp://localhost:" +
+                      Integer::toString(port2) + ")?maxReconnectDelay=500&initialReconnectDelay=100&timeout=30000";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1873,8 +2009,8 @@ TEST_F(FailoverTransportTest, testSimpleBrokerRestart) {
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testBrokerRestartWithProperSync) {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService());
+    Pointer<MockBrokerService> broker2(new MockBrokerService());
 
     // Start both brokers
     broker1->start();
@@ -1883,8 +2019,12 @@ TEST_F(FailoverTransportTest, testBrokerRestartWithProperSync) {
     broker2->start();
     broker2->waitUntilStarted();
 
-    std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)?maxReconnectDelay=1000";
+    int port1 = broker1->getPort();
+    int port2 = broker2->getPort();
+
+    std::string uri = std::string("failover://(tcp://localhost:") +
+                      Integer::toString(port1) + ",tcp://localhost:" +
+                      Integer::toString(port2) + ")?maxReconnectDelay=1000";
 
     PriorityBackupListener listener;
     FailoverTransportFactory factory;
@@ -1957,8 +2097,8 @@ TEST_F(FailoverTransportTest, testBrokerRestartWithProperSync) {
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testFuzzyBrokerAvailability) {
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(61626));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(61628));
+    Pointer<MockBrokerService> broker1(new MockBrokerService());
+    Pointer<MockBrokerService> broker2(new MockBrokerService());
 
     // Start with both brokers online
     broker1->start();
@@ -1967,11 +2107,15 @@ TEST_F(FailoverTransportTest, testFuzzyBrokerAvailability) {
     broker2->start();
     broker2->waitUntilStarted();
 
+    int port1 = broker1->getPort();
+    int port2 = broker2->getPort();
+
     // Give brokers extra time to fully initialize
     Thread::sleep(500);
 
-    std::string uri = "failover://(tcp://localhost:61626,"
-                                  "tcp://localhost:61628)?initialReconnectDelay=100&maxReconnectDelay=500&useExponentialBackOff=false";
+    std::string uri = std::string("failover://(tcp://localhost:") +
+                      Integer::toString(port1) + ",tcp://localhost:" +
+                      Integer::toString(port2) + ")?initialReconnectDelay=100&maxReconnectDelay=500&useExponentialBackOff=false";
 
     PriorityBackupListener listener;
     FailoverTransportFactory factory;

@@ -551,8 +551,8 @@ TransportListener* FailoverTransport::getTransportListener() const {
 ////////////////////////////////////////////////////////////////////////////////
 std::string FailoverTransport::getRemoteAddress() const {
     synchronized( &this->impl->reconnectMutex ) {
-        if (this->impl->connectedTransport != NULL) {
-            return this->impl->connectedTransport->getRemoteAddress();
+        if (this->impl->connectedTransportURI != NULL) {
+            return this->impl->connectedTransportURI->toString();
         }
     }
     return "";
@@ -1120,23 +1120,31 @@ bool FailoverTransport::iterate() {
                 if (this->impl->backups->isEnabled() && this->impl->priorityBackup &&
                     !this->impl->connectedToPrioirty && this->impl->backups->isPriorityBackupAvailable()) {
                     // We have a priority backup available and aren't connected to priority.
-                    // Close any priority backups and disconnect to trigger reconnection.
+                    // Use the priority backup's transport directly for fast switching.
+                    Pointer<BackupTransport> priorityBackup = this->impl->backups->getBackup();
+                    if (priorityBackup != NULL && priorityBackup->isPriority()) {
+                        this->impl->disconnect();
+                        transport = priorityBackup->getTransport();
+                        uri = priorityBackup->getUri();
+                        // Take ownership of the transport
+                        priorityBackup->setTransport(Pointer<Transport>());
+                        transportAlreadyStarted = true;
+                    }
+
+                    // Clean up any remaining priority backups
                     while (this->impl->backups->isPriorityBackupAvailable()) {
-                        Pointer<BackupTransport> priorityBackup = this->impl->backups->getBackup();
-                        if (priorityBackup != NULL && priorityBackup->isPriority()) {
+                        Pointer<BackupTransport> remaining = this->impl->backups->getBackup();
+                        if (remaining != NULL && remaining->isPriority()) {
                             try {
-                                priorityBackup->getTransport()->close();
-                            } catch (...) {
-                                // Ignore close errors
-                            }
+                                if (remaining->getTransport() != NULL) {
+                                    remaining->getTransport()->close();
+                                }
+                            } catch (...) {}
+                            remaining->setTransport(Pointer<Transport>());
                         } else {
-                            // Put it back if it's not a priority backup - but can't put it back
-                            // Just break, we've hit a non-priority backup
                             break;
                         }
                     }
-                    this->impl->disconnect();
-                    // Don't get any backup - let the normal connection logic reconnect
                 } else if (this->impl->backups->isEnabled()) {
                     // Get backup transport if available
                     Pointer<BackupTransport> backupTransport = this->impl->backups->getBackup();

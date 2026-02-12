@@ -15,10 +15,13 @@
  * limitations under the License.
  */
 
-#include <benchmark/BenchmarkBase.h>
+#include <benchmark/PerformanceTimer.h>
 #include <decaf/util/Properties.h>
-
 #include <decaf/lang/Integer.h>
+
+#include <gtest/gtest.h>
+#include <string>
+#include <iostream>
 
 using namespace std;
 using namespace decaf;
@@ -28,59 +31,55 @@ using namespace decaf::lang;
 namespace decaf {
 namespace util {
 
-    class PropertiesBenchmark :
-        public benchmark::BenchmarkBase<
-            decaf::util::PropertiesBenchmark, Properties >
-    {
-    private:
+    class PropertiesBenchmark : public ::testing::Test {
+    protected:
 
         Properties properties;
-
-    public:
-
-        PropertiesBenchmark();
-        virtual ~PropertiesBenchmark() {}
-
-        virtual void run();
     };
 
 }}
 
 ////////////////////////////////////////////////////////////////////////////////
-PropertiesBenchmark::PropertiesBenchmark() : properties() {
+TEST_F(PropertiesBenchmark, runBenchmark) {
+
+    benchmark::PerformanceTimer timer;
+    int iterations = 100;
+
+    for( int iter = 0; iter < iterations; ++iter ) {
+        timer.start();
+
+        int numRuns = 250;
+        std::string result = "";
+        Properties copy;
+
+        for( int i = 0; i < numRuns; ++i ) {
+            properties.setProperty( "test", "value" );
+            properties.hasProperty( "test" );
+            result = properties.getProperty( "test" );
+            properties.remove( "test" );
+        }
+
+        std::vector< std::pair< std::string, std::string > > array;
+
+        std::string prefix = "test";
+        for( int i = 0; i < numRuns; ++i ) {
+            properties.setProperty(
+                prefix + Integer::toString(i), prefix + Integer::toString(i) );
+        }
+
+        for( int i = 0; i < numRuns; ++i ) {
+            array = properties.toArray();
+        }
+
+        for( int i = 0; i < numRuns; ++i ) {
+            copy.copy( properties );
+            copy.clear();
+        }
+
+        timer.stop();
+    }
+
+    std::cout << typeid( Properties ).name() << " Benchmark Time = "
+              << timer.getAverageTime() << " Millisecs"
+              << std::endl;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-void PropertiesBenchmark::run() {
-
-    int numRuns = 250;
-    std::string result = "";
-    Properties copy;
-
-    for( int i = 0; i < numRuns; ++i ) {
-        properties.setProperty( "test", "value" );
-        properties.hasProperty( "test" );
-        result = properties.getProperty( "test" );
-        properties.remove( "test" );
-    }
-
-    std::vector< std::pair< std::string, std::string > > array;
-
-    std::string prefix = "test";
-    for( int i = 0; i < numRuns; ++i ) {
-        properties.setProperty(
-            prefix + Integer::toString(i), prefix + Integer::toString(i) );
-    }
-
-    for( int i = 0; i < numRuns; ++i ) {
-        array = properties.toArray();
-    }
-
-    for( int i = 0; i < numRuns; ++i ) {
-        copy.copy( properties );
-        copy.clear();
-    }
-
-}
-
-TEST_F(PropertiesBenchmark, runBenchmark) { runBenchmark(); }

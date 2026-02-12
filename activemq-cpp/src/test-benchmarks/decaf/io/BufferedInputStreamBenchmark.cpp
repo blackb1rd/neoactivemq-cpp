@@ -15,9 +15,12 @@
  * limitations under the License.
  */
 
-#include <benchmark/BenchmarkBase.h>
+#include <benchmark/PerformanceTimer.h>
 #include <decaf/io/BufferedInputStream.h>
 #include <decaf/io/ByteArrayInputStream.h>
+
+#include <gtest/gtest.h>
+#include <iostream>
 
 using namespace decaf;
 using namespace decaf::io;
@@ -25,81 +28,61 @@ using namespace decaf::io;
 namespace decaf {
 namespace io {
 
-    class BufferedInputStreamBenchmark : public benchmark::BenchmarkBase<
-        BufferedInputStreamBenchmark, BufferedInputStream >
-    {
-    private:
+    class BufferedInputStreamBenchmark : public ::testing::Test {
+    protected:
 
-        static const int bufferSize;
+        static const int bufferSize = 200000;
 
         unsigned char* buffer;
         ByteArrayInputStream source;
 
-    private:
+        void SetUp() override {
+            buffer = new unsigned char[bufferSize];
+            source.setByteArray(buffer, bufferSize);
+        }
 
-        BufferedInputStreamBenchmark( const BufferedInputStreamBenchmark& );
-        BufferedInputStreamBenchmark& operator= ( const BufferedInputStreamBenchmark& );
-
-    public:
-
-        BufferedInputStreamBenchmark();
-
-        virtual ~BufferedInputStreamBenchmark();
-
-        void SetUp() override;
-        void TearDown() override;
-        virtual void run();
-
+        void TearDown() override {
+            delete[] buffer;
+        }
     };
 
 }}
 
 ////////////////////////////////////////////////////////////////////////////////
-const int BufferedInputStreamBenchmark::bufferSize = 200000;
+TEST_F(BufferedInputStreamBenchmark, runBenchmark) {
 
-////////////////////////////////////////////////////////////////////////////////
-BufferedInputStreamBenchmark::BufferedInputStreamBenchmark() : buffer(), source() {
-}
+    benchmark::PerformanceTimer timer;
+    int iterations = 100;
 
-////////////////////////////////////////////////////////////////////////////////
-BufferedInputStreamBenchmark::~BufferedInputStreamBenchmark() {
-}
+    for( int iter = 0; iter < iterations; ++iter ) {
+        timer.start();
 
-////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamBenchmark::SetUp() {
-    buffer = new unsigned char[bufferSize];
-    source.setByteArray(buffer, bufferSize);
-}
+        int numRuns = 25;
 
-////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamBenchmark::TearDown() {
-    delete[] buffer;
-}
+        std::vector<unsigned char> bucket(bufferSize);
+        BufferedInputStream bis(&source);
 
-////////////////////////////////////////////////////////////////////////////////
-void BufferedInputStreamBenchmark::run() {
-
-    int numRuns = 25;
-
-    std::vector<unsigned char> bucket(bufferSize);
-    BufferedInputStream bis(&source);
-
-    for (int iy = 0; iy < numRuns; ++iy) {
-        BufferedInputStream local(&source);
-    }
-
-    for (int iy = 0; iy < numRuns; ++iy) {
-
-        for (int iz = 0; iz < bufferSize; ++iz) {
-            bucket[iy] = (unsigned char) bis.read();
+        for (int iy = 0; iy < numRuns; ++iy) {
+            BufferedInputStream local(&source);
         }
-        source.reset();
+
+        for (int iy = 0; iy < numRuns; ++iy) {
+
+            for (int iz = 0; iz < bufferSize; ++iz) {
+                bucket[iy] = (unsigned char) bis.read();
+            }
+            source.reset();
+        }
+
+        for (int iy = 0; iy < numRuns; ++iy) {
+            bis.read(&bucket[0], bufferSize, 0, bufferSize);
+            source.reset();
+        }
+
+        timer.stop();
     }
 
-    for (int iy = 0; iy < numRuns; ++iy) {
-        bis.read(&bucket[0], bufferSize, 0, bufferSize);
-        source.reset();
-    }
+    std::cout << typeid( BufferedInputStream ).name() << " Benchmark Time = "
+              << timer.getAverageTime() << " Millisecs"
+              << std::endl;
 }
-
-TEST_F(BufferedInputStreamBenchmark, runBenchmark) { runBenchmark(); }

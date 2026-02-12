@@ -15,9 +15,13 @@
  * limitations under the License.
  */
 
-#include <benchmark/BenchmarkBase.h>
+#include <benchmark/PerformanceTimer.h>
 #include <decaf/io/DataInputStream.h>
 #include <decaf/io/ByteArrayInputStream.h>
+
+#include <gtest/gtest.h>
+#include <string>
+#include <iostream>
 
 using namespace std;
 using namespace decaf;
@@ -26,124 +30,108 @@ using namespace decaf::io;
 namespace decaf {
 namespace io {
 
-    class DataInputStreamBenchmark :
-        public benchmark::BenchmarkBase<
-            decaf::io::DataInputStreamBenchmark, DataInputStream >
-    {
-    private:
+    class DataInputStreamBenchmark : public ::testing::Test {
+    protected:
+
+        static const int bufferSize = 200000;
 
         unsigned char* buffer;
         ByteArrayInputStream bis;
-        static const int bufferSize;
 
-    private:
+        void SetUp() override {
+            buffer = new unsigned char[bufferSize];
 
-        DataInputStreamBenchmark( const DataInputStreamBenchmark& );
-        DataInputStreamBenchmark& operator= ( const DataInputStreamBenchmark& );
+            // init to full String Buffer
+            for (int ix = 0; ix < bufferSize - 1; ++ix) {
+                buffer[ix] = 65;
+            }
+            buffer[bufferSize - 1] = 0;
+            bis.setByteArray(buffer, bufferSize);
+        }
 
-    public:
-
-        DataInputStreamBenchmark();
-        virtual ~DataInputStreamBenchmark() {}
-
-        void SetUp() override;
-        void TearDown() override;
-        virtual void run();
+        void TearDown() override {
+            delete[] buffer;
+        }
     };
 
 }}
 
 ////////////////////////////////////////////////////////////////////////////////
-const int DataInputStreamBenchmark::bufferSize = 200000;
+TEST_F(DataInputStreamBenchmark, runBenchmark) {
 
-////////////////////////////////////////////////////////////////////////////////
-DataInputStreamBenchmark::DataInputStreamBenchmark() : buffer(), bis() {
-}
+    benchmark::PerformanceTimer timer;
+    int iterations = 100;
 
-////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamBenchmark::SetUp() {
+    for( int iter = 0; iter < iterations; ++iter ) {
+        timer.start();
 
-    buffer = new unsigned char[bufferSize];
+        DataInputStream dis(&bis);
 
-    // init to full String Buffer
-    for (int ix = 0; ix < bufferSize - 1; ++ix) {
-        buffer[ix] = 65;
-    }
-    buffer[bufferSize - 1] = 0;
-    bis.setByteArray(buffer, bufferSize);
-}
+        bool boolResult = 0;
+        char charResult = 0;
+        unsigned char byteResult = 0;
+        unsigned short ushortResult = 0;
+        short shortResult = 0;
+        int intResult = 0;
+        long long longResult = 0;
+        double doubleResult = 0.0;
+        float floatResult = 0.0f;
+        std::string stringResult = "";
 
-////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamBenchmark::TearDown() {
-
-    delete[] buffer;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void DataInputStreamBenchmark::run() {
-
-    DataInputStream dis(&bis);
-
-    bool boolResult = 0;
-    char charResult = 0;
-    unsigned char byteResult = 0;
-    unsigned short ushortResult = 0;
-    short shortResult = 0;
-    int intResult = 0;
-    long long longResult = 0;
-    double doubleResult = 0.0;
-    float floatResult = 0.0f;
-    std::string stringResult = "";
-
-    for (size_t iy = 0; iy < bufferSize / sizeof(boolResult); ++iy) {
-        boolResult = dis.readBoolean();
-    }
-    bis.reset();
-
-    for (size_t iy = 0; iy < bufferSize / sizeof(charResult); ++iy) {
-        charResult = dis.readChar();
-    }
-    bis.reset();
-
-    for (size_t iy = 0; iy < bufferSize / sizeof(byteResult); ++iy) {
-        byteResult = (unsigned char) dis.readByte();
-    }
-    bis.reset();
-
-    for (size_t iy = 0; iy < bufferSize / sizeof(ushortResult); ++iy) {
-        ushortResult = dis.readUnsignedShort();
-    }
-    bis.reset();
-
-    for (size_t iy = 0; iy < bufferSize / sizeof(shortResult); ++iy) {
-        shortResult = dis.readShort();
-    }
-    bis.reset();
-
-    for (size_t iy = 0; iy < bufferSize / sizeof(intResult); ++iy) {
-        intResult = dis.readInt();
-    }
-    bis.reset();
-
-    for (size_t iy = 0; iy < bufferSize / sizeof(longResult); ++iy) {
-        longResult = dis.readLong();
-    }
-    bis.reset();
-
-    for (size_t iy = 0; iy < bufferSize / sizeof(floatResult); ++iy) {
-        floatResult = dis.readFloat();
-    }
-    bis.reset();
-
-    for (size_t iy = 0; iy < bufferSize / sizeof(doubleResult); ++iy) {
-        doubleResult = dis.readDouble();
-    }
-    bis.reset();
-
-    for (int i = 0; i < 5; ++i) {
-        stringResult = dis.readString();
+        for (size_t iy = 0; iy < bufferSize / sizeof(boolResult); ++iy) {
+            boolResult = dis.readBoolean();
+        }
         bis.reset();
-    }
-}
 
-TEST_F(DataInputStreamBenchmark, runBenchmark) { runBenchmark(); }
+        for (size_t iy = 0; iy < bufferSize / sizeof(charResult); ++iy) {
+            charResult = dis.readChar();
+        }
+        bis.reset();
+
+        for (size_t iy = 0; iy < bufferSize / sizeof(byteResult); ++iy) {
+            byteResult = (unsigned char) dis.readByte();
+        }
+        bis.reset();
+
+        for (size_t iy = 0; iy < bufferSize / sizeof(ushortResult); ++iy) {
+            ushortResult = dis.readUnsignedShort();
+        }
+        bis.reset();
+
+        for (size_t iy = 0; iy < bufferSize / sizeof(shortResult); ++iy) {
+            shortResult = dis.readShort();
+        }
+        bis.reset();
+
+        for (size_t iy = 0; iy < bufferSize / sizeof(intResult); ++iy) {
+            intResult = dis.readInt();
+        }
+        bis.reset();
+
+        for (size_t iy = 0; iy < bufferSize / sizeof(longResult); ++iy) {
+            longResult = dis.readLong();
+        }
+        bis.reset();
+
+        for (size_t iy = 0; iy < bufferSize / sizeof(floatResult); ++iy) {
+            floatResult = dis.readFloat();
+        }
+        bis.reset();
+
+        for (size_t iy = 0; iy < bufferSize / sizeof(doubleResult); ++iy) {
+            doubleResult = dis.readDouble();
+        }
+        bis.reset();
+
+        for (int i = 0; i < 5; ++i) {
+            stringResult = dis.readString();
+            bis.reset();
+        }
+
+        timer.stop();
+    }
+
+    std::cout << typeid( DataInputStream ).name() << " Benchmark Time = "
+              << timer.getAverageTime() << " Millisecs"
+              << std::endl;
+}

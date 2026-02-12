@@ -15,8 +15,12 @@
  * limitations under the License.
  */
 
-#include <benchmark/BenchmarkBase.h>
+#include <benchmark/PerformanceTimer.h>
 #include <decaf/lang/Boolean.h>
+
+#include <gtest/gtest.h>
+#include <string>
+#include <iostream>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -24,48 +28,46 @@ using namespace decaf::lang;
 namespace decaf {
 namespace lang {
 
-    class BooleanBenchmark :
-        public benchmark::BenchmarkBase< decaf::lang::BooleanBenchmark, Boolean >
-    {
-    public:
-
-        BooleanBenchmark();
-        virtual ~BooleanBenchmark() {}
-
-        virtual void run();
+    class BooleanBenchmark : public ::testing::Test {
     };
 
 }}
 
 ////////////////////////////////////////////////////////////////////////////////
-BooleanBenchmark::BooleanBenchmark() {
+TEST_F(BooleanBenchmark, runBenchmark) {
+
+    benchmark::PerformanceTimer timer;
+    int iterations = 100;
+
+    for( int iter = 0; iter < iterations; ++iter ) {
+        timer.start();
+
+        int numRuns = 8000;
+        Boolean boolean( false );
+
+        std::string value = "";
+
+        for( int i = 0; i < numRuns; ++i ) {
+            value = boolean.toString();
+        }
+
+        for( int i = 0; i < numRuns; ++i ) {
+            value = boolean.toString( false );
+            value = boolean.toString( true );
+        }
+
+        for( int i = 0; i < numRuns; ++i ) {
+            bool value1 = Boolean::parseBoolean( "false" );
+            bool value2 = Boolean::parseBoolean( "true" );
+
+            value = Boolean::valueOf( value1 ).toString();
+            value = Boolean::valueOf( value2 ).toString();
+        }
+
+        timer.stop();
+    }
+
+    std::cout << typeid( Boolean ).name() << " Benchmark Time = "
+              << timer.getAverageTime() << " Millisecs"
+              << std::endl;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-void BooleanBenchmark::run(){
-
-    int numRuns = 8000;
-    Boolean boolean( false );
-
-    std::string value = "";
-
-    for( int i = 0; i < numRuns; ++i ) {
-        value = boolean.toString();
-    }
-
-    for( int i = 0; i < numRuns; ++i ) {
-        value = boolean.toString( false );
-        value = boolean.toString( true );
-    }
-
-    for( int i = 0; i < numRuns; ++i ) {
-        bool value1 = Boolean::parseBoolean( "false" );
-        bool value2 = Boolean::parseBoolean( "true" );
-
-        value = Boolean::valueOf( value1 ).toString();
-        value = Boolean::valueOf( value2 ).toString();
-    }
-
-}
-
-TEST_F(BooleanBenchmark, runBenchmark) { runBenchmark(); }

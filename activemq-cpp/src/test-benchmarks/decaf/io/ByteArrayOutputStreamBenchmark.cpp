@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
-#include <benchmark/BenchmarkBase.h>
+#include <benchmark/PerformanceTimer.h>
 #include <decaf/io/ByteArrayOutputStream.h>
+
+#include <gtest/gtest.h>
+#include <iostream>
 
 using namespace decaf;
 using namespace decaf::io;
@@ -24,86 +27,65 @@ using namespace decaf::io;
 namespace decaf {
 namespace io {
 
-    class ByteArrayOutputStreamBenchmark :
-    public benchmark::BenchmarkBase<
-        decaf::io::ByteArrayOutputStreamBenchmark, ByteArrayOutputStream >
-    {
-    private:
+    class ByteArrayOutputStreamBenchmark : public ::testing::Test {
+    protected:
+
+        static const int bufferSize = 200000;
 
         unsigned char* buffer;
         std::vector<unsigned char> stlBuffer;
-        static const int bufferSize;
 
-    private:
+        void SetUp() override {
+            buffer = new unsigned char[bufferSize];
 
-        ByteArrayOutputStreamBenchmark( const ByteArrayOutputStreamBenchmark& );
-        ByteArrayOutputStreamBenchmark& operator= ( const ByteArrayOutputStreamBenchmark& );
+            // init to full String Buffer
+            stlBuffer.reserve( bufferSize );
+            for( int ix = 0; ix < bufferSize - 1; ++ix ) {
+                buffer[ix] = 65;
+                stlBuffer.push_back( 65 );
+            }
+            buffer[bufferSize-1] = 0;
+        }
 
-    public:
-
-        ByteArrayOutputStreamBenchmark();
-        virtual ~ByteArrayOutputStreamBenchmark();
-
-        void SetUp() override;
-        void TearDown() override;
-        virtual void run();
-
+        void TearDown() override {
+            delete [] buffer;
+        }
     };
 
 }}
 
 ////////////////////////////////////////////////////////////////////////////////
-const int ByteArrayOutputStreamBenchmark::bufferSize = 200000;
+TEST_F(ByteArrayOutputStreamBenchmark, runBenchmark) {
 
-////////////////////////////////////////////////////////////////////////////////
-ByteArrayOutputStreamBenchmark::ByteArrayOutputStreamBenchmark() : buffer(), stlBuffer() {
-}
+    benchmark::PerformanceTimer timer;
+    int iterations = 100;
 
-////////////////////////////////////////////////////////////////////////////////
-ByteArrayOutputStreamBenchmark::~ByteArrayOutputStreamBenchmark() {
-}
+    for( int iter = 0; iter < iterations; ++iter ) {
+        timer.start();
 
-////////////////////////////////////////////////////////////////////////////////
-void ByteArrayOutputStreamBenchmark::SetUp() {
+        int numRuns = 100;
 
-    buffer = new unsigned char[bufferSize];
+        ByteArrayOutputStream bos;
 
-    // init to full String Buffer
-    stlBuffer.reserve( bufferSize );
-    for( int ix = 0; ix < bufferSize - 1; ++ix ) {
-        buffer[ix] = 65;
-        stlBuffer.push_back( 65 );
+        for( int iy = 0; iy < numRuns; ++iy ){
+            bos.write( (char)65 );
+        }
+        bos.reset();
+
+        for( int iy = 0; iy < numRuns; ++iy ){
+            bos.write( buffer, bufferSize, 0, bufferSize );
+        }
+        bos.reset();
+
+        for( int iy = 0; iy < numRuns; ++iy ){
+            bos.write( &stlBuffer[0], bufferSize );
+        }
+        bos.reset();
+
+        timer.stop();
     }
-    buffer[bufferSize-1] = 0;
+
+    std::cout << typeid( ByteArrayOutputStream ).name() << " Benchmark Time = "
+              << timer.getAverageTime() << " Millisecs"
+              << std::endl;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-void ByteArrayOutputStreamBenchmark::TearDown(){
-
-    delete [] buffer;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ByteArrayOutputStreamBenchmark::run(){
-
-    int numRuns = 100;
-
-    ByteArrayOutputStream bos;
-
-    for( int iy = 0; iy < numRuns; ++iy ){
-        bos.write( (char)65 );
-    }
-    bos.reset();
-
-    for( int iy = 0; iy < numRuns; ++iy ){
-        bos.write( buffer, bufferSize, 0, bufferSize );
-    }
-    bos.reset();
-
-    for( int iy = 0; iy < numRuns; ++iy ){
-        bos.write( &stlBuffer[0], bufferSize );
-    }
-    bos.reset();
-}
-
-TEST_F(ByteArrayOutputStreamBenchmark, runBenchmark) { runBenchmark(); }

@@ -15,10 +15,12 @@
  * limitations under the License.
  */
 
-#include <benchmark/BenchmarkBase.h>
+#include <benchmark/PerformanceTimer.h>
 #include <decaf/lang/Thread.h>
-
 #include <decaf/lang/Runnable.h>
+
+#include <gtest/gtest.h>
+#include <iostream>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -26,23 +28,10 @@ using namespace decaf::lang;
 namespace decaf {
 namespace lang {
 
-    class ThreadBenchmark : public benchmark::BenchmarkBase< decaf::lang::ThreadBenchmark, Thread >{
-    public:
-
-        ThreadBenchmark();
-        virtual ~ThreadBenchmark();
-
-        virtual void run();
-
+    class ThreadBenchmark : public ::testing::Test {
     };
 
-}}
-
-////////////////////////////////////////////////////////////////////////////////
-namespace decaf{
-namespace lang{
-
-    class BenchmarkRunnable :  public decaf::lang::Runnable {
+    class BenchmarkRunnable : public decaf::lang::Runnable {
     public:
 
         virtual void run() {
@@ -54,23 +43,26 @@ namespace lang{
 }}
 
 ////////////////////////////////////////////////////////////////////////////////
-ThreadBenchmark::ThreadBenchmark() {
-}
+TEST_F(ThreadBenchmark, runBenchmark) {
 
-////////////////////////////////////////////////////////////////////////////////
-ThreadBenchmark::~ThreadBenchmark() {
-}
+    benchmark::PerformanceTimer timer;
+    int iterations = 100;
 
-////////////////////////////////////////////////////////////////////////////////
-void ThreadBenchmark::run() {
+    for( int iter = 0; iter < iterations; ++iter ) {
+        timer.start();
 
-    BenchmarkRunnable runnable;
+        BenchmarkRunnable runnable;
 
-    for( int i = 0; i < 10; ++i ) {
-        Thread theThread( &runnable );
-        theThread.start();
-        theThread.join();
+        for( int i = 0; i < 10; ++i ) {
+            Thread theThread( &runnable );
+            theThread.start();
+            theThread.join();
+        }
+
+        timer.stop();
     }
-}
 
-TEST_F(ThreadBenchmark, runBenchmark) { runBenchmark(); }
+    std::cout << typeid( Thread ).name() << " Benchmark Time = "
+              << timer.getAverageTime() << " Millisecs"
+              << std::endl;
+}

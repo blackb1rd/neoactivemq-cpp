@@ -15,9 +15,13 @@
  * limitations under the License.
  */
 
-#include <benchmark/BenchmarkBase.h>
+#include <benchmark/PerformanceTimer.h>
 #include <decaf/io/DataOutputStream.h>
 #include <decaf/io/ByteArrayOutputStream.h>
+
+#include <gtest/gtest.h>
+#include <string>
+#include <iostream>
 
 using namespace std;
 using namespace decaf;
@@ -26,83 +30,77 @@ using namespace decaf::io;
 namespace decaf {
 namespace io {
 
-    class DataOutputStreamBenchmark :
-        public benchmark::BenchmarkBase<
-        decaf::io::DataOutputStreamBenchmark, DataOutputStream >
-    {
-    private:
+    class DataOutputStreamBenchmark : public ::testing::Test {
+    protected:
 
         std::string testString;
 
-    public:
-
-        DataOutputStreamBenchmark();
-        virtual ~DataOutputStreamBenchmark() {}
-
-        void SetUp() override;
-        virtual void run();
+        void SetUp() override {
+            for (size_t i = 0; i < 8096; ++i) {
+                testString += 'a';
+            }
+        }
     };
 
 }}
 
 ////////////////////////////////////////////////////////////////////////////////
-DataOutputStreamBenchmark::DataOutputStreamBenchmark() : testString() {
-}
+TEST_F(DataOutputStreamBenchmark, runBenchmark) {
 
-////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamBenchmark::SetUp() {
+    benchmark::PerformanceTimer timer;
+    int iterations = 100;
 
-    for (size_t i = 0; i < 8096; ++i) {
-        testString += 'a';
-    }
-}
+    for( int iter = 0; iter < iterations; ++iter ) {
+        timer.start();
 
-////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamBenchmark::run() {
+        int numRuns = 500;
 
-    int numRuns = 500;
+        ByteArrayOutputStream bos;
+        DataOutputStream dos(&bos);
 
-    ByteArrayOutputStream bos;
-    DataOutputStream dos(&bos);
+        for (int iy = 0; iy < numRuns * 40; ++iy) {
+            dos.writeLong((long long) 0xFF00FF00FF00FF00LL);
+        }
+        for (int iy = 0; iy < numRuns * 40; ++iy) {
+            dos.writeInt(312568);
+        }
+        for (int iy = 0; iy < numRuns * 40; ++iy) {
+            dos.writeShort(12568);
+        }
+        for (int iy = 0; iy < numRuns * 40; ++iy) {
+            dos.writeUnsignedShort(12568);
+        }
+        for (int iy = 0; iy < numRuns * 40; ++iy) {
+            dos.writeBoolean(true);
+        }
+        for (int iy = 0; iy < numRuns * 40; ++iy) {
+            dos.writeDouble(10.34235234);
+        }
+        for (int iy = 0; iy < numRuns + 40; ++iy) {
+            dos.writeFloat(32.4f);
+        }
 
-    for (int iy = 0; iy < numRuns * 40; ++iy) {
-        dos.writeLong((long long) 0xFF00FF00FF00FF00LL);
-    }
-    for (int iy = 0; iy < numRuns * 40; ++iy) {
-        dos.writeInt(312568);
-    }
-    for (int iy = 0; iy < numRuns * 40; ++iy) {
-        dos.writeShort(12568);
-    }
-    for (int iy = 0; iy < numRuns * 40; ++iy) {
-        dos.writeUnsignedShort(12568);
-    }
-    for (int iy = 0; iy < numRuns * 40; ++iy) {
-        dos.writeBoolean(true);
-    }
-    for (int iy = 0; iy < numRuns * 40; ++iy) {
-        dos.writeDouble(10.34235234);
-    }
-    for (int iy = 0; iy < numRuns + 40; ++iy) {
-        dos.writeFloat(32.4f);
-    }
-
-    bos.reset();
-
-    for (int iy = 0; iy < numRuns; ++iy) {
-        dos.writeChars(testString);
         bos.reset();
-    }
-    for (int iy = 0; iy < numRuns; ++iy) {
-        dos.writeBytes(testString);
+
+        for (int iy = 0; iy < numRuns; ++iy) {
+            dos.writeChars(testString);
+            bos.reset();
+        }
+        for (int iy = 0; iy < numRuns; ++iy) {
+            dos.writeBytes(testString);
+            bos.reset();
+        }
+        for (int iy = 0; iy < numRuns; ++iy) {
+            dos.writeUTF(testString);
+            bos.reset();
+        }
+
         bos.reset();
-    }
-    for (int iy = 0; iy < numRuns; ++iy) {
-        dos.writeUTF(testString);
-        bos.reset();
+
+        timer.stop();
     }
 
-    bos.reset();
+    std::cout << typeid( DataOutputStream ).name() << " Benchmark Time = "
+              << timer.getAverageTime() << " Millisecs"
+              << std::endl;
 }
-
-TEST_F(DataOutputStreamBenchmark, runBenchmark) { runBenchmark(); }

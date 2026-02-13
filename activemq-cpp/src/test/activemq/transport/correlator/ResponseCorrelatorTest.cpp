@@ -35,7 +35,6 @@ using namespace decaf::io;
     class ResponseCorrelatorTest : public ::testing::Test {
     };
 
-
 ////////////////////////////////////////////////////////////////////////////////
 
     class MyCommand : public commands::BaseCommand {
@@ -140,7 +139,6 @@ using namespace decaf::io;
         }
 
         virtual void close() {
-
             done = true;
 
             if (thread != NULL) {
@@ -168,43 +166,47 @@ using namespace decaf::io;
                     startedMutex.notifyAll();
                 }
 
-                synchronized(&mutex) {
+                mutex.lock();
 
-                    while (!done) {
+                while (!done) {
 
-                        if (requests.empty()) {
-                            mutex.wait();
-                        } else {
+                    if (requests.empty()) {
+                        mutex.wait();
+                    } else {
 
-                            Pointer<Command> cmd = requests.front();
-                            requests.pop();
+                        Pointer<Command> cmd = requests.front();
+                        requests.pop();
 
-                            // Only send a response if one is required.
-                            Pointer<Response> resp;
-                            if (cmd->isResponseRequired()) {
-                                resp = createResponse(cmd);
-                            }
-
-                            mutex.unlock();
-
-                            // Send both the response and the original
-                            // command back to the correlator.
-                            if (listener != NULL) {
-                                if (resp != NULL) {
-                                    listener->onCommand(resp);
-                                }
-                                listener->onCommand(cmd);
-                            }
-
-                            mutex.lock();
+                        // Only send a response if one is required.
+                        Pointer<Response> resp;
+                        if (cmd->isResponseRequired()) {
+                            resp = createResponse(cmd);
                         }
+
+                        mutex.unlock();
+
+                        // Send both the response and the original
+                        // command back to the correlator.
+                        if (listener != NULL) {
+                            if (resp != NULL) {
+                                listener->onCommand(resp);
+                            }
+                            listener->onCommand(cmd);
+                        }
+
+                        mutex.lock();
                     }
                 }
+
+                mutex.unlock();
+
             } catch (exceptions::ActiveMQException& ex) {
+                mutex.unlock();
                 if (listener) {
                     listener->onException(ex);
                 }
             } catch (...) {
+                mutex.unlock();
                 if (listener) {
                     exceptions::ActiveMQException ex( __FILE__, __LINE__, "stuff");
                     listener->onException(ex);
@@ -326,7 +328,6 @@ using namespace decaf::io;
     };
 
 
-////////////////////////////////////////////////////////////////////////////////
 TEST_F(ResponseCorrelatorTest, testBasics) {
 
     MyListener listener;
@@ -344,7 +345,9 @@ TEST_F(ResponseCorrelatorTest, testBasics) {
 
     // Send one request.
     Pointer<MyCommand> cmd(new MyCommand);
+
     Pointer<Response> resp = correlator.request(cmd);
+
     ASSERT_TRUE(resp != NULL);
     ASSERT_TRUE(resp->getCorrelationId() == cmd->getCommandId());
 

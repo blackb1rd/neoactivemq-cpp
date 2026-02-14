@@ -18,9 +18,7 @@
 #ifndef _ACTIVEMQ_TEST_OPENWIRE_OPENWIREHIGHVOLUMELISTENERTEST_H_
 #define _ACTIVEMQ_TEST_OPENWIRE_OPENWIREHIGHVOLUMELISTENERTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <activemq/util/IntegrationCommon.h>
 
 #include <cms/Connection.h>
@@ -47,25 +45,14 @@ namespace openwire {
      * - Async message listeners handling high throughput
      * - Connection stability under load
      */
-    class OpenwireHighVolumeListenerTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE(OpenwireHighVolumeListenerTest);
-        CPPUNIT_TEST(testHighVolumeFailoverListener);
-        CPPUNIT_TEST(testHighVolumeDirectListener);
-        CPPUNIT_TEST(testHighVolumeDualConnectionListeners);
-        CPPUNIT_TEST(testHighVolumeConcurrentProducerConsumer);
-        CPPUNIT_TEST(testHighVolumeWithBrokerInterruption);
-        CPPUNIT_TEST(testDurableTopicTransactedConcurrentServers);
-        CPPUNIT_TEST(testMultiTopicDurableTransactedWithSelector);
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class OpenwireHighVolumeListenerTest : public ::testing::Test {
+public:
 
         OpenwireHighVolumeListenerTest();
         virtual ~OpenwireHighVolumeListenerTest();
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         /**
          * Test high-volume message delivery (10k messages) on failover connection

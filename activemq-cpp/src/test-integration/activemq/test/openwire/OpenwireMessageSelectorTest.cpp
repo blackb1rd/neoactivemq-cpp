@@ -15,7 +15,66 @@
  * limitations under the License.
  */
 
-#include "OpenwireMessageSelectorTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/CMSTestFixture.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    /**
+     * Tests the OpenWire message selector feature.
+     * Message selectors use SQL92-like syntax to filter messages
+     * based on message properties and headers.
+     */
+    class OpenwireMessageSelectorTest : public CMSTestFixture {
+public:
+        OpenwireMessageSelectorTest();
+        virtual ~OpenwireMessageSelectorTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+        /**
+         * Test selector with string property comparison.
+         */
+        void testStringPropertySelector();
+        /**
+         * Test selector with integer property comparison.
+         */
+        void testIntPropertySelector();
+        /**
+         * Test selector with boolean property.
+         */
+        void testBooleanPropertySelector();
+        /**
+         * Test compound selector with AND/OR operators.
+         */
+        void testCompoundSelector();
+        /**
+         * Test selector with LIKE operator for pattern matching.
+         */
+        void testSelectorWithLike();
+        /**
+         * Test selector with IN operator for value lists.
+         */
+        void testSelectorWithIn();
+        /**
+         * Test selector with BETWEEN operator for ranges.
+         */
+        void testSelectorWithBetween();
+        /**
+         * Test selector with IS NULL / IS NOT NULL operators.
+         */
+        void testSelectorWithIsNull();
+        /**
+         * Test selector on JMSType header.
+         */
+        void testJMSTypeSelector();
+        /**
+         * Test selector on JMSPriority header.
+         */
+        void testJMSPrioritySelector();
+    };
+}}}
 
 #include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/exceptions/ActiveMQException.h>
@@ -75,16 +134,16 @@ void OpenwireMessageSelectorTest::testStringPropertySelector() {
 
     // Consumer should only receive red messages
     std::unique_ptr<Message> msg1(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg1.get() != NULL);
-    CPPUNIT_ASSERT_EQUAL(string("red"), msg1->getStringProperty("color"));
+    ASSERT_TRUE(msg1.get() != NULL);
+    ASSERT_EQ(string("red"), msg1->getStringProperty("color"));
 
     std::unique_ptr<Message> msg2(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg2.get() != NULL);
-    CPPUNIT_ASSERT_EQUAL(string("red"), msg2->getStringProperty("color"));
+    ASSERT_TRUE(msg2.get() != NULL);
+    ASSERT_EQ(string("red"), msg2->getStringProperty("color"));
 
     // No more messages should match
     std::unique_ptr<Message> msg3(consumer->receive(500));
-    CPPUNIT_ASSERT(msg3.get() == NULL);
+    ASSERT_TRUE(msg3.get() == NULL);
 
     session->close();
 }
@@ -113,15 +172,15 @@ void OpenwireMessageSelectorTest::testIntPropertySelector() {
 
     // Should receive only messages where quantity > 10 (15 and 20)
     std::unique_ptr<Message> msg1(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg1.get() != NULL);
-    CPPUNIT_ASSERT(msg1->getIntProperty("quantity") > 10);
+    ASSERT_TRUE(msg1.get() != NULL);
+    ASSERT_TRUE(msg1->getIntProperty("quantity") > 10);
 
     std::unique_ptr<Message> msg2(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg2.get() != NULL);
-    CPPUNIT_ASSERT(msg2->getIntProperty("quantity") > 10);
+    ASSERT_TRUE(msg2.get() != NULL);
+    ASSERT_TRUE(msg2->getIntProperty("quantity") > 10);
 
     std::unique_ptr<Message> msg3(consumer->receive(500));
-    CPPUNIT_ASSERT(msg3.get() == NULL);
+    ASSERT_TRUE(msg3.get() == NULL);
 
     session->close();
 }
@@ -152,11 +211,11 @@ void OpenwireMessageSelectorTest::testBooleanPropertySelector() {
 
     // Should only receive urgent message
     std::unique_ptr<Message> msg1(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg1.get() != NULL);
-    CPPUNIT_ASSERT(msg1->getBooleanProperty("urgent") == true);
+    ASSERT_TRUE(msg1.get() != NULL);
+    ASSERT_TRUE(msg1->getBooleanProperty("urgent") == true);
 
     std::unique_ptr<Message> msg2(consumer->receive(500));
-    CPPUNIT_ASSERT(msg2.get() == NULL);
+    ASSERT_TRUE(msg2.get() == NULL);
 
     session->close();
 }
@@ -194,12 +253,12 @@ void OpenwireMessageSelectorTest::testCompoundSelector() {
 
     // Should only receive red AND big message
     std::unique_ptr<Message> received(consumer->receive(1000));
-    CPPUNIT_ASSERT(received.get() != NULL);
-    CPPUNIT_ASSERT_EQUAL(string("red"), received->getStringProperty("color"));
-    CPPUNIT_ASSERT(received->getIntProperty("size") > 5);
+    ASSERT_TRUE(received.get() != NULL);
+    ASSERT_EQ(string("red"), received->getStringProperty("color"));
+    ASSERT_TRUE(received->getIntProperty("size") > 5);
 
     std::unique_ptr<Message> noMore(consumer->receive(500));
-    CPPUNIT_ASSERT(noMore.get() == NULL);
+    ASSERT_TRUE(noMore.get() == NULL);
 
     session->close();
 }
@@ -234,13 +293,13 @@ void OpenwireMessageSelectorTest::testSelectorWithLike() {
 
     // Should receive two messages matching the pattern
     std::unique_ptr<Message> received1(consumer->receive(1000));
-    CPPUNIT_ASSERT(received1.get() != NULL);
+    ASSERT_TRUE(received1.get() != NULL);
 
     std::unique_ptr<Message> received2(consumer->receive(1000));
-    CPPUNIT_ASSERT(received2.get() != NULL);
+    ASSERT_TRUE(received2.get() != NULL);
 
     std::unique_ptr<Message> noMore(consumer->receive(500));
-    CPPUNIT_ASSERT(noMore.get() == NULL);
+    ASSERT_TRUE(noMore.get() == NULL);
 
     session->close();
 }
@@ -279,9 +338,9 @@ void OpenwireMessageSelectorTest::testSelectorWithIn() {
     while ((received.reset(consumer->receive(500)), received.get() != NULL)) {
         count++;
         string status = received->getStringProperty("status");
-        CPPUNIT_ASSERT(status == "pending" || status == "active");
+        ASSERT_TRUE(status == "pending" || status == "active");
     }
-    CPPUNIT_ASSERT_EQUAL(2, count);
+    ASSERT_EQ(2, count);
 
     session->close();
 }
@@ -314,9 +373,9 @@ void OpenwireMessageSelectorTest::testSelectorWithBetween() {
     while ((received.reset(consumer->receive(500)), received.get() != NULL)) {
         count++;
         int price = received->getIntProperty("price");
-        CPPUNIT_ASSERT(price >= 10 && price <= 20);
+        ASSERT_TRUE(price >= 10 && price <= 20);
     }
-    CPPUNIT_ASSERT_EQUAL(3, count);
+    ASSERT_EQ(3, count);
 
     session->close();
 }
@@ -347,11 +406,11 @@ void OpenwireMessageSelectorTest::testSelectorWithIsNull() {
 
     // Should only receive message without optional property
     std::unique_ptr<Message> received(consumer->receive(1000));
-    CPPUNIT_ASSERT(received.get() != NULL);
-    CPPUNIT_ASSERT(!received->propertyExists("optional"));
+    ASSERT_TRUE(received.get() != NULL);
+    ASSERT_TRUE(!received->propertyExists("optional"));
 
     std::unique_ptr<Message> noMore(consumer->receive(500));
-    CPPUNIT_ASSERT(noMore.get() == NULL);
+    ASSERT_TRUE(noMore.get() == NULL);
 
     session->close();
 }
@@ -382,11 +441,11 @@ void OpenwireMessageSelectorTest::testJMSTypeSelector() {
 
     // Should only receive order message
     std::unique_ptr<Message> received(consumer->receive(1000));
-    CPPUNIT_ASSERT(received.get() != NULL);
-    CPPUNIT_ASSERT_EQUAL(string("order"), received->getCMSType());
+    ASSERT_TRUE(received.get() != NULL);
+    ASSERT_EQ(string("order"), received->getCMSType());
 
     std::unique_ptr<Message> noMore(consumer->receive(500));
-    CPPUNIT_ASSERT(noMore.get() == NULL);
+    ASSERT_TRUE(noMore.get() == NULL);
 
     session->close();
 }
@@ -421,9 +480,22 @@ void OpenwireMessageSelectorTest::testJMSPrioritySelector() {
     std::unique_ptr<Message> received;
     while ((received.reset(consumer->receive(500)), received.get() != NULL)) {
         count++;
-        CPPUNIT_ASSERT(received->getCMSPriority() >= 7);
+        ASSERT_TRUE(received->getCMSPriority() >= 7);
     }
-    CPPUNIT_ASSERT_EQUAL(2, count);
+    ASSERT_EQ(2, count);
 
     session->close();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireMessageSelectorTest, testStringPropertySelector) { testStringPropertySelector(); }
+TEST_F(OpenwireMessageSelectorTest, testIntPropertySelector) { testIntPropertySelector(); }
+TEST_F(OpenwireMessageSelectorTest, testBooleanPropertySelector) { testBooleanPropertySelector(); }
+TEST_F(OpenwireMessageSelectorTest, testCompoundSelector) { testCompoundSelector(); }
+TEST_F(OpenwireMessageSelectorTest, testSelectorWithLike) { testSelectorWithLike(); }
+TEST_F(OpenwireMessageSelectorTest, testSelectorWithIn) { testSelectorWithIn(); }
+TEST_F(OpenwireMessageSelectorTest, testSelectorWithBetween) { testSelectorWithBetween(); }
+TEST_F(OpenwireMessageSelectorTest, testSelectorWithIsNull) { testSelectorWithIsNull(); }
+TEST_F(OpenwireMessageSelectorTest, testJMSTypeSelector) { testJMSTypeSelector(); }
+TEST_F(OpenwireMessageSelectorTest, testJMSPrioritySelector) { testJMSPrioritySelector(); }

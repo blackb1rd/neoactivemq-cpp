@@ -15,7 +15,10 @@
  * limitations under the License.
  */
 
-#include "CountDownLatchTest.h"
+#include <gtest/gtest.h>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -23,12 +26,43 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
+    class CountDownLatchTest : public ExecutorsTestSupport {
+protected:
+
+        class MyThread : public lang::Thread {
+        public:
+
+            CountDownLatch* latch;
+
+        protected:
+
+            MyThread(const MyThread&);
+            MyThread operator= (const MyThread&);
+
+        public:
+
+            MyThread() : latch() {}
+            virtual ~MyThread(){}
+
+            virtual void run(){
+
+                while( latch->getCount() > 0 ) {
+                    latch->countDown();
+
+                    lang::Thread::sleep( 20 );
+                }
+            }
+
+        };
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::test()
+TEST_F(CountDownLatchTest, test)
 {
     CountDownLatch latch( 50 );
 
-    CPPUNIT_ASSERT( latch.getCount() == 50 );
+    ASSERT_TRUE(latch.getCount() == 50);
 
     MyThread thread;
     thread.latch = &latch;
@@ -36,37 +70,37 @@ void CountDownLatchTest::test()
 
     latch.await();
 
-    CPPUNIT_ASSERT( latch.getCount() == 0 );
+    ASSERT_TRUE(latch.getCount() == 0);
 
     thread.join();
 
-    CPPUNIT_ASSERT( true );
+    ASSERT_TRUE(true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::test2()
+TEST_F(CountDownLatchTest, test2)
 {
     CountDownLatch latch( 75 );
 
-    CPPUNIT_ASSERT( latch.getCount() == 75 );
+    ASSERT_TRUE(latch.getCount() == 75);
 
     MyThread thread;
     thread.latch = &latch;
     thread.start();
 
-    CPPUNIT_ASSERT( latch.await( 2 ) == false );
+    ASSERT_TRUE(latch.await( 2 ) == false);
 
     latch.await();
 
-    CPPUNIT_ASSERT( latch.getCount() == 0 );
+    ASSERT_TRUE(latch.getCount() == 0);
 
     thread.join();
 
-    CPPUNIT_ASSERT( true );
+    ASSERT_TRUE(true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testConstructor() {
+TEST_F(CountDownLatchTest, testConstructor) {
     try {
         CountDownLatch l(-1);
         shouldThrow();
@@ -74,21 +108,21 @@ void CountDownLatchTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testGetCount() {
+TEST_F(CountDownLatchTest, testGetCount) {
     CountDownLatch l(2);
-    CPPUNIT_ASSERT_EQUAL(2, l.getCount());
+    ASSERT_EQ(2, l.getCount());
     l.countDown();
-    CPPUNIT_ASSERT_EQUAL(1, l.getCount());
+    ASSERT_EQ(1, l.getCount());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testCountDown() {
+TEST_F(CountDownLatchTest, testCountDown) {
     CountDownLatch l(1);
-    CPPUNIT_ASSERT_EQUAL(1, l.getCount());
+    ASSERT_EQ(1, l.getCount());
     l.countDown();
-    CPPUNIT_ASSERT_EQUAL(0, l.getCount());
+    ASSERT_EQ(0, l.getCount());
     l.countDown();
-    CPPUNIT_ASSERT_EQUAL(0, l.getCount());
+    ASSERT_EQ(0, l.getCount());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -124,19 +158,19 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testAwait() {
+TEST_F(CountDownLatchTest, testAwait) {
     CountDownLatch l(2);
     TestAwaitRunnable runnable(&l, this);
     Thread t(&runnable);
 
     t.start();
     try {
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 2);
+        ASSERT_EQ(l.getCount(), 2);
         Thread::sleep(SHORT_DELAY_MS);
         l.countDown();
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 1);
+        ASSERT_EQ(l.getCount(), 1);
         l.countDown();
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 0);
+        ASSERT_EQ(l.getCount(), 0);
         t.join();
     } catch(InterruptedException& e) {
         unexpectedException();
@@ -175,19 +209,19 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testTimedAwait() {
+TEST_F(CountDownLatchTest, testTimedAwait) {
     CountDownLatch l(2);
     TestTimedAwaitRunnable runnable(&l, this);
     Thread t(&runnable);
 
     t.start();
     try {
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 2);
+        ASSERT_EQ(l.getCount(), 2);
         Thread::sleep(SHORT_DELAY_MS);
         l.countDown();
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 1);
+        ASSERT_EQ(l.getCount(), 1);
         l.countDown();
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 0);
+        ASSERT_EQ(l.getCount(), 0);
         t.join();
     } catch(InterruptedException& e) {
         unexpectedException();
@@ -226,14 +260,14 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testAwaitInterruptedException() {
+TEST_F(CountDownLatchTest, testAwaitInterruptedException) {
     CountDownLatch l(1);
     TestAwaitInterruptedExceptionRunnable runnable(&l, this);
     Thread t(&runnable);
 
     t.start();
     try {
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 1);
+        ASSERT_EQ(l.getCount(), 1);
         t.interrupt();
         t.join();
     } catch(InterruptedException& e) {
@@ -273,7 +307,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testTimedAwaitInterruptedException() {
+TEST_F(CountDownLatchTest, testTimedAwaitInterruptedException) {
     CountDownLatch l(1);
     TestTimedAwaitInterruptedExceptionRunnable runnable(&l, this);
     Thread t(&runnable);
@@ -281,7 +315,7 @@ void CountDownLatchTest::testTimedAwaitInterruptedException() {
     t.start();
     try {
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 1);
+        ASSERT_EQ(l.getCount(), 1);
         t.interrupt();
         t.join();
     } catch(InterruptedException& e) {
@@ -322,14 +356,14 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testAwaitTimeout() {
+TEST_F(CountDownLatchTest, testAwaitTimeout) {
     CountDownLatch l(1);
     TestAwaitTimeoutRunnable runnable(&l, this);
     Thread t(&runnable);
 
     t.start();
     try {
-        CPPUNIT_ASSERT_EQUAL(l.getCount(), 1);
+        ASSERT_EQ(l.getCount(), 1);
         t.join();
     } catch(InterruptedException& e) {
         unexpectedException();
@@ -337,14 +371,14 @@ void CountDownLatchTest::testAwaitTimeout() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatchTest::testToString() {
+TEST_F(CountDownLatchTest, testToString) {
     CountDownLatch s(2);
     std::string us = s.toString();
-    CPPUNIT_ASSERT((int)us.find_first_of("Count = 2") >= 0);
+    ASSERT_TRUE((int)us.find_first_of("Count = 2") >= 0);
     s.countDown();
     std::string s1 = s.toString();
-    CPPUNIT_ASSERT((int)s1.find_first_of("Count = 1") >= 0);
+    ASSERT_TRUE((int)s1.find_first_of("Count = 1") >= 0);
     s.countDown();
     std::string s2 = s.toString();
-    CPPUNIT_ASSERT((int)s2.find_first_of("Count = 0") >= 0);
+    ASSERT_TRUE((int)s2.find_first_of("Count = 0") >= 0);
 }

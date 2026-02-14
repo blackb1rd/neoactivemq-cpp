@@ -30,6 +30,15 @@ namespace commands {
         bool responseRequired;
         int commandId;
 
+#if defined(_WIN32) && defined(_DEBUG)
+        // MSVC debug codegen (/RTC1) writes a zero-init byte at offset 12 when
+        // constructing dllimport-derived classes with no additional data members
+        // (e.g., FlushCommand, KeepAliveInfo, ShutdownInfo). Without this padding,
+        // that write corrupts the CRT debug heap guard zone (1-byte buffer overrun).
+        // This only affects debug builds; release builds don't have this codegen.
+        char _msvc_rtc_padding = 0;
+#endif
+
     public:
 
         BaseCommand() : Command(), responseRequired(false), commandId(0) {

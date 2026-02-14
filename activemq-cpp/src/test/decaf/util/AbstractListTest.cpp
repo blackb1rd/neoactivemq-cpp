@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AbstractListTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Integer.h>
 #include <decaf/util/AbstractList.h>
@@ -26,6 +26,14 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class AbstractListTest : public ::testing::Test {
+public:
+
+        AbstractListTest();
+        virtual ~AbstractListTest();
+
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -192,20 +200,20 @@ AbstractListTest::~AbstractListTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractListTest::testIterator() {
+TEST_F(AbstractListTest, testIterator) {
 
     SimpleList<int> list;
     list.add( 10 );
     list.add( 20 );
     std::unique_ptr< Iterator<int> > iter( list.iterator() );
 
-    CPPUNIT_ASSERT_EQUAL( 10, iter->next() );
+    ASSERT_EQ(10, iter->next());
     iter->remove();
-    CPPUNIT_ASSERT_EQUAL( 20, iter->next() );
+    ASSERT_EQ(20, iter->next());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractListTest::testListIterator() {
+TEST_F(AbstractListTest, testListIterator) {
 
     int tempValue;
     SimpleList<int> list;
@@ -218,11 +226,11 @@ void AbstractListTest::testListIterator() {
 
     std::unique_ptr< ListIterator<int> > iter( list.listIterator() );
 
-    CPPUNIT_ASSERT_MESSAGE( "Should not have previous", !iter->hasPrevious() );
-    CPPUNIT_ASSERT_MESSAGE( "Should have next", iter->hasNext() );
+    ASSERT_TRUE(!iter->hasPrevious()) << ("Should not have previous");
+    ASSERT_TRUE(iter->hasNext()) << ("Should have next");
     tempValue = iter->next();
-    CPPUNIT_ASSERT_MESSAGE( std::string( "next returned wrong value.  Wanted 3, got: " ) +
-                            Integer::toString( tempValue ), tempValue == 3 );
+    ASSERT_TRUE(tempValue == 3) << (std::string( "next returned wrong value.  Wanted 3, got: " ) +
+                            Integer::toString( tempValue ));
     tempValue = iter->previous();
 
     SimpleList<std::string> list2;
@@ -230,17 +238,17 @@ void AbstractListTest::testListIterator() {
     std::unique_ptr< ListIterator<std::string> > iter2( list2.listIterator() );
     iter2->add( std::string("2") );
     iter2->next();
-    CPPUNIT_ASSERT_MESSAGE( "Should contain two elements", list2.size() == 2 );
+    ASSERT_TRUE(list2.size() == 2) << ("Should contain two elements");
 
     SimpleList<int> list3;
     std::unique_ptr< ListIterator<int> > it( list3.listIterator() );
     it->add( 1 );
     it->add( 2 );
-    CPPUNIT_ASSERT_MESSAGE( "Should contain two elements", list3.size() == 2 );
+    ASSERT_TRUE(list3.size() == 2) << ("Should contain two elements");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractListTest::testIteratorNext() {
+TEST_F(AbstractListTest, testIteratorNext) {
 
     MockArrayList<std::string> t;
     t.array.push_back( "a" );
@@ -254,7 +262,7 @@ void AbstractListTest::testIteratorNext() {
 
     try {
         it->next();
-        CPPUNIT_FAIL( "Should throw NoSuchElementException" );
+        FAIL() << ("Should throw NoSuchElementException");
     } catch( NoSuchElementException& cme ) {
         // expected
     }
@@ -262,7 +270,7 @@ void AbstractListTest::testIteratorNext() {
     t.add( "c" );
     try {
         it->remove();
-        CPPUNIT_FAIL( "Should throw ConcurrentModificationException" );
+        FAIL() << ("Should throw ConcurrentModificationException");
     } catch( ConcurrentModificationException& cme ) {
         // expected
     }
@@ -270,17 +278,17 @@ void AbstractListTest::testIteratorNext() {
     it.reset( t.iterator() );
     try {
         it->remove();
-        CPPUNIT_FAIL( "Should throw IllegalStateException" );
+        FAIL() << ("Should throw IllegalStateException");
     } catch( IllegalStateException& ise ) {
         // expected
     }
 
     std::string value = it->next();
-    CPPUNIT_ASSERT_EQUAL( std::string("a"), value );
+    ASSERT_EQ(std::string("a"), value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractListTest::testRemove() {
+TEST_F(AbstractListTest, testRemove) {
 
     MockRemoveFailureArrayList<std::string> list;
     std::unique_ptr< Iterator<std::string> > iter( list.iterator() );
@@ -291,14 +299,14 @@ void AbstractListTest::testRemove() {
     try {
         iter->remove();
     } catch( ConcurrentModificationException& e ) {
-        CPPUNIT_FAIL("Excepted to catch IllegalStateException not ConcurrentModificationException");
+        FAIL() << ("Excepted to catch IllegalStateException not ConcurrentModificationException");
     } catch( IllegalStateException& e ) {
         //Excepted to catch IllegalStateException here
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractListTest::testIndexOf() {
+TEST_F(AbstractListTest, testIndexOf) {
 
     SimpleList<int> array;
     for( int i = 1; i < 6; i++ ) {
@@ -308,12 +316,12 @@ void AbstractListTest::testIndexOf() {
     MockArrayList<int> list;
     list.addAll( array );
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "find 0 in the list do not contain 0", -1, list.indexOf( 0 ) );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "did not return the right location of element 3", 2, list.indexOf( 3 ) );
+    ASSERT_EQ(-1, list.indexOf( 0 )) << ("find 0 in the list do not contain 0");
+    ASSERT_EQ(2, list.indexOf( 3 )) << ("did not return the right location of element 3");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractListTest::testLastIndexOf() {
+TEST_F(AbstractListTest, testLastIndexOf) {
 
     SimpleList<int> array;
     for( int i = 1; i < 6; i++ ) {
@@ -323,34 +331,32 @@ void AbstractListTest::testLastIndexOf() {
         array.add(i);
     }
 
-    CPPUNIT_ASSERT( array.size() == 10 );
+    ASSERT_TRUE(array.size() == 10);
 
     MockArrayList<int> list;
     list.addAll( array );
 
-    CPPUNIT_ASSERT( list.size() == 10 );
+    ASSERT_TRUE(list.size() == 10);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "find 6 in the list do not contain 6",
-                                  -1, list.lastIndexOf( 6 ) );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "did not return the right location of element 4",
-                                  6, list.lastIndexOf( 4 ) );
+    ASSERT_EQ(-1, list.lastIndexOf( 6 )) << ("find 6 in the list do not contain 6");
+    ASSERT_EQ(6, list.lastIndexOf( 4 )) << ("did not return the right location of element 4");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractListTest::testRemoveAt() {
+TEST_F(AbstractListTest, testRemoveAt) {
 
     MockList<int> list;
 
     try {
         list.removeAt( 0 );
-        CPPUNIT_FAIL("should throw UnsupportedOperationException");
+        FAIL() << ("should throw UnsupportedOperationException");
     } catch( UnsupportedOperationException& e ) {
         // expected
     }
 
     try {
         list.set( 0, 1 );
-        CPPUNIT_FAIL("should throw UnsupportedOperationException");
+        FAIL() << ("should throw UnsupportedOperationException");
     } catch( UnsupportedOperationException& e ) {
         // expected
     }

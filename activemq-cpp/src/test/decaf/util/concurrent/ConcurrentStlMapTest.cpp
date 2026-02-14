@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ConcurrentStlMapTest.h"
+#include <gtest/gtest.h>
 #include <string>
 #include <decaf/util/concurrent/ConcurrentStlMap.h>
 #include <decaf/util/HashMap.h>
@@ -31,6 +31,8 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class ConcurrentStlMapTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -57,16 +59,13 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testConstructor() {
+TEST_F(ConcurrentStlMapTest, testConstructor) {
 
     ConcurrentStlMap<string, int> map1;
-    CPPUNIT_ASSERT( map1.isEmpty() );
-    CPPUNIT_ASSERT( map1.size() == 0 );
+    ASSERT_TRUE(map1.isEmpty());
+    ASSERT_TRUE(map1.size() == 0);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw a NoSuchElementException",
-        map1.get( "TEST" ),
-        decaf::util::NoSuchElementException );
+    ASSERT_THROW(map1.get( "TEST" ), decaf::util::NoSuchElementException) << ("Should Throw a NoSuchElementException");
 
     HashMap<string, int> srcMap;
     srcMap.put( "A", 1 );
@@ -75,13 +74,13 @@ void ConcurrentStlMapTest::testConstructor() {
 
     ConcurrentStlMap<string, int> destMap( srcMap );
 
-    CPPUNIT_ASSERT( srcMap.size() == 3 );
-    CPPUNIT_ASSERT( destMap.size() == 3 );
-    CPPUNIT_ASSERT( destMap.get( "B" ) == 1 );
+    ASSERT_TRUE(srcMap.size() == 3);
+    ASSERT_TRUE(destMap.size() == 3);
+    ASSERT_TRUE(destMap.get( "B" ) == 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testConstructorMap() {
+TEST_F(ConcurrentStlMapTest, testConstructorMap) {
 
     ConcurrentStlMap<int, int> myMap;
     for (int counter = 0; counter < 125; counter++) {
@@ -90,33 +89,32 @@ void ConcurrentStlMapTest::testConstructorMap() {
 
     ConcurrentStlMap<int, int> map(myMap);
     for (int counter = 0; counter < 125; counter++) {
-        CPPUNIT_ASSERT_MESSAGE("Failed to construct correct HashMap",
-            myMap.get(counter) == map.get(counter));
+        ASSERT_TRUE(myMap.get(counter) == map.get(counter)) << ("Failed to construct correct HashMap");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testContainsKey(){
+TEST_F(ConcurrentStlMapTest, testContainsKey){
 
     ConcurrentStlMap<string, bool> boolMap;
-    CPPUNIT_ASSERT(boolMap.containsKey("bob") == false);
+    ASSERT_TRUE(boolMap.containsKey("bob") == false);
 
     boolMap.put( "bob", true );
 
-    CPPUNIT_ASSERT(boolMap.containsKey("bob") == true );
-    CPPUNIT_ASSERT(boolMap.containsKey("fred") == false );
+    ASSERT_TRUE(boolMap.containsKey("bob") == true);
+    ASSERT_TRUE(boolMap.containsKey("fred") == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testClear(){
+TEST_F(ConcurrentStlMapTest, testClear){
 
     ConcurrentStlMap<string, bool> boolMap;
     boolMap.put( "bob", true );
     boolMap.put( "fred", true );
 
-    CPPUNIT_ASSERT(boolMap.size() == 2 );
+    ASSERT_TRUE(boolMap.size() == 2);
     boolMap.clear();
-    CPPUNIT_ASSERT(boolMap.size() == 0 );
+    ASSERT_TRUE(boolMap.size() == 0);
 
     {
         ConcurrentStlMap<int, std::string> map;
@@ -125,12 +123,9 @@ void ConcurrentStlMapTest::testClear(){
         map.put(2, "two");
 
         map.clear();
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Clear failed to reset size", 0, map.size());
+        ASSERT_EQ(0, map.size()) << ("Clear failed to reset size");
         for (int i = 0; i < 125; i++) {
-            CPPUNIT_ASSERT_THROW_MESSAGE(
-                "Failed to clear all elements",
-                map.get(i),
-                NoSuchElementException);
+            ASSERT_THROW(map.get(i), NoSuchElementException) << ("Failed to clear all elements");
         }
 
         // Check clear on a large loaded map of Integer keys
@@ -139,24 +134,21 @@ void ConcurrentStlMapTest::testClear(){
             map2.put(i, "foobar");
         }
         map2.clear();
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed to reset size on large integer map", 0, map2.size());
+        ASSERT_EQ(0, map2.size()) << ("Failed to reset size on large integer map");
         for (int i = -32767; i < 32768; i++) {
-            CPPUNIT_ASSERT_THROW_MESSAGE(
-                "Failed to clear all elements",
-                map2.get(i),
-                NoSuchElementException);
+            ASSERT_THROW(map2.get(i), NoSuchElementException) << ("Failed to clear all elements");
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testCopy() {
+TEST_F(ConcurrentStlMapTest, testCopy) {
 
     ConcurrentStlMap<string, int> destMap;
     HashMap<string, int> srcMap;
     ConcurrentStlMap<string, int> srcMap2;
 
-    CPPUNIT_ASSERT( destMap.size() == 0 );
+    ASSERT_TRUE(destMap.size() == 0);
 
     srcMap.put( "A", 1 );
     srcMap.put( "B", 2 );
@@ -166,16 +158,16 @@ void ConcurrentStlMapTest::testCopy() {
     srcMap.put( "F", 6 );
 
     destMap.copy( srcMap );
-    CPPUNIT_ASSERT( destMap.size() == 6 );
-    CPPUNIT_ASSERT( destMap.get( "A" ) == 1 );
-    CPPUNIT_ASSERT( destMap.get( "B" ) == 2 );
-    CPPUNIT_ASSERT( destMap.get( "C" ) == 3 );
-    CPPUNIT_ASSERT( destMap.get( "D" ) == 4 );
-    CPPUNIT_ASSERT( destMap.get( "E" ) == 5 );
-    CPPUNIT_ASSERT( destMap.get( "F" ) == 6 );
+    ASSERT_TRUE(destMap.size() == 6);
+    ASSERT_TRUE(destMap.get( "A" ) == 1);
+    ASSERT_TRUE(destMap.get( "B" ) == 2);
+    ASSERT_TRUE(destMap.get( "C" ) == 3);
+    ASSERT_TRUE(destMap.get( "D" ) == 4);
+    ASSERT_TRUE(destMap.get( "E" ) == 5);
+    ASSERT_TRUE(destMap.get( "F" ) == 6);
 
     destMap.copy( srcMap2 );
-    CPPUNIT_ASSERT( destMap.size() == 0 );
+    ASSERT_TRUE(destMap.size() == 0);
 
     srcMap2.put( "A", 1 );
     srcMap2.put( "B", 2 );
@@ -184,71 +176,71 @@ void ConcurrentStlMapTest::testCopy() {
     srcMap2.put( "E", 5 );
 
     destMap.copy( srcMap2 );
-    CPPUNIT_ASSERT( destMap.size() == 5 );
+    ASSERT_TRUE(destMap.size() == 5);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testIsEmpty(){
+TEST_F(ConcurrentStlMapTest, testIsEmpty){
 
     ConcurrentStlMap<string, bool> boolMap;
     boolMap.put( "bob", true );
     boolMap.put( "fred", true );
 
-    CPPUNIT_ASSERT(boolMap.isEmpty() == false );
+    ASSERT_TRUE(boolMap.isEmpty() == false);
     boolMap.clear();
-    CPPUNIT_ASSERT(boolMap.isEmpty() == true );
+    ASSERT_TRUE(boolMap.isEmpty() == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testSize(){
+TEST_F(ConcurrentStlMapTest, testSize){
 
     ConcurrentStlMap<string, bool> boolMap;
 
-    CPPUNIT_ASSERT(boolMap.size() == 0 );
+    ASSERT_TRUE(boolMap.size() == 0);
     boolMap.put( "bob", true );
-    CPPUNIT_ASSERT(boolMap.size() == 1 );
+    ASSERT_TRUE(boolMap.size() == 1);
     boolMap.put( "fred", true );
-    CPPUNIT_ASSERT(boolMap.size() == 2 );
+    ASSERT_TRUE(boolMap.size() == 2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testGet() {
+TEST_F(ConcurrentStlMapTest, testGet) {
 
     ConcurrentStlMap<string, bool> boolMap;
 
     boolMap.put( "fred", true );
-    CPPUNIT_ASSERT( boolMap.get("fred") == true );
+    ASSERT_TRUE(boolMap.get("fred") == true);
 
     boolMap.put( "bob", false );
-    CPPUNIT_ASSERT( boolMap.get("bob") == false );
-    CPPUNIT_ASSERT( boolMap.get("fred") == true );
+    ASSERT_TRUE(boolMap.get("bob") == false);
+    ASSERT_TRUE(boolMap.get("fred") == true);
 
     try{
         boolMap.get( "mike" );
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
     } catch( decaf::util::NoSuchElementException& e ){
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testPut() {
+TEST_F(ConcurrentStlMapTest, testPut) {
 
     ConcurrentStlMap<string, bool> boolMap;
 
     boolMap.put( "fred", true );
-    CPPUNIT_ASSERT( boolMap.get("fred") == true );
+    ASSERT_TRUE(boolMap.get("fred") == true);
 
     boolMap.put( "bob", false );
-    CPPUNIT_ASSERT( boolMap.get("bob") == false );
-    CPPUNIT_ASSERT( boolMap.get("fred") == true );
+    ASSERT_TRUE(boolMap.get("bob") == false);
+    ASSERT_TRUE(boolMap.get("fred") == true);
 
     boolMap.put( "bob", true );
-    CPPUNIT_ASSERT( boolMap.get("bob") == true );
-    CPPUNIT_ASSERT( boolMap.get("fred") == true );
+    ASSERT_TRUE(boolMap.get("bob") == true);
+    ASSERT_TRUE(boolMap.get("fred") == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testPutAll() {
+TEST_F(ConcurrentStlMapTest, testPutAll) {
 
     ConcurrentStlMap<string, int> destMap;
     HashMap<string, int> srcMap;
@@ -258,61 +250,61 @@ void ConcurrentStlMapTest::testPutAll() {
     srcMap.put( "B", 1 );
     srcMap.put( "C", 1 );
 
-    CPPUNIT_ASSERT( srcMap.size() == 3 );
-    CPPUNIT_ASSERT( destMap.size() == 0 );
+    ASSERT_TRUE(srcMap.size() == 3);
+    ASSERT_TRUE(destMap.size() == 0);
 
     srcMap.put( "D", 1 );
     srcMap.put( "E", 1 );
     srcMap.put( "F", 1 );
 
     destMap.putAll( srcMap );
-    CPPUNIT_ASSERT( destMap.size() == 6 );
+    ASSERT_TRUE(destMap.size() == 6);
     destMap.putAll( srcMap2 );
-    CPPUNIT_ASSERT( destMap.size() == 6 );
+    ASSERT_TRUE(destMap.size() == 6);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testValue() {
+TEST_F(ConcurrentStlMapTest, testValue) {
 
     ConcurrentStlMap<string, bool> boolMap;
 
     boolMap.put( "fred", true );
-    CPPUNIT_ASSERT( boolMap.get("fred") == true );
+    ASSERT_TRUE(boolMap.get("fred") == true);
 
     boolMap.put( "bob", false );
-    CPPUNIT_ASSERT( boolMap.get("bob") == false );
-    CPPUNIT_ASSERT( boolMap.get("fred") == true );
+    ASSERT_TRUE(boolMap.get("bob") == false);
+    ASSERT_TRUE(boolMap.get("fred") == true);
 
     try{
         boolMap.get( "mike" );
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
     } catch( decaf::util::NoSuchElementException& e ){
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testRemove(){
+TEST_F(ConcurrentStlMapTest, testRemove){
     ConcurrentStlMap<string, bool> boolMap;
 
     boolMap.put( "fred", true );
-    CPPUNIT_ASSERT( boolMap.containsKey("fred") == true );
+    ASSERT_TRUE(boolMap.containsKey("fred") == true);
     boolMap.remove( "fred" );
-    CPPUNIT_ASSERT( boolMap.containsKey("fred") == false );
+    ASSERT_TRUE(boolMap.containsKey("fred") == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testContiansValue(){
+TEST_F(ConcurrentStlMapTest, testContiansValue){
     ConcurrentStlMap<string, bool> boolMap;
 
     boolMap.put( "fred", true );
     boolMap.put( "fred1", false );
-    CPPUNIT_ASSERT( boolMap.containsValue(true) == true );
+    ASSERT_TRUE(boolMap.containsValue(true) == true);
     boolMap.remove( "fred" );
-    CPPUNIT_ASSERT( boolMap.containsValue(true) == false );
+    ASSERT_TRUE(boolMap.containsValue(true) == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testEntrySet() {
+TEST_F(ConcurrentStlMapTest, testEntrySet) {
 
     ConcurrentStlMap<int, std::string> map;
 
@@ -323,34 +315,33 @@ void ConcurrentStlMapTest::testEntrySet() {
     Set<MapEntry<int, std::string> >& set = map.entrySet();
     Pointer< Iterator<MapEntry<int, std::string> > > iterator(set.iterator());
 
-    CPPUNIT_ASSERT_MESSAGE("Returned set of incorrect size", map.size() == set.size());
+    ASSERT_TRUE(map.size() == set.size()) << ("Returned set of incorrect size");
     while (iterator->hasNext()) {
         MapEntry<int, std::string> entry = iterator->next();
-        CPPUNIT_ASSERT_MESSAGE("Returned incorrect entry set",
-                               map.containsKey(entry.getKey()) && map.containsValue(entry.getValue()));
+        ASSERT_TRUE(map.containsKey(entry.getKey()) && map.containsValue(entry.getValue())) << ("Returned incorrect entry set");
     }
 
     iterator.reset(set.iterator());
     set.remove(iterator->next());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Remove on set didn't take", 49, set.size());
+    ASSERT_EQ(49, set.size()) << ("Remove on set didn't take");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testKeySet() {
+TEST_F(ConcurrentStlMapTest, testKeySet) {
 
     ConcurrentStlMap<int, std::string> map;
     populateMap(map);
     Set<int>& set = map.keySet();
-    CPPUNIT_ASSERT_MESSAGE("Returned set of incorrect size()", set.size() == map.size());
+    ASSERT_TRUE(set.size() == map.size()) << ("Returned set of incorrect size()");
     for (int i = 0; i < MAP_SIZE; i++) {
-        CPPUNIT_ASSERT_MESSAGE("Returned set does not contain all keys", set.contains(i));
+        ASSERT_TRUE(set.contains(i)) << ("Returned set does not contain all keys");
     }
 
     {
         ConcurrentStlMap<int, std::string> localMap;
         localMap.put(0, "test");
         Set<int>& intSet = localMap.keySet();
-        CPPUNIT_ASSERT_MESSAGE("Failed with zero key", intSet.contains(0));
+        ASSERT_TRUE(intSet.contains(0)) << ("Failed with zero key");
     }
     {
         ConcurrentStlMap<int, std::string> localMap;
@@ -374,10 +365,10 @@ void ConcurrentStlMapTest::testKeySet() {
         list.remove(remove1);
         list.remove(remove2);
 
-        CPPUNIT_ASSERT_MESSAGE("Wrong result", it->next() == list.get(0));
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong size", 1, localMap.size());
+        ASSERT_TRUE(it->next() == list.get(0)) << ("Wrong result");
+        ASSERT_EQ(1, localMap.size()) << ("Wrong size");
         it.reset(intSet.iterator());
-        CPPUNIT_ASSERT_MESSAGE("Wrong contents", it->next() == list.get(0));
+        ASSERT_TRUE(it->next() == list.get(0)) << ("Wrong contents");
     }
     {
         ConcurrentStlMap<int, std::string> map2;
@@ -397,33 +388,31 @@ void ConcurrentStlMapTest::testKeySet() {
         }
         it2->hasNext();
         it2->remove();
-        CPPUNIT_ASSERT_MESSAGE("Wrong result 2", it2->next() == next);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong size 2", 1, map2.size());
+        ASSERT_TRUE(it2->next() == next) << ("Wrong result 2");
+        ASSERT_EQ(1, map2.size()) << ("Wrong size 2");
         it2.reset(intSet.iterator());
-        CPPUNIT_ASSERT_MESSAGE("Wrong contents 2", it2->next() == next);
+        ASSERT_TRUE(it2->next() == next) << ("Wrong contents 2");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testValues() {
+TEST_F(ConcurrentStlMapTest, testValues) {
 
     ConcurrentStlMap<int, std::string> map;
     populateMap(map);
 
     Collection<std::string>& c = map.values();
-    CPPUNIT_ASSERT_MESSAGE("Returned collection of incorrect size()", c.size() == map.size());
+    ASSERT_TRUE(c.size() == map.size()) << ("Returned collection of incorrect size()");
     for (int i = 0; i < MAP_SIZE; i++) {
-        CPPUNIT_ASSERT_MESSAGE("Returned collection does not contain all keys",
-                               c.contains(Integer::toString(i)));
+        ASSERT_TRUE(c.contains(Integer::toString(i))) << ("Returned collection does not contain all keys");
     }
 
     c.remove("10");
-    CPPUNIT_ASSERT_MESSAGE("Removing from collection should alter Map",
-                           !map.containsKey(10));
+    ASSERT_TRUE(!map.containsKey(10)) << ("Removing from collection should alter Map");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testEntrySetIterator() {
+TEST_F(ConcurrentStlMapTest, testEntrySetIterator) {
 
     ConcurrentStlMap<int, std::string> map;
     populateMap(map);
@@ -432,18 +421,15 @@ void ConcurrentStlMapTest::testEntrySetIterator() {
     Pointer< Iterator<MapEntry<int, std::string> > > iterator(map.entrySet().iterator());
     while (iterator->hasNext()) {
         MapEntry<int, std::string> entry = iterator->next();
-        CPPUNIT_ASSERT_EQUAL(count, entry.getKey());
-        CPPUNIT_ASSERT_EQUAL(Integer::toString(count), entry.getValue());
+        ASSERT_EQ(count, entry.getKey());
+        ASSERT_EQ(Integer::toString(count), entry.getValue());
         count++;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Iterator didn't cover the expected range", count++ == MAP_SIZE);
+    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.entrySet().iterator());
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalStateException",
-        iterator->remove(),
-        IllegalStateException);
+    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 
     count = 0;
     while (iterator->hasNext()) {
@@ -452,15 +438,12 @@ void ConcurrentStlMapTest::testEntrySetIterator() {
         count++;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Iterator didn't remove the expected range", count++ == MAP_SIZE);
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalStateException",
-        iterator->remove(),
-        IllegalStateException);
+    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
+    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testKeySetIterator() {
+TEST_F(ConcurrentStlMapTest, testKeySetIterator) {
 
     ConcurrentStlMap<int, std::string> map;
     populateMap(map);
@@ -469,17 +452,14 @@ void ConcurrentStlMapTest::testKeySetIterator() {
     Pointer< Iterator<int> > iterator(map.keySet().iterator());
     while (iterator->hasNext()) {
         int key = iterator->next();
-        CPPUNIT_ASSERT_EQUAL(count, key);
+        ASSERT_EQ(count, key);
         count++;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Iterator didn't cover the expected range", count++ == MAP_SIZE);
+    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.keySet().iterator());
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalStateException",
-        iterator->remove(),
-        IllegalStateException);
+    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 
     count = 0;
     while (iterator->hasNext()) {
@@ -488,15 +468,12 @@ void ConcurrentStlMapTest::testKeySetIterator() {
         count++;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Iterator didn't remove the expected range", count++ == MAP_SIZE);
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalStateException",
-        iterator->remove(),
-        IllegalStateException);
+    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
+    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentStlMapTest::testValuesIterator() {
+TEST_F(ConcurrentStlMapTest, testValuesIterator) {
 
     ConcurrentStlMap<int, std::string> map;
     populateMap(map);
@@ -505,17 +482,14 @@ void ConcurrentStlMapTest::testValuesIterator() {
     Pointer< Iterator<std::string> > iterator(map.values().iterator());
     while (iterator->hasNext()) {
         std::string value = iterator->next();
-        CPPUNIT_ASSERT_EQUAL(Integer::toString(count), value);
+        ASSERT_EQ(Integer::toString(count), value);
         count++;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Iterator didn't cover the expected range", count++ == MAP_SIZE);
+    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.values().iterator());
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalStateException",
-        iterator->remove(),
-        IllegalStateException);
+    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 
     count = 0;
     while (iterator->hasNext()) {
@@ -524,9 +498,6 @@ void ConcurrentStlMapTest::testValuesIterator() {
         count++;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("Iterator didn't remove the expected range", count++ == MAP_SIZE);
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalStateException",
-        iterator->remove(),
-        IllegalStateException);
+    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
+    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
 }

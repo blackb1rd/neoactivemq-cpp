@@ -64,7 +64,7 @@ void SimpleTest::testAutoAck() {
     listener.asyncWaitForMessages(IntegrationCommon::defaultMsgCount * 2);
 
     unsigned int numReceived = listener.getNumReceived();
-    CPPUNIT_ASSERT(numReceived == IntegrationCommon::defaultMsgCount * 2);
+    ASSERT_TRUE(numReceived == IntegrationCommon::defaultMsgCount * 2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,7 +98,7 @@ void SimpleTest::testClientAck() {
     listener.asyncWaitForMessages(IntegrationCommon::defaultMsgCount * 2);
 
     unsigned int numReceived = listener.getNumReceived();
-    CPPUNIT_ASSERT(numReceived == IntegrationCommon::defaultMsgCount * 2);
+    ASSERT_TRUE(numReceived == IntegrationCommon::defaultMsgCount * 2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +122,7 @@ void SimpleTest::testProducerWithNullDestination() {
     listener.asyncWaitForMessages(1);
 
     unsigned int numReceived = listener.getNumReceived();
-    CPPUNIT_ASSERT(numReceived == 1);
+    ASSERT_TRUE(numReceived == 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -138,14 +138,12 @@ void SimpleTest::testProducerSendWithNullDestination() {
 
     std::unique_ptr<cms::TextMessage> txtMessage(session->createTextMessage("TEST MESSAGE"));
 
-    CPPUNIT_ASSERT_THROW_MESSAGE("Should Throw an InvalidDestinationException",
-        producer->send( NULL, txtMessage.get() ), cms::InvalidDestinationException);
+    ASSERT_THROW(producer->send( NULL, txtMessage.get() ), cms::InvalidDestinationException) << ("Should Throw an InvalidDestinationException");
 
     producer = cmsProvider->getNoDestProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE("Should Throw an UnsupportedOperationException",
-        producer->send( NULL, txtMessage.get() ), cms::UnsupportedOperationException);
+    ASSERT_THROW(producer->send( NULL, txtMessage.get() ), cms::UnsupportedOperationException) << ("Should Throw an UnsupportedOperationException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -162,8 +160,7 @@ void SimpleTest::testProducerSendToNonDefaultDestination() {
     std::unique_ptr<cms::TextMessage> txtMessage(session->createTextMessage("TEST MESSAGE"));
     std::unique_ptr<cms::Destination> destination(session->createTemporaryTopic());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE("Should Throw an UnsupportedOperationException",
-        producer->send(destination.get(), txtMessage.get()), cms::UnsupportedOperationException);
+    ASSERT_THROW(producer->send(destination.get(), txtMessage.get()), cms::UnsupportedOperationException) << ("Should Throw an UnsupportedOperationException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -181,7 +178,7 @@ void SimpleTest::testSyncReceive() {
     producer->send(txtMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -202,7 +199,7 @@ void SimpleTest::testSyncReceiveClientAck() {
     producer->send(txtMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,7 +213,7 @@ void SimpleTest::testMultipleConnections() {
     std::unique_ptr<cms::Connection> connection2(factory->createConnection());
     connection2->start();
 
-    CPPUNIT_ASSERT(connection1->getClientID() != connection2->getClientID());
+    ASSERT_TRUE(connection1->getClientID() != connection2->getClientID());
 
     std::unique_ptr<cms::Session> session1(connection1->createSession());
     std::unique_ptr<cms::Session> session2(connection1->createSession());
@@ -235,10 +232,10 @@ void SimpleTest::testMultipleConnections() {
     producer->send(textMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer1->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 
     message.reset(consumer2->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 
     // Clean up if we can
     consumer1->close();
@@ -271,10 +268,10 @@ void SimpleTest::testMultipleSessions() {
     producer->send(textMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer1->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 
     message.reset(consumer2->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 
     // Clean up if we can
     consumer1->close();
@@ -308,7 +305,7 @@ void SimpleTest::testReceiveAlreadyInQueue() {
     connection->start();
 
     std::unique_ptr<cms::Message> message(consumer->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 
     // Clean up if we can
     consumer->close();
@@ -364,27 +361,27 @@ void SimpleTest::testBytesMessageSendRecv() {
     producer->send(bytesMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE("Should throw an ActiveMQExceptio", message->setStringProperty("FOO", "BAR"), cms::CMSException);
+    ASSERT_THROW(message->setStringProperty("FOO", "BAR"), cms::CMSException) << ("Should throw an ActiveMQExceptio");
 
     BytesMessage* bytesMessage2 = dynamic_cast<cms::BytesMessage*>(message.get());
-    CPPUNIT_ASSERT(bytesMessage2 != NULL);
-    CPPUNIT_ASSERT_THROW_MESSAGE("Should throw an ActiveMQExceptio", bytesMessage2->writeBoolean(false), cms::CMSException);
+    ASSERT_TRUE(bytesMessage2 != NULL);
+    ASSERT_THROW(bytesMessage2->writeBoolean(false), cms::CMSException) << ("Should throw an ActiveMQExceptio");
 
-    CPPUNIT_ASSERT(bytesMessage2->getBodyLength() > 0);
+    ASSERT_TRUE(bytesMessage2->getBodyLength() > 0);
 
     unsigned char* result = bytesMessage2->getBodyBytes();
-    CPPUNIT_ASSERT(result != NULL);
+    ASSERT_TRUE(result != NULL);
     delete[] result;
 
     bytesMessage2->reset();
 
-    CPPUNIT_ASSERT(bytesMessage2->readBoolean() == true);
-    CPPUNIT_ASSERT(bytesMessage2->readByte() == 127);
-    CPPUNIT_ASSERT(bytesMessage2->readDouble() == 123456.789);
-    CPPUNIT_ASSERT(bytesMessage2->readInt() == 65537);
-    CPPUNIT_ASSERT(bytesMessage2->readString() == "TEST-STRING");
+    ASSERT_TRUE(bytesMessage2->readBoolean() == true);
+    ASSERT_TRUE(bytesMessage2->readByte() == 127);
+    ASSERT_TRUE(bytesMessage2->readDouble() == 123456.789);
+    ASSERT_TRUE(bytesMessage2->readInt() == 65537);
+    ASSERT_TRUE(bytesMessage2->readString() == "TEST-STRING");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -415,11 +412,11 @@ namespace {
                 triggered = true;
                 const BytesMessage* bytesMessage = dynamic_cast<const cms::BytesMessage*>(message);
 
-                CPPUNIT_ASSERT(bytesMessage != NULL);
-                CPPUNIT_ASSERT(bytesMessage->getBodyLength() > 0);
+                ASSERT_TRUE(bytesMessage != NULL);
+                ASSERT_TRUE(bytesMessage->getBodyLength() > 0);
 
                 unsigned char* result = bytesMessage->getBodyBytes();
-                CPPUNIT_ASSERT(result != NULL);
+                ASSERT_TRUE(result != NULL);
                 delete[] result;
 
                 passed = true;
@@ -458,20 +455,20 @@ void SimpleTest::testBytesMessageSendRecvAsync() {
         decaf::lang::Thread::sleep(100);
     }
 
-    CPPUNIT_ASSERT(listener.isPassed());
+    ASSERT_TRUE(listener.isPassed());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimpleTest::testLibraryInitShutdownInit() {
 
     {
-        this->tearDown();
+        this->TearDown();
         // Shutdown the ActiveMQ library
-        CPPUNIT_ASSERT_NO_THROW(activemq::library::ActiveMQCPP::shutdownLibrary());
+        ASSERT_NO_THROW(activemq::library::ActiveMQCPP::shutdownLibrary());
     }
     {
         // Initialize the ActiveMQ library
-        CPPUNIT_ASSERT_NO_THROW(activemq::library::ActiveMQCPP::initializeLibrary());
+        ASSERT_NO_THROW(activemq::library::ActiveMQCPP::initializeLibrary());
         cmsProvider.reset(new util::CMSProvider(getBrokerURL()));
     }
 }

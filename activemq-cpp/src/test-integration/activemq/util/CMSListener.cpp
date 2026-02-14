@@ -17,9 +17,8 @@
 
 #include "CMSListener.h"
 
+#include <gtest/gtest.h>
 #include <activemq/exceptions/ActiveMQException.h>
-#include <cppunit/extensions/HelperMacros.h>
-
 using namespace std;
 using namespace cms;
 using namespace activemq;
@@ -70,7 +69,7 @@ void CMSListener::onMessage(const cms::Message* message) {
         try {
             message->acknowledge();
         } catch (CMSException& ex) {
-            CPPUNIT_ASSERT_MESSAGE(ex.getStackTraceString(), false);
+            ASSERT_TRUE(false) << (ex.getStackTraceString());
         }
     }
 
@@ -106,5 +105,5 @@ void CMSListener::onMessage(const cms::Message* message) {
 
 ////////////////////////////////////////////////////////////////////////////////
 void CMSListener::onException(const cms::CMSException& error) {
-    CPPUNIT_ASSERT_MESSAGE(error.getStackTraceString(), false);
+    ASSERT_TRUE(false) << (error.getStackTraceString());
 }

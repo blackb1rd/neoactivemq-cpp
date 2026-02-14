@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "PointerTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Pointer.h>
 #include <decaf/lang/Thread.h>
@@ -32,6 +32,8 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util::concurrent;
+
+    class PointerTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
 class TestClassBase {
@@ -109,43 +111,43 @@ struct X {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testBasics() {
+TEST_F(PointerTest, testBasics) {
 
     TestClassA* thePointer = new TestClassA();
 
     // Test Null Initialize
     Pointer<TestClassA> nullPointer;
-    CPPUNIT_ASSERT( nullPointer.get() == NULL );
-    CPPUNIT_ASSERT( nullPointer == NULL );
-    CPPUNIT_ASSERT_NO_THROW( nullPointer.reset( NULL ) );
+    ASSERT_TRUE(nullPointer.get() == NULL);
+    ASSERT_TRUE(nullPointer == NULL);
+    ASSERT_NO_THROW(nullPointer.reset( NULL ));
 
     // Test Value Constructor
     Pointer<TestClassA> pointer( thePointer );
-    CPPUNIT_ASSERT( pointer.get() == thePointer );
-    CPPUNIT_ASSERT( pointer.get() != NULL );
+    ASSERT_TRUE(pointer.get() == thePointer);
+    ASSERT_TRUE(pointer.get() != NULL);
 
     // Test Copy Constructor
     Pointer<TestClassA> ctorCopy( pointer );
-    CPPUNIT_ASSERT( ctorCopy.get() == thePointer );
+    ASSERT_TRUE(ctorCopy.get() == thePointer);
 
     // Test Assignment
     Pointer<TestClassA> copy = pointer;
-    CPPUNIT_ASSERT( copy.get() == thePointer );
+    ASSERT_TRUE(copy.get() == thePointer);
 
-    CPPUNIT_ASSERT( ( *pointer ).returnHello() == "Hello" );
-    CPPUNIT_ASSERT( pointer->returnHello() == "Hello" );
+    ASSERT_TRUE(( *pointer ).returnHello() == "Hello");
+    ASSERT_TRUE(pointer->returnHello() == "Hello");
 
     copy.reset( NULL );
-    CPPUNIT_ASSERT( copy.get() == NULL );
+    ASSERT_TRUE(copy.get() == NULL);
 
     Pointer<X> p( new X );
     p->next = Pointer<X>( new X );
     p = p->next;
-    CPPUNIT_ASSERT( !p->next );
+    ASSERT_TRUE(!p->next);
 
     try{
         Pointer<ExceptionThrowingClass> ex( new ExceptionThrowingClass() );
-        CPPUNIT_FAIL( "Should Have Thrown." );
+        FAIL() << ("Should Have Thrown.");
     } catch(...) {}
 }
 
@@ -154,7 +156,7 @@ template<typename T>
 void ConstReferenceMethod( const Pointer<T>& pointer ) {
 
     Pointer<T> copy = pointer;
-    CPPUNIT_ASSERT( copy.get() != NULL );
+    ASSERT_TRUE(copy.get() != NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -162,14 +164,14 @@ template<typename T>
 void ReferenceMethod( Pointer<T>& pointer ) {
 
     pointer.reset( NULL );
-    CPPUNIT_ASSERT( pointer.get() == NULL );
+    ASSERT_TRUE(pointer.get() == NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 Pointer<TestClassA> ReturnByValue() {
 
     Pointer<TestClassA> pointer( new TestClassA );
-    CPPUNIT_ASSERT( pointer.get() != NULL );
+    EXPECT_TRUE(pointer.get() != NULL);
     return pointer;
 }
 
@@ -177,24 +179,24 @@ Pointer<TestClassA> ReturnByValue() {
 const Pointer<TestClassA>& ReturnByConstReference() {
 
     static Pointer<TestClassA> pointer( new TestClassA );
-    CPPUNIT_ASSERT( pointer.get() != NULL );
+    EXPECT_TRUE(pointer.get() != NULL);
     return pointer;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testAssignment() {
+TEST_F(PointerTest, testAssignment) {
 
     TestClassA* thePointerA = new TestClassA();
     TestClassB* thePointerB = new TestClassB();
 
     Pointer<TestClassBase> pointer;
-    CPPUNIT_ASSERT( pointer.get() == NULL );
+    ASSERT_TRUE(pointer.get() == NULL);
 
     pointer.reset( thePointerA );
-    CPPUNIT_ASSERT( pointer.get() == thePointerA );
+    ASSERT_TRUE(pointer.get() == thePointerA);
 
     pointer.reset( thePointerB );
-    CPPUNIT_ASSERT( pointer.get() == thePointerB );
+    ASSERT_TRUE(pointer.get() == thePointerB);
 
     // Doing this however won't compile.
     //    SomeOtherClass other;
@@ -204,65 +206,65 @@ void PointerTest::testAssignment() {
     Pointer<TestClassA> pointer2 = pointer1;
     Pointer<TestClassA> pointer3 = pointer2;
 
-    CPPUNIT_ASSERT( pointer1.get() == pointer2.get() );
-    CPPUNIT_ASSERT( pointer2.get() == pointer3.get() );
+    ASSERT_TRUE(pointer1.get() == pointer2.get());
+    ASSERT_TRUE(pointer2.get() == pointer3.get());
 
     pointer3.reset( NULL );
-    CPPUNIT_ASSERT( pointer1.get() != NULL );
-    CPPUNIT_ASSERT( pointer2.get() != NULL );
-    CPPUNIT_ASSERT( pointer3.get() == NULL );
+    ASSERT_TRUE(pointer1.get() != NULL);
+    ASSERT_TRUE(pointer2.get() != NULL);
+    ASSERT_TRUE(pointer3.get() == NULL);
 
     ConstReferenceMethod( pointer1 );
     ReferenceMethod( pointer2 );
-    CPPUNIT_ASSERT( pointer2.get() == NULL );
+    ASSERT_TRUE(pointer2.get() == NULL);
 
     ReturnByValue();
 
     {
         Pointer<TestClassA> copy = ReturnByValue();
-        CPPUNIT_ASSERT( copy.get() != NULL );
+        ASSERT_TRUE(copy.get() != NULL);
     }
 
     {
         Pointer<TestClassA> copy = ReturnByConstReference();
-        CPPUNIT_ASSERT( copy.get() != NULL );
+        ASSERT_TRUE(copy.get() != NULL);
     }
 
     ReturnByConstReference();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testComparisons() {
+TEST_F(PointerTest, testComparisons) {
 
     Pointer<TestClassBase> pointer1( new TestClassA );
     Pointer<TestClassBase> pointer2( new TestClassB );
 
     TestClassA* raw1 = new TestClassA;
 
-    CPPUNIT_ASSERT( ( pointer1 == pointer2 ) == false );
-    CPPUNIT_ASSERT( ( pointer1 != pointer2 ) == true );
+    ASSERT_TRUE(( pointer1 == pointer2 ) == false);
+    ASSERT_TRUE(( pointer1 != pointer2 ) == true);
 
-    CPPUNIT_ASSERT( ( pointer1 == raw1 ) == false );
-    CPPUNIT_ASSERT( ( pointer1 != raw1 ) == true );
-    CPPUNIT_ASSERT( ( raw1 == pointer2 ) == false );
-    CPPUNIT_ASSERT( ( raw1 != pointer2 ) == true );
+    ASSERT_TRUE(( pointer1 == raw1 ) == false);
+    ASSERT_TRUE(( pointer1 != raw1 ) == true);
+    ASSERT_TRUE(( raw1 == pointer2 ) == false);
+    ASSERT_TRUE(( raw1 != pointer2 ) == true);
 
     delete raw1;
 
     Pointer<TestClassBase> pointer3( new TestClassA );
     Pointer<TestClassA> pointer4( new TestClassA );
 
-    CPPUNIT_ASSERT( ( pointer3 == pointer4 ) == false );
-    CPPUNIT_ASSERT( ( pointer3 != pointer4 ) == true );
+    ASSERT_TRUE(( pointer3 == pointer4 ) == false);
+    ASSERT_TRUE(( pointer3 != pointer4 ) == true);
 
-    CPPUNIT_ASSERT( pointer1 != NULL );
-    CPPUNIT_ASSERT( !pointer1 == false );
-    CPPUNIT_ASSERT( !!pointer1 == true );
+    ASSERT_TRUE(pointer1 != NULL);
+    ASSERT_TRUE(!pointer1 == false);
+    ASSERT_TRUE(!!pointer1 == true);
 
     // This won't compile which is correct.
     //Pointer<TestClassB> pointer5( new TestClassB );
     //Pointer<TestClassA> pointer6( new TestClassA );
-    //CPPUNIT_ASSERT( pointer5 != pointer6 );
+    //ASSERT_TRUE(pointer5 != pointer6);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -279,15 +281,15 @@ public:
 
         for( int i = 0; i < 999; ++i ) {
             Pointer<TestClassBase> copy = this->mine;
-            CPPUNIT_ASSERT( copy->returnHello() == "Hello" );
+            ASSERT_TRUE(copy->returnHello() == "Hello");
             copy.reset( new TestClassB() );
-            CPPUNIT_ASSERT( copy->returnHello() == "GoodBye" );
+            ASSERT_TRUE(copy->returnHello() == "GoodBye");
         }
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testThreaded1() {
+TEST_F(PointerTest, testThreaded1) {
     Pointer<TestClassA> pointer( new TestClassA() );
 
     PointerTestRunnable runnable( pointer );
@@ -297,62 +299,50 @@ void PointerTest::testThreaded1() {
 
     for( int i = 0; i < 999; ++i ) {
         Pointer<TestClassBase> copy = pointer;
-        CPPUNIT_ASSERT( copy->returnHello() == "Hello" );
+        ASSERT_TRUE(copy->returnHello() == "Hello");
         Thread::yield();
         copy.reset( new TestClassB() );
-        CPPUNIT_ASSERT( copy->returnHello() == "GoodBye" );
+        ASSERT_TRUE(copy->returnHello() == "GoodBye");
     }
 
     testThread.join();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testThreaded2() {
+TEST_F(PointerTest, testThreaded2) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testOperators() {
+TEST_F(PointerTest, testOperators) {
 
     Pointer<TestClassBase> pointer1( new TestClassA );
     Pointer<TestClassBase> pointer2( new TestClassB );
     Pointer<TestClassBase> pointer3;
 
-    CPPUNIT_ASSERT( pointer1->returnHello() == "Hello" );
-    CPPUNIT_ASSERT( pointer2->returnHello() == "GoodBye" );
+    ASSERT_TRUE(pointer1->returnHello() == "Hello");
+    ASSERT_TRUE(pointer2->returnHello() == "GoodBye");
 
-    CPPUNIT_ASSERT( ( *pointer1 ).returnHello() == "Hello" );
-    CPPUNIT_ASSERT( ( *pointer2 ).returnHello() == "GoodBye" );
+    ASSERT_TRUE(( *pointer1 ).returnHello() == "Hello");
+    ASSERT_TRUE(( *pointer2 ).returnHello() == "GoodBye");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "operator* on a NULL Should Throw a NullPointerException",
-        ( *pointer3 ).returnHello(),
-        decaf::lang::exceptions::NullPointerException );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "operator-> on a NULL Should Throw a NullPointerException",
-        pointer3->returnHello(),
-        decaf::lang::exceptions::NullPointerException );
+    ASSERT_THROW(( *pointer3 ).returnHello(), decaf::lang::exceptions::NullPointerException) << ("operator* on a NULL Should Throw a NullPointerException");
+    ASSERT_THROW(pointer3->returnHello(), decaf::lang::exceptions::NullPointerException) << ("operator-> on a NULL Should Throw a NullPointerException");
 
     pointer2.reset( NULL );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "operator* on a NULL Should Throw a NullPointerException",
-        ( *pointer2 ).returnHello(),
-        decaf::lang::exceptions::NullPointerException );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "operator-> on a NULL Should Throw a NullPointerException",
-        pointer2->returnHello(),
-        decaf::lang::exceptions::NullPointerException );
+    ASSERT_THROW(( *pointer2 ).returnHello(), decaf::lang::exceptions::NullPointerException) << ("operator* on a NULL Should Throw a NullPointerException");
+    ASSERT_THROW(pointer2->returnHello(), decaf::lang::exceptions::NullPointerException) << ("operator-> on a NULL Should Throw a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testSTLContainers() {
+TEST_F(PointerTest, testSTLContainers) {
 
     Pointer<TestClassBase> pointer1( new TestClassA );
     Pointer<TestClassBase> pointer2( new TestClassB );
     Pointer<TestClassBase> pointer3( pointer2 );
 
-    CPPUNIT_ASSERT( pointer1.get() != NULL );
-    CPPUNIT_ASSERT( pointer2.get() != NULL );
+    ASSERT_TRUE(pointer1.get() != NULL);
+    ASSERT_TRUE(pointer2.get() != NULL);
 
     std::map< Pointer<TestClassBase>, std::string > testMap;
 
@@ -362,12 +352,12 @@ void PointerTest::testSTLContainers() {
 
     // Two and Three should be equivalent (not equal) but in this case
     // equivalent is what matters.  So pointer2 should be bumped out of the map.
-    CPPUNIT_ASSERT( testMap.size() == 2 );
+    ASSERT_TRUE(testMap.size() == 2);
 
     testMap.insert( std::make_pair( Pointer<TestClassBase>( new TestClassA ), "Fred" ) );
 
-    CPPUNIT_ASSERT( testMap.find( pointer1 ) != testMap.end() );
-    CPPUNIT_ASSERT( testMap.find( pointer2 ) != testMap.end() );
+    ASSERT_TRUE(testMap.find( pointer1 ) != testMap.end());
+    ASSERT_TRUE(testMap.find( pointer2 ) != testMap.end());
 
     Pointer< int > one( new int );
     Pointer< int > two( new int );
@@ -379,14 +369,14 @@ void PointerTest::testSTLContainers() {
 
     std::map< Pointer<int>, int, PointerComparator<int> > testMap2;
 
-    CPPUNIT_ASSERT( testMap2.size() == 0 );
+    ASSERT_TRUE(testMap2.size() == 0);
     testMap2.insert( std::make_pair( three, 3 ) );
     testMap2.insert( std::make_pair( two, 2 ) );
     testMap2.insert( std::make_pair( one, 1 ) );
-    CPPUNIT_ASSERT( testMap2.size() == 3 );
+    ASSERT_TRUE(testMap2.size() == 3);
 
-    CPPUNIT_ASSERT( *( testMap2.begin()->first ) == 1 );
-    CPPUNIT_ASSERT( *( testMap2.rbegin()->first ) == 3 );
+    ASSERT_TRUE(*( testMap2.begin()->first ) == 1);
+    ASSERT_TRUE(*( testMap2.rbegin()->first ) == 3);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -402,46 +392,38 @@ Pointer<TestClassBase> methodReturnPointer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testReturnByValue() {
+TEST_F(PointerTest, testReturnByValue) {
 
     Pointer<TestClassBase> result = methodReturnPointer();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testDynamicCast() {
+TEST_F(PointerTest, testDynamicCast) {
 
     Pointer<TestClassBase> pointer1( new TestClassA );
     Pointer<TestClassBase> pointer2( new TestClassB );
 
     Pointer<TestClassA> ptrTestClassA;
-    CPPUNIT_ASSERT_NO_THROW(
-        ptrTestClassA = pointer1.dynamicCast<TestClassA>() );
-    CPPUNIT_ASSERT( ptrTestClassA != NULL );
-    CPPUNIT_ASSERT( ptrTestClassA->getSize() == 1 );
+    ASSERT_NO_THROW(ptrTestClassA = pointer1.dynamicCast<TestClassA>());
+    ASSERT_TRUE(ptrTestClassA != NULL);
+    ASSERT_TRUE(ptrTestClassA->getSize() == 1);
 
     Pointer<TestClassB> ptrTestClassB;
-    CPPUNIT_ASSERT_NO_THROW(
-        ptrTestClassB = pointer2.dynamicCast<TestClassB>() );
-    CPPUNIT_ASSERT( ptrTestClassB != NULL );
-    CPPUNIT_ASSERT( ptrTestClassB->getSize() == 2 );
+    ASSERT_NO_THROW(ptrTestClassB = pointer2.dynamicCast<TestClassB>());
+    ASSERT_TRUE(ptrTestClassB != NULL);
+    ASSERT_TRUE(ptrTestClassB->getSize() == 2);
 
     Pointer<TestClassA> ptrTestClassA2;
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw a ClassCastException",
-        ptrTestClassA2 = pointer2.dynamicCast<TestClassA>(),
-        ClassCastException );
+    ASSERT_THROW(ptrTestClassA2 = pointer2.dynamicCast<TestClassA>(), ClassCastException) << ("Should Throw a ClassCastException");
 
     Pointer<TestClassBase> nullPointer;
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw a ClassCastException",
-        ptrTestClassA2 = nullPointer.dynamicCast<TestClassA>(),
-        ClassCastException );
+    ASSERT_THROW(ptrTestClassA2 = nullPointer.dynamicCast<TestClassA>(), ClassCastException) << ("Should Throw a ClassCastException");
 
     Pointer<TestClassBase> basePointer = ptrTestClassA.dynamicCast<TestClassBase>();
-    CPPUNIT_ASSERT( basePointer->getSize() == 1 );
+    ASSERT_TRUE(basePointer->getSize() == 1);
 
     basePointer = ptrTestClassB.dynamicCast<TestClassBase>();
-    CPPUNIT_ASSERT( basePointer->getSize() == 2 );
+    ASSERT_TRUE(basePointer->getSize() == 2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -525,7 +507,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void PointerTest::testThreadSafety() {
+TEST_F(PointerTest, testThreadSafety) {
 
     const int NUM_THREADS = 1;
     Pointer<PointerTestThread> thread[NUM_THREADS];

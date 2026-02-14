@@ -41,54 +41,54 @@ ExecutorsTestSupport::~ExecutorsTestSupport() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::setUp() {
+void ExecutorsTestSupport::SetUp() {
     threadFailed = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::tearDown() {
-    CPPUNIT_ASSERT(!threadFailed);
+void ExecutorsTestSupport::TearDown() {
+    ASSERT_TRUE(!threadFailed);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void ExecutorsTestSupport::unexpectedException() {
-    CPPUNIT_FAIL("Unexpected exception");
+    FAIL() << ("Unexpected exception");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void ExecutorsTestSupport::unexpectedException(Throwable& ex) {
-    CPPUNIT_FAIL(std::string("Unexpected exception: ") + ex.getMessage());
+    FAIL() << (std::string("Unexpected exception: ") + ex.getMessage());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void ExecutorsTestSupport::threadFail(const std::string& reason) {
     threadFailed = true;
-    CPPUNIT_FAIL(reason);
+    FAIL() << (reason);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void ExecutorsTestSupport::threadShouldThrow() {
    threadFailed = true;
-   CPPUNIT_FAIL("should throw exception");
+   FAIL() << ("should throw exception");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void ExecutorsTestSupport::threadUnexpectedException() {
     threadFailed = true;
-    CPPUNIT_FAIL("Unexpected exception");
+    FAIL() << ("Unexpected exception");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void ExecutorsTestSupport::threadUnexpectedException(Throwable& ex) {
     threadFailed = true;
-    CPPUNIT_FAIL(std::string("Unexpected exception: ") + ex.getMessage());
+    FAIL() << (std::string("Unexpected exception: ") + ex.getMessage());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void ExecutorsTestSupport::threadAssertFalse(bool b) {
     if (b) {
         threadFailed = true;
-        CPPUNIT_ASSERT(!b);
+        ASSERT_TRUE(!b);
     }
 }
 
@@ -96,7 +96,7 @@ void ExecutorsTestSupport::threadAssertFalse(bool b) {
 void ExecutorsTestSupport::threadAssertTrue(bool b) {
     if (!b) {
         threadFailed = true;
-        CPPUNIT_ASSERT(b);
+        ASSERT_TRUE(b);
     }
 }
 
@@ -104,13 +104,13 @@ void ExecutorsTestSupport::threadAssertTrue(bool b) {
 void ExecutorsTestSupport::threadAssertEquals(long long x, long long y) {
     if (x != y) {
         threadFailed = true;
-        CPPUNIT_ASSERT_EQUAL(x, y);
+        ASSERT_EQ(x, y);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void ExecutorsTestSupport::shouldThrow() {
-    CPPUNIT_FAIL("Should throw exception");
+    FAIL() << ("Should throw exception");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,9 +118,9 @@ void ExecutorsTestSupport::joinPool(ExecutorService& exec) {
 
     try {
         exec.shutdown();
-        CPPUNIT_ASSERT(exec.awaitTermination(LONG_DELAY_MS * 2, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(exec.awaitTermination(LONG_DELAY_MS * 2, TimeUnit::MILLISECONDS));
     } catch(InterruptedException& ie) {
-        CPPUNIT_FAIL("Unexpected exception");
+        FAIL() << ("Unexpected exception");
     }
 }
 
@@ -129,9 +129,9 @@ void ExecutorsTestSupport::joinPool(ExecutorService* exec) {
 
     try {
         exec->shutdown();
-        CPPUNIT_ASSERT(exec->awaitTermination(LONG_DELAY_MS, TimeUnit::MILLISECONDS));
+        ASSERT_TRUE(exec->awaitTermination(LONG_DELAY_MS, TimeUnit::MILLISECONDS));
     } catch(InterruptedException& ie) {
-        CPPUNIT_FAIL("Unexpected exception");
+        FAIL() << ("Unexpected exception");
     }
 }
 
@@ -144,6 +144,6 @@ void ExecutorsTestSupport::destroyRemaining(ArrayList<Runnable*> leftovers) {
             delete iter->next();
         }
     } catch(Exception& e) {
-        CPPUNIT_FAIL("Unexpected exception");
+        FAIL() << ("Unexpected exception");
     }
 }

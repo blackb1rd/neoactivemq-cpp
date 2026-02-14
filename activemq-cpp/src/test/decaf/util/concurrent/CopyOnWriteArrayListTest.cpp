@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "CopyOnWriteArrayListTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/concurrent/CopyOnWriteArrayList.h>
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
@@ -30,6 +30,18 @@ using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
+    class CopyOnWriteArrayListTest : public ::testing::Test {
+protected:
+
+        static const int SIZE;
+
+    public:
+
+        CopyOnWriteArrayListTest();
+        virtual ~CopyOnWriteArrayListTest();
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 const int CopyOnWriteArrayListTest::SIZE = 256;
 
@@ -38,38 +50,38 @@ namespace {
 
     void populate( CopyOnWriteArrayList<int>& list, int n ) {
 
-        CPPUNIT_ASSERT( list.isEmpty() );
+        ASSERT_TRUE(list.isEmpty());
 
         for( int i = 0; i < n; ++i ) {
             list.add( i );
         }
 
-        CPPUNIT_ASSERT( !list.isEmpty());
-        CPPUNIT_ASSERT_EQUAL( n, list.size() );
+        ASSERT_TRUE(!list.isEmpty());
+        ASSERT_EQ(n, list.size());
     }
 
     void populate( CopyOnWriteArrayList<std::string>& list, int n ) {
 
-        CPPUNIT_ASSERT( list.isEmpty() );
+        ASSERT_TRUE(list.isEmpty());
 
         for( int i = 0; i < n; ++i ) {
             list.add( Integer::toString( i ) );
         }
 
-        CPPUNIT_ASSERT( !list.isEmpty());
-        CPPUNIT_ASSERT_EQUAL( n, list.size() );
+        ASSERT_TRUE(!list.isEmpty());
+        ASSERT_EQ(n, list.size());
     }
 
     void populate( std::vector<int>& list, int n ) {
 
-        CPPUNIT_ASSERT( list.empty() );
+        ASSERT_TRUE(list.empty());
 
         for( int i = 0; i < n; ++i ) {
             list.push_back( i );
         }
 
-        CPPUNIT_ASSERT( !list.empty());
-        CPPUNIT_ASSERT_EQUAL( n, (int)list.size() );
+        ASSERT_TRUE(!list.empty());
+        ASSERT_EQ(n, (int)list.size());
     }
 }
 
@@ -82,19 +94,19 @@ CopyOnWriteArrayListTest::~CopyOnWriteArrayListTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testConstructor1() {
+TEST_F(CopyOnWriteArrayListTest, testConstructor1) {
 
     CopyOnWriteArrayList<int> array;
-    CPPUNIT_ASSERT( array.isEmpty() );
-    CPPUNIT_ASSERT( array.size() == 0 );
+    ASSERT_TRUE(array.isEmpty());
+    ASSERT_TRUE(array.size() == 0);
 
     CopyOnWriteArrayList<std::string> strArray;
-    CPPUNIT_ASSERT( strArray.isEmpty() );
-    CPPUNIT_ASSERT( strArray.size() == 0 );
+    ASSERT_TRUE(strArray.isEmpty());
+    ASSERT_TRUE(strArray.size() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testConstructor2() {
+TEST_F(CopyOnWriteArrayListTest, testConstructor2) {
 
     StlList<int> intsList;
 
@@ -103,16 +115,16 @@ void CopyOnWriteArrayListTest::testConstructor2() {
     }
 
     CopyOnWriteArrayList<int> array( intsList );
-    CPPUNIT_ASSERT( !array.isEmpty() );
-    CPPUNIT_ASSERT( array.size() == SIZE );
+    ASSERT_TRUE(!array.isEmpty());
+    ASSERT_TRUE(array.size() == SIZE);
 
     for( int i = 0; i < SIZE; ++i ) {
-        CPPUNIT_ASSERT_EQUAL( intsList.get( i ), array.get( i ) );
+        ASSERT_EQ(intsList.get( i ), array.get( i ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testConstructor3() {
+TEST_F(CopyOnWriteArrayListTest, testConstructor3) {
 
     int ints[SIZE];
 
@@ -121,16 +133,16 @@ void CopyOnWriteArrayListTest::testConstructor3() {
     }
 
     CopyOnWriteArrayList<int> array( ints, SIZE );
-    CPPUNIT_ASSERT( !array.isEmpty() );
-    CPPUNIT_ASSERT( array.size() == SIZE );
+    ASSERT_TRUE(!array.isEmpty());
+    ASSERT_TRUE(array.size() == SIZE);
 
     for( int i = 0; i < SIZE; ++i ) {
-        CPPUNIT_ASSERT_EQUAL( ints[i], array.get( i ) );
+        ASSERT_EQ(ints[i], array.get( i ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll) {
 
     CopyOnWriteArrayList<int> list;
     for( int i = 0; i < 3; ++i ) {
@@ -143,11 +155,11 @@ void CopyOnWriteArrayListTest::testAddAll() {
     }
 
     list.addAll( collection );
-    CPPUNIT_ASSERT_EQUAL( 6, list.size() );
+    ASSERT_EQ(6, list.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll1() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll1) {
 
     CopyOnWriteArrayList<int> array;
     populate( array, 100 );
@@ -155,29 +167,26 @@ void CopyOnWriteArrayListTest::testAddAll1() {
     populate( mirror, 100 );
 
     array.addAll( 50, array );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Returned incorrect size after adding to existing list", 200, array.size() );
+    ASSERT_EQ(200, array.size()) << ("Returned incorrect size after adding to existing list");
 
     for( int i = 0; i < 50; i++ ) {
-        CPPUNIT_ASSERT_MESSAGE( "Manipulated elements < index", array.get( i ) == mirror[i] );
+        ASSERT_TRUE(array.get( i ) == mirror[i]) << ("Manipulated elements < index");
     }
 
     for( int i = 0; i >= 50 && ( i < 150 ); i++ ) {
-        CPPUNIT_ASSERT_MESSAGE( "Failed to ad elements properly", array.get( i ) == mirror[i - 50] );
+        ASSERT_TRUE(array.get( i ) == mirror[i - 50]) << ("Failed to ad elements properly");
     }
 
     for( int i = 0; i >= 150 && ( i < 200 ); i++ ) {
-        CPPUNIT_ASSERT_MESSAGE( "Failed to ad elements properly", array.get( i ) == mirror[i - 100] );
+        ASSERT_TRUE(array.get( i ) == mirror[i - 100]) << ("Failed to ad elements properly");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll2() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll2) {
 
     StlList<int> emptyCollection;
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        CopyOnWriteArrayList<int>().addAll( -1, emptyCollection ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(CopyOnWriteArrayList<int>().addAll( -1, emptyCollection ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 
     {
         std::string data[] = { "1", "2", "3", "4", "5", "6", "7", "8" };
@@ -193,8 +202,7 @@ void CopyOnWriteArrayListTest::testAddAll2() {
             list1.removeAt( 0 );
         }
         list1.addAll( list2 );
-        CPPUNIT_ASSERT_MESSAGE( "The object list is not the same as original list",
-                                list1.containsAll( list2 ) && list2.containsAll( list1 ) );
+        ASSERT_TRUE(list1.containsAll( list2 ) && list2.containsAll( list1 )) << ("The object list is not the same as original list");
 
         CopyOnWriteArrayList<std::string> list3;
         for( int i = 0; i < 100; i++ ) {
@@ -203,8 +211,7 @@ void CopyOnWriteArrayListTest::testAddAll2() {
                 list3.addAll( list1 );
             }
         }
-        CPPUNIT_ASSERT_MESSAGE( "The object list is not the same as original list",
-                                list3.containsAll( list1 ) && list1.containsAll( list3 ) );
+        ASSERT_TRUE(list3.containsAll( list1 ) && list1.containsAll( list3 )) << ("The object list is not the same as original list");
     }
     {
         CopyOnWriteArrayList<std::string> list1;
@@ -225,36 +232,30 @@ void CopyOnWriteArrayListTest::testAddAll2() {
 
         // Inserted elements should be equal to second array
         for( int i = 0; i < 8; i++ ) {
-            CPPUNIT_ASSERT_EQUAL( data2[i], list1.get( location + i ) );
+            ASSERT_EQ(data2[i], list1.get( location + i ));
         }
         // Elements after inserted location should
         // be equals to related elements in first array
         for( int i = location + 1; i < 6; i++ ) {
-            CPPUNIT_ASSERT_EQUAL( data1[i], list1.get( i + 8 - 1 ) );
+            ASSERT_EQ(data1[i], list1.get( i + 8 - 1 ));
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll3() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll3) {
 
     CopyOnWriteArrayList<int> list;
     list.addAll( 0, list );
     list.addAll( list.size(), list );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        list.addAll( -1, list ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(list.addAll( -1, list ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        list.addAll( list.size() + 1, list ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(list.addAll( list.size() + 1, list ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll4() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll4) {
 
     CopyOnWriteArrayList<std::string> array;
     CopyOnWriteArrayList<std::string> blist;
@@ -266,13 +267,13 @@ void CopyOnWriteArrayListTest::testAddAll4() {
     blist.removeAt( 0 );
     blist.addAll( 0, array );
 
-    CPPUNIT_ASSERT_EQUAL( std::string("a"), blist.get(0) );
-    CPPUNIT_ASSERT_EQUAL( std::string("b"), blist.get(1) );
-    CPPUNIT_ASSERT_EQUAL( std::string("d"), blist.get(2) );
+    ASSERT_EQ(std::string("a"), blist.get(0));
+    ASSERT_EQ(std::string("b"), blist.get(1));
+    ASSERT_EQ(std::string("d"), blist.get(2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll5() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll5) {
 
     CopyOnWriteArrayList<std::string> array;
     populate( array, 100 );
@@ -280,18 +281,14 @@ void CopyOnWriteArrayListTest::testAddAll5() {
     CopyOnWriteArrayList<std::string> l;
     l.addAll( array );
     for( int i = 0; i < array.size(); i++ ) {
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Failed to add elements properly",
-                                      l.get(i), array.get( i ) );
+        ASSERT_EQ(l.get(i), array.get( i )) << ("Failed to add elements properly");
     }
     array.addAll( array );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Returned incorrect size after adding to existing list",
-                                  200, array.size());
+    ASSERT_EQ(200, array.size()) << ("Returned incorrect size after adding to existing list");
 
     for( int i = 0; i < 100; i++ ) {
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Added to list in incorrect order",
-                                      array.get(i), l.get(i) );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Failed to add to existing list",
-                                      array.get(i + 100), l.get(i) );
+        ASSERT_EQ(array.get(i), l.get(i)) << ("Added to list in incorrect order");
+        ASSERT_EQ(array.get(i + 100), l.get(i)) << ("Failed to add to existing list");
     }
 
     CopyOnWriteArrayList<int> originalList;
@@ -306,12 +303,12 @@ void CopyOnWriteArrayListTest::testAddAll5() {
     for( int j = 0; j < 11; j++ ) {
         additionalList.add( j );
     }
-    CPPUNIT_ASSERT( originalList.addAll( additionalList ) );
-    CPPUNIT_ASSERT_EQUAL( 21, originalList.size() );
+    ASSERT_TRUE(originalList.addAll( additionalList ));
+    ASSERT_EQ(21, originalList.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll6() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll6) {
 
     CopyOnWriteArrayList<int> arrayListA;
     arrayListA.add( 1 );
@@ -319,27 +316,27 @@ void CopyOnWriteArrayListTest::testAddAll6() {
     arrayListB.add( 1 );
     arrayListA.addAll( 1, arrayListB );
     int size = arrayListA.size();
-    CPPUNIT_ASSERT_EQUAL( 2, size );
+    ASSERT_EQ(2, size);
     for( int index = 0; index < size; index++ ) {
-        CPPUNIT_ASSERT_EQUAL( 1, arrayListA.get( index ) );
+        ASSERT_EQ(1, arrayListA.get( index ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll7() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll7) {
 
     CopyOnWriteArrayList<int> arrayList;
     arrayList.add( 1 );
     arrayList.addAll( 1, arrayList );
     int size = arrayList.size();
-    CPPUNIT_ASSERT_EQUAL( 2, size );
+    ASSERT_EQ(2, size);
     for( int index = 0; index < size; index++ ) {
-        CPPUNIT_ASSERT_EQUAL( 1, arrayList.get( index ) );
+        ASSERT_EQ(1, arrayList.get( index ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll8() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll8) {
 
     CopyOnWriteArrayList<std::string> arrayList;
     arrayList.add( "1" );
@@ -358,33 +355,33 @@ void CopyOnWriteArrayListTest::testAddAll8() {
 
     list.addAll( 6, arrayList );
 
-    CPPUNIT_ASSERT_EQUAL( 11, list.size() );
-    CPPUNIT_ASSERT( !list.contains( "q" ) );
+    ASSERT_EQ(11, list.size());
+    ASSERT_TRUE(!list.contains( "q" ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll9() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll9) {
 
     CopyOnWriteArrayList<std::string> list;
     list.add( "one" );
     list.add( "two" );
-    CPPUNIT_ASSERT_EQUAL( 2, list.size() );
+    ASSERT_EQ(2, list.size());
 
     list.removeAt( 0 );
-    CPPUNIT_ASSERT_EQUAL( 1, list.size() );
+    ASSERT_EQ(1, list.size());
 
     CopyOnWriteArrayList<std::string> collection;
     collection.add( "1" );
     collection.add( "2" );
     collection.add( "3" );
-    CPPUNIT_ASSERT_EQUAL( 3, collection.size() );
+    ASSERT_EQ(3, collection.size());
 
     list.addAll( 0, collection );
-    CPPUNIT_ASSERT_EQUAL( 4, list.size() );
+    ASSERT_EQ(4, list.size());
 
     list.removeAt( 0 );
     list.removeAt( 0 );
-    CPPUNIT_ASSERT_EQUAL( 2, list.size() );
+    ASSERT_EQ(2, list.size());
 
     collection.add( "4" );
     collection.add( "5" );
@@ -396,102 +393,102 @@ void CopyOnWriteArrayListTest::testAddAll9() {
     collection.add( "11" );
     collection.add( "12" );
 
-    CPPUNIT_ASSERT_EQUAL( 12, collection.size() );
+    ASSERT_EQ(12, collection.size());
 
     list.addAll( 0, collection );
-    CPPUNIT_ASSERT_EQUAL( 14, list.size() );
+    ASSERT_EQ(14, list.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testClear() {
+TEST_F(CopyOnWriteArrayListTest, testClear) {
 
     CopyOnWriteArrayList<int> list;
 
     populate( list, SIZE );
 
-    CPPUNIT_ASSERT( !list.isEmpty() );
+    ASSERT_TRUE(!list.isEmpty());
 
     list.clear();
 
-    CPPUNIT_ASSERT( list.isEmpty() );
-    CPPUNIT_ASSERT_EQUAL( 0, list.size() );
+    ASSERT_TRUE(list.isEmpty());
+    ASSERT_EQ(0, list.size());
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testContains() {
+TEST_F(CopyOnWriteArrayListTest, testContains) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
 
-    CPPUNIT_ASSERT( list.contains( 1 ) );
-    CPPUNIT_ASSERT( !list.contains( 5 ) );
+    ASSERT_TRUE(list.contains( 1 ));
+    ASSERT_TRUE(!list.contains( 5 ));
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testGet() {
+TEST_F(CopyOnWriteArrayListTest, testGet) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
 
-    CPPUNIT_ASSERT_EQUAL( 0, list.get( 0 ) );
+    ASSERT_EQ(0, list.get( 0 ));
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testIsEmpty() {
+TEST_F(CopyOnWriteArrayListTest, testIsEmpty) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
 
     CopyOnWriteArrayList<int> empty;
 
-    CPPUNIT_ASSERT( empty.isEmpty() );
-    CPPUNIT_ASSERT( !list.isEmpty() );
+    ASSERT_TRUE(empty.isEmpty());
+    ASSERT_TRUE(!list.isEmpty());
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testIndexOf1() {
+TEST_F(CopyOnWriteArrayListTest, testIndexOf1) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
 
-    CPPUNIT_ASSERT_EQUAL( 1, list.indexOf( 1 ) );
-    CPPUNIT_ASSERT_EQUAL( -1, list.indexOf( 99 ) );
+    ASSERT_EQ(1, list.indexOf( 1 ));
+    ASSERT_EQ(-1, list.indexOf( 99 ));
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testLastIndexOf1() {
+TEST_F(CopyOnWriteArrayListTest, testLastIndexOf1) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
     list.add( 1 );
     list.add( 3 );
-    CPPUNIT_ASSERT_EQUAL( 3, list.lastIndexOf( 1 ) );
-    CPPUNIT_ASSERT_EQUAL( -1, list.lastIndexOf( 6 ) );
+    ASSERT_EQ(3, list.lastIndexOf( 1 ));
+    ASSERT_EQ(-1, list.lastIndexOf( 6 ));
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddIndex() {
+TEST_F(CopyOnWriteArrayListTest, testAddIndex) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
 
     list.add( 0, 4 );
-    CPPUNIT_ASSERT_EQUAL( 4, list.size() );
-    CPPUNIT_ASSERT_EQUAL( 4, list.get( 0 ) );
-    CPPUNIT_ASSERT_EQUAL( 0, list.get( 1 ) );
+    ASSERT_EQ(4, list.size());
+    ASSERT_EQ(4, list.get( 0 ));
+    ASSERT_EQ(0, list.get( 1 ));
 
     list.add( 2, 6 );
-    CPPUNIT_ASSERT_EQUAL( 5, list.size() );
-    CPPUNIT_ASSERT_EQUAL( 6, list.get( 2 ) );
-    CPPUNIT_ASSERT_EQUAL( 2, list.get( 4 ) );
+    ASSERT_EQ(5, list.size());
+    ASSERT_EQ(6, list.get( 2 ));
+    ASSERT_EQ(2, list.get( 4 ));
 
     CopyOnWriteArrayList<int> list2;
     list2.add( 0, 42 );
-    CPPUNIT_ASSERT_EQUAL( 1, list2.size() );
+    ASSERT_EQ(1, list2.size());
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAllIndex() {
+TEST_F(CopyOnWriteArrayListTest, testAddAllIndex) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
@@ -502,22 +499,22 @@ void CopyOnWriteArrayListTest::testAddAllIndex() {
     }
 
     list.addAll( 0, collection );
-    CPPUNIT_ASSERT_EQUAL( 9, list.size() );
-    CPPUNIT_ASSERT_EQUAL( 10, list.get( 0 ) );
-    CPPUNIT_ASSERT_EQUAL( 0, list.get( 6 ) );
+    ASSERT_EQ(9, list.size());
+    ASSERT_EQ(10, list.get( 0 ));
+    ASSERT_EQ(0, list.get( 6 ));
 
     list.addAll( 6, collection );
-    CPPUNIT_ASSERT_EQUAL( 15, list.size() );
-    CPPUNIT_ASSERT_EQUAL( 10, list.get( 6 ) );
-    CPPUNIT_ASSERT_EQUAL( 0, list.get( 12 ) );
+    ASSERT_EQ(15, list.size());
+    ASSERT_EQ(10, list.get( 6 ));
+    ASSERT_EQ(0, list.get( 12 ));
 
     CopyOnWriteArrayList<int> list2;
     list2.addAll( 0, collection );
-    CPPUNIT_ASSERT_EQUAL( 6, list2.size() );
+    ASSERT_EQ(6, list2.size());
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testContainsAll() {
+TEST_F(CopyOnWriteArrayListTest, testContainsAll) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 7 );
@@ -527,32 +524,32 @@ void CopyOnWriteArrayListTest::testContainsAll() {
         collection.add( i );
     }
 
-    CPPUNIT_ASSERT( list.containsAll( collection ) );
+    ASSERT_TRUE(list.containsAll( collection ));
     collection.add( 42 );
-    CPPUNIT_ASSERT( !list.containsAll( collection ) );
+    ASSERT_TRUE(!list.containsAll( collection ));
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testEquals() {
+TEST_F(CopyOnWriteArrayListTest, testEquals) {
 
     CopyOnWriteArrayList<int> list1;
     populate( list1, 7 );
     CopyOnWriteArrayList<int> list2;
     populate( list2, 7 );
 
-    CPPUNIT_ASSERT( list1.equals( list2 ) );
-    CPPUNIT_ASSERT( list2.equals( list1 ) );
+    ASSERT_TRUE(list1.equals( list2 ));
+    ASSERT_TRUE(list2.equals( list1 ));
 
     list1.add( 42 );
-    CPPUNIT_ASSERT( !list1.equals( list2 ) );
-    CPPUNIT_ASSERT( !list2.equals( list1 ) );
+    ASSERT_TRUE(!list1.equals( list2 ));
+    ASSERT_TRUE(!list2.equals( list1 ));
     list2.add( 42 );
-    CPPUNIT_ASSERT( list1.equals( list2 ) );
-    CPPUNIT_ASSERT( list2.equals( list1 ) );
+    ASSERT_TRUE(list1.equals( list2 ));
+    ASSERT_TRUE(list2.equals( list1 ));
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testRemove() {
+TEST_F(CopyOnWriteArrayListTest, testRemove) {
 
     CopyOnWriteArrayList<int> list1;
     populate( list1, SIZE );
@@ -562,73 +559,73 @@ void CopyOnWriteArrayListTest::testRemove() {
     list1.remove( 42 );
     list2.remove( 42 );
 
-    CPPUNIT_ASSERT_MESSAGE( "Lists should be equal", list1.equals( list2 ) );
+    ASSERT_TRUE(list1.equals( list2 )) << ("Lists should be equal");
     list1.remove( 42 );
-    CPPUNIT_ASSERT_MESSAGE( "Lists should be equal", list1.equals( list2 ) );
+    ASSERT_TRUE(list1.equals( list2 )) << ("Lists should be equal");
 
-    CPPUNIT_ASSERT( list1.remove( 0 ) );
-    CPPUNIT_ASSERT_MESSAGE( "Lists should not be equal", !list1.equals( list2 ) );
+    ASSERT_TRUE(list1.remove( 0 ));
+    ASSERT_TRUE(!list1.equals( list2 )) << ("Lists should not be equal");
 
     list1.clear();
     populate( list1, SIZE );
 
     for( int i = 0; i < SIZE; i++ ) {
-        CPPUNIT_ASSERT( list1.remove( i ) );
+        ASSERT_TRUE(list1.remove( i ));
     }
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testRemoveAt() {
+TEST_F(CopyOnWriteArrayListTest, testRemoveAt) {
 
     CopyOnWriteArrayList<int> list1;
     populate( list1, 7 );
     CopyOnWriteArrayList<int> list2;
     populate( list2, 7 );
 
-    CPPUNIT_ASSERT_EQUAL( 2, list1.removeAt( 2 ) );
-    CPPUNIT_ASSERT_EQUAL( 6, list1.size() );
-    CPPUNIT_ASSERT_EQUAL( 3, list1.removeAt( 2 ) );
-    CPPUNIT_ASSERT_EQUAL( 5, list1.size() );
+    ASSERT_EQ(2, list1.removeAt( 2 ));
+    ASSERT_EQ(6, list1.size());
+    ASSERT_EQ(3, list1.removeAt( 2 ));
+    ASSERT_EQ(5, list1.size());
 
-    CPPUNIT_ASSERT_EQUAL( 6, list2.removeAt( 6 ) );
-    CPPUNIT_ASSERT_EQUAL( 6, list2.size() );
-    CPPUNIT_ASSERT_EQUAL( 0, list2.removeAt( 0 ) );
-    CPPUNIT_ASSERT_EQUAL( 5, list2.size() );
-    CPPUNIT_ASSERT_EQUAL( 5, list2.removeAt( 4 ) );
-    CPPUNIT_ASSERT_EQUAL( 4, list2.size() );
-    CPPUNIT_ASSERT_EQUAL( 1, list2.removeAt( 0 ) );
-    CPPUNIT_ASSERT_EQUAL( 3, list2.size() );
-    CPPUNIT_ASSERT_EQUAL( 4, list2.removeAt( 2 ) );
-    CPPUNIT_ASSERT_EQUAL( 2, list2.size() );
-    CPPUNIT_ASSERT_EQUAL( 2, list2.removeAt( 0 ) );
-    CPPUNIT_ASSERT_EQUAL( 1, list2.size() );
-    CPPUNIT_ASSERT_EQUAL( 3, list2.removeAt( 0 ) );
-    CPPUNIT_ASSERT_EQUAL( 0, list2.size() );
+    ASSERT_EQ(6, list2.removeAt( 6 ));
+    ASSERT_EQ(6, list2.size());
+    ASSERT_EQ(0, list2.removeAt( 0 ));
+    ASSERT_EQ(5, list2.size());
+    ASSERT_EQ(5, list2.removeAt( 4 ));
+    ASSERT_EQ(4, list2.size());
+    ASSERT_EQ(1, list2.removeAt( 0 ));
+    ASSERT_EQ(3, list2.size());
+    ASSERT_EQ(4, list2.removeAt( 2 ));
+    ASSERT_EQ(2, list2.size());
+    ASSERT_EQ(2, list2.removeAt( 0 ));
+    ASSERT_EQ(1, list2.size());
+    ASSERT_EQ(3, list2.removeAt( 0 ));
+    ASSERT_EQ(0, list2.size());
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddIfAbsent1() {
+TEST_F(CopyOnWriteArrayListTest, testAddIfAbsent1) {
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
 
     list.addIfAbsent( 1 );
 
-    CPPUNIT_ASSERT_EQUAL( SIZE, list.size() );
+    ASSERT_EQ(SIZE, list.size());
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddIfAbsent2() {
+TEST_F(CopyOnWriteArrayListTest, testAddIfAbsent2) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
 
-    CPPUNIT_ASSERT( !list.contains(SIZE) );
+    ASSERT_TRUE(!list.contains(SIZE));
     list.addIfAbsent( SIZE );
-    CPPUNIT_ASSERT( list.contains(SIZE) );
+    ASSERT_TRUE(list.contains(SIZE));
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testIterator() {
+TEST_F(CopyOnWriteArrayListTest, testIterator) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
@@ -636,14 +633,14 @@ void CopyOnWriteArrayListTest::testIterator() {
     std::unique_ptr< Iterator<int> > i( list.iterator() );
     int j;
     for( j = 0; i->hasNext(); j++ ) {
-        CPPUNIT_ASSERT_EQUAL( j, i->next() );
+        ASSERT_EQ(j, i->next());
     }
 
-    CPPUNIT_ASSERT_EQUAL( SIZE, j );
+    ASSERT_EQ(SIZE, j);
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testIteratorRemove() {
+TEST_F(CopyOnWriteArrayListTest, testIteratorRemove) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
@@ -652,14 +649,11 @@ void CopyOnWriteArrayListTest::testIteratorRemove() {
 
     it->next();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UnsupportedOperationException",
-        it->remove(),
-        UnsupportedOperationException );
+    ASSERT_THROW(it->remove(), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testListIterator1() {
+TEST_F(CopyOnWriteArrayListTest, testListIterator1) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
@@ -667,14 +661,14 @@ void CopyOnWriteArrayListTest::testListIterator1() {
     std::unique_ptr< ListIterator<int> > i( list.listIterator() );
     int j;
     for( j = 0; i->hasNext(); j++ ) {
-        CPPUNIT_ASSERT_EQUAL( j, i->next() );
+        ASSERT_EQ(j, i->next());
     }
 
-    CPPUNIT_ASSERT_EQUAL( SIZE, j );
+    ASSERT_EQ(SIZE, j);
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testListIterator2() {
+TEST_F(CopyOnWriteArrayListTest, testListIterator2) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
@@ -682,47 +676,44 @@ void CopyOnWriteArrayListTest::testListIterator2() {
     std::unique_ptr< ListIterator<int> > i( list.listIterator( 1 ) );
     int j;
     for( j = 0; i->hasNext(); j++ ) {
-        CPPUNIT_ASSERT_EQUAL( j+1, i->next() );
+        ASSERT_EQ(j+1, i->next());
     }
 
-    CPPUNIT_ASSERT_EQUAL( SIZE - 1, j );
+    ASSERT_EQ(SIZE - 1, j);
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testSet() {
+TEST_F(CopyOnWriteArrayListTest, testSet) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
 
-    CPPUNIT_ASSERT_EQUAL( 2, list.set( 2, 4 ) );
-    CPPUNIT_ASSERT_EQUAL( 4, list.get( 2 ) );
+    ASSERT_EQ(2, list.set( 2, 4 ));
+    ASSERT_EQ(4, list.get( 2 ));
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testSize() {
+TEST_F(CopyOnWriteArrayListTest, testSize) {
 
     CopyOnWriteArrayList<int> empty;
     CopyOnWriteArrayList<int> list;
     populate( list, SIZE );
 
-    CPPUNIT_ASSERT_EQUAL( SIZE, list.size() );
-    CPPUNIT_ASSERT_EQUAL( 0, empty.size() );
+    ASSERT_EQ(SIZE, list.size());
+    ASSERT_EQ(0, empty.size());
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll1IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll1IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
     StlList<int> collection;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        list.addAll( -1, collection ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(list.addAll( -1, collection ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAll2IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testAddAll2IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
     list.add( 1 );
@@ -730,134 +721,101 @@ void CopyOnWriteArrayListTest::testAddAll2IndexOutOfBoundsException() {
 
     StlList<int> collection;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        list.addAll( 100, collection ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(list.addAll( 100, collection ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testListIterator1IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testListIterator1IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        std::unique_ptr< ListIterator<int> > it( list.listIterator( -1 ) ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(std::unique_ptr< ListIterator<int> > it( list.listIterator( -1 ) ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testListIterator2IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testListIterator2IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
     list.add( 1 );
     list.add( 2 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        std::unique_ptr< ListIterator<int> > it( list.listIterator( 100 ) ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(std::unique_ptr< ListIterator<int> > it( list.listIterator( 100 ) ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAdd1IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testAdd1IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        list.add( -1, 42 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(list.add( -1, 42 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAdd2IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testAdd2IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
     list.add( 1 );
     list.add( 2 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        list.add( 100, 42 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(list.add( 100, 42 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testRemoveAt1IndexOutOfBounds() {
+TEST_F(CopyOnWriteArrayListTest, testRemoveAt1IndexOutOfBounds) {
 
     CopyOnWriteArrayList<int> list;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        list.removeAt( -1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(list.removeAt( -1 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testRemoveAt2IndexOutOfBounds() {
+TEST_F(CopyOnWriteArrayListTest, testRemoveAt2IndexOutOfBounds) {
 
     CopyOnWriteArrayList<int> list;
     list.add( 1 );
     list.add( 2 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        list.removeAt( 100 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(list.removeAt( 100 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testGet1IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testGet1IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        list.get( -1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(list.get( -1 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testGet2IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testGet2IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
     list.add( 1 );
     list.add( 2 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        list.get( 100 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(list.get( 100 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testSet1IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testSet1IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        list.set( -1, 42 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(list.set( -1, 42 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testSet2IndexOutOfBoundsException() {
+TEST_F(CopyOnWriteArrayListTest, testSet2IndexOutOfBoundsException) {
 
     CopyOnWriteArrayList<int> list;
     list.add( 1 );
     list.add( 2 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        list.set( 100, 42 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(list.set( 100, 42 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testToArray() {
+TEST_F(CopyOnWriteArrayListTest, testToArray) {
 
     CopyOnWriteArrayList<int> list;
     list.add( 1 );
@@ -866,35 +824,35 @@ void CopyOnWriteArrayListTest::testToArray() {
 
     std::vector<int> result = list.toArray();
 
-    CPPUNIT_ASSERT_EQUAL( 3, (int)result.size() );
-    CPPUNIT_ASSERT_EQUAL( 1, result[0] );
-    CPPUNIT_ASSERT_EQUAL( 2, result[1] );
-    CPPUNIT_ASSERT_EQUAL( 3, result[2] );
+    ASSERT_EQ(3, (int)result.size());
+    ASSERT_EQ(1, result[0]);
+    ASSERT_EQ(2, result[1]);
+    ASSERT_EQ(3, result[2]);
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testLastIndexOf2() {
+TEST_F(CopyOnWriteArrayListTest, testLastIndexOf2) {
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
     list.add( 1 );
     list.add( 3 );
 
-    CPPUNIT_ASSERT_EQUAL( 3, list.lastIndexOf( 1, 4 ) );
-    CPPUNIT_ASSERT_EQUAL( -1, list.lastIndexOf( 3, 3 ) );
+    ASSERT_EQ(3, list.lastIndexOf( 1, 4 ));
+    ASSERT_EQ(-1, list.lastIndexOf( 3, 3 ));
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testIndexOf2() {
+TEST_F(CopyOnWriteArrayListTest, testIndexOf2) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
 
-    CPPUNIT_ASSERT_EQUAL( 1, list.indexOf( 1, 0 ) );
-    CPPUNIT_ASSERT_EQUAL( -1, list.indexOf( 1, 2 ) );
+    ASSERT_EQ(1, list.indexOf( 1, 0 ));
+    ASSERT_EQ(-1, list.indexOf( 1, 2 ));
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testAddAllAbsent() {
+TEST_F(CopyOnWriteArrayListTest, testAddAllAbsent) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
@@ -906,11 +864,11 @@ void CopyOnWriteArrayListTest::testAddAllAbsent() {
 
     list.addAllAbsent( collection );
 
-    CPPUNIT_ASSERT_EQUAL( 5, list.size() );
+    ASSERT_EQ(5, list.size());
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testRemoveAll() {
+TEST_F(CopyOnWriteArrayListTest, testRemoveAll) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
@@ -921,22 +879,22 @@ void CopyOnWriteArrayListTest::testRemoveAll() {
 
     list.removeAll( collection );
 
-    CPPUNIT_ASSERT_EQUAL( 1, list.size() );
+    ASSERT_EQ(1, list.size());
 
     CopyOnWriteArrayList<int> list2;
     list2.removeAll( collection );
-    CPPUNIT_ASSERT_EQUAL( 0, list2.size() );
+    ASSERT_EQ(0, list2.size());
 
     CopyOnWriteArrayList<int> list3;
     populate( list3, 3 );
     collection.clear();
 
     list3.removeAll( collection );
-    CPPUNIT_ASSERT_EQUAL( 3, list3.size() );
+    ASSERT_EQ(3, list3.size());
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testRetainAll() {
+TEST_F(CopyOnWriteArrayListTest, testRetainAll) {
 
     CopyOnWriteArrayList<int> list;
     populate( list, 3 );
@@ -947,18 +905,18 @@ void CopyOnWriteArrayListTest::testRetainAll() {
 
     list.retainAll( collection );
 
-    CPPUNIT_ASSERT_EQUAL( 2, list.size() );
+    ASSERT_EQ(2, list.size());
 
     CopyOnWriteArrayList<int> list2;
     list2.retainAll( collection );
-    CPPUNIT_ASSERT_EQUAL( 0, list2.size() );
+    ASSERT_EQ(0, list2.size());
 
     CopyOnWriteArrayList<int> list3;
     populate( list3, 3 );
     collection.clear();
 
     list3.retainAll( collection );
-    CPPUNIT_ASSERT_EQUAL( 0, list3.size() );
+    ASSERT_EQ(0, list3.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1042,7 +1000,7 @@ namespace copyonwritearraylisttest {
 }  // namespace copyonwritearraylisttest
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArrayListTest::testConcurrentRandomAddRemoveAndIterate() {
+TEST_F(CopyOnWriteArrayListTest, testConcurrentRandomAddRemoveAndIterate) {
 
     using copyonwritearraylisttest::Target;
     using copyonwritearraylisttest::AddRemoveItemRunnable;
@@ -1059,5 +1017,5 @@ void CopyOnWriteArrayListTest::testConcurrentRandomAddRemoveAndIterate() {
     }
 
     executor.shutdown();
-    CPPUNIT_ASSERT_MESSAGE("executor terminated", executor.awaitTermination(45, TimeUnit::SECONDS));
+    ASSERT_TRUE(executor.awaitTermination(45, TimeUnit::SECONDS)) << ("executor terminated");
 }

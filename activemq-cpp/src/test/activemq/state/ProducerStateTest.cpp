@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ProducerStateTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/state/ProducerState.h>
 #include <activemq/commands/ProducerInfo.h>
@@ -27,8 +27,10 @@ using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
 
+class ProducerStateTest : public ::testing::Test {};
+
 ////////////////////////////////////////////////////////////////////////////////
-void ProducerStateTest::test() {
+TEST_F(ProducerStateTest, test) {
     Pointer<ProducerId> id( new ProducerId );
     id->setConnectionId( "CONNECTION" );
     id->setSessionId( 42 );
@@ -38,7 +40,6 @@ void ProducerStateTest::test() {
     info->setProducerId( id );
     ProducerState state( info );
 
-    CPPUNIT_ASSERT( state.toString() != "NULL" );
-    CPPUNIT_ASSERT( info == state.getInfo() );
+    ASSERT_TRUE(state.toString() != "NULL");
+    ASSERT_TRUE(info == state.getInfo());
 }
-

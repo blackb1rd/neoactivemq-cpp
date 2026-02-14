@@ -18,9 +18,7 @@
 #ifndef _ACTIVEMQ_TEST_OPENWIRE_OPENWIREMULTICONNECTIONTEST_H_
 #define _ACTIVEMQ_TEST_OPENWIRE_OPENWIREMULTICONNECTIONTEST_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <activemq/util/IntegrationCommon.h>
 
 #include <cms/Connection.h>
@@ -50,25 +48,14 @@ namespace openwire {
      * - Messages can be routed to specific brokers
      * - Connection isolation is maintained
      */
-    class OpenwireMultiConnectionTest : public CppUnit::TestFixture {
-
-        CPPUNIT_TEST_SUITE(OpenwireMultiConnectionTest);
-        CPPUNIT_TEST(testMultipleConnectionsEstablish);
-        CPPUNIT_TEST(testSendReceiveOnBothConnections);
-        CPPUNIT_TEST(testFailoverAndDirectConnectionIndependent);
-        CPPUNIT_TEST(testConcurrentMessagingOnMultipleConnections);
-        CPPUNIT_TEST(testConnectionIsolation);
-        CPPUNIT_TEST(testFailoverConnectionWithIndependentBroker);
-        CPPUNIT_TEST(testDurableTopicWithSelectorConcurrentServers);
-        CPPUNIT_TEST_SUITE_END();
-
-    public:
+    class OpenwireMultiConnectionTest : public ::testing::Test {
+public:
 
         OpenwireMultiConnectionTest();
         virtual ~OpenwireMultiConnectionTest();
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
         /**
          * Test that multiple connections to different brokers can be established

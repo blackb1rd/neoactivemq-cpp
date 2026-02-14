@@ -92,13 +92,13 @@ void VirtualTopicTest::testRunnerSync(cms::Session::AcknowledgeMode mode) {
     for (std::size_t i = 0; i < IntegrationCommon::defaultMsgCount; ++i) {
 
         std::unique_ptr<cms::Message> messageA(consumerA->receive(2000));
-        CPPUNIT_ASSERT(messageA.get() != NULL);
+        ASSERT_TRUE(messageA.get() != NULL);
         if (cms::Session::CLIENT_ACKNOWLEDGE == mode) {
             messageA->acknowledge();
         }
 
         std::unique_ptr<cms::Message> messageB(consumerB->receive(2000));
-        CPPUNIT_ASSERT(messageB.get() != NULL);
+        ASSERT_TRUE(messageB.get() != NULL);
         if (cms::Session::CLIENT_ACKNOWLEDGE == mode) {
             messageB->acknowledge();
         }

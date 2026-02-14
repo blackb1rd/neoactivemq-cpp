@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "IOTransportTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/IOTransport.h>
 #include <activemq/transport/TransportListener.h>
@@ -32,12 +32,17 @@
 #include <decaf/lang/Thread.h>
 #include <decaf/lang/Exception.h>
 #include <decaf/util/Random.h>
+#include <activemq/util/Config.h>
 
 using namespace activemq;
 using namespace activemq::transport;
 using namespace activemq::exceptions;
 using namespace decaf::io;
 using namespace decaf::lang::exceptions;
+
+    class IOTransportTest : public ::testing::Test {
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 class MyCommand : public commands::BaseCommand {
@@ -121,9 +126,6 @@ public:
                 return command;
             }
 
-            CPPUNIT_ASSERT( false );
-            return Pointer<Command>();
-
         }catch( decaf::lang::Exception& ex ){
             IOException cx;
             cx.setMark( __FILE__, __LINE__ );
@@ -134,6 +136,8 @@ public:
             cx.setMark( __FILE__, __LINE__ );
             throw cx;
         }
+
+        return Pointer<Command>();
     }
 
     virtual void marshal( const Pointer<commands::Command> command,
@@ -208,7 +212,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // This will just test that we can start and stop the
 // transport without any exceptions.
-void IOTransportTest::testStartClose(){
+TEST_F(IOTransportTest, testStartClose){
 
     decaf::io::BlockingByteArrayInputStream is;
     decaf::io::ByteArrayOutputStream os;
@@ -227,7 +231,7 @@ void IOTransportTest::testStartClose(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IOTransportTest::testStressTransportStartClose(){
+TEST_F(IOTransportTest, testStressTransportStartClose){
 
     decaf::io::BlockingByteArrayInputStream is;
     decaf::io::ByteArrayOutputStream os;
@@ -262,7 +266,7 @@ void IOTransportTest::testStressTransportStartClose(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IOTransportTest::testRead(){
+TEST_F(IOTransportTest, testRead){
 
     decaf::io::BlockingByteArrayInputStream is;
     decaf::io::ByteArrayOutputStream os;
@@ -292,13 +296,13 @@ void IOTransportTest::testRead(){
 
     listener.await();
 
-    CPPUNIT_ASSERT( listener.str == "1234567890" );
+    ASSERT_TRUE(listener.str == "1234567890");
 
     transport.close();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IOTransportTest::testWrite(){
+TEST_F(IOTransportTest, testWrite){
 
     decaf::io::BlockingByteArrayInputStream is;
     decaf::io::ByteArrayOutputStream os;
@@ -330,12 +334,12 @@ void IOTransportTest::testWrite(){
     std::pair<const unsigned char*, int> array = os.toByteArray();
     const unsigned char* bytes = array.first;
     std::size_t size = array.second;
-    CPPUNIT_ASSERT( size >= 5 );
-    CPPUNIT_ASSERT( bytes[0] == '1' );
-    CPPUNIT_ASSERT( bytes[1] == '2' );
-    CPPUNIT_ASSERT( bytes[2] == '3' );
-    CPPUNIT_ASSERT( bytes[3] == '4' );
-    CPPUNIT_ASSERT( bytes[4] == '5' );
+    ASSERT_TRUE(size >= 5);
+    ASSERT_TRUE(bytes[0] == '1');
+    ASSERT_TRUE(bytes[1] == '2');
+    ASSERT_TRUE(bytes[2] == '3');
+    ASSERT_TRUE(bytes[3] == '4');
+    ASSERT_TRUE(bytes[4] == '5');
 
     delete [] array.first;
 
@@ -343,7 +347,7 @@ void IOTransportTest::testWrite(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IOTransportTest::testException(){
+TEST_F(IOTransportTest, testException){
 
     decaf::io::BlockingByteArrayInputStream is;
     decaf::io::ByteArrayOutputStream os;
@@ -380,17 +384,17 @@ void IOTransportTest::testException(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IOTransportTest::testNarrow(){
+TEST_F(IOTransportTest, testNarrow){
 
     IOTransport transport;
 
     Transport* narrowed = transport.narrow( typeid( transport ) );
-    CPPUNIT_ASSERT( narrowed == &transport );
+    ASSERT_TRUE(narrowed == &transport);
 
     narrowed = transport.narrow( typeid( std::string() ) );
-    CPPUNIT_ASSERT( narrowed == NULL );
+    ASSERT_TRUE(narrowed == NULL);
 
     narrowed = transport.narrow( typeid( transport::IOTransport ) );
-    CPPUNIT_ASSERT( narrowed == &transport );
+    ASSERT_TRUE(narrowed == &transport);
 
 }

@@ -103,7 +103,7 @@ void BulkMessageTest::testBulkMessageSendReceive() {
     Pointer<cms::Message> message;
 
     for (int i = 0; i < MSG_COUNT; ++i) {
-        CPPUNIT_ASSERT_NO_THROW(message.reset(consumer->receive(2000)));
-        CPPUNIT_ASSERT(message.get() != NULL);
+        ASSERT_NO_THROW(message.reset(consumer->receive(2000)));
+        ASSERT_TRUE(message.get() != NULL);
     }
 }

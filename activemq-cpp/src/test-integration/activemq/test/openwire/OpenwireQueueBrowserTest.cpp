@@ -15,7 +15,21 @@
  * limitations under the License.
  */
 
-#include "OpenwireQueueBrowserTest.h"
+#include <activemq/test/QueueBrowserTest.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenwireQueueBrowserTest : public QueueBrowserTest {
+    private:
+public:
+        OpenwireQueueBrowserTest();
+        virtual ~OpenwireQueueBrowserTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
 
 using namespace activemq;
 using namespace activemq::test;
@@ -29,3 +43,11 @@ OpenwireQueueBrowserTest::OpenwireQueueBrowserTest() {
 OpenwireQueueBrowserTest::~OpenwireQueueBrowserTest() {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireQueueBrowserTest, testReceiveBrowseReceive) { testReceiveBrowseReceive(); }
+TEST_F(OpenwireQueueBrowserTest, testBrowseReceive) { testBrowseReceive(); }
+TEST_F(OpenwireQueueBrowserTest, testQueueBrowserWith2Consumers) { testQueueBrowserWith2Consumers(); }
+TEST_F(OpenwireQueueBrowserTest, testRepeatedQueueBrowserCreateDestroy) { testRepeatedQueueBrowserCreateDestroy(); }
+TEST_F(OpenwireQueueBrowserTest, testRepeatedQueueBrowserCreateDestroyWithMessageInQueue) { testRepeatedQueueBrowserCreateDestroyWithMessageInQueue(); }
+TEST_F(OpenwireQueueBrowserTest, testBrowsingExpirationIsIgnored) { testBrowsingExpirationIsIgnored(); }

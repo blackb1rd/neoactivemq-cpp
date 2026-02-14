@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AbstractExecutorServiceTest.h"
+#include <gtest/gtest.h>
 
 #include <string>
 
@@ -28,6 +28,7 @@
 #include <decaf/util/concurrent/Future.h>
 #include <decaf/util/concurrent/AbstractExecutorService.h>
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 using namespace std;
 using namespace decaf;
@@ -35,6 +36,15 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
+
+    class AbstractExecutorServiceTest : public ExecutorsTestSupport
+    {
+public:
+
+        AbstractExecutorServiceTest();
+        virtual ~AbstractExecutorServiceTest();
+
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -112,17 +122,17 @@ AbstractExecutorServiceTest::~AbstractExecutorServiceTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testExecuteRunnable() {
+TEST_F(AbstractExecutorServiceTest, testExecuteRunnable) {
 
     try {
         bool done = false;
         DirectExecutorService e;
         TrackedShortRunnable task(&done);
 
-        CPPUNIT_ASSERT(!done);
+        ASSERT_TRUE(!done);
         Future<int>* future = e.submit<int>(&task, false);
         future->get();
-        CPPUNIT_ASSERT(done);
+        ASSERT_TRUE(done);
         delete future;
     } catch (ExecutionException& ex) {
         unexpectedException();
@@ -132,13 +142,13 @@ void AbstractExecutorServiceTest::testExecuteRunnable() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testSubmitCallable() {
+TEST_F(AbstractExecutorServiceTest, testSubmitCallable) {
 
     try {
         DirectExecutorService e;
         Future<string>* future = e.submit(new StringTask());
         string result = future->get();
-        CPPUNIT_ASSERT_EQUAL(TEST_STRING, result);
+        ASSERT_EQ(TEST_STRING, result);
         delete future;
     } catch (ExecutionException& ex) {
         unexpectedException();
@@ -148,12 +158,12 @@ void AbstractExecutorServiceTest::testSubmitCallable() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testSubmitRunnable() {
+TEST_F(AbstractExecutorServiceTest, testSubmitRunnable) {
     try {
         DirectExecutorService e;
         Future<int>* future = e.submit<int>(new NoOpRunnable());
         future->get();
-        CPPUNIT_ASSERT(future->isDone());
+        ASSERT_TRUE(future->isDone());
         delete future;
     } catch (ExecutionException& ex) {
         unexpectedException();
@@ -163,12 +173,12 @@ void AbstractExecutorServiceTest::testSubmitRunnable() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testSubmitRunnable2() {
+TEST_F(AbstractExecutorServiceTest, testSubmitRunnable2) {
     try {
         DirectExecutorService e;
         Future<string>* future = e.submit(new NoOpRunnable(), TEST_STRING);
         string result = future->get();
-        CPPUNIT_ASSERT_EQUAL(TEST_STRING, result);
+        ASSERT_EQ(TEST_STRING, result);
         delete future;
     } catch (ExecutionException& ex) {
         unexpectedException();
@@ -178,7 +188,7 @@ void AbstractExecutorServiceTest::testSubmitRunnable2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testExecuteNullRunnable() {
+TEST_F(AbstractExecutorServiceTest, testExecuteNullRunnable) {
     try {
         DirectExecutorService e;
         TrackedShortRunnable* task = NULL;
@@ -191,7 +201,7 @@ void AbstractExecutorServiceTest::testExecuteNullRunnable() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testSubmitNullCallable() {
+TEST_F(AbstractExecutorServiceTest, testSubmitNullCallable) {
     try {
         DirectExecutorService e;
         StringTask* t = NULL;
@@ -204,7 +214,7 @@ void AbstractExecutorServiceTest::testSubmitNullCallable() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testExecute1() {
+TEST_F(AbstractExecutorServiceTest, testExecute1) {
     ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>(1));
     MediumRunnable task(this);
 
@@ -221,7 +231,7 @@ void AbstractExecutorServiceTest::testExecute1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testExecute2() {
+TEST_F(AbstractExecutorServiceTest, testExecute2) {
     ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>(1));
     try {
 
@@ -301,7 +311,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testInterruptedSubmit() {
+TEST_F(AbstractExecutorServiceTest, testInterruptedSubmit) {
 
     // TODO
 //    ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>(10));
@@ -390,7 +400,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testSubmitIE() {
+TEST_F(AbstractExecutorServiceTest, testSubmitIE) {
 
     ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>(10));
 
@@ -426,7 +436,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorServiceTest::testSubmitEE() {
+TEST_F(AbstractExecutorServiceTest, testSubmitEE) {
     ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>(10));
 
     testSubmitEECallable c;

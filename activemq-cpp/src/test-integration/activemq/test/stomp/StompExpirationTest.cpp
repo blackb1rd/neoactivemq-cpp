@@ -15,7 +15,20 @@
  * limitations under the License.
  */
 
-#include "StompExpirationTest.h"
+#include <activemq/test/ExpirationTest.h>
+
+namespace activemq{
+namespace test{
+namespace stomp{
+    class StompExpirationTest : public ExpirationTest {
+public:
+        StompExpirationTest();
+        virtual ~StompExpirationTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getStompURL();
+        }
+    };
+}}}
 
 using namespace std;
 using namespace cms;
@@ -30,3 +43,9 @@ StompExpirationTest::StompExpirationTest() {
 ////////////////////////////////////////////////////////////////////////////////
 StompExpirationTest::~StompExpirationTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(StompExpirationTest, DISABLED_testExpired) { testExpired(); }
+TEST_F(StompExpirationTest, DISABLED_testExpiredWithChecksDisabled) { testExpiredWithChecksDisabled(); }
+TEST_F(StompExpirationTest, DISABLED_testNotExpired) { testNotExpired(); }

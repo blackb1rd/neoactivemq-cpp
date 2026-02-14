@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "TransportRegistryTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/TransportRegistry.h>
 #include <activemq/transport/mock/MockTransportFactory.h>
@@ -27,30 +27,23 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
+class TransportRegistryTest : public ::testing::Test {};
+
 ////////////////////////////////////////////////////////////////////////////////
-void TransportRegistryTest::test() {
+TEST_F(TransportRegistryTest, test) {
 
     transport::mock::MockTransportFactory factory;
 
     TransportRegistry& registry = TransportRegistry::getInstance();
 
-    CPPUNIT_ASSERT( !registry.getTransportNames().empty() );
+    ASSERT_TRUE(!registry.getTransportNames().empty());
 
-    CPPUNIT_ASSERT_NO_THROW( registry.findFactory( "mock" ) );
+    ASSERT_NO_THROW(registry.findFactory( "mock" ));
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an NoSuchElementException",
-        registry.findFactory(""),
-        NoSuchElementException );
+    ASSERT_THROW(registry.findFactory(""), NoSuchElementException) << ("Should have thrown an NoSuchElementException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an NullPointerException",
-        registry.registerFactory( "test", NULL ),
-        NullPointerException );
+    ASSERT_THROW(registry.registerFactory( "test", NULL ), NullPointerException) << ("Should have thrown an NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IllegalArgumentException",
-        registry.registerFactory( "", &factory ),
-        IllegalArgumentException );
+    ASSERT_THROW(registry.registerFactory( "", &factory ), IllegalArgumentException) << ("Should have thrown an IllegalArgumentException");
 
 }

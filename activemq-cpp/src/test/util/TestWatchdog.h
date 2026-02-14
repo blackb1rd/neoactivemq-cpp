@@ -18,8 +18,7 @@
 #ifndef _TEST_UTIL_TESTWATCHDOG_H_
 #define _TEST_UTIL_TESTWATCHDOG_H_
 
-#include <cppunit/TestListener.h>
-#include <cppunit/Test.h>
+#include <gtest/gtest.h>
 #include <activemq/util/AMQLog.h>
 
 #include <iostream>
@@ -48,7 +47,7 @@ namespace util {
  * - Flight Recorder dump on timeout for debugging
  * - Optional Flight Recorder clearing per test for isolated logs
  */
-class TestWatchdog : public CppUnit::TestListener {
+class TestWatchdog : public ::testing::EmptyTestEventListener {
 private:
     long long testTimeoutSeconds;
     long long checkIntervalSeconds;
@@ -148,9 +147,9 @@ public:
         }
     }
 
-    void startTest(CppUnit::Test* test) override {
+    void OnTestStart(const ::testing::TestInfo& test_info) override {
         std::lock_guard<std::mutex> lock(mutex);
-        currentTestName = test->getName();
+        currentTestName = std::string(test_info.test_suite_name()) + "." + test_info.name();
         testStartTime = std::chrono::steady_clock::now();
         if (clearFlightRecorderPerTest) {
             activemq::util::AMQLogger::clearFlightRecorder();
@@ -158,7 +157,7 @@ public:
         testRunning.store(true, std::memory_order_release);
     }
 
-    void endTest(CppUnit::Test* /*test*/) override {
+    void OnTestEnd(const ::testing::TestInfo& /*test_info*/) override {
         std::lock_guard<std::mutex> lock(mutex);
         testRunning.store(false, std::memory_order_release);
     }

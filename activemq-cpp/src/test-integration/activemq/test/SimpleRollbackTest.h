@@ -31,7 +31,7 @@ namespace test{
         SimpleRollbackTest();
         virtual ~SimpleRollbackTest();
 
-        virtual void setUp() {
+        void SetUp() override {
             cmsProvider.reset(new util::CMSProvider(getBrokerURL(), cms::Session::SESSION_TRANSACTED));
         };
 

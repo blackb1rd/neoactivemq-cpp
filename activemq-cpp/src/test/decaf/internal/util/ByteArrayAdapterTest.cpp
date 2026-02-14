@@ -15,10 +15,12 @@
  * limitations under the License.
  */
 
-#include "ByteArrayAdapterTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
+#include <decaf/internal/util/ByteArrayAdapter.h>
+#include <decaf/util/Config.h>
 
 using namespace decaf;
 using namespace decaf::internal;
@@ -27,27 +29,50 @@ using namespace decaf::nio;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
+    class ByteArrayAdapterTest  : public ::testing::Test {
+    protected:
+
+unsigned char* testData1;
+        static const int testData1Size = 100;
+
+    public:
+
+        ByteArrayAdapterTest() : testData1() {}
+
+        void SetUp() override {
+            testData1 = new unsigned char[testData1Size];
+            for( int i = 0; i < testData1Size; ++i ){
+                testData1[i] = (unsigned char)i;
+            }
+        }
+
+        void TearDown() override {
+            delete [] testData1;
+        }
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testArray() {
+TEST_F(ByteArrayAdapterTest, testArray) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
     testBuffer1.write( testData1, testData1Size, 0, testData1Size );
 
     for( int ix = 0; ix < testBuffer1.getCapacity(); ++ix ) {
-        CPPUNIT_ASSERT( testBuffer1.get( ix ) == testData1[ix] );
+        ASSERT_TRUE(testBuffer1.get( ix ) == testData1[ix]);
     }
 
     unsigned char* array = testBuffer1.getByteArray();
-    CPPUNIT_ASSERT( array != NULL );
+    ASSERT_TRUE(array != NULL);
 
     for( int ix = 0; ix < testBuffer1.getCapacity(); ++ix ) {
-        CPPUNIT_ASSERT( array[ix] == testData1[ix] );
+        ASSERT_TRUE(array[ix] == testData1[ix]);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testRead(){
+TEST_F(ByteArrayAdapterTest, testRead){
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -56,13 +81,13 @@ void ByteArrayAdapterTest::testRead(){
 
     ByteArrayAdapter array( data, 256 );
 
-    CPPUNIT_ASSERT( array.getCapacity() == 256 );
+    ASSERT_TRUE(array.getCapacity() == 256);
 
     unsigned char* result = new unsigned char[256];
     array.read( result, 256, 0, 256 );
 
     for( int i = 0; i < 256; ++i ){
-        CPPUNIT_ASSERT( data[i] == result[i] );
+        ASSERT_TRUE(data[i] == result[i]);
     }
 
     delete [] data;
@@ -70,7 +95,7 @@ void ByteArrayAdapterTest::testRead(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testWrite(){
+TEST_F(ByteArrayAdapterTest, testWrite){
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -79,14 +104,14 @@ void ByteArrayAdapterTest::testWrite(){
 
     ByteArrayAdapter array( (int)256 );
 
-    CPPUNIT_ASSERT( array.getCapacity() == 256 );
+    ASSERT_TRUE(array.getCapacity() == 256);
 
     array.write( data, 256, 0, 256 );
     unsigned char* result = new unsigned char[256];
     array.read( result, 256, 0, 256 );
 
     for( int i = 0; i < 256; ++i ){
-        CPPUNIT_ASSERT( data[i] == result[i] );
+        ASSERT_TRUE(data[i] == result[i]);
     }
 
     delete [] data;
@@ -94,20 +119,20 @@ void ByteArrayAdapterTest::testWrite(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testCtor1(){
+TEST_F(ByteArrayAdapterTest, testCtor1){
 
     ByteArrayAdapter array1( 256 );
-    CPPUNIT_ASSERT( array1.getCapacity() == 256 );
+    ASSERT_TRUE(array1.getCapacity() == 256);
     ByteArrayAdapter array2( 54 );
-    CPPUNIT_ASSERT( array2.getCapacity() == 54 );
+    ASSERT_TRUE(array2.getCapacity() == 54);
     ByteArrayAdapter array3( 5555 );
-    CPPUNIT_ASSERT( array3.getCapacity() == 5555 );
+    ASSERT_TRUE(array3.getCapacity() == 5555);
     ByteArrayAdapter array4( 0 );
-    CPPUNIT_ASSERT( array4.getCapacity() == 0 );
+    ASSERT_TRUE(array4.getCapacity() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testCtor2(){
+TEST_F(ByteArrayAdapterTest, testCtor2){
 
     unsigned char* data1 = new unsigned char[256];
     unsigned char* data2 = new unsigned char[999];
@@ -119,14 +144,14 @@ void ByteArrayAdapterTest::testCtor2(){
     ByteArrayAdapter array3( data3, 10, true );
     ByteArrayAdapter array4( data4, 0, true );
 
-    CPPUNIT_ASSERT( array1.getCapacity() == 256 );
-    CPPUNIT_ASSERT( array2.getCapacity() == 999 );
-    CPPUNIT_ASSERT( array3.getCapacity() == 10 );
-    CPPUNIT_ASSERT( array4.getCapacity() == 0 );
+    ASSERT_TRUE(array1.getCapacity() == 256);
+    ASSERT_TRUE(array2.getCapacity() == 999);
+    ASSERT_TRUE(array3.getCapacity() == 10);
+    ASSERT_TRUE(array4.getCapacity() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testClear(){
+TEST_F(ByteArrayAdapterTest, testClear){
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -135,21 +160,21 @@ void ByteArrayAdapterTest::testClear(){
 
     ByteArrayAdapter array( (int)256 );
 
-    CPPUNIT_ASSERT( array.getCapacity() == 256 );
+    ASSERT_TRUE(array.getCapacity() == 256);
 
     array.write( data, 256, 0, 256 );
     unsigned char* result = new unsigned char[256];
     array.read( result, 256, 0, 256 );
 
     for( int i = 0; i < 256; ++i ){
-        CPPUNIT_ASSERT( data[i] == result[i] );
+        ASSERT_TRUE(data[i] == result[i]);
     }
 
     array.clear();
     array.read( result, 256, 0, 256 );
 
     for( int i = 0; i < 256; ++i ){
-        CPPUNIT_ASSERT( result[i] == 0 );
+        ASSERT_TRUE(result[i] == 0);
     }
 
     delete [] data;
@@ -157,7 +182,7 @@ void ByteArrayAdapterTest::testClear(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testReszie(){
+TEST_F(ByteArrayAdapterTest, testReszie){
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -166,23 +191,23 @@ void ByteArrayAdapterTest::testReszie(){
 
     ByteArrayAdapter array( (int)256 );
 
-    CPPUNIT_ASSERT( array.getCapacity() == 256 );
+    ASSERT_TRUE(array.getCapacity() == 256);
 
     array.write( data, 256, 0, 256 );
     unsigned char* result = new unsigned char[256];
     array.read( result, 256, 0, 256 );
 
     for( int i = 0; i < 256; ++i ){
-        CPPUNIT_ASSERT( data[i] == result[i] );
+        ASSERT_TRUE(data[i] == result[i]);
     }
 
     array.resize( 128 );
-    CPPUNIT_ASSERT( array.getCapacity() == 128 );
+    ASSERT_TRUE(array.getCapacity() == 128);
     unsigned char* result2 = new unsigned char[128];
     array.read( result2, 128, 0, 128 );
 
     for( int i = 0; i < 128; ++i ){
-        CPPUNIT_ASSERT( result[i] == data[i] );
+        ASSERT_TRUE(result[i] == data[i]);
     }
 
     delete [] data;
@@ -191,7 +216,7 @@ void ByteArrayAdapterTest::testReszie(){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testOperators(){
+TEST_F(ByteArrayAdapterTest, testOperators){
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -200,17 +225,17 @@ void ByteArrayAdapterTest::testOperators(){
 
     ByteArrayAdapter array( data, 256 );
 
-    CPPUNIT_ASSERT( array.getCapacity() == 256 );
+    ASSERT_TRUE(array.getCapacity() == 256);
 
     for( int i = 0; i < 256; ++i ){
-        CPPUNIT_ASSERT( data[i] == array[i] );
+        ASSERT_TRUE(data[i] == array[i]);
     }
 
     delete [] data;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testReadExceptions() {
+TEST_F(ByteArrayAdapterTest, testReadExceptions) {
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -219,24 +244,17 @@ void ByteArrayAdapterTest::testReadExceptions() {
 
     ByteArrayAdapter array( data, 256, true );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw NullPointerException",
-        array.read( NULL, 1, 0, 500 ),
-        NullPointerException );
+    ASSERT_THROW(array.read( NULL, 1, 0, 500 ), NullPointerException) << ("Should Throw NullPointerException");
 
     unsigned char result[5000];
     ByteArrayAdapter array2( 256 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw BufferUnderflowException",
-        array.read( result, 5000, 0, 500 ),
-        BufferUnderflowException );
-
+    ASSERT_THROW(array.read( result, 5000, 0, 500 ), BufferUnderflowException) << ("Should Throw BufferUnderflowException");
 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testWriteExceptions() {
+TEST_F(ByteArrayAdapterTest, testWriteExceptions) {
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -244,22 +262,16 @@ void ByteArrayAdapterTest::testWriteExceptions() {
     }
 
     ByteArrayAdapter array( data, 256, true );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw NullPointerException",
-        array.write( NULL, 1, 0, 500 ),
-        NullPointerException );
+    ASSERT_THROW(array.write( NULL, 1, 0, 500 ), NullPointerException) << ("Should Throw NullPointerException");
 
     unsigned char result[5000];
     ByteArrayAdapter array2( 256 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw BufferOverflowException",
-        array.write( result, 5000, 0, 500 ),
-        BufferOverflowException );
+    ASSERT_THROW(array.write( result, 5000, 0, 500 ), BufferOverflowException) << ("Should Throw BufferOverflowException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testOperatorsExceptions() {
+TEST_F(ByteArrayAdapterTest, testOperatorsExceptions) {
 
     unsigned char* data = new unsigned char[256];
     for( int i = 0; i < 256; ++i ) {
@@ -267,135 +279,111 @@ void ByteArrayAdapterTest::testOperatorsExceptions() {
     }
 
     ByteArrayAdapter array( data, 256, true );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw IndexOutOfBoundsException",
-        array[9999],
-        IndexOutOfBoundsException );
+    ASSERT_THROW(array[9999], IndexOutOfBoundsException) << ("Should Throw IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testPut() {
+TEST_F(ByteArrayAdapterTest, testPut) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
     int i = 0;
     for( ; ( testBuffer1.getCapacity() - i ) >= (int)sizeof(unsigned char); i += (int)sizeof(unsigned char) ) {
         testBuffer1.put( i, (unsigned char)(i + 99) );
-        CPPUNIT_ASSERT( testBuffer1.get( i ) == (unsigned char)(i + 99) );
+        ASSERT_TRUE(testBuffer1.get( i ) == (unsigned char)(i + 99));
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1.put( i, 3 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1.put( i, 3 ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testPutChar() {
+TEST_F(ByteArrayAdapterTest, testPutChar) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
     int i = 0;
     for( ; ( testBuffer1.getCapacity() - i ) >= (int)sizeof(char); i += (int)sizeof(char) ) {
         testBuffer1.putChar( i, (char)( i + 99 ) );
-        CPPUNIT_ASSERT( testBuffer1.getChar( i ) == (char)(i + 99) );
+        ASSERT_TRUE(testBuffer1.getChar( i ) == (char)(i + 99));
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1.putChar( i, 3 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1.putChar( i, 3 ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testPutLong() {
+TEST_F(ByteArrayAdapterTest, testPutLong) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
     int i = 0;
     for( ; i < testBuffer1.getLongCapacity(); ++i  ) {
         testBuffer1.putLong( i, i + 99 );
-        CPPUNIT_ASSERT( testBuffer1.getLong( i ) == (long long)(i + 99) );
+        ASSERT_TRUE(testBuffer1.getLong( i ) == (long long)(i + 99));
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1.putLong( i, 3 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1.putLong( i, 3 ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testPutInt() {
+TEST_F(ByteArrayAdapterTest, testPutInt) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
     int i = 0;
     for( ; i < testBuffer1.getIntCapacity(); ++i  ) {
         testBuffer1.putInt( i, (int)( i + 99 ) );
-        CPPUNIT_ASSERT( testBuffer1.getInt( i ) == (int)(i + 99) );
+        ASSERT_TRUE(testBuffer1.getInt( i ) == (int)(i + 99));
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1.putInt( i, 3 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1.putInt( i, 3 ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testPutShort() {
+TEST_F(ByteArrayAdapterTest, testPutShort) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
     int i = 0;
     for( ; i < testBuffer1.getShortCapacity(); ++i  ) {
         testBuffer1.putShort( i, (short)( i + 99 ) );
-        CPPUNIT_ASSERT( testBuffer1.getShort( i ) == (short)(i + 99) );
+        ASSERT_TRUE(testBuffer1.getShort( i ) == (short)(i + 99));
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1.putShort( i, 3 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1.putShort( i, 3 ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testPutDouble() {
+TEST_F(ByteArrayAdapterTest, testPutDouble) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
     int i = 0;
     for( ; i < testBuffer1.getDoubleCapacity(); ++i  ) {
         testBuffer1.putDouble( i, i + 99.025 );
-        CPPUNIT_ASSERT( Double::doubleToLongBits( testBuffer1.getDouble( i ) ) ==
-                        Double::doubleToLongBits( (double)(i + 99.025) ) );
+        ASSERT_TRUE(Double::doubleToLongBits( testBuffer1.getDouble( i ) ) ==
+                        Double::doubleToLongBits( (double)(i + 99.025) ));
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1.putDouble( i, 3 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1.putDouble( i, 3 ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testPutFloat() {
+TEST_F(ByteArrayAdapterTest, testPutFloat) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
     int i = 0;
     for( ; i < testBuffer1.getFloatCapacity(); ++i  ) {
         testBuffer1.putFloat( i, (float)i + 99.025f );
-        CPPUNIT_ASSERT( Float::floatToIntBits( testBuffer1.getFloat( i ) ) ==
-                        Float::floatToIntBits( (float)(i + 99.025) ) );
+        ASSERT_TRUE(Float::floatToIntBits( testBuffer1.getFloat( i ) ) ==
+                        Float::floatToIntBits( (float)(i + 99.025) ));
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1.putFloat( i, 3 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1.putFloat( i, 3 ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testGet() {
+TEST_F(ByteArrayAdapterTest, testGet) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -409,17 +397,14 @@ void ByteArrayAdapterTest::testGet() {
     int j = 0;
 
     for( ; i < testBuffer1.getCapacity(); ++i, ++j ) {
-        CPPUNIT_ASSERT( testBuffer1.get( i ) == values[j] );
+        ASSERT_TRUE(testBuffer1.get( i ) == values[j]);
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1.get( i ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1.get( i ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testGetChar() {
+TEST_F(ByteArrayAdapterTest, testGetChar) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -433,17 +418,14 @@ void ByteArrayAdapterTest::testGetChar() {
     int j = 0;
 
     for( ; i < testBuffer1.getCapacity(); ++i, ++j ) {
-        CPPUNIT_ASSERT( testBuffer1.getChar( i ) == values[j] );
+        ASSERT_TRUE(testBuffer1.getChar( i ) == values[j]);
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1.getChar( i ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1.getChar( i ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testGetShort() {
+TEST_F(ByteArrayAdapterTest, testGetShort) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -457,17 +439,14 @@ void ByteArrayAdapterTest::testGetShort() {
     int j = 0;
 
     for( ; i < testBuffer1.getShortCapacity(); ++i, ++j ) {
-        CPPUNIT_ASSERT( testBuffer1.getShort( i ) == values[j] );
+        ASSERT_TRUE(testBuffer1.getShort( i ) == values[j]);
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1.getShort( i ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1.getShort( i ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testGetInt() {
+TEST_F(ByteArrayAdapterTest, testGetInt) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -481,17 +460,14 @@ void ByteArrayAdapterTest::testGetInt() {
     int j = 0;
 
     for( ; i < testBuffer1.getIntCapacity(); ++i, ++j ) {
-        CPPUNIT_ASSERT( testBuffer1.getInt( i ) == values[j] );
+        ASSERT_TRUE(testBuffer1.getInt( i ) == values[j]);
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1.getInt( i ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1.getInt( i ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testGetLong() {
+TEST_F(ByteArrayAdapterTest, testGetLong) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -505,17 +481,14 @@ void ByteArrayAdapterTest::testGetLong() {
     int j = 0;
 
     for( ; i < testBuffer1.getLongCapacity(); ++i, ++j ) {
-        CPPUNIT_ASSERT( testBuffer1.getLong( i ) == values[j] );
+        ASSERT_TRUE(testBuffer1.getLong( i ) == values[j]);
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1.getLong( i ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1.getLong( i ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testGetFloat() {
+TEST_F(ByteArrayAdapterTest, testGetFloat) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -529,18 +502,15 @@ void ByteArrayAdapterTest::testGetFloat() {
     int j = 0;
 
     for( ; i < testBuffer1.getFloatCapacity(); ++i, ++j ) {
-        CPPUNIT_ASSERT( Float::floatToIntBits( testBuffer1.getFloat( i ) ) ==
-                        Float::floatToIntBits( values[j] ) );
+        ASSERT_TRUE(Float::floatToIntBits( testBuffer1.getFloat( i ) ) ==
+                        Float::floatToIntBits( values[j] ));
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1.getFloat( i ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1.getFloat( i ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayAdapterTest::testGetDouble() {
+TEST_F(ByteArrayAdapterTest, testGetDouble) {
 
     ByteArrayAdapter testBuffer1( testData1Size );
 
@@ -554,12 +524,9 @@ void ByteArrayAdapterTest::testGetDouble() {
     int j = 0;
 
     for( ; i < testBuffer1.getDoubleCapacity(); ++i, ++j ) {
-        CPPUNIT_ASSERT( Double::doubleToLongBits( testBuffer1.getDouble( i ) ) ==
-                        Double::doubleToLongBits( values[j] ) );
+        ASSERT_TRUE(Double::doubleToLongBits( testBuffer1.getDouble( i ) ) ==
+                        Double::doubleToLongBits( values[j] ));
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1.getDouble( i ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1.getDouble( i ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }

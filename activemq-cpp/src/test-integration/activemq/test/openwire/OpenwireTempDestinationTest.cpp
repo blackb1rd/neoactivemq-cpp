@@ -15,7 +15,30 @@
  * limitations under the License.
  */
 
-#include "OpenwireTempDestinationTest.h"
+#include <activemq/test/CMSTestFixture.h>
+
+namespace activemq{
+namespace test{
+namespace openwire{
+    class OpenwireTempDestinationTest : public CMSTestFixture {
+public:
+        OpenwireTempDestinationTest() {}
+        virtual ~OpenwireTempDestinationTest() {}
+        void testBasics();
+        void testTwoConnections();
+        void testTempDestOnlyConsumedByLocalConn();
+        void testTempQueueHoldsMessagesWithConsumers();
+        void testTempQueueHoldsMessagesWithoutConsumers();
+        void testTmpQueueWorksUnderLoad();
+        void testPublishFailsForClosedConnection();
+        void testPublishFailsForDestoryedTempDestination();
+        void testDeleteDestinationWithSubscribersFails();
+        void testCloseConnectionWithManyTempDests();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
 
 #include <decaf/lang/Thread.h>
 #include <decaf/util/concurrent/Mutex.h>
@@ -193,7 +216,7 @@ void OpenwireTempDestinationTest::testBasics() {
 
         std::unique_ptr<cms::Message> received( tempConsumer->receive( 3000 ) );
 
-        CPPUNIT_ASSERT( received.get() != NULL );
+        ASSERT_TRUE(received.get() != NULL);
     }
     AMQ_CATCH_RETHROW( ActiveMQException )
     AMQ_CATCHALL_THROW( ActiveMQException )
@@ -220,10 +243,10 @@ void OpenwireTempDestinationTest::testTwoConnections() {
     requester->awaitAllResponses();
 
     // Check that the responder received all the required requests
-    CPPUNIT_ASSERT( responder->getNumReceived() == 10 );
+    ASSERT_TRUE(responder->getNumReceived() == 10);
 
     // Check that the requester received all the required responses
-    CPPUNIT_ASSERT( requester->getNumReceived() == 10 );
+    ASSERT_TRUE(requester->getNumReceived() == 10);
 
     // Shutdown the Requester.
     requestorThread.join();
@@ -251,19 +274,16 @@ void OpenwireTempDestinationTest::testTempDestOnlyConsumedByLocalConn() {
     std::unique_ptr<TemporaryQueue> otherQueue(otherSession->createTemporaryQueue());
     std::unique_ptr<MessageConsumer> consumer(otherSession->createConsumer(otherQueue.get()));
     std::unique_ptr<Message> msg(consumer->receive(3000));
-    CPPUNIT_ASSERT(msg.get() == NULL);
+    ASSERT_TRUE(msg.get() == NULL);
 
     // should throw InvalidDestinationException when consuming a temp
     // destination from another connection
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a CMS InvalidDestinationException",
-        otherSession->createConsumer(queue.get()),
-        InvalidDestinationException);
+    ASSERT_THROW(otherSession->createConsumer(queue.get()), InvalidDestinationException) << ("Should throw a CMS InvalidDestinationException");
 
     // should be able to consume temp destination from the same connection
     consumer.reset(tempSession->createConsumer(queue.get()));
     msg.reset(consumer->receive(3000));
-    CPPUNIT_ASSERT(msg.get() != NULL);
+    ASSERT_TRUE(msg.get() != NULL);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -277,10 +297,9 @@ void OpenwireTempDestinationTest::testTempQueueHoldsMessagesWithConsumers() {
     producer->send(message.get());
 
     std::unique_ptr<Message> message2(consumer->receive(3000));
-    CPPUNIT_ASSERT(message2.get() != NULL);
-    CPPUNIT_ASSERT_MESSAGE("Expected message to be a TextMessage", dynamic_cast<TextMessage*>(message2.get()) != NULL);
-    CPPUNIT_ASSERT_MESSAGE(std::string("Expected message to be a '") + message->getText() + "'",
-        dynamic_cast<TextMessage*>(message2.get())->getText() == message->getText());
+    ASSERT_TRUE(message2.get() != NULL);
+    ASSERT_TRUE(dynamic_cast<TextMessage*>(message2.get()) != NULL) << ("Expected message to be a TextMessage");
+    ASSERT_TRUE(dynamic_cast<TextMessage*>(message2.get())->getText() == message->getText()) << (std::string("Expected message to be a '") + message->getText() + "'");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -294,10 +313,9 @@ void OpenwireTempDestinationTest::testTempQueueHoldsMessagesWithoutConsumers() {
 
     std::unique_ptr<MessageConsumer> consumer(cmsProvider->getSession()->createConsumer(queue.get()));
     std::unique_ptr<Message> message2(consumer->receive(3000));
-    CPPUNIT_ASSERT(message2.get() != NULL);
-    CPPUNIT_ASSERT_MESSAGE("Expected message to be a TextMessage", dynamic_cast<TextMessage*>(message2.get()) != NULL);
-    CPPUNIT_ASSERT_MESSAGE(std::string("Expected message to be a '") + message->getText() + "'",
-        dynamic_cast<TextMessage*>(message2.get())->getText() == message->getText());
+    ASSERT_TRUE(message2.get() != NULL);
+    ASSERT_TRUE(dynamic_cast<TextMessage*>(message2.get()) != NULL) << ("Expected message to be a TextMessage");
+    ASSERT_TRUE(dynamic_cast<TextMessage*>(message2.get())->getText() == message->getText()) << (std::string("Expected message to be a '") + message->getText() + "'");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -327,9 +345,9 @@ void OpenwireTempDestinationTest::testTmpQueueWorksUnderLoad() {
     std::unique_ptr<MessageConsumer> consumer(cmsProvider->getSession()->createConsumer(queue.get()));
     for (int i = 0; i < count; i++) {
         Pointer<Message> message2(consumer->receive(2000));
-        CPPUNIT_ASSERT(message2 != NULL);
-        CPPUNIT_ASSERT_EQUAL(i, message2->getIntProperty("c"));
-        CPPUNIT_ASSERT_MESSAGE("Expected message to be a BytesMessage", dynamic_cast<BytesMessage*>(message2.get()) != NULL);
+        ASSERT_TRUE(message2 != NULL);
+        ASSERT_EQ(i, message2->getIntProperty("c"));
+        ASSERT_TRUE(dynamic_cast<BytesMessage*>(message2.get()) != NULL) << ("Expected message to be a BytesMessage");
     }
 
     list.clear();
@@ -363,10 +381,7 @@ void OpenwireTempDestinationTest::testPublishFailsForClosedConnection() {
 
     message.reset(cmsProvider->getSession()->createTextMessage("Hello"));
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a InvalidDestinationException since temp destination should not exist anymore.",
-        producer->send(message.get()),
-        cms::InvalidDestinationException);
+    ASSERT_THROW(producer->send(message.get()), cms::InvalidDestinationException) << ("Should throw a InvalidDestinationException since temp destination should not exist anymore.");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -397,10 +412,7 @@ void OpenwireTempDestinationTest::testPublishFailsForDestoryedTempDestination() 
 
     message.reset(cmsProvider->getSession()->createTextMessage("Hello"));
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a InvalidDestinationException since temp destination should not exist anymore.",
-        producer->send(message.get()),
-        InvalidDestinationException);
+    ASSERT_THROW(producer->send(message.get()), InvalidDestinationException) << ("Should throw a InvalidDestinationException since temp destination should not exist anymore.");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -410,10 +422,7 @@ void OpenwireTempDestinationTest::testDeleteDestinationWithSubscribersFails() {
     std::unique_ptr<MessageConsumer> consumer(cmsProvider->getSession()->createConsumer(queue.get()));
 
     // This message delivery should NOT work since the temp connection is now closed.
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should fail with CMSException as Subscribers are active",
-        queue->destroy(),
-        CMSException);
+    ASSERT_THROW(queue->destroy(), CMSException) << ("Should fail with CMSException as Subscribers are active");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -435,3 +444,15 @@ void OpenwireTempDestinationTest::testCloseConnectionWithManyTempDests() {
     producers.clear();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireTempDestinationTest, testBasics) { testBasics(); }
+TEST_F(OpenwireTempDestinationTest, testTwoConnections) { testTwoConnections(); }
+TEST_F(OpenwireTempDestinationTest, testTempDestOnlyConsumedByLocalConn) { testTempDestOnlyConsumedByLocalConn(); }
+TEST_F(OpenwireTempDestinationTest, testTempQueueHoldsMessagesWithConsumers) { testTempQueueHoldsMessagesWithConsumers(); }
+TEST_F(OpenwireTempDestinationTest, testTempQueueHoldsMessagesWithoutConsumers) { testTempQueueHoldsMessagesWithoutConsumers(); }
+TEST_F(OpenwireTempDestinationTest, testTmpQueueWorksUnderLoad) { testTmpQueueWorksUnderLoad(); }
+TEST_F(OpenwireTempDestinationTest, testPublishFailsForClosedConnection) { testPublishFailsForClosedConnection(); }
+TEST_F(OpenwireTempDestinationTest, testPublishFailsForDestoryedTempDestination) { testPublishFailsForDestoryedTempDestination(); }
+TEST_F(OpenwireTempDestinationTest, testDeleteDestinationWithSubscribersFails) { testDeleteDestinationWithSubscribersFails(); }
+TEST_F(OpenwireTempDestinationTest, testCloseConnectionWithManyTempDests) { testCloseConnectionWithManyTempDests(); }

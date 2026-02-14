@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "DateTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/Date.h>
 #include <decaf/lang/Thread.h>
@@ -35,39 +35,41 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 
+    class DateTest : public ::testing::Test {};
+
 ////////////////////////////////////////////////////////////////////////////////
-void DateTest::test() {
+TEST_F(DateTest, test) {
 
     Date date1;
-    CPPUNIT_ASSERT(date1.getTime() != 0);
+    ASSERT_TRUE(date1.getTime() != 0);
 
     decaf::lang::Thread::sleep(55);
 
     Date date2;
 
-    CPPUNIT_ASSERT(date1.before(date2) == true);
-    CPPUNIT_ASSERT(date1.after(date2) == false);
+    ASSERT_TRUE(date1.before(date2) == true);
+    ASSERT_TRUE(date1.after(date2) == false);
 
     Date date3 = date1;
 
     // Test Comparable interface
-    CPPUNIT_ASSERT(date1.equals(date3) == true);
-    CPPUNIT_ASSERT(date3.equals(date1) == true);
-    CPPUNIT_ASSERT(date1.equals(date2) == false);
-    CPPUNIT_ASSERT(date1.compareTo(date2) < 0);
-    CPPUNIT_ASSERT(date2.compareTo(date1) > 0);
-    CPPUNIT_ASSERT(date1.compareTo(date3) == 0);
-    CPPUNIT_ASSERT(date3.compareTo(date1) == 0);
-    CPPUNIT_ASSERT(date1 < date2);
-    CPPUNIT_ASSERT(!(date2 < date1));
-    CPPUNIT_ASSERT(!(date1 < date3));
-    CPPUNIT_ASSERT(date3 == date1);
-    CPPUNIT_ASSERT(date1 == date3);
-    CPPUNIT_ASSERT(!(date1 == date2));
+    ASSERT_TRUE(date1.equals(date3) == true);
+    ASSERT_TRUE(date3.equals(date1) == true);
+    ASSERT_TRUE(date1.equals(date2) == false);
+    ASSERT_TRUE(date1.compareTo(date2) < 0);
+    ASSERT_TRUE(date2.compareTo(date1) > 0);
+    ASSERT_TRUE(date1.compareTo(date3) == 0);
+    ASSERT_TRUE(date3.compareTo(date1) == 0);
+    ASSERT_TRUE(date1 < date2);
+    ASSERT_TRUE(!(date2 < date1));
+    ASSERT_TRUE(!(date1 < date3));
+    ASSERT_TRUE(date3 == date1);
+    ASSERT_TRUE(date1 == date3);
+    ASSERT_TRUE(!(date1 == date2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DateTest::testToString() {
+TEST_F(DateTest, testToString) {
 
     // Save original timezone to restore later (avoid test pollution)
     const char* originalTz = std::getenv("TZ");
@@ -103,18 +105,18 @@ void DateTest::testToString() {
 #endif
     tzset(); // Apply the restoration
 
-    CPPUNIT_ASSERT(result != "");
-    CPPUNIT_ASSERT(result.size() >= 20);
+    ASSERT_TRUE(result != "");
+    ASSERT_TRUE(result.size() >= 20);
 
     // The date library formats as: dow mon dd hh:mm:ss zzz yyyy
     // Example: Thu Jan 15 15:56:14 EST 2015
     // Verify the expected components are present
-    CPPUNIT_ASSERT(result.find("Thu") != std::string::npos);
-    CPPUNIT_ASSERT(result.find("Jan") != std::string::npos);
-    CPPUNIT_ASSERT(result.find("15 ") != std::string::npos);
-    CPPUNIT_ASSERT(result.find("15:56:14") != std::string::npos);
-    CPPUNIT_ASSERT(result.find("2015") != std::string::npos);
+    ASSERT_TRUE(result.find("Thu") != std::string::npos);
+    ASSERT_TRUE(result.find("Jan") != std::string::npos);
+    ASSERT_TRUE(result.find("15 ") != std::string::npos);
+    ASSERT_TRUE(result.find("15:56:14") != std::string::npos);
+    ASSERT_TRUE(result.find("2015") != std::string::npos);
 
     // Full string check - date library outputs EST for Eastern Standard Time
-    CPPUNIT_ASSERT_EQUAL(std::string("Thu Jan 15 15:56:14 EST 2015"), result);
+    ASSERT_EQ(std::string("Thu Jan 15 15:56:14 EST 2015"), result);
 }

@@ -15,7 +15,20 @@
  * limitations under the License.
  */
 
-#include "OpenwireSimpleRollbackTest.h"
+#include <activemq/test/SimpleRollbackTest.h>
+
+namespace activemq{
+namespace test{
+namespace openwire{
+    class OpenwireSimpleRollbackTest : public SimpleRollbackTest {
+public:
+        OpenwireSimpleRollbackTest();
+        virtual ~OpenwireSimpleRollbackTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
 
 using namespace std;
 using namespace cms;
@@ -30,3 +43,7 @@ OpenwireSimpleRollbackTest::OpenwireSimpleRollbackTest() {
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireSimpleRollbackTest::~OpenwireSimpleRollbackTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireSimpleRollbackTest, testRollbacks) { testRollbacks(); }

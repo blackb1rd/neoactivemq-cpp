@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "MutexTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Thread.h>
 #include <decaf/lang/Runnable.h>
@@ -35,15 +35,17 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::internal::util::concurrent;
 
+    class MutexTest : public ::testing::Test {};
+
 ///////////////////////////////////////////////////////////////////////////////
-void MutexTest::testConstructor() {
+TEST_F(MutexTest, testConstructor) {
 
     Mutex mutex;
 
     mutex.lock();
     mutex.unlock();
 
-    CPPUNIT_ASSERT( mutex.tryLock() == true );
+    ASSERT_TRUE(mutex.tryLock() == true);
 
     mutex.unlock();
 
@@ -53,7 +55,7 @@ void MutexTest::testConstructor() {
         }
     } catch (...) {}
 
-    CPPUNIT_ASSERT(!mutex.isLocked());
+    ASSERT_TRUE(!mutex.isLocked());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,7 +77,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void MutexTest::testSimpleThread() {
+TEST_F(MutexTest, testSimpleThread) {
     MyThread test;
 
     synchronized(&test){
@@ -89,7 +91,7 @@ void MutexTest::testSimpleThread() {
 
     test.join();
 
-    CPPUNIT_ASSERT( test.value == 2500 );
+    ASSERT_TRUE(test.value == 2500);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,7 +120,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void MutexTest::testWait(){
+TEST_F(MutexTest, testWait){
 
     try
     {
@@ -140,11 +142,11 @@ void MutexTest::testWait(){
 
         test.join();
 
-        CPPUNIT_ASSERT( test.value == 2500 );
+        ASSERT_TRUE(test.value == 2500);
 
     } catch( lang::Exception& ex ) {
         ex.setMark( __FILE__, __LINE__ );
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -174,7 +176,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void MutexTest::testTimedWait(){
+TEST_F(MutexTest, testTimedWait){
 
     try {
 
@@ -186,32 +188,23 @@ void MutexTest::testTimedWait(){
 
         time_t delta = endTime - startTime;
 
-        CPPUNIT_ASSERT( delta >= 1 && delta <= 2 );
+        ASSERT_TRUE(delta >= 1 && delta <= 2);
 
         {
             Mutex test;
             test.lock();
 
-            CPPUNIT_ASSERT_THROW_MESSAGE(
-                "Should Throw an IllegalArgumentException",
-                test.wait( -1, -1 ),
-                IllegalArgumentException );
+            ASSERT_THROW(test.wait( -1, -1 ), IllegalArgumentException) << ("Should Throw an IllegalArgumentException");
 
-            CPPUNIT_ASSERT_THROW_MESSAGE(
-                "Should Throw an IllegalArgumentException",
-                test.wait( 1, 9999999 ),
-                IllegalArgumentException );
+            ASSERT_THROW(test.wait( 1, 9999999 ), IllegalArgumentException) << ("Should Throw an IllegalArgumentException");
 
-            CPPUNIT_ASSERT_THROW_MESSAGE(
-                "Should Throw an IllegalArgumentException",
-                test.wait( 0, -1 ),
-                IllegalArgumentException );
+            ASSERT_THROW(test.wait( 0, -1 ), IllegalArgumentException) << ("Should Throw an IllegalArgumentException");
 
         }
 
     } catch(lang::Exception& ex) {
         std::cout << ex.getMessage() << std::endl;
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -297,7 +290,7 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void MutexTest::testNotify() {
+TEST_F(MutexTest, testNotify) {
 
     try{
 
@@ -337,7 +330,7 @@ void MutexTest::testNotify() {
         }
 
         // Make sure only 1 thread was notified.
-        CPPUNIT_ASSERT( counter == 1 );
+        ASSERT_TRUE(counter == 1);
 
         synchronized( &mutex ) {
             // Notify all threads.
@@ -361,7 +354,7 @@ void MutexTest::testNotify() {
                 numComplete++;
             }
         }
-        CPPUNIT_ASSERT( numComplete == numThreads );
+        ASSERT_TRUE(numComplete == numThreads);
 
         synchronized( &mutex ) {
             mutex.wait( 5 );
@@ -379,12 +372,12 @@ void MutexTest::testNotify() {
 
     }catch( lang::Exception& ex ){
         ex.setMark( __FILE__, __LINE__ );
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void MutexTest::testNotifyAll()
+TEST_F(MutexTest, testNotifyAll)
 {
     try{
         Mutex mutex;
@@ -416,7 +409,7 @@ void MutexTest::testNotifyAll()
             if( threads[ix]->done == true ){
                 printf("threads[%d] is done prematurely\n", ix );
             }
-            CPPUNIT_ASSERT( threads[ix]->done == false );
+            ASSERT_TRUE(threads[ix]->done == false);
         }
 
         // Notify all threads.
@@ -442,7 +435,7 @@ void MutexTest::testNotifyAll()
             }
         }
         //printf("numComplete: %d, numThreads: %d\n", numComplete, numThreads );
-        CPPUNIT_ASSERT( numComplete == numThreads );
+        ASSERT_TRUE(numComplete == numThreads);
 
         // Delete all the threads.
         for( int ix=0; ix<numThreads; ++ix ){
@@ -452,7 +445,7 @@ void MutexTest::testNotifyAll()
 
     }catch( lang::Exception& ex ){
         ex.setMark( __FILE__, __LINE__ );
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -532,7 +525,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void MutexTest::testRecursiveLock() {
+TEST_F(MutexTest, testRecursiveLock) {
 
     try {
 
@@ -555,7 +548,7 @@ void MutexTest::testRecursiveLock() {
                 std::cout << "threads[" << ix
                           << "] is done prematurely\n";
             }
-            CPPUNIT_ASSERT( threads[ix]->done == false );
+            ASSERT_TRUE(threads[ix]->done == false);
         }
 
         // Notify all threads.
@@ -572,7 +565,7 @@ void MutexTest::testRecursiveLock() {
             if( threads[ix]->done != true ){
                 std::cout<< "threads[" << ix << "] is not done\n";
             }
-            CPPUNIT_ASSERT( threads[ix]->done == true );
+            ASSERT_TRUE(threads[ix]->done == true);
         }
 
         // Delete all the threads.
@@ -583,7 +576,7 @@ void MutexTest::testRecursiveLock() {
 
     }catch( lang::Exception& ex ){
         ex.setMark( __FILE__, __LINE__ );
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -628,7 +621,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void MutexTest::testDoubleLock() {
+TEST_F(MutexTest, testDoubleLock) {
 
     try {
 
@@ -651,11 +644,11 @@ void MutexTest::testDoubleLock() {
         thread.join();
 
         // Verify thread completed successfully
-        CPPUNIT_ASSERT( thread.done );
+        ASSERT_TRUE(thread.done);
 
     }catch( lang::Exception& ex ){
         ex.setMark( __FILE__, __LINE__ );
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
@@ -764,24 +757,24 @@ public:
                 }
             }
         } catch(...) {
-            CPPUNIT_ASSERT( false );
+            ASSERT_TRUE(false);
         }
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void MutexTest::testStressMutex(){
+TEST_F(MutexTest, testStressMutex){
 
     MyStoppableThread tester;
 
     tester.start();
 
-    CPPUNIT_ASSERT( tester.isStarted() );
+    ASSERT_TRUE(tester.isStarted());
 
     for( int i = 0; i < 100; ++i ) {
         tester.stop();
         tester.start();
     }
 
-    CPPUNIT_ASSERT( true );
+    ASSERT_TRUE(true);
 }

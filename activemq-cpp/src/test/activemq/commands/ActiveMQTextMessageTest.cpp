@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ActiveMQTextMessageTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/commands/ActiveMQTextMessage.h>
 
@@ -25,26 +25,30 @@ using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
 
+    class ActiveMQTextMessageTest : public ::testing::Test {
+    };
+
+
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTextMessageTest::test() {
+TEST_F(ActiveMQTextMessageTest, test) {
     ActiveMQTextMessage myMessage;
 
-    CPPUNIT_ASSERT( myMessage.getDataStructureType() == ActiveMQTextMessage::ID_ACTIVEMQTEXTMESSAGE );
+    ASSERT_TRUE(myMessage.getDataStructureType() == ActiveMQTextMessage::ID_ACTIVEMQTEXTMESSAGE);
 
     const char* testText = "This is some test Text";
 
     myMessage.setText( testText );
 
-    CPPUNIT_ASSERT( myMessage.getText() == testText );
+    ASSERT_TRUE(myMessage.getText() == testText);
 
     cms::TextMessage* clonedMessage = myMessage.clone();
-    CPPUNIT_ASSERT( clonedMessage != NULL );
-    CPPUNIT_ASSERT( clonedMessage->getText() == testText );
+    ASSERT_TRUE(clonedMessage != NULL);
+    ASSERT_TRUE(clonedMessage->getText() == testText);
     delete clonedMessage;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTextMessageTest::testShallowCopy() {
+TEST_F(ActiveMQTextMessageTest, testShallowCopy) {
 
     ActiveMQTextMessage msg;
     std::string string1 = "str";
@@ -53,11 +57,11 @@ void ActiveMQTextMessageTest::testShallowCopy() {
     ActiveMQTextMessage msg2;
 
     msg2.copyDataStructure( &msg );
-    CPPUNIT_ASSERT( msg.getText() == msg2.getText() );
+    ASSERT_TRUE(msg.getText() == msg2.getText());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTextMessageTest::testGetBytes() {
+TEST_F(ActiveMQTextMessageTest, testGetBytes) {
 
     ActiveMQTextMessage msg;
     std::string str = "testText";
@@ -67,46 +71,46 @@ void ActiveMQTextMessageTest::testGetBytes() {
     ActiveMQTextMessage msg2;
     msg2.setContent( msg.getContent() );
 
-    CPPUNIT_ASSERT( msg2.getText() == str );
+    ASSERT_TRUE(msg2.getText() == str);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTextMessageTest::testClearBody() {
+TEST_F(ActiveMQTextMessageTest, testClearBody) {
 
     ActiveMQTextMessage textMessage;
     textMessage.setText( "string" );
     textMessage.clearBody();
-    CPPUNIT_ASSERT( !textMessage.isReadOnlyBody() );
-    CPPUNIT_ASSERT( textMessage.getText() == "" );
+    ASSERT_TRUE(!textMessage.isReadOnlyBody());
+    ASSERT_TRUE(textMessage.getText() == "");
     try {
         textMessage.setText( "String" );
         textMessage.getText();
     } catch( MessageNotWriteableException& mnwe ) {
-        CPPUNIT_FAIL( "should be writeable" );
+        FAIL() << ("should be writeable");
     } catch( MessageNotReadableException& mnre ) {
-        CPPUNIT_FAIL( "should be readable" );
+        FAIL() << ("should be readable");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTextMessageTest::testReadOnlyBody() {
+TEST_F(ActiveMQTextMessageTest, testReadOnlyBody) {
     ActiveMQTextMessage textMessage;
     textMessage.setText( "test" );
     textMessage.setReadOnlyBody( true );
     try {
         textMessage.getText();
     } catch( MessageNotReadableException& e ) {
-        CPPUNIT_FAIL( "should be readable" );
+        FAIL() << ("should be readable");
     }
     try {
         textMessage.setText( "test" );
-        CPPUNIT_FAIL( "should throw exception" );
+        FAIL() << ("should throw exception");
     } catch( MessageNotWriteableException& mnwe ) {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTextMessageTest::testWriteOnlyBody() {
+TEST_F(ActiveMQTextMessageTest, testWriteOnlyBody) {
 
     ActiveMQTextMessage textMessage;
     textMessage.setReadOnlyBody( false );
@@ -114,15 +118,15 @@ void ActiveMQTextMessageTest::testWriteOnlyBody() {
         textMessage.setText( "test" );
         textMessage.getText();
     } catch( MessageNotReadableException& e ) {
-        CPPUNIT_FAIL( "should be readable" );
+        FAIL() << ("should be readable");
     }
     textMessage.setReadOnlyBody( true );
     try {
         textMessage.getText();
         textMessage.setText( "test" );
-        CPPUNIT_FAIL( "should throw exception" );
+        FAIL() << ("should throw exception");
     } catch( MessageNotReadableException& e ) {
-        CPPUNIT_FAIL( "should be readable" );
+        FAIL() << ("should be readable");
     } catch( MessageNotWriteableException& mnwe ) {
     }
 }

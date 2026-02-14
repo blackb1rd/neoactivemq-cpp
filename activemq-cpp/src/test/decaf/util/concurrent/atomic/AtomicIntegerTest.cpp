@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AtomicIntegerTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
 #include <decaf/lang/Integer.h>
@@ -27,48 +27,50 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
 
+    class AtomicIntegerTest : public ::testing::Test {};
+
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testConstructor() {
+TEST_F(AtomicIntegerTest, testConstructor) {
     AtomicInteger ai;
-    CPPUNIT_ASSERT( ai.get() == 0 );
+    ASSERT_TRUE(ai.get() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testConstructor2() {
+TEST_F(AtomicIntegerTest, testConstructor2) {
     AtomicInteger ai( 999 );
-    CPPUNIT_ASSERT( ai.get() == 999 );
+    ASSERT_TRUE(ai.get() == 999);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testGetSet() {
+TEST_F(AtomicIntegerTest, testGetSet) {
     AtomicInteger ai( 2 );
-    CPPUNIT_ASSERT( 2 == ai.get() );
+    ASSERT_TRUE(2 == ai.get());
     ai.set( 5 );
-    CPPUNIT_ASSERT( 5 == ai.get() );
+    ASSERT_TRUE(5 == ai.get());
     ai.set( 6 );
-    CPPUNIT_ASSERT( 6 == ai.get() );
+    ASSERT_TRUE(6 == ai.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testCompareAndSet() {
+TEST_F(AtomicIntegerTest, testCompareAndSet) {
     AtomicInteger ai( 25 );
-    CPPUNIT_ASSERT( ai.compareAndSet( 25, 50 ) );
-    CPPUNIT_ASSERT( 50 == ai.get() );
-    CPPUNIT_ASSERT( ai.compareAndSet( 50, 25 ) );
-    CPPUNIT_ASSERT( 25 == ai.get() );
-    CPPUNIT_ASSERT( !ai.compareAndSet( 50, 75 ) );
-    CPPUNIT_ASSERT( ai.get() != 75 );
-    CPPUNIT_ASSERT( ai.compareAndSet( 25, 50 ) );
-    CPPUNIT_ASSERT( 50 == ai.get() );
+    ASSERT_TRUE(ai.compareAndSet( 25, 50 ));
+    ASSERT_TRUE(50 == ai.get());
+    ASSERT_TRUE(ai.compareAndSet( 50, 25 ));
+    ASSERT_TRUE(25 == ai.get());
+    ASSERT_TRUE(!ai.compareAndSet( 50, 75 ));
+    ASSERT_TRUE(ai.get() != 75);
+    ASSERT_TRUE(ai.compareAndSet( 25, 50 ));
+    ASSERT_TRUE(50 == ai.get());
 
     AtomicInteger ai2( 1 );
-    CPPUNIT_ASSERT( ai2.compareAndSet( 1, 2 ) );
-    CPPUNIT_ASSERT( ai2.compareAndSet( 2, -4 ) );
-    CPPUNIT_ASSERT( -4 == ai2.get() );
-    CPPUNIT_ASSERT( !ai2.compareAndSet( -5, 7 ) );
-    CPPUNIT_ASSERT( 7 != ai2.get() );
-    CPPUNIT_ASSERT( ai2.compareAndSet( -4, 7 ) );
-    CPPUNIT_ASSERT( 7 == ai2.get() );
+    ASSERT_TRUE(ai2.compareAndSet( 1, 2 ));
+    ASSERT_TRUE(ai2.compareAndSet( 2, -4 ));
+    ASSERT_TRUE(-4 == ai2.get());
+    ASSERT_TRUE(!ai2.compareAndSet( -5, 7 ));
+    ASSERT_TRUE(7 != ai2.get());
+    ASSERT_TRUE(ai2.compareAndSet( -4, 7 ));
+    ASSERT_TRUE(7 == ai2.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,7 +99,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testCompareAndSetInMultipleThreads() {
+TEST_F(AtomicIntegerTest, testCompareAndSetInMultipleThreads) {
     AtomicInteger ai( 1 );
 
     MyIntRunnable runnable( &ai );
@@ -106,123 +108,123 @@ void AtomicIntegerTest::testCompareAndSetInMultipleThreads() {
     try {
 
         t.start();
-        CPPUNIT_ASSERT( ai.compareAndSet( 1, 2 ) );
+        ASSERT_TRUE(ai.compareAndSet( 1, 2 ));
         t.join();
-        CPPUNIT_ASSERT( ai.get() == 3 );
+        ASSERT_TRUE(ai.get() == 3);
 
     } catch( Exception& e ) {
-        CPPUNIT_FAIL( "Should Not Throw" );
+        FAIL() << ("Should Not Throw");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testGetAndSet() {
+TEST_F(AtomicIntegerTest, testGetAndSet) {
     AtomicInteger ai( 50 );
-    CPPUNIT_ASSERT( 50 == ai.getAndSet( 75 ) );
-    CPPUNIT_ASSERT( 75 == ai.getAndSet( 25 ) );
-    CPPUNIT_ASSERT( 25 == ai.getAndSet( 100 ) );
-    CPPUNIT_ASSERT( 100 == ai.get() );
+    ASSERT_TRUE(50 == ai.getAndSet( 75 ));
+    ASSERT_TRUE(75 == ai.getAndSet( 25 ));
+    ASSERT_TRUE(25 == ai.getAndSet( 100 ));
+    ASSERT_TRUE(100 == ai.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testToString() {
+TEST_F(AtomicIntegerTest, testToString) {
     AtomicInteger ai;
-    CPPUNIT_ASSERT( ai.toString() == Integer::toString( 0 ) );
+    ASSERT_TRUE(ai.toString() == Integer::toString( 0 ));
     ai.set( 999 );
-    CPPUNIT_ASSERT( ai.toString() == Integer::toString( 999 ) );
+    ASSERT_TRUE(ai.toString() == Integer::toString( 999 ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testGetAndAdd() {
+TEST_F(AtomicIntegerTest, testGetAndAdd) {
     AtomicInteger ai( 1 );
-    CPPUNIT_ASSERT( 1 == ai.getAndAdd(2) );
-    CPPUNIT_ASSERT( 3 == ai.get() );
-    CPPUNIT_ASSERT( 3 == ai.getAndAdd(-4) );
-    CPPUNIT_ASSERT( -1 == ai.get() );
+    ASSERT_TRUE(1 == ai.getAndAdd(2));
+    ASSERT_TRUE(3 == ai.get());
+    ASSERT_TRUE(3 == ai.getAndAdd(-4));
+    ASSERT_TRUE(-1 == ai.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testGetAndDecrement() {
+TEST_F(AtomicIntegerTest, testGetAndDecrement) {
     AtomicInteger ai( 1 );
-    CPPUNIT_ASSERT( 1 == ai.getAndDecrement() );
-    CPPUNIT_ASSERT( 0 == ai.getAndDecrement() );
-    CPPUNIT_ASSERT( -1 == ai.getAndDecrement() );
+    ASSERT_TRUE(1 == ai.getAndDecrement());
+    ASSERT_TRUE(0 == ai.getAndDecrement());
+    ASSERT_TRUE(-1 == ai.getAndDecrement());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testGetAndIncrement() {
+TEST_F(AtomicIntegerTest, testGetAndIncrement) {
     AtomicInteger ai( 1 );
-    CPPUNIT_ASSERT( 1 == ai.getAndIncrement() );
-    CPPUNIT_ASSERT( 2 == ai.get() );
+    ASSERT_TRUE(1 == ai.getAndIncrement());
+    ASSERT_TRUE(2 == ai.get());
     ai.set( -2 );
-    CPPUNIT_ASSERT( -2 == ai.getAndIncrement() );
-    CPPUNIT_ASSERT( -1 == ai.getAndIncrement() );
-    CPPUNIT_ASSERT( 0 == ai.getAndIncrement() );
-    CPPUNIT_ASSERT( 1 == ai.get() );
+    ASSERT_TRUE(-2 == ai.getAndIncrement());
+    ASSERT_TRUE(-1 == ai.getAndIncrement());
+    ASSERT_TRUE(0 == ai.getAndIncrement());
+    ASSERT_TRUE(1 == ai.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testAddAndGet() {
+TEST_F(AtomicIntegerTest, testAddAndGet) {
     AtomicInteger ai( 1 );
-    CPPUNIT_ASSERT( 3 == ai.addAndGet(2) );
-    CPPUNIT_ASSERT( 3 == ai.get() );
-    CPPUNIT_ASSERT( -1 == ai.addAndGet(-4) );
-    CPPUNIT_ASSERT( -1 == ai.get() );
+    ASSERT_TRUE(3 == ai.addAndGet(2));
+    ASSERT_TRUE(3 == ai.get());
+    ASSERT_TRUE(-1 == ai.addAndGet(-4));
+    ASSERT_TRUE(-1 == ai.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testDecrementAndGet() {
+TEST_F(AtomicIntegerTest, testDecrementAndGet) {
     AtomicInteger ai( 1 );
-    CPPUNIT_ASSERT( 0 == ai.decrementAndGet() );
-    CPPUNIT_ASSERT( -1 == ai.decrementAndGet() );
-    CPPUNIT_ASSERT( -2 == ai.decrementAndGet() );
-    CPPUNIT_ASSERT( -2 == ai.get() );
+    ASSERT_TRUE(0 == ai.decrementAndGet());
+    ASSERT_TRUE(-1 == ai.decrementAndGet());
+    ASSERT_TRUE(-2 == ai.decrementAndGet());
+    ASSERT_TRUE(-2 == ai.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testIncrementAndGet() {
+TEST_F(AtomicIntegerTest, testIncrementAndGet) {
     AtomicInteger ai( 1 );
-    CPPUNIT_ASSERT( 2 == ai.incrementAndGet() );
-    CPPUNIT_ASSERT( 2 == ai.get() );
+    ASSERT_TRUE(2 == ai.incrementAndGet());
+    ASSERT_TRUE(2 == ai.get());
     ai.set( -2 );
-    CPPUNIT_ASSERT( -1 == ai.incrementAndGet() );
-    CPPUNIT_ASSERT( 0 == ai.incrementAndGet() );
-    CPPUNIT_ASSERT( 1 == ai.incrementAndGet() );
-    CPPUNIT_ASSERT( 1 == ai.get() );
+    ASSERT_TRUE(-1 == ai.incrementAndGet());
+    ASSERT_TRUE(0 == ai.incrementAndGet());
+    ASSERT_TRUE(1 == ai.incrementAndGet());
+    ASSERT_TRUE(1 == ai.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testIntValue() {
+TEST_F(AtomicIntegerTest, testIntValue) {
     AtomicInteger ai;
     for( int i = -12; i < 6; ++i ) {
         ai.set( i );
-        CPPUNIT_ASSERT( i == ai.intValue() );
+        ASSERT_TRUE(i == ai.intValue());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testLongValue() {
+TEST_F(AtomicIntegerTest, testLongValue) {
     AtomicInteger ai;
     for( int i = -12; i < 6; ++i ) {
         ai.set( i );
-        CPPUNIT_ASSERT( (long long)i == ai.longValue() );
+        ASSERT_TRUE((long long)i == ai.longValue());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testFloatValue() {
+TEST_F(AtomicIntegerTest, testFloatValue) {
     AtomicInteger ai;
     for( int i = -12; i < 6; ++i ) {
         ai.set( i );
-        CPPUNIT_ASSERT( (float)i == ai.floatValue() );
+        ASSERT_TRUE((float)i == ai.floatValue());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicIntegerTest::testDoubleValue() {
+TEST_F(AtomicIntegerTest, testDoubleValue) {
     AtomicInteger ai;
     for( int i = -12; i < 6; ++i ) {
         ai.set( i );
-        CPPUNIT_ASSERT( (double)i == ai.doubleValue() );
+        ASSERT_TRUE((double)i == ai.doubleValue());
     }
 }

@@ -15,7 +15,22 @@
  * limitations under the License.
  */
 
-#include "OpenwireMessageCompressionTest.h"
+#include <activemq/test/MessageCompressionTest.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenwireMessageCompressionTest : public MessageCompressionTest {
+    private:
+public:
+        OpenwireMessageCompressionTest();
+        virtual ~OpenwireMessageCompressionTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL() +
+                   "&connection.useCompression=true";
+        }
+    };
+}}}
 
 using namespace activemq;
 using namespace activemq::test;
@@ -28,3 +43,10 @@ OpenwireMessageCompressionTest::OpenwireMessageCompressionTest() {
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireMessageCompressionTest::~OpenwireMessageCompressionTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireMessageCompressionTest, testTextMessageCompression) { testTextMessageCompression(); }
+TEST_F(OpenwireMessageCompressionTest, testBytesMessageCompression) { testBytesMessageCompression(); }
+TEST_F(OpenwireMessageCompressionTest, testStreamMessageCompression) { testStreamMessageCompression(); }
+TEST_F(OpenwireMessageCompressionTest, testMapMessageCompression) { testMapMessageCompression(); }

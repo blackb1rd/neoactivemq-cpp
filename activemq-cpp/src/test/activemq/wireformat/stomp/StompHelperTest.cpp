@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "StompHelperTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/commands/ActiveMQTopic.h>
 
@@ -28,16 +28,11 @@ using namespace activemq::commands;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::stomp;
 
-////////////////////////////////////////////////////////////////////////////////
-StompHelperTest::StompHelperTest() {
-}
+    class StompHelperTest : public ::testing::Test {};
+
 
 ////////////////////////////////////////////////////////////////////////////////
-StompHelperTest::~StompHelperTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void StompHelperTest::testConvertDestinationFromString() {
+TEST_F(StompHelperTest, testConvertDestinationFromString) {
 
     StompWireFormat wireformat;
     wireformat.setTopicPrefix("mytopics://");
@@ -45,11 +40,11 @@ void StompHelperTest::testConvertDestinationFromString() {
 
     Pointer<ActiveMQDestination> destination = helper.convertDestination("mytopics://SomeTopic");
 
-    CPPUNIT_ASSERT_EQUAL(std::string("SomeTopic"), destination->getPhysicalName());
+    ASSERT_EQ(std::string("SomeTopic"), destination->getPhysicalName());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StompHelperTest::testConvertDestinationFromCommand() {
+TEST_F(StompHelperTest, testConvertDestinationFromCommand) {
 
     StompWireFormat wireformat;
     wireformat.setTopicPrefix("mytopics://");
@@ -59,5 +54,5 @@ void StompHelperTest::testConvertDestinationFromCommand() {
 
     std::string result = helper.convertDestination(destination);
 
-    CPPUNIT_ASSERT_EQUAL(std::string("mytopics://SomeTopic"), result);
+    ASSERT_EQ(std::string("mytopics://SomeTopic"), result);
 }

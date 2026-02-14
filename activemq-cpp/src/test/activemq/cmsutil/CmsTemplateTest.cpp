@@ -15,30 +15,150 @@
  * limitations under the License.
  */
 
-#include "CmsTemplateTest.h"
+#include <gtest/gtest.h>
 #include <activemq/cmsutil/DynamicDestinationResolver.h>
 #include <activemq/cmsutil/ResourceLifecycleManager.h>
 #include "DummyConnectionFactory.h"
 #include "DummyMessageCreator.h"
+#include <activemq/cmsutil/CmsTemplate.h>
+#include <activemq/cmsutil/SessionCallback.h>
+#include <activemq/cmsutil/ProducerCallback.h>
+#include <activemq/cmsutil/DummyMessageCreator.h>
+#include <activemq/cmsutil/MessageContext.h>
+#include <activemq/exceptions/ActiveMQException.h>
 
 using namespace activemq;
 using namespace activemq::cmsutil;
 
-////////////////////////////////////////////////////////////////////////////////
-void CmsTemplateTest::setUp() {
-    cf = new DummyConnectionFactory();
-    cmsTemplate = new CmsTemplate(cf);
-    cmsTemplate->setDefaultDestinationName("test");
-}
+class CmsTemplateTest : public ::testing::Test {
+protected:
+
+    CmsTemplate* cmsTemplate;
+    DummyConnectionFactory* cf;
+
+    class MySendListener : public MessageContext::SendListener {
+    private:
+
+        MySendListener(const MySendListener&);
+        MySendListener& operator= (const MySendListener&);
+
+    public:
+
+        const cms::Destination* dest;
+        cms::Message* message;
+        int deliveryMode;
+        int priority;
+        long long ttl;
+        std::string selector;
+        bool noLocal;
+        long long timeout;
+
+        MySendListener() : dest(), message(), deliveryMode(0), priority(), ttl(), selector(), noLocal(), timeout() {}
+        virtual ~MySendListener() {}
+
+        virtual void onSend(const cms::Destination* destination,
+            cms::Message* message, int deliveryMode, int priority,
+            long long timeToLive) {
+            this->dest = destination;
+            this->message = message;
+            this->deliveryMode = deliveryMode;
+            this->priority = priority;
+            this->ttl = timeToLive;
+        }
+
+        virtual cms::Message* doReceive(const cms::Destination* dest,
+                const std::string& selector,
+                bool noLocal,
+                long long timeout) {
+            this->dest = dest;
+            this->selector = selector;
+            this->noLocal = noLocal;
+            this->timeout = timeout;
+            return new DummyMessage();
+        }
+    };
+
+    class FailSendListener : public MessageContext::SendListener {
+    public:
+
+        FailSendListener() {}
+        virtual ~FailSendListener() {}
+
+        virtual void onSend(const cms::Destination* destination,
+                cms::Message* message, int deliveryMode, int priority,
+                long long timeToLive) {
+            throw cms::CMSException();
+        }
+
+        virtual cms::Message* doReceive(const cms::Destination* dest,
+                const std::string& selector, bool noLocal, long long timeout) {
+            throw cms::CMSException();
+        }
+    };
+
+    class MySessionCallback : public SessionCallback {
+    private:
+
+        MySessionCallback(const MySessionCallback&);
+        MySessionCallback& operator= (const MySessionCallback&);
+
+    public:
+
+        cms::Session* session;
+        cms::Session::AcknowledgeMode ackMode;
+
+        MySessionCallback() :session(), ackMode() {}
+        virtual ~MySessionCallback() {}
+
+        virtual void doInCms(cms::Session* session) {
+            this->session = session;
+            this->ackMode = session->getAcknowledgeMode();
+        }
+    };
+
+    class MyProducerCallback : public ProducerCallback {
+    private:
+
+        MyProducerCallback(const MyProducerCallback&);
+        MyProducerCallback& operator= (const MyProducerCallback&);
+
+    public:
+
+        cms::Session* session;
+        cms::MessageProducer* producer;
+
+        MyProducerCallback() : session(), producer() {}
+        virtual ~MyProducerCallback() {}
+
+        virtual void doInCms(cms::Session* session, cms::MessageProducer* producer) {
+            this->session = session;
+            this->producer = producer;
+        }
+    };
+
+private:
+
+    CmsTemplateTest(const CmsTemplateTest&);
+    CmsTemplateTest& operator= (const CmsTemplateTest&);
+
+public:
+
+    CmsTemplateTest() : cmsTemplate(), cf() {}
+
+    void SetUp() override {
+        cf = new DummyConnectionFactory();
+        cmsTemplate = new CmsTemplate(cf);
+        cmsTemplate->setDefaultDestinationName("test");
+    }
+
+    void TearDown() override {
+        delete cmsTemplate;
+        delete cf;
+    }
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplateTest::tearDown() {
-    delete cmsTemplate;
-    delete cf;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void CmsTemplateTest::testExecuteSession() {
+TEST_F(CmsTemplateTest, testExecuteSession) {
 
     try {
         cmsTemplate->setSessionAcknowledgeMode(cms::Session::CLIENT_ACKNOWLEDGE);
@@ -46,22 +166,22 @@ void CmsTemplateTest::testExecuteSession() {
         // Test basics.
         MySessionCallback sessionCallback;
         cmsTemplate->execute(&sessionCallback);
-        CPPUNIT_ASSERT(sessionCallback.session != NULL);
-        CPPUNIT_ASSERT(sessionCallback.ackMode == cms::Session::CLIENT_ACKNOWLEDGE);
+        ASSERT_TRUE(sessionCallback.session != NULL);
+        ASSERT_TRUE(sessionCallback.ackMode == cms::Session::CLIENT_ACKNOWLEDGE);
 
         // Try again and make sure we get the same session
         MySessionCallback sessionCallback2;
         cmsTemplate->execute(&sessionCallback2);
-        CPPUNIT_ASSERT(sessionCallback2.session == sessionCallback.session);
-        CPPUNIT_ASSERT(sessionCallback2.ackMode == cms::Session::CLIENT_ACKNOWLEDGE);
+        ASSERT_TRUE(sessionCallback2.session == sessionCallback.session);
+        ASSERT_TRUE(sessionCallback2.ackMode == cms::Session::CLIENT_ACKNOWLEDGE);
 
         // Now try different ack mode and make sure we have a different session.
         cmsTemplate->setSessionAcknowledgeMode(cms::Session::AUTO_ACKNOWLEDGE);
         MySessionCallback sessionCallback3;
         cmsTemplate->execute(&sessionCallback3);
-        CPPUNIT_ASSERT(sessionCallback3.session != NULL);
-        CPPUNIT_ASSERT(sessionCallback3.session != sessionCallback.session);
-        CPPUNIT_ASSERT(sessionCallback3.ackMode == cms::Session::AUTO_ACKNOWLEDGE);
+        ASSERT_TRUE(sessionCallback3.session != NULL);
+        ASSERT_TRUE(sessionCallback3.session != sessionCallback.session);
+        ASSERT_TRUE(sessionCallback3.ackMode == cms::Session::AUTO_ACKNOWLEDGE);
 
     } catch( cms::CMSException& e) {
         e.printStackTrace();
@@ -69,7 +189,7 @@ void CmsTemplateTest::testExecuteSession() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplateTest::testExecuteProducer() {
+TEST_F(CmsTemplateTest, testExecuteProducer) {
 
     try {
 
@@ -78,28 +198,28 @@ void CmsTemplateTest::testExecuteProducer() {
         // Test basics.
         MyProducerCallback callback;
         cmsTemplate->execute(&callback);
-        CPPUNIT_ASSERT(callback.session != NULL);
-        CPPUNIT_ASSERT(callback.producer != NULL);
+        ASSERT_TRUE(callback.session != NULL);
+        ASSERT_TRUE(callback.producer != NULL);
 
         // Try again and make sure we have the same producer
         MyProducerCallback callback2;
         cmsTemplate->execute(&callback2);
-        CPPUNIT_ASSERT(callback2.session == callback.session);
-        CPPUNIT_ASSERT(callback2.producer == callback.producer);
+        ASSERT_TRUE(callback2.session == callback.session);
+        ASSERT_TRUE(callback2.producer == callback.producer);
 
         // Change to topics and make sure it's a different producer.
         cmsTemplate->setPubSubDomain(true);
         MyProducerCallback callback3;
         cmsTemplate->execute(&callback3);
-        CPPUNIT_ASSERT(callback3.session == callback.session);
-        CPPUNIT_ASSERT(callback3.producer != callback.producer);
+        ASSERT_TRUE(callback3.session == callback.session);
+        ASSERT_TRUE(callback3.producer != callback.producer);
 
         // Now change destination name and make sure it's different yet again.
         cmsTemplate->setDefaultDestinationName("fred");
         MyProducerCallback callback4;
         cmsTemplate->execute(&callback4);
-        CPPUNIT_ASSERT(callback4.session == callback.session);
-        CPPUNIT_ASSERT(callback4.producer != callback3.producer);
+        ASSERT_TRUE(callback4.session == callback.session);
+        ASSERT_TRUE(callback4.producer != callback3.producer);
 
         // Now try without a valid default destination and make sure
         // we get an exception.
@@ -107,7 +227,7 @@ void CmsTemplateTest::testExecuteProducer() {
             cmsTemplate->setDefaultDestinationName("");
             MyProducerCallback callback5;
             cmsTemplate->execute(&callback5);
-            CPPUNIT_FAIL("failed to throw expected exception");
+            FAIL() << ("failed to throw expected exception");
         } catch( cms::CMSException& ex) {
             // expected.
         }
@@ -116,13 +236,13 @@ void CmsTemplateTest::testExecuteProducer() {
         MyProducerCallback callback6;
         activemq::commands::ActiveMQTopic myTopic("anothertopic");
         cmsTemplate->execute(&myTopic, &callback6);
-        CPPUNIT_ASSERT(callback6.session != NULL);
+        ASSERT_TRUE(callback6.session != NULL);
 
         // Now try an explicitly named destination
         MyProducerCallback callback7;
         cmsTemplate->execute("fred", &callback7);
-        CPPUNIT_ASSERT(callback7.session == callback6.session);
-        CPPUNIT_ASSERT(callback7.producer != callback6.producer);
+        ASSERT_TRUE(callback7.session == callback6.session);
+        ASSERT_TRUE(callback7.producer != callback6.producer);
 
     } catch( cms::CMSException& e) {
         e.printStackTrace();
@@ -130,7 +250,7 @@ void CmsTemplateTest::testExecuteProducer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplateTest::testSend() {
+TEST_F(CmsTemplateTest, testSend) {
 
     try {
 
@@ -144,12 +264,12 @@ void CmsTemplateTest::testSend() {
         // First, test basics.
         cmsTemplate->send(&msgCreator);
         const cms::Queue* q = dynamic_cast<const cms::Queue*>(listener.dest);
-        CPPUNIT_ASSERT(q != NULL);
-        CPPUNIT_ASSERT_EQUAL((std::string)"test", q->getQueueName());
-        CPPUNIT_ASSERT(listener.message != NULL);
-        CPPUNIT_ASSERT_EQUAL(4, listener.priority);
-        CPPUNIT_ASSERT_EQUAL(0LL, listener.ttl);
-        CPPUNIT_ASSERT_EQUAL(1, listener.deliveryMode);
+        ASSERT_TRUE(q != NULL);
+        ASSERT_EQ((std::string)"test", q->getQueueName());
+        ASSERT_TRUE(listener.message != NULL);
+        ASSERT_EQ(4, listener.priority);
+        ASSERT_EQ(0LL, listener.ttl);
+        ASSERT_EQ(1, listener.deliveryMode);
 
         // Now change the defaults and verify that they did not change
         // the values (explicit qos not enabled). Also, change to using topics.
@@ -161,36 +281,36 @@ void CmsTemplateTest::testSend() {
         cmsTemplate->setDeliveryMode(0);
         cmsTemplate->send(&msgCreator);
         const cms::Topic* t = dynamic_cast<const cms::Topic*>(listener.dest);
-        CPPUNIT_ASSERT(t != NULL);
-        CPPUNIT_ASSERT_EQUAL((std::string)"bob", t->getTopicName());
-        CPPUNIT_ASSERT(listener.message != NULL);
-        CPPUNIT_ASSERT_EQUAL(4, listener.priority);
-        CPPUNIT_ASSERT_EQUAL(0LL, listener.ttl);
-        CPPUNIT_ASSERT_EQUAL(1, listener.deliveryMode);
+        ASSERT_TRUE(t != NULL);
+        ASSERT_EQ((std::string)"bob", t->getTopicName());
+        ASSERT_TRUE(listener.message != NULL);
+        ASSERT_EQ(4, listener.priority);
+        ASSERT_EQ(0LL, listener.ttl);
+        ASSERT_EQ(1, listener.deliveryMode);
 
         // Now enable explicit quality of service and verify that the new default
         // values are used.
         cmsTemplate->setExplicitQosEnabled(true);
         cmsTemplate->send(&msgCreator);
         t = dynamic_cast<const cms::Topic*>(listener.dest);
-        CPPUNIT_ASSERT(t != NULL);
-        CPPUNIT_ASSERT_EQUAL((std::string)"bob", t->getTopicName());
-        CPPUNIT_ASSERT(listener.message != NULL);
-        CPPUNIT_ASSERT_EQUAL(5, listener.priority);
-        CPPUNIT_ASSERT_EQUAL(10LL, listener.ttl);
-        CPPUNIT_ASSERT_EQUAL(0, listener.deliveryMode);
+        ASSERT_TRUE(t != NULL);
+        ASSERT_EQ((std::string)"bob", t->getTopicName());
+        ASSERT_TRUE(listener.message != NULL);
+        ASSERT_EQ(5, listener.priority);
+        ASSERT_EQ(10LL, listener.ttl);
+        ASSERT_EQ(0, listener.deliveryMode);
 
         // Now try the version of send with an explicit destination.
         activemq::commands::ActiveMQTopic myTopic("anothertopic");
         cmsTemplate->send(&myTopic, &msgCreator);
         t = dynamic_cast<const cms::Topic*>(listener.dest);
-        CPPUNIT_ASSERT(t == &myTopic);
+        ASSERT_TRUE(t == &myTopic);
 
         // Now try the version of send with just a named destination.
         cmsTemplate->send("yetanothertopic", &msgCreator);
         t = dynamic_cast<const cms::Topic*>(listener.dest);
-        CPPUNIT_ASSERT(t != NULL);
-        CPPUNIT_ASSERT_EQUAL((std::string)"yetanothertopic", t->getTopicName());
+        ASSERT_TRUE(t != NULL);
+        ASSERT_EQ((std::string)"yetanothertopic", t->getTopicName());
 
     } catch( cms::CMSException& e) {
         e.printStackTrace();
@@ -198,7 +318,7 @@ void CmsTemplateTest::testSend() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplateTest::testReceive() {
+TEST_F(CmsTemplateTest, testReceive) {
 
     try {
 
@@ -209,45 +329,45 @@ void CmsTemplateTest::testReceive() {
 
         // First, test basics.
         cms::Message* message = cmsTemplate->receive();
-        CPPUNIT_ASSERT( message != NULL );
+        ASSERT_TRUE(message != NULL);
         const cms::Queue* q = dynamic_cast<const cms::Queue*>(listener.dest);
-        CPPUNIT_ASSERT(q != NULL);
-        CPPUNIT_ASSERT_EQUAL((std::string)"test", q->getQueueName());
-        CPPUNIT_ASSERT(listener.selector == "" );
-        CPPUNIT_ASSERT_EQUAL(cmsTemplate->isNoLocal(), listener.noLocal);
-        CPPUNIT_ASSERT_EQUAL(cmsTemplate->getReceiveTimeout(), listener.timeout);
+        ASSERT_TRUE(q != NULL);
+        ASSERT_EQ((std::string)"test", q->getQueueName());
+        ASSERT_TRUE(listener.selector == "");
+        ASSERT_EQ(cmsTemplate->isNoLocal(), listener.noLocal);
+        ASSERT_EQ(cmsTemplate->getReceiveTimeout(), listener.timeout);
         delete message;
 
         // Now change the destination type and verify that it changes.
         cmsTemplate->setPubSubDomain(true);
         message = cmsTemplate->receive();
-        CPPUNIT_ASSERT( message != NULL );
+        ASSERT_TRUE(message != NULL);
         const cms::Topic* t = dynamic_cast<const cms::Topic*>(listener.dest);
-        CPPUNIT_ASSERT(t != NULL);
-        CPPUNIT_ASSERT_EQUAL((std::string)"test", t->getTopicName());
+        ASSERT_TRUE(t != NULL);
+        ASSERT_EQ((std::string)"test", t->getTopicName());
         delete message;
 
         // Now change the destination name and verify that it changes.
         cmsTemplate->setDefaultDestinationName("bob");
         message = cmsTemplate->receive();
-        CPPUNIT_ASSERT( message != NULL );
+        ASSERT_TRUE(message != NULL);
         t = dynamic_cast<const cms::Topic*>(listener.dest);
-        CPPUNIT_ASSERT(t != NULL);
-        CPPUNIT_ASSERT_EQUAL((std::string)"bob", t->getTopicName());
+        ASSERT_TRUE(t != NULL);
+        ASSERT_EQ((std::string)"bob", t->getTopicName());
         delete message;
 
         // Now change the timeout and verify that it changes.
         cmsTemplate->setReceiveTimeout(1000);
         message = cmsTemplate->receive();
-        CPPUNIT_ASSERT( message != NULL );
-        CPPUNIT_ASSERT_EQUAL(cmsTemplate->getReceiveTimeout(), listener.timeout);
+        ASSERT_TRUE(message != NULL);
+        ASSERT_EQ(cmsTemplate->getReceiveTimeout(), listener.timeout);
         delete message;
 
         // Now change the noLocal flag and verify that it changes.
         cmsTemplate->setNoLocal(true);
         message = cmsTemplate->receive();
-        CPPUNIT_ASSERT( message != NULL );
-        CPPUNIT_ASSERT_EQUAL(cmsTemplate->isNoLocal(), listener.noLocal);
+        ASSERT_TRUE(message != NULL);
+        ASSERT_EQ(cmsTemplate->isNoLocal(), listener.noLocal);
         delete message;
 
         // Now try a failure.
@@ -258,7 +378,7 @@ void CmsTemplateTest::testReceive() {
 
             // First, test basics.
             cmsTemplate->receive();
-            CPPUNIT_FAIL("failed to throw expected exception");
+            FAIL() << ("failed to throw expected exception");
 
         } catch( cms::CMSException& e) {
             // Expected
@@ -270,7 +390,7 @@ void CmsTemplateTest::testReceive() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplateTest::testReceive_Destination() {
+TEST_F(CmsTemplateTest, testReceive_Destination) {
 
     try {
 
@@ -282,8 +402,8 @@ void CmsTemplateTest::testReceive_Destination() {
         // First, test basics.
         activemq::commands::ActiveMQTopic myTopic("anothertopic");
         cms::Message* message = cmsTemplate->receive(&myTopic);
-        CPPUNIT_ASSERT( message != NULL );
-        CPPUNIT_ASSERT(&myTopic == listener.dest);
+        ASSERT_TRUE(message != NULL);
+        ASSERT_TRUE(&myTopic == listener.dest);
         delete message;
 
         // Now try a failure.
@@ -294,7 +414,7 @@ void CmsTemplateTest::testReceive_Destination() {
 
             // First, test basics.
             cmsTemplate->receive(&myTopic);
-            CPPUNIT_FAIL("failed to throw expected exception");
+            FAIL() << ("failed to throw expected exception");
 
         } catch( cms::CMSException& e) {
             // Expected
@@ -306,7 +426,7 @@ void CmsTemplateTest::testReceive_Destination() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplateTest::testReceive_DestinationName() {
+TEST_F(CmsTemplateTest, testReceive_DestinationName) {
 
     try {
 
@@ -318,10 +438,10 @@ void CmsTemplateTest::testReceive_DestinationName() {
         // First, test basics.
         std::string destName = "bob";
         cms::Message* message = cmsTemplate->receive(destName);
-        CPPUNIT_ASSERT( message != NULL );
+        ASSERT_TRUE(message != NULL);
         const cms::Queue* q = dynamic_cast<const cms::Queue*>(listener.dest);
-        CPPUNIT_ASSERT(q != NULL);
-        CPPUNIT_ASSERT_EQUAL((std::string)"bob", q->getQueueName());
+        ASSERT_TRUE(q != NULL);
+        ASSERT_EQ((std::string)"bob", q->getQueueName());
         delete message;
 
         // Now try a failure.
@@ -332,7 +452,7 @@ void CmsTemplateTest::testReceive_DestinationName() {
 
             // First, test basics.
             cmsTemplate->receive(destName);
-            CPPUNIT_FAIL("failed to throw expected exception");
+            FAIL() << ("failed to throw expected exception");
 
         } catch( cms::CMSException& e) {
             // Expected
@@ -344,7 +464,7 @@ void CmsTemplateTest::testReceive_DestinationName() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplateTest::testReceiveSelected() {
+TEST_F(CmsTemplateTest, testReceiveSelected) {
 
     try {
 
@@ -356,50 +476,50 @@ void CmsTemplateTest::testReceiveSelected() {
         // First, test basics.
         std::string selector = "yadda";
         cms::Message* message = cmsTemplate->receiveSelected(selector);
-        CPPUNIT_ASSERT( message != NULL );
+        ASSERT_TRUE(message != NULL);
         const cms::Queue* q = dynamic_cast<const cms::Queue*>(listener.dest);
-        CPPUNIT_ASSERT(q != NULL);
-        CPPUNIT_ASSERT_EQUAL((std::string)"test", q->getQueueName());
-        CPPUNIT_ASSERT_EQUAL(cmsTemplate->isNoLocal(), listener.noLocal);
-        CPPUNIT_ASSERT_EQUAL(cmsTemplate->getReceiveTimeout(), listener.timeout);
-        CPPUNIT_ASSERT_EQUAL(selector, listener.selector);
+        ASSERT_TRUE(q != NULL);
+        ASSERT_EQ((std::string)"test", q->getQueueName());
+        ASSERT_EQ(cmsTemplate->isNoLocal(), listener.noLocal);
+        ASSERT_EQ(cmsTemplate->getReceiveTimeout(), listener.timeout);
+        ASSERT_EQ(selector, listener.selector);
         delete message;
 
         // Now change the destination type and verify that it changes.
         selector = "blah";
         cmsTemplate->setPubSubDomain(true);
         message = cmsTemplate->receiveSelected(selector);
-        CPPUNIT_ASSERT( message != NULL );
+        ASSERT_TRUE(message != NULL);
         const cms::Topic* t = dynamic_cast<const cms::Topic*>(listener.dest);
-        CPPUNIT_ASSERT(t != NULL);
-        CPPUNIT_ASSERT_EQUAL((std::string)"test", t->getTopicName());
-        CPPUNIT_ASSERT_EQUAL(selector, listener.selector);
+        ASSERT_TRUE(t != NULL);
+        ASSERT_EQ((std::string)"test", t->getTopicName());
+        ASSERT_EQ(selector, listener.selector);
         delete message;
 
         // Now change the destination name and verify that it changes.
         cmsTemplate->setDefaultDestinationName("bob");
         message = cmsTemplate->receiveSelected(selector);
-        CPPUNIT_ASSERT( message != NULL );
+        ASSERT_TRUE(message != NULL);
         t = dynamic_cast<const cms::Topic*>(listener.dest);
-        CPPUNIT_ASSERT(t != NULL);
-        CPPUNIT_ASSERT_EQUAL((std::string)"bob", t->getTopicName());
-        CPPUNIT_ASSERT_EQUAL(selector, listener.selector);
+        ASSERT_TRUE(t != NULL);
+        ASSERT_EQ((std::string)"bob", t->getTopicName());
+        ASSERT_EQ(selector, listener.selector);
         delete message;
 
         // Now change the timeout and verify that it changes.
         cmsTemplate->setReceiveTimeout(1000);
         message = cmsTemplate->receiveSelected(selector);
-        CPPUNIT_ASSERT( message != NULL );
-        CPPUNIT_ASSERT_EQUAL(cmsTemplate->getReceiveTimeout(), listener.timeout);
-        CPPUNIT_ASSERT_EQUAL(selector, listener.selector);
+        ASSERT_TRUE(message != NULL);
+        ASSERT_EQ(cmsTemplate->getReceiveTimeout(), listener.timeout);
+        ASSERT_EQ(selector, listener.selector);
         delete message;
 
         // Now change the noLocal flag and verify that it changes.
         cmsTemplate->setNoLocal(true);
         message = cmsTemplate->receiveSelected(selector);
-        CPPUNIT_ASSERT( message != NULL );
-        CPPUNIT_ASSERT_EQUAL(cmsTemplate->isNoLocal(), listener.noLocal);
-        CPPUNIT_ASSERT_EQUAL(selector, listener.selector);
+        ASSERT_TRUE(message != NULL);
+        ASSERT_EQ(cmsTemplate->isNoLocal(), listener.noLocal);
+        ASSERT_EQ(selector, listener.selector);
         delete message;
 
         // Now try a failure.
@@ -410,7 +530,7 @@ void CmsTemplateTest::testReceiveSelected() {
 
             // First, test basics.
             cmsTemplate->receiveSelected(selector);
-            CPPUNIT_FAIL("failed to throw expected exception");
+            FAIL() << ("failed to throw expected exception");
 
         } catch( cms::CMSException& e) {
             // Expected
@@ -422,7 +542,7 @@ void CmsTemplateTest::testReceiveSelected() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplateTest::testReceiveSelected_Destination() {
+TEST_F(CmsTemplateTest, testReceiveSelected_Destination) {
 
     try {
 
@@ -435,9 +555,9 @@ void CmsTemplateTest::testReceiveSelected_Destination() {
         std::string selector = "yadda";
         activemq::commands::ActiveMQTopic myTopic("anothertopic");
         cms::Message* message = cmsTemplate->receiveSelected(&myTopic, selector);
-        CPPUNIT_ASSERT( message != NULL );
-        CPPUNIT_ASSERT(&myTopic == listener.dest);
-        CPPUNIT_ASSERT_EQUAL(selector, listener.selector);
+        ASSERT_TRUE(message != NULL);
+        ASSERT_TRUE(&myTopic == listener.dest);
+        ASSERT_EQ(selector, listener.selector);
         delete message;
 
         // Now try a failure.
@@ -448,7 +568,7 @@ void CmsTemplateTest::testReceiveSelected_Destination() {
 
             // First, test basics.
             cmsTemplate->receiveSelected(&myTopic, selector);
-            CPPUNIT_FAIL("failed to throw expected exception");
+            FAIL() << ("failed to throw expected exception");
 
         } catch( cms::CMSException& e) {
             // Expected
@@ -460,7 +580,7 @@ void CmsTemplateTest::testReceiveSelected_Destination() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplateTest::testReceiveSelected_DestinationName() {
+TEST_F(CmsTemplateTest, testReceiveSelected_DestinationName) {
 
     try {
 
@@ -473,11 +593,11 @@ void CmsTemplateTest::testReceiveSelected_DestinationName() {
         std::string selector = "yadda";
         std::string destName = "bob";
         cms::Message* message = cmsTemplate->receiveSelected(destName, selector);
-        CPPUNIT_ASSERT( message != NULL );
+        ASSERT_TRUE(message != NULL);
         const cms::Queue* q = dynamic_cast<const cms::Queue*>(listener.dest);
-        CPPUNIT_ASSERT(q != NULL);
-        CPPUNIT_ASSERT_EQUAL((std::string)"bob", q->getQueueName());
-        CPPUNIT_ASSERT_EQUAL(selector, listener.selector);
+        ASSERT_TRUE(q != NULL);
+        ASSERT_EQ((std::string)"bob", q->getQueueName());
+        ASSERT_EQ(selector, listener.selector);
         delete message;
 
         // Now try a failure.
@@ -488,7 +608,7 @@ void CmsTemplateTest::testReceiveSelected_DestinationName() {
 
             // First, test basics.
             cmsTemplate->receiveSelected(destName, selector);
-            CPPUNIT_FAIL("failed to throw expected exception");
+            FAIL() << ("failed to throw expected exception");
 
         } catch( cms::CMSException& e) {
             // Expected
@@ -498,4 +618,3 @@ void CmsTemplateTest::testReceiveSelected_DestinationName() {
         e.printStackTrace();
     }
 }
-

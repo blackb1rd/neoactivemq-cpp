@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "InputStreamTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/io/InputStream.h>
 
@@ -23,6 +23,14 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang::exceptions;
+
+    class InputStreamTest : public ::testing::Test {
+public:
+
+        InputStreamTest();
+        virtual ~InputStreamTest();
+
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace{
@@ -49,12 +57,9 @@ InputStreamTest::~InputStreamTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InputStreamTest::test() {
+TEST_F(InputStreamTest, test) {
 
     MockInputStream stream;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a NullPointerException",
-        stream.read( NULL, 0, 0, 1 ),
-        NullPointerException );
+    ASSERT_THROW(stream.read( NULL, 0, 0, 1 ), NullPointerException) << ("Should throw a NullPointerException");
 }

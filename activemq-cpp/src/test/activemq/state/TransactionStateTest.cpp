@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "TransactionStateTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/state/TransactionState.h>
 #include <activemq/commands/TransactionInfo.h>
@@ -28,8 +28,12 @@ using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
 
+    class TransactionStateTest : public ::testing::Test {
+    };
+
+
 ////////////////////////////////////////////////////////////////////////////////
-void TransactionStateTest::test() {
+TEST_F(TransactionStateTest, test) {
 
     Pointer<ConnectionId> connectionId(new ConnectionId);
     connectionId->setValue("CONNECTION");
@@ -39,10 +43,10 @@ void TransactionStateTest::test() {
     id->setValue( 42 );
     TransactionState state( id );
 
-    CPPUNIT_ASSERT( state.toString() != "NULL" );
-    CPPUNIT_ASSERT( state.getId() != NULL );
+    ASSERT_TRUE(state.toString() != "NULL");
+    ASSERT_TRUE(state.getId() != NULL);
 
     Pointer<LocalTransactionId> temp;
-    CPPUNIT_ASSERT_NO_THROW( temp = state.getId().dynamicCast<LocalTransactionId>() );
-    CPPUNIT_ASSERT( temp->getValue() == id->getValue() );
+    ASSERT_NO_THROW(temp = state.getId().dynamicCast<LocalTransactionId>());
+    ASSERT_TRUE(temp->getValue() == id->getValue());
 }

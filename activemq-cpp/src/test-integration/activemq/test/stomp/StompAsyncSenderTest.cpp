@@ -15,7 +15,22 @@
  * limitations under the License.
  */
 
-#include "StompAsyncSenderTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/AsyncSenderTest.h>
+
+namespace activemq{
+namespace test{
+namespace stomp{
+    class StompAsyncSenderTest : public AsyncSenderTest {
+public:
+        StompAsyncSenderTest();
+        virtual ~StompAsyncSenderTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getStompURL() +
+                   "&connection.useAsyncSend=true";
+        }
+    };
+}}}
 
 using namespace activemq::test::stomp;
 using namespace activemq::test;
@@ -30,3 +45,7 @@ StompAsyncSenderTest::StompAsyncSenderTest() {
 ////////////////////////////////////////////////////////////////////////////////
 StompAsyncSenderTest::~StompAsyncSenderTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(StompAsyncSenderTest, DISABLED_testAsyncSends) { testAsyncSends(); }

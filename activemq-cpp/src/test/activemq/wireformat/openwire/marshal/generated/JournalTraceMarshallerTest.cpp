@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include <activemq/wireformat/openwire/marshal/generated/JournalTraceMarshallerTest.h>
+#include <gtest/gtest.h>
 
 #include <activemq/wireformat/openwire/marshal/generated/JournalTraceMarshaller.h>
 #include <activemq/commands/JournalTrace.h>
@@ -52,21 +52,29 @@ using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::util;
 
+// Turn off warning message for ignored exception specification
+#ifdef _MSC_VER
+#pragma warning( disable : 4290 )
+#endif
+
+    class JournalTraceMarshallerTest : public ::testing::Test {};
+
+
 ///////////////////////////////////////////////////////////////////////////////
-void JournalTraceMarshallerTest::test() {
+TEST_F(JournalTraceMarshallerTest, test) {
 
     JournalTraceMarshaller myMarshaller;
     JournalTrace myCommand;
     JournalTrace* myCommand2;
 
-    CPPUNIT_ASSERT( myMarshaller.getDataStructureType() == myCommand.getDataStructureType() );
+    ASSERT_TRUE(myMarshaller.getDataStructureType() == myCommand.getDataStructureType());
     myCommand2 = dynamic_cast<JournalTrace*>( myMarshaller.createObject() );
-    CPPUNIT_ASSERT( myCommand2 != NULL );
+    ASSERT_TRUE(myCommand2 != NULL);
     delete myCommand2;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void JournalTraceMarshallerTest::testLooseMarshal() {
+TEST_F(JournalTraceMarshallerTest, testLooseMarshal) {
 
     JournalTraceMarshaller marshaller;
     Properties props;
@@ -92,21 +100,21 @@ void JournalTraceMarshallerTest::testLooseMarshal() {
         ByteArrayInputStream bais( array.first, array.second, true );
         DataInputStream dataIn( &bais );
         unsigned char dataType = dataIn.readByte();
-        CPPUNIT_ASSERT( dataType == outCommand.getDataStructureType() );
+        ASSERT_TRUE(dataType == outCommand.getDataStructureType());
         marshaller.looseUnmarshal( &openWireFormat, &inCommand, &dataIn );
 
-        CPPUNIT_ASSERT( inCommand.equals( (DataStructure*) &outCommand ) == true );
+        ASSERT_TRUE(inCommand.equals( (DataStructure*) &outCommand ) == true);
 
     } catch( ActiveMQException& e ) {
         e.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     } catch( ... ) {
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void JournalTraceMarshallerTest::testTightMarshal() {
+TEST_F(JournalTraceMarshallerTest, testTightMarshal) {
 
     JournalTraceMarshaller marshaller;
     Properties props;
@@ -140,18 +148,17 @@ void JournalTraceMarshallerTest::testTightMarshal() {
         DataInputStream dataIn( &bais );
 
         unsigned char dataType = dataIn.readByte();
-        CPPUNIT_ASSERT( dataType == outCommand.getDataStructureType() );
+        ASSERT_TRUE(dataType == outCommand.getDataStructureType());
         bs.clear();
         bs.unmarshal( &dataIn );
         marshaller.tightUnmarshal( &openWireFormat, &inCommand, &dataIn, &bs );
 
-        CPPUNIT_ASSERT( inCommand.equals( (DataStructure*) &outCommand ) == true );
+        ASSERT_TRUE(inCommand.equals( (DataStructure*) &outCommand ) == true);
 
     } catch( ActiveMQException& e ) {
         e.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     } catch( ... ) {
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
-

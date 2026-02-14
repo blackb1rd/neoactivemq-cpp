@@ -15,7 +15,21 @@
  * limitations under the License.
  */
 
-#include "OpenwireDurableTest.h"
+#include <activemq/test/DurableTest.h>
+
+namespace activemq{
+namespace test{
+namespace openwire{
+    class OpenwireDurableTest : public DurableTest {
+public:
+        OpenwireDurableTest();
+        virtual ~OpenwireDurableTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+        virtual std::string getSubscriptionName() const;
+    };
+}}}
 
 #include <decaf/util/UUID.h>
 
@@ -36,3 +50,7 @@ OpenwireDurableTest::~OpenwireDurableTest() {
 std::string OpenwireDurableTest::getSubscriptionName() const {
     return UUID::randomUUID().toString();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireDurableTest, testDurableConsumer) { testDurableConsumer(); }

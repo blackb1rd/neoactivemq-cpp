@@ -70,43 +70,43 @@ void QueueBrowserTest::testReceiveBrowseReceive() {
 
     // Get the first.
     std::unique_ptr<cms::TextMessage> inbound(dynamic_cast<cms::TextMessage*>(consumer->receive(1000)));
-    CPPUNIT_ASSERT(inbound.get() != NULL);
-    CPPUNIT_ASSERT_EQUAL(message1->getText(), inbound->getText());
+    ASSERT_TRUE(inbound.get() != NULL);
+    ASSERT_EQ(message1->getText(), inbound->getText());
     consumer->close();
 
     std::unique_ptr<cms::QueueBrowser> browser(session->createBrowser(queue.get()));
     cms::MessageEnumeration* enumeration = browser->getEnumeration();
 
     // browse the second
-    CPPUNIT_ASSERT_MESSAGE("should have received the second message", enumeration->hasMoreMessages());
+    ASSERT_TRUE(enumeration->hasMoreMessages()) << ("should have received the second message");
     inbound.reset(dynamic_cast<cms::TextMessage*>(enumeration->nextMessage()));
-    CPPUNIT_ASSERT(inbound.get() != NULL);
-    CPPUNIT_ASSERT_EQUAL(message2->getText(), inbound->getText());
+    ASSERT_TRUE(inbound.get() != NULL);
+    ASSERT_EQ(message2->getText(), inbound->getText());
 
     // browse the third.
-    CPPUNIT_ASSERT_MESSAGE("should have received the third message", enumeration->hasMoreMessages());
+    ASSERT_TRUE(enumeration->hasMoreMessages()) << ("should have received the third message");
     inbound.reset(dynamic_cast<cms::TextMessage*>(enumeration->nextMessage()));
-    CPPUNIT_ASSERT(inbound.get() != NULL);
-    CPPUNIT_ASSERT_EQUAL(message3->getText(), inbound->getText());
+    ASSERT_TRUE(inbound.get() != NULL);
+    ASSERT_EQ(message3->getText(), inbound->getText());
 
     // There should be no more.
     bool tooMany = false;
     while (enumeration->hasMoreMessages()) {
         tooMany = true;
     }
-    CPPUNIT_ASSERT_MESSAGE("Should not have browsed any more messages", !tooMany);
+    ASSERT_TRUE(!tooMany) << ("Should not have browsed any more messages");
     browser->close();
 
     // Re-open the consumer
     consumer.reset(session->createConsumer(queue.get()));
     // Receive the second.
     inbound.reset(dynamic_cast<cms::TextMessage*>(consumer->receive(1000)));
-    CPPUNIT_ASSERT(inbound.get() != NULL);
-    CPPUNIT_ASSERT_EQUAL(message2->getText(), inbound->getText());
+    ASSERT_TRUE(inbound.get() != NULL);
+    ASSERT_EQ(message2->getText(), inbound->getText());
     // Receive the third.
     inbound.reset(dynamic_cast<cms::TextMessage*>(consumer->receive(1000)));
-    CPPUNIT_ASSERT(inbound.get() != NULL);
-    CPPUNIT_ASSERT_EQUAL(message3->getText(), inbound->getText());
+    ASSERT_TRUE(inbound.get() != NULL);
+    ASSERT_EQ(message3->getText(), inbound->getText());
 
     consumer->close();
     browser->close();
@@ -134,15 +134,15 @@ void QueueBrowserTest::testBrowseReceive() {
     std::unique_ptr<cms::MessageConsumer> consumer(session->createConsumer(queue.get()));
 
     // browse the first message
-    CPPUNIT_ASSERT_MESSAGE("should have received the first message", enumeration->hasMoreMessages());
+    ASSERT_TRUE(enumeration->hasMoreMessages()) << ("should have received the first message");
     inbound.reset(dynamic_cast<cms::TextMessage*>(enumeration->nextMessage()));
-    CPPUNIT_ASSERT(inbound.get() != NULL);
-    CPPUNIT_ASSERT_EQUAL(message1->getText(), inbound->getText());
+    ASSERT_TRUE(inbound.get() != NULL);
+    ASSERT_EQ(message1->getText(), inbound->getText());
 
     // Receive the first message.
     inbound.reset(dynamic_cast<cms::TextMessage*>(consumer->receive(1000)));
-    CPPUNIT_ASSERT(inbound.get() != NULL);
-    CPPUNIT_ASSERT_EQUAL(message1->getText(), inbound->getText());
+    ASSERT_TRUE(inbound.get() != NULL);
+    ASSERT_EQ(message1->getText(), inbound->getText());
 
     consumer->close();
     browser->close();
@@ -155,7 +155,7 @@ void QueueBrowserTest::testQueueBrowserWith2Consumers() {
     static const int numMessages = 100;
 
     ActiveMQConnection* connection = dynamic_cast<ActiveMQConnection*>(cmsProvider->getConnection());
-    CPPUNIT_ASSERT(connection != NULL);
+    ASSERT_TRUE(connection != NULL);
     connection->setAlwaysSyncSend(false);
 
     std::unique_ptr<cms::Session> session(connection->createSession(cms::Session::CLIENT_ACKNOWLEDGE));
@@ -189,20 +189,20 @@ void QueueBrowserTest::testQueueBrowserWith2Consumers() {
     std::vector<cms::Message*> messages;
     for (int i = 0; i < numMessages; i++) {
         cms::Message* m1 = consumer->receive(5000);
-        CPPUNIT_ASSERT_MESSAGE(std::string("m1 is null for index: ") + Integer::toString(i), m1 != NULL);
+        ASSERT_TRUE(m1 != NULL) << (std::string("m1 is null for index: ") + Integer::toString(i));
         messages.push_back(m1);
     }
 
     for (int i = 0; i < numMessages && browserView->hasMoreMessages(); i++) {
         cms::Message* m1 = messages[i];
         cms::Message* m2 = browserView->nextMessage();
-        CPPUNIT_ASSERT_MESSAGE(std::string("m2 is null for index: ") + Integer::toString(i), m2 != NULL);
-        CPPUNIT_ASSERT(m1->getCMSMessageID() == m2->getCMSMessageID());
+        ASSERT_TRUE(m2 != NULL) << (std::string("m2 is null for index: ") + Integer::toString(i));
+        ASSERT_TRUE(m1->getCMSMessageID() == m2->getCMSMessageID());
         delete m2;
     }
 
-    CPPUNIT_ASSERT_MESSAGE("nothing left in the browser", !browserView->hasMoreMessages());
-    CPPUNIT_ASSERT_MESSAGE("consumer finished", consumer->receiveNoWait() == NULL);
+    ASSERT_TRUE(!browserView->hasMoreMessages()) << ("nothing left in the browser");
+    ASSERT_TRUE(consumer->receiveNoWait() == NULL) << ("consumer finished");
 
     for (std::size_t ix = 0; ix < messages.size(); ++ix) {
         cms::Message* msg = messages[ix];
@@ -215,7 +215,7 @@ void QueueBrowserTest::testQueueBrowserWith2Consumers() {
 void QueueBrowserTest::testRepeatedQueueBrowserCreateDestroy() {
 
     ActiveMQConnection* connection = dynamic_cast<ActiveMQConnection*>(cmsProvider->getConnection());
-    CPPUNIT_ASSERT(connection != NULL);
+    ASSERT_TRUE(connection != NULL);
 
     std::unique_ptr<cms::Session> session(connection->createSession(cms::Session::SESSION_TRANSACTED));
     std::unique_ptr<cms::Queue> queue(session->createTemporaryQueue());
@@ -236,7 +236,7 @@ void QueueBrowserTest::testRepeatedQueueBrowserCreateDestroy() {
 
         if (browserView->hasMoreMessages()) {
             std::unique_ptr<cms::Message> message(browserView->nextMessage());
-            CPPUNIT_ASSERT(message.get() != NULL);
+            ASSERT_TRUE(message.get() != NULL);
         }
 
         browser.reset(NULL);
@@ -247,7 +247,7 @@ void QueueBrowserTest::testRepeatedQueueBrowserCreateDestroy() {
 void QueueBrowserTest::testRepeatedQueueBrowserCreateDestroyWithMessageInQueue() {
 
     ActiveMQConnection* connection = dynamic_cast<ActiveMQConnection*>(cmsProvider->getConnection());
-    CPPUNIT_ASSERT(connection != NULL);
+    ASSERT_TRUE(connection != NULL);
 
     std::unique_ptr<cms::Session> session(connection->createSession(cms::Session::AUTO_ACKNOWLEDGE));
     std::unique_ptr<cms::Queue> queue(session->createTemporaryQueue());
@@ -270,7 +270,7 @@ void QueueBrowserTest::testRepeatedQueueBrowserCreateDestroyWithMessageInQueue()
 
         if (browserView->hasMoreMessages()) {
             std::unique_ptr<cms::Message> message(browserView->nextMessage());
-            CPPUNIT_ASSERT(message.get() != NULL);
+            ASSERT_TRUE(message.get() != NULL);
         }
 
         browser.reset(NULL);
@@ -283,7 +283,7 @@ void QueueBrowserTest::testBrowsingExpirationIsIgnored() {
     const int MESSAGES_TO_SEND = 50;
 
     ActiveMQConnection* connection = dynamic_cast<ActiveMQConnection*>(cmsProvider->getConnection());
-    CPPUNIT_ASSERT(connection != NULL);
+    ASSERT_TRUE(connection != NULL);
 
     std::unique_ptr<cms::Session> session(connection->createSession(cms::Session::AUTO_ACKNOWLEDGE));
     std::unique_ptr<cms::Queue> queue(session->createTemporaryQueue());
@@ -306,11 +306,11 @@ void QueueBrowserTest::testBrowsingExpirationIsIgnored() {
 
     while (enumeration->hasMoreMessages()) {
         std::unique_ptr<cms::Message> message(enumeration->nextMessage());
-        CPPUNIT_ASSERT(message.get() != NULL);
+        ASSERT_TRUE(message.get() != NULL);
         browsed++;
     }
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should have browsed all", MESSAGES_TO_SEND, browsed);
+    ASSERT_EQ(MESSAGES_TO_SEND, browsed) << ("Should have browsed all");
 
     browser->close();
 }

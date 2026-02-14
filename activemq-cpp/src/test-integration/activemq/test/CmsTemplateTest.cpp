@@ -174,7 +174,7 @@ void CmsTemplateTest::testBasics() {
     rt.join();
 
     unsigned int numReceived = receiver.getNumReceived();
-    CPPUNIT_ASSERT( numReceived == NUM_MESSAGES );
+    ASSERT_TRUE(numReceived == NUM_MESSAGES);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -187,7 +187,7 @@ void CmsTemplateTest::testReceiveException() {
 
     try {
         cmsTemplate.receive();
-        CPPUNIT_FAIL("failed to throw expected exception");
+        FAIL() << ("failed to throw expected exception");
     } catch (CMSException& ex) {
         // Expected.
     }
@@ -205,7 +205,7 @@ void CmsTemplateTest::testReceiveException() {
 
     // Receive the message.
     cms::Message* message = cmsTemplate.receive();
-    CPPUNIT_ASSERT( message != NULL );
+    ASSERT_TRUE(message != NULL);
     delete message;
 }
 
@@ -219,7 +219,7 @@ void CmsTemplateTest::testSendException() {
     try {
         TextMessageCreator msgCreator("hello world");
         cmsTemplate.send(&msgCreator);
-        CPPUNIT_FAIL( "failed to throw expected exception" );
+        FAIL() << ("failed to throw expected exception");
     } catch (CMSException& ex) {
         // Expected.
     }

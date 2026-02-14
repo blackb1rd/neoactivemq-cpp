@@ -15,7 +15,32 @@
  * limitations under the License.
  */
 
-#include "OpenwireSimpleTest.h"
+#include <activemq/test/SimpleTest.h>
+
+namespace activemq{
+namespace test{
+namespace openwire{
+    class OpenwireSimpleTest : public SimpleTest {
+public:
+        OpenwireSimpleTest();
+        virtual ~OpenwireSimpleTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+        void testWithZeroConsumerPrefetch();
+        void testWithZeroConsumerPrefetchAndNoMessage();
+        void testWithZeroConsumerPrefetch2();
+        void testWithZeroConsumerPrefetchAndNoMessage2();
+        void testWithZeroConsumerPrefetchAndZeroRedelivery();
+        void testWithZeroConsumerPrefetchWithInFlightExpiration();
+        void testMapMessageSendToQueue();
+        void testMapMessageSendToTopic();
+        void tesstStreamMessage();
+        void testDestroyDestination();
+        void testMessageIdSetOnSend();
+        void testReceiveWithSessionSyncDispatch();
+    };
+}}}
 
 #include <activemq/util/CMSListener.h>
 #include <activemq/core/ActiveMQConnectionFactory.h>
@@ -66,7 +91,7 @@ void OpenwireSimpleTest::testWithZeroConsumerPrefetch() {
     producer->send(txtMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer->receive(1000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +115,7 @@ void OpenwireSimpleTest::testWithZeroConsumerPrefetch2() {
     producer->send(txtMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer->receive(1000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,11 +132,11 @@ void OpenwireSimpleTest::testWithZeroConsumerPrefetchAndNoMessage() {
 
     // Should be no message and no exceptions
     std::unique_ptr<cms::Message> message(consumer->receiveNoWait());
-    CPPUNIT_ASSERT(message.get() == NULL);
+    ASSERT_TRUE(message.get() == NULL);
 
     // Should be no message and no exceptions
     message.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(message.get() == NULL);
+    ASSERT_TRUE(message.get() == NULL);
 
     consumer->close();
     session->close();
@@ -132,11 +157,11 @@ void OpenwireSimpleTest::testWithZeroConsumerPrefetchAndNoMessage2() {
 
     // Should be no message and no exceptions
     std::unique_ptr<cms::Message> message(consumer->receiveNoWait());
-    CPPUNIT_ASSERT(message.get() == NULL);
+    ASSERT_TRUE(message.get() == NULL);
 
     // Should be no message and no exceptions
     message.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(message.get() == NULL);
+    ASSERT_TRUE(message.get() == NULL);
 
     consumer->close();
     session->close();
@@ -190,20 +215,20 @@ void OpenwireSimpleTest::testMapMessageSendToQueue() {
     producer->send(mapMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 
     cms::MapMessage* recvMapMessage = dynamic_cast<MapMessage*>(message.get());
-    CPPUNIT_ASSERT(recvMapMessage != NULL);
-    CPPUNIT_ASSERT(recvMapMessage->getString("stringKey") == stringValue);
-    CPPUNIT_ASSERT(recvMapMessage->getBoolean("boolKey") == booleanValue);
-    CPPUNIT_ASSERT(recvMapMessage->getByte("byteKey") == byteValue);
-    CPPUNIT_ASSERT(recvMapMessage->getChar("charKey") == charValue);
-    CPPUNIT_ASSERT(recvMapMessage->getShort("shortKey") == shortValue);
-    CPPUNIT_ASSERT(recvMapMessage->getInt("intKey") == intValue);
-    CPPUNIT_ASSERT(recvMapMessage->getLong("longKey") == longValue);
-    CPPUNIT_ASSERT(recvMapMessage->getFloat("floatKey") == floatValue);
-    CPPUNIT_ASSERT(recvMapMessage->getDouble("doubleKey") == doubleValue);
-    CPPUNIT_ASSERT(recvMapMessage->getBytes("bytesKey") == bytes);
+    ASSERT_TRUE(recvMapMessage != NULL);
+    ASSERT_TRUE(recvMapMessage->getString("stringKey") == stringValue);
+    ASSERT_TRUE(recvMapMessage->getBoolean("boolKey") == booleanValue);
+    ASSERT_TRUE(recvMapMessage->getByte("byteKey") == byteValue);
+    ASSERT_TRUE(recvMapMessage->getChar("charKey") == charValue);
+    ASSERT_TRUE(recvMapMessage->getShort("shortKey") == shortValue);
+    ASSERT_TRUE(recvMapMessage->getInt("intKey") == intValue);
+    ASSERT_TRUE(recvMapMessage->getLong("longKey") == longValue);
+    ASSERT_TRUE(recvMapMessage->getFloat("floatKey") == floatValue);
+    ASSERT_TRUE(recvMapMessage->getDouble("doubleKey") == doubleValue);
+    ASSERT_TRUE(recvMapMessage->getBytes("bytesKey") == bytes);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -249,20 +274,20 @@ void OpenwireSimpleTest::testMapMessageSendToTopic() {
     producer->send(mapMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 
     cms::MapMessage* recvMapMessage = dynamic_cast<MapMessage*>(message.get());
-    CPPUNIT_ASSERT(recvMapMessage != NULL);
-    CPPUNIT_ASSERT(recvMapMessage->getString("stringKey") == stringValue);
-    CPPUNIT_ASSERT(recvMapMessage->getBoolean("boolKey") == booleanValue);
-    CPPUNIT_ASSERT(recvMapMessage->getByte("byteKey") == byteValue);
-    CPPUNIT_ASSERT(recvMapMessage->getChar("charKey") == charValue);
-    CPPUNIT_ASSERT(recvMapMessage->getShort("shortKey") == shortValue);
-    CPPUNIT_ASSERT(recvMapMessage->getInt("intKey") == intValue);
-    CPPUNIT_ASSERT(recvMapMessage->getLong("longKey") == longValue);
-    CPPUNIT_ASSERT(recvMapMessage->getFloat("floatKey") == floatValue);
-    CPPUNIT_ASSERT(recvMapMessage->getDouble("doubleKey") == doubleValue);
-    CPPUNIT_ASSERT(recvMapMessage->getBytes("bytesKey") == bytes);
+    ASSERT_TRUE(recvMapMessage != NULL);
+    ASSERT_TRUE(recvMapMessage->getString("stringKey") == stringValue);
+    ASSERT_TRUE(recvMapMessage->getBoolean("boolKey") == booleanValue);
+    ASSERT_TRUE(recvMapMessage->getByte("byteKey") == byteValue);
+    ASSERT_TRUE(recvMapMessage->getChar("charKey") == charValue);
+    ASSERT_TRUE(recvMapMessage->getShort("shortKey") == shortValue);
+    ASSERT_TRUE(recvMapMessage->getInt("intKey") == intValue);
+    ASSERT_TRUE(recvMapMessage->getLong("longKey") == longValue);
+    ASSERT_TRUE(recvMapMessage->getFloat("floatKey") == floatValue);
+    ASSERT_TRUE(recvMapMessage->getDouble("doubleKey") == doubleValue);
+    ASSERT_TRUE(recvMapMessage->getBytes("bytesKey") == bytes);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -285,15 +310,15 @@ void OpenwireSimpleTest::testDestroyDestination() {
         producer->send(txtMessage.get());
 
         std::unique_ptr<cms::Message> message(consumer->receive(1000));
-        CPPUNIT_ASSERT(message.get() != NULL);
+        ASSERT_TRUE(message.get() != NULL);
 
         ActiveMQConnection* connection = dynamic_cast<ActiveMQConnection*>(cmsProvider->getConnection());
 
-        CPPUNIT_ASSERT(connection != NULL);
+        ASSERT_TRUE(connection != NULL);
 
         try {
             connection->destroyDestination(cmsProvider->getDestination());
-            CPPUNIT_ASSERT_MESSAGE("Destination Should be in use.", false);
+            ASSERT_TRUE(false) << ("Destination Should be in use.");
         } catch (ActiveMQException& ex) {
         }
 
@@ -303,7 +328,7 @@ void OpenwireSimpleTest::testDestroyDestination() {
 
     } catch (ActiveMQException& ex) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT_MESSAGE("CAUGHT EXCEPTION", false);
+        ASSERT_TRUE(false) << ("CAUGHT EXCEPTION");
     }
 }
 
@@ -351,20 +376,20 @@ void OpenwireSimpleTest::tesstStreamMessage() {
     producer->send(streamMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 
     cms::StreamMessage* rcvStreamMessage = dynamic_cast<StreamMessage*>(message.get());
-    CPPUNIT_ASSERT(rcvStreamMessage != NULL);
-    CPPUNIT_ASSERT(rcvStreamMessage->readString() == stringValue);
-    CPPUNIT_ASSERT(rcvStreamMessage->readBoolean() == booleanValue);
-    CPPUNIT_ASSERT(rcvStreamMessage->readByte() == byteValue);
-    CPPUNIT_ASSERT(rcvStreamMessage->readChar() == charValue);
-    CPPUNIT_ASSERT(rcvStreamMessage->readShort() == shortValue);
-    CPPUNIT_ASSERT(rcvStreamMessage->readInt() == intValue);
-    CPPUNIT_ASSERT(rcvStreamMessage->readLong() == longValue);
-    CPPUNIT_ASSERT(rcvStreamMessage->readFloat() == floatValue);
-    CPPUNIT_ASSERT(rcvStreamMessage->readDouble() == doubleValue);
-    CPPUNIT_ASSERT(rcvStreamMessage->readBytes(readBytes) == (int )bytes.size());
+    ASSERT_TRUE(rcvStreamMessage != NULL);
+    ASSERT_TRUE(rcvStreamMessage->readString() == stringValue);
+    ASSERT_TRUE(rcvStreamMessage->readBoolean() == booleanValue);
+    ASSERT_TRUE(rcvStreamMessage->readByte() == byteValue);
+    ASSERT_TRUE(rcvStreamMessage->readChar() == charValue);
+    ASSERT_TRUE(rcvStreamMessage->readShort() == shortValue);
+    ASSERT_TRUE(rcvStreamMessage->readInt() == intValue);
+    ASSERT_TRUE(rcvStreamMessage->readLong() == longValue);
+    ASSERT_TRUE(rcvStreamMessage->readFloat() == floatValue);
+    ASSERT_TRUE(rcvStreamMessage->readDouble() == doubleValue);
+    ASSERT_TRUE(rcvStreamMessage->readBytes(readBytes) == (int )bytes.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -378,8 +403,8 @@ void OpenwireSimpleTest::testMessageIdSetOnSend() {
     std::unique_ptr<cms::Message> message(session->createMessage());
     producer->send(message.get());
 
-    CPPUNIT_ASSERT(message->getCMSMessageID() != "");
-    CPPUNIT_ASSERT(message->getCMSDestination() != NULL);
+    ASSERT_TRUE(message->getCMSMessageID() != "");
+    ASSERT_TRUE(message->getCMSDestination() != NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -402,7 +427,7 @@ void OpenwireSimpleTest::testReceiveWithSessionSyncDispatch() {
     producer->send(txtMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer->receive(1000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -430,7 +455,7 @@ void OpenwireSimpleTest::testWithZeroConsumerPrefetchAndZeroRedelivery() {
         std::unique_ptr<cms::MessageConsumer> consumer(session->createConsumer(queue.get()));
 
         std::unique_ptr<cms::Message> message(consumer->receive(5000));
-        CPPUNIT_ASSERT(message.get() != NULL);
+        ASSERT_TRUE(message.get() != NULL);
 
         session->rollback();
         session->close();
@@ -450,7 +475,7 @@ void OpenwireSimpleTest::testWithZeroConsumerPrefetchAndZeroRedelivery() {
     std::unique_ptr<cms::MessageConsumer> consumer(session->createConsumer(queue.get()));
 
     std::unique_ptr<cms::Message> message(consumer->receive(5000));
-    CPPUNIT_ASSERT(message.get() == NULL);
+    ASSERT_TRUE(message.get() == NULL);
 
     session->commit();
     session->close();
@@ -490,9 +515,9 @@ void OpenwireSimpleTest::testWithZeroConsumerPrefetchWithInFlightExpiration() {
 
     {
         std::unique_ptr<cms::Message> message(consumer->receive(5000));
-        CPPUNIT_ASSERT(message.get() != NULL);
+        ASSERT_TRUE(message.get() != NULL);
         TextMessage* received = dynamic_cast<TextMessage*>(message.get());
-        CPPUNIT_ASSERT_EQUAL(std::string("Expired"), received->getText());
+        ASSERT_EQ(std::string("Expired"), received->getText());
     }
 
     session->rollback();
@@ -500,9 +525,9 @@ void OpenwireSimpleTest::testWithZeroConsumerPrefetchWithInFlightExpiration() {
 
     {
         std::unique_ptr<cms::Message> message(consumer->receive(5000));
-        CPPUNIT_ASSERT(message.get() != NULL);
+        ASSERT_TRUE(message.get() != NULL);
         TextMessage* received = dynamic_cast<TextMessage*>(message.get());
-        CPPUNIT_ASSERT_EQUAL(std::string("Valid"), received->getText());
+        ASSERT_EQ(std::string("Valid"), received->getText());
     }
 
     session->commit();
@@ -511,3 +536,31 @@ void OpenwireSimpleTest::testWithZeroConsumerPrefetchWithInFlightExpiration() {
     amqConnection->destroyDestination(queue.get());
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireSimpleTest, testAutoAck) { testAutoAck(); }
+TEST_F(OpenwireSimpleTest, testClientAck) { testClientAck(); }
+TEST_F(OpenwireSimpleTest, testProducerWithNullDestination) { testProducerWithNullDestination(); }
+TEST_F(OpenwireSimpleTest, testProducerSendWithNullDestination) { testProducerSendWithNullDestination(); }
+TEST_F(OpenwireSimpleTest, testProducerSendToNonDefaultDestination) { testProducerSendToNonDefaultDestination(); }
+TEST_F(OpenwireSimpleTest, testSyncReceive) { testSyncReceive(); }
+TEST_F(OpenwireSimpleTest, testSyncReceiveClientAck) { testSyncReceiveClientAck(); }
+TEST_F(OpenwireSimpleTest, testMultipleConnections) { testMultipleConnections(); }
+TEST_F(OpenwireSimpleTest, testMultipleSessions) { testMultipleSessions(); }
+TEST_F(OpenwireSimpleTest, testReceiveAlreadyInQueue) { testReceiveAlreadyInQueue(); }
+TEST_F(OpenwireSimpleTest, testBytesMessageSendRecv) { testBytesMessageSendRecv(); }
+TEST_F(OpenwireSimpleTest, testQuickCreateAndDestroy) { testQuickCreateAndDestroy(); }
+TEST_F(OpenwireSimpleTest, testWithZeroConsumerPrefetch) { testWithZeroConsumerPrefetch(); }
+TEST_F(OpenwireSimpleTest, testWithZeroConsumerPrefetchAndNoMessage) { testWithZeroConsumerPrefetchAndNoMessage(); }
+TEST_F(OpenwireSimpleTest, testWithZeroConsumerPrefetch2) { testWithZeroConsumerPrefetch2(); }
+TEST_F(OpenwireSimpleTest, testWithZeroConsumerPrefetchAndNoMessage2) { testWithZeroConsumerPrefetchAndNoMessage2(); }
+TEST_F(OpenwireSimpleTest, testWithZeroConsumerPrefetchAndZeroRedelivery) { testWithZeroConsumerPrefetchAndZeroRedelivery(); }
+TEST_F(OpenwireSimpleTest, testWithZeroConsumerPrefetchWithInFlightExpiration) { testWithZeroConsumerPrefetchWithInFlightExpiration(); }
+TEST_F(OpenwireSimpleTest, testMapMessageSendToQueue) { testMapMessageSendToQueue(); }
+TEST_F(OpenwireSimpleTest, testMapMessageSendToTopic) { testMapMessageSendToTopic(); }
+TEST_F(OpenwireSimpleTest, testDestroyDestination) { testDestroyDestination(); }
+TEST_F(OpenwireSimpleTest, tesstStreamMessage) { tesstStreamMessage(); }
+TEST_F(OpenwireSimpleTest, testLibraryInitShutdownInit) { testLibraryInitShutdownInit(); }
+TEST_F(OpenwireSimpleTest, testBytesMessageSendRecvAsync) { testBytesMessageSendRecvAsync(); }
+TEST_F(OpenwireSimpleTest, testMessageIdSetOnSend) { testMessageIdSetOnSend(); }
+TEST_F(OpenwireSimpleTest, testReceiveWithSessionSyncDispatch) { testReceiveWithSessionSyncDispatch(); }

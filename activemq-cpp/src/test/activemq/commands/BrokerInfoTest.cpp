@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "BrokerInfoTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/commands/BrokerInfo.h>
 
@@ -23,12 +23,13 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::commands;
 
+class BrokerInfoTest : public ::testing::Test {};
+
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfoTest::test()
-{
+TEST_F(BrokerInfoTest, test) {
     BrokerInfo myCommand;
 
-    CPPUNIT_ASSERT( myCommand.getDataStructureType() == BrokerInfo::ID_BROKERINFO );
+    ASSERT_TRUE(myCommand.getDataStructureType() == BrokerInfo::ID_BROKERINFO);
 
     myCommand.setBrokerName( "BrokerName" );
     myCommand.setBrokerURL( "http://www.example.com" );
@@ -38,11 +39,11 @@ void BrokerInfoTest::test()
     BrokerInfo* copy =
         dynamic_cast<BrokerInfo*>( myCommand.cloneDataStructure() );
 
-    CPPUNIT_ASSERT( copy != NULL );
-    CPPUNIT_ASSERT( copy->getBrokerName() == myCommand.getBrokerName() );
-    CPPUNIT_ASSERT( copy->getBrokerURL() == myCommand.getBrokerURL() );
-    CPPUNIT_ASSERT( copy->getCommandId() == myCommand.getCommandId() );
-    CPPUNIT_ASSERT( copy->isMasterBroker() == myCommand.isMasterBroker() );
+    ASSERT_TRUE(copy != NULL);
+    ASSERT_TRUE(copy->getBrokerName() == myCommand.getBrokerName());
+    ASSERT_TRUE(copy->getBrokerURL() == myCommand.getBrokerURL());
+    ASSERT_TRUE(copy->getCommandId() == myCommand.getCommandId());
+    ASSERT_TRUE(copy->isMasterBroker() == myCommand.isMasterBroker());
 
     delete copy;
 }

@@ -15,7 +15,20 @@
  * limitations under the License.
  */
 
-#include "StompJmsMessageGroupsTest.h"
+#include <activemq/test/JmsMessageGroupsTest.h>
+
+namespace activemq {
+namespace test {
+namespace stomp {
+    class StompJmsMessageGroupsTest : public JmsMessageGroupsTest {
+public:
+        StompJmsMessageGroupsTest();
+        virtual ~StompJmsMessageGroupsTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getStompURL();
+        }
+    };
+}}}
 
 using namespace activemq;
 using namespace activemq::test;
@@ -28,3 +41,7 @@ StompJmsMessageGroupsTest::StompJmsMessageGroupsTest() {
 ////////////////////////////////////////////////////////////////////////////////
 StompJmsMessageGroupsTest::~StompJmsMessageGroupsTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(StompJmsMessageGroupsTest, DISABLED_testMessageSend) { testMessageSend(); }

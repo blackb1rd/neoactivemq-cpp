@@ -15,31 +15,34 @@
  * limitations under the License.
  */
 
-#include "BooleanTest.h"
+#include <gtest/gtest.h>
+#include <decaf/lang/Boolean.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
 
-void BooleanTest::test()
+    class BooleanTest : public ::testing::Test {};
+
+TEST_F(BooleanTest, test)
 {
     bool x = Boolean::parseBoolean("false");
     bool y = Boolean::parseBoolean("true");
     bool z = Boolean::parseBoolean("false");
 
-    CPPUNIT_ASSERT( x == false );
-    CPPUNIT_ASSERT( y == true );
-    CPPUNIT_ASSERT( z == false );
+    ASSERT_TRUE(x == false);
+    ASSERT_TRUE(y == true);
+    ASSERT_TRUE(z == false);
 
     std::string x1 = Boolean::toString( x );
     std::string y1 = Boolean::toString( y );
     std::string z1 = Boolean::toString( z );
 
-    CPPUNIT_ASSERT( x1 == "false" );
-    CPPUNIT_ASSERT( y1 == "true" );
-    CPPUNIT_ASSERT( z1 == "false" );
+    ASSERT_TRUE(x1 == "false");
+    ASSERT_TRUE(y1 == "true");
+    ASSERT_TRUE(z1 == "false");
 
     Boolean b( true );
-    CPPUNIT_ASSERT( b.booleanValue() == true );
+    ASSERT_TRUE(b.booleanValue() == true);
 
 }

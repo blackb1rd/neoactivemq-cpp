@@ -15,7 +15,20 @@
  * limitations under the License.
  */
 
-#include "OpenwireMessagePriorityTest.h"
+#include <activemq/test/MessagePriorityTest.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenwireMessagePriorityTest : public MessagePriorityTest {
+public:
+        OpenwireMessagePriorityTest();
+        virtual ~OpenwireMessagePriorityTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
 
 using namespace activemq;
 using namespace activemq::test;
@@ -28,3 +41,7 @@ OpenwireMessagePriorityTest::OpenwireMessagePriorityTest() {
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireMessagePriorityTest::~OpenwireMessagePriorityTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireMessagePriorityTest, testMessagePrioritySendReceive) { testMessagePrioritySendReceive(); }

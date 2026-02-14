@@ -15,7 +15,22 @@
  * limitations under the License.
  */
 
-#include "OpenwireCmsConnectionStartStopTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/CmsConnectionStartStopTest.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenwireCmsConnectionStartStopTest : public CmsConnectionStartStopTest {
+    private:
+public:
+        OpenwireCmsConnectionStartStopTest();
+        virtual ~OpenwireCmsConnectionStartStopTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
 
 #include <activemq/exceptions/ActiveMQException.h>
 
@@ -36,3 +51,9 @@ OpenwireCmsConnectionStartStopTest::OpenwireCmsConnectionStartStopTest() {
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireCmsConnectionStartStopTest::~OpenwireCmsConnectionStartStopTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireCmsConnectionStartStopTest, testStoppedConsumerHoldsMessagesTillStarted) { testStoppedConsumerHoldsMessagesTillStarted(); }
+TEST_F(OpenwireCmsConnectionStartStopTest, testMultipleConnectionStops) { testMultipleConnectionStops(); }
+TEST_F(OpenwireCmsConnectionStartStopTest, testConcurrentSessionCreateWithStart) { testConcurrentSessionCreateWithStart(); }

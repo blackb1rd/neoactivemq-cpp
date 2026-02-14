@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "URIHelperTest.h"
+#include <gtest/gtest.h>
 #include <vector>
 
 #include <decaf/internal/net/URIHelper.h>
@@ -28,12 +28,19 @@ using namespace decaf::internal;
 using namespace decaf::internal::net;
 using namespace decaf::lang;
 
+    class URIHelperTest : public ::testing::Test {
+public:
+
+        URIHelperTest();
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 URIHelperTest::URIHelperTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URIHelperTest::testParseURI() {
+TEST_F(URIHelperTest, testParseURI) {
 
     std::vector<std::string> constructorTests;
     constructorTests.push_back( "http://user@www.google.com:45/search?q=helpinfo#somefragment" );
@@ -76,9 +83,7 @@ void URIHelperTest::testParseURI() {
     // legal chars in scheme
 
     for( unsigned int i = 0; i < constructorTests.size(); i++ ) {
-        CPPUNIT_ASSERT_NO_THROW_MESSAGE(
-            string( "Failed to construct URI for: " ) + constructorTests[i],
-            URIHelper().parseURI( constructorTests.at(i), false ) );
+        ASSERT_NO_THROW(URIHelper().parseURI( constructorTests.at(i), false )) << (string( "Failed to construct URI for: " ) + constructorTests[i]);
     }
 
     std::vector<const char*> constructorTestsInvalid;
@@ -111,10 +116,7 @@ void URIHelperTest::testParseURI() {
     constructorTestsInvalid.push_back( "mailto:user^name@fklkf.com"  );
 
     for( unsigned int i = 0; i < constructorTestsInvalid.size(); i++ ) {
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            string( "URI not caught as invalid: " ) + constructorTestsInvalid[i],
-            URIHelper().parseURI( constructorTestsInvalid.at(i), false ),
-            URISyntaxException );
+        ASSERT_THROW(URIHelper().parseURI( constructorTestsInvalid.at(i), false ), URISyntaxException) << (string( "URI not caught as invalid: " ) + constructorTestsInvalid[i]);
     }
 
     std::vector<const char*> constructorTestsInvalid2;
@@ -144,15 +146,12 @@ void URIHelperTest::testParseURI() {
     constructorTestsInvalid2.push_back( "asc%20heme:ssp" );// escape octets
 
     for( unsigned int i = 0; i < constructorTestsInvalid2.size(); i++ ) {
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            string( "URI not caught as invalid: " ) + constructorTestsInvalid2[i],
-            URIHelper().parseURI( constructorTestsInvalid2.at(i), false ),
-            URISyntaxException );
+        ASSERT_THROW(URIHelper().parseURI( constructorTestsInvalid2.at(i), false ), URISyntaxException) << (string( "URI not caught as invalid: " ) + constructorTestsInvalid2[i]);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URIHelperTest::isValidIPv4Address() {
+TEST_F(URIHelperTest, isValidIPv4Address) {
 
     URIHelper uriHelper;
 
@@ -178,13 +177,11 @@ void URIHelperTest::isValidIPv4Address() {
 
     std::vector<std::string>::const_iterator address = validIPs.begin();
     for( ; address != validIPs.end(); ++address ) {
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Valid address tested as invalid",
-                                      true, uriHelper.isValidIPv4Address( *address ) );
+        ASSERT_EQ(true, uriHelper.isValidIPv4Address( *address )) << ("Valid address tested as invalid");
     }
 
     address = invalidIPs.begin();
     for( ; address != invalidIPs.end(); ++address ) {
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Invalid address tested as valid",
-                                      false, uriHelper.isValidIPv4Address( *address ) );
+        ASSERT_EQ(false, uriHelper.isValidIPv4Address( *address )) << ("Invalid address tested as valid");
     }
 }

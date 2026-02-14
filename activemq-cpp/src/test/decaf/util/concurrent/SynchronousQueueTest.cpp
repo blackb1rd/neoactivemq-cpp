@@ -15,9 +15,15 @@
  * limitations under the License.
  */
 
-#include "SynchronousQueueTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/concurrent/SynchronousQueue.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/lang/Runnable.h>
+#include <decaf/util/concurrent/Concurrent.h>
+#include <decaf/util/concurrent/Mutex.h>
+#include <decaf/util/Random.h>
+#include <time.h>
 
 using namespace std;
 using namespace decaf;
@@ -25,13 +31,24 @@ using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
+    class SynchronousQueueTest : public ::testing::Test {
+public:
+
+        SynchronousQueueTest() {}
+        virtual ~SynchronousQueueTest() {}
+
+        void testConstructor_1();
+
+    };
+
+
 ///////////////////////////////////////////////////////////////////////////////
 void SynchronousQueueTest::testConstructor_1() {
 
     SynchronousQueue<int> q;
 
-    CPPUNIT_ASSERT( q.isEmpty() );
-    CPPUNIT_ASSERT( 0 == q.size() );
-    CPPUNIT_ASSERT( 0 == q.remainingCapacity() );
-    CPPUNIT_ASSERT( !q.offer( 0 ) );
+    ASSERT_TRUE(q.isEmpty());
+    ASSERT_TRUE(0 == q.size());
+    ASSERT_TRUE(0 == q.remainingCapacity());
+    ASSERT_TRUE(!q.offer( 0 ));
 }

@@ -15,7 +15,21 @@
  * limitations under the License.
  */
 
-#include "OpenwireCmsTemplateTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/CmsTemplateTest.h>
+
+namespace activemq{
+namespace test{
+namespace openwire{
+    class OpenwireCmsTemplateTest : public CmsTemplateTest {
+public:
+        OpenwireCmsTemplateTest();
+        virtual ~OpenwireCmsTemplateTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
 
 using namespace activemq;
 using namespace activemq::test;
@@ -28,3 +42,9 @@ OpenwireCmsTemplateTest::OpenwireCmsTemplateTest() {
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireCmsTemplateTest::~OpenwireCmsTemplateTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireCmsTemplateTest, testBasics) { testBasics(); }
+TEST_F(OpenwireCmsTemplateTest, testReceiveException) { testReceiveException(); }
+TEST_F(OpenwireCmsTemplateTest, testSendException) { testSendException(); }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "LockSupportTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/System.h>
 #include <decaf/lang/Thread.h>
@@ -23,6 +23,7 @@
 #include <decaf/util/Date.h>
 #include <decaf/util/concurrent/TimeUnit.h>
 #include <decaf/util/concurrent/locks/LockSupport.h>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 using namespace std;
 using namespace decaf;
@@ -30,6 +31,15 @@ using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
+
+    class LockSupportTest : public ExecutorsTestSupport {
+public:
+
+        LockSupportTest();
+
+        virtual ~LockSupportTest();
+
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 LockSupportTest::LockSupportTest() {
@@ -68,7 +78,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupportTest::testPark1() {
+TEST_F(LockSupportTest, testPark1) {
 
     ParkTestThread t(this);
 
@@ -80,7 +90,7 @@ void LockSupportTest::testPark1() {
         t.join();
 
     } catch(...) {
-        CPPUNIT_FAIL("Caught an unexpected exception");
+        FAIL() << ("Caught an unexpected exception");
     }
 }
 
@@ -115,7 +125,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupportTest::testPark2() {
+TEST_F(LockSupportTest, testPark2) {
 
     ParkTest2Thread t(this);
 
@@ -129,10 +139,10 @@ void LockSupportTest::testPark2() {
 
         long long delta = after - before;
 
-        CPPUNIT_ASSERT( delta > 800 && delta < 1500 );
+        ASSERT_TRUE(delta > 800 && delta < 1500);
 
     } catch(...) {
-        CPPUNIT_FAIL("Caught an unexpected exception");
+        FAIL() << ("Caught an unexpected exception");
     }
 }
 
@@ -165,7 +175,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupportTest::testPark3() {
+TEST_F(LockSupportTest, testPark3) {
 
     Park3TestThread t(this);
 
@@ -213,7 +223,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupportTest::testPark4() {
+TEST_F(LockSupportTest, testPark4) {
 
     Mutex lock;
     Park4TestThread t(this, &lock);
@@ -259,7 +269,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupportTest::testParkNanos() {
+TEST_F(LockSupportTest, testParkNanos) {
 
     ParkNanosTestThread t(this);
 
@@ -269,7 +279,7 @@ void LockSupportTest::testParkNanos() {
     long long after = System::currentTimeMillis();
     long long delta = after - before;
 
-    CPPUNIT_ASSERT( delta > 1500 && delta < 3000 );
+    ASSERT_TRUE(delta > 1500 && delta < 3000);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -302,7 +312,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupportTest::testParkUntil() {
+TEST_F(LockSupportTest, testParkUntil) {
 
     ParkUntilTestThread t(this);
 
@@ -310,6 +320,6 @@ void LockSupportTest::testParkUntil() {
         t.start();
         t.join();
     } catch(...) {
-        CPPUNIT_FAIL("Caught an unexpected exception");
+        FAIL() << ("Caught an unexpected exception");
     }
 }

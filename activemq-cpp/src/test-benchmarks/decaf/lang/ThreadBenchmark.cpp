@@ -15,18 +15,23 @@
  * limitations under the License.
  */
 
-#include "ThreadBenchmark.h"
-
+#include <benchmark/PerformanceTimer.h>
+#include <decaf/lang/Thread.h>
 #include <decaf/lang/Runnable.h>
+
+#include <gtest/gtest.h>
+#include <iostream>
 
 using namespace decaf;
 using namespace decaf::lang;
 
-////////////////////////////////////////////////////////////////////////////////
-namespace decaf{
-namespace lang{
+namespace decaf {
+namespace lang {
 
-    class BenchmarkRunnable :  public decaf::lang::Runnable {
+    class ThreadBenchmark : public ::testing::Test {
+    };
+
+    class BenchmarkRunnable : public decaf::lang::Runnable {
     public:
 
         virtual void run() {
@@ -38,21 +43,26 @@ namespace lang{
 }}
 
 ////////////////////////////////////////////////////////////////////////////////
-ThreadBenchmark::ThreadBenchmark() {
-}
+TEST_F(ThreadBenchmark, runBenchmark) {
 
-////////////////////////////////////////////////////////////////////////////////
-ThreadBenchmark::~ThreadBenchmark() {
-}
+    benchmark::PerformanceTimer timer;
+    int iterations = 100;
 
-////////////////////////////////////////////////////////////////////////////////
-void ThreadBenchmark::run() {
+    for( int iter = 0; iter < iterations; ++iter ) {
+        timer.start();
 
-    BenchmarkRunnable runnable;
+        BenchmarkRunnable runnable;
 
-    for( int i = 0; i < 10; ++i ) {
-        Thread theThread( &runnable );
-        theThread.start();
-        theThread.join();
+        for( int i = 0; i < 10; ++i ) {
+            Thread theThread( &runnable );
+            theThread.start();
+            theThread.join();
+        }
+
+        timer.stop();
     }
+
+    std::cout << typeid( Thread ).name() << " Benchmark Time = "
+              << timer.getAverageTime() << " Millisecs"
+              << std::endl;
 }

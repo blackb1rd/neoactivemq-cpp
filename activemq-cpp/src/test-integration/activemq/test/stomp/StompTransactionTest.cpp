@@ -15,7 +15,20 @@
  * limitations under the License.
  */
 
-#include "StompTransactionTest.h"
+#include <activemq/test/TransactionTest.h>
+
+namespace activemq{
+namespace test{
+namespace stomp{
+    class StompTransactionTest : public TransactionTest {
+public:
+        StompTransactionTest();
+        virtual ~StompTransactionTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getStompURL();
+        }
+    };
+}}}
 
 using namespace std;
 using namespace cms;
@@ -30,3 +43,12 @@ StompTransactionTest::StompTransactionTest() {
 ////////////////////////////////////////////////////////////////////////////////
 StompTransactionTest::~StompTransactionTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(StompTransactionTest, DISABLED_testSendReceiveTransactedBatches) { testSendReceiveTransactedBatches(); }
+TEST_F(StompTransactionTest, DISABLED_testSendRollback) { testSendRollback(); }
+TEST_F(StompTransactionTest, DISABLED_testSendSessionClose) { testSendSessionClose(); }
+TEST_F(StompTransactionTest, DISABLED_testWithTTLSet) { testWithTTLSet(); }
+TEST_F(StompTransactionTest, DISABLED_testSendRollbackCommitRollback) { testSendRollbackCommitRollback(); }
+TEST_F(StompTransactionTest, DISABLED_testSessionCommitAfterConsumerClosed) { testSessionCommitAfterConsumerClosed(); }

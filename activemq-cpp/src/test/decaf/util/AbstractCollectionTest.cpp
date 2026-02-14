@@ -15,11 +15,20 @@
  * limitations under the License.
  */
 
-#include "AbstractCollectionTest.h"
+#include <gtest/gtest.h>
 
+namespace decaf { namespace util {} }
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
+
+    class AbstractCollectionTest : public ::testing::Test {
+public:
+
+        AbstractCollectionTest();
+        virtual ~AbstractCollectionTest();
+
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 AbstractCollectionTest::AbstractCollectionTest() {
@@ -30,5 +39,5 @@ AbstractCollectionTest::~AbstractCollectionTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractCollectionTest::testIterator() {
+TEST_F(AbstractCollectionTest, testIterator) {
 }

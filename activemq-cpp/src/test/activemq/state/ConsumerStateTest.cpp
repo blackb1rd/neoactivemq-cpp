@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ConsumerStateTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/state/ConsumerState.h>
 #include <activemq/commands/ConsumerInfo.h>
@@ -27,8 +27,10 @@ using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
 
+class ConsumerStateTest : public ::testing::Test {};
+
 ////////////////////////////////////////////////////////////////////////////////
-void ConsumerStateTest::test() {
+TEST_F(ConsumerStateTest, test) {
 
     Pointer<ConsumerId> id( new ConsumerId );
     id->setConnectionId( "CONNECTION" );
@@ -39,6 +41,6 @@ void ConsumerStateTest::test() {
     info->setConsumerId( id );
     ConsumerState state( info );
 
-    CPPUNIT_ASSERT( state.toString() != "NULL" );
-    CPPUNIT_ASSERT( info == state.getInfo() );
+    ASSERT_TRUE(state.toString() != "NULL");
+    ASSERT_TRUE(info == state.getInfo());
 }

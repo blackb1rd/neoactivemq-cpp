@@ -15,7 +15,21 @@
  * limitations under the License.
  */
 
-#include "OpenwireMapMessageTest.h"
+#include <activemq/test/MapMessageTest.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenwireMapMessageTest : public MapMessageTest {
+    private:
+public:
+        OpenwireMapMessageTest();
+        virtual ~OpenwireMapMessageTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
 
 using namespace activemq;
 using namespace activemq::test;
@@ -28,3 +42,11 @@ OpenwireMapMessageTest::OpenwireMapMessageTest() {
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireMapMessageTest::~OpenwireMapMessageTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireMapMessageTest, testEmptyMapSendReceive) { testEmptyMapSendReceive(); }
+TEST_F(OpenwireMapMessageTest, testMapWithEmptyStringValue) { testMapWithEmptyStringValue(); }
+TEST_F(OpenwireMapMessageTest, testMapSetEmptyBytesVector) { testMapSetEmptyBytesVector(); }
+TEST_F(OpenwireMapMessageTest, testMapWithSingleCharEntry) { testMapWithSingleCharEntry(); }
+TEST_F(OpenwireMapMessageTest, testMapWithCharAndStringEntry) { testMapWithCharAndStringEntry(); }

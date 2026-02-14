@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AtomicBooleanTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 #include <decaf/lang/Boolean.h>
@@ -27,43 +27,50 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
 
+    class AtomicBooleanTest : public ::testing::Test {
+public:
+
+        AtomicBooleanTest();
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 AtomicBooleanTest::AtomicBooleanTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicBooleanTest::testConstructor() {
+TEST_F(AtomicBooleanTest, testConstructor) {
     AtomicBoolean aboolean;
-    CPPUNIT_ASSERT( aboolean.get() == false );
+    ASSERT_TRUE(aboolean.get() == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicBooleanTest::testConstructor2() {
+TEST_F(AtomicBooleanTest, testConstructor2) {
     AtomicBoolean aboolean( true );
-    CPPUNIT_ASSERT( aboolean.get() == true );
+    ASSERT_TRUE(aboolean.get() == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicBooleanTest::testGetSet() {
+TEST_F(AtomicBooleanTest, testGetSet) {
     AtomicBoolean ai( true );
-    CPPUNIT_ASSERT( true == ai.get() );
+    ASSERT_TRUE(true == ai.get());
     ai.set( false );
-    CPPUNIT_ASSERT( false == ai.get() );
+    ASSERT_TRUE(false == ai.get());
     ai.set( true );
-    CPPUNIT_ASSERT( true == ai.get() );
+    ASSERT_TRUE(true == ai.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicBooleanTest::testCompareAndSet() {
+TEST_F(AtomicBooleanTest, testCompareAndSet) {
     AtomicBoolean ai( true );
-    CPPUNIT_ASSERT( ai.compareAndSet( true, false ) );
-    CPPUNIT_ASSERT( false == ai.get() );
-    CPPUNIT_ASSERT( ai.compareAndSet( false, false ) );
-    CPPUNIT_ASSERT( false == ai.get() );
-    CPPUNIT_ASSERT( !ai.compareAndSet( true, false ) );
-    CPPUNIT_ASSERT( !ai.get() );
-    CPPUNIT_ASSERT( ai.compareAndSet( false, true ) );
-    CPPUNIT_ASSERT( true == ai.get() );
+    ASSERT_TRUE(ai.compareAndSet( true, false ));
+    ASSERT_TRUE(false == ai.get());
+    ASSERT_TRUE(ai.compareAndSet( false, false ));
+    ASSERT_TRUE(false == ai.get());
+    ASSERT_TRUE(!ai.compareAndSet( true, false ));
+    ASSERT_TRUE(!ai.get());
+    ASSERT_TRUE(ai.compareAndSet( false, true ));
+    ASSERT_TRUE(true == ai.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +95,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicBooleanTest::testCompareAndSetInMultipleThreads() {
+TEST_F(AtomicBooleanTest, testCompareAndSetInMultipleThreads) {
     AtomicBoolean ai(true);
 
     MyRunnable runnable( &ai );
@@ -97,27 +104,27 @@ void AtomicBooleanTest::testCompareAndSetInMultipleThreads() {
     try {
 
         t.start();
-        CPPUNIT_ASSERT( ai.compareAndSet( true, false ) );
+        ASSERT_TRUE(ai.compareAndSet( true, false ));
         t.join();
 
     } catch(Exception& e) {
-        CPPUNIT_FAIL( "Should Not Throw" );
+        FAIL() << ("Should Not Throw");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicBooleanTest::testGetAndSet() {
+TEST_F(AtomicBooleanTest, testGetAndSet) {
     AtomicBoolean ai( true );
-    CPPUNIT_ASSERT( true == ai.getAndSet( false ) );
-    CPPUNIT_ASSERT( false == ai.getAndSet( false ) );
-    CPPUNIT_ASSERT( false == ai.getAndSet( true ) );
-    CPPUNIT_ASSERT( true == ai.get() );
+    ASSERT_TRUE(true == ai.getAndSet( false ));
+    ASSERT_TRUE(false == ai.getAndSet( false ));
+    ASSERT_TRUE(false == ai.getAndSet( true ));
+    ASSERT_TRUE(true == ai.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicBooleanTest::testToString() {
+TEST_F(AtomicBooleanTest, testToString) {
     AtomicBoolean ai;
-    CPPUNIT_ASSERT( ai.toString() == Boolean::toString( false ) );
+    ASSERT_TRUE(ai.toString() == Boolean::toString( false ));
     ai.set( true );
-    CPPUNIT_ASSERT( ai.toString() == Boolean::toString( true ) );
+    ASSERT_TRUE(ai.toString() == Boolean::toString( true ));
 }

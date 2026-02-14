@@ -15,32 +15,34 @@
  * limitations under the License.
  */
 
-#include "URLDecoderTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/net/URLEncoder.h>
+#include <decaf/net/URLDecoder.h>
 
 using namespace decaf;
 using namespace decaf::net;
+
+    class URLDecoderTest : public ::testing::Test {
+public:
+
+        URLDecoderTest();
+
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 URLDecoderTest::URLDecoderTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLDecoderTest::testDecode() {
+TEST_F(URLDecoderTest, testDecode) {
 
     const std::string URL = "http://127.0.0.1:80/%24%25";
     const std::string URL2 = "telnet://justWantToHaveFun.com:400";
     const std::string URL3 = "file://myServer.org/a file with spaces.jpg";
 
-    CPPUNIT_ASSERT_MESSAGE(
-        "1. Incorrect encoding/decoding",
-        URLDecoder::decode( URLEncoder::encode(URL) ) == URL );
-    CPPUNIT_ASSERT_MESSAGE(
-        "2. Incorrect encoding/decoding",
-        URLDecoder::decode( URLEncoder::encode(URL2) ) == URL2 );
-    CPPUNIT_ASSERT_MESSAGE(
-        "3. Incorrect encoding/decoding",
-        URLDecoder::decode( URLEncoder::encode(URL3) ) == URL3 );
+    ASSERT_TRUE(URLDecoder::decode( URLEncoder::encode(URL) ) == URL) << ("1. Incorrect encoding/decoding");
+    ASSERT_TRUE(URLDecoder::decode( URLEncoder::encode(URL2) ) == URL2) << ("2. Incorrect encoding/decoding");
+    ASSERT_TRUE(URLDecoder::decode( URLEncoder::encode(URL3) ) == URL3) << ("3. Incorrect encoding/decoding");
 
 }

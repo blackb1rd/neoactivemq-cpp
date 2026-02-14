@@ -28,11 +28,8 @@ namespace test{
 
     class SlowListenerTest : public CMSTestFixture {
 
-//        CPPUNIT_TEST_SUITE( SlowListenerTest );
-//        CPPUNIT_TEST( testSlowListener );
-//        CPPUNIT_TEST_SUITE_END();
-
-    public:
+//
+public:
 
         SlowListenerTest() {}
         virtual ~SlowListenerTest() {}

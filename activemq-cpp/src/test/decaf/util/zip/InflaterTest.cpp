@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "InflaterTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/zip/Deflater.h>
 #include <decaf/util/zip/Inflater.h>
@@ -31,6 +31,17 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
+    class InflaterTest : public ::testing::Test {
+public:
+
+        InflaterTest();
+        virtual ~InflaterTest();
+
+        void SetUp() override;
+        void TearDown() override;
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 InflaterTest::InflaterTest() {
 }
@@ -40,15 +51,15 @@ InflaterTest::~InflaterTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::setUp() {
+void InflaterTest::SetUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::tearDown() {
+void InflaterTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testEnd() {
+TEST_F(InflaterTest, testEnd) {
 
     // test method of java.util.zip.inflater.end()
     unsigned char byteArray[] = { 5, 2, 3, 7, 8 };
@@ -64,7 +75,7 @@ void InflaterTest::testEnd() {
     } catch( IllegalStateException& e ) {
         r = 1;
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "inflate can still be used after end is called", 1, r );
+    ASSERT_EQ(1, r) << ("inflate can still be used after end is called");
 
     Inflater i;
     i.end();
@@ -73,7 +84,7 @@ void InflaterTest::testEnd() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testFinished() {
+TEST_F(InflaterTest, testFinished) {
 
     static const std::size_t SIZE = 10;
     unsigned char byteArray[] = { 1, 3, 4, 7, 8, 'e', 'r', 't', 'y', '5' };
@@ -98,24 +109,19 @@ void InflaterTest::testFinished() {
 
             inflate.inflate( outPutInf );
         }
-        CPPUNIT_ASSERT_MESSAGE(
-            "the method finished() returned false when no more data needs to be decompressed",
-            inflate.finished() );
+        ASSERT_TRUE(inflate.finished()) << ("the method finished() returned false when no more data needs to be decompressed");
     } catch( DataFormatException& e ) {
-        CPPUNIT_FAIL( "Invalid input to be decompressed" );
+        FAIL() << ("Invalid input to be decompressed");
     }
 
     for( std::size_t i = 0; i < SIZE; i++ ) {
-        CPPUNIT_ASSERT_MESSAGE( "Final decompressed data does not equal the original data",
-                                byteArray[i] == outPutInf[i] );
+        ASSERT_TRUE(byteArray[i] == outPutInf[i]) << ("Final decompressed data does not equal the original data");
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(
-        "final decompressed data contained more bytes than original - finished()",
-        0, (int)outPutInf[SIZE]);
+    ASSERT_EQ(0, (int)outPutInf[SIZE]) << ("final decompressed data contained more bytes than original - finished()");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testGetAdler() {
+TEST_F(InflaterTest, testGetAdler) {
 
     static const int DICT_SIZE = 7;
     static const int ARRAY_SIZE = 15;
@@ -144,30 +150,24 @@ void InflaterTest::testGetAdler() {
     inflateDiction.setInput( outPutBuf );
     inflateDiction.inflate( outPutInf );
 
-    CPPUNIT_ASSERT_MESSAGE( "Inflater did not detect the need for a Dictionary",
-                            inflateDiction.needsDictionary() );
+    ASSERT_TRUE(inflateDiction.needsDictionary()) << ("Inflater did not detect the need for a Dictionary");
 
-    CPPUNIT_ASSERT_MESSAGE(
-        "the checksum value returned by getAdler() is not the same as the checksum returned "
-        "by creating the adler32 instance",
-        checkSumR == inflateDiction.getAdler() );
+    ASSERT_TRUE(checkSumR == inflateDiction.getAdler()) << ("the checksum value returned by getAdler() is not the same as the checksum returned "
+        "by creating the adler32 instance");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testGetRemaining() {
+TEST_F(InflaterTest, testGetRemaining) {
 
     unsigned char byteArray[] = { 1, 3, 5, 6, 7 };
     Inflater inflate;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "upon creating an instance of inflate, getRemaining returned a non zero value",
-                                  0, (int)inflate.getRemaining());
+    ASSERT_EQ(0, (int)inflate.getRemaining()) << ("upon creating an instance of inflate, getRemaining returned a non zero value");
     inflate.setInput( byteArray, 5, 0, 5 );
-    CPPUNIT_ASSERT_MESSAGE(
-        "getRemaining returned zero when there is input in the input buffer",
-        inflate.getRemaining() != 0 );
+    ASSERT_TRUE(inflate.getRemaining() != 0) << ("getRemaining returned zero when there is input in the input buffer");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testInflateVector() {
+TEST_F(InflaterTest, testInflateVector) {
 
     static const std::size_t SIZE = 39;
 
@@ -194,15 +194,13 @@ void InflaterTest::testInflateVector() {
             inflate.inflate( outPutInf );
         }
     } catch( DataFormatException& e ) {
-        CPPUNIT_FAIL("Invalid input to be decompressed");
+        FAIL() << ("Invalid input to be decompressed");
     }
 
     for( std::size_t i = 0; i < codedString.length(); i++ ) {
-        CPPUNIT_ASSERT_MESSAGE( "Final decompressed data does not equal the original data",
-                                codedString[i] == outPutInf[i] );
+        ASSERT_TRUE(codedString[i] == outPutInf[i]) << ("Final decompressed data does not equal the original data");
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "final decompressed data contained more bytes than original - inflateB",
-                                  0, (int)outPutInf[codedString.length()] );
+    ASSERT_EQ(0, (int)outPutInf[codedString.length()]) << ("final decompressed data contained more bytes than original - inflateB");
     // testing for an empty input array
     outPutBuf.clear();
     outPutBuf.resize( 500 );
@@ -218,12 +216,9 @@ void InflaterTest::testInflateVector() {
     while( !( defEmpty.finished() ) ) {
         x += defEmpty.deflate( outPutBuf, x, (int)outPutBuf.size() - x );
     }
-    CPPUNIT_ASSERT_MESSAGE( "the total number of unsigned char from deflate did not equal "
-                            "getTotalOut - inflate(unsigned char)",
-                            (long long)x == defEmpty.getBytesWritten() );
-    CPPUNIT_ASSERT_MESSAGE(
-                "the number of input unsigned char from the array did not correspond with getTotalIn - inflate(unsigned char)",
-                (std::size_t)defEmpty.getBytesRead() == emptyArray.size() );
+    ASSERT_TRUE((long long)x == defEmpty.getBytesWritten()) << ("the total number of unsigned char from deflate did not equal "
+                            "getTotalOut - inflate(unsigned char)");
+    ASSERT_TRUE((std::size_t)defEmpty.getBytesRead() == emptyArray.size()) << ("the number of input unsigned char from the array did not correspond with getTotalIn - inflate(unsigned char)");
     Inflater infEmpty;
     try {
         while( !( infEmpty.finished() ) ) {
@@ -233,21 +228,18 @@ void InflaterTest::testInflateVector() {
             infEmpty.inflate( outPutInf );
         }
     } catch( DataFormatException& e ) {
-        CPPUNIT_FAIL( "Invalid input to be decompressed" );
+        FAIL() << ("Invalid input to be decompressed");
     }
 
     for( std::size_t i = 0; i < 11; i++ ) {
-        CPPUNIT_ASSERT_MESSAGE( "Final decompressed data does not equal the original data",
-                                emptyArray[i] == outPutInf[i] );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Final decompressed data does not equal zero",
-                                      0, (int)outPutInf[i] );
+        ASSERT_TRUE(emptyArray[i] == outPutInf[i]) << ("Final decompressed data does not equal the original data");
+        ASSERT_EQ(0, (int)outPutInf[i]) << ("Final decompressed data does not equal zero");
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Final decompressed data contains more element than original data",
-                                  0, (int)outPutInf[11] );
+    ASSERT_EQ(0, (int)outPutInf[11]) << ("Final decompressed data contains more element than original data");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testInflateB1() {
+TEST_F(InflaterTest, testInflateB1) {
 
     static const std::size_t CODEDATA_SIZE = 39;
 
@@ -270,25 +262,22 @@ void InflaterTest::testInflateB1() {
     try {
         decLen = infl1.inflate( result );
     } catch( DataFormatException& e ) {
-        CPPUNIT_FAIL("Unexpected DataFormatException");
+        FAIL() << ("Unexpected DataFormatException");
     }
 
     infl1.end();
-    CPPUNIT_ASSERT_EQUAL( codedString, std::string( result.begin(), result.begin() + decLen ) );
+    ASSERT_EQ(codedString, std::string( result.begin(), result.begin() + decLen ));
     codedData[5] = 0;
 
     infl2.setInput( codedData, CODEDATA_SIZE, 0, CODEDATA_SIZE );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected DataFormatException",
-        decLen = infl2.inflate( result ),
-        DataFormatException );
+    ASSERT_THROW(decLen = infl2.inflate( result ), DataFormatException) << ("Expected DataFormatException");
 
     infl2.end();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testInflateBII() {
+TEST_F(InflaterTest, testInflateBII) {
 
     static const std::size_t SIZE = 39;
 
@@ -315,15 +304,12 @@ void InflaterTest::testInflateBII() {
             y += inflate.inflate( outPutInf, y, (int)outPutInf.size() - y );
         }
     } catch( DataFormatException& e ) {
-        CPPUNIT_FAIL("Invalid input to be decompressed");
+        FAIL() << ("Invalid input to be decompressed");
     }
     for( std::size_t i = 0; i < codedString.length(); i++ ) {
-        CPPUNIT_ASSERT_MESSAGE(
-                        "Final decompressed data does not equal the original data",
-                        codedString[i] == outPutInf[i]);
+        ASSERT_TRUE(codedString[i] == outPutInf[i]) << ("Final decompressed data does not equal the original data");
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "final decompressed data contained more bytes than original - inflateB",
-                                  0, (int)outPutInf[codedString.length()]);
+    ASSERT_EQ(0, (int)outPutInf[codedString.length()]) << ("final decompressed data contained more bytes than original - inflateB");
 
     // test boundary checks
     inflate.reset();
@@ -337,15 +323,15 @@ void InflaterTest::testInflateBII() {
         inflate.inflate( outPutInf, offSet, lengthError );
 
     } catch( DataFormatException& e ) {
-        CPPUNIT_FAIL("Invalid input to be decompressed");
+        FAIL() << ("Invalid input to be decompressed");
     } catch( IndexOutOfBoundsException& e ) {
         r = 1;
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "out of bounds error did not get caught", 1, r );
+    ASSERT_EQ(1, r) << ("out of bounds error did not get caught");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testInflateBII1() {
+TEST_F(InflaterTest, testInflateBII1) {
 
     static const std::size_t CODEDATA_SIZE = 39;
     unsigned char codedData[] = { 120, (unsigned char) -38, 75, (unsigned char) -54, 73,
@@ -368,9 +354,9 @@ void InflaterTest::testInflateBII1() {
     infl1.setInput( codedData, CODEDATA_SIZE, 0, CODEDATA_SIZE );
     try {
         decLen = infl1.inflate( result, 10, 11 );
-        CPPUNIT_ASSERT( decLen != 0 );
+        ASSERT_TRUE(decLen != 0);
     } catch( DataFormatException& e ) {
-        CPPUNIT_FAIL("Unexpected DataFormatException");
+        FAIL() << ("Unexpected DataFormatException");
     }
 
     std::string outputStr;
@@ -379,28 +365,24 @@ void InflaterTest::testInflateBII1() {
     }
 
     infl1.end();
-    CPPUNIT_ASSERT_EQUAL( codedString, outputStr );
+    ASSERT_EQ(codedString, outputStr);
     codedData[5] = 0;
 
     infl2.setInput( codedData, CODEDATA_SIZE, 0, CODEDATA_SIZE );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Expected DataFormatException",
-        decLen = infl2.inflate( result, 10, 11 ),
-        DataFormatException );
+    ASSERT_THROW(decLen = infl2.inflate( result, 10, 11 ), DataFormatException) << ("Expected DataFormatException");
 
     infl2.end();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testConstructor() {
+TEST_F(InflaterTest, testConstructor) {
 
     Inflater inflate;
-    CPPUNIT_ASSERT_MESSAGE( "failed to create the instance of inflater",
-                            inflate.getBytesRead() == 0LL );
+    ASSERT_TRUE(inflate.getBytesRead() == 0LL) << ("failed to create the instance of inflater");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testConstructorZ() {
+TEST_F(InflaterTest, testConstructorZ) {
 
     static const std::size_t SIZE = 10;
 
@@ -435,19 +417,17 @@ void InflaterTest::testConstructorZ() {
             inflate.inflate( outPutInf );
         }
         for( std::size_t i = 0; i < SIZE; i++ ) {
-            CPPUNIT_ASSERT_EQUAL_MESSAGE(
-                "the output array from inflate should contain 0 because the header of inflate "
-                "and deflate did not match, but this failed",
-                0, (int)outPutBuf[i] );
+            ASSERT_EQ(0, (int)outPutBuf[i]) << ("the output array from inflate should contain 0 because the header of inflate "
+                "and deflate did not match, but this failed");
         }
     } catch( DataFormatException& e ) {
         r = 1;
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Error: exception should be thrown because of header inconsistency", 1, r );
+    ASSERT_EQ(1, r) << ("Error: exception should be thrown because of header inconsistency");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testNeedsDictionary() {
+TEST_F(InflaterTest, testNeedsDictionary) {
 
     static const int DICT_SIZE = 7;
     static const int ARRAY_SIZE = 15;
@@ -483,14 +463,11 @@ void InflaterTest::testNeedsDictionary() {
         inflateDiction.setInput( outPutBuf );
     }
     try {
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "should return 0 because needs dictionary",
-                                      0, (int)inflateDiction.inflate( outPutInf ) );
+        ASSERT_EQ(0, (int)inflateDiction.inflate( outPutInf )) << ("should return 0 because needs dictionary");
     } catch( DataFormatException& e ) {
-        CPPUNIT_FAIL("Should not cause exception");
+        FAIL() << ("Should not cause exception");
     }
-    CPPUNIT_ASSERT_MESSAGE(
-        "method needsDictionary returned false when dictionary was used in deflater",
-        inflateDiction.needsDictionary() );
+    ASSERT_TRUE(inflateDiction.needsDictionary()) << ("method needsDictionary returned false when dictionary was used in deflater");
 
     // Recompress without a Dictionary
     outPutBuf.assign( outPutBuf.size(), 0 );
@@ -509,46 +486,38 @@ void InflaterTest::testNeedsDictionary() {
     try {
         inflate.setInput( outPutBuf );
         inflate.inflate( outPutInf );
-        CPPUNIT_ASSERT_MESSAGE(
-            "method needsDictionary returned true when dictionary was not used in deflater",
-            !inflate.needsDictionary() );
+        ASSERT_TRUE(!inflate.needsDictionary()) << ("method needsDictionary returned true when dictionary was not used in deflater");
     } catch( DataFormatException& e ) {
-        CPPUNIT_FAIL( "Input to inflate is invalid or corrupted - needsDictionary" );
+        FAIL() << ("Input to inflate is invalid or corrupted - needsDictionary");
     }
 
     Inflater inf;
-    CPPUNIT_ASSERT( !inf.needsDictionary() );
-    CPPUNIT_ASSERT_EQUAL( 0LL, inf.getBytesRead() );
-    CPPUNIT_ASSERT_EQUAL( 0LL, inf.getBytesWritten() );
+    ASSERT_TRUE(!inf.needsDictionary());
+    ASSERT_EQ(0LL, inf.getBytesRead());
+    ASSERT_EQ(0LL, inf.getBytesWritten());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testNeedsInput() {
+TEST_F(InflaterTest, testNeedsInput) {
 
     Inflater inflate;
-    CPPUNIT_ASSERT_MESSAGE(
-        "needsInput give the wrong bool value as a result of no input buffer",
-        inflate.needsInput() );
+    ASSERT_TRUE(inflate.needsInput()) << ("needsInput give the wrong bool value as a result of no input buffer");
 
     static const std::size_t SIZE = 12;
 
     unsigned char byteArray[] = { 2, 3, 4, 't', 'y', 'u', 'e', 'w', 7, 6, 5, 9 };
     inflate.setInput( byteArray, SIZE, 0, SIZE );
-    CPPUNIT_ASSERT_MESSAGE(
-        "methodNeedsInput returned true when the input buffer is full",
-        !inflate.needsInput() );
+    ASSERT_TRUE(!inflate.needsInput()) << ("methodNeedsInput returned true when the input buffer is full");
 
     inflate.reset();
     std::vector<unsigned char> byteArrayEmpty( 0 );;
     inflate.setInput( byteArrayEmpty );
     inflate.needsInput();
-    CPPUNIT_ASSERT_MESSAGE(
-        "needsInput give wrong bool value as a result of an empty input buffer",
-        inflate.needsInput() );
+    ASSERT_TRUE(inflate.needsInput()) << ("needsInput give wrong bool value as a result of an empty input buffer");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testReset() {
+TEST_F(InflaterTest, testReset) {
 
     static const std::size_t SIZE = 10;
 
@@ -581,15 +550,13 @@ void InflaterTest::testReset() {
         }
 
     } catch( DataFormatException& e ) {
-        CPPUNIT_FAIL("Invalid input to be decompressed");
+        FAIL() << ("Invalid input to be decompressed");
     }
 
     for( std::size_t i = 0; i < SIZE; i++ ) {
-        CPPUNIT_ASSERT_MESSAGE( "Final decompressed data does not equal the original data",
-                                byteArray[i] == outPutInf[i] );
+        ASSERT_TRUE(byteArray[i] == outPutInf[i]) << ("Final decompressed data does not equal the original data");
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "final decompressed data contained more bytes than original - reset",
-                                  0, (int)outPutInf[SIZE] );
+    ASSERT_EQ(0, (int)outPutInf[SIZE]) << ("final decompressed data contained more bytes than original - reset");
 
     // testing that resetting the inflater will also return the correct
     // decompressed data
@@ -605,30 +572,27 @@ void InflaterTest::testReset() {
         }
 
     } catch( DataFormatException& e ) {
-        CPPUNIT_FAIL("Invalid input to be decompressed");
+        FAIL() << ("Invalid input to be decompressed");
     }
 
     for( std::size_t i = 0; i < SIZE; i++ ) {
-        CPPUNIT_ASSERT_MESSAGE( "Final decompressed data does not equal the original data",
-                                byteArray[i] == outPutInf[i] );
+        ASSERT_TRUE(byteArray[i] == outPutInf[i]) << ("Final decompressed data does not equal the original data");
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "final decompressed data contained more bytes than original - reset",
-                                  0, (int)outPutInf[SIZE]);
+    ASSERT_EQ(0, (int)outPutInf[SIZE]) << ("final decompressed data contained more bytes than original - reset");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testSetInputB() {
+TEST_F(InflaterTest, testSetInputB) {
 
     static const std::size_t SIZE = 12;
     unsigned char byteArray[] = { 2, 3, 4, 't', 'y', 'u', 'e', 'w', 7, 6, 5, 9 };
     Inflater inflate;
     inflate.setInput( byteArray, SIZE, 0, SIZE );
-    CPPUNIT_ASSERT_MESSAGE( "setInputB did not deliver any unsigned char to the input buffer",
-                            inflate.getRemaining() != 0 );
+    ASSERT_TRUE(inflate.getRemaining() != 0) << ("setInputB did not deliver any unsigned char to the input buffer");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testSetInputBIII() {
+TEST_F(InflaterTest, testSetInputBIII) {
 
     static const std::size_t SIZE = 12;
     unsigned char byteArray[] = { 2, 3, 4, 't', 'y', 'u', 'e', 'w', 7, 6, 5, 9 };
@@ -637,8 +601,7 @@ void InflaterTest::testSetInputBIII() {
 
     Inflater inflate;
     inflate.setInput( byteArray, SIZE, offSet, length );
-    CPPUNIT_ASSERT_MESSAGE( "setInputBII did not deliver the right number of bytes to the input buffer",
-                            inflate.getRemaining() == length );
+    ASSERT_TRUE(inflate.getRemaining() == length) << ("setInputBII did not deliver the right number of bytes to the input buffer");
 
     // boundary check
     inflate.reset();
@@ -648,16 +611,16 @@ void InflaterTest::testSetInputBIII() {
     } catch( IndexOutOfBoundsException& e ) {
         r = 1;
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "boundary check is not present for setInput", 1, r );
+    ASSERT_EQ(1, r) << ("boundary check is not present for setInput");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testGetBytesRead() {
+TEST_F(InflaterTest, testGetBytesRead) {
 
     Deflater def;
     Inflater inf;
-    CPPUNIT_ASSERT_EQUAL( 0LL, def.getBytesWritten() );
-    CPPUNIT_ASSERT_EQUAL( 0LL, def.getBytesRead() );
+    ASSERT_EQ(0LL, def.getBytesWritten());
+    ASSERT_EQ(0LL, def.getBytesRead());
 
     // Encode a String into bytes
     std::string inputString = "blahblahblah??";
@@ -671,17 +634,17 @@ void InflaterTest::testGetBytesRead() {
     def.deflate( output );
     inf.setInput( output );
     int compressedDataLength = inf.inflate( input );
-    CPPUNIT_ASSERT_EQUAL( (long long)compressedDataLength, inf.getBytesWritten() );
-    CPPUNIT_ASSERT_EQUAL( 16LL, inf.getBytesRead() );
+    ASSERT_EQ((long long)compressedDataLength, inf.getBytesWritten());
+    ASSERT_EQ(16LL, inf.getBytesRead());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testGetBytesWritten() {
+TEST_F(InflaterTest, testGetBytesWritten) {
 
     Deflater def;
     Inflater inf;
-    CPPUNIT_ASSERT_EQUAL( 0LL, def.getBytesRead() );
-    CPPUNIT_ASSERT_EQUAL( 0LL, def.getBytesWritten() );
+    ASSERT_EQ(0LL, def.getBytesRead());
+    ASSERT_EQ(0LL, def.getBytesWritten());
 
     // Encode a String into bytes
     std::string inputString = "blahblahblah??";
@@ -694,24 +657,24 @@ void InflaterTest::testGetBytesWritten() {
     def.deflate( output );
     inf.setInput( output );
     int compressedDataLength = inf.inflate( input );
-    CPPUNIT_ASSERT_EQUAL( 16LL, inf.getBytesRead() );
-    CPPUNIT_ASSERT_EQUAL( compressedDataLength, (int)inf.getBytesWritten() );
-    CPPUNIT_ASSERT_EQUAL( 14LL, inf.getBytesWritten() );
+    ASSERT_EQ(16LL, inf.getBytesRead());
+    ASSERT_EQ(compressedDataLength, (int)inf.getBytesWritten());
+    ASSERT_EQ(14LL, inf.getBytesWritten());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testInflate() {
+TEST_F(InflaterTest, testInflate) {
 
     Inflater inf;
     std::vector<unsigned char> empty(0);
     int res = inf.inflate( empty );
 
-    CPPUNIT_ASSERT_EQUAL( 0, (int)res );
+    ASSERT_EQ(0, (int)res);
 
     // Regression for HARMONY-2508
     Inflater inflater;
     std::vector<unsigned char> b( 1024 );
-    CPPUNIT_ASSERT_EQUAL( 0, (int)inflater.inflate( b ) );
+    ASSERT_EQ(0, (int)inflater.inflate( b ));
     inflater.end();
 
     {
@@ -725,7 +688,7 @@ void InflaterTest::testInflate() {
             // this implementation and the native zlib API return "need input"
             // on that data. This is an error if the stream is exhausted, but
             // not one that results in an exception in the Inflater API.
-            CPPUNIT_ASSERT( inflater.needsInput() );
+            ASSERT_TRUE(inflater.needsInput());
         } catch( DataFormatException& e ) {
             // expected
         }
@@ -744,7 +707,7 @@ void InflaterTest::testInflate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testSetDictionaryB() {
+TEST_F(InflaterTest, testSetDictionaryB) {
 
     int i = 0;
     std::string inputString = "blah string contains blahblahblahblah and blah";
@@ -800,9 +763,9 @@ void InflaterTest::testSetDictionaryB() {
         }
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "Compressed data the same for stream with dictionary and without it.", passNo1 );
-    CPPUNIT_ASSERT_MESSAGE( "Compressed data the same for stream with dictionary and without it.", passNo2 );
-    CPPUNIT_ASSERT_MESSAGE( "Compressed data the same for stream with different dictionaries.", pass12 );
+    ASSERT_TRUE(passNo1) << ("Compressed data the same for stream with dictionary and without it.");
+    ASSERT_TRUE(passNo2) << ("Compressed data the same for stream with dictionary and without it.");
+    ASSERT_TRUE(pass12) << ("Compressed data the same for stream with different dictionaries.");
 
     Inflater inflNo;
     Inflater infl1;
@@ -814,56 +777,50 @@ void InflaterTest::testSetDictionaryB() {
     inflNo.setInput( outputNo, 0, dataLenNo );
     decLen = inflNo.inflate( result );
 
-    CPPUNIT_ASSERT( !inflNo.needsDictionary() );
+    ASSERT_TRUE(!inflNo.needsDictionary());
     inflNo.end();
-    CPPUNIT_ASSERT_EQUAL( inputString, std::string( result.begin(), result.begin() + decLen ) );
+    ASSERT_EQ(inputString, std::string( result.begin(), result.begin() + decLen ));
 
     infl1.setInput( output1, 0, dataLen1 );
     decLen = infl1.inflate( result );
 
-    CPPUNIT_ASSERT( infl1.needsDictionary() );
+    ASSERT_TRUE(infl1.needsDictionary());
     infl1.setDictionary( dictionary1 );
     decLen = infl1.inflate( result );
     infl1.end();
-    CPPUNIT_ASSERT_EQUAL( inputString, std::string( result.begin(), result.begin() + decLen ) );
+    ASSERT_EQ(inputString, std::string( result.begin(), result.begin() + decLen ));
 
     infl2.setInput( output2, 0, dataLen2 );
     decLen = infl2.inflate( result );
 
-    CPPUNIT_ASSERT(infl2.needsDictionary());
+    ASSERT_TRUE(infl2.needsDictionary());
     infl2.setDictionary( dictionary2 );
     decLen = infl2.inflate( result );
     infl2.end();
-    CPPUNIT_ASSERT_EQUAL(inputString, std::string( result.begin(), result.begin() + decLen ) );
+    ASSERT_EQ(inputString, std::string( result.begin(), result.begin() + decLen ));
 
     {
         Inflater inflNo;
         Inflater infl1;
         inflNo.setInput( outputNo, 0, dataLenNo );
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "IllegalArgumentException expected.",
-            infl1.setDictionary( dictionary1 ),
-            IllegalArgumentException );
+        ASSERT_THROW(infl1.setDictionary( dictionary1 ), IllegalArgumentException) << ("IllegalArgumentException expected.");
 
         inflNo.end();
 
         infl1.setInput( output1, 0, dataLen1 );
         decLen = infl1.inflate( result );
 
-        CPPUNIT_ASSERT( infl1.needsDictionary() );
+        ASSERT_TRUE(infl1.needsDictionary());
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "IllegalArgumentException expected.",
-            infl1.setDictionary( dictionary2 ),
-            IllegalArgumentException );
+        ASSERT_THROW(infl1.setDictionary( dictionary2 ), IllegalArgumentException) << ("IllegalArgumentException expected.");
 
         infl1.end();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InflaterTest::testSetDictionaryBIII() {
+TEST_F(InflaterTest, testSetDictionaryBIII) {
 
     int i = 0;
     std::string inputString = "blah string contains blahblahblahblah and blah";
@@ -920,9 +877,9 @@ void InflaterTest::testSetDictionaryBIII() {
         }
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "Compressed data the same for stream with different dictionaries.", pass12 );
-    CPPUNIT_ASSERT_MESSAGE( "Compressed data the same for stream with different dictionaries.", pass23 );
-    CPPUNIT_ASSERT_MESSAGE( "Compressed data the differs for stream with the same dictionaries.", pass13 );
+    ASSERT_TRUE(pass12) << ("Compressed data the same for stream with different dictionaries.");
+    ASSERT_TRUE(pass23) << ("Compressed data the same for stream with different dictionaries.");
+    ASSERT_TRUE(pass13) << ("Compressed data the differs for stream with the same dictionaries.");
 
     Inflater infl1;
     Inflater infl2;
@@ -934,29 +891,26 @@ void InflaterTest::testSetDictionaryBIII() {
     infl1.setInput( output1, 0, dataLen1 );
     decLen = infl1.inflate( result );
 
-    CPPUNIT_ASSERT( infl1.needsDictionary() );
+    ASSERT_TRUE(infl1.needsDictionary());
     infl1.setDictionary( dictionary2, 4, 4 );
     decLen = infl1.inflate( result );
     infl1.end();
-    CPPUNIT_ASSERT_EQUAL( inputString, std::string( result.begin(), result.begin() + decLen ) );
+    ASSERT_EQ(inputString, std::string( result.begin(), result.begin() + decLen ));
 
     infl2.setInput( output2, 0, dataLen2 );
     decLen = infl2.inflate( result );
 
-    CPPUNIT_ASSERT(infl2.needsDictionary());
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "IllegalArgumentException expected.",
-        infl2.setDictionary( dictionary1 ),
-        IllegalArgumentException );
+    ASSERT_TRUE(infl2.needsDictionary());
+    ASSERT_THROW(infl2.setDictionary( dictionary1 ), IllegalArgumentException) << ("IllegalArgumentException expected.");
 
     infl2.end();
 
     infl3.setInput( output3, 0, dataLen3 );
     decLen = infl3.inflate( result );
 
-    CPPUNIT_ASSERT( infl3.needsDictionary() );
+    ASSERT_TRUE(infl3.needsDictionary());
     infl3.setDictionary( dictionary1 );
     decLen = infl3.inflate( result );
     infl3.end();
-    CPPUNIT_ASSERT_EQUAL( inputString, std::string( result.begin(), result.begin() + decLen ) );
+    ASSERT_EQ(inputString, std::string( result.begin(), result.begin() + decLen ));
 }

@@ -15,7 +15,20 @@
  * limitations under the License.
  */
 
-#include "OpenwireTransactionTest.h"
+#include <activemq/test/TransactionTest.h>
+
+namespace activemq{
+namespace test{
+namespace openwire{
+    class OpenwireTransactionTest : public TransactionTest {
+public:
+        OpenwireTransactionTest();
+        virtual ~OpenwireTransactionTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
 
 using namespace std;
 using namespace cms;
@@ -30,3 +43,12 @@ OpenwireTransactionTest::OpenwireTransactionTest() {
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireTransactionTest::~OpenwireTransactionTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireTransactionTest, testSendReceiveTransactedBatches) { testSendReceiveTransactedBatches(); }
+TEST_F(OpenwireTransactionTest, testSendRollback) { testSendRollback(); }
+TEST_F(OpenwireTransactionTest, testWithTTLSet) { testWithTTLSet(); }
+TEST_F(OpenwireTransactionTest, testSendRollbackCommitRollback) { testSendRollbackCommitRollback(); }
+TEST_F(OpenwireTransactionTest, testSessionCommitAfterConsumerClosed) { testSessionCommitAfterConsumerClosed(); }
+TEST_F(OpenwireTransactionTest, testSendSessionClose) { testSendSessionClose(); }

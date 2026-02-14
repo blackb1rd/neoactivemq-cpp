@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ConnectionAuditTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/core/ConnectionAudit.h>
 #include <activemq/core/Dispatcher.h>
@@ -35,6 +35,9 @@ using namespace activemq::util;
 using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::util;
+
+    class ConnectionAuditTest : public ::testing::Test {
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -56,33 +59,25 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionAuditTest::ConnectionAuditTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-ConnectionAuditTest::~ConnectionAuditTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ConnectionAuditTest::testConstructor1() {
+TEST_F(ConnectionAuditTest, testConstructor1) {
 
     ConnectionAudit audit;
-    CPPUNIT_ASSERT(audit.isCheckForDuplicates());
-    CPPUNIT_ASSERT(audit.getAuditDepth() == ActiveMQMessageAudit::DEFAULT_WINDOW_SIZE);
-    CPPUNIT_ASSERT(audit.getAuditMaximumProducerNumber() == ActiveMQMessageAudit::MAXIMUM_PRODUCER_COUNT);
+    ASSERT_TRUE(audit.isCheckForDuplicates());
+    ASSERT_TRUE(audit.getAuditDepth() == ActiveMQMessageAudit::DEFAULT_WINDOW_SIZE);
+    ASSERT_TRUE(audit.getAuditMaximumProducerNumber() == ActiveMQMessageAudit::MAXIMUM_PRODUCER_COUNT);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionAuditTest::testConstructor2() {
+TEST_F(ConnectionAuditTest, testConstructor2) {
 
     ConnectionAudit audit(100, 200);
-    CPPUNIT_ASSERT(audit.isCheckForDuplicates());
-    CPPUNIT_ASSERT(audit.getAuditDepth() == 100);
-    CPPUNIT_ASSERT(audit.getAuditMaximumProducerNumber() == 200);
+    ASSERT_TRUE(audit.isCheckForDuplicates());
+    ASSERT_TRUE(audit.getAuditDepth() == 100);
+    ASSERT_TRUE(audit.getAuditMaximumProducerNumber() == 200);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionAuditTest::testIsDuplicate() {
+TEST_F(ConnectionAuditTest, testIsDuplicate) {
 
     int count = 10000;
     ConnectionAudit audit;
@@ -106,20 +101,19 @@ void ConnectionAuditTest::testIsDuplicate() {
         list.add(id);
 
         message->setMessageId(id);
-        CPPUNIT_ASSERT(!audit.isDuplicate(dispatcher.get(), message));
+        ASSERT_TRUE(!audit.isDuplicate(dispatcher.get(), message));
     }
 
     int index = list.size() -1 -audit.getAuditDepth();
     for (; index < list.size(); index++) {
         Pointer<MessageId> id = list.get(index);
         message->setMessageId(id);
-        CPPUNIT_ASSERT_MESSAGE(std::string() + "duplicate msg:" + id->toString(),
-                               audit.isDuplicate(dispatcher.get(), message));
+        ASSERT_TRUE(audit.isDuplicate(dispatcher.get(), message)) << (std::string() + "duplicate msg:" + id->toString());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionAuditTest::testRollbackDuplicate() {
+TEST_F(ConnectionAuditTest, testRollbackDuplicate) {
 
     int count = 10000;
     ConnectionAudit audit;
@@ -142,17 +136,15 @@ void ConnectionAuditTest::testRollbackDuplicate() {
         list.add(id);
 
         message->setMessageId(id);
-        CPPUNIT_ASSERT(!audit.isDuplicate(dispatcher.get(), message));
+        ASSERT_TRUE(!audit.isDuplicate(dispatcher.get(), message));
     }
 
     int index = list.size() -1 -audit.getAuditDepth();
     for (; index < list.size(); index++) {
         Pointer<MessageId> id = list.get(index);
         message->setMessageId(id);
-        CPPUNIT_ASSERT_MESSAGE(std::string() + "duplicate msg:" + id->toString(),
-                               audit.isDuplicate(dispatcher.get(), message));
+        ASSERT_TRUE(audit.isDuplicate(dispatcher.get(), message)) << (std::string() + "duplicate msg:" + id->toString());
         audit.rollbackDuplicate(dispatcher.get(), message);
-        CPPUNIT_ASSERT_MESSAGE(std::string() + "duplicate msg:" + id->toString(),
-                               !audit.isDuplicate(dispatcher.get(), message));
+        ASSERT_TRUE(!audit.isDuplicate(dispatcher.get(), message)) << (std::string() + "duplicate msg:" + id->toString());
     }
 }

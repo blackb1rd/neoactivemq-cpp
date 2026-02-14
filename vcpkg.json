@@ -16,7 +16,7 @@
     "tests": {
       "description": "Build tests (unit, benchmark, integration)",
       "dependencies": [
-        "cppunit"
+        "gtest"
       ]
     }
   }

@@ -18,8 +18,7 @@
 #ifndef _BENCHMARK_BENCHMARKBASE_H_
 #define _BENCHMARK_BENCHMARKBASE_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 #include <decaf/lang/Runnable.h>
 #include <benchmark/PerformanceTimer.h>
 #include <string>
@@ -28,14 +27,9 @@
 namespace benchmark{
 
     template < class NAME, class TARGET, int ITERATIONS = 100 >
-    class BenchmarkBase : public decaf::lang::Runnable,
-                          public CppUnit::TestFixture
+    class BenchmarkBase : public decaf::lang::Runnable, public ::testing::Test
     {
-        CPPUNIT_TEST_SUITE( NAME );
-        CPPUNIT_TEST( runBenchmark );
-        CPPUNIT_TEST_SUITE_END();
-
-    private:
+private:
 
         PerformanceTimer timer;
 

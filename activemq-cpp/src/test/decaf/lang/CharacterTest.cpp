@@ -15,36 +15,44 @@
  * limitations under the License.
  */
 
-#include "CharacterTest.h"
+#include <gtest/gtest.h>
+#include <decaf/lang/Character.h>
 
 using namespace decaf;
 using namespace decaf::lang;
+
+    class CharacterTest : public ::testing::Test
+    {
+public:
+
+        CharacterTest();
+
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 CharacterTest::CharacterTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CharacterTest::test() {
+TEST_F(CharacterTest, test) {
 
     Character character( 'b' );
 
-    CPPUNIT_ASSERT( ( character < 'a' ) == false );
-    CPPUNIT_ASSERT( character.compareTo( 'a' ) == 1 );
-    CPPUNIT_ASSERT( character.compareTo( 'b' ) == 0 );
-    CPPUNIT_ASSERT( character.compareTo( 'c' ) == -1 );
+    ASSERT_TRUE(( character < 'a' ) == false);
+    ASSERT_TRUE(character.compareTo( 'a' ) == 1);
+    ASSERT_TRUE(character.compareTo( 'b' ) == 0);
+    ASSERT_TRUE(character.compareTo( 'c' ) == -1);
 
-    CPPUNIT_ASSERT( Character::isDigit('a') == false );
-    CPPUNIT_ASSERT( Character::isDigit('7') == true );
-    CPPUNIT_ASSERT( Character::isLowerCase('a') == true );
-    CPPUNIT_ASSERT( Character::isLowerCase('A') == false );
-    CPPUNIT_ASSERT( Character::isUpperCase('a') == false );
-    CPPUNIT_ASSERT( Character::isUpperCase('A') == true );
-    CPPUNIT_ASSERT( Character::isLetter('a') == true );
-    CPPUNIT_ASSERT( Character::isLetter('8') == false );
-    CPPUNIT_ASSERT( Character::isLetterOrDigit('a') == true );
-    CPPUNIT_ASSERT( Character::isLetterOrDigit('&') == false );
-    CPPUNIT_ASSERT( Character::digit( '9', 10 ) == 9 );
+    ASSERT_TRUE(Character::isDigit('a') == false);
+    ASSERT_TRUE(Character::isDigit('7') == true);
+    ASSERT_TRUE(Character::isLowerCase('a') == true);
+    ASSERT_TRUE(Character::isLowerCase('A') == false);
+    ASSERT_TRUE(Character::isUpperCase('a') == false);
+    ASSERT_TRUE(Character::isUpperCase('A') == true);
+    ASSERT_TRUE(Character::isLetter('a') == true);
+    ASSERT_TRUE(Character::isLetter('8') == false);
+    ASSERT_TRUE(Character::isLetterOrDigit('a') == true);
+    ASSERT_TRUE(Character::isLetterOrDigit('&') == false);
+    ASSERT_TRUE(Character::digit( '9', 10 ) == 9);
 
 }
-

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "TcpTransportTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/tcp/TcpTransportFactory.h>
 #include <activemq/transport/tcp/TcpTransport.h>
@@ -31,6 +31,7 @@
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
 #include <decaf/util/Random.h>
+#include <activemq/util/Config.h>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -44,13 +45,11 @@ using namespace activemq::wireformat::openwire;
 using namespace activemq::transport;
 using namespace activemq::transport::tcp;
 
-////////////////////////////////////////////////////////////////////////////////
-TcpTransportTest::TcpTransportTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-TcpTransportTest::~TcpTransportTest() {
-}
+    class TcpTransportTest : public ::testing::Test {
+    protected:
+        void SetUp() override;
+        void TearDown() override;
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -183,7 +182,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TcpTransportTest::setUp() {
+void TcpTransportTest::SetUp() {
 
     server = new TestServer();
     server->start();
@@ -191,7 +190,7 @@ void TcpTransportTest::setUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TcpTransportTest::tearDown() {
+void TcpTransportTest::TearDown() {
 
     try {
         if (server == NULL) {
@@ -207,7 +206,7 @@ void TcpTransportTest::tearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TcpTransportTest::testTransportCreateWithRadomFailures() {
+TEST_F(TcpTransportTest, testTransportCreateWithRadomFailures) {
 
     Properties properties;
     OpenWireFormat wireFormat(properties);

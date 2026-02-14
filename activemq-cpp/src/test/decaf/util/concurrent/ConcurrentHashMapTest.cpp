@@ -15,12 +15,21 @@
  * limitations under the License.
  */
 
-#include "ConcurrentHashMapTest.h"
+#include <gtest/gtest.h>
 
+namespace decaf { namespace util { namespace concurrent {} } }
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
+
+    class ConcurrentHashMapTest : public ::testing::Test {
+public:
+
+        ConcurrentHashMapTest();
+        virtual ~ConcurrentHashMapTest();
+
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 ConcurrentHashMapTest::ConcurrentHashMapTest() {
@@ -31,6 +40,6 @@ ConcurrentHashMapTest::~ConcurrentHashMapTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConcurrentHashMapTest::testConstructor() {
+TEST_F(ConcurrentHashMapTest, testConstructor) {
 
 }

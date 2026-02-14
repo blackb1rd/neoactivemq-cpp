@@ -114,7 +114,7 @@ void MessagePriorityTest::testMessagePrioritySendReceive() {
 
     for (int i = 0; i < MSG_COUNT * 2; ++i) {
         Pointer<cms::Message> message(consumer->receive(2000));
-        CPPUNIT_ASSERT(message != NULL);
-        CPPUNIT_ASSERT(message->getCMSPriority() == (i < MSG_COUNT ? 9 : 1));
+        ASSERT_TRUE(message != NULL);
+        ASSERT_TRUE(message->getCMSPriority() == (i < MSG_COUNT ? 9 : 1));
     }
 }

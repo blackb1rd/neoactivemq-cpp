@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "WireFormatRegistryTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/wireformat/WireFormatRegistry.h>
 
@@ -28,30 +28,23 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
+class WireFormatRegistryTest : public ::testing::Test {};
+
 ////////////////////////////////////////////////////////////////////////////////
-void WireFormatRegistryTest::test() {
+TEST_F(WireFormatRegistryTest, test) {
 
     wireformat::openwire::OpenWireFormatFactory factory;
 
     WireFormatRegistry& registry = WireFormatRegistry::getInstance();
 
-    CPPUNIT_ASSERT( !registry.getWireFormatNames().empty() );
+    ASSERT_TRUE(!registry.getWireFormatNames().empty());
 
-    CPPUNIT_ASSERT_NO_THROW( registry.findFactory( "openwire" ) );
+    ASSERT_NO_THROW(registry.findFactory( "openwire" ));
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an NoSuchElementException",
-        registry.findFactory(""),
-        NoSuchElementException );
+    ASSERT_THROW(registry.findFactory(""), NoSuchElementException) << ("Should have thrown an NoSuchElementException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an NullPointerException",
-        registry.registerFactory( "test", NULL ),
-        NullPointerException );
+    ASSERT_THROW(registry.registerFactory( "test", NULL ), NullPointerException) << ("Should have thrown an NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IllegalArgumentException",
-        registry.registerFactory( "", &factory ),
-        IllegalArgumentException );
+    ASSERT_THROW(registry.registerFactory( "", &factory ), IllegalArgumentException) << ("Should have thrown an IllegalArgumentException");
 
 }

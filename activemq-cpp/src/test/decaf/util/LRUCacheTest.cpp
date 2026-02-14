@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "LRUCacheTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/LRUCache.h>
 #include <decaf/lang/System.h>
@@ -28,6 +28,14 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
+    class LRUCacheTest : public ::testing::Test {
+public:
+
+        LRUCacheTest();
+        virtual ~LRUCacheTest();
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 LRUCacheTest::LRUCacheTest() {
 }
@@ -37,7 +45,7 @@ LRUCacheTest::~LRUCacheTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LRUCacheTest::testConstructor() {
+TEST_F(LRUCacheTest, testConstructor) {
 
     LRUCache<int, int> underTest(1000);
 
@@ -46,27 +54,24 @@ void LRUCacheTest::testConstructor() {
             underTest.put(count, count);
         }
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("size is still in order", 1000, underTest.size());
+    ASSERT_EQ(1000, underTest.size()) << ("size is still in order");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LRUCacheTest::testExceptions() {
+TEST_F(LRUCacheTest, testExceptions) {
 
     try {
         LRUCache<int, int> underTest(-1);
-        CPPUNIT_FAIL("Should have thrown an IllegalArgumentException");
+        FAIL() << ("Should have thrown an IllegalArgumentException");
     } catch(IllegalArgumentException& ex) {}
 
     LRUCache<int, int> underTest(1000);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalArgumentException",
-        underTest.setMaxCacheSize(-1),
-        IllegalArgumentException );
+    ASSERT_THROW(underTest.setMaxCacheSize(-1), IllegalArgumentException) << ("Should throw an IllegalArgumentException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LRUCacheTest::testChangeMaxCacheSize() {
+TEST_F(LRUCacheTest, testChangeMaxCacheSize) {
 
     LRUCache<int, int> underTest(1000);
 
@@ -76,7 +81,7 @@ void LRUCacheTest::testChangeMaxCacheSize() {
         }
     }
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("size is still in order", 1000, underTest.size());
+    ASSERT_EQ(1000, underTest.size()) << ("size is still in order");
     underTest.setMaxCacheSize(2000);
 
     for (int count = 0; count < 5000; count++) {
@@ -85,6 +90,5 @@ void LRUCacheTest::testChangeMaxCacheSize() {
         }
     }
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("size is still in order", 2000, underTest.size());
+    ASSERT_EQ(2000, underTest.size()) << ("size is still in order");
 }
-

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SingleBrokerReconnectTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/tcp/TcpTransportFactory.h>
 #include <activemq/transport/tcp/TcpTransport.h>
@@ -33,6 +33,7 @@
 
 #include <random>
 #include <chrono>
+#include <activemq/util/Config.h>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -46,6 +47,16 @@ using namespace activemq::commands;
 using namespace activemq::mock;
 using namespace activemq::transport;
 using namespace activemq::transport::tcp;
+
+    /**
+     * Tests single broker connection without failover wrapper.
+     * This tests the C# behavior where:
+     * - tcp:// connection has NO auto-reconnect (IsFaultTolerant=false)
+     * - On failure, connection dies permanently
+     * - App must handle reconnection by creating new transport
+     */
+    class SingleBrokerReconnectTest : public ::testing::Test {};
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -84,23 +95,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SingleBrokerReconnectTest::SingleBrokerReconnectTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-SingleBrokerReconnectTest::~SingleBrokerReconnectTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void SingleBrokerReconnectTest::setUp() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void SingleBrokerReconnectTest::tearDown() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void SingleBrokerReconnectTest::testSingleBrokerNoAutoReconnect() {
+TEST_F(SingleBrokerReconnectTest, testSingleBrokerNoAutoReconnect) {
 
     // Start a mock broker
     Pointer<MockBrokerService> broker(new MockBrokerService(61100));
@@ -114,21 +109,18 @@ void SingleBrokerReconnectTest::testSingleBrokerNoAutoReconnect() {
     SingleBrokerListener listener;
 
     Pointer<Transport> transport(factory.create(uri));
-    CPPUNIT_ASSERT(transport != NULL);
+    ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
     // Verify this is NOT a fault-tolerant transport
-    CPPUNIT_ASSERT_MESSAGE("tcp:// transport should NOT be fault tolerant",
-            transport->isFaultTolerant() == false);
-    CPPUNIT_ASSERT_MESSAGE("tcp:// transport should NOT support reconnect",
-            transport->isReconnectSupported() == false);
+    ASSERT_TRUE(transport->isFaultTolerant() == false) << ("tcp:// transport should NOT be fault tolerant");
+    ASSERT_TRUE(transport->isReconnectSupported() == false) << ("tcp:// transport should NOT support reconnect");
 
     // Start the transport - should connect
     transport->start();
     Thread::sleep(500);
 
-    CPPUNIT_ASSERT_MESSAGE("Transport should be connected",
-            transport->isConnected() == true);
+    ASSERT_TRUE(transport->isConnected() == true) << ("Transport should be connected");
 
     // Stop the broker - should trigger exception
     broker->stop();
@@ -138,8 +130,7 @@ void SingleBrokerReconnectTest::testSingleBrokerNoAutoReconnect() {
     bool gotException = listener.waitForException(5000);
 
     // The transport should have failed
-    CPPUNIT_ASSERT_MESSAGE("Should have received exception when broker stopped",
-            gotException == true || listener.hasException());
+    ASSERT_TRUE(gotException == true || listener.hasException()) << ("Should have received exception when broker stopped");
 
     // Transport should now be disconnected and NOT auto-reconnecting
     // (unlike failover://, tcp:// just dies)
@@ -165,7 +156,7 @@ void SingleBrokerReconnectTest::testSingleBrokerNoAutoReconnect() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SingleBrokerReconnectTest::testAppLevelReconnectAfterBrokerRestart() {
+TEST_F(SingleBrokerReconnectTest, testAppLevelReconnectAfterBrokerRestart) {
 
     // Start a mock broker
     Pointer<MockBrokerService> broker(new MockBrokerService(61101));
@@ -182,8 +173,7 @@ void SingleBrokerReconnectTest::testAppLevelReconnectAfterBrokerRestart() {
     transport1->start();
 
     Thread::sleep(500);
-    CPPUNIT_ASSERT_MESSAGE("First connection should succeed",
-            transport1->isConnected() == true);
+    ASSERT_TRUE(transport1->isConnected() == true) << ("First connection should succeed");
 
     // Stop broker - connection dies
     broker->stop();
@@ -207,12 +197,10 @@ void SingleBrokerReconnectTest::testAppLevelReconnectAfterBrokerRestart() {
     transport2->start();
 
     Thread::sleep(500);
-    CPPUNIT_ASSERT_MESSAGE("Second connection (app-level reconnect) should succeed",
-            transport2->isConnected() == true);
+    ASSERT_TRUE(transport2->isConnected() == true) << ("Second connection (app-level reconnect) should succeed");
 
     // Verify no exception on the new transport
-    CPPUNIT_ASSERT_MESSAGE("New transport should not have exception",
-            listener2.hasException() == false);
+    ASSERT_TRUE(listener2.hasException() == false) << ("New transport should not have exception");
 
     transport2->close();
     broker->stop();
@@ -220,7 +208,7 @@ void SingleBrokerReconnectTest::testAppLevelReconnectAfterBrokerRestart() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SingleBrokerReconnectTest::testFuzzyBrokerUpDown() {
+TEST_F(SingleBrokerReconnectTest, testFuzzyBrokerUpDown) {
 
     const int NUM_CYCLES = 10;
 
@@ -324,10 +312,8 @@ void SingleBrokerReconnectTest::testFuzzyBrokerUpDown() {
     }
 
     // At least some connections should succeed
-    CPPUNIT_ASSERT_MESSAGE("Should have at least some successful connections",
-            successfulConnects > 0);
+    ASSERT_TRUE(successfulConnects > 0) << ("Should have at least some successful connections");
 
     // At least some app-level reconnects should succeed
-    CPPUNIT_ASSERT_MESSAGE("Should have at least some successful app-level reconnects",
-            successfulReconnects > 0);
+    ASSERT_TRUE(successfulReconnects > 0) << ("Should have at least some successful app-level reconnects");
 }

@@ -15,7 +15,20 @@
  * limitations under the License.
  */
 
-#include "StompBulkMessageTest.h"
+#include <activemq/test/BulkMessageTest.h>
+
+namespace activemq{
+namespace test{
+namespace stomp{
+    class StompBulkMessageTest : public BulkMessageTest {
+public:
+        StompBulkMessageTest();
+        virtual ~StompBulkMessageTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getStompURL();
+        }
+    };
+}}}
 
 using namespace std;
 using namespace cms;
@@ -30,3 +43,7 @@ StompBulkMessageTest::StompBulkMessageTest() {
 ////////////////////////////////////////////////////////////////////////////////
 StompBulkMessageTest::~StompBulkMessageTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(StompBulkMessageTest, DISABLED_testBulkMessageSendReceive) { testBulkMessageSendReceive(); }

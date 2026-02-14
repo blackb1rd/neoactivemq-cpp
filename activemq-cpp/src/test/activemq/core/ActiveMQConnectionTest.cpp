@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ActiveMQConnectionTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/Properties.h>
 #include <decaf/util/concurrent/Concurrent.h>
@@ -43,6 +43,10 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
+
+    class ActiveMQConnectionTest : public ::testing::Test {};
+
+
 
 namespace activemq {
 namespace core {
@@ -121,7 +125,7 @@ namespace core {
 }}
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnectionTest::test2WithOpenwire() {
+TEST_F(ActiveMQConnectionTest, test2WithOpenwire) {
     try {
         MyCommandListener cmdListener;
         MyDispatcher msgListener;
@@ -134,13 +138,13 @@ void ActiveMQConnectionTest::test2WithOpenwire() {
 
         transport::TransportFactory* factory = transport::TransportRegistry::getInstance().findFactory("mock");
         if (factory == NULL) {
-            CPPUNIT_ASSERT(false);
+            ASSERT_TRUE(false);
         }
 
         // Create the transport.
         transport = factory->createComposite(uri);
         if (transport == NULL) {
-            CPPUNIT_ASSERT(false);
+            ASSERT_TRUE(false);
         }
 
         transport->setTransportListener(&cmdListener);
@@ -150,9 +154,9 @@ void ActiveMQConnectionTest::test2WithOpenwire() {
         connection.getClientID();
         connection.close();
 
-        CPPUNIT_ASSERT(connection.getClientID() == "");
+        ASSERT_TRUE(connection.getClientID() == "");
 
-    } catch (exceptions::ActiveMQException& ex) {
+    } catch (activemq::exceptions::ActiveMQException& ex) {
         ex.printStackTrace();
         throw ex;
     }
@@ -199,7 +203,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnectionTest::testCloseCancelsHungStart() {
+TEST_F(ActiveMQConnectionTest, testCloseCancelsHungStart) {
 
     TestCloseCancelsHungStartRunnable runnable;
 
@@ -211,7 +215,7 @@ void ActiveMQConnectionTest::testCloseCancelsHungStart() {
     }
 
     runner.join(1000);
-    CPPUNIT_ASSERT(runner.isAlive());
+    ASSERT_TRUE(runner.isAlive());
 
     try {
         runnable.getConnection()->close();
@@ -219,11 +223,11 @@ void ActiveMQConnectionTest::testCloseCancelsHungStart() {
     }
 
     runner.join(2000);
-    CPPUNIT_ASSERT(!runner.isAlive());
+    ASSERT_TRUE(!runner.isAlive());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnectionTest::testExceptionInOnException() {
+TEST_F(ActiveMQConnectionTest, testExceptionInOnException) {
 
     try {
         MyExceptionListener exListener;
@@ -233,20 +237,20 @@ void ActiveMQConnectionTest::testExceptionInOnException() {
         std::unique_ptr<cms::Connection> connection(factory->createConnection());
 
         connection->setExceptionListener(&exListener);
-        CPPUNIT_ASSERT(exListener.waitForException(0) == false);
+        ASSERT_TRUE(exListener.waitForException(0) == false);
 
         transport::mock::MockTransport* transport = transport::mock::MockTransport::getInstance();
-        CPPUNIT_ASSERT(transport != NULL);
+        ASSERT_TRUE(transport != NULL);
 
         // Setup our ExceptionListener to throw inside the onException callback
         exListener.throwInCallback = true;
 
         // Trigger the onException callback
         transport->fireException(
-            exceptions::ActiveMQException(__FILE__, __LINE__, "test"));
-        CPPUNIT_ASSERT(exListener.waitForException(2000) == true);
+            activemq::exceptions::ActiveMQException(__FILE__, __LINE__, "test"));
+        ASSERT_TRUE(exListener.waitForException(2000) == true);
         connection->close();
-    } catch (exceptions::ActiveMQException& ex) {
+    } catch (activemq::exceptions::ActiveMQException& ex) {
         ex.printStackTrace();
         throw ex;
     }

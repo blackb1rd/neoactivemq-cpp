@@ -221,12 +221,6 @@ using namespace decaf::io;
                 if (listener) {
                     listener->onException(ex);
                 }
-            } catch (std::exception& ex) {
-                std::cout << "[MyTransport] Caught std::exception: " << ex.what() << std::endl;
-                if (listener) {
-                    exceptions::ActiveMQException amqEx( __FILE__, __LINE__, ex.what());
-                    listener->onException(amqEx);
-                }
             } catch (...) {
                 std::cout << "[MyTransport] Caught unknown exception" << std::endl;
                 if (listener) {
@@ -371,11 +365,18 @@ TEST_F(ResponseCorrelatorTest, testBasics) {
         std::cout << "[TEST] startedMutex.wait() returned, thread has started" << std::endl;
     }
     std::cout << "[TEST] startedMutex released, proceeding with test" << std::endl;
+    std::cout.flush();
 
     // Send one request.
+    std::cout << "[TEST] Creating MyCommand" << std::endl;
+    std::cout.flush();
     Pointer<MyCommand> cmd(new MyCommand);
+    std::cout << "[TEST] Calling correlator.request()" << std::endl;
+    std::cout.flush();
 
     Pointer<Response> resp = correlator.request(cmd);
+    std::cout << "[TEST] correlator.request() returned" << std::endl;
+    std::cout.flush();
 
     ASSERT_TRUE(resp != NULL);
     ASSERT_TRUE(resp->getCorrelationId() == cmd->getCommandId());
@@ -415,22 +416,33 @@ TEST_F(ResponseCorrelatorTest, testOneway){
         std::cout << "[TEST] startedMutex.wait() returned, thread has started" << std::endl;
     }
     std::cout << "[TEST] startedMutex released, proceeding with test" << std::endl;
+    std::cout.flush();
 
     // Send many oneway request (we'll get them back asynchronously).
     const unsigned int numCommands = 1000;
+    std::cout << "[TEST] Sending " << numCommands << " oneway commands" << std::endl;
+    std::cout.flush();
     for (unsigned int ix = 0; ix < numCommands; ++ix) {
+        if (ix % 100 == 0) {
+            std::cout << "[TEST] Sent " << ix << " commands" << std::endl;
+        }
         Pointer<MyCommand> command(new MyCommand());
         correlator.oneway(command);
     }
+    std::cout << "[TEST] All oneway commands sent, sleeping 500ms" << std::endl;
 
     // Give the thread a little time to get all the messages back.
     decaf::lang::Thread::sleep(500);
+    std::cout << "[TEST] Sleep complete, checking assertions" << std::endl;
 
     // Make sure we got them all back.
+    std::cout << "[TEST] Received " << listener.commands.size() << " commands" << std::endl;
     ASSERT_TRUE(listener.commands.size() == numCommands);
     ASSERT_TRUE(listener.exCount == 0);
 
+    std::cout << "[TEST] Calling correlator.close()" << std::endl;
     correlator.close();
+    std::cout << "[TEST] testOneway complete" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -458,22 +470,30 @@ TEST_F(ResponseCorrelatorTest, testTransportException){
 
     // Send one request.
     Pointer<MyCommand> cmd(new MyCommand);
+    std::cout << "[TEST] About to call correlator.request() with 1000ms timeout" << std::endl;
     try {
         correlator.request(cmd, 1000);
+        std::cout << "[TEST] correlator.request() returned successfully" << std::endl;
     } catch (IOException& ex) {
+        std::cout << "[TEST] correlator.request() threw IOException: " << ex.getMessage() << std::endl;
         ASSERT_TRUE(false);
     }
+    std::cout << "[TEST] Sleeping 200ms" << std::endl;
 
     // Wait to make sure we get the asynchronous message back.
     decaf::lang::Thread::sleep(200);
+    std::cout << "[TEST] Sleep complete, checking assertions" << std::endl;
 
     // Since our transport relays our original command back at us as a
     // non-response message, check to make sure we received it and that
     // it is the original command.
+    std::cout << "[TEST] listener.commands.size()=" << listener.commands.size() << " exCount=" << listener.exCount << std::endl;
     ASSERT_TRUE(listener.commands.size() == 0);
     ASSERT_TRUE(listener.exCount == 1);
 
+    std::cout << "[TEST] Calling correlator.close()" << std::endl;
     correlator.close();
+    std::cout << "[TEST] testTransportException complete" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -506,25 +526,34 @@ TEST_F(ResponseCorrelatorTest, testMultiRequests){
     // Start all the requester threads.
     const unsigned int numRequests = 20;
     RequestThread requesters[numRequests];
+    std::cout << "[TEST] Starting " << numRequests << " requester threads" << std::endl;
     for (unsigned int ix = 0; ix < numRequests; ++ix) {
         requesters[ix].setTransport(&correlator);
         requesters[ix].start();
     }
+    std::cout << "[TEST] All requester threads started" << std::endl;
 
     // Make sure we got all the responses and that they were all
     // what we expected.
+    std::cout << "[TEST] Waiting for all requester threads to complete" << std::endl;
     for (unsigned int ix = 0; ix < numRequests; ++ix) {
+        if (ix % 5 == 0) {
+            std::cout << "[TEST] Waiting for requester thread " << ix << std::endl;
+        }
         requesters[ix].join();
         ASSERT_TRUE(requesters[ix].resp != NULL);
         ASSERT_TRUE(requesters[ix].cmd->getCommandId() ==
                        requesters[ix].resp->getCorrelationId());
     }
+    std::cout << "[TEST] All requester threads completed, sleeping 60ms" << std::endl;
 
     decaf::lang::Thread::sleep(60);
+    std::cout << "[TEST] Acquiring listener.mutex to wait for commands" << std::endl;
     synchronized(&listener.mutex) {
         unsigned int count = 0;
 
         while (listener.commands.size() != numRequests) {
+            std::cout << "[TEST] Have " << listener.commands.size() << " commands, waiting for " << numRequests << std::endl;
             listener.mutex.wait(75);
 
             ++count;
@@ -534,14 +563,18 @@ TEST_F(ResponseCorrelatorTest, testMultiRequests){
             }
         }
     }
+    std::cout << "[TEST] Got all commands, checking assertions" << std::endl;
 
     // Since our transport relays our original command back at us as a
     // non-response message, check to make sure we received it and that
     // it is the original command.
+    std::cout << "[TEST] listener.commands.size()=" << listener.commands.size() << " exCount=" << listener.exCount << std::endl;
     ASSERT_TRUE(listener.commands.size() == numRequests);
     ASSERT_TRUE(listener.exCount == 0);
 
+    std::cout << "[TEST] Calling correlator.close()" << std::endl;
     correlator.close();
+    std::cout << "[TEST] testMultiRequests complete" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

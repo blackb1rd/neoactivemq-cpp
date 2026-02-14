@@ -139,12 +139,12 @@ using namespace decaf::io;
         }
 
         virtual void close() {
-            done = true;
-
             if (thread != NULL) {
-                synchronized( &mutex ) {
-                    mutex.notifyAll();
-                }
+                mutex.lock();
+                done = true;
+                mutex.notifyAll();
+                mutex.unlock();
+
                 thread->join();
                 delete thread;
                 thread = NULL;
@@ -168,45 +168,58 @@ using namespace decaf::io;
 
                 mutex.lock();
 
-                while (!done) {
+                try {
+                    while (!done) {
 
-                    if (requests.empty()) {
-                        mutex.wait();
-                    } else {
+                        if (requests.empty()) {
+                            mutex.wait();
+                        } else {
 
-                        Pointer<Command> cmd = requests.front();
-                        requests.pop();
+                            Pointer<Command> cmd = requests.front();
+                            requests.pop();
 
-                        // Only send a response if one is required.
-                        Pointer<Response> resp;
-                        if (cmd->isResponseRequired()) {
-                            resp = createResponse(cmd);
-                        }
-
-                        mutex.unlock();
-
-                        // Send both the response and the original
-                        // command back to the correlator.
-                        if (listener != NULL) {
-                            if (resp != NULL) {
-                                listener->onCommand(resp);
+                            // Only send a response if one is required.
+                            Pointer<Response> resp;
+                            if (cmd->isResponseRequired()) {
+                                resp = createResponse(cmd);
                             }
-                            listener->onCommand(cmd);
-                        }
 
-                        mutex.lock();
+                            mutex.unlock();
+
+                            try {
+                                // Send both the response and the original
+                                // command back to the correlator.
+                                if (listener != NULL) {
+                                    if (resp != NULL) {
+                                        listener->onCommand(resp);
+                                    }
+                                    listener->onCommand(cmd);
+                                }
+                            } catch (...) {
+                                // Re-lock and re-throw if listener callbacks fail
+                                mutex.lock();
+                                throw;
+                            }
+
+                            mutex.lock();
+                        }
                     }
+
+                    mutex.unlock();
+
+                } catch (...) {
+                    // Ensure mutex is unlocked if we're holding it
+                    try {
+                        mutex.unlock();
+                    } catch (...) {}
+                    throw;
                 }
 
-                mutex.unlock();
-
             } catch (exceptions::ActiveMQException& ex) {
-                mutex.unlock();
                 if (listener) {
                     listener->onException(ex);
                 }
             } catch (...) {
-                mutex.unlock();
                 if (listener) {
                     exceptions::ActiveMQException ex( __FILE__, __LINE__, "stuff");
                     listener->onException(ex);

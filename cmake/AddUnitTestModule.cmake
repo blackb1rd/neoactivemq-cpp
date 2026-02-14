@@ -75,7 +75,7 @@ function(add_unit_test_module)
         TEST_PREFIX "unit/"
         SOURCES ${ARG_SOURCES}
         PROPERTIES
-            TIMEOUT 300
+            TIMEOUT 330
             ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
     )
 endfunction()

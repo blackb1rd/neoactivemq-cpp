@@ -26,6 +26,7 @@
 #include <decaf/util/concurrent/Concurrent.h>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <queue>
+#include <iostream>
 
 using namespace activemq;
 using namespace activemq::transport;
@@ -128,27 +129,36 @@ using namespace decaf::io;
         }
 
         virtual void start() {
+            std::cout << "[MyTransport] start() called" << std::endl;
             close();
 
             done = false;
             thread = new decaf::lang::Thread( this );
+            std::cout << "[MyTransport] Thread created, calling thread->start()" << std::endl;
             thread->start();
+            std::cout << "[MyTransport] Thread started" << std::endl;
         }
 
         virtual void stop() {
         }
 
         virtual void close() {
-            if (thread != NULL) {
-                mutex.lock();
-                done = true;
-                mutex.notifyAll();
-                mutex.unlock();
+            std::cout << "[MyTransport] close() called" << std::endl;
 
+            done = true;
+
+            if (thread != NULL) {
+                std::cout << "[MyTransport] Notifying thread to shutdown" << std::endl;
+                synchronized(&mutex) {
+                    mutex.notifyAll();
+                }
+                std::cout << "[MyTransport] Waiting for thread to join" << std::endl;
                 thread->join();
+                std::cout << "[MyTransport] Thread joined, deleting thread object" << std::endl;
                 delete thread;
                 thread = NULL;
             }
+            std::cout << "[MyTransport] close() completed" << std::endl;
         }
 
         virtual Pointer<Response> createResponse(const Pointer<Command> command) {
@@ -159,16 +169,21 @@ using namespace decaf::io;
         }
 
         virtual void run() {
+            std::cout << "[MyTransport] run() method entered" << std::endl;
 
             try {
-
+                std::cout << "[MyTransport] About to acquire startedMutex" << std::endl;
                 synchronized(&startedMutex) {
+                    std::cout << "[MyTransport] startedMutex acquired, calling notifyAll()" << std::endl;
                     startedMutex.notifyAll();
+                    std::cout << "[MyTransport] notifyAll() called, releasing startedMutex" << std::endl;
                 }
+                std::cout << "[MyTransport] startedMutex released" << std::endl;
 
-                mutex.lock();
+                std::cout << "[MyTransport] About to acquire mutex for main loop" << std::endl;
+                synchronized(&mutex) {
+                    std::cout << "[MyTransport] mutex acquired, entering main loop" << std::endl;
 
-                try {
                     while (!done) {
 
                         if (requests.empty()) {
@@ -186,45 +201,40 @@ using namespace decaf::io;
 
                             mutex.unlock();
 
-                            try {
-                                // Send both the response and the original
-                                // command back to the correlator.
-                                if (listener != NULL) {
-                                    if (resp != NULL) {
-                                        listener->onCommand(resp);
-                                    }
-                                    listener->onCommand(cmd);
+                            // Send both the response and the original
+                            // command back to the correlator.
+                            if (listener != NULL) {
+                                if (resp != NULL) {
+                                    listener->onCommand(resp);
                                 }
-                            } catch (...) {
-                                // Re-lock and re-throw if listener callbacks fail
-                                mutex.lock();
-                                throw;
+                                listener->onCommand(cmd);
                             }
 
                             mutex.lock();
                         }
                     }
-
-                    mutex.unlock();
-
-                } catch (...) {
-                    // Ensure mutex is unlocked if we're holding it
-                    try {
-                        mutex.unlock();
-                    } catch (...) {}
-                    throw;
+                    std::cout << "[MyTransport] Exiting main loop (done=true)" << std::endl;
                 }
-
+                std::cout << "[MyTransport] mutex released, exiting run()" << std::endl;
             } catch (exceptions::ActiveMQException& ex) {
+                std::cout << "[MyTransport] Caught ActiveMQException: " << ex.getMessage() << std::endl;
                 if (listener) {
                     listener->onException(ex);
                 }
+            } catch (std::exception& ex) {
+                std::cout << "[MyTransport] Caught std::exception: " << ex.what() << std::endl;
+                if (listener) {
+                    exceptions::ActiveMQException amqEx( __FILE__, __LINE__, ex.what());
+                    listener->onException(amqEx);
+                }
             } catch (...) {
+                std::cout << "[MyTransport] Caught unknown exception" << std::endl;
                 if (listener) {
                     exceptions::ActiveMQException ex( __FILE__, __LINE__, "stuff");
                     listener->onException(ex);
                 }
             }
+            std::cout << "[MyTransport] run() method exiting" << std::endl;
         }
 
         virtual Transport* narrow(const std::type_info& typeId) {
@@ -342,6 +352,7 @@ using namespace decaf::io;
 
 
 TEST_F(ResponseCorrelatorTest, testBasics) {
+    std::cout << "[TEST] testBasics starting" << std::endl;
 
     MyListener listener;
     Pointer<MyTransport> transport(new MyTransport());
@@ -349,12 +360,17 @@ TEST_F(ResponseCorrelatorTest, testBasics) {
     correlator.setTransportListener(&listener);
     ASSERT_TRUE(transport->listener == &correlator);
 
+    std::cout << "[TEST] About to acquire startedMutex and start correlator" << std::endl;
     // Give the thread a little time to get up and running.
     synchronized(&(transport->startedMutex)) {
+        std::cout << "[TEST] startedMutex acquired, calling correlator.start()" << std::endl;
         // Start the transport.
         correlator.start();
+        std::cout << "[TEST] correlator.start() returned, waiting on startedMutex" << std::endl;
         transport->startedMutex.wait();
+        std::cout << "[TEST] startedMutex.wait() returned, thread has started" << std::endl;
     }
+    std::cout << "[TEST] startedMutex released, proceeding with test" << std::endl;
 
     // Send one request.
     Pointer<MyCommand> cmd(new MyCommand);
@@ -378,6 +394,7 @@ TEST_F(ResponseCorrelatorTest, testBasics) {
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ResponseCorrelatorTest, testOneway){
+    std::cout << "[TEST] testOneway starting" << std::endl;
 
     MyListener listener;
     Pointer<MyTransport> transport(new MyTransport());
@@ -385,14 +402,19 @@ TEST_F(ResponseCorrelatorTest, testOneway){
     correlator.setTransportListener(&listener);
     ASSERT_TRUE(transport->listener == &correlator);
 
+    std::cout << "[TEST] About to acquire startedMutex and start correlator" << std::endl;
     // Give the thread a little time to get up and running.
     synchronized( &(transport->startedMutex) ) {
+        std::cout << "[TEST] startedMutex acquired, calling correlator.start()" << std::endl;
 
         // Start the transport.
         correlator.start();
+        std::cout << "[TEST] correlator.start() returned, waiting on startedMutex" << std::endl;
 
         transport->startedMutex.wait();
+        std::cout << "[TEST] startedMutex.wait() returned, thread has started" << std::endl;
     }
+    std::cout << "[TEST] startedMutex released, proceeding with test" << std::endl;
 
     // Send many oneway request (we'll get them back asynchronously).
     const unsigned int numCommands = 1000;
@@ -413,6 +435,7 @@ TEST_F(ResponseCorrelatorTest, testOneway){
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ResponseCorrelatorTest, testTransportException){
+    std::cout << "[TEST] testTransportException starting" << std::endl;
 
     MyListener listener;
     Pointer<MyBrokenTransport> transport(new MyBrokenTransport());
@@ -420,13 +443,18 @@ TEST_F(ResponseCorrelatorTest, testTransportException){
     correlator.setTransportListener(&listener);
     ASSERT_TRUE(transport->listener == &correlator);
 
+    std::cout << "[TEST] About to acquire startedMutex and start correlator" << std::endl;
     // Give the thread a little time to get up and running.
     synchronized( &(transport->startedMutex) ) {
+        std::cout << "[TEST] startedMutex acquired, calling correlator.start()" << std::endl;
         // Start the transport.
         correlator.start();
+        std::cout << "[TEST] correlator.start() returned, waiting on startedMutex" << std::endl;
 
         transport->startedMutex.wait();
+        std::cout << "[TEST] startedMutex.wait() returned, thread has started" << std::endl;
     }
+    std::cout << "[TEST] startedMutex released, proceeding with test" << std::endl;
 
     // Send one request.
     Pointer<MyCommand> cmd(new MyCommand);
@@ -450,6 +478,7 @@ TEST_F(ResponseCorrelatorTest, testTransportException){
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ResponseCorrelatorTest, testMultiRequests){
+    std::cout << "[TEST] testMultiRequests starting" << std::endl;
 
     MyListener listener;
     Pointer<MyTransport> transport(new MyTransport());
@@ -457,16 +486,22 @@ TEST_F(ResponseCorrelatorTest, testMultiRequests){
     correlator.setTransportListener(&listener);
     ASSERT_TRUE(transport->listener == &correlator);
 
+    std::cout << "[TEST] Calling correlator.start()" << std::endl;
     // Start the transport.
     correlator.start();
+    std::cout << "[TEST] correlator.start() returned" << std::endl;
 
     // Make sure the start command got down to the thread.
     ASSERT_TRUE(transport->thread != NULL);
 
+    std::cout << "[TEST] About to acquire startedMutex and wait with timeout" << std::endl;
     // Give the thread a little time to get up and running.
     synchronized( &(transport->startedMutex) ) {
+        std::cout << "[TEST] startedMutex acquired, waiting with 500ms timeout" << std::endl;
         transport->startedMutex.wait(500);
+        std::cout << "[TEST] startedMutex.wait() returned" << std::endl;
     }
+    std::cout << "[TEST] startedMutex released, proceeding with test" << std::endl;
 
     // Start all the requester threads.
     const unsigned int numRequests = 20;

@@ -378,19 +378,35 @@ TEST_F(ResponseCorrelatorTest, testBasics) {
     std::cout << "[TEST] correlator.request() returned" << std::endl;
     std::cout.flush();
 
+    std::cout << "[TEST] Checking if resp != NULL, resp=" << resp.get() << std::endl;
+    std::cout.flush();
     ASSERT_TRUE(resp != NULL);
+    std::cout << "[TEST] resp is not NULL, checking correlation ID" << std::endl;
+    std::cout.flush();
     ASSERT_TRUE(resp->getCorrelationId() == cmd->getCommandId());
+    std::cout << "[TEST] Assertions passed, sleeping 100ms" << std::endl;
+    std::cout.flush();
 
     // Wait to get the message back asynchronously.
     decaf::lang::Thread::sleep(100);
+    std::cout << "[TEST] Sleep complete, checking listener" << std::endl;
+    std::cout.flush();
 
     // Since our transport relays our original command back at us as a
     // non-response message, check to make sure we received it and that
     // it is the original command.
+    std::cout << "[TEST] listener.commands.size()=" << listener.commands.size() << std::endl;
+    std::cout.flush();
     ASSERT_TRUE(listener.commands.size() == 1);
     ASSERT_TRUE(listener.exCount == 0);
 
+    std::cout << "[TEST] Calling correlator.close()" << std::endl;
+    std::cout.flush();
     correlator.close();
+    std::cout << "[TEST] correlator.close() returned" << std::endl;
+    std::cout.flush();
+    std::cout << "[TEST] testBasics complete, exiting test function" << std::endl;
+    std::cout.flush();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -425,9 +441,14 @@ TEST_F(ResponseCorrelatorTest, testOneway){
     for (unsigned int ix = 0; ix < numCommands; ++ix) {
         if (ix % 100 == 0) {
             std::cout << "[TEST] Sent " << ix << " commands" << std::endl;
+            std::cout.flush();
         }
         Pointer<MyCommand> command(new MyCommand());
+        std::cout << "[TEST] About to call correlator.oneway() for command " << ix << std::endl;
+        std::cout.flush();
         correlator.oneway(command);
+        std::cout << "[TEST] correlator.oneway() returned for command " << ix << std::endl;
+        std::cout.flush();
     }
     std::cout << "[TEST] All oneway commands sent, sleeping 500ms" << std::endl;
 
@@ -441,8 +462,12 @@ TEST_F(ResponseCorrelatorTest, testOneway){
     ASSERT_TRUE(listener.exCount == 0);
 
     std::cout << "[TEST] Calling correlator.close()" << std::endl;
+    std::cout.flush();
     correlator.close();
-    std::cout << "[TEST] testOneway complete" << std::endl;
+    std::cout << "[TEST] correlator.close() returned" << std::endl;
+    std::cout.flush();
+    std::cout << "[TEST] testOneway complete, exiting test function" << std::endl;
+    std::cout.flush();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -492,8 +517,12 @@ TEST_F(ResponseCorrelatorTest, testTransportException){
     ASSERT_TRUE(listener.exCount == 1);
 
     std::cout << "[TEST] Calling correlator.close()" << std::endl;
+    std::cout.flush();
     correlator.close();
-    std::cout << "[TEST] testTransportException complete" << std::endl;
+    std::cout << "[TEST] correlator.close() returned" << std::endl;
+    std::cout.flush();
+    std::cout << "[TEST] testTransportException complete, exiting test function" << std::endl;
+    std::cout.flush();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -573,8 +602,12 @@ TEST_F(ResponseCorrelatorTest, testMultiRequests){
     ASSERT_TRUE(listener.exCount == 0);
 
     std::cout << "[TEST] Calling correlator.close()" << std::endl;
+    std::cout.flush();
     correlator.close();
-    std::cout << "[TEST] testMultiRequests complete" << std::endl;
+    std::cout << "[TEST] correlator.close() returned" << std::endl;
+    std::cout.flush();
+    std::cout << "[TEST] testMultiRequests complete, exiting test function" << std::endl;
+    std::cout.flush();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -86,11 +86,21 @@ using namespace decaf::io;
         }
 
         virtual ~MyTransport(){
+            std::cerr << "[MyTransport] *** DESTRUCTOR ENTRY *** (using cerr)" << std::endl;
+            std::cerr.flush();
             std::cout << "[MyTransport] Destructor called" << std::endl;
             std::cout.flush();
+
+            std::cout << "[MyTransport] Destructor about to call close()" << std::endl;
+            std::cout.flush();
             close();
+            std::cout << "[MyTransport] Destructor close() returned" << std::endl;
+            std::cout.flush();
+
             std::cout << "[MyTransport] Destructor completed" << std::endl;
             std::cout.flush();
+            std::cerr << "[MyTransport] *** DESTRUCTOR EXIT *** (using cerr)" << std::endl;
+            std::cerr.flush();
         }
 
         virtual void oneway(const Pointer<Command> command) {
@@ -419,8 +429,11 @@ TEST_F(ResponseCorrelatorTest, testBasics) {
     correlator.close();
     std::cout << "[TEST] correlator.close() returned" << std::endl;
     std::cout.flush();
-    std::cout << "[TEST] testBasics complete, exiting test function" << std::endl;
+    std::cout << "[TEST] testBasics complete, about to exit function and destroy local variables" << std::endl;
     std::cout.flush();
+    std::cout << "[TEST] testBasics: listener, transport, and correlator will now be destroyed in reverse order" << std::endl;
+    std::cout.flush();
+    // Function exits here - local variables destroyed in reverse order: correlator, transport, listener
 }
 
 ////////////////////////////////////////////////////////////////////////////////

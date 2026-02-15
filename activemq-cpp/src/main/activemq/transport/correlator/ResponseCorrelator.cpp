@@ -111,24 +111,28 @@ ResponseCorrelator::ResponseCorrelator(Pointer<Transport> next) : TransportFilte
 ////////////////////////////////////////////////////////////////////////////////
 ResponseCorrelator::~ResponseCorrelator() {
 
+    std::cerr << "[ResponseCorrelator] *** DESTRUCTOR ENTRY *** (using cerr)" << std::endl;
+    std::cerr.flush();
     std::cout << "[ResponseCorrelator] Destructor called" << std::endl;
     std::cout.flush();
 
     // Close the transport and destroy it.
     try {
-        std::cout << "[ResponseCorrelator] Calling close() from destructor" << std::endl;
+        std::cout << "[ResponseCorrelator] Destructor about to call close()" << std::endl;
         std::cout.flush();
         close();
-        std::cout << "[ResponseCorrelator] close() returned" << std::endl;
+        std::cout << "[ResponseCorrelator] Destructor close() returned" << std::endl;
         std::cout.flush();
     }
     AMQ_CATCHALL_NOTHROW()
 
-    std::cout << "[ResponseCorrelator] Deleting impl" << std::endl;
+    std::cout << "[ResponseCorrelator] Destructor about to delete impl" << std::endl;
     std::cout.flush();
     delete this->impl;
     std::cout << "[ResponseCorrelator] Destructor completed" << std::endl;
     std::cout.flush();
+    std::cerr << "[ResponseCorrelator] *** DESTRUCTOR EXIT *** (using cerr)" << std::endl;
+    std::cerr.flush();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -142,10 +146,29 @@ void ResponseCorrelator::oneway(const Pointer<Command> command) {
 
         std::cout << "[ResponseCorrelator] Setting command ID" << std::endl;
         std::cout.flush();
-        command->setCommandId(this->impl->nextCommandId.getAndIncrement());
-        command->setResponseRequired(false);
 
-        std::cout << "[ResponseCorrelator] Calling next->oneway() with command ID " << command->getCommandId() << std::endl;
+        std::cout << "[ResponseCorrelator] About to call getAndIncrement()" << std::endl;
+        std::cout.flush();
+        int cmdId = this->impl->nextCommandId.getAndIncrement();
+        std::cout << "[ResponseCorrelator] getAndIncrement() returned: " << cmdId << std::endl;
+        std::cout.flush();
+
+        std::cout << "[ResponseCorrelator] About to call command->setCommandId(" << cmdId << ")" << std::endl;
+        std::cout.flush();
+        command->setCommandId(cmdId);
+        std::cout << "[ResponseCorrelator] setCommandId() completed" << std::endl;
+        std::cout.flush();
+
+        std::cout << "[ResponseCorrelator] About to call command->setResponseRequired(false)" << std::endl;
+        std::cout.flush();
+        command->setResponseRequired(false);
+        std::cout << "[ResponseCorrelator] setResponseRequired() completed" << std::endl;
+        std::cout.flush();
+
+        std::cout << "[ResponseCorrelator] About to call command->getCommandId()" << std::endl;
+        std::cout.flush();
+        int retrievedId = command->getCommandId();
+        std::cout << "[ResponseCorrelator] Calling next->oneway() with command ID " << retrievedId << std::endl;
         std::cout.flush();
         next->oneway(command);
         std::cout << "[ResponseCorrelator] next->oneway() returned for command ID " << command->getCommandId() << std::endl;

@@ -111,13 +111,24 @@ ResponseCorrelator::ResponseCorrelator(Pointer<Transport> next) : TransportFilte
 ////////////////////////////////////////////////////////////////////////////////
 ResponseCorrelator::~ResponseCorrelator() {
 
+    std::cout << "[ResponseCorrelator] Destructor called" << std::endl;
+    std::cout.flush();
+
     // Close the transport and destroy it.
     try {
+        std::cout << "[ResponseCorrelator] Calling close() from destructor" << std::endl;
+        std::cout.flush();
         close();
+        std::cout << "[ResponseCorrelator] close() returned" << std::endl;
+        std::cout.flush();
     }
     AMQ_CATCHALL_NOTHROW()
 
+    std::cout << "[ResponseCorrelator] Deleting impl" << std::endl;
+    std::cout.flush();
     delete this->impl;
+    std::cout << "[ResponseCorrelator] Destructor completed" << std::endl;
+    std::cout.flush();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -125,12 +136,20 @@ void ResponseCorrelator::oneway(const Pointer<Command> command) {
 
     try {
 
+        std::cout << "[ResponseCorrelator] oneway() called, checking if closed" << std::endl;
+        std::cout.flush();
         checkClosed();
 
+        std::cout << "[ResponseCorrelator] Setting command ID" << std::endl;
+        std::cout.flush();
         command->setCommandId(this->impl->nextCommandId.getAndIncrement());
         command->setResponseRequired(false);
 
+        std::cout << "[ResponseCorrelator] Calling next->oneway() with command ID " << command->getCommandId() << std::endl;
+        std::cout.flush();
         next->oneway(command);
+        std::cout << "[ResponseCorrelator] next->oneway() returned for command ID " << command->getCommandId() << std::endl;
+        std::cout.flush();
     }
     AMQ_CATCH_RETHROW(UnsupportedOperationException)
     AMQ_CATCH_RETHROW(IOException)
@@ -364,8 +383,12 @@ void ResponseCorrelator::onCommand(const Pointer<Command> command) {
 
 ////////////////////////////////////////////////////////////////////////////////
 void ResponseCorrelator::doClose() {
+    std::cout << "[ResponseCorrelator] doClose() called" << std::endl;
+    std::cout.flush();
     try {
         dispose(Pointer<Exception>(new IOException(__FILE__, __LINE__, "Transport Stopped")));
+        std::cout << "[ResponseCorrelator] dispose() completed" << std::endl;
+        std::cout.flush();
     }
     AMQ_CATCH_RETHROW(IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)

@@ -86,14 +86,28 @@ using namespace decaf::io;
         }
 
         virtual ~MyTransport(){
+            std::cout << "[MyTransport] Destructor called" << std::endl;
+            std::cout.flush();
             close();
+            std::cout << "[MyTransport] Destructor completed" << std::endl;
+            std::cout.flush();
         }
 
         virtual void oneway(const Pointer<Command> command) {
+            std::cout << "[MyTransport] oneway() called, about to acquire mutex" << std::endl;
+            std::cout.flush();
             synchronized(&mutex) {
+                std::cout << "[MyTransport] oneway() mutex acquired, pushing command" << std::endl;
+                std::cout.flush();
                 requests.push(command);
+                std::cout << "[MyTransport] oneway() command pushed, calling notifyAll()" << std::endl;
+                std::cout.flush();
                 mutex.notifyAll();
+                std::cout << "[MyTransport] oneway() notifyAll() called, releasing mutex" << std::endl;
+                std::cout.flush();
             }
+            std::cout << "[MyTransport] oneway() completed" << std::endl;
+            std::cout.flush();
         }
 
         virtual Pointer<FutureResponse> asyncRequest(const Pointer<Command> command,

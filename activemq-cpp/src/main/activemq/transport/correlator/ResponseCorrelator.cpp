@@ -109,16 +109,32 @@ ResponseCorrelator::ResponseCorrelator(Pointer<Transport> next) : TransportFilte
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ResponseCorrelator::~ResponseCorrelator() {
-    // Base class TransportFilter::~TransportFilter() handles:
-    // - Calling close()
-    // - Resetting next pointer
-    // - Cleaning up impl
-    // We only need to delete our ResponseCorrelator-specific impl
-    try {
+void ResponseCorrelator::cleanup() {
+    std::cerr << "[ResponseCorrelator] cleanup() called" << std::endl;
+    std::cerr.flush();
+
+    if (this->impl != NULL) {
+        std::cerr << "[ResponseCorrelator] About to delete impl" << std::endl;
+        std::cerr.flush();
         delete this->impl;
+        this->impl = NULL;
+        std::cerr << "[ResponseCorrelator] impl deleted" << std::endl;
+        std::cerr.flush();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+ResponseCorrelator::~ResponseCorrelator() {
+    std::cerr << "[ResponseCorrelator] *** DESTRUCTOR ENTRY *** (using cerr)" << std::endl;
+    std::cerr.flush();
+
+    try {
+        cleanup();
     }
     AMQ_CATCHALL_NOTHROW()
+
+    std::cerr << "[ResponseCorrelator] *** DESTRUCTOR EXIT *** (about to call base destructor)" << std::endl;
+    std::cerr.flush();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -398,6 +414,9 @@ void ResponseCorrelator::doClose() {
         dispose(Pointer<Exception>(new IOException(__FILE__, __LINE__, "Transport Stopped")));
         std::cout << "[ResponseCorrelator] dispose() completed" << std::endl;
         std::cout.flush();
+
+        // Clean up impl early to avoid issues during destruction
+        cleanup();
     }
     AMQ_CATCH_RETHROW(IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)

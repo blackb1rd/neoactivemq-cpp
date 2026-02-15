@@ -110,29 +110,15 @@ ResponseCorrelator::ResponseCorrelator(Pointer<Transport> next) : TransportFilte
 
 ////////////////////////////////////////////////////////////////////////////////
 ResponseCorrelator::~ResponseCorrelator() {
-
-    std::cerr << "[ResponseCorrelator] *** DESTRUCTOR ENTRY *** (using cerr)" << std::endl;
-    std::cerr.flush();
-    std::cout << "[ResponseCorrelator] Destructor called" << std::endl;
-    std::cout.flush();
-
-    // Close the transport and destroy it.
+    // Base class TransportFilter::~TransportFilter() handles:
+    // - Calling close()
+    // - Resetting next pointer
+    // - Cleaning up impl
+    // We only need to delete our ResponseCorrelator-specific impl
     try {
-        std::cout << "[ResponseCorrelator] Destructor about to call close()" << std::endl;
-        std::cout.flush();
-        close();
-        std::cout << "[ResponseCorrelator] Destructor close() returned" << std::endl;
-        std::cout.flush();
+        delete this->impl;
     }
     AMQ_CATCHALL_NOTHROW()
-
-    std::cout << "[ResponseCorrelator] Destructor about to delete impl" << std::endl;
-    std::cout.flush();
-    delete this->impl;
-    std::cout << "[ResponseCorrelator] Destructor completed" << std::endl;
-    std::cout.flush();
-    std::cerr << "[ResponseCorrelator] *** DESTRUCTOR EXIT *** (using cerr)" << std::endl;
-    std::cerr.flush();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

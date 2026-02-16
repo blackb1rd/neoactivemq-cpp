@@ -1061,8 +1061,9 @@ TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker2OnlyOnline) {
     broker1->stop();
     broker1->waitUntilStopped();
 
-    std::string uri = "failover://(tcp://localhost:" + Integer::toString(port1) + ","
-                                  "tcp://localhost:" + Integer::toString(port2) + ")?randomize=false";
+    // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
+    std::string uri = "failover://(tcp://127.0.0.1:" + Integer::toString(port1) + ","
+                                  "tcp://127.0.0.1:" + Integer::toString(port2) + ")?randomize=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;

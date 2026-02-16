@@ -111,5 +111,35 @@
     },
     "cmake.buildDirectory": "${workspaceFolder}/output/build/${buildPreset}",
     "neoactivemq.buildPreset": "x86-windows-debug-test",
-    "neoactivemq.buildPresetNonTest": "x86-windows-debug"
+    "neoactivemq.buildPresetNonTest": "x86-windows-debug",
+
+    // Test Explorer debug configuration
+    "cmake.debugConfig": {
+        "name": "(Windows) Launch",
+        "type": "cppvsdbg",
+        "request": "launch",
+        "program": "${command:cmake.launchTargetPath}",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "console": "integratedTerminal"
+    },
+
+    // CTest timeout for individual tests
+    "cmake.ctestTimeout": 60,
+
+    // Enable test output
+    "cmake.ctestArgs": [
+        "--output-on-failure",
+        "--verbose"
+    ],
+
+    // Make sure test explorer is enabled
+    "cmake.options.statusBarVisibility": "visible",
+    "cmake.options.advanced": {
+        "test": {
+            "enabled": true
+        }
+    }
 }

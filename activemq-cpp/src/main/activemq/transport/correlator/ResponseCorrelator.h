@@ -67,9 +67,6 @@ namespace correlator {
 
         virtual ~ResponseCorrelator();
 
-    private:
-        void cleanup();
-
     public:  // Transport Methods
 
         virtual void oneway(const Pointer<Command> command);

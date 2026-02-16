@@ -61,41 +61,23 @@ TransportFilter::TransportFilter(const Pointer<Transport> next) :
 
 ////////////////////////////////////////////////////////////////////////////////
 TransportFilter::~TransportFilter() {
-    std::cerr << "[TransportFilter] *** DESTRUCTOR ENTRY *** (using cerr)" << std::endl;
-    std::cerr.flush();
-
     try {
-        std::cerr << "[TransportFilter] About to call close()" << std::endl;
-        std::cerr.flush();
         close();
-        std::cerr << "[TransportFilter] close() returned" << std::endl;
-        std::cerr.flush();
     }
     AMQ_CATCHALL_NOTHROW()
 
     try {
-        std::cerr << "[TransportFilter] About to reset next pointer" << std::endl;
-        std::cerr.flush();
         // Force next out here so we can ensure we catch any stray
         // exceptions.  Since we hold the only reference to next it
         // should get deleted.
         this->next.reset(NULL);
-        std::cerr << "[TransportFilter] next pointer reset complete" << std::endl;
-        std::cerr.flush();
     }
     AMQ_CATCHALL_NOTHROW()
 
     try {
-        std::cerr << "[TransportFilter] About to delete impl" << std::endl;
-        std::cerr.flush();
         delete this->impl;
-        std::cerr << "[TransportFilter] impl deleted" << std::endl;
-        std::cerr.flush();
     }
     AMQ_CATCHALL_NOTHROW()
-
-    std::cerr << "[TransportFilter] *** DESTRUCTOR EXIT *** (using cerr)" << std::endl;
-    std::cerr.flush();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

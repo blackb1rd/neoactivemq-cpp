@@ -1098,14 +1098,17 @@ bool FailoverTransport::iterate() {
             } else {
 
                 if (this->impl->doRebalance) {
-                    if (this->impl->connectedToPrioirty || connectList->getPriorityURI().equals(*this->impl->connectedTransportURI)) {
+                    if (this->impl->connectedTransportURI != NULL &&
+                        (this->impl->connectedToPrioirty || connectList->getPriorityURI().equals(*this->impl->connectedTransportURI))) {
                         // already connected to first in the list, no need to rebalance
                         this->impl->doRebalance = false;
                         return false;
-                    } else {
+                    } else if (this->impl->connectedTransportURI != NULL) {
                         // break any existing connect for rebalance.
                         this->impl->disconnect();
                     }
+                    // else: connectedTransportURI is NULL (transport already failed),
+                    // just clear the flag and proceed with normal reconnection.
 
                     this->impl->doRebalance = false;
                 }

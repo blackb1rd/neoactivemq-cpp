@@ -776,8 +776,9 @@ TEST_F(FailoverTransportTest, testConnectedToMockBroker) {
         tempSocket.close();
     }
 
-    std::string uri = "failover://(tcp://localhost:" + Integer::toString(port1) + ","
-            "tcp://localhost:" + Integer::toString(port2) + ")";
+    // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
+    std::string uri = "failover://(tcp://127.0.0.1:" + Integer::toString(port1) + ","
+            "tcp://127.0.0.1:" + Integer::toString(port2) + ")";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -926,8 +927,9 @@ TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOnline) {
     int port1 = broker1->getPort();
     int port2 = broker2->getPort();
 
-    std::string uri = "failover://(tcp://localhost:" + Integer::toString(port1) + ","
-                                  "tcp://localhost:" + Integer::toString(port2) + ")?randomize=false";
+    // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
+    std::string uri = "failover://(tcp://127.0.0.1:" + Integer::toString(port1) + ","
+                                  "tcp://127.0.0.1:" + Integer::toString(port2) + ")?randomize=false";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1261,8 +1263,9 @@ TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOnline) {
     int port1 = broker1->getPort();
     int port2 = broker2->getPort();
 
-    std::string uri = "failover://(tcp://localhost:" + Integer::toString(port1) + ","
-                                  "tcp://localhost:" + Integer::toString(port2) + ")";
+    // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
+    std::string uri = "failover://(tcp://127.0.0.1:" + Integer::toString(port1) + ","
+                                  "tcp://127.0.0.1:" + Integer::toString(port2) + ")";
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
@@ -1590,8 +1593,9 @@ TEST_F(FailoverTransportTest, testConnectedToPriorityOnFirstTryThenFailover) {
     int port1 = broker1->getPort();
     int port2 = broker2->getPort();
 
-    std::string uri = std::string("failover://(tcp://localhost:") +
-                      Integer::toString(port1) + ",tcp://localhost:" +
+    // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
+    std::string uri = std::string("failover://(tcp://127.0.0.1:") +
+                      Integer::toString(port1) + ",tcp://127.0.0.1:" +
                       Integer::toString(port2) + ")?randomize=false&priorityBackup=true";
 
     PriorityBackupListener listener;
@@ -1731,10 +1735,11 @@ TEST_F(FailoverTransportTest, testConnectsToPriorityAfterInitialBackupFails) {
     broker3->waitUntilStarted();
     int port3 = broker3->getPort();
 
-    std::string uri = std::string("failover://(tcp://localhost:") +
+    // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
+    std::string uri = std::string("failover://(tcp://127.0.0.1:") +
                       Integer::toString(port1) + "?transport.useInactivityMonitor=false," +
-                      "tcp://localhost:" + Integer::toString(port2) + "?transport.useInactivityMonitor=false," +
-                      "tcp://localhost:" + Integer::toString(port3) +
+                      "tcp://127.0.0.1:" + Integer::toString(port2) + "?transport.useInactivityMonitor=false," +
+                      "tcp://127.0.0.1:" + Integer::toString(port3) +
                       "?transport.useInactivityMonitor=false)?randomize=false&priorityBackup=true";
 
     PriorityBackupListener listener;
@@ -1810,8 +1815,9 @@ TEST_F(FailoverTransportTest, testPriorityBackupRapidSwitchingOnRestore) {
     int port1 = broker1->getPort();
     int port2 = broker2->getPort();
 
-    std::string uri = std::string("failover://(tcp://localhost:") +
-                      Integer::toString(port1) + ",tcp://localhost:" +
+    // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
+    std::string uri = std::string("failover://(tcp://127.0.0.1:") +
+                      Integer::toString(port1) + ",tcp://127.0.0.1:" +
                       Integer::toString(port2) + ")?randomize=false&priorityBackup=true";
 
     PriorityBackupListener listener;
@@ -1883,8 +1889,9 @@ TEST_F(FailoverTransportTest, testSimpleBrokerRestart) {
     int port2 = broker2->getPort();
 
     // Use aggressive retry settings for faster failover in tests
-    std::string uri = std::string("failover://(tcp://localhost:") +
-                      Integer::toString(port1) + ",tcp://localhost:" +
+    // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
+    std::string uri = std::string("failover://(tcp://127.0.0.1:") +
+                      Integer::toString(port1) + ",tcp://127.0.0.1:" +
                       Integer::toString(port2) + ")?maxReconnectDelay=500&initialReconnectDelay=100&timeout=30000";
 
     DefaultTransportListener listener;
@@ -2023,8 +2030,9 @@ TEST_F(FailoverTransportTest, testBrokerRestartWithProperSync) {
     int port1 = broker1->getPort();
     int port2 = broker2->getPort();
 
-    std::string uri = std::string("failover://(tcp://localhost:") +
-                      Integer::toString(port1) + ",tcp://localhost:" +
+    // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
+    std::string uri = std::string("failover://(tcp://127.0.0.1:") +
+                      Integer::toString(port1) + ",tcp://127.0.0.1:" +
                       Integer::toString(port2) + ")?maxReconnectDelay=1000";
 
     PriorityBackupListener listener;
@@ -2114,8 +2122,9 @@ TEST_F(FailoverTransportTest, testFuzzyBrokerAvailability) {
     // Give brokers extra time to fully initialize
     Thread::sleep(500);
 
-    std::string uri = std::string("failover://(tcp://localhost:") +
-                      Integer::toString(port1) + ",tcp://localhost:" +
+    // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
+    std::string uri = std::string("failover://(tcp://127.0.0.1:") +
+                      Integer::toString(port1) + ",tcp://127.0.0.1:" +
                       Integer::toString(port2) + ")?initialReconnectDelay=100&maxReconnectDelay=500&useExponentialBackOff=false";
 
     PriorityBackupListener listener;

@@ -36,6 +36,17 @@ namespace util{
             return this->openwireURL;
         }
 
+        // SSL URL for SSL integration testing
+        // Requires: docker compose --profile ssl up
+
+        /**
+         * Returns the SSL OpenWire URL (port 61617).
+         * Requires SSL certificates generated via docker/ssl/generate-certs.sh
+         */
+        virtual std::string getSslOpenwireURL() const {
+            return this->sslOpenwireURL;
+        }
+
         // Failover URLs for multi-broker testing
         // Requires: docker compose --profile failover up
 
@@ -85,6 +96,7 @@ namespace util{
         std::string urlCommon;
         std::string stompURL;
         std::string openwireURL;
+        std::string sslOpenwireURL;
 
         // Multi-broker URLs
         std::string openwireURL1;

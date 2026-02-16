@@ -36,7 +36,7 @@ int main( int argc, char **argv ) {
     // Enable record-only mode: skip formatting overhead, only record to flight recorder
     activemq::util::AMQLogger::setRecordOnlyMode(true);
 
-    long long testTimeoutSeconds = 600; // Per-test timeout: 10 minutes default for system tests
+    long long testTimeoutSeconds = 600; // Per-test timeout: 10 minutes default for integration benchmark tests
     bool useTeamCity = false;
 
     // Let GTest parse --gtest_* flags first
@@ -77,7 +77,7 @@ int main( int argc, char **argv ) {
     // Add watchdog listener for per-test timeout (0 = disabled)
     std::unique_ptr<test::util::TestWatchdog> watchdog;
     if( testTimeoutSeconds > 0 ) {
-        watchdog.reset( new test::util::TestWatchdog( testTimeoutSeconds, true, "System test" ) );
+        watchdog.reset( new test::util::TestWatchdog( testTimeoutSeconds, true, "Integration benchmark test" ) );
         listeners.Append( watchdog.get() );
     }
 

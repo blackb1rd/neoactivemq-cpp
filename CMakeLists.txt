@@ -213,7 +213,7 @@ if(AMQCPP_BUILD_TESTS)
 	add_subdirectory(activemq-cpp/src/test)
 	add_subdirectory(activemq-cpp/src/test-benchmarks)
 	add_subdirectory(activemq-cpp/src/test-integration)
-	add_subdirectory(activemq-cpp/src/test-system)
+	add_subdirectory(activemq-cpp/src/test-integration-benchmarks)
 
 	# =========================================================================
 	# Integration & System Test Workflow Targets
@@ -232,21 +232,21 @@ if(AMQCPP_BUILD_TESTS)
 		COMMENT "Full integration test workflow (start broker, test, stop broker)..."
 	)
 
-	# System tests: start all brokers (failover profile), run tests, stop brokers
-	add_custom_target(system-full
+	# Integration benchmark tests: start all brokers (failover profile), run tests, stop brokers
+	add_custom_target(integration-benchmark-full
 		COMMAND docker compose --profile failover up -d
 		COMMAND ${CMAKE_COMMAND} -E sleep 15
-		COMMAND ${CMAKE_COMMAND} -E echo "Running system tests..."
-		COMMAND $<TARGET_FILE:neoactivemq-system-test>
+		COMMAND ${CMAKE_COMMAND} -E echo "Running integration benchmark tests..."
+		COMMAND $<TARGET_FILE:neoactivemq-integration-benchmark-test>
 		COMMAND docker compose --profile failover down
 		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		DEPENDS neoactivemq-system-test
-		COMMENT "Full system test workflow (start all brokers, test, stop brokers)..."
+		DEPENDS neoactivemq-integration-benchmark-test
+		COMMENT "Full integration benchmark test workflow (start all brokers, test, stop brokers)..."
 	)
 
 	message(STATUS "Test workflow targets:")
-	message(STATUS "  cmake --build --preset <preset> --target integration-full  # Integration tests (auto Docker)")
-	message(STATUS "  cmake --build --preset <preset> --target system-full       # System tests (auto Docker)")
+	message(STATUS "  cmake --build --preset <preset> --target integration-full            # Integration tests (auto Docker)")
+	message(STATUS "  cmake --build --preset <preset> --target integration-benchmark-full  # Integration benchmark tests (auto Docker)")
 endif()
 
 # Installation rules

@@ -14,9 +14,9 @@
 #     apache/activemq-classic:5.18.7
 #
 # NOTE: Failover, multi-connection, and high-volume tests have been moved to
-# test-system directory. Run those with:
+# test-integration-benchmarks directory. Run those with:
 #   docker compose --profile failover up -d
-#   ./neoactivemq-system-test
+#   ./neoactivemq-integration-benchmark-test
 #
 # To stop the broker after testing:
 #   docker-compose down
@@ -82,6 +82,10 @@ set(INTEGRATION_TEST_SRCS
   activemq/test/openwire/OpenwireXATransactionsTest.cpp
   # Additional OpenWire protocol specification tests
   activemq/test/openwire/OpenwireMessageSelectorTest.cpp
+
+  # OpenWire SSL protocol tests (require SSL broker: docker compose --profile ssl up)
+  activemq/test/openwire_ssl/OpenwireSslSimpleTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslConnectionTest.cpp
 
   # STOMP protocol tests
   activemq/test/stomp/StompAdvisoryTest.cpp
@@ -183,6 +187,22 @@ static_discover_tests(neoactivemq-integration-test
   TEST_PREFIX "integration/"
   SOURCES ${INTEGRATION_TEST_DISCOVERY_SRCS}
   LABELS integration
+  PROPERTIES
+    TIMEOUT 300
+    ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
+)
+
+# SSL integration tests - discovered separately with their own label
+# These require an SSL-enabled broker: docker compose --profile ssl up
+set(INTEGRATION_SSL_TEST_DISCOVERY_SRCS
+  activemq/test/openwire_ssl/OpenwireSslSimpleTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslConnectionTest.cpp
+)
+
+static_discover_tests(neoactivemq-integration-test
+  TEST_PREFIX "integration-ssl/"
+  SOURCES ${INTEGRATION_SSL_TEST_DISCOVERY_SRCS}
+  LABELS integration-ssl
   PROPERTIES
     TIMEOUT 300
     ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"

@@ -1,0 +1,88 @@
+<!--
+    ActiveMQ broker configuration with SSL transport connector for integration testing.
+
+    This configuration adds an SSL transport connector on port 61617 in addition
+    to the default OpenWire connector on port 61616.
+
+    Certificate files are expected to be mounted at /opt/activemq/conf/certs/
+-->
+<beans
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+                       http://www.springframework.org/schema/beans/spring-beans.xsd
+                       http://activemq.apache.org/schema/core
+                       http://activemq.apache.org/schema/core/activemq-core.xsd">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <value>file:${activemq.conf}/credentials.properties</value>
+        </property>
+    </bean>
+
+    <!-- SSL context configuration -->
+    <bean id="sslContext" class="org.apache.activemq.broker.SslContext">
+        <property name="keyStore" value="/opt/activemq/conf/certs/broker.p12"/>
+        <property name="keyStoreType" value="PKCS12"/>
+        <property name="keyStorePassword" value="password"/>
+        <property name="trustStore" value="/opt/activemq/conf/certs/broker-truststore.p12"/>
+        <property name="trustStoreType" value="PKCS12"/>
+        <property name="trustStorePassword" value="password"/>
+    </bean>
+
+    <broker xmlns="http://activemq.apache.org/schema/core"
+            brokerName="localhost"
+            dataDirectory="${activemq.data}"
+            sslContext="#sslContext">
+
+        <destinationPolicy>
+            <policyMap>
+                <policyEntries>
+                    <policyEntry topic=">" >
+                        <pendingMessageLimitStrategy>
+                            <constantPendingMessageLimitStrategy limit="1000"/>
+                        </pendingMessageLimitStrategy>
+                    </policyEntry>
+                </policyEntries>
+            </policyMap>
+        </destinationPolicy>
+
+        <managementContext>
+            <managementContext createConnector="false"/>
+        </managementContext>
+
+        <persistenceAdapter>
+            <kahaDB directory="${activemq.data}/kahadb"/>
+        </persistenceAdapter>
+
+        <systemUsage>
+            <systemUsage>
+                <memoryUsage>
+                    <memoryUsage percentOfJvmHeap="70" />
+                </memoryUsage>
+                <storeUsage>
+                    <storeUsage limit="1 gb"/>
+                </storeUsage>
+                <tempUsage>
+                    <tempUsage limit="500 mb"/>
+                </tempUsage>
+            </systemUsage>
+        </systemUsage>
+
+        <transportConnectors>
+            <!-- Standard OpenWire connector -->
+            <transportConnector name="openwire" uri="tcp://0.0.0.0:61616?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600"/>
+            <!-- SSL OpenWire connector -->
+            <transportConnector name="ssl" uri="ssl://0.0.0.0:61617?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600&amp;needClientAuth=false"/>
+        </transportConnectors>
+
+        <shutdownHooks>
+            <bean xmlns="http://www.springframework.org/schema/beans"
+                  class="org.apache.activemq.hooks.SpringContextHook" />
+        </shutdownHooks>
+
+    </broker>
+
+    <import resource="jetty.xml"/>
+
+</beans>

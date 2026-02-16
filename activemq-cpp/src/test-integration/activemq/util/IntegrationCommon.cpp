@@ -30,6 +30,7 @@ IntegrationCommon::IntegrationCommon()
     : urlCommon()
     , stompURL()
     , openwireURL()
+    , sslOpenwireURL()
     , openwireURL1()
     , openwireURL2()
     , openwireURL3()
@@ -38,6 +39,11 @@ IntegrationCommon::IntegrationCommon()
     this->urlCommon = "tcp://localhost:";
     this->stompURL = this->urlCommon + "61613?wireFormat=stomp";
     this->openwireURL = this->urlCommon + "61616?transport.trace=false";
+
+    // SSL URL for SSL integration testing
+    // Requires: docker compose --profile ssl up
+    // Requires: SSL certificates generated via docker/ssl/generate-certs.sh
+    this->sslOpenwireURL = "ssl://localhost:61617?transport.trace=false";
 
     // Multi-broker URLs for failover testing
     // These require: docker compose --profile failover up

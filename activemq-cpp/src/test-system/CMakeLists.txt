@@ -88,7 +88,6 @@ static_discover_tests(neoactivemq-system-test
     activemq/test/openwire/OpenwireMultiConnectionTest.cpp
   LABELS system
   PROPERTIES
-    FIXTURES_REQUIRED SystemFixture
     TIMEOUT 600
     ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
 )

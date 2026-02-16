@@ -184,7 +184,6 @@ static_discover_tests(neoactivemq-integration-test
   SOURCES ${INTEGRATION_TEST_DISCOVERY_SRCS}
   LABELS integration
   PROPERTIES
-    FIXTURES_REQUIRED IntegrationFixture
     TIMEOUT 300
     ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
 )

@@ -16,6 +16,7 @@ add_unit_test_module(
     activemq/cmsutil/CmsTemplateTest.cpp
     activemq/cmsutil/DynamicDestinationResolverTest.cpp
     activemq/cmsutil/SessionPoolTest.cpp
+  LABELS activemq cmsutil
 )
 
 # ─── Module 2: activemq-commands (13 tests) ──────────────────────────────────
@@ -35,6 +36,7 @@ add_unit_test_module(
     activemq/commands/BrokerIdTest.cpp
     activemq/commands/BrokerInfoTest.cpp
     activemq/commands/XATransactionIdTest.cpp
+  LABELS activemq commands
 )
 
 # ─── Module 3: activemq-core (9 tests, includes exceptions) ──────────────────
@@ -50,6 +52,7 @@ add_unit_test_module(
     activemq/core/LazyPropertyUnmarshalTest.cpp
     activemq/core/SimplePriorityMessageDispatchChannelTest.cpp
     activemq/exceptions/ActiveMQExceptionTest.cpp
+  LABELS activemq core
 )
 
 # ─── Module 4: activemq-state (6 tests) ──────────────────────────────────────
@@ -62,6 +65,7 @@ add_unit_test_module(
     activemq/state/ProducerStateTest.cpp
     activemq/state/SessionStateTest.cpp
     activemq/state/TransactionStateTest.cpp
+  LABELS activemq state
 )
 
 # ─── Module 5: activemq-threads (3 tests) ────────────────────────────────────
@@ -71,6 +75,7 @@ add_unit_test_module(
     activemq/threads/CompositeTaskRunnerTest.cpp
     activemq/threads/DedicatedTaskRunnerTest.cpp
     activemq/threads/SchedulerTest.cpp
+  LABELS activemq threads
 )
 
 # ─── Module 6: activemq-transport (14 tests) ─────────────────────────────────
@@ -95,6 +100,7 @@ add_unit_test_module(
     activemq/transport/tcp/SslTransportTest.cpp
   EXTRA_SOURCES
     activemq/mock/MockBrokerService.cpp
+  LABELS activemq transport
 )
 
 # ─── Module 7: activemq-util (12 tests) ──────────────────────────────────────
@@ -113,6 +119,7 @@ add_unit_test_module(
     activemq/util/PrimitiveValueConverterTest.cpp
     activemq/util/PrimitiveValueNodeTest.cpp
     activemq/util/URISupportTest.cpp
+  LABELS activemq util
 )
 
 # ─── Module 8: activemq-wireformat (66 tests) ────────────────────────────────
@@ -185,6 +192,7 @@ add_unit_test_module(
     activemq/wireformat/stomp/StompHelperTest.cpp
     activemq/wireformat/stomp/StompWireFormatFactoryTest.cpp
     activemq/wireformat/stomp/StompWireFormatTest.cpp
+  LABELS activemq wireformat
 )
 
 # ─── Module 9: decaf-internal (16 tests) ─────────────────────────────────────
@@ -207,6 +215,7 @@ add_unit_test_module(
     decaf/internal/util/TimerTaskHeapTest.cpp
     decaf/internal/util/concurrent/TransferQueueTest.cpp
     decaf/internal/util/concurrent/TransferStackTest.cpp
+  LABELS decaf internal
 )
 
 # ─── Module 10: decaf-io (15 tests) ──────────────────────────────────────────
@@ -231,6 +240,7 @@ add_unit_test_module(
     decaf/io/WriterTest.cpp
   EXTRA_SOURCES
     decaf/util/Endian.cpp
+  LABELS decaf io
 )
 
 # ─── Module 11: decaf-lang (18 tests) ────────────────────────────────────────
@@ -255,6 +265,7 @@ add_unit_test_module(
     decaf/lang/SystemTest.cpp
     decaf/lang/ThreadLocalTest.cpp
     decaf/lang/ThreadTest.cpp
+  LABELS decaf lang
 )
 
 # ─── Module 12: decaf-net (12 tests, includes ssl) ───────────────────────────
@@ -273,6 +284,7 @@ add_unit_test_module(
     decaf/net/URLEncoderTest.cpp
     decaf/net/URLTest.cpp
     decaf/net/ssl/SSLSocketFactoryTest.cpp
+  LABELS decaf net
 )
 
 # ─── Module 13: decaf-util (36 tests, includes zip/nio/security) ─────────────
@@ -317,6 +329,7 @@ add_unit_test_module(
     decaf/security/SecureRandomTest.cpp
   EXTRA_SOURCES
     decaf/util/Endian.cpp
+  LABELS decaf util
 )
 
 # ─── Module 14: decaf-concurrent (21 tests) ──────────────────────────────────
@@ -347,4 +360,5 @@ add_unit_test_module(
     decaf/util/concurrent/locks/AbstractQueuedSynchronizerTest.cpp
   EXTRA_SOURCES
     decaf/util/concurrent/ExecutorsTestSupport.cpp
+  LABELS decaf concurrent
 )

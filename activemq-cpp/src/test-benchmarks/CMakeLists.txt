@@ -87,6 +87,7 @@ set(BENCHMARK_DISCOVERY_SRCS
 static_discover_tests(neoactivemq-benchmark
   TEST_PREFIX "benchmark/"
   SOURCES ${BENCHMARK_DISCOVERY_SRCS}
+  LABELS benchmark
   PROPERTIES
     ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
 )

@@ -182,8 +182,8 @@ set(INTEGRATION_TEST_DISCOVERY_SRCS
 static_discover_tests(neoactivemq-integration-test
   TEST_PREFIX "integration/"
   SOURCES ${INTEGRATION_TEST_DISCOVERY_SRCS}
+  LABELS integration
   PROPERTIES
-    LABELS "integration"
     FIXTURES_REQUIRED IntegrationFixture
     TIMEOUT 300
     ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"

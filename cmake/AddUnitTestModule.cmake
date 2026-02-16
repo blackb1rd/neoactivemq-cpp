@@ -15,15 +15,19 @@
 #       activemq/core/ActiveMQSessionTest.cpp
 #     EXTRA_SOURCES
 #       activemq/mock/MockBrokerService.cpp
+#     LABELS
+#       unit activemq core
 #   )
 #
 # SOURCES:       Test files containing TEST_F/TEST macros. Passed to both
 #                add_executable and static_discover_tests for CTest registration.
 # EXTRA_SOURCES: Support files (mocks, utilities) that must be compiled but
 #                contain no test macros. Passed only to add_executable.
+# LABELS:        CTest labels for filtering (e.g., ctest -L activemq).
+#                Multiple labels can be specified; each test gets all of them.
 #
 function(add_unit_test_module)
-    cmake_parse_arguments(ARG "" "NAME" "SOURCES;EXTRA_SOURCES" ${ARGN})
+    cmake_parse_arguments(ARG "" "NAME" "SOURCES;EXTRA_SOURCES;LABELS" ${ARGN})
 
     if(NOT ARG_NAME)
         message(FATAL_ERROR "add_unit_test_module: NAME is required")
@@ -71,9 +75,18 @@ function(add_unit_test_module)
     # Register tests with CTest -- pass only test source files (SOURCES),
     # not support files (EXTRA_SOURCES) which contain no TEST_F macros.
     include(StaticTestDiscovery)
+
+    # Build the LABELS list: always include "unit", plus any custom labels
+    set(_labels "unit")
+    if(ARG_LABELS)
+        list(APPEND _labels ${ARG_LABELS})
+    endif()
+    list(REMOVE_DUPLICATES _labels)
+
     static_discover_tests(${ARG_NAME}
         TEST_PREFIX "unit/"
         SOURCES ${ARG_SOURCES}
+        LABELS ${_labels}
         PROPERTIES
             TIMEOUT 330
             ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"

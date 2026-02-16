@@ -20,12 +20,13 @@
 #     SOURCES testRegistry.cpp other_test.cpp
 #     GROUP_MODE SUITE          # SUITE (default) or INDIVIDUAL
 #     GROUPS_OUTPUT_FILE "${CMAKE_BINARY_DIR}/test-groups.json"
+#     LABELS unit activemq core  # CTest labels for filtering (ctest -L activemq)
 #     PROPERTIES
 #       TIMEOUT 300
 #       ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
 #   )
 function(static_discover_tests TARGET)
-    cmake_parse_arguments(ARG "" "TEST_PREFIX;GROUP_MODE;GROUPS_OUTPUT_FILE" "SOURCES;PROPERTIES" ${ARGN})
+    cmake_parse_arguments(ARG "" "TEST_PREFIX;GROUP_MODE;GROUPS_OUTPUT_FILE" "SOURCES;PROPERTIES;LABELS" ${ARGN})
 
     if(NOT ARG_SOURCES)
         message(FATAL_ERROR "static_discover_tests: SOURCES is required")
@@ -120,6 +121,9 @@ function(static_discover_tests TARGET)
                 if(ARG_PROPERTIES)
                     set_tests_properties("${test_name}" PROPERTIES ${ARG_PROPERTIES})
                 endif()
+                if(ARG_LABELS)
+                    set_tests_properties("${test_name}" PROPERTIES LABELS "${ARG_LABELS}")
+                endif()
 
                 math(EXPR test_count "${test_count} + 1")
             else()
@@ -153,6 +157,9 @@ function(static_discover_tests TARGET)
 
             if(ARG_PROPERTIES)
                 set_tests_properties("${test_name}" PROPERTIES ${ARG_PROPERTIES})
+            endif()
+            if(ARG_LABELS)
+                set_tests_properties("${test_name}" PROPERTIES LABELS "${ARG_LABELS}")
             endif()
 
             math(EXPR test_count "${test_count} + 1")

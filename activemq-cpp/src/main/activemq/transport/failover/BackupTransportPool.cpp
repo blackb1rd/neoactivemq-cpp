@@ -201,10 +201,20 @@ void BackupTransportPool::close() {
         this->impl->retryMutex.notifyAll();
     }
 
+    // Move backups out of the list under the lock, then destroy them outside
+    // the lock to prevent deadlock. BackupTransport destructors close their
+    // transport, and if the IO thread fires onBackupTransportFailure it tries
+    // to acquire the same backups lock - causing deadlock if we hold it.
+    LinkedList< Pointer<BackupTransport> > toClose;
     synchronized(&this->impl->backups) {
         this->enabled = false;
-        this->impl->backups.clear();
+        while (!this->impl->backups.isEmpty()) {
+            toClose.addLast(this->impl->backups.removeAt(0));
+        }
+        this->impl->priorityBackups = 0;
     }
+    // Destroy outside the lock - safe for IO thread callbacks
+    toClose.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -219,9 +229,15 @@ void BackupTransportPool::setEnabled(bool value) {
     if (enabled == true) {
         this->taskRunner->wakeup();
     } else {
+        // Move backups out under lock, destroy outside to prevent deadlock
+        LinkedList< Pointer<BackupTransport> > toClose;
         synchronized(&this->impl->backups) {
-            this->impl->backups.clear();
+            while (!this->impl->backups.isEmpty()) {
+                toClose.addLast(this->impl->backups.removeAt(0));
+            }
+            this->impl->priorityBackups = 0;
         }
+        toClose.clear();
     }
 }
 

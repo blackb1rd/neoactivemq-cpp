@@ -32,6 +32,9 @@ BackupTransport::BackupTransport(BackupTransportPool* parent) :
 BackupTransport::~BackupTransport() {
     try {
         if (this->transport != NULL) {
+            // Detach the listener before closing to prevent the transport's IO
+            // thread from calling back into this object while it's being destroyed.
+            this->transport->setTransportListener(NULL);
             this->transport->close();
         }
     } catch (...) {

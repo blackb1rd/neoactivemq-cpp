@@ -15,7 +15,21 @@
  * limitations under the License.
  */
 
-#include "StompCmsTemplateTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/CmsTemplateTest.h>
+
+namespace activemq{
+namespace test{
+namespace stomp{
+    class StompCmsTemplateTest : public CmsTemplateTest {
+public:
+        StompCmsTemplateTest();
+        virtual ~StompCmsTemplateTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getStompURL();
+        }
+    };
+}}}
 
 using namespace activemq;
 using namespace activemq::test;
@@ -28,3 +42,9 @@ StompCmsTemplateTest::StompCmsTemplateTest() {
 ////////////////////////////////////////////////////////////////////////////////
 StompCmsTemplateTest::~StompCmsTemplateTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(StompCmsTemplateTest, DISABLED_testBasics) { testBasics(); }
+TEST_F(StompCmsTemplateTest, DISABLED_testReceiveException) { testReceiveException(); }
+TEST_F(StompCmsTemplateTest, DISABLED_testSendException) { testSendException(); }

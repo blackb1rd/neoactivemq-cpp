@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ConnectionStateTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/state/ConnectionState.h>
 #include <activemq/state/SessionState.h>
@@ -28,8 +28,10 @@ using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
 
+class ConnectionStateTest : public ::testing::Test {};
+
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionStateTest::test() {
+TEST_F(ConnectionStateTest, test) {
 
     // Create a Session
     Pointer<SessionId> sid(new SessionId);
@@ -46,11 +48,11 @@ void ConnectionStateTest::test() {
     ConnectionState state(info);
 
     state.addSession(sinfo);
-    CPPUNIT_ASSERT( state.getSessionStates().size() == 2 );
+    ASSERT_TRUE(state.getSessionStates().size() == 2);
     state.removeSession(sinfo->getSessionId());
-    CPPUNIT_ASSERT( state.getSessionStates().size() == 1 );
+    ASSERT_TRUE(state.getSessionStates().size() == 1);
 
     state.addSession(sinfo);
     state.addSession(sinfo);
-    CPPUNIT_ASSERT( state.getSessionStates().size() == 2 );
+    ASSERT_TRUE(state.getSessionStates().size() == 2);
 }

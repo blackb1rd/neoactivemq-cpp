@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SocketFactoryTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/Properties.h>
 #include <decaf/net/SocketFactory.h>
@@ -26,6 +26,12 @@
 #endif
 
 #include <memory>
+#include <decaf/net/Socket.h>
+#include <decaf/net/ServerSocket.h>
+#include <decaf/util/concurrent/Concurrent.h>
+#include <decaf/util/concurrent/Mutex.h>
+#include <decaf/lang/Thread.h>
+#include <sstream>
 
 using namespace decaf;
 using namespace decaf::net;
@@ -33,8 +39,8 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::util::concurrent;
 
-////////////////////////////////////////////////////////////////////////////////
-const int SocketFactoryTest::DEFAULT_PORT = 23232;
+    class SocketFactoryTest : public ::testing::Test {
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace{
@@ -45,14 +51,18 @@ namespace{
         bool done;
         int numClients;
         std::string lastMessage;
+        int serverPort;
+        bool serverReady;
 
     public:
 
         util::concurrent::Mutex mutex;
+        util::concurrent::Mutex startMutex;
 
     public:
 
-        MyServerThread() : done(false), numClients(0), lastMessage(), mutex() {
+        MyServerThread() : done(false), numClients(0), lastMessage(), serverPort(0),
+                           serverReady(false), mutex(), startMutex() {
         }
 
         virtual ~MyServerThread() {
@@ -67,6 +77,18 @@ namespace{
             return numClients;
         }
 
+        int getPort() {
+            return serverPort;
+        }
+
+        void waitUntilReady() {
+            synchronized(&startMutex) {
+                while (!serverReady) {
+                    startMutex.wait(10000);
+                }
+            }
+        }
+
         virtual void stop() {
             done = true;
         }
@@ -76,7 +98,13 @@ namespace{
                 unsigned char buf[1000];
 
                 ServerSocket server;
-                server.bind("127.0.0.1", SocketFactoryTest::DEFAULT_PORT);
+                server.bind("127.0.0.1", 0);
+                serverPort = server.getLocalPort();
+
+                synchronized(&startMutex) {
+                    serverReady = true;
+                    startMutex.notifyAll();
+                }
 
                 net::Socket* socket = server.accept();
                 server.close();
@@ -121,24 +149,23 @@ namespace{
 
             } catch (io::IOException& ex) {
                 printf("%s\n", ex.getMessage().c_str());
-                CPPUNIT_ASSERT( false);
+                ASSERT_TRUE(false);
             } catch (...) {
-                CPPUNIT_ASSERT( false);
+                ASSERT_TRUE(false);
             }
         }
     };
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketFactoryTest::test() {
+TEST_F(SocketFactoryTest, test) {
     try {
         MyServerThread serverThread;
         serverThread.start();
-
-        Thread::sleep(500);
+        serverThread.waitUntilReady();
 
         SocketFactory* factory = SocketFactory::getDefault();
-        std::unique_ptr<Socket> client(factory->createSocket("127.0.0.1", SocketFactoryTest::DEFAULT_PORT));
+        std::unique_ptr<Socket> client(factory->createSocket("127.0.0.1", serverThread.getPort()));
 
         client->setSoLinger(false, 0);
 
@@ -148,9 +175,9 @@ void SocketFactoryTest::test() {
             }
         }
 
-        CPPUNIT_ASSERT( client->isConnected());
+        ASSERT_TRUE(client->isConnected());
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 1);
+        ASSERT_TRUE(serverThread.getNumClients() == 1);
 
         client->close();
 
@@ -160,31 +187,30 @@ void SocketFactoryTest::test() {
             }
         }
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 0);
+        ASSERT_TRUE(serverThread.getNumClients() == 0);
 
         serverThread.stop();
         serverThread.join();
     } catch (lang::Exception& ex) {
         ex.printStackTrace();
-        CPPUNIT_ASSERT( false);
+        ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketFactoryTest::testNoDelay() {
+TEST_F(SocketFactoryTest, testNoDelay) {
     try {
         MyServerThread serverThread;
         serverThread.start();
-
-        Thread::sleep(40);
+        serverThread.waitUntilReady();
 
         SocketFactory* factory = SocketFactory::getDefault();
-        std::unique_ptr<Socket> client(factory->createSocket("127.0.0.1", SocketFactoryTest::DEFAULT_PORT));
+        std::unique_ptr<Socket> client(factory->createSocket("127.0.0.1", serverThread.getPort()));
 
         client->setSoLinger(false, 0);
         client->setTcpNoDelay(true);
 
-        CPPUNIT_ASSERT( client->getTcpNoDelay() == true);
+        ASSERT_TRUE(client->getTcpNoDelay() == true);
 
         synchronized(&serverThread.mutex) {
             if (serverThread.getNumClients() != 1) {
@@ -192,9 +218,9 @@ void SocketFactoryTest::testNoDelay() {
             }
         }
 
-        CPPUNIT_ASSERT( client->isConnected());
+        ASSERT_TRUE(client->isConnected());
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 1);
+        ASSERT_TRUE(serverThread.getNumClients() == 1);
 
         client->close();
 
@@ -204,11 +230,11 @@ void SocketFactoryTest::testNoDelay() {
             }
         }
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 0);
+        ASSERT_TRUE(serverThread.getNumClients() == 0);
 
         serverThread.stop();
         serverThread.join();
     } catch (lang::Exception& ex) {
-        CPPUNIT_ASSERT( false);
+        ASSERT_TRUE(false);
     }
 }

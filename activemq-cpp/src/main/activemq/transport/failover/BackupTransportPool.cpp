@@ -59,13 +59,15 @@ namespace failover {
         volatile bool pending;
         volatile bool closed;
         volatile int priorityBackups;
+        Mutex retryMutex;
 
         BackupTransportPoolImpl(BackupTransportPool* pool, FailoverTransport* parent) : pool(pool),
                                                                                         parent(parent),
                                                                                         backups(),
                                                                                         pending(false),
                                                                                         closed(false),
-                                                                                        priorityBackups(0) {
+                                                                                        priorityBackups(0),
+                                                                                        retryMutex() {
         }
 
         bool shouldBuildBackup() {
@@ -192,11 +194,27 @@ void BackupTransportPool::close() {
         return;
     }
 
+    this->impl->closed = true;
+
+    // Interrupt any in-progress retry wait in iterate()
+    synchronized(&this->impl->retryMutex) {
+        this->impl->retryMutex.notifyAll();
+    }
+
+    // Move backups out of the list under the lock, then destroy them outside
+    // the lock to prevent deadlock. BackupTransport destructors close their
+    // transport, and if the IO thread fires onBackupTransportFailure it tries
+    // to acquire the same backups lock - causing deadlock if we hold it.
+    LinkedList< Pointer<BackupTransport> > toClose;
     synchronized(&this->impl->backups) {
         this->enabled = false;
-        this->impl->closed = true;
-        this->impl->backups.clear();
+        while (!this->impl->backups.isEmpty()) {
+            toClose.addLast(this->impl->backups.removeAt(0));
+        }
+        this->impl->priorityBackups = 0;
     }
+    // Destroy outside the lock - safe for IO thread callbacks
+    toClose.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -211,9 +229,15 @@ void BackupTransportPool::setEnabled(bool value) {
     if (enabled == true) {
         this->taskRunner->wakeup();
     } else {
+        // Move backups out under lock, destroy outside to prevent deadlock
+        LinkedList< Pointer<BackupTransport> > toClose;
         synchronized(&this->impl->backups) {
-            this->impl->backups.clear();
+            while (!this->impl->backups.isEmpty()) {
+                toClose.addLast(this->impl->backups.removeAt(0));
+            }
+            this->impl->priorityBackups = 0;
         }
+        toClose.clear();
     }
 }
 
@@ -229,6 +253,11 @@ Pointer<BackupTransport> BackupTransportPool::getBackup() {
     synchronized(&this->impl->backups) {
         if (!this->impl->backups.isEmpty()) {
             result = this->impl->backups.removeAt(0);
+
+            // Track priority backup count correctly
+            if (result != NULL && result->isPriority() && this->impl->priorityBackups > 0) {
+                this->impl->priorityBackups--;
+            }
         }
     }
 
@@ -243,7 +272,7 @@ Pointer<BackupTransport> BackupTransportPool::getBackup() {
 bool BackupTransportPool::isPending() const {
 
     if (this->isEnabled()) {
-        return this->impl->pending;
+        return this->impl->pending || this->impl->shouldBuildBackup();
     }
 
     return false;
@@ -252,6 +281,7 @@ bool BackupTransportPool::isPending() const {
 ////////////////////////////////////////////////////////////////////////////////
 bool BackupTransportPool::iterate() {
 
+    bool needsRetry = false;
     LinkedList<URI> failures;
 
     synchronized(&this->impl->backups) {
@@ -323,7 +353,24 @@ bool BackupTransportPool::iterate() {
         // return all failures to the URI Pool, we can try again later.
         uriPool->addURIs(failures);
 
+        // Check if we still need more backups after this attempt
+        needsRetry = impl->shouldBuildBackup();
+
         this->impl->pending = false;
+    }
+
+    // Rate-limit retry attempts when we couldn't fill the backup pool
+    // (e.g., target broker isn't available yet). Uses an interruptible
+    // wait so close() can wake us immediately.
+    if (needsRetry && !this->impl->closed) {
+        synchronized(&this->impl->retryMutex) {
+            if (!this->impl->closed) {
+                try {
+                    this->impl->retryMutex.wait(1000);
+                } catch (...) {
+                }
+            }
+        }
     }
 
     return false;
@@ -334,13 +381,18 @@ void BackupTransportPool::onBackupTransportFailure(BackupTransport* failedTransp
 
     synchronized(&this->impl->backups) {
 
+        bool found = false;
         std::unique_ptr<Iterator<Pointer<BackupTransport> > > iter(this->impl->backups.iterator());
 
         while (iter->hasNext()) {
             if (iter->next() == failedTransport) {
                 iter->remove();
+                found = true;
+                break;
             }
+        }
 
+        if (found) {
             if (failedTransport->isPriority() && this->impl->priorityBackups > 0) {
                 this->impl->priorityBackups--;
             }

@@ -180,7 +180,7 @@ void ExpirationTest::testExpired() {
     consumerThread.start();
     consumerThread.join();
 
-    CPPUNIT_ASSERT_EQUAL(0, consumer.getNumReceived());
+    ASSERT_EQ(0, consumer.getNumReceived());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -200,7 +200,7 @@ void ExpirationTest::testExpiredWithChecksDisabled() {
         consumerThread.start();
         consumerThread.join();
 
-        CPPUNIT_ASSERT_EQUAL(0, consumer.getNumReceived());
+        ASSERT_EQ(0, consumer.getNumReceived());
     }
     {
         // Now lets try it disabled.
@@ -216,7 +216,7 @@ void ExpirationTest::testExpiredWithChecksDisabled() {
         consumerThread.start();
         consumerThread.join();
 
-        CPPUNIT_ASSERT_EQUAL(2, consumer.getNumReceived());
+        ASSERT_EQ(2, consumer.getNumReceived());
     }
 }
 
@@ -235,6 +235,6 @@ void ExpirationTest::testNotExpired() {
     consumerThread.start();
     consumerThread.join();
 
-    CPPUNIT_ASSERT_EQUAL(2, consumer.getNumReceived());
+    ASSERT_EQ(2, consumer.getNumReceived());
 }
 

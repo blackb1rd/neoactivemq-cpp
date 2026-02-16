@@ -15,75 +15,78 @@
  * limitations under the License.
  */
 
-#include "SessionPoolTest.h"
+#include <gtest/gtest.h>
 #include "DummyConnection.h"
 #include <activemq/cmsutil/SessionPool.h>
 #include <activemq/cmsutil/ResourceLifecycleManager.h>
 
 using namespace activemq::cmsutil;
 
+    class SessionPoolTest : public ::testing::Test {
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
-void SessionPoolTest::testTakeSession() {
-    
+TEST_F(SessionPoolTest, testTakeSession) {
+
     DummyConnection connection(NULL);
     ResourceLifecycleManager mgr;
-    
+
     SessionPool pool(&connection, cms::Session::AUTO_ACKNOWLEDGE, &mgr);
-    
+
     // Take a session.
     PooledSession* pooledSession1 = pool.takeSession();
-    CPPUNIT_ASSERT(pooledSession1 != NULL);
-    
+    ASSERT_TRUE(pooledSession1 != NULL);
+
     // Take a second session.
     PooledSession* pooledSession2 = pool.takeSession();
-    CPPUNIT_ASSERT(pooledSession2 != NULL );
-    
+    ASSERT_TRUE(pooledSession2 != NULL);
+
     // Make sure they're different objects.
-    CPPUNIT_ASSERT(pooledSession1 != pooledSession2);    
+    ASSERT_TRUE(pooledSession1 != pooledSession2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SessionPoolTest::testReturnSession() {
-    
+TEST_F(SessionPoolTest, testReturnSession) {
+
     DummyConnection connection(NULL);
     ResourceLifecycleManager mgr;
-    
+
     SessionPool pool(&connection, cms::Session::AUTO_ACKNOWLEDGE, &mgr);
-    
+
     // Take a session.
     PooledSession* pooledSession1 = pool.takeSession();
-    CPPUNIT_ASSERT(pooledSession1 != NULL);
-    
+    ASSERT_TRUE(pooledSession1 != NULL);
+
     // Return the session to the pool
     pool.returnSession(pooledSession1);
-    
+
     // Take a second session.
     PooledSession* pooledSession2 = pool.takeSession();
-    CPPUNIT_ASSERT(pooledSession2 != NULL );
-    
+    ASSERT_TRUE(pooledSession2 != NULL);
+
     // Make sure they're the same object.
-    CPPUNIT_ASSERT(pooledSession1 == pooledSession2); 
+    ASSERT_TRUE(pooledSession1 == pooledSession2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SessionPoolTest::testCloseSession() {
-    
+TEST_F(SessionPoolTest, testCloseSession) {
+
     DummyConnection connection(NULL);
     ResourceLifecycleManager mgr;
-    
+
     SessionPool pool(&connection, cms::Session::AUTO_ACKNOWLEDGE, &mgr);
-    
+
     // Take a session.
     PooledSession* pooledSession1 = pool.takeSession();
-    CPPUNIT_ASSERT(pooledSession1 != NULL);
-    
+    ASSERT_TRUE(pooledSession1 != NULL);
+
     // Return the session to the pool
     pooledSession1->close();
-    
+
     // Take a second session.
     PooledSession* pooledSession2 = pool.takeSession();
-    CPPUNIT_ASSERT(pooledSession2 != NULL );
-    
+    ASSERT_TRUE(pooledSession2 != NULL);
+
     // Make sure they're the same object.
-    CPPUNIT_ASSERT(pooledSession1 == pooledSession2); 
+    ASSERT_TRUE(pooledSession1 == pooledSession2);
 }

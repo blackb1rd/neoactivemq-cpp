@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SocketTest.h"
+#include <gtest/gtest.h>
 
 #ifndef _WIN32
 #include <csignal>
@@ -39,93 +39,89 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
+    class SocketTest : public ::testing::Test {
+public:
+
+        // Old Tests
+        void testConnect();
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testConnectUnknownHost() {
+TEST_F(SocketTest, testConnectUnknownHost) {
 
     // TODO - Should throw an UnknownHostException
     Socket s;
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "IOException should have been thrown",
-        s.connect( "unknown.host", 45 ),
-        IOException );
+    ASSERT_THROW(s.connect( "unknown.host", 45 ), IOException) << ("IOException should have been thrown");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testConnectPortOutOfRange() {
+TEST_F(SocketTest, testConnectPortOutOfRange) {
 
     Socket s;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw an IllegalArguementException",
-        s.connect( "0.0.0.0", 70000 ),
-        IllegalArgumentException );
+    ASSERT_THROW(s.connect( "0.0.0.0", 70000 ), IllegalArgumentException) << ("Should Throw an IllegalArguementException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw an IllegalArguementException",
-        s.connect( "0.0.0.0", 70000, 1000 ),
-        IllegalArgumentException );
+    ASSERT_THROW(s.connect( "0.0.0.0", 70000, 1000 ), IllegalArgumentException) << ("Should Throw an IllegalArguementException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testConstructor() {
+TEST_F(SocketTest, testConstructor) {
 
     // create the socket and then validate some basic state
     Socket s;
-    CPPUNIT_ASSERT_MESSAGE("new socket should not be connected", !s.isConnected());
-    CPPUNIT_ASSERT_MESSAGE("new socket should not be bound", !s.isBound());
-    CPPUNIT_ASSERT_MESSAGE("new socket should not be closed", !s.isClosed());
-    CPPUNIT_ASSERT_MESSAGE("new socket should not be in InputShutdown", !s.isInputShutdown());
-    CPPUNIT_ASSERT_MESSAGE("new socket should not be in OutputShutdown", !s.isOutputShutdown());
+    ASSERT_TRUE(!s.isConnected()) << ("new socket should not be connected");
+    ASSERT_TRUE(!s.isBound()) << ("new socket should not be bound");
+    ASSERT_TRUE(!s.isClosed()) << ("new socket should not be closed");
+    ASSERT_TRUE(!s.isInputShutdown()) << ("new socket should not be in InputShutdown");
+    ASSERT_TRUE(!s.isOutputShutdown()) << ("new socket should not be in OutputShutdown");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetReuseAddress() {
+TEST_F(SocketTest, testGetReuseAddress) {
 
     Socket s;
     s.setReuseAddress( true );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Socket Reuse Address value not what was expected.", true, s.getReuseAddress() );
+    ASSERT_EQ(true, s.getReuseAddress()) << ("Socket Reuse Address value not what was expected.");
     s.setReuseAddress( false );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Socket Reuse Address value not what was expected.", false, s.getReuseAddress() );
+    ASSERT_EQ(false, s.getReuseAddress()) << ("Socket Reuse Address value not what was expected.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testClose() {
+TEST_F(SocketTest, testClose) {
 
     ServerSocket ss(0);
     Socket client( "localhost", ss.getLocalPort() );
 
-    CPPUNIT_ASSERT_NO_THROW_MESSAGE( "Exception on setSoLinger unexpected", client.setSoLinger( false, 100 ) );
+    ASSERT_NO_THROW(client.setSoLinger( false, 100 )) << ("Exception on setSoLinger unexpected");
 
     client.close();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-         "Should have thrown an IOException",
-         client.getOutputStream(),
-         IOException );
+    ASSERT_THROW(client.getOutputStream(), IOException) << ("Should have thrown an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetPort() {
+TEST_F(SocketTest, testGetPort) {
 
     ServerSocket server(0);
     int serverPort = server.getLocalPort();
     Socket client( "localhost", serverPort );
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Returned incorrect port", serverPort, client.getPort() );
+    ASSERT_EQ(serverPort, client.getPort()) << ("Returned incorrect port");
 
     client.close();
     server.close();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetInputStream() {
+TEST_F(SocketTest, testGetInputStream) {
 
     ServerSocket ss(0);
     Socket client( "localhost", ss.getLocalPort() );
 
     InputStream* is = client.getInputStream();
 
-    CPPUNIT_ASSERT( is != NULL );
+    ASSERT_TRUE(is != NULL);
 
     is->close();
     client.close();
@@ -133,7 +129,7 @@ void SocketTest::testGetInputStream() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetKeepAlive() {
+TEST_F(SocketTest, testGetKeepAlive) {
 
     try {
 
@@ -142,33 +138,31 @@ void SocketTest::testGetKeepAlive() {
 
         client.setKeepAlive( true );
 
-        CPPUNIT_ASSERT_MESSAGE( "getKeepAlive false when it should be true",
-                                client.getKeepAlive() );
+        ASSERT_TRUE(client.getKeepAlive()) << ("getKeepAlive false when it should be true");
 
         client.setKeepAlive( false );
 
-        CPPUNIT_ASSERT_MESSAGE( "getKeepAlive true when it should be False",
-                                !client.getKeepAlive() );
+        ASSERT_TRUE(!client.getKeepAlive()) << ("getKeepAlive true when it should be False");
 
     } catch (Exception e) {
-        CPPUNIT_FAIL( "Error during test of Get SO_KEEPALIVE" );
+        FAIL() << ("Error during test of Get SO_KEEPALIVE");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetLocalPort() {
+TEST_F(SocketTest, testGetLocalPort) {
 
     ServerSocket server(0);
     Socket client( "localhost", server.getLocalPort() );
 
-    CPPUNIT_ASSERT_MESSAGE( "Returned incorrect port", 0 != client.getLocalPort() );
+    ASSERT_TRUE(0 != client.getLocalPort()) << ("Returned incorrect port");
 
     client.close();
     server.close();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetSoLinger() {
+TEST_F(SocketTest, testGetSoLinger) {
 
     try {
 
@@ -177,54 +171,49 @@ void SocketTest::testGetSoLinger() {
 
         client.setSoLinger( true, 100 );
 
-        CPPUNIT_ASSERT_MESSAGE( "getSoLinger returned incorrect value",
-                                100 == client.getSoLinger() );
+        ASSERT_TRUE(100 == client.getSoLinger()) << ("getSoLinger returned incorrect value");
 
         client.setSoLinger( false, 100 );
 
-        CPPUNIT_ASSERT_MESSAGE( "getSoLinger returned incorrect value",
-                                -1 == client.getSoLinger() );
+        ASSERT_TRUE(-1 == client.getSoLinger()) << ("getSoLinger returned incorrect value");
 
     } catch (Exception e) {
-        CPPUNIT_FAIL( "Error during test of Get SO_LINGER" );
+        FAIL() << ("Error during test of Get SO_LINGER");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetSoTimeout() {
+TEST_F(SocketTest, testGetSoTimeout) {
 
     ServerSocket server(0);
     Socket client( "localhost", server.getLocalPort() );
 
     client.setSoTimeout( 100 );
-    CPPUNIT_ASSERT_MESSAGE( "Returned incorrect timeout", 100 == client.getSoTimeout() );
+    ASSERT_TRUE(100 == client.getSoTimeout()) << ("Returned incorrect timeout");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetTcpNoDelay() {
+TEST_F(SocketTest, testGetTcpNoDelay) {
 
     ServerSocket server(0);
     Socket client( "localhost", server.getLocalPort() );
 
     client.setTcpNoDelay( true );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Returned incorrect TCP_NODELAY value, should be true",
-                                  true, client.getTcpNoDelay() );
+    ASSERT_EQ(true, client.getTcpNoDelay()) << ("Returned incorrect TCP_NODELAY value, should be true");
 
     client.setTcpNoDelay( false );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Returned incorrect TCP_NODELAY value, should be false",
-                                  false, client.getTcpNoDelay() );
+    ASSERT_EQ(false, client.getTcpNoDelay()) << ("Returned incorrect TCP_NODELAY value, should be false");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testIsConnected() {
+TEST_F(SocketTest, testIsConnected) {
 
     ServerSocket server(0);
     Socket client( "localhost", server.getLocalPort() );
 
     std::unique_ptr<Socket> worker( server.accept() );
 
-    CPPUNIT_ASSERT_MESSAGE( "Socket indicated  not connected when it should be",
-                            client.isConnected() );
+    ASSERT_TRUE(client.isConnected()) << ("Socket indicated  not connected when it should be");
 
     client.close();
     worker->close();
@@ -232,7 +221,7 @@ void SocketTest::testIsConnected() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testIsClosed() {
+TEST_F(SocketTest, testIsClosed) {
 
     ServerSocket server(0);
     Socket client( "localhost", server.getLocalPort() );
@@ -240,30 +229,24 @@ void SocketTest::testIsClosed() {
     std::unique_ptr<Socket> worker( server.accept() );
 
     // validate isClosed returns expected values
-    CPPUNIT_ASSERT_MESSAGE( "Socket should indicate it is not closed(1):",
-                            !client.isClosed() );
+    ASSERT_TRUE(!client.isClosed()) << ("Socket should indicate it is not closed(1):");
     client.close();
-    CPPUNIT_ASSERT_MESSAGE( "Socket should indicate it is closed(1):",
-                            client.isClosed() );
+    ASSERT_TRUE(client.isClosed()) << ("Socket should indicate it is closed(1):");
 
     // validate that isClosed works ok for sockets returned from
     // ServerSocket.accept()
-    CPPUNIT_ASSERT_MESSAGE( "Accepted Socket should indicate it is not closed:",
-                            !worker->isClosed() );
+    ASSERT_TRUE(!worker->isClosed()) << ("Accepted Socket should indicate it is not closed:");
     worker->close();
-    CPPUNIT_ASSERT_MESSAGE( "Accepted Socket should indicate it is closed:",
-                            worker->isClosed() );
+    ASSERT_TRUE(worker->isClosed()) << ("Accepted Socket should indicate it is closed:");
 
     // and finally for the server socket
-    CPPUNIT_ASSERT_MESSAGE( "Server Socket should indicate it is not closed:",
-                            !server.isClosed() );
+    ASSERT_TRUE(!server.isClosed()) << ("Server Socket should indicate it is not closed:");
     server.close();
-    CPPUNIT_ASSERT_MESSAGE( "Server Socket should indicate it is closed:",
-                            server.isClosed() );
+    ASSERT_TRUE(server.isClosed()) << ("Server Socket should indicate it is closed:");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testIsInputShutdown() {
+TEST_F(SocketTest, testIsInputShutdown) {
 
     ServerSocket server(0);
     Socket client( "localhost", server.getLocalPort() );
@@ -274,30 +257,27 @@ void SocketTest::testIsInputShutdown() {
     OutputStream* theOutput = worker->getOutputStream();
 
     // make sure we get the right answer with newly connected socket
-    CPPUNIT_ASSERT_MESSAGE( "Socket indicated input shutdown when it should not have",
-                            !client.isInputShutdown() );
+    ASSERT_TRUE(!client.isInputShutdown()) << ("Socket indicated input shutdown when it should not have");
 
     // shutdown the output
     client.shutdownInput();
 
     // make sure we get the right answer once it is shut down
-    CPPUNIT_ASSERT_MESSAGE( "Socket indicated input was NOT shutdown when it should have been",
-                            client.isInputShutdown() );
+    ASSERT_TRUE(client.isInputShutdown()) << ("Socket indicated input was NOT shutdown when it should have been");
 
     client.close();
     worker->close();
     server.close();
 
     // make sure we get the right answer for closed sockets
-    CPPUNIT_ASSERT_MESSAGE( "Socket indicated input was shutdown when socket was closed",
-                            !worker->isInputShutdown() );
+    ASSERT_TRUE(!worker->isInputShutdown()) << ("Socket indicated input was shutdown when socket was closed");
 
     theInput->close();
     theOutput->close();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testIsOutputShutdown() {
+TEST_F(SocketTest, testIsOutputShutdown) {
 
     ServerSocket server(0);
     Socket client( "localhost", server.getLocalPort() );
@@ -308,23 +288,20 @@ void SocketTest::testIsOutputShutdown() {
     OutputStream* theOutput = worker->getOutputStream();
 
     // make sure we get the right answer with newly connected socket
-    CPPUNIT_ASSERT_MESSAGE( "Socket indicated output shutdown when it should not have",
-                            !worker->isOutputShutdown() );
+    ASSERT_TRUE(!worker->isOutputShutdown()) << ("Socket indicated output shutdown when it should not have");
 
     // shutdown the output
     worker->shutdownOutput();
 
     // make sure we get the right answer once it is shut down
-    CPPUNIT_ASSERT_MESSAGE( "Socket indicated output was NOT shutdown when it should have been",
-                            worker->isOutputShutdown() );
+    ASSERT_TRUE(worker->isOutputShutdown()) << ("Socket indicated output was NOT shutdown when it should have been");
 
     client.close();
     worker->close();
     server.close();
 
     // make sure we get the right answer for closed sockets
-    CPPUNIT_ASSERT_MESSAGE( "Socket indicated output was output shutdown when the socket was closed",
-                            !client.isOutputShutdown() );
+    ASSERT_TRUE(!client.isOutputShutdown()) << ("Socket indicated output was output shutdown when the socket was closed");
 
     theInput->close();
     theOutput->close();
@@ -368,14 +345,14 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testGetOutputStream() {
+TEST_F(SocketTest, testGetOutputStream) {
 
     {
         // Simple fetch test
         ServerSocket server(0);
         Socket client( "127.0.0.1", server.getLocalPort() );
         OutputStream* os = client.getOutputStream();
-        CPPUNIT_ASSERT_MESSAGE( "Failed to get stream", os != NULL );
+        ASSERT_TRUE(os != NULL) << ("Failed to get stream");
         os->close();
         client.close();
         server.close();
@@ -399,7 +376,7 @@ void SocketTest::testGetOutputStream() {
         }
 
         if( ++c > 5 ) {
-            CPPUNIT_FAIL( "thread is not alive" );
+            FAIL() << ("thread is not alive");
         }
     }
 
@@ -421,7 +398,7 @@ void SocketTest::testGetOutputStream() {
         }
 
         if( ++c > 5 ) {
-            CPPUNIT_FAIL( "read call did not exit" );
+            FAIL() << ("read call did not exit");
         }
     }
 
@@ -432,7 +409,7 @@ void SocketTest::testGetOutputStream() {
         for( int i = 0; i < 400; i++ ) {
             out->write( buffer, 1 );
         }
-        CPPUNIT_FAIL( "write to closed socket did not cause exception" );
+        FAIL() << ("write to closed socket did not cause exception");
     } catch( IOException& e ) {
     }
 
@@ -447,10 +424,7 @@ void SocketTest::testGetOutputStream() {
         std::unique_ptr<Socket> worker( ss2.accept() );
         s.shutdownOutput();
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should have thrown an IOException",
-            s.getOutputStream(),
-            IOException );
+        ASSERT_THROW(s.getOutputStream(), IOException) << ("Should have thrown an IOException");
     }
 }
 
@@ -560,9 +534,9 @@ namespace {
 
             }catch( io::IOException& ex ){
                 printf("%s\n", ex.getMessage().c_str() );
-                CPPUNIT_ASSERT( false );
+                ASSERT_TRUE(false);
             }catch( ... ){
-                CPPUNIT_ASSERT( false );
+                ASSERT_TRUE(false);
             }
         }
 
@@ -592,7 +566,7 @@ void SocketTest::testConnect() {
             }
         }
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 1 );
+        ASSERT_TRUE(serverThread.getNumClients() == 1);
 
         client->close();
 
@@ -604,7 +578,7 @@ void SocketTest::testConnect() {
            }
         }
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 0 );
+        ASSERT_TRUE(serverThread.getNumClients() == 0);
 
         serverThread.stop();
         serverThread.join();
@@ -615,7 +589,7 @@ void SocketTest::testConnect() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testTx() {
+TEST_F(SocketTest, testTx) {
 
     try{
 
@@ -639,7 +613,7 @@ void SocketTest::testTx() {
            }
         }
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 1 );
+        ASSERT_TRUE(serverThread.getNumClients() == 1);
 
         io::OutputStream* stream = client->getOutputStream();
 
@@ -648,7 +622,7 @@ void SocketTest::testTx() {
 
         Thread::sleep( 10 );
 
-        CPPUNIT_ASSERT( serverThread.getLastMessage() == msg );
+        ASSERT_TRUE(serverThread.getLastMessage() == msg);
 
         client->close();
 
@@ -660,7 +634,7 @@ void SocketTest::testTx() {
            }
         }
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 0 );
+        ASSERT_TRUE(serverThread.getNumClients() == 0);
 
         serverThread.stop();
         serverThread.join();
@@ -671,7 +645,7 @@ void SocketTest::testTx() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testTrx() {
+TEST_F(SocketTest, testTrx) {
 
     try{
 
@@ -694,7 +668,7 @@ void SocketTest::testTrx() {
            }
         }
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 1 );
+        ASSERT_TRUE(serverThread.getNumClients() == 1);
 
         io::OutputStream* stream = client->getOutputStream();
 
@@ -713,9 +687,9 @@ void SocketTest::testTrx() {
         // Avoid relying on available(); perform a blocking read which will
         // attempt to read up to the buffer size and block until data arrives.
         int numRead = istream->read( buf, 500 );
-        CPPUNIT_ASSERT_MESSAGE( "No data read from server", numRead > 0 );
-        CPPUNIT_ASSERT( numRead == 5 );
-        CPPUNIT_ASSERT( strcmp( (char*)buf, "hello" ) == 0 );
+        ASSERT_TRUE(numRead > 0) << ("No data read from server");
+        ASSERT_TRUE(numRead == 5);
+        ASSERT_TRUE(strcmp( (char*)buf, "hello" ) == 0);
 
         client->close();
 
@@ -728,7 +702,7 @@ void SocketTest::testTrx() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testRxFail() {
+TEST_F(SocketTest, testRxFail) {
 
     try{
 
@@ -751,7 +725,7 @@ void SocketTest::testRxFail() {
            }
         }
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 1 );
+        ASSERT_TRUE(serverThread.getNumClients() == 1);
 
         // Give it a chance to get to its read call
         Thread::sleep( 100 );
@@ -766,7 +740,7 @@ void SocketTest::testRxFail() {
            }
         }
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 0 );
+        ASSERT_TRUE(serverThread.getNumClients() == 0);
 
         serverThread.stop();
         serverThread.join();
@@ -777,7 +751,7 @@ void SocketTest::testRxFail() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketTest::testTrxNoDelay() {
+TEST_F(SocketTest, testTrxNoDelay) {
 
     try{
 
@@ -793,7 +767,7 @@ void SocketTest::testTrxNoDelay() {
         client->setSoLinger( false, 0 );
         client->setTcpNoDelay(true);
 
-        CPPUNIT_ASSERT( client->getTcpNoDelay() == true );
+        ASSERT_TRUE(client->getTcpNoDelay() == true);
 
         synchronized(&serverThread.mutex)
         {
@@ -803,7 +777,7 @@ void SocketTest::testTrxNoDelay() {
            }
         }
 
-        CPPUNIT_ASSERT( serverThread.getNumClients() == 1 );
+        ASSERT_TRUE(serverThread.getNumClients() == 1);
 
         io::OutputStream* stream = client->getOutputStream();
 
@@ -819,8 +793,8 @@ void SocketTest::testTrxNoDelay() {
         memset( buf, 0, 500 );
         io::InputStream* istream = client->getInputStream();
         std::size_t numRead = istream->read( buf, 500, 0, 500 );
-        CPPUNIT_ASSERT( numRead == 5 );
-        CPPUNIT_ASSERT( strcmp( (char*)buf, "hello" ) == 0 );
+        ASSERT_TRUE(numRead == 5);
+        ASSERT_TRUE(strcmp( (char*)buf, "hello" ) == 0);
 
         client->close();
 

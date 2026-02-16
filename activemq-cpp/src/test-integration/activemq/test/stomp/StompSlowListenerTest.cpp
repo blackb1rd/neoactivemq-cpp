@@ -15,7 +15,20 @@
  * limitations under the License.
  */
 
-#include "StompSlowListenerTest.h"
+#include <activemq/test/SlowListenerTest.h>
+
+namespace activemq{
+namespace test{
+namespace stomp{
+    class StompSlowListenerTest : public SlowListenerTest {
+public:
+        StompSlowListenerTest();
+        virtual ~StompSlowListenerTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getStompURL();
+        }
+    };
+}}}
 
 using namespace std;
 using namespace cms;
@@ -31,3 +44,7 @@ StompSlowListenerTest::StompSlowListenerTest() {
 ////////////////////////////////////////////////////////////////////////////////
 StompSlowListenerTest::~StompSlowListenerTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(StompSlowListenerTest, DISABLED_testSlowListener) { testSlowListener(); }

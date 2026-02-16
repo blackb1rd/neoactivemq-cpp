@@ -15,14 +15,26 @@
  * limitations under the License.
  */
 
-#include "TransferQueueTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/internal/util/concurrent/TransferQueue.h>
+#include <decaf/util/Config.h>
 
 using namespace decaf;
 using namespace decaf::internal;
 using namespace decaf::internal::util;
 using namespace decaf::internal::util::concurrent;
+
+    class TransferQueueTest : public ::testing::Test {
+public:
+
+        TransferQueueTest();
+        virtual ~TransferQueueTest();
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 TransferQueueTest::TransferQueueTest() {

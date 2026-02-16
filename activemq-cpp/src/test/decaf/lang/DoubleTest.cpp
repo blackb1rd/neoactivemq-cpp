@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "DoubleTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Double.h>
 #include <string>
@@ -24,10 +24,18 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
 
+    class DoubleTest : public ::testing::Test
+    {
+public:
+
+        DoubleTest();
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 DoubleTest::DoubleTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DoubleTest::test() {
+TEST_F(DoubleTest, test) {
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ConnectionStateTrackerTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/Transport.h>
 #include <activemq/wireformat/WireFormat.h>
@@ -40,6 +40,9 @@ using namespace activemq::wireformat;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class ConnectionStateTrackerTest : public ::testing::Test {
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -200,7 +203,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionStateTrackerTest::test() {
+TEST_F(ConnectionStateTrackerTest, test) {
 
     ConnectionStateTracker tracker;
     ConnectionData conn = createConnectionState(tracker);
@@ -208,7 +211,7 @@ void ConnectionStateTrackerTest::test() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionStateTrackerTest::testMessageCache() {
+TEST_F(ConnectionStateTrackerTest, testMessageCache) {
 
     Pointer<TrackingTransport> transport(new TrackingTransport);
     ConnectionStateTracker tracker;
@@ -241,11 +244,11 @@ void ConnectionStateTrackerTest::testMessageCache() {
 
     tracker.restore(transport);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should only be three messages", 4, transport->messages.size());
+    ASSERT_EQ(4, transport->messages.size()) << ("Should only be three messages");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionStateTrackerTest::testMessagePullCache() {
+TEST_F(ConnectionStateTrackerTest, testMessagePullCache) {
 
     Pointer<TrackingTransport> transport(new TrackingTransport);
     ConnectionStateTracker tracker;
@@ -264,5 +267,5 @@ void ConnectionStateTrackerTest::testMessagePullCache() {
 
     tracker.restore(transport);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Should only be three message pulls", 10, transport->messagePulls.size());
+    ASSERT_EQ(10, transport->messagePulls.size()) << ("Should only be three message pulls");
 }

@@ -15,7 +15,26 @@
  * limitations under the License.
  */
 
-#include "OpenwireClientAckTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/CMSTestFixture.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenwireClientAckTest : public CMSTestFixture {
+public:
+        OpenwireClientAckTest();
+        virtual ~OpenwireClientAckTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+        void testAckedMessageAreConsumed();
+        void testLastMessageAcked();
+        void testUnAckedMessageAreNotConsumedOnSessionClose();
+        void testAckedMessageAreConsumedAsync();
+        void testUnAckedMessageAreNotConsumedOnSessionCloseAsync();
+    };
+}}}
 
 #include <activemq/exceptions/ActiveMQException.h>
 
@@ -50,7 +69,7 @@ namespace {
 
         virtual void onMessage(const Message* message) {
 
-            CPPUNIT_ASSERT( message != NULL);
+            ASSERT_TRUE(message != NULL);
 
             if (!dontAck) {
 
@@ -89,7 +108,7 @@ void OpenwireClientAckTest::testAckedMessageAreConsumed() {
     // Consume the message...
     std::unique_ptr<MessageConsumer> consumer(session->createConsumer(queue.get()));
     std::unique_ptr<Message> msg(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() != NULL);
+    ASSERT_TRUE(msg.get() != NULL);
     msg->acknowledge();
 
     // Reset the session->
@@ -99,7 +118,7 @@ void OpenwireClientAckTest::testAckedMessageAreConsumed() {
     // Attempt to Consume the message...
     consumer.reset(session->createConsumer(queue.get()));
     msg.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() == NULL);
+    ASSERT_TRUE(msg.get() == NULL);
 
     session->close();
 }
@@ -124,11 +143,11 @@ void OpenwireClientAckTest::testLastMessageAcked() {
     // Consume the message...
     std::unique_ptr<MessageConsumer> consumer(session->createConsumer(queue.get()));
     std::unique_ptr<Message> msg(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() != NULL);
+    ASSERT_TRUE(msg.get() != NULL);
     msg.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() != NULL);
+    ASSERT_TRUE(msg.get() != NULL);
     msg.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() != NULL);
+    ASSERT_TRUE(msg.get() != NULL);
     msg->acknowledge();
 
     // Reset the session->
@@ -138,7 +157,7 @@ void OpenwireClientAckTest::testLastMessageAcked() {
     // Attempt to Consume the message...
     consumer.reset(session->createConsumer(queue.get()));
     msg.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() == NULL);
+    ASSERT_TRUE(msg.get() == NULL);
 
     session->close();
 }
@@ -159,7 +178,7 @@ void OpenwireClientAckTest::testUnAckedMessageAreNotConsumedOnSessionClose() {
     // Consume the message...
     std::unique_ptr<MessageConsumer> consumer(session->createConsumer(queue.get()));
     std::unique_ptr<Message> msg(consumer->receive(1000));
-    CPPUNIT_ASSERT_MESSAGE("Consumer did not get message on first receive()", msg.get() != NULL);
+    ASSERT_TRUE(msg.get() != NULL) << ("Consumer did not get message on first receive()");
     // Don't ack the message.
 
     // Reset the session->  This should cause the unacknowledged message to be re-delivered.
@@ -169,7 +188,7 @@ void OpenwireClientAckTest::testUnAckedMessageAreNotConsumedOnSessionClose() {
     // Attempt to Consume the message...
     consumer.reset(session->createConsumer(queue.get()));
     msg.reset(consumer->receive(1000));
-    CPPUNIT_ASSERT_MESSAGE("Consumer did not get message on second receive()", msg.get() != NULL);
+    ASSERT_TRUE(msg.get() != NULL) << ("Consumer did not get message on second receive()");
     msg->acknowledge();
 
     session->close();
@@ -204,7 +223,7 @@ void OpenwireClientAckTest::testAckedMessageAreConsumedAsync() {
     // Attempt to Consume the message...
     consumer.reset(session->createConsumer(queue.get()));
     std::unique_ptr<Message> msg(consumer->receive(1000));
-    CPPUNIT_ASSERT(msg.get() == NULL);
+    ASSERT_TRUE(msg.get() == NULL);
 
     session->close();
 }
@@ -239,9 +258,16 @@ void OpenwireClientAckTest::testUnAckedMessageAreNotConsumedOnSessionCloseAsync(
     // Attempt to Consume the message...
     consumer.reset(session->createConsumer(queue.get()));
     std::unique_ptr<Message> msg(consumer->receive(2000));
-    CPPUNIT_ASSERT(msg.get() != NULL);
+    ASSERT_TRUE(msg.get() != NULL);
     msg->acknowledge();
 
     session->close();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireClientAckTest, testAckedMessageAreConsumed) { testAckedMessageAreConsumed(); }
+TEST_F(OpenwireClientAckTest, testLastMessageAcked) { testLastMessageAcked(); }
+TEST_F(OpenwireClientAckTest, testUnAckedMessageAreNotConsumedOnSessionClose) { testUnAckedMessageAreNotConsumedOnSessionClose(); }
+TEST_F(OpenwireClientAckTest, testUnAckedMessageAreNotConsumedOnSessionCloseAsync) { testUnAckedMessageAreNotConsumedOnSessionCloseAsync(); }
+TEST_F(OpenwireClientAckTest, testAckedMessageAreConsumedAsync) { testAckedMessageAreConsumedAsync(); }

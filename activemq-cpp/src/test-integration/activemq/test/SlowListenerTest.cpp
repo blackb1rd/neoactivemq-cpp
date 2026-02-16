@@ -99,8 +99,8 @@ void SlowListenerTest::testSlowListener() {
         synchronized(&listener.mutex) {
             // Make sure that the listener was always accessed by the same thread
             // and that it received all the messages from all consumers.
-            CPPUNIT_ASSERT_EQUAL(1, (int )listener.threadIds.size());
-            CPPUNIT_ASSERT_EQUAL((msgCount * numConsumers), listener.count);
+            ASSERT_EQ(1, (int )listener.threadIds.size());
+            ASSERT_EQ((msgCount * numConsumers), listener.count);
         }
 
         for (unsigned int i = 0; i < numConsumers; i++) {

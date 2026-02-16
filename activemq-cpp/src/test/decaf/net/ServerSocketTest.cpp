@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ServerSocketTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/net/Socket.h>
 #include <decaf/net/ServerSocket.h>
@@ -27,6 +27,27 @@ using namespace decaf::net;
 using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class ServerSocketTest  : public ::testing::Test {
+protected:
+
+        Socket* ssconn;
+
+        decaf::lang::Thread* theThread;
+
+    public:
+
+        ServerSocketTest();
+        virtual ~ServerSocketTest();
+
+        void SetUp() override;
+        void TearDown() override;
+
+    protected:
+
+        void startClient( int port );
+
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -66,7 +87,7 @@ ServerSocketTest::~ServerSocketTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::setUp() {
+void ServerSocketTest::SetUp() {
 
     this->ssconn = NULL;
     this->theThread = NULL;
@@ -76,7 +97,7 @@ void ServerSocketTest::setUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::tearDown() {
+void ServerSocketTest::TearDown() {
 
     if( this->theThread != NULL ) {
         this->theThread->join( 3000 );
@@ -94,7 +115,7 @@ void ServerSocketTest::tearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::testConstructor() {
+TEST_F(ServerSocketTest, testConstructor) {
 
     try {
 
@@ -115,10 +136,7 @@ void ServerSocketTest::testConstructor() {
 
 // No idea why but windows seems to let two sockets listen on the same port.
 #ifndef WIN32
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should throw an IOException",
-            ServerSocket s2( s1.getLocalPort() ),
-            IOException );
+        ASSERT_THROW(ServerSocket s2( s1.getLocalPort() ), IOException) << ("Should throw an IOException");
 #endif
     } catch( Exception& ex ) {
         ex.printStackTrace();
@@ -133,15 +151,12 @@ void ServerSocketTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::testClose() {
+TEST_F(ServerSocketTest, testClose) {
 
     ServerSocket s(0);
     s.close();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IOException",
-        s.accept(),
-        IOException );
+    ASSERT_THROW(s.accept(), IOException) << ("Should throw an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -175,7 +190,7 @@ namespace{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::testAccept() {
+TEST_F(ServerSocketTest, testAccept) {
 
     ServerSocket s(0);
     try {
@@ -185,7 +200,7 @@ void ServerSocketTest::testAccept() {
         int localPort1 = s.getLocalPort();
         int localPort2 = this->ssconn->getLocalPort();
         this->ssconn->close();
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Bad local port value", localPort1, localPort2 );
+        ASSERT_EQ(localPort1, localPort2) << ("Bad local port value");
     } catch(...) {
         s.close();
     }
@@ -215,10 +230,10 @@ void ServerSocketTest::testAccept() {
 //            }
 //
 //            if( interrupted ) {
-//                CPPUNIT_FAIL( "accept interrupted" );
+//                FAIL() << ("accept interrupted");
 //            }
 //            if( ++c > 4 ) {
-//                CPPUNIT_FAIL( "accept call did not exit" );
+//                FAIL() << ("accept call did not exit");
 //            }
 //        } while( thread.isAlive() );
 //
@@ -234,19 +249,19 @@ void ServerSocketTest::testAccept() {
 //            interrupted = true;
 //        }
 //
-//        CPPUNIT_ASSERT_MESSAGE( "accept not interrupted", interrupted );
+//        ASSERT_TRUE(interrupted) << ("accept not interrupted");
 //        long long finish = System::currentTimeMillis();
 //        int delay = (int)( finish - start );
-//        CPPUNIT_ASSERT_MESSAGE( "timeout too soon: ", delay >= 490);
+//        ASSERT_TRUE(delay >= 490) << ("timeout too soon: ");
 //        ss2.close();
 //
 //    } catch( IOException& e ) {
-//        CPPUNIT_FAIL( "Unexpected IOException : " + e.getMessage() );
+//        FAIL() << ("Unexpected IOException : " + e.getMessage());
 //    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::testGetLocalPort() {
+TEST_F(ServerSocketTest, testGetLocalPort) {
 
     int port = 23232;
     int actual = 0;
@@ -261,27 +276,27 @@ void ServerSocketTest::testGetLocalPort() {
         return;
     }
 
-    CPPUNIT_ASSERT_EQUAL( port, actual );
+    ASSERT_EQ(port, actual);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::testGetSoTimeout() {
+TEST_F(ServerSocketTest, testGetSoTimeout) {
 
     ServerSocket s(0);
     s.setSoTimeout( 100 );
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "SO_TIMEOUT doesnt match what was set.", 100, s.getSoTimeout() );
+    ASSERT_EQ(100, s.getSoTimeout()) << ("SO_TIMEOUT doesnt match what was set.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::testGetReuseAddress() {
+TEST_F(ServerSocketTest, testGetReuseAddress) {
 
     try{
         ServerSocket s;
         s.setReuseAddress( true );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Reuse Address doesnt match what was set.", true, s.getReuseAddress() );
+        ASSERT_EQ(true, s.getReuseAddress()) << ("Reuse Address doesnt match what was set.");
         s.setReuseAddress( false );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Reuse Address doesnt match what was set.", false, s.getReuseAddress() );
+        ASSERT_EQ(false, s.getReuseAddress()) << ("Reuse Address doesnt match what was set.");
     } catch( Exception& ex ) {
         ex.printStackTrace();
         throw ex;
@@ -289,12 +304,12 @@ void ServerSocketTest::testGetReuseAddress() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::testGetReceiveBufferSize() {
+TEST_F(ServerSocketTest, testGetReceiveBufferSize) {
 
     try{
         ServerSocket s;
-//        CPPUNIT_ASSERT_MESSAGE( "Receive Buffer should never be zero.", 0 != s.getReceiveBufferSize() );
-//        CPPUNIT_ASSERT_MESSAGE( "Receive Buffer should never be negative.", 0 < s.getReceiveBufferSize() );
+//        ASSERT_TRUE(0 != s.getReceiveBufferSize()) << ("Receive Buffer should never be zero.");
+//        ASSERT_TRUE(0 < s.getReceiveBufferSize()) << ("Receive Buffer should never be negative.");
     } catch( Exception& ex ) {
         ex.printStackTrace();
         throw ex;
@@ -312,6 +327,6 @@ void ServerSocketTest::startClient( int port ) {
     try {
         Thread::sleep( 1000 );
     } catch( InterruptedException& e ) {
-        CPPUNIT_FAIL( std::string( "Exception during startClinet()" ) + e.getMessage() );
+        FAIL() << (std::string( "Exception during startClinet()" ) + e.getMessage());
     }
 }

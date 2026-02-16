@@ -20,9 +20,7 @@
 
 #include <memory>
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <activemq/util/CMSProvider.h>
 #include <activemq/util/IntegrationCommon.h>
 
@@ -31,14 +29,14 @@
 namespace activemq {
 namespace test {
 
-    class CMSTestFixture : public CppUnit::TestFixture {
+    class CMSTestFixture : public ::testing::Test {
     protected:
 
         std::unique_ptr<util::CMSProvider> cmsProvider;
 
     public:
 
-        CMSTestFixture() : CppUnit::TestFixture(), cmsProvider() {
+        CMSTestFixture() : cmsProvider() {
         }
 
         virtual ~CMSTestFixture() {
@@ -51,11 +49,11 @@ namespace test {
          */
         virtual std::string getBrokerURL() const = 0;
 
-        virtual void setUp() {
+        void SetUp() override {
             cmsProvider.reset( new util::CMSProvider( getBrokerURL() ) );
         };
 
-        virtual void tearDown() {
+        void TearDown() override {
             // Wait a small period of time to allow the messages to all get
             // processed.
             decaf::lang::Thread::sleep( 50 );

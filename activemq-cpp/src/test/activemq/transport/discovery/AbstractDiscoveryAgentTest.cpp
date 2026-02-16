@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AbstractDiscoveryAgentTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/discovery/DiscoveryListener.h>
 #include <activemq/transport/discovery/AbstractDiscoveryAgent.h>
@@ -34,6 +34,17 @@ using namespace decaf::util::concurrent;
 using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class AbstractDiscoveryAgentTest : public ::testing::Test {
+public:
+
+        AbstractDiscoveryAgentTest();
+        virtual ~AbstractDiscoveryAgentTest();
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -127,19 +138,19 @@ void AbstractDiscoveryAgentTest::test() {
     DiscoveryAgentRegistry& registry = DiscoveryAgentRegistry::getInstance();
     registry.registerFactory("mock", new MockDiscoveryAgentFactory);
 
-    CPPUNIT_ASSERT_EQUAL(1, (int) registry.getAgentNames().size());
+    ASSERT_EQ(1, (int) registry.getAgentNames().size());
 
     DiscoveryAgentFactory* factory = registry.findFactory("mock");
-    CPPUNIT_ASSERT(factory != NULL);
+    ASSERT_TRUE(factory != NULL);
 
     Pointer<DiscoveryAgent> agent(factory->createAgent(URI("mock://default")));
-    CPPUNIT_ASSERT(agent != NULL);
+    ASSERT_TRUE(agent != NULL);
 
     agent->setDiscoveryListener(&listener);
     agent->start();
 
-    CPPUNIT_ASSERT_MESSAGE("Should have discovered by now", added.await(60000));
-    CPPUNIT_ASSERT_MESSAGE("Should have timed out by now", removed.await(60000));
+    ASSERT_TRUE(added.await(60000)) << ("Should have discovered by now");
+    ASSERT_TRUE(removed.await(60000)) << ("Should have timed out by now");
 
     registry.unregisterAllFactories();
 }

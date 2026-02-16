@@ -17,70 +17,65 @@
 
 #include <iostream>
 #include <sstream>
-#include "cppunit/Test.h"
-#include "cppunit/Exception.h"
 
 #include <util/teamcity/TeamCityProgressListener.h>
 
-using namespace CPPUNIT_NS;
 using namespace std;
 using namespace test;
 using namespace test::util;
 using namespace test::util::teamcity;
 
 ////////////////////////////////////////////////////////////////////////////////
-void TeamCityProgressListener::startTest( Test* test ) {
-    writeOpen( "testStarted" );
-    writeProperty( "name", test->getName() );
+void TeamCityProgressListener::OnTestSuiteStart(const ::testing::TestSuite& test_suite) {
+    writeOpen( "testSuiteStarted" );
+    writeProperty( "name", test_suite.name() );
     writeClose();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-static string sourceLine2string( const SourceLine& sline ) {
-
-    std::stringstream ss;
-    ss << sline.fileName() << ":" << sline.lineNumber();
-    return ss.str();
+void TeamCityProgressListener::OnTestSuiteEnd(const ::testing::TestSuite& test_suite) {
+    writeOpen( "testSuiteFinished" );
+    writeProperty( "name", test_suite.name() );
+    writeClose();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TeamCityProgressListener::addFailure( const TestFailure& failure ) {
+void TeamCityProgressListener::OnTestStart(const ::testing::TestInfo& test_info) {
+    writeOpen( "testStarted" );
+    writeProperty( "name", test_info.name() );
+    writeClose();
+}
 
-    const Exception *e = failure.thrownException();
+////////////////////////////////////////////////////////////////////////////////
+void TeamCityProgressListener::OnTestEnd(const ::testing::TestInfo& test_info) {
+    if (test_info.result()->Failed()) {
+        std::string details;
 
-    string details = e->message().details();
+        for (int i = 0; i < test_info.result()->total_part_count(); ++i) {
+            const ::testing::TestPartResult& part = test_info.result()->GetTestPartResult(i);
+            if (part.failed()) {
+                if (!details.empty()) {
+                    details.append("\n");
+                }
+                if (part.file_name()) {
+                    details.append(part.file_name());
+                    details.append(":");
+                    details.append(std::to_string(part.line_number()));
+                    details.append(": ");
+                }
+                details.append(part.summary());
+            }
+        }
 
-    if( e->sourceLine().isValid() ) {
-        details.append( " at " );
-        details.append( sourceLine2string( e->sourceLine() ) );
-        details.append( "\n" );
+        writeOpen( "testFailed" );
+        writeProperty( "name", test_info.name() );
+        writeProperty( "message", "Test failed" );
+        writeProperty( "details", details );
+        writeClose();
     }
 
-    writeOpen( "testFailed" );
-    writeProperty( "name", failure.failedTest()->getName() );
-    writeProperty( "message", e->message().shortDescription() );
-    writeProperty( "details", details );
-    writeClose();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void TeamCityProgressListener::endTest( Test* test ) {
     writeOpen( "testFinished" );
-    writeProperty("name", test->getName() );
-    writeClose();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void TeamCityProgressListener::startSuite( Test* test ) {
-    writeOpen( "testSuiteStarted" );
-    writeProperty( "name", test->getName() );
-    writeClose();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void TeamCityProgressListener::endSuite( Test* test ) {
-    writeOpen( "testSuiteFinished" );
-    writeProperty( "name", test->getName() );
+    writeProperty( "name", test_info.name() );
     writeClose();
 }
 

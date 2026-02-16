@@ -15,7 +15,22 @@
  * limitations under the License.
  */
 
-#include "StompCmsConnectionStartStopTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/CmsConnectionStartStopTest.h>
+
+namespace activemq {
+namespace test {
+namespace stomp {
+    class StompCmsConnectionStartStopTest : public CmsConnectionStartStopTest {
+    private:
+public:
+        StompCmsConnectionStartStopTest();
+        virtual ~StompCmsConnectionStartStopTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getStompURL();
+        }
+    };
+}}}
 
 #include <activemq/exceptions/ActiveMQException.h>
 
@@ -37,3 +52,8 @@ StompCmsConnectionStartStopTest::StompCmsConnectionStartStopTest() {
 StompCmsConnectionStartStopTest::~StompCmsConnectionStartStopTest() {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(StompCmsConnectionStartStopTest, DISABLED_testStoppedConsumerHoldsMessagesTillStarted) { testStoppedConsumerHoldsMessagesTillStarted(); }
+TEST_F(StompCmsConnectionStartStopTest, DISABLED_testMultipleConnectionStops) { testMultipleConnectionStops(); }
+TEST_F(StompCmsConnectionStartStopTest, DISABLED_testConcurrentSessionCreateWithStart) { testConcurrentSessionCreateWithStart(); }

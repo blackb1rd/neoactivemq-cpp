@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-#include "DataOutputStreamTest.h"
+#include <gtest/gtest.h>
+#include <decaf/util/Endian.h>
+#include <decaf/io/DataOutputStream.h>
+#include <decaf/io/DataInputStream.h>
+#include <decaf/io/ByteArrayOutputStream.h>
+#include <decaf/io/ByteArrayInputStream.h>
+#include <memory>
 #include <cstring>
 
 #ifdef HAVE_STRING_H
@@ -31,8 +37,49 @@ using namespace decaf::lang;
 using namespace decaf::io;
 using namespace decaf::util;
 
+    class DataOutputStreamTest : public ::testing::Test {
+    protected:
+
+std::unique_ptr<ByteArrayOutputStream> baos;
+        std::unique_ptr<ByteArrayInputStream> bais;
+
+        std::unique_ptr<DataOutputStream> os;
+        std::unique_ptr<DataInputStream> is;
+
+        std::string testData;
+
+    public:
+
+        DataOutputStreamTest() : baos(), bais(), os(), is(), testData() {}
+        void SetUp() override{
+            testData = "Test_All_Tests\nTest_decaf_io_BufferedInputStream\nTest_BufferedOutputStream\nTest_decaf_io_ByteArrayInputStream\nTest_decaf_io_ByteArrayOutputStream\nTest_decaf_io_DataInputStream\nTest_decaf_io_File\nTest_decaf_io_FileDescriptor\nTest_decaf_io_FileInputStream\nTest_decaf_io_FileNotFoundException\nTest_decaf_io_FileOutputStream\nTest_decaf_io_FilterInputStream\nTest_decaf_io_FilterOutputStream\nTest_decaf_io_InputStream\nTest_decaf_io_IOException\nTest_decaf_io_OutputStream\nTest_decaf_io_PrintStream\nTest_decaf_io_RandomAccessFile\nTest_decaf_io_SyncFailedException\nTest_decaf_lang_AbstractMethodError\nTest_decaf_lang_ArithmeticException\nTest_decaf_lang_ArrayIndexOutOfBoundsException\nTest_decaf_lang_ArrayStoreException\nTest_decaf_lang_Boolean\nTest_decaf_lang_Byte\nTest_decaf_lang_Character\nTest_decaf_lang_Class\nTest_decaf_lang_ClassCastException\nTest_decaf_lang_ClassCircularityError\nTest_decaf_lang_ClassFormatError\nTest_decaf_lang_ClassLoader\nTest_decaf_lang_ClassNotFoundException\nTest_decaf_lang_CloneNotSupportedException\nTest_decaf_lang_Double\nTest_decaf_lang_Error\nTest_decaf_lang_Exception\nTest_decaf_lang_ExceptionInInitializerError\nTest_decaf_lang_Float\nTest_decaf_lang_IllegalAccessError\nTest_decaf_lang_IllegalAccessException\nTest_decaf_lang_IllegalArgumentException\nTest_decaf_lang_IllegalMonitorStateException\nTest_decaf_lang_IllegalThreadStateException\nTest_decaf_lang_IncompatibleClassChangeError\nTest_decaf_lang_IndexOutOfBoundsException\nTest_decaf_lang_InstantiationError\nTest_decaf_lang_InstantiationException\nTest_decaf_lang_Integer\nTest_decaf_lang_InternalError\nTest_decaf_lang_InterruptedException\nTest_decaf_lang_LinkageError\nTest_decaf_lang_Long\nTest_decaf_lang_Math\nTest_decaf_lang_NegativeArraySizeException\nTest_decaf_lang_NoClassDefFoundError\nTest_decaf_lang_NoSuchFieldError\nTest_decaf_lang_NoSuchMethodError\nTest_decaf_lang_NullPointerException\nTest_decaf_lang_Number\nTest_decaf_lang_NumberFormatException\nTest_decaf_lang_Object\nTest_decaf_lang_OutOfMemoryError\nTest_decaf_lang_RuntimeException\nTest_decaf_lang_SecurityManager\nTest_decaf_lang_Short\nTest_decaf_lang_StackOverflowError\nTest_decaf_lang_String\nTest_decaf_lang_StringBuffer\nTest_decaf_lang_StringIndexOutOfBoundsException\nTest_decaf_lang_System\nTest_decaf_lang_Thread\nTest_decaf_lang_ThreadDeath\nTest_decaf_lang_ThreadGroup\nTest_decaf_lang_Throwable\nTest_decaf_lang_UnknownError\nTest_decaf_lang_UnsatisfiedLinkError\nTest_decaf_lang_VerifyError\nTest_decaf_lang_VirtualMachineError\nTest_decaf_lang_vm_Image\nTest_decaf_lang_vm_MemorySegment\nTest_decaf_lang_vm_ROMStoreException\nTest_decaf_lang_vm_VM\nTest_decaf_lang_Void\nTest_decaf_net_BindException\nTest_decaf_net_ConnectException\nTest_decaf_net_DatagramPacket\nTest_decaf_net_DatagramSocket\nTest_decaf_net_DatagramSocketImpl\nTest_decaf_net_InetAddress\nTest_decaf_net_NoRouteToHostException\nTest_decaf_net_PlainDatagramSocketImpl\nTest_decaf_net_PlainSocketImpl\nTest_decaf_net_Socket\nTest_decaf_net_SocketException\nTest_decaf_net_SocketImpl\nTest_decaf_net_SocketInputStream\nTest_decaf_net_SocketOutputStream\nTest_decaf_net_UnknownHostException\nTest_decaf_util_ArrayEnumerator\nTest_decaf_util_Date\nTest_decaf_util_EventObject\nTest_decaf_util_HashEnumerator\nTest_decaf_util_Hashtable\nTest_decaf_util_Properties\nTest_decaf_util_ResourceBundle\nTest_decaf_util_tm\nTest_decaf_util_Vector\n";
+            this->baos.reset( new ByteArrayOutputStream() );
+            this->os.reset( new DataOutputStream( baos.get() ) );
+        }
+        void TearDown() override{
+            try {
+                os.reset( NULL );
+                baos.reset( NULL );
+                is.reset( NULL );
+                bais.reset( NULL );
+            } catch(...) {}
+        }
+
+    protected:
+
+        void testHelper( unsigned char* input, int inputLength,
+                         unsigned char* expect, int expectLength );
+
+        void openDataInputStream() {
+            std::pair<const unsigned char*, int> array = baos->toByteArray();
+            this->bais.reset( new ByteArrayInputStream( array.first, array.second, true ) );
+            this->is.reset( new DataInputStream( bais.get() ) );
+        }
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testFlush() {
+TEST_F(DataOutputStreamTest, testFlush) {
 
     try {
         os->writeInt(9087589);
@@ -40,14 +87,14 @@ void DataOutputStreamTest::testFlush() {
         openDataInputStream();
         int c = is->readInt();
         is->close();
-        CPPUNIT_ASSERT_MESSAGE("Failed to flush correctly", 9087589 == c);
+        ASSERT_TRUE(9087589 == c) << ("Failed to flush correctly");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("Exception during flush test : " + e.getMessage());
+        FAIL() << ("Exception during flush test : " + e.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testSize() {
+TEST_F(DataOutputStreamTest, testSize) {
 
     try {
         os->write( (unsigned char*)&testData[0], (int)testData.size(), 0, 150 );
@@ -56,14 +103,14 @@ void DataOutputStreamTest::testSize() {
         unsigned char rbuf[150];
         is->read( rbuf, 150, 0, 150 );
         is->close();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect size returned", 150 == os->size());
+        ASSERT_TRUE(150 == os->size()) << ("Incorrect size returned");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("Exception during write test : " + e.getMessage());
+        FAIL() << ("Exception during write test : " + e.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWrite1() {
+TEST_F(DataOutputStreamTest, testWrite1) {
 
     try {
         os->write( (unsigned char*)&testData[0], (int)testData.size(), 0, 150 );
@@ -72,16 +119,15 @@ void DataOutputStreamTest::testWrite1() {
         unsigned char* rbuf = new unsigned char[150];
         is->read(rbuf, 150, 0, 150);
         is->close();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect bytes written",
-            string( (const char*)rbuf, 150 ) == testData.substr( 0, 150 ) );
+        ASSERT_TRUE(string( (const char*)rbuf, 150 ) == testData.substr( 0, 150 )) << ("Incorrect bytes written");
         delete [] rbuf;
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("Exception during write test : " + e.getMessage());
+        FAIL() << ("Exception during write test : " + e.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWrite2() {
+TEST_F(DataOutputStreamTest, testWrite2) {
 
     try {
         os->write( 't' );
@@ -89,14 +135,14 @@ void DataOutputStreamTest::testWrite2() {
         openDataInputStream();
         char c = is->readChar();
         is->close();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect int written", 't' == c);
+        ASSERT_TRUE('t' == c) << ("Incorrect int written");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("Exception during write test : " + e.getMessage());
+        FAIL() << ("Exception during write test : " + e.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteBoolean() {
+TEST_F(DataOutputStreamTest, testWriteBoolean) {
 
     try {
         os->writeBoolean(true);
@@ -104,28 +150,28 @@ void DataOutputStreamTest::testWriteBoolean() {
         openDataInputStream();
         bool c = is->readBoolean();
         is->close();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect boolean written", c );
+        ASSERT_TRUE(c) << ("Incorrect boolean written");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("Exception during writeBoolean test : " + e.getMessage());
+        FAIL() << ("Exception during writeBoolean test : " + e.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteByte() {
+TEST_F(DataOutputStreamTest, testWriteByte) {
     try {
         os->writeByte( (unsigned char) 127 );
         os->close();
         openDataInputStream();
         unsigned char c = is->readByte();
         is->close();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect unsigned char written", c == (unsigned char) 127);
+        ASSERT_TRUE(c == (unsigned char) 127) << ("Incorrect unsigned char written");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("Exception during writeByte test : " + e.getMessage());
+        FAIL() << ("Exception during writeByte test : " + e.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteBytes() {
+TEST_F(DataOutputStreamTest, testWriteBytes) {
 
     try {
         os->writeBytes( testData );
@@ -134,10 +180,9 @@ void DataOutputStreamTest::testWriteBytes() {
         std::vector<unsigned char> result( testData.size() );
         is->read( &result[0], (int)testData.size() );
         is->close();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect bytes written",
-            string( (const char*)&result[0], result.size() ) == testData );
+        ASSERT_TRUE(string( (const char*)&result[0], result.size() ) == testData) << ("Incorrect bytes written");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("Exception during writeBytes test : " + e.getMessage());
+        FAIL() << ("Exception during writeBytes test : " + e.getMessage());
     }
 
     // regression test for HARMONY-1101
@@ -146,21 +191,21 @@ void DataOutputStreamTest::testWriteBytes() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteChar() {
+TEST_F(DataOutputStreamTest, testWriteChar) {
     try {
         os->writeChar('T');
         os->close();
         openDataInputStream();
         char c = is->readChar();
         is->close();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect char written", 'T' == c );
+        ASSERT_TRUE('T' == c) << ("Incorrect char written");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("Exception during writeChar test : " + e.getMessage());
+        FAIL() << ("Exception during writeChar test : " + e.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteChars() {
+TEST_F(DataOutputStreamTest, testWriteChars) {
 
     try {
         os->writeChars( testData );
@@ -169,134 +214,123 @@ void DataOutputStreamTest::testWriteChars() {
         std::vector<unsigned char> result( testData.size() );
         is->read( &result[0], (int)testData.size() );
         is->close();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect bytes written",
-            string( (const char*)&result[0], result.size() ) == testData );
+        ASSERT_TRUE(string( (const char*)&result[0], result.size() ) == testData) << ("Incorrect bytes written");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("Exception during writeChars test : " + e.getMessage());
+        FAIL() << ("Exception during writeChars test : " + e.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteDouble() {
+TEST_F(DataOutputStreamTest, testWriteDouble) {
     try {
         os->writeDouble(908755555456.98);
         os->close();
         openDataInputStream();
         double c = is->readDouble();
         is->close();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect double written", 908755555456.98 == c);
+        ASSERT_TRUE(908755555456.98 == c) << ("Incorrect double written");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("Exception during writeDouble test : " + e.getMessage());
+        FAIL() << ("Exception during writeDouble test : " + e.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteFloat() {
+TEST_F(DataOutputStreamTest, testWriteFloat) {
     try {
         os->writeFloat(9087.456f);
         os->close();
         openDataInputStream();
         float c = is->readFloat();
         is->close();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect float written", c == 9087.456f);
+        ASSERT_TRUE(c == 9087.456f) << ("Incorrect float written");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("Exception during writeFloattest : " + e.getMessage());
+        FAIL() << ("Exception during writeFloattest : " + e.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteInt() {
+TEST_F(DataOutputStreamTest, testWriteInt) {
     try {
         os->writeInt(9087589);
         os->close();
         openDataInputStream();
         int c = is->readInt();
         is->close();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect int written", 9087589 == c);
+        ASSERT_TRUE(9087589 == c) << ("Incorrect int written");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("Exception during writeInt test : " + e.getMessage());
+        FAIL() << ("Exception during writeInt test : " + e.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteLong() {
+TEST_F(DataOutputStreamTest, testWriteLong) {
     try {
         os->writeLong(908755555456LL);
         os->close();
         openDataInputStream();
         long long c = is->readLong();
         is->close();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect long written", 908755555456LL == c);
+        ASSERT_TRUE(908755555456LL == c) << ("Incorrect long written");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("Exception during writeLong test" + e.getMessage());
+        FAIL() << ("Exception during writeLong test" + e.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteShort() {
+TEST_F(DataOutputStreamTest, testWriteShort) {
     try {
         os->writeShort((short) 9087);
         os->close();
         openDataInputStream();
         short c = is->readShort();
         is->close();
-        CPPUNIT_ASSERT_MESSAGE("Incorrect short written", 9087 == c);
+        ASSERT_TRUE(9087 == c) << ("Incorrect short written");
     } catch( IOException &e ) {
-        CPPUNIT_FAIL("Exception during writeShort test : " + e.getMessage());
+        FAIL() << ("Exception during writeShort test : " + e.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteUTF() {
+TEST_F(DataOutputStreamTest, testWriteUTF) {
     string testString = "test string one";
     os->writeUTF( testString );
     os->close();
     openDataInputStream();
-    CPPUNIT_ASSERT_MESSAGE("Failed to write string in UTF format",
-        is->available() == (int)testString.length() + 2 );
-    CPPUNIT_ASSERT_MESSAGE("Incorrect string returned",
-        is->readUTF() == testString );
+    ASSERT_TRUE(is->available() == (int)testString.length() + 2) << ("Failed to write string in UTF format");
+    ASSERT_TRUE(is->readUTF() == testString) << ("Incorrect string returned");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteUTFStringLength() {
+TEST_F(DataOutputStreamTest, testWriteUTFStringLength) {
 
     // String of length 65536 of Null Characters.
     // Expect: UTFDataFormatException.
     std::string testStr( 65536, char('a') );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a UTFDataFormatException",
-        os->writeUTF( testStr ),
-        UTFDataFormatException );
+    ASSERT_THROW(os->writeUTF( testStr ), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
 
     baos->reset();
     // String of length 65535 of non Null Characters since Null encodes as UTF-8.
     // Expect: Success.
     testStr.resize( 65535 );
-    CPPUNIT_ASSERT_NO_THROW_MESSAGE(
-        "String of 65535 Non-Null chars should not throw.",
-        os->writeUTF( testStr ) );
+    ASSERT_NO_THROW(os->writeUTF( testStr )) << ("String of 65535 Non-Null chars should not throw.");
 
     baos->reset();
     // Set one of the 65535 bytes to a value that will result in a 2 byte UTF8 encoded sequence.
     // This will cause the string of length 65535 to have a utf length of 65536.
     // Expect: UTFDataFormatException.
     testStr[0] = char( 255 );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an UTFDataFormatException",
-        os->writeUTF( testStr ),
-        UTFDataFormatException );
+    ASSERT_THROW(os->writeUTF( testStr ), UTFDataFormatException) << ("Should throw an UTFDataFormatException");
 
     // Test that a zero length string write the zero size marker.
     ByteArrayOutputStream byteOut;
     DataOutputStream dataOut( &byteOut );
     dataOut.writeUTF( "" );
-    CPPUNIT_ASSERT( dataOut.size() == 2 );
+    ASSERT_TRUE(dataOut.size() == 2);
 
     std::pair<const unsigned char*, int> array = byteOut.toByteArray();
     ByteArrayInputStream byteIn( array.first, array.second, true );
     DataInputStream dataIn( &byteIn );
-    CPPUNIT_ASSERT( dataIn.readUnsignedShort() == 0 );
+    ASSERT_TRUE(dataIn.readUnsignedShort() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -308,11 +342,11 @@ void DataOutputStreamTest::testHelper( unsigned char* input, int inputLength,
 
     std::pair<const unsigned char*, int> array = baos->toByteArray();
 
-    CPPUNIT_ASSERT( array.first[0] == 0x00 );
-    CPPUNIT_ASSERT( array.first[1] == (unsigned char)( expectLength ) );
+    ASSERT_TRUE(array.first[0] == 0x00);
+    ASSERT_TRUE(array.first[1] == (unsigned char)( expectLength ));
 
     for( int i = 2; i < array.second; ++i ) {
-        CPPUNIT_ASSERT( array.first[i] == expect[i-2] );
+        ASSERT_TRUE(array.first[i] == expect[i-2]);
     }
 
     baos->reset();
@@ -321,7 +355,7 @@ void DataOutputStreamTest::testHelper( unsigned char* input, int inputLength,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::testWriteUTFEncoding() {
+TEST_F(DataOutputStreamTest, testWriteUTFEncoding) {
 
     // Test data with 1-byte UTF8 encoding.
     {
@@ -351,7 +385,7 @@ void DataOutputStreamTest::testWriteUTFEncoding() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataOutputStreamTest::test(){
+TEST_F(DataOutputStreamTest, test){
 
     unsigned char byteVal = (unsigned char)'T';
     unsigned short shortVal = 5;
@@ -379,37 +413,37 @@ void DataOutputStreamTest::test(){
     int ix = 0;
 
     unsigned char tempByte = buffer.first[ix];
-    CPPUNIT_ASSERT( tempByte == byteVal );
+    ASSERT_TRUE(tempByte == byteVal);
     ix += (int)sizeof( tempByte );
 
     unsigned short tempShort = 0;
     memcpy( &tempShort, buffer.first+ix, sizeof( unsigned short ) );
     tempShort = util::Endian::byteSwap( tempShort );
-    CPPUNIT_ASSERT( tempShort == shortVal );
+    ASSERT_TRUE(tempShort == shortVal);
     ix += (int)sizeof( tempShort );
 
     unsigned int tempInt = 0;
     memcpy( &tempInt, buffer.first+ix, sizeof( unsigned int ) );
     tempInt = util::Endian::byteSwap( tempInt );
-    CPPUNIT_ASSERT( tempInt == intVal );
+    ASSERT_TRUE(tempInt == intVal);
     ix += (int)sizeof( tempInt );
 
     unsigned long long tempLong = 0;
     memcpy( &tempLong, buffer.first+ix, sizeof( unsigned long long ) );
     tempLong = util::Endian::byteSwap( tempLong );
-    CPPUNIT_ASSERT( tempLong == longVal );
+    ASSERT_TRUE(tempLong == longVal);
     ix += (int)sizeof( tempLong );
 
     float tempFloat = 0;
     memcpy( &tempFloat, buffer.first+ix, sizeof( float ) );
     tempFloat = util::Endian::byteSwap( tempFloat );
-    CPPUNIT_ASSERT( tempFloat == floatVal );
+    ASSERT_TRUE(tempFloat == floatVal);
     ix += (int)sizeof( tempFloat );
 
     double tempDouble = 0;
     memcpy( &tempDouble, buffer.first+ix, sizeof( double ) );
     tempDouble = util::Endian::byteSwap( tempDouble );
-    CPPUNIT_ASSERT( tempDouble == doubleVal );
+    ASSERT_TRUE(tempDouble == doubleVal);
     ix += (int)sizeof( tempDouble );
 
     delete [] buffer.first;

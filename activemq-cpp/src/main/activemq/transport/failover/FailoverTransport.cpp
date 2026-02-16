@@ -30,6 +30,7 @@
 #include <activemq/threads/CompositeTaskRunner.h>
 #include <activemq/transport/failover/BackupTransportPool.h>
 #include <activemq/transport/failover/URIPool.h>
+#include <activemq/transport/DefaultTransportListener.h>
 #include <activemq/transport/failover/FailoverTransportListener.h>
 #include <activemq/transport/failover/CloseTransportsTask.h>
 #include <activemq/transport/failover/URIPool.h>
@@ -171,7 +172,7 @@ namespace failover {
             backups(),
             closeTask(new CloseTransportsTask()),
             taskRunner(new CompositeTaskRunner()),
-            disposedListener(),
+            disposedListener(new DefaultTransportListener()),
             myTransportListener(new FailoverTransportListener(parent)),
             transportListener(NULL) {
 
@@ -551,8 +552,8 @@ TransportListener* FailoverTransport::getTransportListener() const {
 ////////////////////////////////////////////////////////////////////////////////
 std::string FailoverTransport::getRemoteAddress() const {
     synchronized( &this->impl->reconnectMutex ) {
-        if (this->impl->connectedTransport != NULL) {
-            return this->impl->connectedTransport->getRemoteAddress();
+        if (this->impl->connectedTransportURI != NULL) {
+            return this->impl->connectedTransportURI->toString();
         }
     }
     return "";
@@ -1097,14 +1098,17 @@ bool FailoverTransport::iterate() {
             } else {
 
                 if (this->impl->doRebalance) {
-                    if (this->impl->connectedToPrioirty || connectList->getPriorityURI().equals(*this->impl->connectedTransportURI)) {
+                    if (this->impl->connectedTransportURI != NULL &&
+                        (this->impl->connectedToPrioirty || connectList->getPriorityURI().equals(*this->impl->connectedTransportURI))) {
                         // already connected to first in the list, no need to rebalance
                         this->impl->doRebalance = false;
                         return false;
-                    } else {
+                    } else if (this->impl->connectedTransportURI != NULL) {
                         // break any existing connect for rebalance.
                         this->impl->disconnect();
                     }
+                    // else: connectedTransportURI is NULL (transport already failed),
+                    // just clear the flag and proceed with normal reconnection.
 
                     this->impl->doRebalance = false;
                 }
@@ -1120,29 +1124,50 @@ bool FailoverTransport::iterate() {
                 if (this->impl->backups->isEnabled() && this->impl->priorityBackup &&
                     !this->impl->connectedToPrioirty && this->impl->backups->isPriorityBackupAvailable()) {
                     // We have a priority backup available and aren't connected to priority.
-                    // Close any priority backups and disconnect to trigger reconnection.
+                    // Use the priority backup's transport directly for fast switching.
+                    Pointer<BackupTransport> priorityBackup = this->impl->backups->getBackup();
+                    if (priorityBackup != NULL && priorityBackup->isPriority()) {
+                        this->impl->disconnect();
+                        transport = priorityBackup->getTransport();
+                        uri = priorityBackup->getUri();
+                        // Set the transport listener immediately to prevent use-after-free.
+                        // The BackupTransport object is the current listener, but it will be
+                        // destroyed when priorityBackup goes out of scope. We must redirect
+                        // IO events before that happens.
+                        transport->setTransportListener(this->impl->myTransportListener.get());
+                        // Take ownership of the transport
+                        priorityBackup->setTransport(Pointer<Transport>());
+                        transportAlreadyStarted = true;
+                    }
+
+                    // Clean up any remaining priority backups
                     while (this->impl->backups->isPriorityBackupAvailable()) {
-                        Pointer<BackupTransport> priorityBackup = this->impl->backups->getBackup();
-                        if (priorityBackup != NULL && priorityBackup->isPriority()) {
+                        Pointer<BackupTransport> remaining = this->impl->backups->getBackup();
+                        if (remaining != NULL && remaining->isPriority()) {
                             try {
-                                priorityBackup->getTransport()->close();
-                            } catch (...) {
-                                // Ignore close errors
-                            }
+                                if (remaining->getTransport() != NULL) {
+                                    remaining->getTransport()->close();
+                                }
+                            } catch (...) {}
+                            remaining->setTransport(Pointer<Transport>());
                         } else {
-                            // Put it back if it's not a priority backup - but can't put it back
-                            // Just break, we've hit a non-priority backup
                             break;
                         }
                     }
-                    this->impl->disconnect();
-                    // Don't get any backup - let the normal connection logic reconnect
                 } else if (this->impl->backups->isEnabled()) {
                     // Get backup transport if available
                     Pointer<BackupTransport> backupTransport = this->impl->backups->getBackup();
                     if (backupTransport != NULL) {
                         transport = backupTransport->getTransport();
                         uri = backupTransport->getUri();
+                        // Set the transport listener immediately to prevent use-after-free.
+                        // The BackupTransport object is the current listener, but it will be
+                        // destroyed when backupTransport goes out of scope. We must redirect
+                        // IO events before that happens.
+                        transport->setTransportListener(this->impl->myTransportListener.get());
+                        // Take ownership of the transport: clear the backup's reference
+                        // so its destructor won't close the transport we're about to use.
+                        backupTransport->setTransport(Pointer<Transport>());
                         transportAlreadyStarted = true;
                     }
                 }
@@ -1269,6 +1294,8 @@ bool FailoverTransport::iterate() {
                     } catch (Exception& e) {
                         e.setMark(__FILE__, __LINE__);
                         AMQ_LOG_DEBUG("FailoverTransport", "Connection attempt to " << uri.toString() << " failed: " << e.getMessage());
+                        // Reset so next iteration creates and starts a fresh transport
+                        transportAlreadyStarted = false;
                         if (transport != NULL) {
                             if (this->impl->disposedListener != NULL) {
                                 transport->setTransportListener(this->impl->disposedListener.get());

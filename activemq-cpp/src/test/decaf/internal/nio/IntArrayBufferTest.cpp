@@ -15,11 +15,13 @@
  * limitations under the License.
  */
 
-#include "IntArrayBufferTest.h"
+#include <gtest/gtest.h>
+#include <decaf/nio/IntBuffer.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
 
+namespace decaf { namespace internal { namespace nio {} } }
 using namespace std;
 using namespace decaf;
 using namespace decaf::nio;
@@ -27,35 +29,120 @@ using namespace decaf::internal::nio;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
+    class IntArrayBufferTest : public ::testing::Test {
+    protected:
+
+decaf::nio::IntBuffer* testBuffer1;
+        int* testData1;
+
+        static const int testData1Size;
+        static const int SMALL_TEST_LENGTH;
+        static const int BUFFER_LENGTH;
+
+    public:
+
+        IntArrayBufferTest() : testBuffer1(), testData1() {}
+
+        void SetUp() override {
+            testBuffer1 = decaf::nio::IntBuffer::allocate( testData1Size );
+
+            testData1 = new int[testData1Size];
+            for( int i = 0; i < testData1Size; ++i ){
+                testData1[i] = (int)i;
+            }
+        }
+
+        void TearDown() override {
+            delete testBuffer1;
+            delete [] testData1;
+        }
+
+    protected:
+
+        void loadTestData1( int* array, int offset, int length ) {
+            for( int i = 0; i < length; i++ ) {
+                array[offset + i] = (int)i;
+            }
+        }
+
+        void loadTestData2( int* array, int offset, int length ) {
+            for( int i = 0; i < length; i++ ) {
+                array[offset + i] = (int)(length - i);
+            }
+        }
+
+        void loadTestData1( decaf::nio::IntBuffer* buf ) {
+            buf->clear();
+            for( int i = 0; i < buf->capacity(); i++ ) {
+                buf->put( i, (int)i );
+            }
+        }
+
+        void loadTestData2( decaf::nio::IntBuffer* buf ) {
+            buf->clear();
+            for( int i = 0; i < buf->capacity(); i++ ) {
+                buf->put(i, (int)( buf->capacity() - i) );
+            }
+        }
+
+        void assertContentEquals( decaf::nio::IntBuffer* buf, int* array,
+                                  int offset, int length) {
+
+            for( int i = 0; i < length; i++ ) {
+                ASSERT_TRUE(buf->get(i) == array[offset + i]);
+            }
+        }
+
+        void assertContentEquals( decaf::nio::IntBuffer* buf,
+                                  decaf::nio::IntBuffer* other ) {
+            ASSERT_TRUE(buf->capacity() == other->capacity());
+            for( int i = 0; i < buf->capacity(); i++ ) {
+                ASSERT_TRUE(buf->get(i) == other->get(i));
+            }
+        }
+
+        void assertContentLikeTestData1(
+            decaf::nio::IntBuffer* buf, int startIndex,
+            int startValue, int length ) {
+
+            int value = startValue;
+            for( int i = 0; i < length; i++ ) {
+                ASSERT_TRUE(buf->get( startIndex + i ) == value);
+                value = value + 1;
+            }
+        }
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 const int IntArrayBufferTest::testData1Size = 100;
 const int IntArrayBufferTest::SMALL_TEST_LENGTH = 5;
 const int IntArrayBufferTest::BUFFER_LENGTH = 250;
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::test() {
+TEST_F(IntArrayBufferTest, test) {
 
     // Check that we have setup the array and our initial assumptions on state
     // are correct.  This is the first test run.
-    CPPUNIT_ASSERT( testBuffer1 != NULL );
-    CPPUNIT_ASSERT( testBuffer1->capacity() == testData1Size );
-    CPPUNIT_ASSERT( testBuffer1->hasRemaining() == true );
-    CPPUNIT_ASSERT( testBuffer1->limit() == testBuffer1->capacity() );
-    CPPUNIT_ASSERT( testBuffer1->position() == 0 );
-    CPPUNIT_ASSERT( testBuffer1->isReadOnly() == false );
-    CPPUNIT_ASSERT( testBuffer1->toString() != "" );
-    CPPUNIT_ASSERT( testBuffer1->hasArray() == true );
-    CPPUNIT_ASSERT( testBuffer1->array() != NULL );
-    CPPUNIT_ASSERT( testBuffer1->arrayOffset() == 0 );
+    ASSERT_TRUE(testBuffer1 != NULL);
+    ASSERT_TRUE(testBuffer1->capacity() == testData1Size);
+    ASSERT_TRUE(testBuffer1->hasRemaining() == true);
+    ASSERT_TRUE(testBuffer1->limit() == testBuffer1->capacity());
+    ASSERT_TRUE(testBuffer1->position() == 0);
+    ASSERT_TRUE(testBuffer1->isReadOnly() == false);
+    ASSERT_TRUE(testBuffer1->toString() != "");
+    ASSERT_TRUE(testBuffer1->hasArray() == true);
+    ASSERT_TRUE(testBuffer1->array() != NULL);
+    ASSERT_TRUE(testBuffer1->arrayOffset() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testArray() {
+TEST_F(IntArrayBufferTest, testArray) {
 
     int* array = testBuffer1->array();
 
     testBuffer1->put( 0, 10 );
-    CPPUNIT_ASSERT( array[0] == 10.0 );
+    ASSERT_TRUE(array[0] == 10.0);
 
     assertContentEquals(
         testBuffer1, array, testBuffer1->arrayOffset(), testBuffer1->capacity() );
@@ -78,7 +165,7 @@ void IntArrayBufferTest::testArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testArrayOffset() {
+TEST_F(IntArrayBufferTest, testArrayOffset) {
 
     int* array = testBuffer1->array();
 
@@ -98,28 +185,22 @@ void IntArrayBufferTest::testArrayOffset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testReadOnlyArray() {
+TEST_F(IntArrayBufferTest, testReadOnlyArray) {
 
     IntBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
 
-    CPPUNIT_ASSERT( readOnly != NULL );
-    CPPUNIT_ASSERT( readOnly->isReadOnly() == true );
+    ASSERT_TRUE(readOnly != NULL);
+    ASSERT_TRUE(readOnly->isReadOnly() == true);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw UnsupportedOperationException",
-        readOnly->array(),
-        UnsupportedOperationException );
+    ASSERT_THROW(readOnly->array(), UnsupportedOperationException) << ("Should throw UnsupportedOperationException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw UnsupportedOperationException",
-        readOnly->arrayOffset(),
-        UnsupportedOperationException );
+    ASSERT_THROW(readOnly->arrayOffset(), UnsupportedOperationException) << ("Should throw UnsupportedOperationException");
 
     delete readOnly;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testAsReadOnlyBuffer() {
+TEST_F(IntArrayBufferTest, testAsReadOnlyBuffer) {
 
     testBuffer1->clear();
     testBuffer1->mark();
@@ -127,28 +208,28 @@ void IntArrayBufferTest::testAsReadOnlyBuffer() {
 
     // readonly's contents should be the same as testBuffer1
     IntBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
-    CPPUNIT_ASSERT( testBuffer1 != readOnly );
-    CPPUNIT_ASSERT( readOnly->isReadOnly() );
-    CPPUNIT_ASSERT( testBuffer1->position() == readOnly->position() );
-    CPPUNIT_ASSERT( testBuffer1->limit() == readOnly->limit() );
+    ASSERT_TRUE(testBuffer1 != readOnly);
+    ASSERT_TRUE(readOnly->isReadOnly());
+    ASSERT_TRUE(testBuffer1->position() == readOnly->position());
+    ASSERT_TRUE(testBuffer1->limit() == readOnly->limit());
 
     for( int i = 0; i < testBuffer1->capacity(); ++i ) {
-        CPPUNIT_ASSERT( testBuffer1->get( i ) == readOnly->get( i ) );
+        ASSERT_TRUE(testBuffer1->get( i ) == readOnly->get( i ));
     }
 
     // readOnly's position, mark, and limit should be independent to testBuffer1
     readOnly->reset();
-    CPPUNIT_ASSERT( readOnly->position() == 0 );
+    ASSERT_TRUE(readOnly->position() == 0);
     readOnly->clear();
-    CPPUNIT_ASSERT( testBuffer1->position() == testBuffer1->limit() );
+    ASSERT_TRUE(testBuffer1->position() == testBuffer1->limit());
     testBuffer1->reset();
-    CPPUNIT_ASSERT( testBuffer1->position() == 0 );
+    ASSERT_TRUE(testBuffer1->position() == 0);
 
     delete readOnly;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testCompact() {
+TEST_F(IntArrayBufferTest, testCompact) {
 
     loadTestData1( testBuffer1 );
 
@@ -157,72 +238,63 @@ void IntArrayBufferTest::testCompact() {
     testBuffer1->mark();
 
     IntBuffer& ret = testBuffer1->compact();
-    CPPUNIT_ASSERT( &ret == testBuffer1 );
-    CPPUNIT_ASSERT( testBuffer1->position() == testBuffer1->capacity() );
-    CPPUNIT_ASSERT( testBuffer1->limit() == testBuffer1->capacity() );
+    ASSERT_TRUE(&ret == testBuffer1);
+    ASSERT_TRUE(testBuffer1->position() == testBuffer1->capacity());
+    ASSERT_TRUE(testBuffer1->limit() == testBuffer1->capacity());
 
     assertContentLikeTestData1( testBuffer1, 0, 0, testBuffer1->capacity() );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw InvalidMarkException",
-        testBuffer1->reset(),
-        InvalidMarkException );
+    ASSERT_THROW(testBuffer1->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
 
     // case: buffer is empty
     testBuffer1->position(0);
     testBuffer1->limit(0);
     testBuffer1->mark();
     ret = testBuffer1->compact();
-    CPPUNIT_ASSERT( &ret == testBuffer1 );
-    CPPUNIT_ASSERT( testBuffer1->position() == 0 );
-    CPPUNIT_ASSERT( testBuffer1->limit() == testBuffer1->capacity() );
+    ASSERT_TRUE(&ret == testBuffer1);
+    ASSERT_TRUE(testBuffer1->position() == 0);
+    ASSERT_TRUE(testBuffer1->limit() == testBuffer1->capacity());
 
     assertContentLikeTestData1(testBuffer1, 0, 0, testBuffer1->capacity());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw InvalidMarkException",
-        testBuffer1->reset(),
-        InvalidMarkException );
+    ASSERT_THROW(testBuffer1->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
 
     // case: normal
-    CPPUNIT_ASSERT( testBuffer1->capacity() > 5 );
+    ASSERT_TRUE(testBuffer1->capacity() > 5);
 
     testBuffer1->position(1);
     testBuffer1->limit(5);
     testBuffer1->mark();
     ret = testBuffer1->compact();
-    CPPUNIT_ASSERT( &ret == testBuffer1);
-    CPPUNIT_ASSERT( testBuffer1->position() == 4 );
-    CPPUNIT_ASSERT( testBuffer1->limit() == testBuffer1->capacity() );
+    ASSERT_TRUE(&ret == testBuffer1);
+    ASSERT_TRUE(testBuffer1->position() == 4);
+    ASSERT_TRUE(testBuffer1->limit() == testBuffer1->capacity());
 
     assertContentLikeTestData1(testBuffer1, 0, 1, 4);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw InvalidMarkException",
-        testBuffer1->reset(),
-        InvalidMarkException );
+    ASSERT_THROW(testBuffer1->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testCompareTo() {
+TEST_F(IntArrayBufferTest, testCompareTo) {
 
     IntBuffer* other = IntBuffer::allocate( testBuffer1->capacity() );
 
     loadTestData1(testBuffer1);
     loadTestData1(other);
 
-    CPPUNIT_ASSERT( 0 == testBuffer1->compareTo( *other ) );
-    CPPUNIT_ASSERT( 0 == other->compareTo( *testBuffer1 ) );
+    ASSERT_TRUE(0 == testBuffer1->compareTo( *other ));
+    ASSERT_TRUE(0 == other->compareTo( *testBuffer1 ));
     testBuffer1->position(1);
-    CPPUNIT_ASSERT( testBuffer1->compareTo( *other ) > 0 );
-    CPPUNIT_ASSERT( other->compareTo( *testBuffer1 ) < 0 );
+    ASSERT_TRUE(testBuffer1->compareTo( *other ) > 0);
+    ASSERT_TRUE(other->compareTo( *testBuffer1 ) < 0);
     other->position( 2 );
-    CPPUNIT_ASSERT( testBuffer1->compareTo( *other ) < 0 );
-    CPPUNIT_ASSERT( other->compareTo( *testBuffer1 ) > 0 );
+    ASSERT_TRUE(testBuffer1->compareTo( *other ) < 0);
+    ASSERT_TRUE(other->compareTo( *testBuffer1 ) > 0);
     testBuffer1->position(2);
     other->limit(5);
-    CPPUNIT_ASSERT( testBuffer1->compareTo( *other ) > 0 );
-    CPPUNIT_ASSERT( other->compareTo( *testBuffer1 ) < 0 );
+    ASSERT_TRUE(testBuffer1->compareTo( *other ) > 0);
+    ASSERT_TRUE(other->compareTo( *testBuffer1 ) < 0);
 
     std::vector<int> array1( 1, 545645 );
     std::vector<int> array2( 1, 545645 );
@@ -232,15 +304,9 @@ void IntArrayBufferTest::testCompareTo() {
     IntBuffer* dbuffer2 = IntBuffer::wrap( array2 );
     IntBuffer* dbuffer3 = IntBuffer::wrap( array3 );
 
-    CPPUNIT_ASSERT_MESSAGE(
-        "Failed equal comparison with NaN entry",
-        dbuffer1->compareTo( *dbuffer2 ) == 0 );
-    CPPUNIT_ASSERT_MESSAGE(
-        "Failed greater than comparison with NaN entry",
-        dbuffer3->compareTo( *dbuffer1 ) );
-    CPPUNIT_ASSERT_MESSAGE(
-        "Failed greater than comparison with NaN entry",
-        dbuffer1->compareTo( *dbuffer3 ) );
+    ASSERT_TRUE(dbuffer1->compareTo( *dbuffer2 ) == 0) << ("Failed equal comparison with NaN entry");
+    ASSERT_TRUE(dbuffer3->compareTo( *dbuffer1 )) << ("Failed greater than comparison with NaN entry");
+    ASSERT_TRUE(dbuffer1->compareTo( *dbuffer3 )) << ("Failed greater than comparison with NaN entry");
 
     delete other;
     delete dbuffer1;
@@ -249,398 +315,308 @@ void IntArrayBufferTest::testCompareTo() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testDuplicate() {
+TEST_F(IntArrayBufferTest, testDuplicate) {
     testBuffer1->clear();
     testBuffer1->mark();
     testBuffer1->position(testBuffer1->limit());
 
     // duplicate's contents should be the same as testBuffer1
     IntBuffer* duplicate = testBuffer1->duplicate();
-    CPPUNIT_ASSERT( testBuffer1 != duplicate );
-    CPPUNIT_ASSERT( testBuffer1->position() == duplicate->position() );
-    CPPUNIT_ASSERT( testBuffer1->limit() == duplicate->limit() );
-    CPPUNIT_ASSERT( testBuffer1->isReadOnly() == duplicate->isReadOnly() );
+    ASSERT_TRUE(testBuffer1 != duplicate);
+    ASSERT_TRUE(testBuffer1->position() == duplicate->position());
+    ASSERT_TRUE(testBuffer1->limit() == duplicate->limit());
+    ASSERT_TRUE(testBuffer1->isReadOnly() == duplicate->isReadOnly());
     assertContentEquals( testBuffer1, duplicate );
 
     // duplicate's position, mark, and limit should be independent to testBuffer1
     duplicate->reset();
-    CPPUNIT_ASSERT( duplicate->position() == 0 );
+    ASSERT_TRUE(duplicate->position() == 0);
     duplicate->clear();
-    CPPUNIT_ASSERT( testBuffer1->position() == testBuffer1->limit() );
+    ASSERT_TRUE(testBuffer1->position() == testBuffer1->limit());
     testBuffer1->reset();
-    CPPUNIT_ASSERT( testBuffer1->position() == 0 );
+    ASSERT_TRUE(testBuffer1->position() == 0);
 
     delete duplicate;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testEquals() {
+TEST_F(IntArrayBufferTest, testEquals) {
 
     // equal to self
-    CPPUNIT_ASSERT( testBuffer1->equals( *testBuffer1 ) );
+    ASSERT_TRUE(testBuffer1->equals( *testBuffer1 ));
     IntBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
-    CPPUNIT_ASSERT( testBuffer1->equals( *readOnly ) );
+    ASSERT_TRUE(testBuffer1->equals( *readOnly ));
     IntBuffer* duplicate = testBuffer1->duplicate();
-    CPPUNIT_ASSERT( testBuffer1->equals( *duplicate ) );
+    ASSERT_TRUE(testBuffer1->equals( *duplicate ));
 
-    CPPUNIT_ASSERT( testBuffer1->capacity() > 5 );
+    ASSERT_TRUE(testBuffer1->capacity() > 5);
 
     testBuffer1->limit( testBuffer1->capacity() ).position(0);
     readOnly->limit( readOnly->capacity() ).position( 1 );
-    CPPUNIT_ASSERT( !testBuffer1->equals( *readOnly ) );
+    ASSERT_TRUE(!testBuffer1->equals( *readOnly ));
 
     testBuffer1->limit( testBuffer1->capacity() - 1).position(0);
     duplicate->limit( duplicate->capacity() ).position( 0 );
-    CPPUNIT_ASSERT( !testBuffer1->equals( *duplicate ) );
+    ASSERT_TRUE(!testBuffer1->equals( *duplicate ));
 
     delete readOnly;
     delete duplicate;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testGet() {
+TEST_F(IntArrayBufferTest, testGet) {
 
     testBuffer1->clear();
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
-        CPPUNIT_ASSERT( testBuffer1->position() == i );
-        CPPUNIT_ASSERT( testBuffer1->get() == testBuffer1->get(i) );
+        ASSERT_TRUE(testBuffer1->position() == i);
+        ASSERT_TRUE(testBuffer1->get() == testBuffer1->get(i));
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw BufferUnderflowException",
-        testBuffer1->get(),
-        BufferUnderflowException );
+    ASSERT_THROW(testBuffer1->get(), BufferUnderflowException) << ("Should throw BufferUnderflowException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testGetIntArray() {
+TEST_F(IntArrayBufferTest, testGetIntArray) {
 
     std::vector<int> array(1);
     testBuffer1->clear();
 
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
-        CPPUNIT_ASSERT( testBuffer1->position() == i );
+        ASSERT_TRUE(testBuffer1->position() == i);
         IntBuffer& ret = testBuffer1->get( array );
-        CPPUNIT_ASSERT( array[0] == testBuffer1->get(i) );
-        CPPUNIT_ASSERT( &ret == testBuffer1 );
+        ASSERT_TRUE(array[0] == testBuffer1->get(i));
+        ASSERT_TRUE(&ret == testBuffer1);
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw BufferUnderflowException",
-        testBuffer1->get( array ),
-        BufferUnderflowException );
+    ASSERT_THROW(testBuffer1->get( array ), BufferUnderflowException) << ("Should throw BufferUnderflowException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testGetIntArray2() {
+TEST_F(IntArrayBufferTest, testGetIntArray2) {
 
     testBuffer1->clear();
     int* array1 = new int[testBuffer1->capacity()];
     int* array2 = new int[testBuffer1->capacity() + 1];
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw BufferUnderflowException",
-        testBuffer1->get( array2, testBuffer1->capacity() + 1, 0, testBuffer1->capacity() + 1 ),
-        BufferUnderflowException );
+    ASSERT_THROW(testBuffer1->get( array2, testBuffer1->capacity() + 1, 0, testBuffer1->capacity() + 1 ), BufferUnderflowException) << ("Should throw BufferUnderflowException");
 
-    CPPUNIT_ASSERT( testBuffer1->position() == 0 );
+    ASSERT_TRUE(testBuffer1->position() == 0);
 
     testBuffer1->get( array1, testBuffer1->capacity(), 10, 0 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->get( array1, testBuffer1->capacity(), -1, testBuffer1->capacity() ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->get( array1, testBuffer1->capacity(), -1, testBuffer1->capacity() ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->get( array1, testBuffer1->capacity(), testBuffer1->capacity() + 1, 1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->get( array1, testBuffer1->capacity(), testBuffer1->capacity() + 1, 1 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->get( array1, testBuffer1->capacity(), 2, -1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->get( array1, testBuffer1->capacity(), 2, -1 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->get( array1, testBuffer1->capacity(), 2, testBuffer1->capacity() ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->get( array1, testBuffer1->capacity(), 2, testBuffer1->capacity() ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->get( array1, testBuffer1->capacity(), 1, Integer::MAX_VALUE ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->get( array1, testBuffer1->capacity(), 1, Integer::MAX_VALUE ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->get( array1, testBuffer1->capacity(), Integer::MAX_VALUE, 1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->get( array1, testBuffer1->capacity(), Integer::MAX_VALUE, 1 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw NullPointerException",
-        testBuffer1->get( NULL, testBuffer1->capacity(), 1, Integer::MAX_VALUE ),
-        NullPointerException );
+    ASSERT_THROW(testBuffer1->get( NULL, testBuffer1->capacity(), 1, Integer::MAX_VALUE ), NullPointerException) << ("Should throw NullPointerException");
 
-    CPPUNIT_ASSERT( testBuffer1->position() == 0 );
+    ASSERT_TRUE(testBuffer1->position() == 0);
 
     testBuffer1->clear();
     IntBuffer& ret = testBuffer1->get( array1, testBuffer1->capacity(), 0, testBuffer1->capacity() );
-    CPPUNIT_ASSERT( testBuffer1->position() == testBuffer1->capacity() );
+    ASSERT_TRUE(testBuffer1->position() == testBuffer1->capacity());
     assertContentEquals( testBuffer1, array1, 0, testBuffer1->capacity() );
-    CPPUNIT_ASSERT( &ret == testBuffer1 );
+    ASSERT_TRUE(&ret == testBuffer1);
 
     delete [] array1;
     delete [] array2;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testGet2() {
+TEST_F(IntArrayBufferTest, testGet2) {
 
     testBuffer1->clear();
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
-        CPPUNIT_ASSERT( testBuffer1->position() == i );
-        CPPUNIT_ASSERT( testBuffer1->get() == testBuffer1->get(i) );
+        ASSERT_TRUE(testBuffer1->position() == i);
+        ASSERT_TRUE(testBuffer1->get() == testBuffer1->get(i));
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->get( -1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->get( -1 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->get( testBuffer1->limit() ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->get( testBuffer1->limit() ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testHasArray() {
-    CPPUNIT_ASSERT( testBuffer1->hasArray() );
+TEST_F(IntArrayBufferTest, testHasArray) {
+    ASSERT_TRUE(testBuffer1->hasArray());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testPutInt() {
+TEST_F(IntArrayBufferTest, testPutInt) {
 
     testBuffer1->clear();
 
     for( int i = 0; i < testBuffer1->capacity(); i++) {
-        CPPUNIT_ASSERT( testBuffer1->position() == i );
+        ASSERT_TRUE(testBuffer1->position() == i);
         IntBuffer& ret = testBuffer1->put( (int)i );
-        CPPUNIT_ASSERT( testBuffer1->get(i) == (int)i );
-        CPPUNIT_ASSERT( &ret == testBuffer1 );
+        ASSERT_TRUE(testBuffer1->get(i) == (int)i);
+        ASSERT_TRUE(&ret == testBuffer1);
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw BufferOverflowException",
-        testBuffer1->put( 0 ),
-        BufferOverflowException );
+    ASSERT_THROW(testBuffer1->put( 0 ), BufferOverflowException) << ("Should throw BufferOverflowException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testPutIntArray() {
+TEST_F(IntArrayBufferTest, testPutIntArray) {
 
     int* array = new int[1];
 
     testBuffer1->clear();
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
-        CPPUNIT_ASSERT( testBuffer1->position() == i );
+        ASSERT_TRUE(testBuffer1->position() == i);
         array[0] = (int) i;
         IntBuffer& ret = testBuffer1->put( array, 1, 0, 1 );
-        CPPUNIT_ASSERT( testBuffer1->get(i) == (int)i );
-        CPPUNIT_ASSERT( &ret == testBuffer1 );
+        ASSERT_TRUE(testBuffer1->get(i) == (int)i);
+        ASSERT_TRUE(&ret == testBuffer1);
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw BufferOverflowException",
-        testBuffer1->put( array, 1, 0, 1 ),
-        BufferOverflowException );
+    ASSERT_THROW(testBuffer1->put( array, 1, 0, 1 ), BufferOverflowException) << ("Should throw BufferOverflowException");
 
     delete [] array;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testPutIntArray2() {
+TEST_F(IntArrayBufferTest, testPutIntArray2) {
 
     testBuffer1->clear();
     int* array1 = new int[ testBuffer1->capacity() ];
     int* array2 = new int[ testBuffer1->capacity() + 1 ];
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw BufferOverflowException",
-        testBuffer1->put( array2, testBuffer1->capacity() + 1, 0, testBuffer1->capacity() + 1 ),
-        BufferOverflowException );
+    ASSERT_THROW(testBuffer1->put( array2, testBuffer1->capacity() + 1, 0, testBuffer1->capacity() + 1 ), BufferOverflowException) << ("Should throw BufferOverflowException");
 
-    CPPUNIT_ASSERT( testBuffer1->position() == 0 );
+    ASSERT_TRUE(testBuffer1->position() == 0);
 
     testBuffer1->put( array1, testBuffer1->capacity(), testBuffer1->capacity() + 1, 0 );
-    CPPUNIT_ASSERT( testBuffer1->position() == 0 );
+    ASSERT_TRUE(testBuffer1->position() == 0);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->put( array1, testBuffer1->capacity(), -1, testBuffer1->capacity() ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->put( array1, testBuffer1->capacity(), -1, testBuffer1->capacity() ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->put( array1, testBuffer1->capacity(), testBuffer1->capacity() + 1, 1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->put( array1, testBuffer1->capacity(), testBuffer1->capacity() + 1, 1 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->put( array1, testBuffer1->capacity(), 2, -1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->put( array1, testBuffer1->capacity(), 2, -1 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->put( array1, testBuffer1->capacity(), 2, testBuffer1->capacity() ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->put( array1, testBuffer1->capacity(), 2, testBuffer1->capacity() ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->put( array1, testBuffer1->capacity(), 1, Integer::MAX_VALUE ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->put( array1, testBuffer1->capacity(), 1, Integer::MAX_VALUE ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->put( array1, testBuffer1->capacity(), Integer::MAX_VALUE, 1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->put( array1, testBuffer1->capacity(), Integer::MAX_VALUE, 1 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw NullPointerException",
-        testBuffer1->put( NULL, testBuffer1->capacity(), 1, Integer::MAX_VALUE ),
-        NullPointerException );
+    ASSERT_THROW(testBuffer1->put( NULL, testBuffer1->capacity(), 1, Integer::MAX_VALUE ), NullPointerException) << ("Should throw NullPointerException");
 
-    CPPUNIT_ASSERT( testBuffer1->position() == 0 );
+    ASSERT_TRUE(testBuffer1->position() == 0);
 
     loadTestData2( array1, 0, testBuffer1->capacity() );
     IntBuffer& ret = testBuffer1->put( array1, testBuffer1->capacity(), 0, testBuffer1->capacity() );
-    CPPUNIT_ASSERT( testBuffer1->position() == testBuffer1->capacity() );
+    ASSERT_TRUE(testBuffer1->position() == testBuffer1->capacity());
     assertContentEquals( testBuffer1, array1, 0, testBuffer1->capacity() );
-    CPPUNIT_ASSERT( &ret == testBuffer1 );
+    ASSERT_TRUE(&ret == testBuffer1);
 
     delete [] array1;
     delete [] array2;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testPutIntBuffer() {
+TEST_F(IntArrayBufferTest, testPutIntBuffer) {
 
     IntBuffer* other = IntBuffer::allocate( testBuffer1->capacity() );
     IntBuffer* other1 = IntBuffer::allocate( testBuffer1->capacity() + 1 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IllegalArgumentException",
-        testBuffer1->put( *testBuffer1 ),
-        IllegalArgumentException );
+    ASSERT_THROW(testBuffer1->put( *testBuffer1 ), IllegalArgumentException) << ("Should throw IllegalArgumentException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw BufferOverflowException",
-        testBuffer1->put( *other1 ),
-        BufferOverflowException );
+    ASSERT_THROW(testBuffer1->put( *other1 ), BufferOverflowException) << ("Should throw BufferOverflowException");
 
     loadTestData2(other);
     other->clear();
     testBuffer1->clear();
     IntBuffer& ret = testBuffer1->put( *other );
 
-    CPPUNIT_ASSERT( other->position() == other->capacity() );
-    CPPUNIT_ASSERT( testBuffer1->position() == testBuffer1->capacity() );
+    ASSERT_TRUE(other->position() == other->capacity());
+    ASSERT_TRUE(testBuffer1->position() == testBuffer1->capacity());
     assertContentEquals( other, testBuffer1 );
-    CPPUNIT_ASSERT( &ret == testBuffer1 );
+    ASSERT_TRUE(&ret == testBuffer1);
 
     delete other;
     delete other1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testGetWithIndex() {
+TEST_F(IntArrayBufferTest, testGetWithIndex) {
 
     testBuffer1->clear();
 
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
-        CPPUNIT_ASSERT( testBuffer1->position() == 0 );
+        ASSERT_TRUE(testBuffer1->position() == 0);
         IntBuffer& ret = testBuffer1->put( i, (int)i );
-        CPPUNIT_ASSERT( testBuffer1->get(i) == (int)i );
-        CPPUNIT_ASSERT( &ret == testBuffer1 );
+        ASSERT_TRUE(testBuffer1->get(i) == (int)i);
+        ASSERT_TRUE(&ret == testBuffer1);
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->put( -1, 0 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->put( -1, 0 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw IndexOutOfBoundsException",
-        testBuffer1->put( testBuffer1->limit(), 0 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->put( testBuffer1->limit(), 0 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testPutIndexed() {
+TEST_F(IntArrayBufferTest, testPutIndexed) {
 
     IntBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a ReadOnlyBufferException",
-        readOnly->put( 0, 0 ),
-        ReadOnlyBufferException );
+    ASSERT_THROW(readOnly->put( 0, 0 ), ReadOnlyBufferException) << ("Should throw a ReadOnlyBufferException");
     delete readOnly;
 
     testBuffer1->clear();
 
     for( int i = 0; i < testBuffer1->capacity(); i++ ) {
-        CPPUNIT_ASSERT( testBuffer1->position() == 0 );
+        ASSERT_TRUE(testBuffer1->position() == 0);
         IntBuffer& ret = testBuffer1->put( i, (int)i );
-        CPPUNIT_ASSERT( testBuffer1->get(i) == (int)i );
-        CPPUNIT_ASSERT( &ret == testBuffer1 );
+        ASSERT_TRUE(testBuffer1->get(i) == (int)i);
+        ASSERT_TRUE(&ret == testBuffer1);
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1->put( -1, 0 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->put( -1, 0 ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a IndexOutOfBoundsException",
-        testBuffer1->put( testBuffer1->limit(), 0 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(testBuffer1->put( testBuffer1->limit(), 0 ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testSlice() {
+TEST_F(IntArrayBufferTest, testSlice) {
 
-    CPPUNIT_ASSERT( testBuffer1->capacity() > 5 );
+    ASSERT_TRUE(testBuffer1->capacity() > 5);
     testBuffer1->position(1);
     testBuffer1->limit(testBuffer1->capacity() - 1);
 
     IntBuffer* slice = testBuffer1->slice();
-    CPPUNIT_ASSERT( testBuffer1->isReadOnly() == slice->isReadOnly() );
-    CPPUNIT_ASSERT( slice->position() == 0 );
-    CPPUNIT_ASSERT( slice->limit() == testBuffer1->remaining() );
-    CPPUNIT_ASSERT( slice->capacity() == testBuffer1->remaining() );
+    ASSERT_TRUE(testBuffer1->isReadOnly() == slice->isReadOnly());
+    ASSERT_TRUE(slice->position() == 0);
+    ASSERT_TRUE(slice->limit() == testBuffer1->remaining());
+    ASSERT_TRUE(slice->capacity() == testBuffer1->remaining());
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw InvalidMarkException",
-        slice->reset(),
-        InvalidMarkException );
+    ASSERT_THROW(slice->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
 
     // slice share the same content with testBuffer1
     // FIXME:
     loadTestData1(slice);
     assertContentLikeTestData1(testBuffer1, 1, 0, slice->capacity());
     testBuffer1->put( 2, 500 );
-    CPPUNIT_ASSERT( slice->get(1) == 500 );
+    ASSERT_TRUE(slice->get(1) == 500);
 
     delete slice;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void IntArrayBufferTest::testToString() {
+TEST_F(IntArrayBufferTest, testToString) {
 
     std::string str = testBuffer1->toString();
-    CPPUNIT_ASSERT( str.find("Int") != string::npos );
-    CPPUNIT_ASSERT( str.find( Integer::toString( (int)testBuffer1->position() ) ) != string::npos );
-    CPPUNIT_ASSERT( str.find( Integer::toString( (int)testBuffer1->limit() ) ) != string::npos );
-    CPPUNIT_ASSERT( str.find( Integer::toString( (int)testBuffer1->capacity() ) ) != string::npos );
+    ASSERT_TRUE(str.find("Int") != string::npos);
+    ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->position() ) ) != string::npos);
+    ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->limit() ) ) != string::npos);
+    ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->capacity() ) ) != string::npos);
 }

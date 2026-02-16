@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "DeflaterTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/zip/Deflater.h>
 #include <decaf/util/zip/Inflater.h>
@@ -47,6 +47,18 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
+    class DeflaterTest : public ::testing::Test {
+public:
+
+        DeflaterTest();
+        virtual ~DeflaterTest();
+
+    protected:
+
+        void helperEndTest( Deflater& defl, const std::string& testName );
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 DeflaterTest::DeflaterTest() {
 }
@@ -56,7 +68,7 @@ DeflaterTest::~DeflaterTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testDeflateVector() {
+TEST_F(DeflaterTest, testDeflateVector) {
 
     unsigned char byteArray[5] = { 1, 3, 4, 7, 8 };
 
@@ -73,14 +85,13 @@ void DeflaterTest::testDeflateVector() {
         x += defl.deflate( outPutBuf );
     }
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Deflater at end of stream, should return 0",
-                                  0, (int)defl.deflate( outPutBuf ) );
+    ASSERT_EQ(0, (int)defl.deflate( outPutBuf )) << ("Deflater at end of stream, should return 0");
 
     long long totalOut = defl.getBytesWritten();
     long long totalIn = defl.getBytesRead();
 
-    CPPUNIT_ASSERT_EQUAL( (long long)x, totalOut );
-    CPPUNIT_ASSERT_EQUAL( 5LL, totalIn );
+    ASSERT_EQ((long long)x, totalOut);
+    ASSERT_EQ(5LL, totalIn);
 
     defl.end();
 
@@ -91,24 +102,23 @@ void DeflaterTest::testDeflateVector() {
             infl.inflate( outPutInf );
         }
     } catch( DataFormatException& e ) {
-        CPPUNIT_FAIL("Invalid input to be decompressed");
+        FAIL() << ("Invalid input to be decompressed");
     }
 
-    CPPUNIT_ASSERT_EQUAL( totalIn, infl.getBytesWritten() );
-    CPPUNIT_ASSERT_EQUAL( totalOut, infl.getBytesRead() );
+    ASSERT_EQ(totalIn, infl.getBytesWritten());
+    ASSERT_EQ(totalOut, infl.getBytesRead());
 
     for( int i = 0; i < 5; i++ ) {
-        CPPUNIT_ASSERT_EQUAL( byteArray[i], outPutInf[i] );
+        ASSERT_EQ(byteArray[i], outPutInf[i]);
     }
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Final decompressed data contained more bytes than original",
-                                  (unsigned char) 0, outPutInf[5] );
+    ASSERT_EQ((unsigned char) 0, outPutInf[5]) << ("Final decompressed data contained more bytes than original");
 
     infl.end();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testDeflateArray() {
+TEST_F(DeflaterTest, testDeflateArray) {
 
     static const int BUFFER_SIZE = 50;
     static const int INPUT_SIZE = 5;
@@ -132,13 +142,12 @@ void DeflaterTest::testDeflateArray() {
         x += defl.deflate( outPutBuf, BUFFER_SIZE, offSet, length );
     }
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Deflater at end of stream, should return 0",
-                                  0, (int)defl.deflate( outPutBuf, BUFFER_SIZE, offSet, length ) );
+    ASSERT_EQ(0, (int)defl.deflate( outPutBuf, BUFFER_SIZE, offSet, length )) << ("Deflater at end of stream, should return 0");
 
     long long totalOut = defl.getBytesWritten();
     long long totalIn = defl.getBytesRead();
-    CPPUNIT_ASSERT_EQUAL( x, (int)totalOut );
-    CPPUNIT_ASSERT_EQUAL( INPUT_SIZE, (int)totalIn );
+    ASSERT_EQ(x, (int)totalOut);
+    ASSERT_EQ(INPUT_SIZE, (int)totalIn);
     defl.end();
 
     Inflater infl;
@@ -148,16 +157,15 @@ void DeflaterTest::testDeflateArray() {
             infl.inflate( outPutInf, BUFFER_SIZE, 0, BUFFER_SIZE );
         }
     } catch( DataFormatException& e ) {
-        CPPUNIT_FAIL("Invalid input to be decompressed");
+        FAIL() << ("Invalid input to be decompressed");
     }
 
-    CPPUNIT_ASSERT_EQUAL( totalIn, infl.getBytesWritten() );
-    CPPUNIT_ASSERT_EQUAL( totalOut, infl.getBytesRead() );
+    ASSERT_EQ(totalIn, infl.getBytesWritten());
+    ASSERT_EQ(totalOut, infl.getBytesRead());
     for( int i = 0; i < INPUT_SIZE; i++ ) {
-        CPPUNIT_ASSERT_EQUAL( byteArray[i], outPutInf[i] );
+        ASSERT_EQ(byteArray[i], outPutInf[i]);
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Final decompressed data contained more bytes than original",
-                                  0, (int) outPutInf[BUFFER_SIZE-1] );
+    ASSERT_EQ(0, (int) outPutInf[BUFFER_SIZE-1]) << ("Final decompressed data contained more bytes than original");
     infl.end();
 
     // Set of tests testing the boundaries of the offSet/length
@@ -176,17 +184,14 @@ void DeflaterTest::testDeflateArray() {
             length = SIZE + 1;
         }
 
-        CPPUNIT_ASSERT_THROW_MESSAGE(
-            "Should have thrown an IndexOutOfBoundsException",
-            deflater.deflate( outPutBuf2, SIZE, offSet, length ),
-            IndexOutOfBoundsException );
+        ASSERT_THROW(deflater.deflate( outPutBuf2, SIZE, offSet, length ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
     }
 
     defl.end();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testEnd() {
+TEST_F(DeflaterTest, testEnd) {
 
     unsigned char byteArray[] = { 5, 2, 3, 7, 8 };
     std::vector<unsigned char> outPutBuf(100);
@@ -206,7 +211,7 @@ void DeflaterTest::testEnd() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testFinish() {
+TEST_F(DeflaterTest, testFinish) {
 
     // This test already here, its the same as test_deflate()
     unsigned char byteArray[] = { 5, 2, 3, 7, 8 };
@@ -224,8 +229,8 @@ void DeflaterTest::testFinish() {
 
     long long totalOut = defl.getBytesWritten();
     long long totalIn = defl.getBytesRead();
-    CPPUNIT_ASSERT_EQUAL( (long long)x, totalOut);
-    CPPUNIT_ASSERT_EQUAL( 5LL, totalIn );
+    ASSERT_EQ((long long)x, totalOut);
+    ASSERT_EQ(5LL, totalIn);
     defl.end();
 
     Inflater infl;
@@ -233,39 +238,38 @@ void DeflaterTest::testFinish() {
     while( !infl.finished() ) {
         infl.inflate( outPutInf );
     }
-    CPPUNIT_ASSERT_EQUAL( totalIn, infl.getBytesWritten() );
-    CPPUNIT_ASSERT_EQUAL( totalOut, infl.getBytesRead() );
+    ASSERT_EQ(totalIn, infl.getBytesWritten());
+    ASSERT_EQ(totalOut, infl.getBytesRead());
     for( int i = 0; i < 5; i++ ) {
-        CPPUNIT_ASSERT_EQUAL( byteArray[i], outPutInf[i] );
+        ASSERT_EQ(byteArray[i], outPutInf[i]);
     }
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Final decompressed data contained more bytes than original",
-                                  0, (int)outPutInf[5] );
+    ASSERT_EQ(0, (int)outPutInf[5]) << ("Final decompressed data contained more bytes than original");
     infl.end();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testFinished() {
+TEST_F(DeflaterTest, testFinished) {
 
     unsigned char byteArray[] = { 5, 2, 3, 7, 8 };
     std::vector<unsigned char> outPutBuf( 100 );
     Deflater defl;
 
-    CPPUNIT_ASSERT_MESSAGE( "Test 1: Deflater should not be finished.", !defl.finished() );
+    ASSERT_TRUE(!defl.finished()) << ("Test 1: Deflater should not be finished.");
     defl.setInput( byteArray, 5, 0, 5 );
-    CPPUNIT_ASSERT_MESSAGE( "Test 2: Deflater should not be finished.", !defl.finished() );
+    ASSERT_TRUE(!defl.finished()) << ("Test 2: Deflater should not be finished.");
     defl.finish();
-    CPPUNIT_ASSERT_MESSAGE( "Test 3: Deflater should not be finished.", !defl.finished() );
+    ASSERT_TRUE(!defl.finished()) << ("Test 3: Deflater should not be finished.");
     while( !defl.finished() ) {
         defl.deflate( outPutBuf );
     }
-    CPPUNIT_ASSERT_MESSAGE( "Test 4: Deflater should be finished.", defl.finished() );
+    ASSERT_TRUE(defl.finished()) << ("Test 4: Deflater should be finished.");
     defl.end();
-    CPPUNIT_ASSERT_MESSAGE( "Test 5: Deflater should be finished.", defl.finished() );
+    ASSERT_TRUE(defl.finished()) << ("Test 5: Deflater should be finished.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testGetAdler() {
+TEST_F(DeflaterTest, testGetAdler) {
 
     unsigned char byteArray[] = { 'a', 'b', 'c', 1, 2, 3 };
     std::vector<unsigned char> outPutBuf( 100 );
@@ -285,30 +289,26 @@ void DeflaterTest::testGetAdler() {
     adl.update( byteArray, 5, 0, 5 );
     long long checkSumR = adl.getValue();
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( std::string() +
+    ASSERT_EQ(checkSumD, checkSumR) << (std::string() +
                                   "The checksum value returned by getAdler() is not the same " +
-                                  "as the checksum returned by creating the adler32 instance",
-                                  checkSumD, checkSumR );
+                                  "as the checksum returned by creating the adler32 instance");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testNeedsInput() {
+TEST_F(DeflaterTest, testNeedsInput) {
 
     Deflater defl;
-    CPPUNIT_ASSERT_MESSAGE( "needsInput give the wrong boolean value as a result of no input buffer",
-                            defl.needsInput() );
+    ASSERT_TRUE(defl.needsInput()) << ("needsInput give the wrong boolean value as a result of no input buffer");
     unsigned char byteArray[] = { 1, 2, 3 };
     defl.setInput( byteArray, 3, 0, 3 );
-    CPPUNIT_ASSERT_MESSAGE( "needsInput give wrong boolean value as a result of a full input buffer",
-                            !defl.needsInput() );
+    ASSERT_TRUE(!defl.needsInput()) << ("needsInput give wrong boolean value as a result of a full input buffer");
     std::vector<unsigned char> outPutBuf( 100 );
     while( !defl.needsInput() ) {
         defl.deflate( outPutBuf );
     }
     std::vector<unsigned char> emptyByteArray( 0 );
     defl.setInput( emptyByteArray );
-    CPPUNIT_ASSERT_MESSAGE( "needsInput give wrong boolean value as a result of an empty input buffer",
-                            defl.needsInput() );
+    ASSERT_TRUE(defl.needsInput()) << ("needsInput give wrong boolean value as a result of an empty input buffer");
     defl.setInput( byteArray, 3, 0, 3 );
     defl.finish();
     while( !defl.finished() ) {
@@ -318,7 +318,7 @@ void DeflaterTest::testNeedsInput() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testReset() {
+TEST_F(DeflaterTest, testReset) {
 
     std::vector<unsigned char> outPutBuf( 100 );
     std::vector<unsigned char> outPutInf( 100 );
@@ -348,11 +348,11 @@ void DeflaterTest::testReset() {
         }
 
         if( i == 0 ) {
-            CPPUNIT_ASSERT_EQUAL( x, (int)defl.getBytesWritten() );
+            ASSERT_EQ(x, (int)defl.getBytesWritten());
         } else if( i == 1 ) {
-            CPPUNIT_ASSERT_EQUAL( x, orgValue );
+            ASSERT_EQ(x, orgValue);
         } else {
-            CPPUNIT_ASSERT_EQUAL( x, orgValue * 2 );
+            ASSERT_EQ(x, orgValue * 2);
         }
 
         if( i == 0 ) {
@@ -367,8 +367,8 @@ void DeflaterTest::testReset() {
             }
             infl.end();
         } catch( DataFormatException e ) {
-            CPPUNIT_FAIL( std::string( "Test " ) + Integer::toString( i ) +
-                          ": Invalid input to be decompressed" );
+            FAIL() << (std::string( "Test " ) + Integer::toString( i ) +
+                          ": Invalid input to be decompressed");
         }
 
         if( i == 1 ) {
@@ -376,15 +376,15 @@ void DeflaterTest::testReset() {
         }
 
         for( int j = 0; j < 5; j++ ) {
-            CPPUNIT_ASSERT_EQUAL( curArray[j], outPutInf[j] );
+            ASSERT_EQ(curArray[j], outPutInf[j]);
         }
 
-        CPPUNIT_ASSERT_EQUAL( 0, (int)outPutInf[5] );
+        ASSERT_EQ(0, (int)outPutInf[5]);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testSetDictionaryVector() {
+TEST_F(DeflaterTest, testSetDictionaryVector) {
 
     static const int DICT_SIZE = 7;
     static const int ARRAY_SIZE = 15;
@@ -404,8 +404,7 @@ void DeflaterTest::testSetDictionaryVector() {
 
     Deflater defl;
     long long deflAdler = defl.getAdler();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "No dictionary set, no data deflated, getAdler should return 1",
-                                  1LL, deflAdler );
+    ASSERT_EQ(1LL, deflAdler) << ("No dictionary set, no data deflated, getAdler should return 1");
     defl.setDictionary( dictionary, 0, DICT_SIZE );
     deflAdler = defl.getAdler();
 
@@ -413,7 +412,7 @@ void DeflaterTest::testSetDictionaryVector() {
     Adler32 adl;
     adl.update( dictionary, 0, DICT_SIZE );
     long long realAdler = adl.getValue();
-    CPPUNIT_ASSERT_EQUAL( deflAdler, realAdler );
+    ASSERT_EQ(deflAdler, realAdler);
 
     defl.setInput( byteArray, ARRAY_SIZE, 0, ARRAY_SIZE );
     defl.finish();
@@ -427,12 +426,12 @@ void DeflaterTest::testSetDictionaryVector() {
     // Deflate is finished and there were bytes deflated that did not occur
     // in the dictionaryArray, therefore a new dictionary was automatically
     // set.
-    CPPUNIT_ASSERT_EQUAL( realAdler, deflAdler );
+    ASSERT_EQ(realAdler, deflAdler);
     defl.end();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testSetDictionaryBIII() {
+TEST_F(DeflaterTest, testSetDictionaryBIII) {
 
     static const int DICT_SIZE = 9;
     static const int ARRAY_SIZE = 23;
@@ -448,8 +447,7 @@ void DeflaterTest::testSetDictionaryBIII() {
 
     Deflater defl;
     long long deflAdler = defl.getAdler();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "No dictionary set, no data deflated, getAdler should return 1",
-                                  1LL, deflAdler );
+    ASSERT_EQ(1LL, deflAdler) << ("No dictionary set, no data deflated, getAdler should return 1");
     defl.setDictionary( dictionaryArray, DICT_SIZE, offSet, length );
     deflAdler = defl.getAdler();
 
@@ -457,7 +455,7 @@ void DeflaterTest::testSetDictionaryBIII() {
     Adler32 adl;
     adl.update( dictionaryArray, DICT_SIZE, offSet, length );
     long long realAdler = adl.getValue();
-    CPPUNIT_ASSERT_EQUAL( deflAdler, realAdler );
+    ASSERT_EQ(deflAdler, realAdler);
 
     defl.setInput( byteArray, ARRAY_SIZE, 0, ARRAY_SIZE );
     while( !defl.needsInput() ) {
@@ -470,7 +468,7 @@ void DeflaterTest::testSetDictionaryBIII() {
     // Deflate is finished and there were bytes deflated that did not occur
     // in the dictionaryArray, therefore a new dictionary was automatically
     // set.
-    CPPUNIT_ASSERT_EQUAL( realAdler, deflAdler );
+    ASSERT_EQ(realAdler, deflAdler);
     defl.end();
 
     // boundary check
@@ -487,17 +485,17 @@ void DeflaterTest::testSetDictionaryBIII() {
 
         try {
             defl2.setDictionary( dictionaryArray, DICT_SIZE, offSet, length );
-            CPPUNIT_FAIL( std::string( "Test " ) + Integer::toString( i ) +
+            FAIL() << (std::string( "Test " ) + Integer::toString( i ) +
                           ": boundary check for setDictionary CPPUNIT_FAILed for offset " +
                           Integer::toString( offSet ) + " and length " +
-                          Integer::toString( length ) );
+                          Integer::toString( length ));
         } catch( IndexOutOfBoundsException& e ) {
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testSetInputVector() {
+TEST_F(DeflaterTest, testSetInputVector) {
 
     std::vector<unsigned char> byteVector( 3 );
     std::vector<unsigned char> outPutBuf( 100 );
@@ -509,8 +507,7 @@ void DeflaterTest::testSetInputVector() {
 
     Deflater defl;
     defl.setInput( byteVector );
-    CPPUNIT_ASSERT_MESSAGE( "the array buffer in setInput() is empty",
-                    !defl.needsInput());
+    ASSERT_TRUE(!defl.needsInput()) << ("the array buffer in setInput() is empty");
     // The second setInput() should be ignored since needsInput() return
     // false
     defl.setInput( byteVector );
@@ -527,18 +524,18 @@ void DeflaterTest::testSetInputVector() {
             infl.inflate( outPutInf );
         }
     } catch( DataFormatException e ) {
-        CPPUNIT_FAIL("Invalid input to be decompressed");
+        FAIL() << ("Invalid input to be decompressed");
     }
 
     for( int i = 0; i < (int)byteVector.size(); i++ ) {
-        CPPUNIT_ASSERT_EQUAL( byteVector[i], outPutInf[i] );
+        ASSERT_EQ(byteVector[i], outPutInf[i]);
     }
-    CPPUNIT_ASSERT_EQUAL( (long long)byteVector.size(), infl.getBytesWritten() );
+    ASSERT_EQ((long long)byteVector.size(), infl.getBytesWritten());
     infl.end();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testSetInputBIII() {
+TEST_F(DeflaterTest, testSetInputBIII) {
 
     static const int SIZE = 5;
 
@@ -552,7 +549,7 @@ void DeflaterTest::testSetInputBIII() {
     Deflater defl;
     defl.setInput( byteArray, SIZE, offSet, length);
 
-    CPPUNIT_ASSERT_MESSAGE( "the array buffer in setInput() is empty", !defl.needsInput() );
+    ASSERT_TRUE(!defl.needsInput()) << ("the array buffer in setInput() is empty");
 
     // The second setInput() should be ignored since needsInput() return
     // false
@@ -571,9 +568,9 @@ void DeflaterTest::testSetInputBIII() {
     }
 
     for( int i = 0; i < length; i++ ) {
-        CPPUNIT_ASSERT_EQUAL( byteArray[i + offSet], outPutInf[i] );
+        ASSERT_EQ(byteArray[i + offSet], outPutInf[i]);
     }
-    CPPUNIT_ASSERT_EQUAL( length, (int)infl.getBytesWritten() );
+    ASSERT_EQ(length, (int)infl.getBytesWritten());
     infl.end();
 
     // boundary check
@@ -590,17 +587,17 @@ void DeflaterTest::testSetInputBIII() {
 
         try {
             defl2.setInput( byteArray, SIZE, offSet, length );
-            CPPUNIT_FAIL( std::string( "Test " ) + Integer::toString( i ) +
+            FAIL() << (std::string( "Test " ) + Integer::toString( i ) +
                           ": boundary check for setInput CPPUNIT_FAILed for offset " +
                           Integer::toString( offSet ) + " and length " +
-                          Integer::toString( length ) );
+                          Integer::toString( length ));
         } catch( IndexOutOfBoundsException& e ) {
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testSetLevel() {
+TEST_F(DeflaterTest, testSetLevel) {
 
     std::vector<unsigned char> byteArray( 100 );
     for( int ix = 0; ix < 100; ++ix ) {
@@ -638,7 +635,7 @@ void DeflaterTest::testSetLevel() {
             while( !defl.finished() ) {
                 defl.deflate( outPutBuf );
             }
-            CPPUNIT_ASSERT_EQUAL( totalOut, defl.getBytesWritten() );
+            ASSERT_EQ(totalOut, defl.getBytesWritten());
             defl.end();
         }
     }
@@ -646,19 +643,13 @@ void DeflaterTest::testSetLevel() {
     Deflater boundDefl;
 
     // testing boundaries
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "IllegalArgumentException not thrown when setting level to a number < 0.",
-        boundDefl.setLevel( -2 ),
-        IllegalArgumentException );
+    ASSERT_THROW(boundDefl.setLevel( -2 ), IllegalArgumentException) << ("IllegalArgumentException not thrown when setting level to a number < 0.");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "IllegalArgumentException not thrown when setting level to a number > 9.",
-        boundDefl.setLevel( 10 ),
-        IllegalArgumentException );
+    ASSERT_THROW(boundDefl.setLevel( 10 ), IllegalArgumentException) << ("IllegalArgumentException not thrown when setting level to a number > 9.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testSetStrategy() {
+TEST_F(DeflaterTest, testSetStrategy) {
 
     std::vector<unsigned char> byteArray( 100 );
     for( int ix = 0; ix < 100; ++ix ) {
@@ -688,14 +679,11 @@ void DeflaterTest::testSetStrategy() {
         }
 
         if( i == 0 ) {
-            CPPUNIT_ASSERT_MESSAGE( "getBytesWritten() for the default strategy did not produce data",
-                                    0LL != mdefl.getBytesWritten() );
+            ASSERT_TRUE(0LL != mdefl.getBytesWritten()) << ("getBytesWritten() for the default strategy did not produce data");
         } else if( i == 1 ) {
-            CPPUNIT_ASSERT_MESSAGE( "getBytesWritten() for the Huffman strategy did not produce data",
-                                    0LL != mdefl.getBytesWritten() );
+            ASSERT_TRUE(0LL != mdefl.getBytesWritten()) << ("getBytesWritten() for the Huffman strategy did not produce data");
         } else {
-            CPPUNIT_ASSERT_MESSAGE( "getBytesWritten for the Filtered strategy did not produce data",
-                                    0LL != mdefl.getBytesWritten() );
+            ASSERT_TRUE(0LL != mdefl.getBytesWritten()) << ("getBytesWritten for the Filtered strategy did not produce data");
         }
         mdefl.end();
     }
@@ -704,14 +692,11 @@ void DeflaterTest::testSetStrategy() {
     Deflater boundDefl;
 
     // testing boundaries
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "IllegalArgumentException not thrown when setting strategy to an invalid value.",
-        boundDefl.setStrategy( 424 ),
-        IllegalArgumentException );
+    ASSERT_THROW(boundDefl.setStrategy( 424 ), IllegalArgumentException) << ("IllegalArgumentException not thrown when setting strategy to an invalid value.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testConstructor() {
+TEST_F(DeflaterTest, testConstructor) {
 
     std::vector<unsigned char> byteArray( 100 );
     for( int ix = 0; ix < 100; ++ix ) {
@@ -742,12 +727,12 @@ void DeflaterTest::testConstructor() {
     while( !mdefl.finished() ) {
         mdefl.deflate( outPutBuf );
     }
-    CPPUNIT_ASSERT_EQUAL( totalOut, mdefl.getBytesWritten() );
+    ASSERT_EQ(totalOut, mdefl.getBytesWritten());
     mdefl.end();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testConstructorIB() {
+TEST_F(DeflaterTest, testConstructorIB) {
 
     static const int ARRAY_SIZE = 15;
 
@@ -778,7 +763,7 @@ void DeflaterTest::testConstructorIB() {
         while( !defl.finished() ) {
             defl.deflate( outPutBuf );
         }
-        CPPUNIT_ASSERT_EQUAL( totalOut, defl.getBytesWritten() );
+        ASSERT_EQ(totalOut, defl.getBytesWritten());
         defl.end();
     }
 
@@ -793,8 +778,7 @@ void DeflaterTest::testConstructorIB() {
         while( !defl.finished() ) {
             defl.deflate( outPutBuf );
         }
-        CPPUNIT_ASSERT_MESSAGE( "getBytesWritten() should not be equal comparing two Deflaters with different header options.",
-                                defl.getBytesWritten() != totalOut );
+        ASSERT_TRUE(defl.getBytesWritten() != totalOut) << ("getBytesWritten() should not be equal comparing two Deflaters with different header options.");
         defl.end();
     }
 
@@ -807,10 +791,9 @@ void DeflaterTest::testConstructorIB() {
         infl.inflate( outPutInf );
     }
     for( int i = 0; i < ARRAY_SIZE; i++ ) {
-        CPPUNIT_ASSERT_EQUAL( byteArray[i], outPutInf[i] );
+        ASSERT_EQ(byteArray[i], outPutInf[i]);
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "final decompressed data contained more bytes than original - constructorIZ",
-                                  0, (int)outPutInf[ARRAY_SIZE] );
+    ASSERT_EQ(0, (int)outPutInf[ARRAY_SIZE]) << ("final decompressed data contained more bytes than original - constructorIZ");
     infl.end();
 
     {
@@ -827,25 +810,19 @@ void DeflaterTest::testConstructorIB() {
         } catch( DataFormatException e ) {
             r = 1;
         }
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "header option did not correspond", 1, (int)r );
+        ASSERT_EQ(1, (int)r) << ("header option did not correspond");
     }
 
     Deflater boundDefl;
 
     // testing boundaries
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "IllegalArgumentException not thrown when setting level to a number < 0.",
-        boundDefl.setLevel( -2 ),
-        IllegalArgumentException );
+    ASSERT_THROW(boundDefl.setLevel( -2 ), IllegalArgumentException) << ("IllegalArgumentException not thrown when setting level to a number < 0.");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "IllegalArgumentException not thrown when setting level to a number > 9.",
-        boundDefl.setLevel( 10 ),
-        IllegalArgumentException );
+    ASSERT_THROW(boundDefl.setLevel( 10 ), IllegalArgumentException) << ("IllegalArgumentException not thrown when setting level to a number > 9.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testConstructorI() {
+TEST_F(DeflaterTest, testConstructorI) {
 
     std::vector<unsigned char> byteArray( 100 );
     for( int ix = 0; ix < 100; ++ix ) {
@@ -882,21 +859,15 @@ void DeflaterTest::testConstructorI() {
     while( !defl2.finished() ) {
         defl2.deflate( outPutBuf );
     }
-    CPPUNIT_ASSERT_EQUAL( totalOut, defl2.getBytesWritten() );
+    ASSERT_EQ(totalOut, defl2.getBytesWritten());
     defl2.end();
 
     Deflater boundDefl;
 
     // testing boundaries
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "IllegalArgumentException not thrown when setting level to a number < 0.",
-        boundDefl.setLevel( -2 ),
-        IllegalArgumentException );
+    ASSERT_THROW(boundDefl.setLevel( -2 ), IllegalArgumentException) << ("IllegalArgumentException not thrown when setting level to a number < 0.");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "IllegalArgumentException not thrown when setting level to a number > 9.",
-        boundDefl.setLevel( 10 ),
-        IllegalArgumentException );
+    ASSERT_THROW(boundDefl.setLevel( 10 ), IllegalArgumentException) << ("IllegalArgumentException not thrown when setting level to a number > 9.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -907,48 +878,27 @@ void DeflaterTest::helperEndTest( Deflater& defl, const std::string& desc ) {
 
     // Methods where we expect IllegalStateException or NullPointerException
     // to be thrown
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        std::string() + "defl.getBytesWritten() can still be used after " + desc
-                      + " is called in test_" + desc,
-        defl.getBytesWritten(),
-        IllegalStateException );
+    ASSERT_THROW(defl.getBytesWritten(), IllegalStateException) << (std::string() + "defl.getBytesWritten() can still be used after " + desc
+                      + " is called in test_" + desc);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        std::string() + "defl.getAdler() can still be used after " + desc
-                      + " is called in test_" + desc,
-        defl.getAdler(),
-        IllegalStateException );
+    ASSERT_THROW(defl.getAdler(), IllegalStateException) << (std::string() + "defl.getAdler() can still be used after " + desc
+                      + " is called in test_" + desc);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        std::string() + "defl.getBytesRead() can still be used after " + desc
-                      + " is called in test_" + desc,
-        defl.getBytesRead(),
-        IllegalStateException );
+    ASSERT_THROW(defl.getBytesRead(), IllegalStateException) << (std::string() + "defl.getBytesRead() can still be used after " + desc
+                      + " is called in test_" + desc);
 
     unsigned char dict[] = {'a', 'b', 'c'};
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        std::string() + "defl.setDictionary() can still be used after " + desc
-                      + " is called in test_" + desc,
-        defl.setDictionary( dict, 3, 0, 3 ),
-        IllegalStateException );
+    ASSERT_THROW(defl.setDictionary( dict, 3, 0, 3 ), IllegalStateException) << (std::string() + "defl.setDictionary() can still be used after " + desc
+                      + " is called in test_" + desc);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        std::string() + "defl.deflate() can still be used after " + desc
-                      + " is called in test_" + desc,
-        defl.deflate( byteArray, 5, 0, 5 ),
-        IllegalStateException );
+    ASSERT_THROW(defl.deflate( byteArray, 5, 0, 5 ), IllegalStateException) << (std::string() + "defl.deflate() can still be used after " + desc
+                      + " is called in test_" + desc);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        std::string() + "defl.setInput() can still be used after " + desc
-                      + " is called in test_" + desc,
-        defl.setInput( byteArray, 5, 0, 5 ),
-        IllegalStateException );
+    ASSERT_THROW(defl.setInput( byteArray, 5, 0, 5 ), IllegalStateException) << (std::string() + "defl.setInput() can still be used after " + desc
+                      + " is called in test_" + desc);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        std::string() + "defl.reset() can still be used after " + desc
-                      + " is called in test_" + desc,
-        defl.reset(),
-        IllegalStateException );
+    ASSERT_THROW(defl.reset(), IllegalStateException) << (std::string() + "defl.reset() can still be used after " + desc
+                      + " is called in test_" + desc);
 
     // Methods that should be allowed to be called after end() is called
     defl.needsInput();
@@ -958,20 +908,20 @@ void DeflaterTest::helperEndTest( Deflater& defl, const std::string& desc ) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testInitialState() {
+TEST_F(DeflaterTest, testInitialState) {
 
     Deflater inf;
-    CPPUNIT_ASSERT_EQUAL( false, inf.finished() );
-    CPPUNIT_ASSERT_EQUAL( 0LL, inf.getBytesRead() );
-    CPPUNIT_ASSERT_EQUAL( 0LL, inf.getBytesWritten() );
+    ASSERT_EQ(false, inf.finished());
+    ASSERT_EQ(0LL, inf.getBytesRead());
+    ASSERT_EQ(0LL, inf.getBytesWritten());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testGetBytesRead() {
+TEST_F(DeflaterTest, testGetBytesRead) {
 
     Deflater def;
-    CPPUNIT_ASSERT_EQUAL( 0LL, def.getBytesRead() );
-    CPPUNIT_ASSERT_EQUAL( 0LL, def.getBytesWritten() );
+    ASSERT_EQ(0LL, def.getBytesRead());
+    ASSERT_EQ(0LL, def.getBytesWritten());
 
     // Encode a String into bytes
     std::string inputString = "blahblahblah??";
@@ -984,16 +934,16 @@ void DeflaterTest::testGetBytesRead() {
 
     long long compressedDataLength = (long long)def.deflate( output );
 
-    CPPUNIT_ASSERT_EQUAL( 14LL, def.getBytesRead() );
-    CPPUNIT_ASSERT_EQUAL( compressedDataLength, def.getBytesWritten() );
+    ASSERT_EQ(14LL, def.getBytesRead());
+    ASSERT_EQ(compressedDataLength, def.getBytesWritten());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testGetBytesWritten() {
+TEST_F(DeflaterTest, testGetBytesWritten) {
 
     Deflater def;
-    CPPUNIT_ASSERT_EQUAL( 0LL, def.getBytesRead() );
-    CPPUNIT_ASSERT_EQUAL( 0LL, def.getBytesWritten() );
+    ASSERT_EQ(0LL, def.getBytesRead());
+    ASSERT_EQ(0LL, def.getBytesWritten());
 
     // Encode a String into bytes
     std::string inputString = "blahblahblah??";
@@ -1006,23 +956,23 @@ void DeflaterTest::testGetBytesWritten() {
 
     long long compressedDataLength = (long long)def.deflate( output );
 
-    CPPUNIT_ASSERT_EQUAL( 14LL, def.getBytesRead() );
-    CPPUNIT_ASSERT_EQUAL( compressedDataLength, def.getBytesWritten() );
+    ASSERT_EQ(14LL, def.getBytesRead());
+    ASSERT_EQ(compressedDataLength, def.getBytesWritten());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DeflaterTest::testDeflateBeforeSetInput() {
+TEST_F(DeflaterTest, testDeflateBeforeSetInput) {
 
     Deflater deflater;
     deflater.finish();
 
     std::vector<unsigned char> buffer( 1024 );
 
-    CPPUNIT_ASSERT_EQUAL( 8, (int)deflater.deflate( buffer ) );
+    ASSERT_EQ(8, (int)deflater.deflate( buffer ));
 
     unsigned char expectedBytes[] = { 120, (unsigned char) -100, 3, 0, 0, 0, 0, 1 };
 
     for( int i = 0; i < 8; i++ ) {
-        CPPUNIT_ASSERT_EQUAL( expectedBytes[i], buffer[i] );
+        ASSERT_EQ(expectedBytes[i], buffer[i]);
     }
 }

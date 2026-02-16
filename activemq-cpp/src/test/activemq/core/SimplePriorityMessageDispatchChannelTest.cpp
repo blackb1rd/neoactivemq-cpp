@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SimplePriorityMessageDispatchChannelTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/core/SimplePriorityMessageDispatchChannel.h>
 #include <activemq/commands/MessageDispatch.h>
@@ -28,72 +28,75 @@ using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
 
+class SimplePriorityMessageDispatchChannelTest : public ::testing::Test {
+};
+
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testCtor() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testCtor) {
 
     SimplePriorityMessageDispatchChannel channel;
-    CPPUNIT_ASSERT( channel.isRunning() == false );
-    CPPUNIT_ASSERT( channel.isEmpty() == true );
-    CPPUNIT_ASSERT( channel.size() == 0 );
-    CPPUNIT_ASSERT( channel.isClosed() == false );
+    ASSERT_TRUE(channel.isRunning() == false);
+    ASSERT_TRUE(channel.isEmpty() == true);
+    ASSERT_TRUE(channel.size() == 0);
+    ASSERT_TRUE(channel.isClosed() == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testStart() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testStart) {
 
     SimplePriorityMessageDispatchChannel channel;
     channel.start();
-    CPPUNIT_ASSERT( channel.isRunning() == true );
+    ASSERT_TRUE(channel.isRunning() == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testStop() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testStop) {
 
     SimplePriorityMessageDispatchChannel channel;
     channel.start();
-    CPPUNIT_ASSERT( channel.isRunning() == true );
+    ASSERT_TRUE(channel.isRunning() == true);
     channel.stop();
-    CPPUNIT_ASSERT( channel.isRunning() == false );
+    ASSERT_TRUE(channel.isRunning() == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testClose() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testClose) {
 
     SimplePriorityMessageDispatchChannel channel;
     channel.start();
-    CPPUNIT_ASSERT( channel.isRunning() == true );
-    CPPUNIT_ASSERT( channel.isClosed() == false );
+    ASSERT_TRUE(channel.isRunning() == true);
+    ASSERT_TRUE(channel.isClosed() == false);
     channel.close();
-    CPPUNIT_ASSERT( channel.isRunning() == false );
-    CPPUNIT_ASSERT( channel.isClosed() == true );
+    ASSERT_TRUE(channel.isRunning() == false);
+    ASSERT_TRUE(channel.isClosed() == true);
     channel.start();
-    CPPUNIT_ASSERT( channel.isRunning() == false );
-    CPPUNIT_ASSERT( channel.isClosed() == true );
+    ASSERT_TRUE(channel.isRunning() == false);
+    ASSERT_TRUE(channel.isClosed() == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testEnqueue() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueue) {
 
     SimplePriorityMessageDispatchChannel channel;
     Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
     Pointer<MessageDispatch> dispatch2( new MessageDispatch() );
 
-    CPPUNIT_ASSERT( channel.isEmpty() == true );
-    CPPUNIT_ASSERT( channel.size() == 0 );
+    ASSERT_TRUE(channel.isEmpty() == true);
+    ASSERT_TRUE(channel.size() == 0);
 
     channel.enqueue( dispatch1 );
 
-    CPPUNIT_ASSERT( channel.isEmpty() == false );
-    CPPUNIT_ASSERT( channel.size() == 1 );
+    ASSERT_TRUE(channel.isEmpty() == false);
+    ASSERT_TRUE(channel.size() == 1);
 
     channel.enqueue( dispatch2 );
 
-    CPPUNIT_ASSERT( channel.isEmpty() == false );
-    CPPUNIT_ASSERT( channel.size() == 2 );
+    ASSERT_TRUE(channel.isEmpty() == false);
+    ASSERT_TRUE(channel.size() == 2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testEnqueueFront() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueueFront) {
 
     SimplePriorityMessageDispatchChannel channel;
     Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
@@ -110,25 +113,25 @@ void SimplePriorityMessageDispatchChannelTest::testEnqueueFront() {
 
     channel.start();
 
-    CPPUNIT_ASSERT( channel.isEmpty() == true );
-    CPPUNIT_ASSERT( channel.size() == 0 );
+    ASSERT_TRUE(channel.isEmpty() == true);
+    ASSERT_TRUE(channel.size() == 0);
 
     channel.enqueueFirst( dispatch1 );
 
-    CPPUNIT_ASSERT( channel.isEmpty() == false );
-    CPPUNIT_ASSERT( channel.size() == 1 );
+    ASSERT_TRUE(channel.isEmpty() == false);
+    ASSERT_TRUE(channel.size() == 1);
 
     channel.enqueueFirst( dispatch2 );
 
-    CPPUNIT_ASSERT( channel.isEmpty() == false );
-    CPPUNIT_ASSERT( channel.size() == 2 );
+    ASSERT_TRUE(channel.isEmpty() == false);
+    ASSERT_TRUE(channel.size() == 2);
 
-    CPPUNIT_ASSERT( channel.dequeueNoWait() == dispatch1 );
-    CPPUNIT_ASSERT( channel.dequeueNoWait() == dispatch2 );
+    ASSERT_TRUE(channel.dequeueNoWait() == dispatch1);
+    ASSERT_TRUE(channel.dequeueNoWait() == dispatch2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testPeek() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testPeek) {
 
     SimplePriorityMessageDispatchChannel channel;
     Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
@@ -143,31 +146,31 @@ void SimplePriorityMessageDispatchChannelTest::testPeek() {
     dispatch1->setMessage( message1 );
     dispatch2->setMessage( message2 );
 
-    CPPUNIT_ASSERT( channel.isEmpty() == true );
-    CPPUNIT_ASSERT( channel.size() == 0 );
+    ASSERT_TRUE(channel.isEmpty() == true);
+    ASSERT_TRUE(channel.size() == 0);
 
     channel.enqueueFirst( dispatch1 );
 
-    CPPUNIT_ASSERT( channel.isEmpty() == false );
-    CPPUNIT_ASSERT( channel.size() == 1 );
+    ASSERT_TRUE(channel.isEmpty() == false);
+    ASSERT_TRUE(channel.size() == 1);
 
     channel.enqueueFirst( dispatch2 );
 
-    CPPUNIT_ASSERT( channel.isEmpty() == false );
-    CPPUNIT_ASSERT( channel.size() == 2 );
+    ASSERT_TRUE(channel.isEmpty() == false);
+    ASSERT_TRUE(channel.size() == 2);
 
-    CPPUNIT_ASSERT( channel.peek() == NULL );
+    ASSERT_TRUE(channel.peek() == NULL);
 
     channel.start();
 
-    CPPUNIT_ASSERT( channel.peek() == dispatch1 );
-    CPPUNIT_ASSERT( channel.dequeueNoWait() == dispatch1 );
-    CPPUNIT_ASSERT( channel.peek() == dispatch2 );
-    CPPUNIT_ASSERT( channel.dequeueNoWait() == dispatch2 );
+    ASSERT_TRUE(channel.peek() == dispatch1);
+    ASSERT_TRUE(channel.dequeueNoWait() == dispatch1);
+    ASSERT_TRUE(channel.peek() == dispatch2);
+    ASSERT_TRUE(channel.dequeueNoWait() == dispatch2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testDequeueNoWait() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testDequeueNoWait) {
 
     SimplePriorityMessageDispatchChannel channel;
 
@@ -187,29 +190,29 @@ void SimplePriorityMessageDispatchChannelTest::testDequeueNoWait() {
     dispatch2->setMessage( message2 );
     dispatch3->setMessage( message3 );
 
-    CPPUNIT_ASSERT( channel.isRunning() == false );
-    CPPUNIT_ASSERT( channel.dequeueNoWait() == NULL );
+    ASSERT_TRUE(channel.isRunning() == false);
+    ASSERT_TRUE(channel.dequeueNoWait() == NULL);
 
     channel.enqueue( dispatch1 );
     channel.enqueue( dispatch2 );
     channel.enqueue( dispatch3 );
 
-    CPPUNIT_ASSERT( channel.dequeueNoWait() == NULL );
+    ASSERT_TRUE(channel.dequeueNoWait() == NULL);
     channel.start();
-    CPPUNIT_ASSERT( channel.isRunning() == true );
+    ASSERT_TRUE(channel.isRunning() == true);
 
-    CPPUNIT_ASSERT( channel.isEmpty() == false );
-    CPPUNIT_ASSERT( channel.size() == 3 );
-    CPPUNIT_ASSERT( channel.dequeueNoWait() == dispatch2 );
-    CPPUNIT_ASSERT( channel.dequeueNoWait() == dispatch1 );
-    CPPUNIT_ASSERT( channel.dequeueNoWait() == dispatch3 );
+    ASSERT_TRUE(channel.isEmpty() == false);
+    ASSERT_TRUE(channel.size() == 3);
+    ASSERT_TRUE(channel.dequeueNoWait() == dispatch2);
+    ASSERT_TRUE(channel.dequeueNoWait() == dispatch1);
+    ASSERT_TRUE(channel.dequeueNoWait() == dispatch3);
 
-    CPPUNIT_ASSERT( channel.size() == 0 );
-    CPPUNIT_ASSERT( channel.isEmpty() == true );
+    ASSERT_TRUE(channel.size() == 0);
+    ASSERT_TRUE(channel.isEmpty() == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testDequeue() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testDequeue) {
 
     SimplePriorityMessageDispatchChannel channel;
 
@@ -230,29 +233,29 @@ void SimplePriorityMessageDispatchChannelTest::testDequeue() {
     dispatch3->setMessage( message3 );
 
     channel.start();
-    CPPUNIT_ASSERT( channel.isRunning() == true );
+    ASSERT_TRUE(channel.isRunning() == true);
 
     long long timeStarted = System::currentTimeMillis();
 
-    CPPUNIT_ASSERT( channel.dequeue( 1000 ) == NULL );
+    ASSERT_TRUE(channel.dequeue( 1000 ) == NULL);
 
-    CPPUNIT_ASSERT( System::currentTimeMillis() - timeStarted >= 999 );
+    ASSERT_TRUE(System::currentTimeMillis() - timeStarted >= 999);
 
     channel.enqueue( dispatch1 );
     channel.enqueue( dispatch2 );
     channel.enqueue( dispatch3 );
-    CPPUNIT_ASSERT( channel.isEmpty() == false );
-    CPPUNIT_ASSERT( channel.size() == 3 );
-    CPPUNIT_ASSERT( channel.dequeue( -1 ) == dispatch2 );
-    CPPUNIT_ASSERT( channel.dequeue( 0 ) == dispatch1 );
-    CPPUNIT_ASSERT( channel.dequeue( 1000 ) == dispatch3 );
+    ASSERT_TRUE(channel.isEmpty() == false);
+    ASSERT_TRUE(channel.size() == 3);
+    ASSERT_TRUE(channel.dequeue( -1 ) == dispatch2);
+    ASSERT_TRUE(channel.dequeue( 0 ) == dispatch1);
+    ASSERT_TRUE(channel.dequeue( 1000 ) == dispatch3);
 
-    CPPUNIT_ASSERT( channel.size() == 0 );
-    CPPUNIT_ASSERT( channel.isEmpty() == true );
+    ASSERT_TRUE(channel.size() == 0);
+    ASSERT_TRUE(channel.isEmpty() == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannelTest::testRemoveAll() {
+TEST_F(SimplePriorityMessageDispatchChannelTest, testRemoveAll) {
 
     SimplePriorityMessageDispatchChannel channel;
 
@@ -277,10 +280,10 @@ void SimplePriorityMessageDispatchChannelTest::testRemoveAll() {
     channel.enqueue( dispatch3 );
 
     channel.start();
-    CPPUNIT_ASSERT( channel.isRunning() == true );
-    CPPUNIT_ASSERT( channel.isEmpty() == false );
-    CPPUNIT_ASSERT( channel.size() == 3 );
-    CPPUNIT_ASSERT( channel.removeAll().size() == 3 );
-    CPPUNIT_ASSERT( channel.size() == 0 );
-    CPPUNIT_ASSERT( channel.isEmpty() == true );
+    ASSERT_TRUE(channel.isRunning() == true);
+    ASSERT_TRUE(channel.isEmpty() == false);
+    ASSERT_TRUE(channel.size() == 3);
+    ASSERT_TRUE(channel.removeAll().size() == 3);
+    ASSERT_TRUE(channel.size() == 0);
+    ASSERT_TRUE(channel.isEmpty() == true);
 }

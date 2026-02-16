@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include <activemq/wireformat/openwire/marshal/generated/ActiveMQQueueMarshallerTest.h>
+#include <gtest/gtest.h>
 
 #include <activemq/wireformat/openwire/marshal/generated/ActiveMQQueueMarshaller.h>
 #include <activemq/commands/ActiveMQQueue.h>
@@ -52,21 +52,29 @@ using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::util;
 
+// Turn off warning message for ignored exception specification
+#ifdef _MSC_VER
+#pragma warning( disable : 4290 )
+#endif
+
+    class ActiveMQQueueMarshallerTest : public ::testing::Test {};
+
+
 ///////////////////////////////////////////////////////////////////////////////
-void ActiveMQQueueMarshallerTest::test() {
+TEST_F(ActiveMQQueueMarshallerTest, test) {
 
     ActiveMQQueueMarshaller myMarshaller;
     ActiveMQQueue myCommand;
     ActiveMQQueue* myCommand2;
 
-    CPPUNIT_ASSERT( myMarshaller.getDataStructureType() == myCommand.getDataStructureType() );
+    ASSERT_TRUE(myMarshaller.getDataStructureType() == myCommand.getDataStructureType());
     myCommand2 = dynamic_cast<ActiveMQQueue*>( myMarshaller.createObject() );
-    CPPUNIT_ASSERT( myCommand2 != NULL );
+    ASSERT_TRUE(myCommand2 != NULL);
     delete myCommand2;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ActiveMQQueueMarshallerTest::testLooseMarshal() {
+TEST_F(ActiveMQQueueMarshallerTest, testLooseMarshal) {
 
     ActiveMQQueueMarshaller marshaller;
     Properties props;
@@ -92,21 +100,21 @@ void ActiveMQQueueMarshallerTest::testLooseMarshal() {
         ByteArrayInputStream bais( array.first, array.second, true );
         DataInputStream dataIn( &bais );
         unsigned char dataType = dataIn.readByte();
-        CPPUNIT_ASSERT( dataType == outCommand.getDataStructureType() );
+        ASSERT_TRUE(dataType == outCommand.getDataStructureType());
         marshaller.looseUnmarshal( &openWireFormat, &inCommand, &dataIn );
 
-        CPPUNIT_ASSERT( inCommand.equals( (DataStructure*) &outCommand ) == true );
+        ASSERT_TRUE(inCommand.equals( (DataStructure*) &outCommand ) == true);
 
     } catch( ActiveMQException& e ) {
         e.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     } catch( ... ) {
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ActiveMQQueueMarshallerTest::testTightMarshal() {
+TEST_F(ActiveMQQueueMarshallerTest, testTightMarshal) {
 
     ActiveMQQueueMarshaller marshaller;
     Properties props;
@@ -140,18 +148,17 @@ void ActiveMQQueueMarshallerTest::testTightMarshal() {
         DataInputStream dataIn( &bais );
 
         unsigned char dataType = dataIn.readByte();
-        CPPUNIT_ASSERT( dataType == outCommand.getDataStructureType() );
+        ASSERT_TRUE(dataType == outCommand.getDataStructureType());
         bs.clear();
         bs.unmarshal( &dataIn );
         marshaller.tightUnmarshal( &openWireFormat, &inCommand, &dataIn, &bs );
 
-        CPPUNIT_ASSERT( inCommand.equals( (DataStructure*) &outCommand ) == true );
+        ASSERT_TRUE(inCommand.equals( (DataStructure*) &outCommand ) == true);
 
     } catch( ActiveMQException& e ) {
         e.printStackTrace();
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     } catch( ... ) {
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 }
-

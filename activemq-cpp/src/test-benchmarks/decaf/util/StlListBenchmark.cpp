@@ -15,87 +15,108 @@
  * limitations under the License.
  */
 
-#include "StlListBenchmark.h"
-
+#include <benchmark/PerformanceTimer.h>
+#include <decaf/util/StlList.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/util/Iterator.h>
+
+#include <gtest/gtest.h>
+#include <string>
+#include <iostream>
 
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 
-////////////////////////////////////////////////////////////////////////////////
-StlListBenchmark::StlListBenchmark() : intList(), stringList() {
-}
+namespace decaf {
+namespace util {
+
+    class StlListBenchmark : public ::testing::Test {
+    protected:
+
+        StlList<int> intList;
+        StlList<std::string> stringList;
+    };
+
+}}
 
 ////////////////////////////////////////////////////////////////////////////////
-StlListBenchmark::~StlListBenchmark() {
-}
+TEST_F(StlListBenchmark, runBenchmark) {
 
-////////////////////////////////////////////////////////////////////////////////
-void StlListBenchmark::run(){
+    benchmark::PerformanceTimer timer;
+    int iterations = 100;
 
-    int numRuns = 500;
-    std::string test = "test";
-    std::string resultStr = "";
-    StlList<std::string> stringCopy;
-    StlList<int> intCopy;
+    for( int iter = 0; iter < iterations; ++iter ) {
+        timer.start();
 
-    for( int i = 0; i < numRuns; ++i ) {
-        stringList.add( test + Integer::toString(i) );
-        intList.add( 100 + i );
-        stringList.contains( test + Integer::toString(i) );
-        intList.contains( 100 + i );
-    }
+        int numRuns = 500;
+        std::string test = "test";
+        std::string resultStr = "";
+        StlList<std::string> stringCopy;
+        StlList<int> intCopy;
 
-    for( int i = 0; i < numRuns; ++i ) {
-        stringList.remove( test + Integer::toString(i) );
-        intList.remove( 100 + i );
-        stringList.contains( test + Integer::toString(i) );
-        intList.contains( 100 + i );
-    }
-
-    for( int i = 0; i < numRuns; ++i ) {
-        stringList.add( test + Integer::toString(i) );
-        intList.add( 100 + i );
-    }
-
-    std::vector<std::string> stringVec;
-    std::vector<int> intVec;
-
-    for( int i = 0; i < numRuns / 2; ++i ) {
-        stringVec = stringList.toArray();
-        intVec = intList.toArray();
-    }
-
-    std::string tempStr = "";
-    int tempInt = 0;
-
-    for( int i = 0; i < numRuns / 2; ++i ) {
-
-        Iterator<std::string>* strIter = stringList.iterator();
-        Iterator<int>* intIter = intList.iterator();
-
-        while( strIter->hasNext() ){
-            tempStr = strIter->next();
+        for( int i = 0; i < numRuns; ++i ) {
+            stringList.add( test + Integer::toString(i) );
+            intList.add( 100 + i );
+            stringList.contains( test + Integer::toString(i) );
+            intList.contains( 100 + i );
         }
 
-        while( intIter->hasNext() ){
-            tempInt = intIter->next();
-            tempInt++;
+        for( int i = 0; i < numRuns; ++i ) {
+            stringList.remove( test + Integer::toString(i) );
+            intList.remove( 100 + i );
+            stringList.contains( test + Integer::toString(i) );
+            intList.contains( 100 + i );
         }
 
-        delete strIter;
-        delete intIter;
+        for( int i = 0; i < numRuns; ++i ) {
+            stringList.add( test + Integer::toString(i) );
+            intList.add( 100 + i );
+        }
+
+        std::vector<std::string> stringVec;
+        std::vector<int> intVec;
+
+        for( int i = 0; i < numRuns / 2; ++i ) {
+            stringVec = stringList.toArray();
+            intVec = intList.toArray();
+        }
+
+        std::string tempStr = "";
+        int tempInt = 0;
+
+        for( int i = 0; i < numRuns / 2; ++i ) {
+
+            Iterator<std::string>* strIter = stringList.iterator();
+            Iterator<int>* intIter = intList.iterator();
+
+            while( strIter->hasNext() ){
+                tempStr = strIter->next();
+            }
+
+            while( intIter->hasNext() ){
+                tempInt = intIter->next();
+                tempInt++;
+            }
+
+            delete strIter;
+            delete intIter;
+        }
+
+        for( int i = 0; i < numRuns / 2; ++i ) {
+            stringCopy.copy( stringList );
+            stringCopy.clear();
+            intCopy.copy( intList );
+            intCopy.clear();
+        }
+
+        stringList.clear();
+        intList.clear();
+
+        timer.stop();
     }
 
-    for( int i = 0; i < numRuns / 2; ++i ) {
-        stringCopy.copy( stringList );
-        stringCopy.clear();
-        intCopy.copy( intList );
-        intCopy.clear();
-    }
-
-    stringList.clear();
-    intList.clear();
+    std::cout << typeid( StlList<int> ).name() << " Benchmark Time = "
+              << timer.getAverageTime() << " Millisecs"
+              << std::endl;
 }

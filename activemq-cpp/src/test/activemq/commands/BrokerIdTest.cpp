@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "BrokerIdTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/commands/BrokerId.h>
 #include <decaf/util/StlMap.h>
@@ -23,8 +23,6 @@
 #include <decaf/lang/Comparable.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace commands {
 
     struct BrokerIdComparitor {
         typedef activemq::commands::BrokerId* first_argument_type;
@@ -46,8 +44,6 @@ namespace commands {
         }
     };
 
-}}
-
 using namespace std;
 using namespace activemq;
 using namespace activemq::commands;
@@ -55,13 +51,16 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::util;
 
+    class BrokerIdTest : public ::testing::Test {};
+
+
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerIdTest::test() {
+TEST_F(BrokerIdTest, test) {
 
     BrokerId myCommand2;
     BrokerId myCommand3;
     BrokerId myCommand1;
-    CPPUNIT_ASSERT( myCommand1.getDataStructureType() == BrokerId::ID_BROKERID );
+    ASSERT_TRUE(myCommand1.getDataStructureType() == BrokerId::ID_BROKERID);
 
     myCommand1.setValue( "A" );
     myCommand2.setValue( "B" );
@@ -75,13 +74,13 @@ void BrokerIdTest::test() {
 
     std::vector<BrokerId*> keys = testMap.keySet().toArray();
 
-    CPPUNIT_ASSERT( keys.at( 0 )->getValue() == "A" );
-    CPPUNIT_ASSERT( keys.at( 1 )->getValue() == "B" );
-    CPPUNIT_ASSERT( keys.at( 2 )->getValue() == "C" );
+    ASSERT_TRUE(keys.at( 0 )->getValue() == "A");
+    ASSERT_TRUE(keys.at( 1 )->getValue() == "B");
+    ASSERT_TRUE(keys.at( 2 )->getValue() == "C");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerIdTest::test2() {
+TEST_F(BrokerIdTest, test2) {
 
     typedef PointerComparator< BrokerId > COMPARATOR;
 
@@ -93,20 +92,20 @@ void BrokerIdTest::test2() {
     myCommand2->setValue( "A" );
     myCommand3->setValue( "C" );
 
-    CPPUNIT_ASSERT( myCommand1->compareTo( *myCommand2 ) == 0 );
-    CPPUNIT_ASSERT( myCommand1->compareTo( *myCommand3 ) == -1 );
+    ASSERT_TRUE(myCommand1->compareTo( *myCommand2 ) == 0);
+    ASSERT_TRUE(myCommand1->compareTo( *myCommand3 ) == -1);
 
     StlMap< Pointer<BrokerId>, int, COMPARATOR > testMap;
 
     testMap.put( myCommand3, 0 );
     testMap.put( myCommand1, 0 );
-    CPPUNIT_ASSERT( testMap.size() == 2 );
+    ASSERT_TRUE(testMap.size() == 2);
 
     testMap.put( myCommand2, 0 );
-    CPPUNIT_ASSERT( testMap.size() == 2 );
+    ASSERT_TRUE(testMap.size() == 2);
 
     std::vector< Pointer<BrokerId> > keys = testMap.keySet().toArray();
 
-    CPPUNIT_ASSERT( keys.at( 0 )->getValue() == "A" );
-    CPPUNIT_ASSERT( keys.at( 1 )->getValue() == "C" );
+    ASSERT_TRUE(keys.at( 0 )->getValue() == "A");
+    ASSERT_TRUE(keys.at( 1 )->getValue() == "C");
 }

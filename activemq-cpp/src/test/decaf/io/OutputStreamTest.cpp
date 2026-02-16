@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "OutputStreamTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/io/OutputStream.h>
 
@@ -23,6 +23,14 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang::exceptions;
+
+    class OutputStreamTest : public ::testing::Test {
+public:
+
+        OutputStreamTest();
+        virtual ~OutputStreamTest();
+
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -58,7 +66,7 @@ OutputStreamTest::~OutputStreamTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStreamTest::test() {
+TEST_F(OutputStreamTest, test) {
 
     MockOutputStream ostream;
 
@@ -68,6 +76,5 @@ void OutputStreamTest::test() {
 
     std::string result( ostream.getBuffer().begin(), ostream.getBuffer().end() );
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Written string not what was expected",
-                                  std::string( "hello world" ), result );
+    ASSERT_EQ(std::string( "hello world" ), result) << ("Written string not what was expected");
 }

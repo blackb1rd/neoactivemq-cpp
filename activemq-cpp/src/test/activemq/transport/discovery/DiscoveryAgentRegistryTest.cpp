@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "DiscoveryAgentRegistryTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/discovery/DiscoveryAgent.h>
 #include <activemq/transport/discovery/DiscoveryAgentFactory.h>
@@ -31,6 +31,17 @@ using namespace decaf::util;
 using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class DiscoveryAgentRegistryTest : public ::testing::Test {
+public:
+
+        DiscoveryAgentRegistryTest();
+        virtual ~DiscoveryAgentRegistryTest();
+
+        void test();
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -75,16 +86,16 @@ void DiscoveryAgentRegistryTest::test() {
     DiscoveryAgentRegistry& registry = DiscoveryAgentRegistry::getInstance();
     registry.registerFactory("mock", new MockDiscoveryAgentFactory);
 
-    CPPUNIT_ASSERT_EQUAL(1, (int) registry.getAgentNames().size());
+    ASSERT_EQ(1, (int) registry.getAgentNames().size());
 
     DiscoveryAgentFactory* factory = registry.findFactory("mock");
-    CPPUNIT_ASSERT(factory != NULL);
+    ASSERT_TRUE(factory != NULL);
 
     Pointer<DiscoveryAgent> agent(factory->createAgent(URI("mock://default")));
-    CPPUNIT_ASSERT(agent != NULL);
+    ASSERT_TRUE(agent != NULL);
 
     Pointer<MockDiscoveryAgent> mock = agent.dynamicCast<MockDiscoveryAgent>();
-    CPPUNIT_ASSERT(mock != NULL);
+    ASSERT_TRUE(mock != NULL);
 
     registry.unregisterAllFactories();
 }

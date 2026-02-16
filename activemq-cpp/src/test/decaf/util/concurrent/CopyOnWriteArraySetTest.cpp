@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "CopyOnWriteArraySetTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/concurrent/CopyOnWriteArraySet.h>
 #include <decaf/util/StlList.h>
@@ -26,19 +26,31 @@ using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
+    class CopyOnWriteArraySetTest : public ::testing::Test {
+protected:
+
+        static const int SIZE;
+
+    public:
+
+        CopyOnWriteArraySetTest();
+        virtual ~CopyOnWriteArraySetTest();
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
 
     void populate( CopyOnWriteArraySet<int>& set, int n ) {
 
-        CPPUNIT_ASSERT( set.isEmpty() );
+        ASSERT_TRUE(set.isEmpty());
 
         for( int i = 0; i < n; ++i ) {
             set.add( i );
         }
 
-        CPPUNIT_ASSERT( !set.isEmpty());
-        CPPUNIT_ASSERT_EQUAL( n, set.size() );
+        ASSERT_TRUE(!set.isEmpty());
+        ASSERT_EQ(n, set.size());
     }
 }
 
@@ -54,19 +66,19 @@ CopyOnWriteArraySetTest::~CopyOnWriteArraySetTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testConstructor1() {
+TEST_F(CopyOnWriteArraySetTest, testConstructor1) {
 
     CopyOnWriteArraySet<int> set;
-    CPPUNIT_ASSERT( set.isEmpty() );
-    CPPUNIT_ASSERT( set.size() == 0 );
+    ASSERT_TRUE(set.isEmpty());
+    ASSERT_TRUE(set.size() == 0);
 
     CopyOnWriteArraySet<std::string> strSet;
-    CPPUNIT_ASSERT( strSet.isEmpty() );
-    CPPUNIT_ASSERT( strSet.size() == 0 );
+    ASSERT_TRUE(strSet.isEmpty());
+    ASSERT_TRUE(strSet.size() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testConstructor2() {
+TEST_F(CopyOnWriteArraySetTest, testConstructor2) {
 
     StlList<int> intsList;
 
@@ -75,16 +87,16 @@ void CopyOnWriteArraySetTest::testConstructor2() {
     }
 
     CopyOnWriteArraySet<int> array( intsList );
-    CPPUNIT_ASSERT( !array.isEmpty() );
-    CPPUNIT_ASSERT( array.size() == SIZE );
+    ASSERT_TRUE(!array.isEmpty());
+    ASSERT_TRUE(array.size() == SIZE);
 
     for( int i = 0; i < SIZE; ++i ) {
-        CPPUNIT_ASSERT( array.contains( i ) );
+        ASSERT_TRUE(array.contains( i ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testConstructor3() {
+TEST_F(CopyOnWriteArraySetTest, testConstructor3) {
 
     int ints[SIZE];
 
@@ -93,16 +105,16 @@ void CopyOnWriteArraySetTest::testConstructor3() {
     }
 
     CopyOnWriteArraySet<int> array( ints, SIZE );
-    CPPUNIT_ASSERT( !array.isEmpty() );
-    CPPUNIT_ASSERT( array.size() == SIZE );
+    ASSERT_TRUE(!array.isEmpty());
+    ASSERT_TRUE(array.size() == SIZE);
 
     for( int i = 0; i < SIZE; ++i ) {
-        CPPUNIT_ASSERT( array.contains( i ) );
+        ASSERT_TRUE(array.contains( i ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testAddAll1() {
+TEST_F(CopyOnWriteArraySetTest, testAddAll1) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -113,11 +125,11 @@ void CopyOnWriteArraySetTest::testAddAll1() {
     intsList.add( 5 );
 
     full.addAll( intsList );
-    CPPUNIT_ASSERT_EQUAL( 6, full.size() );
+    ASSERT_EQ(6, full.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testAddAll2() {
+TEST_F(CopyOnWriteArraySetTest, testAddAll2) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -128,72 +140,72 @@ void CopyOnWriteArraySetTest::testAddAll2() {
     intsList.add( 1 );
 
     full.addAll( intsList );
-    CPPUNIT_ASSERT_EQUAL( 5, full.size() );
+    ASSERT_EQ(5, full.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testAdd1() {
+TEST_F(CopyOnWriteArraySetTest, testAdd1) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
 
     full.add( 1 );
-    CPPUNIT_ASSERT_EQUAL( 3, full.size() );
+    ASSERT_EQ(3, full.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testAdd2() {
+TEST_F(CopyOnWriteArraySetTest, testAdd2) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
 
     full.add( 3 );
-    CPPUNIT_ASSERT_EQUAL( 4, full.size() );
-    CPPUNIT_ASSERT( full.contains( 3 ) );
+    ASSERT_EQ(4, full.size());
+    ASSERT_TRUE(full.contains( 3 ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testClear() {
+TEST_F(CopyOnWriteArraySetTest, testClear) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
 
     full.clear();
-    CPPUNIT_ASSERT_EQUAL( 0, full.size() );
+    ASSERT_EQ(0, full.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testContains() {
+TEST_F(CopyOnWriteArraySetTest, testContains) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
 
-    CPPUNIT_ASSERT( full.contains( 1 ) );
-    CPPUNIT_ASSERT( !full.contains( 5 ) );
+    ASSERT_TRUE(full.contains( 1 ));
+    ASSERT_TRUE(!full.contains( 5 ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testEquals() {
+TEST_F(CopyOnWriteArraySetTest, testEquals) {
 
     CopyOnWriteArraySet<int> a;
     populate( a, 3 );
     CopyOnWriteArraySet<int> b;
     populate( b, 3 );
 
-    CPPUNIT_ASSERT( a.equals( b ) );
-    CPPUNIT_ASSERT( b.equals( a ) );
+    ASSERT_TRUE(a.equals( b ));
+    ASSERT_TRUE(b.equals( a ));
     a.add( 42 );
 
-    CPPUNIT_ASSERT( !a.equals( b ) );
-    CPPUNIT_ASSERT( !b.equals( a ) );
+    ASSERT_TRUE(!a.equals( b ));
+    ASSERT_TRUE(!b.equals( a ));
     b.add( 42 );
 
-    CPPUNIT_ASSERT( a.equals( b ) );
-    CPPUNIT_ASSERT( b.equals( a ) );
+    ASSERT_TRUE(a.equals( b ));
+    ASSERT_TRUE(b.equals( a ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testContainsAll() {
+TEST_F(CopyOnWriteArraySetTest, testContainsAll) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -202,25 +214,25 @@ void CopyOnWriteArraySetTest::testContainsAll() {
     intsList.add( 1 );
     intsList.add( 2 );
 
-    CPPUNIT_ASSERT( full.containsAll( intsList ) );
+    ASSERT_TRUE(full.containsAll( intsList ));
 
     intsList.add( 6 );
-    CPPUNIT_ASSERT( !full.containsAll( intsList ) );
+    ASSERT_TRUE(!full.containsAll( intsList ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testIsEmpty() {
+TEST_F(CopyOnWriteArraySetTest, testIsEmpty) {
 
     CopyOnWriteArraySet<int> empty;
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
 
-    CPPUNIT_ASSERT( empty.isEmpty() );
-    CPPUNIT_ASSERT( !full.isEmpty() );
+    ASSERT_TRUE(empty.isEmpty());
+    ASSERT_TRUE(!full.isEmpty());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testIterator() {
+TEST_F(CopyOnWriteArraySetTest, testIterator) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -228,14 +240,14 @@ void CopyOnWriteArraySetTest::testIterator() {
     std::unique_ptr< Iterator<int> > iter( full.iterator() );
     int j;
     for( j = 0; iter->hasNext(); j++ ) {
-        CPPUNIT_ASSERT_EQUAL( j, iter->next() );
+        ASSERT_EQ(j, iter->next());
     }
 
-    CPPUNIT_ASSERT_EQUAL( 3, j );
+    ASSERT_EQ(3, j);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testIteratorRemove() {
+TEST_F(CopyOnWriteArraySetTest, testIteratorRemove) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -243,14 +255,11 @@ void CopyOnWriteArraySetTest::testIteratorRemove() {
     std::unique_ptr< Iterator<int> > iter( full.iterator() );
     iter->next();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw a UnsupportedOperationException",
-        iter->remove(),
-        UnsupportedOperationException );
+    ASSERT_THROW(iter->remove(), UnsupportedOperationException) << ("Should throw a UnsupportedOperationException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testRemoveAll() {
+TEST_F(CopyOnWriteArraySetTest, testRemoveAll) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
@@ -260,42 +269,42 @@ void CopyOnWriteArraySetTest::testRemoveAll() {
     intsList.add( 2 );
 
     full.removeAll( intsList );
-    CPPUNIT_ASSERT_EQUAL( 1, full.size() );
+    ASSERT_EQ(1, full.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testRemove() {
+TEST_F(CopyOnWriteArraySetTest, testRemove) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
 
     full.remove( 1 );
 
-    CPPUNIT_ASSERT( !full.contains( 1 ) );
-    CPPUNIT_ASSERT_EQUAL( 2, full.size() );
+    ASSERT_TRUE(!full.contains( 1 ));
+    ASSERT_EQ(2, full.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testSize() {
+TEST_F(CopyOnWriteArraySetTest, testSize) {
 
     CopyOnWriteArraySet<int> empty;
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
 
-    CPPUNIT_ASSERT_EQUAL( 3, full.size() );
-    CPPUNIT_ASSERT_EQUAL( 0, empty.size() );
+    ASSERT_EQ(3, full.size());
+    ASSERT_EQ(0, empty.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CopyOnWriteArraySetTest::testToArray() {
+TEST_F(CopyOnWriteArraySetTest, testToArray) {
 
     CopyOnWriteArraySet<int> full;
     populate( full, 3 );
 
     std::vector<int> array = full.toArray();
 
-    CPPUNIT_ASSERT_EQUAL( 3, (int)array.size() );
-    CPPUNIT_ASSERT_EQUAL( 0, array[0] );
-    CPPUNIT_ASSERT_EQUAL( 1, array[1] );
-    CPPUNIT_ASSERT_EQUAL( 2, array[2] );
+    ASSERT_EQ(3, (int)array.size());
+    ASSERT_EQ(0, array[0]);
+    ASSERT_EQ(1, array[1]);
+    ASSERT_EQ(2, array[2]);
 }

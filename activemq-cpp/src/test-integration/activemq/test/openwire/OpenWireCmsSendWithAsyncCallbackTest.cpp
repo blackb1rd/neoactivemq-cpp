@@ -15,7 +15,22 @@
  * limitations under the License.
  */
 
-#include "OpenWireCmsSendWithAsyncCallbackTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/CmsSendWithAsyncCallbackTest.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenWireCmsSendWithAsyncCallbackTest : public CmsSendWithAsyncCallbackTest {
+    private:
+public:
+        OpenWireCmsSendWithAsyncCallbackTest();
+        virtual ~OpenWireCmsSendWithAsyncCallbackTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
 
 using namespace activemq;
 using namespace activemq::test;
@@ -29,3 +44,6 @@ OpenWireCmsSendWithAsyncCallbackTest::OpenWireCmsSendWithAsyncCallbackTest() {
 OpenWireCmsSendWithAsyncCallbackTest::~OpenWireCmsSendWithAsyncCallbackTest() {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenWireCmsSendWithAsyncCallbackTest, testAsyncCallbackIsFaster) { testAsyncCallbackIsFaster(); }

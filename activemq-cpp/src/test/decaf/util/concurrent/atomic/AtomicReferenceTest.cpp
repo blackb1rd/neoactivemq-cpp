@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "AtomicReferenceTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/concurrent/atomic/AtomicReference.h>
 #include <decaf/lang/Integer.h>
@@ -28,46 +28,48 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
 
+    class AtomicReferenceTest : public ::testing::Test {};
+
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicReferenceTest::testConstructor() {
+TEST_F(AtomicReferenceTest, testConstructor) {
     AtomicReference<int> ai;
-    CPPUNIT_ASSERT( ai.get() == 0 );
+    ASSERT_TRUE(ai.get() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicReferenceTest::testConstructor2() {
+TEST_F(AtomicReferenceTest, testConstructor2) {
     int value = 999;
     AtomicReference<int> ai( &value );
-    CPPUNIT_ASSERT( *( ai.get() ) == 999 );
+    ASSERT_TRUE(*( ai.get() ) == 999);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicReferenceTest::testGetSet() {
+TEST_F(AtomicReferenceTest, testGetSet) {
     int value1 = 2;
     AtomicReference<int> ai( &value1 );
-    CPPUNIT_ASSERT( 2 == *( ai.get() ) );
+    ASSERT_TRUE(2 == *( ai.get() ));
     int value2 = 5;
     ai.set( &value2 );
-    CPPUNIT_ASSERT( 5 == *( ai.get() ) );
+    ASSERT_TRUE(5 == *( ai.get() ));
     int value3 = 6;
     ai.set( &value3 );
-    CPPUNIT_ASSERT( 6 == *( ai.get() ) );
+    ASSERT_TRUE(6 == *( ai.get() ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicReferenceTest::testCompareAndSet() {
+TEST_F(AtomicReferenceTest, testCompareAndSet) {
     int value1 = 25;
     int value2 = 50;
     int value3 = 75;
     AtomicReference<int> ai( &value1 );
-    CPPUNIT_ASSERT( ai.compareAndSet( &value1, &value2 ) );
-    CPPUNIT_ASSERT( &value2 == ai.get() );
-    CPPUNIT_ASSERT( ai.compareAndSet( &value2, &value1 ) );
-    CPPUNIT_ASSERT( &value1 == ai.get() );
-    CPPUNIT_ASSERT( !ai.compareAndSet( &value2, &value3 ) );
-    CPPUNIT_ASSERT( ai.get() != &value3 );
-    CPPUNIT_ASSERT( ai.compareAndSet( &value1, &value2 ) );
-    CPPUNIT_ASSERT( &value2 == ai.get() );
+    ASSERT_TRUE(ai.compareAndSet( &value1, &value2 ));
+    ASSERT_TRUE(&value2 == ai.get());
+    ASSERT_TRUE(ai.compareAndSet( &value2, &value1 ));
+    ASSERT_TRUE(&value1 == ai.get());
+    ASSERT_TRUE(!ai.compareAndSet( &value2, &value3 ));
+    ASSERT_TRUE(ai.get() != &value3);
+    ASSERT_TRUE(ai.compareAndSet( &value1, &value2 ));
+    ASSERT_TRUE(&value2 == ai.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,7 +105,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicReferenceTest::testCompareAndSetInMultipleThreads() {
+TEST_F(AtomicReferenceTest, testCompareAndSetInMultipleThreads) {
 
     AtomicReference<int> ai;
     MyRefedRunnable runnable( &ai );
@@ -113,33 +115,33 @@ void AtomicReferenceTest::testCompareAndSetInMultipleThreads() {
     try {
 
         t.start();
-        CPPUNIT_ASSERT( ai.compareAndSet( &runnable.value1, &runnable.value2 ) );
+        ASSERT_TRUE(ai.compareAndSet( &runnable.value1, &runnable.value2 ));
         t.join();
-        CPPUNIT_ASSERT( ai.get() == &runnable.value3 );
+        ASSERT_TRUE(ai.get() == &runnable.value3);
 
     } catch( Exception& e ) {
-        CPPUNIT_FAIL( "Should Not Throw" );
+        FAIL() << ("Should Not Throw");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicReferenceTest::testGetAndSet() {
+TEST_F(AtomicReferenceTest, testGetAndSet) {
     int value1 = 50;
     int value2 = 75;
     int value3 = 25;
     int value4 = 100;
     AtomicReference<int> ai( &value1 );
-    CPPUNIT_ASSERT( &value1 == ai.getAndSet( &value2 ) );
-    CPPUNIT_ASSERT( &value2 == ai.getAndSet( &value3 ) );
-    CPPUNIT_ASSERT( &value3 == ai.getAndSet( &value4 ) );
-    CPPUNIT_ASSERT( &value4 == ai.get() );
+    ASSERT_TRUE(&value1 == ai.getAndSet( &value2 ));
+    ASSERT_TRUE(&value2 == ai.getAndSet( &value3 ));
+    ASSERT_TRUE(&value3 == ai.getAndSet( &value4 ));
+    ASSERT_TRUE(&value4 == ai.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AtomicReferenceTest::testToString() {
+TEST_F(AtomicReferenceTest, testToString) {
     int value;
     AtomicReference<int> ai;
-    CPPUNIT_ASSERT( ai.toString() == Long::toString( 0 ) );
+    ASSERT_TRUE(ai.toString() == Long::toString( 0 ));
     ai.set( &value );
-    CPPUNIT_ASSERT( ai.toString() == Long::toString( (long long)&value ) );
+    ASSERT_TRUE(ai.toString() == Long::toString( (long long)&value ));
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "BufferFactoryTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/nio/ByteBuffer.h>
 #include <decaf/nio/CharBuffer.h>
@@ -24,49 +24,52 @@
 #include <decaf/nio/LongBuffer.h>
 #include <decaf/nio/IntBuffer.h>
 #include <decaf/nio/ShortBuffer.h>
+#include <decaf/internal/nio/BufferFactory.h>
 
 using namespace decaf;
 using namespace decaf::internal;
 using namespace decaf::internal::nio;
 using namespace decaf::nio;
 
+    class BufferFactoryTest : public ::testing::Test {};
+
 ////////////////////////////////////////////////////////////////////////////////
-void BufferFactoryTest::testCreateByteBuffer1() {
+TEST_F(BufferFactoryTest, testCreateByteBuffer1) {
 
     ByteBuffer* buffer = BufferFactory::createByteBuffer( 500 );
-    CPPUNIT_ASSERT( buffer != NULL );
-    CPPUNIT_ASSERT( buffer->capacity() == 500 );
-    CPPUNIT_ASSERT( buffer->isReadOnly() == false );
+    ASSERT_TRUE(buffer != NULL);
+    ASSERT_TRUE(buffer->capacity() == 500);
+    ASSERT_TRUE(buffer->isReadOnly() == false);
 
     delete buffer;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferFactoryTest::testCreateByteBuffer2() {
+TEST_F(BufferFactoryTest, testCreateByteBuffer2) {
 
     std::vector<unsigned char> array;
     array.resize( 500 );
     ByteBuffer* buffer = BufferFactory::createByteBuffer( array );
-    CPPUNIT_ASSERT( buffer != NULL );
-    CPPUNIT_ASSERT( buffer->hasArray() == true );
-    CPPUNIT_ASSERT( buffer->array() == &array[0] );
-    CPPUNIT_ASSERT( buffer->capacity() == 500 );
-    CPPUNIT_ASSERT( buffer->isReadOnly() == false );
+    ASSERT_TRUE(buffer != NULL);
+    ASSERT_TRUE(buffer->hasArray() == true);
+    ASSERT_TRUE(buffer->array() == &array[0]);
+    ASSERT_TRUE(buffer->capacity() == 500);
+    ASSERT_TRUE(buffer->isReadOnly() == false);
 
     delete buffer;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BufferFactoryTest::testCreateByteBuffer3() {
+TEST_F(BufferFactoryTest, testCreateByteBuffer3) {
 
     std::vector<unsigned char> array;
     array.resize( 500 );
     ByteBuffer* buffer = BufferFactory::createByteBuffer( &array[0], 500, 100, 400 );
-    CPPUNIT_ASSERT( buffer != NULL );
-    CPPUNIT_ASSERT( buffer->hasArray() == true );
-    CPPUNIT_ASSERT( buffer->array() == &array[0] );
-    CPPUNIT_ASSERT( buffer->capacity() == 400 );
-    CPPUNIT_ASSERT( buffer->isReadOnly() == false );
+    ASSERT_TRUE(buffer != NULL);
+    ASSERT_TRUE(buffer->hasArray() == true);
+    ASSERT_TRUE(buffer->array() == &array[0]);
+    ASSERT_TRUE(buffer->capacity() == 400);
+    ASSERT_TRUE(buffer->isReadOnly() == false);
 
     delete buffer;
 }

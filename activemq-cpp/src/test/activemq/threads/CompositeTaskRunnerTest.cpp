@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "CompositeTaskRunnerTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/threads/CompositeTask.h>
 #include <activemq/threads/CompositeTaskRunner.h>
@@ -28,6 +28,9 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::threads;
 using namespace decaf::lang;
+
+    class CompositeTaskRunnerTest : public ::testing::Test {};
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -59,7 +62,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CompositeTaskRunnerTest::test() {
+TEST_F(CompositeTaskRunnerTest, test) {
 
     int attempts = 0;
 
@@ -83,17 +86,17 @@ void CompositeTaskRunnerTest::test() {
         }
     }
 
-    CPPUNIT_ASSERT(task1.getCount() == 100);
-    CPPUNIT_ASSERT(task2.getCount() == 200);
+    ASSERT_TRUE(task1.getCount() == 100);
+    ASSERT_TRUE(task2.getCount() == 200);
 
     runner.removeTask(&task1);
     runner.removeTask(&task2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CompositeTaskRunnerTest::testCreateButNotStarted() {
+TEST_F(CompositeTaskRunnerTest, testCreateButNotStarted) {
     Pointer<CompositeTaskRunner> runner(new CompositeTaskRunner);
-    CPPUNIT_ASSERT(!runner->isStarted());
+    ASSERT_TRUE(!runner->isStarted());
     runner->start();
     runner->shutdown();
     runner.reset(NULL);

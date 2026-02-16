@@ -52,8 +52,8 @@ void JmsMessageGroupsTest::testMessageSend() {
         producer->send( txtMessage.get() );
 
         std::unique_ptr<cms::Message> message( consumer->receive( 2000 ) );
-        CPPUNIT_ASSERT( message.get() != NULL );
-        CPPUNIT_ASSERT( message->getStringProperty( "JMSXGroupID" ) == GROUPID );
+        ASSERT_TRUE(message.get() != NULL);
+        ASSERT_TRUE(message->getStringProperty( "JMSXGroupID" ) == GROUPID);
     }
     AMQ_CATCH_RETHROW( ActiveMQException )
     AMQ_CATCHALL_THROW( ActiveMQException )

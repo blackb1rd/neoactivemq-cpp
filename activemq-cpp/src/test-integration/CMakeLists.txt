@@ -23,9 +23,8 @@
 #   # OR: docker stop activemq-test
 
 set(INTEGRATION_TEST_SRCS
-  # Top level launcher / registry
+  # Top level launcher
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/TestRegistry.cpp
 
   # Utilities and support
   util/teamcity/TeamCityProgressListener.cpp
@@ -130,19 +129,61 @@ if(AMQCPP_SHARED_LIB AND WIN32)
   )
 endif()
 
-# Link to the consolidated library and CppUnit
-target_link_libraries(neoactivemq-integration-test PRIVATE neoactivemq-cpp CppUnit)
+# Link to the consolidated library and Google Test
+target_link_libraries(neoactivemq-integration-test PRIVATE neoactivemq-cpp GTest::gtest)
 
-# Note: Integration tests are NOT registered with CTest by default because they
-# require a running ActiveMQ broker. To run integration tests manually:
-#
-# 1. Start ActiveMQ broker (see Docker commands above)
-# 2. Run: ./activemq-integration-test
-# 3. Stop the broker when done
-#
-# To register with CTest (advanced users only), uncomment the following:
-# add_test(NAME activemq-integration-tests COMMAND activemq-integration-test)
-# set_tests_properties(activemq-integration-tests PROPERTIES
-#   TIMEOUT 600
-#   ENVIRONMENT "ACTIVEMQ_BROKER_URI=tcp://localhost:61616"
-# )
+include(StaticTestDiscovery)
+
+# Collect openwire + stomp test sources for static test discovery
+# (these files contain the TEST_F macros after header merge)
+set(INTEGRATION_TEST_DISCOVERY_SRCS
+  activemq/test/openwire/OpenwireAdvisoryTest.cpp
+  activemq/test/openwire/OpenwireAsyncSenderTest.cpp
+  activemq/test/openwire/OpenwireClientAckTest.cpp
+  activemq/test/openwire/OpenwireCmsConnectionStartStopTest.cpp
+  activemq/test/openwire/OpenWireCmsSendWithAsyncCallbackTest.cpp
+  activemq/test/openwire/OpenwireCmsTemplateTest.cpp
+  activemq/test/openwire/OpenwireDurableTest.cpp
+  activemq/test/openwire/OpenwireEnhancedConnectionTest.cpp
+  activemq/test/openwire/OpenwireExpirationTest.cpp
+  activemq/test/openwire/OpenwireIndividualAckTest.cpp
+  activemq/test/openwire/OpenwireJmsMessageGroupsTest.cpp
+  activemq/test/openwire/OpenwireJmsRecoverTest.cpp
+  activemq/test/openwire/OpenwireMapMessageTest.cpp
+  activemq/test/openwire/OpenwireMessageCompressionTest.cpp
+  activemq/test/openwire/OpenWireMessageListenerRedeliveryTest.cpp
+  activemq/test/openwire/OpenwireMessagePriorityTest.cpp
+  activemq/test/openwire/OpenwireNonBlockingRedeliveryTest.cpp
+  activemq/test/openwire/OpenwireOptimizedAckTest.cpp
+  activemq/test/openwire/OpenwireQueueBrowserTest.cpp
+  activemq/test/openwire/OpenWireRedeliveryPolicyTest.cpp
+  activemq/test/openwire/OpenwireSimpleRollbackTest.cpp
+  activemq/test/openwire/OpenwireSimpleTest.cpp
+  activemq/test/openwire/OpenwireSlowListenerTest.cpp
+  activemq/test/openwire/OpenwireTempDestinationTest.cpp
+  activemq/test/openwire/OpenwireTransactionTest.cpp
+  activemq/test/openwire/OpenwireVirtualTopicTest.cpp
+  activemq/test/openwire/OpenwireXATransactionsTest.cpp
+  activemq/test/openwire/OpenwireMessageSelectorTest.cpp
+  activemq/test/stomp/StompAdvisoryTest.cpp
+  activemq/test/stomp/StompAsyncSenderTest.cpp
+  activemq/test/stomp/StompBulkMessageTest.cpp
+  activemq/test/stomp/StompCmsConnectionStartStopTest.cpp
+  activemq/test/stomp/StompCmsTemplateTest.cpp
+  activemq/test/stomp/StompDurableTest.cpp
+  activemq/test/stomp/StompExpirationTest.cpp
+  activemq/test/stomp/StompJmsMessageGroupsTest.cpp
+  activemq/test/stomp/StompSimpleRollbackTest.cpp
+  activemq/test/stomp/StompSimpleTest.cpp
+  activemq/test/stomp/StompSlowListenerTest.cpp
+  activemq/test/stomp/StompTransactionTest.cpp
+)
+
+static_discover_tests(neoactivemq-integration-test
+  TEST_PREFIX "integration/"
+  SOURCES ${INTEGRATION_TEST_DISCOVERY_SRCS}
+  LABELS integration
+  PROPERTIES
+    TIMEOUT 300
+    ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
+)

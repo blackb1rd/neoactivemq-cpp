@@ -15,38 +15,59 @@
  * limitations under the License.
  */
 
-#include "BooleanBenchmark.h"
+#include <benchmark/PerformanceTimer.h>
+#include <decaf/lang/Boolean.h>
+
+#include <gtest/gtest.h>
+#include <string>
+#include <iostream>
 
 using namespace decaf;
 using namespace decaf::lang;
 
-////////////////////////////////////////////////////////////////////////////////
-BooleanBenchmark::BooleanBenchmark() {
-}
+namespace decaf {
+namespace lang {
+
+    class BooleanBenchmark : public ::testing::Test {
+    };
+
+}}
 
 ////////////////////////////////////////////////////////////////////////////////
-void BooleanBenchmark::run(){
+TEST_F(BooleanBenchmark, runBenchmark) {
 
-    int numRuns = 8000;
-    Boolean boolean( false );
+    benchmark::PerformanceTimer timer;
+    int iterations = 100;
 
-    std::string value = "";
+    for( int iter = 0; iter < iterations; ++iter ) {
+        timer.start();
 
-    for( int i = 0; i < numRuns; ++i ) {
-        value = boolean.toString();
+        int numRuns = 8000;
+        Boolean boolean( false );
+
+        std::string value = "";
+
+        for( int i = 0; i < numRuns; ++i ) {
+            value = boolean.toString();
+        }
+
+        for( int i = 0; i < numRuns; ++i ) {
+            value = boolean.toString( false );
+            value = boolean.toString( true );
+        }
+
+        for( int i = 0; i < numRuns; ++i ) {
+            bool value1 = Boolean::parseBoolean( "false" );
+            bool value2 = Boolean::parseBoolean( "true" );
+
+            value = Boolean::valueOf( value1 ).toString();
+            value = Boolean::valueOf( value2 ).toString();
+        }
+
+        timer.stop();
     }
 
-    for( int i = 0; i < numRuns; ++i ) {
-        value = boolean.toString( false );
-        value = boolean.toString( true );
-    }
-
-    for( int i = 0; i < numRuns; ++i ) {
-        bool value1 = Boolean::parseBoolean( "false" );
-        bool value2 = Boolean::parseBoolean( "true" );
-
-        value = Boolean::valueOf( value1 ).toString();
-        value = Boolean::valueOf( value2 ).toString();
-    }
-
+    std::cout << typeid( Boolean ).name() << " Benchmark Time = "
+              << timer.getAverageTime() << " Millisecs"
+              << std::endl;
 }

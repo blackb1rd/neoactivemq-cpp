@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "PriorityQueueTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/PriorityQueue.h>
 #include <decaf/util/Comparator.h>
@@ -30,9 +30,9 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
+    class PriorityQueueTest : public ::testing::Test {};
+
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf {
-namespace util {
 
     class MockComparatorStringByLength : public decaf::util::Comparator<std::string> {
 
@@ -46,30 +46,28 @@ namespace util {
 
     };
 
-}}
-
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testConstructor_1() {
+TEST_F(PriorityQueueTest, testConstructor_1) {
 
     PriorityQueue<int> pqueue;
 
-    CPPUNIT_ASSERT( pqueue.isEmpty() );
-    CPPUNIT_ASSERT( pqueue.size() == 0 );
-    CPPUNIT_ASSERT( pqueue.comparator() != NULL );
+    ASSERT_TRUE(pqueue.isEmpty());
+    ASSERT_TRUE(pqueue.size() == 0);
+    ASSERT_TRUE(pqueue.comparator() != NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testConstructor_2() {
+TEST_F(PriorityQueueTest, testConstructor_2) {
 
     PriorityQueue<int> pqueue( 1024 );
 
-    CPPUNIT_ASSERT( pqueue.isEmpty() );
-    CPPUNIT_ASSERT( pqueue.size() == 0 );
-    CPPUNIT_ASSERT( pqueue.comparator() != NULL );
+    ASSERT_TRUE(pqueue.isEmpty());
+    ASSERT_TRUE(pqueue.size() == 0);
+    ASSERT_TRUE(pqueue.comparator() != NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testConstructor_3() {
+TEST_F(PriorityQueueTest, testConstructor_3) {
 
     PriorityQueue<int> intQueue;
     LinkedList<int> collection;
@@ -83,18 +81,18 @@ void PriorityQueueTest::testConstructor_3() {
 
     PriorityQueue<int> copy( collection );
 
-    CPPUNIT_ASSERT( copy.size() == intQueue.size() );
+    ASSERT_TRUE(copy.size() == intQueue.size());
 
     std::unique_ptr< Iterator<int> > q_iter( intQueue.iterator() );
     std::unique_ptr< Iterator<int> > c_iter( copy.iterator() );
 
     while( q_iter->hasNext() && c_iter->hasNext() ) {
-        CPPUNIT_ASSERT( q_iter->next() == c_iter->next() );
+        ASSERT_TRUE(q_iter->next() == c_iter->next());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testAssignment() {
+TEST_F(PriorityQueueTest, testAssignment) {
 
     PriorityQueue<int> intQueue;
     LinkedList<int> collection;
@@ -108,13 +106,13 @@ void PriorityQueueTest::testAssignment() {
 
     PriorityQueue<int> copy = collection;
 
-    CPPUNIT_ASSERT( copy.size() == intQueue.size() );
+    ASSERT_TRUE(copy.size() == intQueue.size());
 
     std::unique_ptr< Iterator<int> > q_iter( intQueue.iterator() );
     std::unique_ptr< Iterator<int> > c_iter( copy.iterator() );
 
     while( q_iter->hasNext() && c_iter->hasNext() ) {
-        CPPUNIT_ASSERT( q_iter->next() == c_iter->next() );
+        ASSERT_TRUE(q_iter->next() == c_iter->next());
     }
 
     PriorityQueue<int> assigned = copy;
@@ -123,26 +121,26 @@ void PriorityQueueTest::testAssignment() {
     std::unique_ptr< Iterator<int> > a2_iter( assigned.iterator() );
 
     while( a1_iter->hasNext() && a2_iter->hasNext() ) {
-        CPPUNIT_ASSERT( a1_iter->next() == a2_iter->next() );
+        ASSERT_TRUE(a1_iter->next() == a2_iter->next());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testSize() {
+TEST_F(PriorityQueueTest, testSize) {
 
     PriorityQueue<int> intQueue;
 
-    CPPUNIT_ASSERT( 0 == intQueue.size() );
+    ASSERT_TRUE(0 == intQueue.size());
     int array[] = { 2, 45, 7, -12, 9 };
     for( int i = 0; i < 5; i++ ) {
         intQueue.offer( array[i] );
     }
 
-    CPPUNIT_ASSERT( sizeof(array)/sizeof(int) == intQueue.size() );
+    ASSERT_TRUE(sizeof(array)/sizeof(int) == intQueue.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testOfferString() {
+TEST_F(PriorityQueueTest, testOfferString) {
 
     PriorityQueue<std::string> queue( 10, new MockComparatorStringByLength() );
 
@@ -153,19 +151,16 @@ void PriorityQueueTest::testOfferString() {
 
     std::string sortedArray[] = { "AA", "AAAA", "AAAAA", "AAAAAAAA" };
     for( int i = 0; i < 4; i++ ) {
-        CPPUNIT_ASSERT( sortedArray[i] == queue.remove() );
+        ASSERT_TRUE(sortedArray[i] == queue.remove());
     }
 
     std::string result;
-    CPPUNIT_ASSERT( 0 == queue.size() );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw a NoSuchElementException",
-        queue.remove(),
-        decaf::util::NoSuchElementException );
+    ASSERT_TRUE(0 == queue.size());
+    ASSERT_THROW(queue.remove(), decaf::util::NoSuchElementException) << ("Should Throw a NoSuchElementException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testPoll() {
+TEST_F(PriorityQueueTest, testPoll) {
 
     PriorityQueue<int> intQueue;
     int array[] = { 52, 12, 42, 7, 111 };
@@ -177,25 +172,25 @@ void PriorityQueueTest::testPoll() {
 
     int result = 0;
     for( int i = 0; i < 5; i++ ) {
-        CPPUNIT_ASSERT( intQueue.poll( result ) );
-        CPPUNIT_ASSERT( sorted[i] == result );
+        ASSERT_TRUE(intQueue.poll( result ));
+        ASSERT_TRUE(sorted[i] == result);
     }
 
-    CPPUNIT_ASSERT( 0 == intQueue.size() );
-    CPPUNIT_ASSERT( intQueue.poll( result ) == false );
+    ASSERT_TRUE(0 == intQueue.size());
+    ASSERT_TRUE(intQueue.poll( result ) == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testPollEmpty() {
+TEST_F(PriorityQueueTest, testPollEmpty) {
 
     double result;
     PriorityQueue<double> queue;
-    CPPUNIT_ASSERT( 0 == queue.size() );
-    CPPUNIT_ASSERT( queue.poll( result ) == false );
+    ASSERT_TRUE(0 == queue.size());
+    ASSERT_TRUE(queue.poll( result ) == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testPeek() {
+TEST_F(PriorityQueueTest, testPeek) {
     PriorityQueue<int> integerQueue;
 
     int array[] = { 2, 45, 7, -12, 9 };
@@ -207,24 +202,24 @@ void PriorityQueueTest::testPeek() {
 
     int result = 0;
 
-    CPPUNIT_ASSERT( integerQueue.peek( result ) == true );
-    CPPUNIT_ASSERT( sorted[0] == result );
+    ASSERT_TRUE(integerQueue.peek( result ) == true);
+    ASSERT_TRUE(sorted[0] == result);
 
-    CPPUNIT_ASSERT( integerQueue.peek( result ) == true );
-    CPPUNIT_ASSERT( sorted[0] == result );
+    ASSERT_TRUE(integerQueue.peek( result ) == true);
+    ASSERT_TRUE(sorted[0] == result);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testPeekEmpty() {
+TEST_F(PriorityQueueTest, testPeekEmpty) {
 
     float result;
     PriorityQueue<float> queue;
-    CPPUNIT_ASSERT( 0 == queue.size() );
-    CPPUNIT_ASSERT( queue.peek( result ) == false );
+    ASSERT_TRUE(0 == queue.size());
+    ASSERT_TRUE(queue.peek( result ) == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testClear() {
+TEST_F(PriorityQueueTest, testClear) {
     PriorityQueue<int> integerQueue;
 
     int array[] = {2, 45, 7, -12, 9};
@@ -234,11 +229,11 @@ void PriorityQueueTest::testClear() {
     }
 
     integerQueue.clear();
-    CPPUNIT_ASSERT( integerQueue.isEmpty() );
+    ASSERT_TRUE(integerQueue.isEmpty());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testAdd() {
+TEST_F(PriorityQueueTest, testAdd) {
     PriorityQueue<int> integerQueue;
 
     int array[] = {2, 45, 7, -12, 9};
@@ -248,17 +243,17 @@ void PriorityQueueTest::testAdd() {
         integerQueue.add( array[i] );
     }
 
-    CPPUNIT_ASSERT( 5 == integerQueue.size() );
+    ASSERT_TRUE(5 == integerQueue.size());
 
     for( int i = 0; i < 5; i++ ) {
-        CPPUNIT_ASSERT( sorted[i] == integerQueue.remove() );
+        ASSERT_TRUE(sorted[i] == integerQueue.remove());
     }
 
-    CPPUNIT_ASSERT( 0 == integerQueue.size() );
+    ASSERT_TRUE(0 == integerQueue.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testAddAll() {
+TEST_F(PriorityQueueTest, testAddAll) {
     PriorityQueue<int> integerQueue;
 
     LinkedList<int> list;
@@ -272,17 +267,17 @@ void PriorityQueueTest::testAddAll() {
 
     integerQueue.addAll( list );
 
-    CPPUNIT_ASSERT( 5 == integerQueue.size() );
+    ASSERT_TRUE(5 == integerQueue.size());
 
     for( int i = 0; i < 5; i++ ) {
-        CPPUNIT_ASSERT( sorted[i] == integerQueue.remove() );
+        ASSERT_TRUE(sorted[i] == integerQueue.remove());
     }
 
-    CPPUNIT_ASSERT( 0 == integerQueue.size() );
+    ASSERT_TRUE(0 == integerQueue.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testRemove() {
+TEST_F(PriorityQueueTest, testRemove) {
 
     int array[] = { 2, 45, 7, -12, 9, 23, 17, 1118, 10, 16, 39 };
 
@@ -292,21 +287,21 @@ void PriorityQueueTest::testRemove() {
         integerQueue.add( array[i] );
     }
 
-    CPPUNIT_ASSERT( integerQueue.remove( 16 ) );
+    ASSERT_TRUE(integerQueue.remove( 16 ));
 
     int sorted[] = { -12, 2, 7, 9, 10, 17, 23, 39, 45, 1118 };
 
     int result = 0;
     for( int i = 0; i < 10; i++ ) {
-        CPPUNIT_ASSERT( integerQueue.poll( result ) );
-        CPPUNIT_ASSERT( sorted[i] == result );
+        ASSERT_TRUE(integerQueue.poll( result ));
+        ASSERT_TRUE(sorted[i] == result);
     }
 
-    CPPUNIT_ASSERT( 0 == integerQueue.size() );
+    ASSERT_TRUE(0 == integerQueue.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testRemoveUsingComparator() {
+TEST_F(PriorityQueueTest, testRemoveUsingComparator) {
 
     PriorityQueue<std::string> queue( 10, new MockComparatorStringByLength() );
     std::string array[] = {"AAAAA", "AA", "AAAA", "AAAAAAAA"};
@@ -317,12 +312,12 @@ void PriorityQueueTest::testRemoveUsingComparator() {
 
     // Prove that the comparator overrides the equality tests for remove, the Queue
     // doesn't contains BB but it should contain a string of length two.
-    CPPUNIT_ASSERT( !queue.contains( "BB" ) );
-    CPPUNIT_ASSERT( queue.remove( "BB" ) );
+    ASSERT_TRUE(!queue.contains( "BB" ));
+    ASSERT_TRUE(queue.remove( "BB" ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testRemoveNotExists() {
+TEST_F(PriorityQueueTest, testRemoveNotExists) {
 
     int array[] = {2, 45, 7, -12, 9, 23, 17, 1118, 10, 16, 39};
 
@@ -332,22 +327,22 @@ void PriorityQueueTest::testRemoveNotExists() {
         integerQueue.offer( array[i] );
     }
 
-    CPPUNIT_ASSERT( !integerQueue.remove( 111 ) );
+    ASSERT_TRUE(!integerQueue.remove( 111 ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testComparator() {
+TEST_F(PriorityQueueTest, testComparator) {
 
     PriorityQueue<std::string> queue1;
-    CPPUNIT_ASSERT( queue1.comparator() != NULL );
+    ASSERT_TRUE(queue1.comparator() != NULL);
 
     MockComparatorStringByLength* comparator = new MockComparatorStringByLength();
     PriorityQueue<std::string> queue2( 100, comparator );
-    CPPUNIT_ASSERT( comparator == queue2.comparator().get() );
+    ASSERT_TRUE(comparator == queue2.comparator().get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testIterator() {
+TEST_F(PriorityQueueTest, testIterator) {
 
     PriorityQueue<int> integerQueue;
 
@@ -359,7 +354,7 @@ void PriorityQueueTest::testIterator() {
     }
 
     std::unique_ptr< Iterator<int> > iter( integerQueue.iterator() );
-    CPPUNIT_ASSERT( iter.get() != NULL );
+    ASSERT_TRUE(iter.get() != NULL);
 
     std::vector<int> result;
 
@@ -367,59 +362,44 @@ void PriorityQueueTest::testIterator() {
         result.push_back( iter->next() );
     }
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw a NoSuchElementException",
-        iter->next(),
-        NoSuchElementException );
+    ASSERT_THROW(iter->next(), NoSuchElementException) << ("Should Throw a NoSuchElementException");
 
     std::sort( result.begin(), result.end() );
 
     for( int i = 0; i < 5; i++ ) {
-        CPPUNIT_ASSERT( result[i] == sorted[i] );
+        ASSERT_TRUE(result[i] == sorted[i]);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testIteratorEmpty() {
+TEST_F(PriorityQueueTest, testIteratorEmpty) {
 
     PriorityQueue<int> intQueue;
     std::unique_ptr< Iterator<int> > iter( intQueue.iterator() );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw a NoSuchElementException",
-        iter->next(),
-        NoSuchElementException );
+    ASSERT_THROW(iter->next(), NoSuchElementException) << ("Should Throw a NoSuchElementException");
 
     iter.reset( intQueue.iterator() );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw a IllegalStateException",
-        iter->remove(),
-        IllegalStateException );
+    ASSERT_THROW(iter->remove(), IllegalStateException) << ("Should Throw a IllegalStateException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testIteratorOutOfBounds() {
+TEST_F(PriorityQueueTest, testIteratorOutOfBounds) {
 
     PriorityQueue<int> intQueue;
     intQueue.offer( 0 );
     std::unique_ptr< Iterator<int> > iter( intQueue.iterator() );
     iter->next();
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw a NoSuchElementException",
-        iter->next(),
-        NoSuchElementException );
+    ASSERT_THROW(iter->next(), NoSuchElementException) << ("Should Throw a NoSuchElementException");
 
     iter.reset( intQueue.iterator() );
     iter->next();
     iter->remove();
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw a NoSuchElementException",
-        iter->next(),
-        NoSuchElementException );
+    ASSERT_THROW(iter->next(), NoSuchElementException) << ("Should Throw a NoSuchElementException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testIteratorRemove() {
+TEST_F(PriorityQueueTest, testIteratorRemove) {
 
     PriorityQueue<int> intQueue;
     int array[] = {2, 45, 7, -12, 9};
@@ -427,14 +407,14 @@ void PriorityQueueTest::testIteratorRemove() {
         intQueue.offer( array[i] );
     }
     std::unique_ptr< Iterator<int> > iter( intQueue.iterator() );
-    CPPUNIT_ASSERT( iter.get() != NULL );
+    ASSERT_TRUE(iter.get() != NULL);
     for( int i = 0; i < 5; i++ ) {
         iter->next();
         if( 2 == i ) {
             iter->remove();
         }
     }
-    CPPUNIT_ASSERT( 4 == intQueue.size() );
+    ASSERT_TRUE(4 == intQueue.size());
 
     iter.reset( intQueue.iterator() );
     std::vector<int> newArray;
@@ -445,24 +425,21 @@ void PriorityQueueTest::testIteratorRemove() {
     int result;
     std::sort( newArray.begin(), newArray.end() );
     for( int i = 0; i < intQueue.size(); i++ ) {
-        CPPUNIT_ASSERT( intQueue.poll( result ) );
-        CPPUNIT_ASSERT( newArray[i] == result );
+        ASSERT_TRUE(intQueue.poll( result ));
+        ASSERT_TRUE(newArray[i] == result);
     }
 
     const PriorityQueue<int> constQueue( intQueue );
-    CPPUNIT_ASSERT( !constQueue.isEmpty() );
-    CPPUNIT_ASSERT( constQueue.size() == intQueue.size() );
+    ASSERT_TRUE(!constQueue.isEmpty());
+    ASSERT_TRUE(constQueue.size() == intQueue.size());
 
     std::unique_ptr< Iterator<int> > const_iter( constQueue.iterator() );
     const_iter->next();
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw a UnsupportedOperationException",
-        const_iter->remove(),
-        UnsupportedOperationException );
+    ASSERT_THROW(const_iter->remove(), UnsupportedOperationException) << ("Should Throw a UnsupportedOperationException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PriorityQueueTest::testIteratorRemoveIllegalState() {
+TEST_F(PriorityQueueTest, testIteratorRemoveIllegalState) {
 
     PriorityQueue<int> intQueue;
     int array[] = {2, 45, 7, -12, 9};
@@ -470,17 +447,10 @@ void PriorityQueueTest::testIteratorRemoveIllegalState() {
         intQueue.offer( array[i] );
     }
     std::unique_ptr< Iterator<int> > iter( intQueue.iterator() );
-    CPPUNIT_ASSERT( iter.get() != NULL );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw a IllegalStateException",
-        iter->remove(),
-        IllegalStateException );
+    ASSERT_TRUE(iter.get() != NULL);
+    ASSERT_THROW(iter->remove(), IllegalStateException) << ("Should Throw a IllegalStateException");
 
     iter->next();
     iter->remove();
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw a IllegalStateException",
-        iter->remove(),
-        IllegalStateException );
-
+    ASSERT_THROW(iter->remove(), IllegalStateException) << ("Should Throw a IllegalStateException");
 }

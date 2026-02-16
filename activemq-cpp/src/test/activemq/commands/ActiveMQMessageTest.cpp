@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ActiveMQMessageTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/commands/ActiveMQMessage.h>
 #include <activemq/commands/ActiveMQTopic.h>
@@ -24,6 +24,11 @@
 
 #include <decaf/lang/System.h>
 #include <decaf/lang/Pointer.h>
+#include <activemq/core/ActiveMQAckHandler.h>
+#include <activemq/commands/ActiveMQDestination.h>
+#include <activemq/commands/MessageId.h>
+#include <vector>
+#include <memory>
 
 using namespace cms;
 using namespace std;
@@ -32,6 +37,28 @@ using namespace activemq::util;
 using namespace activemq::core;
 using namespace activemq::commands;
 using namespace decaf::lang;
+
+    class ActiveMQMessageTest : public ::testing::Test {
+protected:
+
+        bool readOnlyMessage;
+        decaf::lang::Pointer<commands::MessageId> cmsMessageId;
+        std::string cmsCorrelationID;
+        std::unique_ptr<commands::ActiveMQTopic> cmsDestination;
+        std::unique_ptr<commands::ActiveMQTempTopic> cmsReplyTo;
+        int cmsDeliveryMode;
+        bool cmsRedelivered;
+        std::string cmsType;
+        long long cmsExpiration;
+        int cmsPriority;
+        long long cmsTimestamp;
+
+        std::vector<long long> consumerIDs;
+
+        void SetUp() override;
+
+    };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace{
@@ -62,7 +89,7 @@ namespace{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::setUp() {
+void ActiveMQMessageTest::SetUp() {
 
     Pointer<ProducerId> producerId( new ProducerId() );
     producerId->setConnectionId( "testConnectionId" );
@@ -90,29 +117,24 @@ void ActiveMQMessageTest::setUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::tearDown() {
+TEST_F(ActiveMQMessageTest, test) {
 
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::test()
-{
     ActiveMQMessage myMessage;
     Pointer<MyAckHandler> ackHandler( new MyAckHandler() );
 
-    CPPUNIT_ASSERT( myMessage.getDataStructureType() == ActiveMQMessage::ID_ACTIVEMQMESSAGE );
+    ASSERT_TRUE(myMessage.getDataStructureType() == ActiveMQMessage::ID_ACTIVEMQMESSAGE);
 
     myMessage.setAckHandler( ackHandler );
     myMessage.acknowledge();
 
-    CPPUNIT_ASSERT( ackHandler->wasAcked == true );
+    ASSERT_TRUE(ackHandler->wasAcked == true);
 
-    CPPUNIT_ASSERT( myMessage.getPropertyNames().size() == 0 );
-    CPPUNIT_ASSERT( myMessage.propertyExists( "something" ) == false );
+    ASSERT_TRUE(myMessage.getPropertyNames().size() == 0);
+    ASSERT_TRUE(myMessage.propertyExists( "something" ) == false);
 
     try {
         myMessage.getBooleanProperty( "somethingElse" );
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     } catch(...) {}
 
     myMessage.setBooleanProperty( "boolean", false );
@@ -124,59 +146,54 @@ void ActiveMQMessageTest::test()
     myMessage.setShortProperty( "short", 512 );
     myMessage.setStringProperty( "string", "This is a test String" );
 
-    CPPUNIT_ASSERT( myMessage.getBooleanProperty( "boolean" ) == false );
-    CPPUNIT_ASSERT( myMessage.getByteProperty( "byte" ) == 60 );
-    CPPUNIT_ASSERT( myMessage.getDoubleProperty( "double" ) == 642.5643 );
-    CPPUNIT_ASSERT( myMessage.getFloatProperty( "float" ) == 0.564f );
-    CPPUNIT_ASSERT( myMessage.getIntProperty( "int" ) == 65438746 );
-    CPPUNIT_ASSERT( myMessage.getLongProperty( "long" ) == 0xFFFFFFFF0000000LL );
-    CPPUNIT_ASSERT( myMessage.getShortProperty( "short" ) == 512 );
-    CPPUNIT_ASSERT( myMessage.getStringProperty( "string" ) == "This is a test String" );
+    ASSERT_TRUE(myMessage.getBooleanProperty( "boolean" ) == false);
+    ASSERT_TRUE(myMessage.getByteProperty( "byte" ) == 60);
+    ASSERT_TRUE(myMessage.getDoubleProperty( "double" ) == 642.5643);
+    ASSERT_TRUE(myMessage.getFloatProperty( "float" ) == 0.564f);
+    ASSERT_TRUE(myMessage.getIntProperty( "int" ) == 65438746);
+    ASSERT_TRUE(myMessage.getLongProperty( "long" ) == 0xFFFFFFFF0000000LL);
+    ASSERT_TRUE(myMessage.getShortProperty( "short" ) == 512);
+    ASSERT_TRUE(myMessage.getStringProperty( "string" ) == "This is a test String");
 
     myMessage.setStringProperty( "JMSXGroupID", "hello" );
-    CPPUNIT_ASSERT( myMessage.getStringProperty( "JMSXGroupID" ) == "hello" );
+    ASSERT_TRUE(myMessage.getStringProperty( "JMSXGroupID" ) == "hello");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testSetReadOnly() {
+TEST_F(ActiveMQMessageTest, testSetReadOnly) {
 
     ActiveMQMessage msg;
     msg.setReadOnlyProperties( true );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a MessageNotWriteableException",
-        msg.setIntProperty( "test", 1 ),
-        MessageNotWriteableException);
+    ASSERT_THROW(msg.setIntProperty( "test", 1 ), MessageNotWriteableException) << ("Should have thrown a MessageNotWriteableException");
 
     msg.setReadOnlyProperties( false );
 
-    CPPUNIT_ASSERT_NO_THROW_MESSAGE(
-        "Should have thrown a MessageNotWriteableException",
-        msg.setIntProperty( "test", 1 ));
+    ASSERT_NO_THROW(msg.setIntProperty( "test", 1 )) << ("Should have thrown a MessageNotWriteableException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testSetToForeignJMSID() {
+TEST_F(ActiveMQMessageTest, testSetToForeignJMSID) {
 
     ActiveMQMessage msg;
     msg.setCMSMessageID( "ID:EMS-SERVER.8B443C380083:429" );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testEqualsObject() {
+TEST_F(ActiveMQMessageTest, testEqualsObject) {
 
     ActiveMQMessage msg1;
     ActiveMQMessage msg2;
 
     msg1.setMessageId( this->cmsMessageId );
-    CPPUNIT_ASSERT( !msg1.equals( &msg2 ) );
+    ASSERT_TRUE(!msg1.equals( &msg2 ));
 
     msg2.setMessageId( this->cmsMessageId );
-    CPPUNIT_ASSERT( msg1.equals( &msg2 ) );
+    ASSERT_TRUE(msg1.equals( &msg2 ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testShallowCopy() {
+TEST_F(ActiveMQMessageTest, testShallowCopy) {
 
     ActiveMQMessage msg1;
     msg1.setMessageId( this->cmsMessageId );
@@ -184,11 +201,11 @@ void ActiveMQMessageTest::testShallowCopy() {
     ActiveMQMessage msg2;
     msg2.copyDataStructure( &msg1 );
 
-    CPPUNIT_ASSERT( msg1.equals( &msg2 ) );
+    ASSERT_TRUE(msg1.equals( &msg2 ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testCopy() {
+TEST_F(ActiveMQMessageTest, testCopy) {
 
     this->cmsCorrelationID = "testcorrelationid";
     this->cmsDestination.reset( new ActiveMQTopic( "test.topic" ) );
@@ -216,84 +233,84 @@ void ActiveMQMessageTest::testCopy() {
     ActiveMQMessage msg2;
     msg2.copyDataStructure( &msg1 );
 
-    CPPUNIT_ASSERT( msg1.getCMSMessageID() == msg2.getCMSMessageID() );
-    CPPUNIT_ASSERT( msg1.getCMSCorrelationID() == msg2.getCMSCorrelationID() );
-    CPPUNIT_ASSERT( msg1.getCMSDestination() == msg2.getCMSDestination() );
-    CPPUNIT_ASSERT( msg1.getCMSReplyTo() == msg2.getCMSReplyTo() );
-    CPPUNIT_ASSERT( msg1.getCMSDeliveryMode() == msg2.getCMSDeliveryMode() );
-    CPPUNIT_ASSERT( msg1.getCMSRedelivered() == msg2.getCMSRedelivered() );
-    CPPUNIT_ASSERT( msg1.getCMSType() == msg2.getCMSType() );
-    CPPUNIT_ASSERT( msg1.getCMSExpiration() == msg2.getCMSExpiration() );
-    CPPUNIT_ASSERT( msg1.getCMSPriority() == msg2.getCMSPriority() );
-    CPPUNIT_ASSERT( msg1.getCMSTimestamp() == msg2.getCMSTimestamp() );
+    ASSERT_TRUE(msg1.getCMSMessageID() == msg2.getCMSMessageID());
+    ASSERT_TRUE(msg1.getCMSCorrelationID() == msg2.getCMSCorrelationID());
+    ASSERT_TRUE(msg1.getCMSDestination() == msg2.getCMSDestination());
+    ASSERT_TRUE(msg1.getCMSReplyTo() == msg2.getCMSReplyTo());
+    ASSERT_TRUE(msg1.getCMSDeliveryMode() == msg2.getCMSDeliveryMode());
+    ASSERT_TRUE(msg1.getCMSRedelivered() == msg2.getCMSRedelivered());
+    ASSERT_TRUE(msg1.getCMSType() == msg2.getCMSType());
+    ASSERT_TRUE(msg1.getCMSExpiration() == msg2.getCMSExpiration());
+    ASSERT_TRUE(msg1.getCMSPriority() == msg2.getCMSPriority());
+    ASSERT_TRUE(msg1.getCMSTimestamp() == msg2.getCMSTimestamp());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSMessageID() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSMessageID) {
 
     ActiveMQMessage msg;
     msg.setMessageId( this->cmsMessageId );
-    CPPUNIT_ASSERT( msg.getMessageId() == this->cmsMessageId );
+    ASSERT_TRUE(msg.getMessageId() == this->cmsMessageId);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSTimestamp() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSTimestamp) {
 
     ActiveMQMessage msg;
     msg.setCMSTimestamp( this->cmsTimestamp );
-    CPPUNIT_ASSERT( msg.getCMSTimestamp() == this->cmsTimestamp );
+    ASSERT_TRUE(msg.getCMSTimestamp() == this->cmsTimestamp);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSCorrelationID() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSCorrelationID) {
 
     ActiveMQMessage msg;
     msg.setCMSCorrelationID( this->cmsCorrelationID );
-    CPPUNIT_ASSERT( msg.getCMSCorrelationID() == this->cmsCorrelationID );
+    ASSERT_TRUE(msg.getCMSCorrelationID() == this->cmsCorrelationID);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSDeliveryMode() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSDeliveryMode) {
 
     ActiveMQMessage msg;
     msg.setCMSDeliveryMode( this->cmsDeliveryMode );
-    CPPUNIT_ASSERT( msg.getCMSDeliveryMode() == this->cmsDeliveryMode );
+    ASSERT_TRUE(msg.getCMSDeliveryMode() == this->cmsDeliveryMode);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSRedelivered() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSRedelivered) {
 
     ActiveMQMessage msg;
     msg.setRedeliveryCounter( 1 );
-    CPPUNIT_ASSERT( msg.getCMSRedelivered() == true );
+    ASSERT_TRUE(msg.getCMSRedelivered() == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSType() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSType) {
 
     ActiveMQMessage msg;
     msg.setCMSType( this->cmsType );
-    CPPUNIT_ASSERT( msg.getCMSType() == this->cmsType );
+    ASSERT_TRUE(msg.getCMSType() == this->cmsType);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSExpiration() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSExpiration) {
 
     ActiveMQMessage msg;
     msg.setCMSExpiration( this->cmsExpiration );
-    CPPUNIT_ASSERT( msg.getCMSExpiration() == this->cmsExpiration );
+    ASSERT_TRUE(msg.getCMSExpiration() == this->cmsExpiration);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSPriority() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSPriority) {
 
     ActiveMQMessage msg;
     msg.setCMSPriority( this->cmsPriority );
-    CPPUNIT_ASSERT( msg.getCMSPriority() == this->cmsPriority );
+    ASSERT_TRUE(msg.getCMSPriority() == this->cmsPriority);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testClearProperties() {
+TEST_F(ActiveMQMessageTest, testClearProperties) {
 
     ActiveMQMessage msg;
 
@@ -304,93 +321,93 @@ void ActiveMQMessageTest::testClearProperties() {
     msg.setMessageId( this->cmsMessageId );
     msg.clearProperties();
 
-    CPPUNIT_ASSERT( !msg.propertyExists( "test" ) );
-    CPPUNIT_ASSERT( msg.getCMSMessageID() != "" );
-    CPPUNIT_ASSERT( msg.getContent().size() == 20 );
+    ASSERT_TRUE(!msg.propertyExists( "test" ));
+    ASSERT_TRUE(msg.getCMSMessageID() != "");
+    ASSERT_TRUE(msg.getContent().size() == 20);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testPropertyExists() {
+TEST_F(ActiveMQMessageTest, testPropertyExists) {
 
     ActiveMQMessage msg;
     msg.setStringProperty( "test", "test" );
-    CPPUNIT_ASSERT( msg.propertyExists( "test" ) );
+    ASSERT_TRUE(msg.propertyExists( "test" ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetBooleanProperty() {
+TEST_F(ActiveMQMessageTest, testGetBooleanProperty) {
 
     ActiveMQMessage msg;
     std::string name = "booleanProperty";
     msg.setBooleanProperty( name, true );
-    CPPUNIT_ASSERT( msg.getBooleanProperty( name ) );
+    ASSERT_TRUE(msg.getBooleanProperty( name ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetByteProperty() {
+TEST_F(ActiveMQMessageTest, testGetByteProperty) {
 
     ActiveMQMessage msg;
     std::string name = "byteProperty";
     msg.setByteProperty( name, (unsigned char)1 );
-    CPPUNIT_ASSERT( msg.getByteProperty( name ) == 1 );
+    ASSERT_TRUE(msg.getByteProperty( name ) == 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetShortProperty() {
+TEST_F(ActiveMQMessageTest, testGetShortProperty) {
 
     ActiveMQMessage msg;
     std::string name = "shortProperty";
     msg.setShortProperty( name, (short)1 );
-    CPPUNIT_ASSERT( msg.getShortProperty( name ) == 1 );
+    ASSERT_TRUE(msg.getShortProperty( name ) == 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetIntProperty() {
+TEST_F(ActiveMQMessageTest, testGetIntProperty) {
 
     ActiveMQMessage msg;
     std::string name = "intProperty";
     msg.setIntProperty( name, 1 );
-    CPPUNIT_ASSERT( msg.getIntProperty( name ) == 1 );
+    ASSERT_TRUE(msg.getIntProperty( name ) == 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetLongProperty() {
+TEST_F(ActiveMQMessageTest, testGetLongProperty) {
 
     ActiveMQMessage msg;
     std::string name = "longProperty";
     msg.setLongProperty( name, 1 );
-    CPPUNIT_ASSERT( msg.getLongProperty( name ) == 1 );
+    ASSERT_TRUE(msg.getLongProperty( name ) == 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetFloatProperty() {
+TEST_F(ActiveMQMessageTest, testGetFloatProperty) {
 
     ActiveMQMessage msg;
     std::string name = "floatProperty";
     msg.setFloatProperty( name, 1.3f );
-    CPPUNIT_ASSERT( msg.getFloatProperty( name ) == 1.3f );
+    ASSERT_TRUE(msg.getFloatProperty( name ) == 1.3f);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetDoubleProperty() {
+TEST_F(ActiveMQMessageTest, testGetDoubleProperty) {
 
     ActiveMQMessage msg;
     std::string name = "doubleProperty";
     msg.setDoubleProperty( name, 1.3 );
-    CPPUNIT_ASSERT( msg.getDoubleProperty( name ) == 1.3 );
+    ASSERT_TRUE(msg.getDoubleProperty( name ) == 1.3);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetStringProperty() {
+TEST_F(ActiveMQMessageTest, testGetStringProperty) {
 
     ActiveMQMessage msg;
     std::string name = "stringProperty";
     msg.setStringProperty( name, name );
-    CPPUNIT_ASSERT( msg.getStringProperty( name ) == name );
+    ASSERT_TRUE(msg.getStringProperty( name ) == name);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetPropertyNames() {
+TEST_F(ActiveMQMessageTest, testGetPropertyNames) {
 
     ActiveMQMessage msg;
     std::string name = "floatProperty";
@@ -400,308 +417,308 @@ void ActiveMQMessageTest::testGetPropertyNames() {
     std::vector<std::string>::iterator iter = propertyNames.begin();
 
     for( ; iter != propertyNames.end(); ++iter ) {
-        CPPUNIT_ASSERT( *iter == name );
+        ASSERT_TRUE(*iter == name);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testSetEmptyPropertyName() {
+TEST_F(ActiveMQMessageTest, testSetEmptyPropertyName) {
 
     ActiveMQMessage msg;
 
     try {
         msg.setStringProperty("", "Cheese");
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( CMSException& e ) {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testGetAndSetCMSXDeliveryCount() {
+TEST_F(ActiveMQMessageTest, testGetAndSetCMSXDeliveryCount) {
 
     ActiveMQMessage msg;
     msg.setIntProperty( "CMSXDeliveryCount", 1 );
     int count = msg.getIntProperty( "CMSXDeliveryCount" );
-    CPPUNIT_ASSERT_MESSAGE( "expected delivery count = 1", count == 1 );
+    ASSERT_TRUE(count == 1) << ("expected delivery count = 1");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testClearBody() {
+TEST_F(ActiveMQMessageTest, testClearBody) {
 
     ActiveMQMessage message;
     message.clearBody();
-    CPPUNIT_ASSERT( !message.isReadOnlyBody() );
-    CPPUNIT_ASSERT( message.getContent().size() == 0 );
+    ASSERT_TRUE(!message.isReadOnlyBody());
+    ASSERT_TRUE(message.getContent().size() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testBooleanPropertyConversion() {
+TEST_F(ActiveMQMessageTest, testBooleanPropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
     msg.setBooleanProperty( propertyName, true );
 
-    CPPUNIT_ASSERT( msg.getBooleanProperty( propertyName ) );
-    CPPUNIT_ASSERT( msg.getStringProperty( propertyName ) == "true" );
+    ASSERT_TRUE(msg.getBooleanProperty( propertyName ));
+    ASSERT_TRUE(msg.getStringProperty( propertyName ) == "true");
 
     try {
         msg.getByteProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getShortProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getIntProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getLongProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getFloatProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getDoubleProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testBytePropertyConversion() {
+TEST_F(ActiveMQMessageTest, testBytePropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
     msg.setByteProperty( propertyName, (unsigned char)1 );
 
-    CPPUNIT_ASSERT( msg.getByteProperty( propertyName ) == 1 );
-    CPPUNIT_ASSERT( msg.getShortProperty( propertyName ) == 1 );
-    CPPUNIT_ASSERT( msg.getIntProperty( propertyName ) == 1 );
-    CPPUNIT_ASSERT( msg.getLongProperty( propertyName ) == 1 );
-    CPPUNIT_ASSERT( msg.getStringProperty( propertyName ) == "1" );
+    ASSERT_TRUE(msg.getByteProperty( propertyName ) == 1);
+    ASSERT_TRUE(msg.getShortProperty( propertyName ) == 1);
+    ASSERT_TRUE(msg.getIntProperty( propertyName ) == 1);
+    ASSERT_TRUE(msg.getLongProperty( propertyName ) == 1);
+    ASSERT_TRUE(msg.getStringProperty( propertyName ) == "1");
 
     try {
         msg.getBooleanProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getFloatProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getDoubleProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testShortPropertyConversion() {
+TEST_F(ActiveMQMessageTest, testShortPropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
     msg.setShortProperty( propertyName, (short)1 );
 
-    CPPUNIT_ASSERT( msg.getShortProperty( propertyName ) == 1 );
-    CPPUNIT_ASSERT( msg.getIntProperty( propertyName ) == 1 );
-    CPPUNIT_ASSERT( msg.getLongProperty( propertyName ) == 1 );
-    CPPUNIT_ASSERT( msg.getStringProperty( propertyName ) == "1" );
+    ASSERT_TRUE(msg.getShortProperty( propertyName ) == 1);
+    ASSERT_TRUE(msg.getIntProperty( propertyName ) == 1);
+    ASSERT_TRUE(msg.getLongProperty( propertyName ) == 1);
+    ASSERT_TRUE(msg.getStringProperty( propertyName ) == "1");
 
     try {
         msg.getBooleanProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getByteProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getFloatProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getDoubleProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testIntPropertyConversion() {
+TEST_F(ActiveMQMessageTest, testIntPropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
     msg.setIntProperty( propertyName, (int)1 );
 
-    CPPUNIT_ASSERT( msg.getIntProperty( propertyName ) == 1 );
-    CPPUNIT_ASSERT( msg.getLongProperty( propertyName ) == 1 );
-    CPPUNIT_ASSERT( msg.getStringProperty( propertyName ) == "1" );
+    ASSERT_TRUE(msg.getIntProperty( propertyName ) == 1);
+    ASSERT_TRUE(msg.getLongProperty( propertyName ) == 1);
+    ASSERT_TRUE(msg.getStringProperty( propertyName ) == "1");
 
     try {
         msg.getBooleanProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getByteProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getShortProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getFloatProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getDoubleProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testLongPropertyConversion() {
+TEST_F(ActiveMQMessageTest, testLongPropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
     msg.setLongProperty( propertyName, 1 );
 
-    CPPUNIT_ASSERT( msg.getLongProperty( propertyName ) == 1 );
-    CPPUNIT_ASSERT( msg.getStringProperty( propertyName ) == "1" );
+    ASSERT_TRUE(msg.getLongProperty( propertyName ) == 1);
+    ASSERT_TRUE(msg.getStringProperty( propertyName ) == "1");
 
     try {
         msg.getBooleanProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getByteProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getShortProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getIntProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getFloatProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getDoubleProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testFloatPropertyConversion() {
+TEST_F(ActiveMQMessageTest, testFloatPropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
     msg.setFloatProperty( propertyName, (float)1.5 );
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( msg.getFloatProperty( propertyName ), 1.5, 0 );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( msg.getDoubleProperty( propertyName ), 1.5, 0 );
-    CPPUNIT_ASSERT( msg.getStringProperty( propertyName ) == "1.5" );
+    ASSERT_NEAR(msg.getFloatProperty( propertyName ), 1.5, 0);
+    ASSERT_NEAR(msg.getDoubleProperty( propertyName ), 1.5, 0);
+    ASSERT_TRUE(msg.getStringProperty( propertyName ) == "1.5");
 
     try {
         msg.getBooleanProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getByteProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getShortProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getIntProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getLongProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testDoublePropertyConversion() {
+TEST_F(ActiveMQMessageTest, testDoublePropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
     msg.setDoubleProperty( propertyName, 1.5 );
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( msg.getDoubleProperty( propertyName ), 1.5, 0 );
-    CPPUNIT_ASSERT( msg.getStringProperty( propertyName ) == "1.5" );
+    ASSERT_NEAR(msg.getDoubleProperty( propertyName ), 1.5, 0);
+    ASSERT_TRUE(msg.getStringProperty( propertyName ) == "1.5");
 
     try {
         msg.getBooleanProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getByteProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getShortProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getIntProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getLongProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getFloatProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testStringPropertyConversion() {
+TEST_F(ActiveMQMessageTest, testStringPropertyConversion) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
@@ -709,59 +726,59 @@ void ActiveMQMessageTest::testStringPropertyConversion() {
 
     msg.setStringProperty( propertyName, stringValue );
 
-    CPPUNIT_ASSERT( msg.getStringProperty( propertyName ) == stringValue );
-    CPPUNIT_ASSERT( msg.getBooleanProperty( propertyName ) == true );
+    ASSERT_TRUE(msg.getStringProperty( propertyName ) == stringValue);
+    ASSERT_TRUE(msg.getBooleanProperty( propertyName ) == true);
 
     stringValue = "1";
     msg.setStringProperty( propertyName, stringValue );
-    CPPUNIT_ASSERT( msg.getByteProperty( propertyName ) == 1 );
-    CPPUNIT_ASSERT( msg.getShortProperty( propertyName ) == 1 );
-    CPPUNIT_ASSERT( msg.getIntProperty( propertyName ) == 1 );
-    CPPUNIT_ASSERT( msg.getLongProperty( propertyName ) == 1 );
+    ASSERT_TRUE(msg.getByteProperty( propertyName ) == 1);
+    ASSERT_TRUE(msg.getShortProperty( propertyName ) == 1);
+    ASSERT_TRUE(msg.getIntProperty( propertyName ) == 1);
+    ASSERT_TRUE(msg.getLongProperty( propertyName ) == 1);
 
     stringValue = "1.5";
     msg.setStringProperty( propertyName, stringValue );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( msg.getFloatProperty( propertyName ), 1.5, 0 );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( msg.getDoubleProperty( propertyName ), 1.5, 0 );
+    ASSERT_NEAR(msg.getFloatProperty( propertyName ), 1.5, 0);
+    ASSERT_NEAR(msg.getDoubleProperty( propertyName ), 1.5, 0);
 
     stringValue = "bad";
     msg.setStringProperty( propertyName, stringValue );
     try {
         msg.getByteProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getShortProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getIntProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getLongProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getFloatProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
     try {
         msg.getDoubleProperty( propertyName );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageFormatException& e ) {
     }
 
-    CPPUNIT_ASSERT( !msg.getBooleanProperty( propertyName ) );
+    ASSERT_TRUE(!msg.getBooleanProperty( propertyName ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testReadOnlyProperties() {
+TEST_F(ActiveMQMessageTest, testReadOnlyProperties) {
 
     ActiveMQMessage msg;
     std::string propertyName = "property";
@@ -769,52 +786,52 @@ void ActiveMQMessageTest::testReadOnlyProperties() {
 
     try {
         msg.setStringProperty( propertyName, "test" );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& e ) {
     }
     try {
         msg.setBooleanProperty( propertyName, true );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& e ) {
     }
     try {
         msg.setByteProperty( propertyName, (unsigned char)1 );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& e ) {
     }
     try {
         msg.setShortProperty( propertyName, (short)1 );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& e ) {
     }
     try {
         msg.setIntProperty( propertyName, 1 );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& e ) {
     }
     try {
         msg.setLongProperty( propertyName, 1 );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& e ) {
     }
     try {
         msg.setFloatProperty( propertyName, (float)1.5 );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& e ) {
     }
     try {
         msg.setDoubleProperty( propertyName, 1.5 );
-        CPPUNIT_FAIL("Should have thrown exception");
+        FAIL() << ("Should have thrown exception");
     } catch( MessageNotWriteableException& e ) {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTest::testIsExpired() {
+TEST_F(ActiveMQMessageTest, testIsExpired) {
 
     ActiveMQMessage msg;
     msg.setCMSExpiration( System::currentTimeMillis() - 100 );
-    CPPUNIT_ASSERT( msg.isExpired() );
+    ASSERT_TRUE(msg.isExpired());
     msg.setCMSExpiration( System::currentTimeMillis() + 10000 );
-    CPPUNIT_ASSERT( !msg.isExpired() );
+    ASSERT_TRUE(!msg.isExpired());
 }

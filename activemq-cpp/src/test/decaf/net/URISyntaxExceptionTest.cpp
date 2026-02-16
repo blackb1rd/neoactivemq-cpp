@@ -15,28 +15,34 @@
  * limitations under the License.
  */
 
-#include "URISyntaxExceptionTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/net/URISyntaxException.h>
 
 using namespace decaf;
 using namespace decaf::net;
 
+    class URISyntaxExceptionTest : public ::testing::Test {
+public:
+
+        URISyntaxExceptionTest();
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 URISyntaxExceptionTest::URISyntaxExceptionTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URISyntaxExceptionTest::test() {
+TEST_F(URISyntaxExceptionTest, test) {
 
     URISyntaxException e1( __FILE__, __LINE__, "str", "problem", 2);
-    CPPUNIT_ASSERT_MESSAGE("returned incorrect reason",
-                           e1.getReason() == "problem" );
-    CPPUNIT_ASSERT_MESSAGE("returned incorrect input", e1.getInput() == "str" );
-    CPPUNIT_ASSERT_MESSAGE("returned incorrect index", 2 == e1.getIndex());
+    ASSERT_TRUE(e1.getReason() == "problem") << ("returned incorrect reason");
+    ASSERT_TRUE(e1.getInput() == "str") << ("returned incorrect input");
+    ASSERT_TRUE(2 == e1.getIndex()) << ("returned incorrect index");
 
     URISyntaxException e2( __FILE__, __LINE__, "str", "problem");
-    CPPUNIT_ASSERT_MESSAGE("returned incorrect reason", e2.getReason() == "problem" );
-    CPPUNIT_ASSERT_MESSAGE("returned incorrect input", e2.getInput() == "str" );
-    CPPUNIT_ASSERT_MESSAGE("returned incorrect index", -1 == (int)e2.getIndex());
+    ASSERT_TRUE(e2.getReason() == "problem") << ("returned incorrect reason");
+    ASSERT_TRUE(e2.getInput() == "str") << ("returned incorrect input");
+    ASSERT_TRUE(-1 == (int)e2.getIndex()) << ("returned incorrect index");
 }

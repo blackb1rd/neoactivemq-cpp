@@ -15,7 +15,20 @@
  * limitations under the License.
  */
 
-#include "StompSimpleRollbackTest.h"
+#include <activemq/test/SimpleRollbackTest.h>
+
+namespace activemq{
+namespace test{
+namespace stomp{
+    class StompSimpleRollbackTest : public SimpleRollbackTest {
+public:
+        StompSimpleRollbackTest();
+        virtual ~StompSimpleRollbackTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getStompURL();
+        }
+    };
+}}}
 
 using namespace std;
 using namespace cms;
@@ -30,3 +43,7 @@ StompSimpleRollbackTest::StompSimpleRollbackTest() {
 ////////////////////////////////////////////////////////////////////////////////
 StompSimpleRollbackTest::~StompSimpleRollbackTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(StompSimpleRollbackTest, DISABLED_testRollbacks) { testRollbacks(); }

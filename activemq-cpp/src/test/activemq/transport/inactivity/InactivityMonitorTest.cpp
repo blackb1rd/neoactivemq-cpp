@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "InactivityMonitorTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/inactivity/InactivityMonitor.h>
 #include <activemq/transport/mock/MockTransport.h>
@@ -28,6 +28,8 @@
 #include <decaf/lang/Thread.h>
 
 #include <typeinfo>
+#include <activemq/util/Config.h>
+#include <decaf/lang/Pointer.h>
 
 using namespace activemq;
 using namespace activemq::commands;
@@ -40,6 +42,19 @@ using namespace decaf::net;
 using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+    class InactivityMonitorTest : public ::testing::Test {
+    protected:
+
+        decaf::lang::Pointer<mock::MockTransport> transport;
+
+        Pointer<activemq::commands::WireFormatInfo> localWireFormatInfo;
+
+        void SetUp() override;
+        void TearDown() override;
+
+    };
+
 
 namespace {
 
@@ -74,15 +89,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InactivityMonitorTest::InactivityMonitorTest() : transport(), localWireFormatInfo() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-InactivityMonitorTest::~InactivityMonitorTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitorTest::setUp() {
+void InactivityMonitorTest::SetUp() {
 
     URI uri( "mock://mock?wireformat=openwire" );
     MockTransportFactory factory;
@@ -97,24 +104,24 @@ void InactivityMonitorTest::setUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitorTest::tearDown() {
+void InactivityMonitorTest::TearDown() {
     this->transport.reset( NULL );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitorTest::testCreate() {
+TEST_F(InactivityMonitorTest, testCreate) {
 
     InactivityMonitor monitor( this->transport, this->transport->getWireFormat() );
 
-    CPPUNIT_ASSERT( monitor.getInitialDelayTime() == 0 );
-    CPPUNIT_ASSERT( monitor.getReadCheckTime() == 0 );
-    CPPUNIT_ASSERT( monitor.getWriteCheckTime() == 0 );
-    CPPUNIT_ASSERT( monitor.isKeepAliveResponseRequired() == false );
-    CPPUNIT_ASSERT( monitor.isClosed() == false );
+    ASSERT_TRUE(monitor.getInitialDelayTime() == 0);
+    ASSERT_TRUE(monitor.getReadCheckTime() == 0);
+    ASSERT_TRUE(monitor.getWriteCheckTime() == 0);
+    ASSERT_TRUE(monitor.isKeepAliveResponseRequired() == false);
+    ASSERT_TRUE(monitor.isClosed() == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitorTest::testReadTimeout() {
+TEST_F(InactivityMonitorTest, testReadTimeout) {
 
     MyTransportListener listener;
     InactivityMonitor monitor( this->transport, this->transport->getWireFormat() );
@@ -127,16 +134,16 @@ void InactivityMonitorTest::testReadTimeout() {
     Thread::sleep( 2000 );
 
     // Should not have timed out on Read yet.
-    CPPUNIT_ASSERT( listener.exceptionFired == false );
+    ASSERT_TRUE(listener.exceptionFired == false);
 
     Thread::sleep( 5000 );
 
     // Channel should have been inactive for to long.
-    CPPUNIT_ASSERT( listener.exceptionFired == true );
+    ASSERT_TRUE(listener.exceptionFired == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitorTest::testWriteMessageFail() {
+TEST_F(InactivityMonitorTest, testWriteMessageFail) {
 
     this->transport->setFailOnKeepAliveSends( true );
     this->transport->setNumSentKeepAlivesBeforeFail( 4 );
@@ -155,16 +162,16 @@ void InactivityMonitorTest::testWriteMessageFail() {
     this->transport->fireCommand( message );
 
     // Should not have timed out on Read yet.
-    CPPUNIT_ASSERT( listener.exceptionFired == false );
+    ASSERT_TRUE(listener.exceptionFired == false);
 
     Thread::sleep( 5000 );
 
     // Channel should have been inactive for to long.
-    CPPUNIT_ASSERT( listener.exceptionFired == true );
+    ASSERT_TRUE(listener.exceptionFired == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitorTest::testNonFailureSendCase() {
+TEST_F(InactivityMonitorTest, testNonFailureSendCase) {
 
     MyTransportListener listener;
     InactivityMonitor monitor( this->transport, this->transport->getWireFormat() );
@@ -183,5 +190,5 @@ void InactivityMonitorTest::testNonFailureSendCase() {
     }
 
     // Channel should have been inactive for to long.
-    CPPUNIT_ASSERT( listener.exceptionFired == false );
+    ASSERT_TRUE(listener.exceptionFired == false);
 }

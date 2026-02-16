@@ -49,7 +49,7 @@ void DurableTest::testDurableConsumer() {
         producer->send( txtMessage.get() );
         std::unique_ptr<cms::Message> received( consumer->receive( 3000 ) );
 
-        CPPUNIT_ASSERT( received.get() != NULL );
+        ASSERT_TRUE(received.get() != NULL);
 
         cmsProvider->reconnectSession();
         session = cmsProvider->getSession();
@@ -70,15 +70,14 @@ void DurableTest::testDurableConsumer() {
         for( int i = 0; i < MSG_COUNT * 2; i++ ) {
             received.reset( consumer->receive( 1000 * 5 ) );
 
-            CPPUNIT_ASSERT_MESSAGE(
-                "Failed to receive all messages in batch", received.get() != NULL );
+            ASSERT_TRUE(received.get() != NULL) << ("Failed to receive all messages in batch");
         }
 
         // Remove the subscription after the consumer is forcibly closed.
         cmsProvider->unsubscribe();
     }
     catch( ActiveMQException& ex ) {
-        CPPUNIT_ASSERT_MESSAGE( ex.getStackTraceString(), false );
+        ASSERT_TRUE(false) << (ex.getStackTraceString());
     }
 }
 

@@ -15,20 +15,23 @@
  * limitations under the License.
  */
 
-#include "ActiveMQQueueTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/UUID.h>
 
 #include <activemq/commands/ActiveMQQueue.h>
+#include <activemq/commands/ActiveMQDestination.h>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
 
+class ActiveMQQueueTest : public ::testing::Test {};
+
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQQueueTest::test() {
+TEST_F(ActiveMQQueueTest, test) {
 
     ActiveMQQueue myQueue;
-    CPPUNIT_ASSERT( myQueue.getDestinationType() == cms::Destination::QUEUE );
+    ASSERT_TRUE(myQueue.getDestinationType() == cms::Destination::QUEUE);
 }

@@ -41,7 +41,21 @@
 #include <cms/TextMessage.h>
 
 #include <memory>
-#include "StompAdvisoryTest.h"
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/AdvisoryTest.h>
+
+namespace activemq {
+namespace test {
+namespace stomp {
+    class StompAdvisoryTest : public AdvisoryTest {
+public:
+        StompAdvisoryTest();
+        virtual ~StompAdvisoryTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getStompURL();
+        }
+    };
+}}}
 
 using namespace cms;
 using namespace std;
@@ -64,3 +78,7 @@ StompAdvisoryTest::StompAdvisoryTest() {
 ////////////////////////////////////////////////////////////////////////////////
 StompAdvisoryTest::~StompAdvisoryTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(StompAdvisoryTest, DISABLED_testTempDestinationCompositeAdvisoryTopic) { testTempDestinationCompositeAdvisoryTopic(); }

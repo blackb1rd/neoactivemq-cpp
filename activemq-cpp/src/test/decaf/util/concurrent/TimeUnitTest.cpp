@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "TimeUnitTest.h"
+#include <gtest/gtest.h>
 
 #include <string>
 #include <decaf/util/concurrent/TimeUnit.h>
@@ -28,155 +28,157 @@ using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
+    class TimeUnitTest : public ::testing::Test {};
+
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testConvert1() {
+TEST_F(TimeUnitTest, testConvert1) {
 
     for( long long t = 0; t < 10; ++t ) {
-        CPPUNIT_ASSERT( t == TimeUnit::SECONDS.convert( t, TimeUnit::SECONDS ) );
-        CPPUNIT_ASSERT( t == TimeUnit::SECONDS.convert( 1000 * t, TimeUnit::MILLISECONDS ) );
-        CPPUNIT_ASSERT( t == TimeUnit::SECONDS.convert( 1000000 * t, TimeUnit::MICROSECONDS ) );
-        CPPUNIT_ASSERT( t == TimeUnit::SECONDS.convert( 1000000000 * t, TimeUnit::NANOSECONDS ) );
-        CPPUNIT_ASSERT( 1000 * t == TimeUnit::MILLISECONDS.convert( t, TimeUnit::SECONDS ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MILLISECONDS.convert( t, TimeUnit::MILLISECONDS ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MILLISECONDS.convert( 1000 * t, TimeUnit::MICROSECONDS ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MILLISECONDS.convert( 1000000 * t, TimeUnit::NANOSECONDS ) );
-        CPPUNIT_ASSERT( 1000000 * t == TimeUnit::MICROSECONDS.convert( t, TimeUnit::SECONDS ) );
-        CPPUNIT_ASSERT( 1000 * t == TimeUnit::MICROSECONDS.convert( t, TimeUnit::MILLISECONDS ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MICROSECONDS.convert( t, TimeUnit::MICROSECONDS ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MICROSECONDS.convert( 1000 * t, TimeUnit::NANOSECONDS ) );
-        CPPUNIT_ASSERT( 1000000000 * t == TimeUnit::NANOSECONDS.convert( t, TimeUnit::SECONDS ) );
-        CPPUNIT_ASSERT( 1000000 * t == TimeUnit::NANOSECONDS.convert( t, TimeUnit::MILLISECONDS ) );
-        CPPUNIT_ASSERT( 1000 * t == TimeUnit::NANOSECONDS.convert( t, TimeUnit::MICROSECONDS ) );
-        CPPUNIT_ASSERT( t == TimeUnit::NANOSECONDS.convert( t, TimeUnit::NANOSECONDS ) );
+        ASSERT_TRUE(t == TimeUnit::SECONDS.convert( t, TimeUnit::SECONDS ));
+        ASSERT_TRUE(t == TimeUnit::SECONDS.convert( 1000 * t, TimeUnit::MILLISECONDS ));
+        ASSERT_TRUE(t == TimeUnit::SECONDS.convert( 1000000 * t, TimeUnit::MICROSECONDS ));
+        ASSERT_TRUE(t == TimeUnit::SECONDS.convert( 1000000000 * t, TimeUnit::NANOSECONDS ));
+        ASSERT_TRUE(1000 * t == TimeUnit::MILLISECONDS.convert( t, TimeUnit::SECONDS ));
+        ASSERT_TRUE(t == TimeUnit::MILLISECONDS.convert( t, TimeUnit::MILLISECONDS ));
+        ASSERT_TRUE(t == TimeUnit::MILLISECONDS.convert( 1000 * t, TimeUnit::MICROSECONDS ));
+        ASSERT_TRUE(t == TimeUnit::MILLISECONDS.convert( 1000000 * t, TimeUnit::NANOSECONDS ));
+        ASSERT_TRUE(1000000 * t == TimeUnit::MICROSECONDS.convert( t, TimeUnit::SECONDS ));
+        ASSERT_TRUE(1000 * t == TimeUnit::MICROSECONDS.convert( t, TimeUnit::MILLISECONDS ));
+        ASSERT_TRUE(t == TimeUnit::MICROSECONDS.convert( t, TimeUnit::MICROSECONDS ));
+        ASSERT_TRUE(t == TimeUnit::MICROSECONDS.convert( 1000 * t, TimeUnit::NANOSECONDS ));
+        ASSERT_TRUE(1000000000 * t == TimeUnit::NANOSECONDS.convert( t, TimeUnit::SECONDS ));
+        ASSERT_TRUE(1000000 * t == TimeUnit::NANOSECONDS.convert( t, TimeUnit::MILLISECONDS ));
+        ASSERT_TRUE(1000 * t == TimeUnit::NANOSECONDS.convert( t, TimeUnit::MICROSECONDS ));
+        ASSERT_TRUE(t == TimeUnit::NANOSECONDS.convert( t, TimeUnit::NANOSECONDS ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testConvert2() {
+TEST_F(TimeUnitTest, testConvert2) {
 
     for( long long t = 0; t < 10; ++t ) {
-        CPPUNIT_ASSERT( t == TimeUnit::DAYS.convert( t * 24, TimeUnit::HOURS ) );
-        CPPUNIT_ASSERT( t == TimeUnit::HOURS.convert( t * 60, TimeUnit::MINUTES ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MINUTES.convert( t * 60, TimeUnit::SECONDS ) );
-        CPPUNIT_ASSERT( t == TimeUnit::SECONDS.convert( t * 1000, TimeUnit::MILLISECONDS ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MILLISECONDS.convert( t * 1000, TimeUnit::MICROSECONDS ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MICROSECONDS.convert( t * 1000, TimeUnit::NANOSECONDS ) );
-        CPPUNIT_ASSERT( t * 24 == TimeUnit::HOURS.convert( t, TimeUnit::DAYS ) );
-        CPPUNIT_ASSERT( t * 60 == TimeUnit::MINUTES.convert( t, TimeUnit::HOURS ) );
-        CPPUNIT_ASSERT( t * 60 == TimeUnit::SECONDS.convert( t, TimeUnit::MINUTES ) );
-        CPPUNIT_ASSERT( t * 1000 == TimeUnit::MILLISECONDS.convert( t, TimeUnit::SECONDS ) );
-        CPPUNIT_ASSERT( t * 1000 == TimeUnit::MICROSECONDS.convert( t, TimeUnit::MILLISECONDS ) );
-        CPPUNIT_ASSERT( t * 1000 == TimeUnit::NANOSECONDS.convert( t, TimeUnit::MICROSECONDS ) );
+        ASSERT_TRUE(t == TimeUnit::DAYS.convert( t * 24, TimeUnit::HOURS ));
+        ASSERT_TRUE(t == TimeUnit::HOURS.convert( t * 60, TimeUnit::MINUTES ));
+        ASSERT_TRUE(t == TimeUnit::MINUTES.convert( t * 60, TimeUnit::SECONDS ));
+        ASSERT_TRUE(t == TimeUnit::SECONDS.convert( t * 1000, TimeUnit::MILLISECONDS ));
+        ASSERT_TRUE(t == TimeUnit::MILLISECONDS.convert( t * 1000, TimeUnit::MICROSECONDS ));
+        ASSERT_TRUE(t == TimeUnit::MICROSECONDS.convert( t * 1000, TimeUnit::NANOSECONDS ));
+        ASSERT_TRUE(t * 24 == TimeUnit::HOURS.convert( t, TimeUnit::DAYS ));
+        ASSERT_TRUE(t * 60 == TimeUnit::MINUTES.convert( t, TimeUnit::HOURS ));
+        ASSERT_TRUE(t * 60 == TimeUnit::SECONDS.convert( t, TimeUnit::MINUTES ));
+        ASSERT_TRUE(t * 1000 == TimeUnit::MILLISECONDS.convert( t, TimeUnit::SECONDS ));
+        ASSERT_TRUE(t * 1000 == TimeUnit::MICROSECONDS.convert( t, TimeUnit::MILLISECONDS ));
+        ASSERT_TRUE(t * 1000 == TimeUnit::NANOSECONDS.convert( t, TimeUnit::MICROSECONDS ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToNanos() {
+TEST_F(TimeUnitTest, testToNanos) {
 
     for( long long t = 0; t < 10; ++t ) {
-        CPPUNIT_ASSERT( 1000000000 * t == TimeUnit::SECONDS.toNanos( t ) );
-        CPPUNIT_ASSERT( 1000000 * t == TimeUnit::MILLISECONDS.toNanos( t ) );
-        CPPUNIT_ASSERT( 1000 * t == TimeUnit::MICROSECONDS.toNanos( t ) );
-        CPPUNIT_ASSERT( t == TimeUnit::NANOSECONDS.toNanos( t ) );
+        ASSERT_TRUE(1000000000 * t == TimeUnit::SECONDS.toNanos( t ));
+        ASSERT_TRUE(1000000 * t == TimeUnit::MILLISECONDS.toNanos( t ));
+        ASSERT_TRUE(1000 * t == TimeUnit::MICROSECONDS.toNanos( t ));
+        ASSERT_TRUE(t == TimeUnit::NANOSECONDS.toNanos( t ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToMicros() {
+TEST_F(TimeUnitTest, testToMicros) {
 
     for( long long t = 0; t < 10; ++t ) {
-        CPPUNIT_ASSERT( 1000000 * t == TimeUnit::SECONDS.toMicros( t ) );
-        CPPUNIT_ASSERT( 1000 * t == TimeUnit::MILLISECONDS.toMicros( t ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MICROSECONDS.toMicros( t ) );
-        CPPUNIT_ASSERT( t == TimeUnit::NANOSECONDS.toMicros( t * 1000 ) );
+        ASSERT_TRUE(1000000 * t == TimeUnit::SECONDS.toMicros( t ));
+        ASSERT_TRUE(1000 * t == TimeUnit::MILLISECONDS.toMicros( t ));
+        ASSERT_TRUE(t == TimeUnit::MICROSECONDS.toMicros( t ));
+        ASSERT_TRUE(t == TimeUnit::NANOSECONDS.toMicros( t * 1000 ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToMillis() {
+TEST_F(TimeUnitTest, testToMillis) {
 
     for( long long t = 0; t < 10; ++t ) {
-        CPPUNIT_ASSERT( 1000 * t == TimeUnit::SECONDS.toMillis( t ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MILLISECONDS.toMillis( t ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MICROSECONDS.toMillis( t * 1000 ) );
-        CPPUNIT_ASSERT( t == TimeUnit::NANOSECONDS.toMillis( t * 1000000 ) );
+        ASSERT_TRUE(1000 * t == TimeUnit::SECONDS.toMillis( t ));
+        ASSERT_TRUE(t == TimeUnit::MILLISECONDS.toMillis( t ));
+        ASSERT_TRUE(t == TimeUnit::MICROSECONDS.toMillis( t * 1000 ));
+        ASSERT_TRUE(t == TimeUnit::NANOSECONDS.toMillis( t * 1000000 ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToSeconds() {
+TEST_F(TimeUnitTest, testToSeconds) {
 
     for( long long t = 0; t < 10; ++t ) {
-        CPPUNIT_ASSERT( t == TimeUnit::SECONDS.toSeconds( t ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MILLISECONDS.toSeconds( t * 1000 ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MICROSECONDS.toSeconds( t * 1000000 ) );
-        CPPUNIT_ASSERT( t == TimeUnit::NANOSECONDS.toSeconds( t * 1000000000 ) );
+        ASSERT_TRUE(t == TimeUnit::SECONDS.toSeconds( t ));
+        ASSERT_TRUE(t == TimeUnit::MILLISECONDS.toSeconds( t * 1000 ));
+        ASSERT_TRUE(t == TimeUnit::MICROSECONDS.toSeconds( t * 1000000 ));
+        ASSERT_TRUE(t == TimeUnit::NANOSECONDS.toSeconds( t * 1000000000 ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToMinutes() {
+TEST_F(TimeUnitTest, testToMinutes) {
 
     for( long long t = 0; t < 10; ++t ) {
-        CPPUNIT_ASSERT( t == TimeUnit::MINUTES.toMinutes( t ) );
-        CPPUNIT_ASSERT( t == TimeUnit::SECONDS.toMinutes( t * 60 ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MILLISECONDS.toMinutes( t * 1000LL * 60 ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MICROSECONDS.toMinutes( t * 1000000LL * 60 ) );
-        CPPUNIT_ASSERT( t == TimeUnit::NANOSECONDS.toMinutes( t * 1000000000LL * 60 ) );
+        ASSERT_TRUE(t == TimeUnit::MINUTES.toMinutes( t ));
+        ASSERT_TRUE(t == TimeUnit::SECONDS.toMinutes( t * 60 ));
+        ASSERT_TRUE(t == TimeUnit::MILLISECONDS.toMinutes( t * 1000LL * 60 ));
+        ASSERT_TRUE(t == TimeUnit::MICROSECONDS.toMinutes( t * 1000000LL * 60 ));
+        ASSERT_TRUE(t == TimeUnit::NANOSECONDS.toMinutes( t * 1000000000LL * 60 ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToHours() {
+TEST_F(TimeUnitTest, testToHours) {
 
     for( long long t = 0; t < 10; ++t ) {
-        CPPUNIT_ASSERT( t == TimeUnit::HOURS.toHours( t ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MINUTES.toHours( t * 60 ) );
-        CPPUNIT_ASSERT( t == TimeUnit::SECONDS.toHours( t * 60 * 60 ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MILLISECONDS.toHours( t * 1000LL * 60 * 60 ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MICROSECONDS.toHours( t * 1000000LL * 60 * 60 ) );
-        CPPUNIT_ASSERT( t == TimeUnit::NANOSECONDS.toHours( t * 1000000000LL * 60 * 60 ) );
+        ASSERT_TRUE(t == TimeUnit::HOURS.toHours( t ));
+        ASSERT_TRUE(t == TimeUnit::MINUTES.toHours( t * 60 ));
+        ASSERT_TRUE(t == TimeUnit::SECONDS.toHours( t * 60 * 60 ));
+        ASSERT_TRUE(t == TimeUnit::MILLISECONDS.toHours( t * 1000LL * 60 * 60 ));
+        ASSERT_TRUE(t == TimeUnit::MICROSECONDS.toHours( t * 1000000LL * 60 * 60 ));
+        ASSERT_TRUE(t == TimeUnit::NANOSECONDS.toHours( t * 1000000000LL * 60 * 60 ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToDays() {
+TEST_F(TimeUnitTest, testToDays) {
 
     for( long long t = 0; t < 10; ++t ) {
-        CPPUNIT_ASSERT( t == TimeUnit::DAYS.toDays( t ) );
-        CPPUNIT_ASSERT( t == TimeUnit::HOURS.toDays( t * 24 ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MINUTES.toDays( t * 60 * 24 ) );
-        CPPUNIT_ASSERT( t == TimeUnit::SECONDS.toDays( t * 60 * 60 * 24 ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MILLISECONDS.toDays( t * 1000LL * 60 * 60 * 24 ) );
-        CPPUNIT_ASSERT( t == TimeUnit::MICROSECONDS.toDays( t * 1000000LL * 60 * 60 * 24 ) );
-        CPPUNIT_ASSERT( t == TimeUnit::NANOSECONDS.toDays( t * 1000000000LL * 60 * 60 * 24 ) );
+        ASSERT_TRUE(t == TimeUnit::DAYS.toDays( t ));
+        ASSERT_TRUE(t == TimeUnit::HOURS.toDays( t * 24 ));
+        ASSERT_TRUE(t == TimeUnit::MINUTES.toDays( t * 60 * 24 ));
+        ASSERT_TRUE(t == TimeUnit::SECONDS.toDays( t * 60 * 60 * 24 ));
+        ASSERT_TRUE(t == TimeUnit::MILLISECONDS.toDays( t * 1000LL * 60 * 60 * 24 ));
+        ASSERT_TRUE(t == TimeUnit::MICROSECONDS.toDays( t * 1000000LL * 60 * 60 * 24 ));
+        ASSERT_TRUE(t == TimeUnit::NANOSECONDS.toDays( t * 1000000000LL * 60 * 60 * 24 ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testConvertSaturate() {
-    CPPUNIT_ASSERT( Long::MAX_VALUE ==
-        TimeUnit::NANOSECONDS.convert( Long::MAX_VALUE / 2, TimeUnit::SECONDS ) );
-    CPPUNIT_ASSERT( Long::MIN_VALUE ==
-        TimeUnit::NANOSECONDS.convert( -Long::MAX_VALUE / 4, TimeUnit::SECONDS ) );
+TEST_F(TimeUnitTest, testConvertSaturate) {
+    ASSERT_TRUE(Long::MAX_VALUE ==
+        TimeUnit::NANOSECONDS.convert( Long::MAX_VALUE / 2, TimeUnit::SECONDS ));
+    ASSERT_TRUE(Long::MIN_VALUE ==
+        TimeUnit::NANOSECONDS.convert( -Long::MAX_VALUE / 4, TimeUnit::SECONDS ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToNanosSaturate() {
-    CPPUNIT_ASSERT( Long::MAX_VALUE ==
-        TimeUnit::MILLISECONDS.toNanos( Long::MAX_VALUE / 2 ) );
-    CPPUNIT_ASSERT( Long::MIN_VALUE ==
-        TimeUnit::MILLISECONDS.toNanos( -Long::MAX_VALUE / 3 ) );
+TEST_F(TimeUnitTest, testToNanosSaturate) {
+    ASSERT_TRUE(Long::MAX_VALUE ==
+        TimeUnit::MILLISECONDS.toNanos( Long::MAX_VALUE / 2 ));
+    ASSERT_TRUE(Long::MIN_VALUE ==
+        TimeUnit::MILLISECONDS.toNanos( -Long::MAX_VALUE / 3 ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testToString() {
+TEST_F(TimeUnitTest, testToString) {
     std::string s = TimeUnit::SECONDS.toString();
-    CPPUNIT_ASSERT( s.find_first_of( "ECOND" ) != (std::size_t)0 );
+    ASSERT_TRUE(s.find_first_of( "ECOND" ) != (std::size_t)0);
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testTimedWait() {
+TEST_F(TimeUnitTest, testTimedWait) {
 
     Mutex o;
 
@@ -186,31 +188,28 @@ void TimeUnitTest::testTimedWait() {
     }
     long long later = System::currentTimeMillis();
 
-    CPPUNIT_ASSERT( later - now + 10 >= TimeUnit::SECONDS.toMillis( 1 ) );
+    ASSERT_TRUE(later - now + 10 >= TimeUnit::SECONDS.toMillis( 1 ));
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testSleep() {
+TEST_F(TimeUnitTest, testSleep) {
 
     long long now = System::currentTimeMillis();
     TimeUnit::SECONDS.sleep( 1 );
     long long later = System::currentTimeMillis();
-    CPPUNIT_ASSERT( later - now + 10 >= TimeUnit::SECONDS.toMillis( 1 ) );
+    ASSERT_TRUE(later - now + 10 >= TimeUnit::SECONDS.toMillis( 1 ));
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-void TimeUnitTest::testValueOf() {
+TEST_F(TimeUnitTest, testValueOf) {
 
-    CPPUNIT_ASSERT( TimeUnit::NANOSECONDS == TimeUnit::valueOf( "NANOSECONDS" ) );
-    CPPUNIT_ASSERT( TimeUnit::MICROSECONDS == TimeUnit::valueOf( "MICROSECONDS" ) );
-    CPPUNIT_ASSERT( TimeUnit::MILLISECONDS == TimeUnit::valueOf( "MILLISECONDS" ) );
-    CPPUNIT_ASSERT( TimeUnit::SECONDS == TimeUnit::valueOf( "SECONDS" ) );
-    CPPUNIT_ASSERT( TimeUnit::MINUTES == TimeUnit::valueOf( "MINUTES" ) );
-    CPPUNIT_ASSERT( TimeUnit::DAYS == TimeUnit::valueOf( "DAYS" ) );
-    CPPUNIT_ASSERT( TimeUnit::HOURS == TimeUnit::valueOf( "HOURS" ) );
+    ASSERT_TRUE(TimeUnit::NANOSECONDS == TimeUnit::valueOf( "NANOSECONDS" ));
+    ASSERT_TRUE(TimeUnit::MICROSECONDS == TimeUnit::valueOf( "MICROSECONDS" ));
+    ASSERT_TRUE(TimeUnit::MILLISECONDS == TimeUnit::valueOf( "MILLISECONDS" ));
+    ASSERT_TRUE(TimeUnit::SECONDS == TimeUnit::valueOf( "SECONDS" ));
+    ASSERT_TRUE(TimeUnit::MINUTES == TimeUnit::valueOf( "MINUTES" ));
+    ASSERT_TRUE(TimeUnit::DAYS == TimeUnit::valueOf( "DAYS" ));
+    ASSERT_TRUE(TimeUnit::HOURS == TimeUnit::valueOf( "HOURS" ));
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw an IllegalArgumentException",
-        TimeUnit::valueOf( "FOO" ),
-        decaf::lang::exceptions::IllegalArgumentException );
+    ASSERT_THROW(TimeUnit::valueOf( "FOO" ), decaf::lang::exceptions::IllegalArgumentException) << ("Should Throw an IllegalArgumentException");
 }

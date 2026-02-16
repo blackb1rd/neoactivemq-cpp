@@ -57,11 +57,11 @@ void MapMessageTest::testEmptyMapSendReceive() {
     producer->send(mapMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 
     cms::MapMessage* recvMapMessage = dynamic_cast<MapMessage*>(message.get());
-    CPPUNIT_ASSERT(recvMapMessage != NULL);
-    CPPUNIT_ASSERT(recvMapMessage->itemExists("SomeKey") == false);
+    ASSERT_TRUE(recvMapMessage != NULL);
+    ASSERT_TRUE(recvMapMessage->itemExists("SomeKey") == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,15 +82,15 @@ void MapMessageTest::testMapWithEmptyStringValue() {
     producer->send(mapMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 
     cms::MapMessage* recvMapMessage = dynamic_cast<MapMessage*>(message.get());
-    CPPUNIT_ASSERT(recvMapMessage != NULL);
-    CPPUNIT_ASSERT(recvMapMessage->itemExists("String1") == true);
-    CPPUNIT_ASSERT(recvMapMessage->getString("String1") == "");
-    CPPUNIT_ASSERT(recvMapMessage->itemExists("String2") == true);
-    CPPUNIT_ASSERT(recvMapMessage->itemExists("String3") == false);
-    CPPUNIT_ASSERT(recvMapMessage->getString("String2") == string("value"));
+    ASSERT_TRUE(recvMapMessage != NULL);
+    ASSERT_TRUE(recvMapMessage->itemExists("String1") == true);
+    ASSERT_TRUE(recvMapMessage->getString("String1") == "");
+    ASSERT_TRUE(recvMapMessage->itemExists("String2") == true);
+    ASSERT_TRUE(recvMapMessage->itemExists("String3") == false);
+    ASSERT_TRUE(recvMapMessage->getString("String2") == string("value"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -110,13 +110,13 @@ void MapMessageTest::testMapWithSingleCharEntry() {
     producer->send(mapMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 
     cms::MapMessage* recvMapMessage = dynamic_cast<MapMessage*>(message.get());
-    CPPUNIT_ASSERT(recvMapMessage != NULL);
-    CPPUNIT_ASSERT(recvMapMessage->itemExists("Char1") == true);
-    CPPUNIT_ASSERT(recvMapMessage->getChar("Char1") == 'a');
-    CPPUNIT_ASSERT(recvMapMessage->itemExists("Char2") == false);
+    ASSERT_TRUE(recvMapMessage != NULL);
+    ASSERT_TRUE(recvMapMessage->itemExists("Char1") == true);
+    ASSERT_TRUE(recvMapMessage->getChar("Char1") == 'a');
+    ASSERT_TRUE(recvMapMessage->itemExists("Char2") == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -137,16 +137,16 @@ void MapMessageTest::testMapWithCharAndStringEntry() {
     producer->send(mapMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 
     cms::MapMessage* recvMapMessage = dynamic_cast<MapMessage*>(message.get());
-    CPPUNIT_ASSERT(recvMapMessage != NULL);
-    CPPUNIT_ASSERT(recvMapMessage->itemExists("Char1") == true);
-    CPPUNIT_ASSERT(recvMapMessage->getChar("Char1") == 'a');
-    CPPUNIT_ASSERT(recvMapMessage->itemExists("Char2") == false);
-    CPPUNIT_ASSERT(recvMapMessage->itemExists("String1") == true);
-    CPPUNIT_ASSERT(recvMapMessage->itemExists("String3") == false);
-    CPPUNIT_ASSERT(recvMapMessage->getString("String1") == string("string"));
+    ASSERT_TRUE(recvMapMessage != NULL);
+    ASSERT_TRUE(recvMapMessage->itemExists("Char1") == true);
+    ASSERT_TRUE(recvMapMessage->getChar("Char1") == 'a');
+    ASSERT_TRUE(recvMapMessage->itemExists("Char2") == false);
+    ASSERT_TRUE(recvMapMessage->itemExists("String1") == true);
+    ASSERT_TRUE(recvMapMessage->itemExists("String3") == false);
+    ASSERT_TRUE(recvMapMessage->getString("String1") == string("string"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,11 +168,11 @@ void MapMessageTest::testMapSetEmptyBytesVector() {
     producer->send(mapMessage.get());
 
     std::unique_ptr<cms::Message> message(consumer->receive(2000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 
     cms::MapMessage* recvMapMessage = dynamic_cast<MapMessage*>(message.get());
-    CPPUNIT_ASSERT(recvMapMessage != NULL);
-    CPPUNIT_ASSERT(recvMapMessage->itemExists("BYTES") == true);
-    CPPUNIT_ASSERT(recvMapMessage->getBytes("BYTES").empty() == true);
+    ASSERT_TRUE(recvMapMessage != NULL);
+    ASSERT_TRUE(recvMapMessage->itemExists("BYTES") == true);
+    ASSERT_TRUE(recvMapMessage->getBytes("BYTES").empty() == true);
 }
 

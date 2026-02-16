@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "CheckedInputStreamTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/zip/Deflater.h>
 #include <decaf/util/zip/CheckedOutputStream.h>
@@ -35,6 +35,14 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
+    class CheckedInputStreamTest : public ::testing::Test {
+public:
+
+        CheckedInputStreamTest();
+        virtual ~CheckedInputStreamTest();
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 CheckedInputStreamTest::CheckedInputStreamTest() {
 }
@@ -44,18 +52,17 @@ CheckedInputStreamTest::~CheckedInputStreamTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedInputStreamTest::testConstructor() {
+TEST_F(CheckedInputStreamTest, testConstructor) {
 
     std::vector<unsigned char> outPutBuf;
     ByteArrayInputStream baos( outPutBuf );
     CRC32 check;
     CheckedInputStream chkIn( &baos, &check );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "the checkSum value of the constructor is not 0",
-                                  0LL, chkIn.getChecksum()->getValue() );
+    ASSERT_EQ(0LL, chkIn.getChecksum()->getValue()) << ("the checkSum value of the constructor is not 0");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedInputStreamTest::testGetChecksum() {
+TEST_F(CheckedInputStreamTest, testGetChecksum) {
 
     std::vector<unsigned char> emptyBuf;
     ByteArrayInputStream baos( emptyBuf );
@@ -64,8 +71,7 @@ void CheckedInputStreamTest::testGetChecksum() {
 
     while( checkEmpty.read() >= 0 ) {
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "the checkSum value of an empty file is not zero",
-                                  0LL, checkEmpty.getChecksum()->getValue() );
+    ASSERT_EQ(0LL, checkEmpty.getChecksum()->getValue()) << ("the checkSum value of an empty file is not zero");
 
     static const int SIZE = 10;
     unsigned char byteArray[] = { 1, 3, 4, 7, 8, 'e', 'r', 't', 'y', '5' };
@@ -85,12 +91,11 @@ void CheckedInputStreamTest::testGetChecksum() {
     while( checkIn.read() >= 0 ) {
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "the checksum value is incorrect",
-                            checkIn.getChecksum()->getValue() > 0 );
+    ASSERT_TRUE(checkIn.getChecksum()->getValue() > 0) << ("the checksum value is incorrect");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedInputStreamTest::testSkip() {
+TEST_F(CheckedInputStreamTest, testSkip) {
 
     static const int SIZE = 256;
     std::vector<unsigned char> byteArray( SIZE );
@@ -111,15 +116,14 @@ void CheckedInputStreamTest::testSkip() {
     CheckedInputStream checkIn( &bais, &adler );
 
     long long skipValue = 5;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "the value returned by skip(n) is not the same as its parameter",
-                                  skipValue, checkIn.skip( skipValue ) );
+    ASSERT_EQ(skipValue, checkIn.skip( skipValue )) << ("the value returned by skip(n) is not the same as its parameter");
     checkIn.skip( skipValue );
 
-    CPPUNIT_ASSERT_MESSAGE( "checkSum value is not correct", checkIn.getChecksum()->getValue() > 0 );
+    ASSERT_TRUE(checkIn.getChecksum()->getValue() > 0) << ("checkSum value is not correct");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedInputStreamTest::testRead() {
+TEST_F(CheckedInputStreamTest, testRead) {
 
     static const int SIZE = 256;
     std::vector<unsigned char> byteArray( SIZE );
@@ -142,14 +146,11 @@ void CheckedInputStreamTest::testRead() {
     checkIn.read();
     checkIn.close();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IOException",
-        checkIn.read(),
-        IOException );
+    ASSERT_THROW(checkIn.read(), IOException) << ("Should have thrown an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedInputStreamTest::testReadBIII() {
+TEST_F(CheckedInputStreamTest, testReadBIII) {
 
     static const int SIZE = 256;
     std::vector<unsigned char> byteArray( SIZE );
@@ -173,8 +174,5 @@ void CheckedInputStreamTest::testReadBIII() {
     checkIn.read( buff, 50, 10, 5 );
     checkIn.close();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IOException",
-        checkIn.read( buff, 50, 10, 5 ),
-        IOException );
+    ASSERT_THROW(checkIn.read( buff, 50, 10, 5 ), IOException) << ("Should have thrown an IOException");
 }

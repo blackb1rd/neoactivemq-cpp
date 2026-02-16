@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "URISupportTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/util/URISupport.h>
 #include <decaf/util/Properties.h>
@@ -28,76 +28,79 @@ using namespace decaf::util;
 using namespace activemq;
 using namespace activemq::util;
 
+    class URISupportTest : public ::testing::Test {
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
 
     void verifyParams(const Properties& parameters) {
-        CPPUNIT_ASSERT(parameters.getProperty("proxyHost", "") == "localhost");
-        CPPUNIT_ASSERT(parameters.getProperty("proxyPort", "") == "80");
+        ASSERT_TRUE(parameters.getProperty("proxyHost", "") == "localhost");
+        ASSERT_TRUE(parameters.getProperty("proxyPort", "") == "80");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URISupportTest::test() {
+TEST_F(URISupportTest, test) {
 
     string test = "?option1=test1&option2=test2";
 
     Properties map = URISupport::parseQuery( test );
 
-    CPPUNIT_ASSERT( map.hasProperty( "option1" ) == true );
-    CPPUNIT_ASSERT( map.hasProperty( "option2" ) == true );
+    ASSERT_TRUE(map.hasProperty( "option1" ) == true);
+    ASSERT_TRUE(map.hasProperty( "option2" ) == true);
 
-    CPPUNIT_ASSERT( map.getProperty( "option1", "" ) == "test1" );
-    CPPUNIT_ASSERT( map.getProperty( "option2", "" ) == "test2" );
+    ASSERT_TRUE(map.getProperty( "option1", "" ) == "test1");
+    ASSERT_TRUE(map.getProperty( "option2", "" ) == "test2");
 
     string test2 = "option&option";
 
     try{
         map = URISupport::parseQuery( test2 );
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     } catch(...) {}
 
     string test3 = "option1=test1&option2=test2";
 
     map = URISupport::parseQuery( test3 );
 
-    CPPUNIT_ASSERT( map.hasProperty( "option1" ) == true );
-    CPPUNIT_ASSERT( map.hasProperty( "option2" ) == true );
+    ASSERT_TRUE(map.hasProperty( "option1" ) == true);
+    ASSERT_TRUE(map.hasProperty( "option2" ) == true);
 
-    CPPUNIT_ASSERT( map.getProperty( "option1", "" ) == "test1" );
-    CPPUNIT_ASSERT( map.getProperty( "option2", "" ) == "test2" );
+    ASSERT_TRUE(map.getProperty( "option1", "" ) == "test1");
+    ASSERT_TRUE(map.getProperty( "option2", "" ) == "test2");
 
     string test4 = "http://cause.exception.com?option1=test1&option2=test2";
 
     try{
         map = URISupport::parseQuery( test4 );
     } catch(...) {
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 
     string test5 = "failover:(tcp://127.0.0.1:61616)?startupMaxReconnectAttempts=10&initialReconnectDelay=10";
 
     map = URISupport::parseQuery( test5 );
 
-    CPPUNIT_ASSERT( map.hasProperty( "startupMaxReconnectAttempts" ) == true );
-    CPPUNIT_ASSERT( map.hasProperty( "initialReconnectDelay" ) == true );
+    ASSERT_TRUE(map.hasProperty( "startupMaxReconnectAttempts" ) == true);
+    ASSERT_TRUE(map.hasProperty( "initialReconnectDelay" ) == true);
 
-    CPPUNIT_ASSERT( map.getProperty( "startupMaxReconnectAttempts", "" ) == "10" );
-    CPPUNIT_ASSERT( map.getProperty( "initialReconnectDelay", "" ) == "10" );
+    ASSERT_TRUE(map.getProperty( "startupMaxReconnectAttempts", "" ) == "10");
+    ASSERT_TRUE(map.getProperty( "initialReconnectDelay", "" ) == "10");
 
     string test6 = "failover://(tcp://127.0.0.1:61616)?startupMaxReconnectAttempts=10&initialReconnectDelay=10";
 
     map = URISupport::parseQuery( test6 );
 
-    CPPUNIT_ASSERT( map.hasProperty( "startupMaxReconnectAttempts" ) == true );
-    CPPUNIT_ASSERT( map.hasProperty( "initialReconnectDelay" ) == true );
+    ASSERT_TRUE(map.hasProperty( "startupMaxReconnectAttempts" ) == true);
+    ASSERT_TRUE(map.hasProperty( "initialReconnectDelay" ) == true);
 
-    CPPUNIT_ASSERT( map.getProperty( "startupMaxReconnectAttempts", "" ) == "10" );
-    CPPUNIT_ASSERT( map.getProperty( "initialReconnectDelay", "" ) == "10" );
+    ASSERT_TRUE(map.getProperty( "startupMaxReconnectAttempts", "" ) == "10");
+    ASSERT_TRUE(map.getProperty( "initialReconnectDelay", "" ) == "10");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URISupportTest::testURIParseEnv() {
+TEST_F(URISupportTest, testURIParseEnv) {
 
     string test = "tcp://localhost:61616?option1=test1&option2=test2";
 
@@ -105,134 +108,119 @@ void URISupportTest::testURIParseEnv() {
 
     URISupport::parseURL( test, map );
 
-    CPPUNIT_ASSERT( map.hasProperty( "option1" ) == true );
-    CPPUNIT_ASSERT( map.hasProperty( "option2" ) == true );
+    ASSERT_TRUE(map.hasProperty( "option1" ) == true);
+    ASSERT_TRUE(map.hasProperty( "option2" ) == true);
 
-    CPPUNIT_ASSERT( map.getProperty( "option1", "" ) == "test1" );
-    CPPUNIT_ASSERT( map.getProperty( "option2", "" ) == "test2" );
+    ASSERT_TRUE(map.getProperty( "option1", "" ) == "test1");
+    ASSERT_TRUE(map.getProperty( "option2", "" ) == "test2");
 
     decaf::lang::System::setenv( "TEST_CPP_AMQ", "test2" );
 
     test = "tcp://localhost:61616?option1=test1&option2=${TEST_CPP_AMQ}";
     map.clear();
     URISupport::parseURL( test, map );
-    CPPUNIT_ASSERT( map.hasProperty( "option2" ) == true );
-    CPPUNIT_ASSERT( map.getProperty( "option2", "" ) == "test2" );
+    ASSERT_TRUE(map.hasProperty( "option2" ) == true);
+    ASSERT_TRUE(map.getProperty( "option2", "" ) == "test2");
 
     test = "tcp://localhost:61616?option1=test1&option2=${TEST_CPP_AMQ_XXX}";
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw an IllegalArgumentException",
-        URISupport::parseURL( test, map ),
-        decaf::lang::exceptions::IllegalArgumentException );
+    ASSERT_THROW(URISupport::parseURL( test, map ), decaf::lang::exceptions::IllegalArgumentException) << ("Should Throw an IllegalArgumentException");
 
     test = "tcp://localhost:61616?option1=test1&option2=${}";
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw an IllegalArgumentException",
-        URISupport::parseURL( test, map ),
-        decaf::lang::exceptions::IllegalArgumentException );
+    ASSERT_THROW(URISupport::parseURL( test, map ), decaf::lang::exceptions::IllegalArgumentException) << ("Should Throw an IllegalArgumentException");
 
     test = "tcp://localhost:61616?option1=test1&option2=$X}";
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw an IllegalArgumentException",
-        URISupport::parseURL( test, map ),
-        decaf::lang::exceptions::IllegalArgumentException );
+    ASSERT_THROW(URISupport::parseURL( test, map ), decaf::lang::exceptions::IllegalArgumentException) << ("Should Throw an IllegalArgumentException");
 
     test = "tcp://localhost:61616?option1=test1&option2=${X";
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw an IllegalArgumentException",
-        URISupport::parseURL( test, map ),
-        decaf::lang::exceptions::IllegalArgumentException );
+    ASSERT_THROW(URISupport::parseURL( test, map ), decaf::lang::exceptions::IllegalArgumentException) << ("Should Throw an IllegalArgumentException");
 
     test = "tcp://localhost:61616?option1=test1&option2=$X";
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should Throw an IllegalArgumentException",
-        URISupport::parseURL( test, map ),
-        decaf::lang::exceptions::IllegalArgumentException );
+    ASSERT_THROW(URISupport::parseURL( test, map ), decaf::lang::exceptions::IllegalArgumentException) << ("Should Throw an IllegalArgumentException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URISupportTest::testParseComposite() {
+TEST_F(URISupportTest, testParseComposite) {
 
     CompositeData data = URISupport::parseComposite(
         URI("broker:()/localhost?persistent=false" ) );
-    CPPUNIT_ASSERT( 0 == data.getComponents().size() );
+    ASSERT_TRUE(0 == data.getComponents().size());
 
     data = URISupport::parseComposite( URI( "test:(path)/path" ) );
-    CPPUNIT_ASSERT( data.getPath() == "path" );
+    ASSERT_TRUE(data.getPath() == "path");
 
     data = URISupport::parseComposite( URI( "test:path" ) );
-    CPPUNIT_ASSERT( data.getPath() == "" );
+    ASSERT_TRUE(data.getPath() == "");
 
     data = URISupport::parseComposite( URI( "test:part1" ) );
-    CPPUNIT_ASSERT( 1 == data.getComponents().size() );
+    ASSERT_TRUE(1 == data.getComponents().size());
 
     data = URISupport::parseComposite(
         URI( "test:(part1://host,part2://(sub1://part,sube2:part))" ) );
-    CPPUNIT_ASSERT( 2 == data.getComponents().size() );
+    ASSERT_TRUE(2 == data.getComponents().size());
 
     data = URISupport::parseComposite(
         URI( "broker://(tcp://localhost:61616?wireformat=openwire)?name=foo" ) );
 
-    CPPUNIT_ASSERT( data.getScheme() == "broker" );
-    CPPUNIT_ASSERT( data.getParameters().hasProperty( "name" ) );
-    CPPUNIT_ASSERT( string( data.getParameters().getProperty( "name" ) ) == "foo" );
-    CPPUNIT_ASSERT( data.getComponents().size() == 1 );
-    CPPUNIT_ASSERT( data.getComponents().get(0).toString() ==
-                    "tcp://localhost:61616?wireformat=openwire" );
+    ASSERT_TRUE(data.getScheme() == "broker");
+    ASSERT_TRUE(data.getParameters().hasProperty( "name" ));
+    ASSERT_TRUE(string( data.getParameters().getProperty( "name" ) ) == "foo");
+    ASSERT_TRUE(data.getComponents().size() == 1);
+    ASSERT_TRUE(data.getComponents().get(0).toString() ==
+                    "tcp://localhost:61616?wireformat=openwire");
 
     data = URISupport::parseComposite(
         URI( "broker:(tcp://localhost:61616?wireformat=openwire)?name=foo" ) );
 
-    CPPUNIT_ASSERT( data.getScheme() == "broker" );
-    CPPUNIT_ASSERT( data.getParameters().hasProperty( "name" ) );
-    CPPUNIT_ASSERT( !data.getParameters().hasProperty( "wireformat" ) );
-    CPPUNIT_ASSERT( string( data.getParameters().getProperty( "name" ) ) == "foo" );
-    CPPUNIT_ASSERT( data.getComponents().size() == 1 );
-    CPPUNIT_ASSERT( data.getComponents().get(0).toString() ==
-                    "tcp://localhost:61616?wireformat=openwire" );
+    ASSERT_TRUE(data.getScheme() == "broker");
+    ASSERT_TRUE(data.getParameters().hasProperty( "name" ));
+    ASSERT_TRUE(!data.getParameters().hasProperty( "wireformat" ));
+    ASSERT_TRUE(string( data.getParameters().getProperty( "name" ) ) == "foo");
+    ASSERT_TRUE(data.getComponents().size() == 1);
+    ASSERT_TRUE(data.getComponents().get(0).toString() ==
+                    "tcp://localhost:61616?wireformat=openwire");
 
     data = URISupport::parseComposite(
         URI( "broker:(tcp://localhost:61616)?name=foo" ) );
 
-    CPPUNIT_ASSERT( data.getScheme() == "broker" );
-    CPPUNIT_ASSERT( data.getParameters().hasProperty( "name" ) );
-    CPPUNIT_ASSERT( !data.getParameters().hasProperty( "wireformat" ) );
-    CPPUNIT_ASSERT( string( data.getParameters().getProperty( "name" ) ) == "foo" );
-    CPPUNIT_ASSERT( data.getComponents().size() == 1 );
-    CPPUNIT_ASSERT( data.getComponents().get(0).toString() ==
-                    "tcp://localhost:61616" );
+    ASSERT_TRUE(data.getScheme() == "broker");
+    ASSERT_TRUE(data.getParameters().hasProperty( "name" ));
+    ASSERT_TRUE(!data.getParameters().hasProperty( "wireformat" ));
+    ASSERT_TRUE(string( data.getParameters().getProperty( "name" ) ) == "foo");
+    ASSERT_TRUE(data.getComponents().size() == 1);
+    ASSERT_TRUE(data.getComponents().get(0).toString() ==
+                    "tcp://localhost:61616");
 
     data = URISupport::parseComposite(
         URI( "test:(part1://host,part2://host,part3://host,part4://host)" ) );
-    CPPUNIT_ASSERT( 4 == data.getComponents().size() );
-    CPPUNIT_ASSERT( data.getComponents().get(0).toString() == "part1://host" );
-    CPPUNIT_ASSERT( data.getComponents().get(1).toString() == "part2://host" );
-    CPPUNIT_ASSERT( data.getComponents().get(2).toString() == "part3://host" );
-    CPPUNIT_ASSERT( data.getComponents().get(3).toString() == "part4://host" );
+    ASSERT_TRUE(4 == data.getComponents().size());
+    ASSERT_TRUE(data.getComponents().get(0).toString() == "part1://host");
+    ASSERT_TRUE(data.getComponents().get(1).toString() == "part2://host");
+    ASSERT_TRUE(data.getComponents().get(2).toString() == "part3://host");
+    ASSERT_TRUE(data.getComponents().get(3).toString() == "part4://host");
 
     data = URISupport::parseComposite(
         URI( "test:(part1://host,part2://host,part3://host,part4://host?option=value)" ) );
-    CPPUNIT_ASSERT( 4 == data.getComponents().size() );
-    CPPUNIT_ASSERT( data.getComponents().get(0).toString() == "part1://host" );
-    CPPUNIT_ASSERT( data.getComponents().get(1).toString() == "part2://host" );
-    CPPUNIT_ASSERT( data.getComponents().get(2).toString() == "part3://host" );
-    CPPUNIT_ASSERT( data.getComponents().get(3).toString() == "part4://host?option=value" );
+    ASSERT_TRUE(4 == data.getComponents().size());
+    ASSERT_TRUE(data.getComponents().get(0).toString() == "part1://host");
+    ASSERT_TRUE(data.getComponents().get(1).toString() == "part2://host");
+    ASSERT_TRUE(data.getComponents().get(2).toString() == "part3://host");
+    ASSERT_TRUE(data.getComponents().get(3).toString() == "part4://host?option=value");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URISupportTest::testCreateWithQuery() {
+TEST_F(URISupportTest, testCreateWithQuery) {
 
     URI source("vm://localhost");
     URI dest = URISupport::createURIWithQuery(source, "network=true&one=two");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("correct param count", 2, URISupport::parseParameters(dest).size());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("same uri, host", source.getHost(), dest.getHost());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("same uri, scheme", source.getScheme(), dest.getScheme());
-    CPPUNIT_ASSERT_MESSAGE("same uri, ssp", dest.getQuery() != source.getQuery());
+    ASSERT_EQ(2, URISupport::parseParameters(dest).size()) << ("correct param count");
+    ASSERT_EQ(source.getHost(), dest.getHost()) << ("same uri, host");
+    ASSERT_EQ(source.getScheme(), dest.getScheme()) << ("same uri, scheme");
+    ASSERT_TRUE(dest.getQuery() != source.getQuery()) << ("same uri, ssp");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URISupportTest::testApplyParameters() {
+TEST_F(URISupportTest, testApplyParameters) {
 
     URI uri("http://0.0.0.0:61616");
     Properties parameters;
@@ -241,14 +229,14 @@ void URISupportTest::testApplyParameters() {
 
     uri = URISupport::applyParameters(uri, parameters);
     Properties appliedParameters = URISupport::parseParameters(uri);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("all params applied with no prefix", 2, appliedParameters.size());
+    ASSERT_EQ(2, appliedParameters.size()) << ("all params applied with no prefix");
 
     // strip off params again
     uri = URISupport::createURIWithQuery(uri, "");
 
     uri = URISupport::applyParameters(uri, parameters, "joe");
     appliedParameters = URISupport::parseParameters(uri);
-    CPPUNIT_ASSERT_MESSAGE("no params applied as none match joe", appliedParameters.isEmpty());
+    ASSERT_TRUE(appliedParameters.isEmpty()) << ("no params applied as none match joe");
 
     uri = URISupport::applyParameters(uri, parameters, "t.");
     verifyParams(URISupport::parseParameters(uri));

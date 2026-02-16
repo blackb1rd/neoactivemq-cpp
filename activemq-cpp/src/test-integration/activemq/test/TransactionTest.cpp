@@ -54,20 +54,19 @@ void TransactionTest::testSendReceiveTransactedBatches() {
         std::unique_ptr<TextMessage> message(session->createTextMessage("Batch Message"));
 
         for (int i = 0; i < batchSize; i++) {
-            CPPUNIT_ASSERT_NO_THROW_MESSAGE("Send should not throw an exception here.", producer->send(message.get()));
+            ASSERT_NO_THROW(producer->send(message.get())) << ("Send should not throw an exception here.");
         }
 
-        CPPUNIT_ASSERT_NO_THROW_MESSAGE("Session Commit should not throw an exception here:", session->commit());
+        ASSERT_NO_THROW(session->commit()) << ("Session Commit should not throw an exception here:");
 
         for (int i = 0; i < batchSize; i++) {
-            CPPUNIT_ASSERT_NO_THROW_MESSAGE("Receive Shouldn't throw a Message here:",
-                message.reset(dynamic_cast<TextMessage*>(consumer->receive(1000 * 5))));
+            ASSERT_NO_THROW(message.reset(dynamic_cast<TextMessage*>(consumer->receive(1000 * 5)))) << ("Receive Shouldn't throw a Message here:");
 
-            CPPUNIT_ASSERT_MESSAGE("Failed to receive all messages in batch", message.get() != NULL);
-            CPPUNIT_ASSERT(string("Batch Message") == message->getText());
+            ASSERT_TRUE(message.get() != NULL) << ("Failed to receive all messages in batch");
+            ASSERT_TRUE(string("Batch Message") == message->getText());
         }
 
-        CPPUNIT_ASSERT_NO_THROW_MESSAGE("Session Commit should not throw an exception here:", session->commit());
+        ASSERT_NO_THROW(session->commit()) << ("Session Commit should not throw an exception here:");
     }
 }
 
@@ -106,8 +105,8 @@ void TransactionTest::testSendRollback() {
     // validates that the rollbacked was not consumed
     session->commit();
 
-    CPPUNIT_ASSERT(outbound1->getText() == inbound1->getText());
-    CPPUNIT_ASSERT(outbound2->getText() == inbound2->getText());
+    ASSERT_TRUE(outbound1->getText() == inbound1->getText());
+    ASSERT_TRUE(outbound2->getText() == inbound2->getText());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -135,15 +134,15 @@ void TransactionTest::testSendRollbackCommitRollback() {
     // receives the first message
     std::unique_ptr<TextMessage> inbound1(dynamic_cast<TextMessage*>(consumer->receive(1500)));
 
-    CPPUNIT_ASSERT(NULL == consumer->receive( 1500 ));
-    CPPUNIT_ASSERT(outbound1->getText() == inbound1->getText());
+    ASSERT_TRUE(NULL == consumer->receive( 1500 ));
+    ASSERT_TRUE(outbound1->getText() == inbound1->getText());
 
     session->rollback();
 
     inbound1.reset(dynamic_cast<TextMessage*>(consumer->receive(1500)));
 
-    CPPUNIT_ASSERT(NULL == consumer->receive( 1500 ));
-    CPPUNIT_ASSERT(outbound1->getText() == inbound1->getText());
+    ASSERT_TRUE(NULL == consumer->receive( 1500 ));
+    ASSERT_TRUE(outbound1->getText() == inbound1->getText());
 
     // validates that the rollbacked was not consumed
     session->commit();
@@ -198,11 +197,11 @@ void TransactionTest::testSendSessionClose() {
     // validates that the rolled back was not consumed
     session->commit();
 
-    CPPUNIT_ASSERT_MESSAGE("Failed to receive first message", inbound1.get() != NULL);
-    CPPUNIT_ASSERT_MESSAGE("Failed to receive second message", inbound2.get() != NULL);
+    ASSERT_TRUE(inbound1.get() != NULL) << ("Failed to receive first message");
+    ASSERT_TRUE(inbound2.get() != NULL) << ("Failed to receive second message");
 
-    CPPUNIT_ASSERT_MESSAGE("First messages aren't equal", outbound1->getText() == inbound1->getText());
-    CPPUNIT_ASSERT_MESSAGE("Second messages aren't equal", outbound2->getText() == inbound2->getText());
+    ASSERT_TRUE(outbound1->getText() == inbound1->getText()) << ("First messages aren't equal");
+    ASSERT_TRUE(outbound2->getText() == inbound2->getText()) << ("Second messages aren't equal");
 
     session->close();
     amqConnection->destroyDestination(destination.get());
@@ -231,8 +230,8 @@ void TransactionTest::testWithTTLSet() {
 
         // receives the second message
         std::unique_ptr<TextMessage> inbound1(dynamic_cast<TextMessage*>(consumer->receive(600000)));
-        CPPUNIT_ASSERT(inbound1.get() != NULL);
-        CPPUNIT_ASSERT(outbound1->getText() == inbound1->getText());
+        ASSERT_TRUE(inbound1.get() != NULL);
+        ASSERT_TRUE(outbound1->getText() == inbound1->getText());
     }
 
     cmsProvider->getSession()->commit();
@@ -262,7 +261,7 @@ void TransactionTest::testSessionCommitAfterConsumerClosed() {
     connection->start();
 
     std::unique_ptr<cms::Message> message(consumer->receive(5000));
-    CPPUNIT_ASSERT(message.get() != NULL);
+    ASSERT_TRUE(message.get() != NULL);
 
     consumer->close();
     session->commit();

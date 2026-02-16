@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "StompWireFormatTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/wireformat/stomp/StompFrame.h>
 #include <activemq/wireformat/stomp/StompHelper.h>
@@ -25,16 +25,11 @@ using namespace activemq;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::stomp;
 
-////////////////////////////////////////////////////////////////////////////////
-StompWireFormatTest::StompWireFormatTest() {
-}
+    class StompWireFormatTest : public ::testing::Test {
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
-StompWireFormatTest::~StompWireFormatTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void StompWireFormatTest::testChangeDestinationPrefix() {
+TEST_F(StompWireFormatTest, testChangeDestinationPrefix) {
 
     StompWireFormat wireformat;
     wireformat.setTopicPrefix("mytopics://");

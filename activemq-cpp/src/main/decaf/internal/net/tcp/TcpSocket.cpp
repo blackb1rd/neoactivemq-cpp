@@ -276,6 +276,8 @@ void TcpSocket::accept(SocketImpl* socket) {
         tcpSocket->impl->connected = true;
         tcpSocket->impl->remoteEndpoint = tcpSocket->impl->socket->remote_endpoint();
         tcpSocket->impl->localEndpoint = tcpSocket->impl->socket->local_endpoint();
+        tcpSocket->localPort = tcpSocket->impl->localEndpoint.port();
+        tcpSocket->port = tcpSocket->impl->remoteEndpoint.port();
     }
     DECAF_CATCH_RETHROW(decaf::io::IOException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, decaf::io::IOException)

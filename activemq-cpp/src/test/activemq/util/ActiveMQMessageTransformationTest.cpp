@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ActiveMQMessageTransformationTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/commands/ActiveMQDestination.h>
 #include <activemq/commands/ActiveMQTopic.h>
@@ -36,6 +36,8 @@ using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
+
+class ActiveMQMessageTransformationTest : public ::testing::Test {};
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -85,50 +87,33 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQMessageTransformationTest::ActiveMQMessageTransformationTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-ActiveMQMessageTransformationTest::~ActiveMQMessageTransformationTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageTransformationTest::testTransformDestination() {
+TEST_F(ActiveMQMessageTransformationTest, testTransformDestination) {
 
     CustomCmsTopic customTopic;
     const ActiveMQDestination* transformed;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an NullPointerException",
-        ActiveMQMessageTransformation::transformDestination(&customTopic, NULL),
-        NullPointerException);
+    ASSERT_THROW(ActiveMQMessageTransformation::transformDestination(&customTopic, NULL), NullPointerException) << ("Should throw an NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an NullPointerException",
-        ActiveMQMessageTransformation::transformDestination(NULL, NULL),
-        NullPointerException);
+    ASSERT_THROW(ActiveMQMessageTransformation::transformDestination(NULL, NULL), NullPointerException) << ("Should throw an NullPointerException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an NullPointerException",
-        ActiveMQMessageTransformation::transformDestination(NULL, &transformed),
-        NullPointerException);
+    ASSERT_THROW(ActiveMQMessageTransformation::transformDestination(NULL, &transformed), NullPointerException) << ("Should throw an NullPointerException");
 
-    CPPUNIT_ASSERT(ActiveMQMessageTransformation::transformDestination(&customTopic, &transformed));
-    CPPUNIT_ASSERT(transformed != NULL);
-    CPPUNIT_ASSERT(transformed->isTopic());
-    CPPUNIT_ASSERT(!transformed->isQueue());
-    CPPUNIT_ASSERT(!transformed->isAdvisory());
-    CPPUNIT_ASSERT(!transformed->isComposite());
-    CPPUNIT_ASSERT(!transformed->isTemporary());
-    CPPUNIT_ASSERT(!transformed->isWildcard());
+    ASSERT_TRUE(ActiveMQMessageTransformation::transformDestination(&customTopic, &transformed));
+    ASSERT_TRUE(transformed != NULL);
+    ASSERT_TRUE(transformed->isTopic());
+    ASSERT_TRUE(!transformed->isQueue());
+    ASSERT_TRUE(!transformed->isAdvisory());
+    ASSERT_TRUE(!transformed->isComposite());
+    ASSERT_TRUE(!transformed->isTemporary());
+    ASSERT_TRUE(!transformed->isWildcard());
 
-    CPPUNIT_ASSERT_EQUAL(customTopic.getTopicName(), transformed->getPhysicalName());
+    ASSERT_EQ(customTopic.getTopicName(), transformed->getPhysicalName());
     delete transformed;
 
     ActiveMQQueue queue("ActiveMQ.Test.Queue");
 
-    CPPUNIT_ASSERT(!ActiveMQMessageTransformation::transformDestination(&queue, &transformed));
-    CPPUNIT_ASSERT(transformed != NULL);
-    CPPUNIT_ASSERT(!transformed->isTopic());
-    CPPUNIT_ASSERT(transformed->isQueue());
+    ASSERT_TRUE(!ActiveMQMessageTransformation::transformDestination(&queue, &transformed));
+    ASSERT_TRUE(transformed != NULL);
+    ASSERT_TRUE(!transformed->isTopic());
+    ASSERT_TRUE(transformed->isQueue());
 }

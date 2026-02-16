@@ -18,9 +18,7 @@
 #ifndef _DECAF_UTIL_CONCURRENT_EXECUTORSTESTSUPPORT_H_
 #define _DECAF_UTIL_CONCURRENT_EXECUTORSTESTSUPPORT_H_
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#include <gtest/gtest.h>
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/lang/Runnable.h>
@@ -38,7 +36,7 @@ namespace concurrent {
     using decaf::lang::Thread;
     using decaf::lang::Runnable;
 
-    class ExecutorsTestSupport : public CppUnit::TestFixture {
+    class ExecutorsTestSupport : public ::testing::Test {
     public:
 
         static const int SHORT_DELAY_MS;
@@ -57,8 +55,8 @@ namespace concurrent {
         ExecutorsTestSupport();
         virtual ~ExecutorsTestSupport();
 
-        virtual void setUp();
-        virtual void tearDown();
+        void SetUp() override;
+        void TearDown() override;
 
     public:
 

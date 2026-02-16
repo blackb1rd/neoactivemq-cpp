@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "PrimitiveTypesMarshallerTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/util/PrimitiveMap.h>
 #include <activemq/util/PrimitiveList.h>
@@ -30,8 +30,25 @@ using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using namespace activemq::wireformat::openwire::marshal;
 
+    class PrimitiveTypesMarshallerTest : public ::testing::Test {
+    protected:
+
+        activemq::util::PrimitiveMap* unmarshaledMap;
+
+        void SetUp() override {
+            this->unmarshaledMap = NULL;
+        }
+
+        void TearDown() override {
+            delete this->unmarshaledMap;
+            this->unmarshaledMap = NULL;
+        }
+
+    };
+
+
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveTypesMarshallerTest::test() {
+TEST_F(PrimitiveTypesMarshallerTest, test) {
 
     PrimitiveMap myMap;
 
@@ -72,25 +89,25 @@ void PrimitiveTypesMarshallerTest::test() {
         this->unmarshaledMap = new PrimitiveMap();
         PrimitiveTypesMarshaller::unmarshal( this->unmarshaledMap, marshaled );
     } catch(...) {
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 
-    CPPUNIT_ASSERT( this->unmarshaledMap != NULL );
+    ASSERT_TRUE(this->unmarshaledMap != NULL);
 
-    CPPUNIT_ASSERT( this->unmarshaledMap->getString( "stringKey" ) == stringValue );
-    CPPUNIT_ASSERT( this->unmarshaledMap->getBool( "boolKey" ) == booleanValue );
-    CPPUNIT_ASSERT( this->unmarshaledMap->getByte( "byteKey" ) == byteValue );
-    CPPUNIT_ASSERT( this->unmarshaledMap->getChar( "charKey" ) == charValue );
-    CPPUNIT_ASSERT( this->unmarshaledMap->getShort( "shortKey" ) == shortValue );
-    CPPUNIT_ASSERT( this->unmarshaledMap->getInt( "intKey" ) == intValue );
-    CPPUNIT_ASSERT( this->unmarshaledMap->getLong( "longKey" ) == longValue );
-    CPPUNIT_ASSERT( this->unmarshaledMap->getFloat( "floatKey" ) == floatValue );
-    CPPUNIT_ASSERT( this->unmarshaledMap->getDouble( "doubleKey" ) == doubleValue );
-    CPPUNIT_ASSERT( this->unmarshaledMap->getByteArray( "bytesKey" ) == bytes );
+    ASSERT_TRUE(this->unmarshaledMap->getString( "stringKey" ) == stringValue);
+    ASSERT_TRUE(this->unmarshaledMap->getBool( "boolKey" ) == booleanValue);
+    ASSERT_TRUE(this->unmarshaledMap->getByte( "byteKey" ) == byteValue);
+    ASSERT_TRUE(this->unmarshaledMap->getChar( "charKey" ) == charValue);
+    ASSERT_TRUE(this->unmarshaledMap->getShort( "shortKey" ) == shortValue);
+    ASSERT_TRUE(this->unmarshaledMap->getInt( "intKey" ) == intValue);
+    ASSERT_TRUE(this->unmarshaledMap->getLong( "longKey" ) == longValue);
+    ASSERT_TRUE(this->unmarshaledMap->getFloat( "floatKey" ) == floatValue);
+    ASSERT_TRUE(this->unmarshaledMap->getDouble( "doubleKey" ) == doubleValue);
+    ASSERT_TRUE(this->unmarshaledMap->getByteArray( "bytesKey" ) == bytes);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveTypesMarshallerTest::testLists() {
+TEST_F(PrimitiveTypesMarshallerTest, testLists) {
 
     PrimitiveMap myMap;
 
@@ -117,15 +134,15 @@ void PrimitiveTypesMarshallerTest::testLists() {
     try {
         PrimitiveTypesMarshaller::unmarshal( newMap.get(), marshaled );
     } catch(...) {
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 
-    CPPUNIT_ASSERT( newMap.get() != NULL );
-    CPPUNIT_ASSERT( newMap->size() == 3 );
+    ASSERT_TRUE(newMap.get() != NULL);
+    ASSERT_TRUE(newMap->size() == 3);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PrimitiveTypesMarshallerTest::testMaps() {
+TEST_F(PrimitiveTypesMarshallerTest, testMaps) {
 
     PrimitiveMap myMap;
 
@@ -152,9 +169,9 @@ void PrimitiveTypesMarshallerTest::testMaps() {
     try {
         PrimitiveTypesMarshaller::unmarshal( newMap.get(), marshaled );
     } catch(...) {
-        CPPUNIT_ASSERT( false );
+        ASSERT_TRUE(false);
     }
 
-    CPPUNIT_ASSERT( newMap.get() != NULL );
-    CPPUNIT_ASSERT( newMap->size() == 3 );
+    ASSERT_TRUE(newMap.get() != NULL);
+    ASSERT_TRUE(newMap->size() == 3);
 }

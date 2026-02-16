@@ -18,9 +18,7 @@
 #ifndef _TEST_UTIL_TEAMCITY_TEAMCITYPROGRESSLISTENER_H_
 #define _TEST_UTIL_TEAMCITY_TEAMCITYPROGRESSLISTENER_H_
 
-#include <cppunit/TestFailure.h>
-#include <cppunit/TestListener.h>
-
+#include <gtest/gtest.h>
 #include <string>
 
 namespace test {
@@ -28,43 +26,31 @@ namespace util {
 namespace teamcity {
 
     /**
-     * CPPUnit Derived Test Listener that can output the test life cycle messages in
-     * a manner that can be processed by the TeamCity Continuous integration tool.
+     * Google Test event listener that outputs test lifecycle messages in
+     * a format that can be processed by the TeamCity Continuous Integration tool.
      */
-    class TeamCityProgressListener: public CPPUNIT_NS::TestListener {
+    class TeamCityProgressListener : public ::testing::EmptyTestEventListener {
     public:
 
         TeamCityProgressListener() {}
         ~TeamCityProgressListener() {}
 
-        void startTest( CPPUNIT_NS::Test *test );
-        void addFailure( const CPPUNIT_NS::TestFailure &failure );
-        void endTest( CPPUNIT_NS::Test *test );
-        void startSuite( CPPUNIT_NS::Test *test );
-        void endSuite( CPPUNIT_NS::Test *test );
+        void OnTestSuiteStart(const ::testing::TestSuite& test_suite) override;
+        void OnTestSuiteEnd(const ::testing::TestSuite& test_suite) override;
+        void OnTestStart(const ::testing::TestInfo& test_info) override;
+        void OnTestEnd(const ::testing::TestInfo& test_info) override;
 
     private:
 
-        // Prevents the use of the copy constructor.
-        TeamCityProgressListener( const TeamCityProgressListener& );
-
-        // Prevents the use of the copy operator.
-        void operator =( const TeamCityProgressListener& );
+        TeamCityProgressListener( const TeamCityProgressListener& ) = delete;
+        void operator =( const TeamCityProgressListener& ) = delete;
 
     protected:
 
-        /**
-         * Escapes the control characters in a string.
-         *
-         * @param value - String to escape
-         * @return the new escaped string.
-         */
         virtual std::string escape( const std::string& value ) const;
-
         virtual void writeOpen( const std::string& name );
         virtual void writeProperty( const std::string& name, const std::string& value );
         virtual void writeClose();
-
     };
 
 }}}

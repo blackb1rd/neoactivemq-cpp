@@ -15,7 +15,20 @@
  * limitations under the License.
  */
 
-#include "StompSimpleTest.h"
+#include <activemq/test/SimpleTest.h>
+
+namespace activemq{
+namespace test{
+namespace stomp{
+    class StompSimpleTest : public SimpleTest {
+public:
+        StompSimpleTest();
+        virtual ~StompSimpleTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getStompURL();
+        }
+    };
+}}}
 
 using namespace std;
 using namespace cms;
@@ -30,3 +43,20 @@ StompSimpleTest::StompSimpleTest() {
 ////////////////////////////////////////////////////////////////////////////////
 StompSimpleTest::~StompSimpleTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(StompSimpleTest, DISABLED_testAutoAck) { testAutoAck(); }
+TEST_F(StompSimpleTest, DISABLED_testClientAck) { testClientAck(); }
+TEST_F(StompSimpleTest, DISABLED_testProducerWithNullDestination) { testProducerWithNullDestination(); }
+TEST_F(StompSimpleTest, DISABLED_testProducerSendWithNullDestination) { testProducerSendWithNullDestination(); }
+TEST_F(StompSimpleTest, DISABLED_testProducerSendToNonDefaultDestination) { testProducerSendToNonDefaultDestination(); }
+TEST_F(StompSimpleTest, DISABLED_testSyncReceive) { testSyncReceive(); }
+TEST_F(StompSimpleTest, DISABLED_testSyncReceiveClientAck) { testSyncReceiveClientAck(); }
+TEST_F(StompSimpleTest, DISABLED_testMultipleConnections) { testMultipleConnections(); }
+TEST_F(StompSimpleTest, DISABLED_testMultipleSessions) { testMultipleSessions(); }
+TEST_F(StompSimpleTest, DISABLED_testReceiveAlreadyInQueue) { testReceiveAlreadyInQueue(); }
+TEST_F(StompSimpleTest, DISABLED_testQuickCreateAndDestroy) { testQuickCreateAndDestroy(); }
+TEST_F(StompSimpleTest, DISABLED_testBytesMessageSendRecv) { testBytesMessageSendRecv(); }
+TEST_F(StompSimpleTest, DISABLED_testBytesMessageSendRecvAsync) { testBytesMessageSendRecvAsync(); }
+TEST_F(StompSimpleTest, DISABLED_testLibraryInitShutdownInit) { testLibraryInitShutdownInit(); }

@@ -85,8 +85,8 @@ void MessageCompressionTest::testTextMessageCompression() {
     ActiveMQConnection* connection =
         dynamic_cast<ActiveMQConnection*>( this->cmsProvider->getConnection() );
 
-    CPPUNIT_ASSERT( connection != NULL );
-    CPPUNIT_ASSERT_MESSAGE( "Compression not enabled.", connection->isUseCompression() );
+    ASSERT_TRUE(connection != NULL);
+    ASSERT_TRUE(connection->isUseCompression()) << ("Compression not enabled.");
 
     Session* session = this->cmsProvider->getSession();
 
@@ -100,17 +100,16 @@ void MessageCompressionTest::testTextMessageCompression() {
     producer->send( sent.get() );
 
     std::unique_ptr<cms::Message> message( consumer->receive( 2000 ) );
-    CPPUNIT_ASSERT( message.get() != NULL );
+    ASSERT_TRUE(message.get() != NULL);
 
     TextMessage* recvd = dynamic_cast<TextMessage*>( message.get() );
-    CPPUNIT_ASSERT_MESSAGE( "Received message was not a TextMessage", recvd != NULL );
+    ASSERT_TRUE(recvd != NULL) << ("Received message was not a TextMessage");
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Received text differs from sent text.",
-                                  sent->getText(), recvd->getText() );
+    ASSERT_EQ(sent->getText(), recvd->getText()) << ("Received text differs from sent text.");
 
     commands::Message* amqMsg = dynamic_cast<commands::Message*>( message.get() );
-    CPPUNIT_ASSERT_MESSAGE( "Received message was not an AMQ message type", amqMsg != NULL );
-    CPPUNIT_ASSERT_MESSAGE( "Received message was not compressed.", amqMsg->isCompressed() );
+    ASSERT_TRUE(amqMsg != NULL) << ("Received message was not an AMQ message type");
+    ASSERT_TRUE(amqMsg->isCompressed()) << ("Received message was not compressed.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -119,8 +118,8 @@ void MessageCompressionTest::testBytesMessageCompression() {
     ActiveMQConnection* connection =
         dynamic_cast<ActiveMQConnection*>( this->cmsProvider->getConnection() );
 
-    CPPUNIT_ASSERT( connection != NULL );
-    CPPUNIT_ASSERT_MESSAGE( "Compression not enabled.", connection->isUseCompression() );
+    ASSERT_TRUE(connection != NULL);
+    ASSERT_TRUE(connection->isUseCompression()) << ("Compression not enabled.");
 
     Session* session = this->cmsProvider->getSession();
 
@@ -149,29 +148,29 @@ void MessageCompressionTest::testBytesMessageCompression() {
     producer->send( sent.get() );
 
     std::unique_ptr<cms::Message> message( consumer->receive( 2000 ) );
-    CPPUNIT_ASSERT( message.get() != NULL );
+    ASSERT_TRUE(message.get() != NULL);
 
     BytesMessage* recvd = dynamic_cast<BytesMessage*>( message.get() );
-    CPPUNIT_ASSERT_MESSAGE( "Received message was not a BytesMessage", recvd != NULL );
+    ASSERT_TRUE(recvd != NULL) << ("Received message was not a BytesMessage");
 
-    CPPUNIT_ASSERT_EQUAL( a, recvd->readBoolean() );
-    CPPUNIT_ASSERT_EQUAL( b, recvd->readByte() );
-    CPPUNIT_ASSERT_EQUAL( c, recvd->readChar() );
-    CPPUNIT_ASSERT_EQUAL( d, recvd->readShort() );
-    CPPUNIT_ASSERT_EQUAL( e, recvd->readInt() );
-    CPPUNIT_ASSERT_EQUAL( f, recvd->readLong() );
-    CPPUNIT_ASSERT_EQUAL( g, recvd->readString() );
-    CPPUNIT_ASSERT_EQUAL( h, recvd->readBoolean() );
-    CPPUNIT_ASSERT_EQUAL( i, recvd->readByte() );
-    CPPUNIT_ASSERT_EQUAL( j, recvd->readShort() );
-    CPPUNIT_ASSERT_EQUAL( k, recvd->readInt() );
-    CPPUNIT_ASSERT_EQUAL( l, recvd->readLong() );
-    CPPUNIT_ASSERT_EQUAL( m, recvd->readFloat() );
-    CPPUNIT_ASSERT_EQUAL( n, recvd->readDouble() );
+    ASSERT_EQ(a, recvd->readBoolean());
+    ASSERT_EQ(b, recvd->readByte());
+    ASSERT_EQ(c, recvd->readChar());
+    ASSERT_EQ(d, recvd->readShort());
+    ASSERT_EQ(e, recvd->readInt());
+    ASSERT_EQ(f, recvd->readLong());
+    ASSERT_EQ(g, recvd->readString());
+    ASSERT_EQ(h, recvd->readBoolean());
+    ASSERT_EQ(i, recvd->readByte());
+    ASSERT_EQ(j, recvd->readShort());
+    ASSERT_EQ(k, recvd->readInt());
+    ASSERT_EQ(l, recvd->readLong());
+    ASSERT_EQ(m, recvd->readFloat());
+    ASSERT_EQ(n, recvd->readDouble());
 
     commands::Message* amqMsg = dynamic_cast<commands::Message*>( message.get() );
-    CPPUNIT_ASSERT_MESSAGE( "Received message was not an AMQ message type", amqMsg != NULL );
-    CPPUNIT_ASSERT_MESSAGE( "Received message was not compressed.", amqMsg->isCompressed() );
+    ASSERT_TRUE(amqMsg != NULL) << ("Received message was not an AMQ message type");
+    ASSERT_TRUE(amqMsg->isCompressed()) << ("Received message was not compressed.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -180,8 +179,8 @@ void MessageCompressionTest::testStreamMessageCompression() {
     ActiveMQConnection* connection =
         dynamic_cast<ActiveMQConnection*>( this->cmsProvider->getConnection() );
 
-    CPPUNIT_ASSERT( connection != NULL );
-    CPPUNIT_ASSERT_MESSAGE( "Compression not enabled.", connection->isUseCompression() );
+    ASSERT_TRUE(connection != NULL);
+    ASSERT_TRUE(connection->isUseCompression()) << ("Compression not enabled.");
 
     Session* session = this->cmsProvider->getSession();
 
@@ -210,29 +209,29 @@ void MessageCompressionTest::testStreamMessageCompression() {
     producer->send( sent.get() );
 
     std::unique_ptr<cms::Message> message( consumer->receive( 2000 ) );
-    CPPUNIT_ASSERT( message.get() != NULL );
+    ASSERT_TRUE(message.get() != NULL);
 
     StreamMessage* recvd = dynamic_cast<StreamMessage*>( message.get() );
-    CPPUNIT_ASSERT_MESSAGE( "Received message was not a StreamMessage", recvd != NULL );
+    ASSERT_TRUE(recvd != NULL) << ("Received message was not a StreamMessage");
 
-    CPPUNIT_ASSERT_EQUAL( a, recvd->readBoolean() );
-    CPPUNIT_ASSERT_EQUAL( b, recvd->readByte() );
-    CPPUNIT_ASSERT_EQUAL( c, recvd->readChar() );
-    CPPUNIT_ASSERT_EQUAL( d, recvd->readShort() );
-    CPPUNIT_ASSERT_EQUAL( e, recvd->readInt() );
-    CPPUNIT_ASSERT_EQUAL( f, recvd->readLong() );
-    CPPUNIT_ASSERT_EQUAL( g, recvd->readString() );
-    CPPUNIT_ASSERT_EQUAL( h, recvd->readBoolean() );
-    CPPUNIT_ASSERT_EQUAL( i, recvd->readByte() );
-    CPPUNIT_ASSERT_EQUAL( j, recvd->readShort() );
-    CPPUNIT_ASSERT_EQUAL( k, recvd->readInt() );
-    CPPUNIT_ASSERT_EQUAL( l, recvd->readLong() );
-    CPPUNIT_ASSERT_EQUAL( m, recvd->readFloat() );
-    CPPUNIT_ASSERT_EQUAL( n, recvd->readDouble() );
+    ASSERT_EQ(a, recvd->readBoolean());
+    ASSERT_EQ(b, recvd->readByte());
+    ASSERT_EQ(c, recvd->readChar());
+    ASSERT_EQ(d, recvd->readShort());
+    ASSERT_EQ(e, recvd->readInt());
+    ASSERT_EQ(f, recvd->readLong());
+    ASSERT_EQ(g, recvd->readString());
+    ASSERT_EQ(h, recvd->readBoolean());
+    ASSERT_EQ(i, recvd->readByte());
+    ASSERT_EQ(j, recvd->readShort());
+    ASSERT_EQ(k, recvd->readInt());
+    ASSERT_EQ(l, recvd->readLong());
+    ASSERT_EQ(m, recvd->readFloat());
+    ASSERT_EQ(n, recvd->readDouble());
 
     commands::Message* amqMsg = dynamic_cast<commands::Message*>( message.get() );
-    CPPUNIT_ASSERT_MESSAGE( "Received message was not an AMQ message type", amqMsg != NULL );
-    CPPUNIT_ASSERT_MESSAGE( "Received message was not compressed.", amqMsg->isCompressed() );
+    ASSERT_TRUE(amqMsg != NULL) << ("Received message was not an AMQ message type");
+    ASSERT_TRUE(amqMsg->isCompressed()) << ("Received message was not compressed.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -241,8 +240,8 @@ void MessageCompressionTest::testMapMessageCompression() {
     ActiveMQConnection* connection =
         dynamic_cast<ActiveMQConnection*>( this->cmsProvider->getConnection() );
 
-    CPPUNIT_ASSERT( connection != NULL );
-    CPPUNIT_ASSERT_MESSAGE( "Compression not enabled.", connection->isUseCompression() );
+    ASSERT_TRUE(connection != NULL);
+    ASSERT_TRUE(connection->isUseCompression()) << ("Compression not enabled.");
 
     Session* session = this->cmsProvider->getSession();
 
@@ -271,28 +270,28 @@ void MessageCompressionTest::testMapMessageCompression() {
     producer->send( sent.get() );
 
     std::unique_ptr<cms::Message> message( consumer->receive( 2000 ) );
-    CPPUNIT_ASSERT( message.get() != NULL );
+    ASSERT_TRUE(message.get() != NULL);
 
     MapMessage* recvd = dynamic_cast<MapMessage*>( message.get() );
-    CPPUNIT_ASSERT_MESSAGE( "Received message was not a MapMessage", recvd != NULL );
+    ASSERT_TRUE(recvd != NULL) << ("Received message was not a MapMessage");
 
-    CPPUNIT_ASSERT_EQUAL( a, recvd->getBoolean( "a" ) );
-    CPPUNIT_ASSERT_EQUAL( b, recvd->getByte( "b" ) );
-    CPPUNIT_ASSERT_EQUAL( c, recvd->getChar( "c" ) );
-    CPPUNIT_ASSERT_EQUAL( d, recvd->getShort( "d" ) );
-    CPPUNIT_ASSERT_EQUAL( e, recvd->getInt( "e" ) );
-    CPPUNIT_ASSERT_EQUAL( f, recvd->getLong( "f" ) );
-    CPPUNIT_ASSERT_EQUAL( g, recvd->getString( "g" ) );
-    CPPUNIT_ASSERT_EQUAL( h, recvd->getBoolean( "h" ) );
-    CPPUNIT_ASSERT_EQUAL( i, recvd->getByte( "i" ) );
-    CPPUNIT_ASSERT_EQUAL( j, recvd->getShort( "j" ) );
-    CPPUNIT_ASSERT_EQUAL( k, recvd->getInt( "k" ) );
-    CPPUNIT_ASSERT_EQUAL( l, recvd->getLong( "l" ) );
-    CPPUNIT_ASSERT_EQUAL( m, recvd->getFloat( "m" ) );
-    CPPUNIT_ASSERT_EQUAL( n, recvd->getDouble( "n" ) );
+    ASSERT_EQ(a, recvd->getBoolean( "a" ));
+    ASSERT_EQ(b, recvd->getByte( "b" ));
+    ASSERT_EQ(c, recvd->getChar( "c" ));
+    ASSERT_EQ(d, recvd->getShort( "d" ));
+    ASSERT_EQ(e, recvd->getInt( "e" ));
+    ASSERT_EQ(f, recvd->getLong( "f" ));
+    ASSERT_EQ(g, recvd->getString( "g" ));
+    ASSERT_EQ(h, recvd->getBoolean( "h" ));
+    ASSERT_EQ(i, recvd->getByte( "i" ));
+    ASSERT_EQ(j, recvd->getShort( "j" ));
+    ASSERT_EQ(k, recvd->getInt( "k" ));
+    ASSERT_EQ(l, recvd->getLong( "l" ));
+    ASSERT_EQ(m, recvd->getFloat( "m" ));
+    ASSERT_EQ(n, recvd->getDouble( "n" ));
 
     commands::Message* amqMsg = dynamic_cast<commands::Message*>( message.get() );
-    CPPUNIT_ASSERT_MESSAGE( "Received message was not an AMQ message type", amqMsg != NULL );
-    CPPUNIT_ASSERT_MESSAGE( "Received message was not compressed.", amqMsg->isCompressed() );
+    ASSERT_TRUE(amqMsg != NULL) << ("Received message was not an AMQ message type");
+    ASSERT_TRUE(amqMsg->isCompressed()) << ("Received message was not compressed.");
 }
 

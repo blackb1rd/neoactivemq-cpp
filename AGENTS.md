@@ -28,8 +28,8 @@ cmake --list-presets
 ### Test
 
 ```powershell
-# Run tests after building
-.\output\build\x86-windows-debug-test\bin\neoactivemq-test.exe
+# Run all unit tests via CTest after building
+ctest --preset x86-windows-debug-test
 ```
 
 ## Important Notes

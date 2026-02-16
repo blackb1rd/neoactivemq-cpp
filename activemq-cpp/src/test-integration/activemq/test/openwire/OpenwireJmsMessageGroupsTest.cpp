@@ -15,7 +15,20 @@
  * limitations under the License.
  */
 
-#include "OpenwireJmsMessageGroupsTest.h"
+#include <activemq/test/JmsMessageGroupsTest.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenwireJmsMessageGroupsTest : public JmsMessageGroupsTest {
+public:
+        OpenwireJmsMessageGroupsTest();
+        virtual ~OpenwireJmsMessageGroupsTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
 
 using namespace activemq;
 using namespace activemq::test;
@@ -28,3 +41,7 @@ OpenwireJmsMessageGroupsTest::OpenwireJmsMessageGroupsTest() {
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireJmsMessageGroupsTest::~OpenwireJmsMessageGroupsTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireJmsMessageGroupsTest, testMessageSend) { testMessageSend(); }

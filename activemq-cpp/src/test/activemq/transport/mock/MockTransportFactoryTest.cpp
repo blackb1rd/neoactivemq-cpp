@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "MockTransportFactoryTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/transport/mock/MockTransportFactory.h>
 #include <activemq/transport/mock/MockTransport.h>
@@ -31,8 +31,10 @@ using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
+class MockTransportFactoryTest : public ::testing::Test {};
+
 ////////////////////////////////////////////////////////////////////////////////
-void MockTransportFactoryTest::test() {
+TEST_F(MockTransportFactoryTest, test) {
 
     URI uri( "mock://mock?wireformat=openwire" );
 
@@ -40,11 +42,11 @@ void MockTransportFactoryTest::test() {
 
     Pointer<Transport> transport( factory.create( uri ) );
 
-    CPPUNIT_ASSERT( transport.get() != NULL );
+    ASSERT_TRUE(transport.get() != NULL);
 
     transport = factory.createComposite( uri );
 
-    CPPUNIT_ASSERT( transport.get() != NULL );
+    ASSERT_TRUE(transport.get() != NULL);
 
     transport.reset( NULL );
 

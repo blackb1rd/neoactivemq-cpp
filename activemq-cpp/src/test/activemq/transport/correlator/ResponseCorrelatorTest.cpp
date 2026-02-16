@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ResponseCorrelatorTest.h"
+#include <gtest/gtest.h>
 
 #include <activemq/util/Config.h>
 #include <activemq/commands/BaseCommand.h>
@@ -26,16 +26,17 @@
 #include <decaf/util/concurrent/Concurrent.h>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <queue>
+#include <vector>
 
 using namespace activemq;
 using namespace activemq::transport;
 using namespace activemq::transport::correlator;
 using namespace decaf::io;
 
+    class ResponseCorrelatorTest : public ::testing::Test {
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace transport {
-namespace correlator {
 
     class MyCommand : public commands::BaseCommand {
     public:
@@ -139,11 +140,10 @@ namespace correlator {
         }
 
         virtual void close() {
-
             done = true;
 
             if (thread != NULL) {
-                synchronized( &mutex ) {
+                synchronized(&mutex) {
                     mutex.notifyAll();
                 }
                 thread->join();
@@ -160,9 +160,7 @@ namespace correlator {
         }
 
         virtual void run() {
-
             try {
-
                 synchronized(&startedMutex) {
                     startedMutex.notifyAll();
                 }
@@ -319,34 +317,34 @@ namespace correlator {
                 resp = transport->request(cmd);
                 Thread::sleep(10);
             } catch (...) {
-                CPPUNIT_ASSERT(false);
+                ASSERT_TRUE(false);
             }
         }
     };
 
-}}}
 
-////////////////////////////////////////////////////////////////////////////////
-void ResponseCorrelatorTest::testBasics() {
+TEST_F(ResponseCorrelatorTest, testBasics) {
 
-    MyListener listener;
+    // Use heap-allocated objects to control destruction order and avoid
+    // MSVC debug runtime hang when destroying Pointer<MyCommand>.
+    MyListener* listener = new MyListener();
     Pointer<MyTransport> transport(new MyTransport());
-    ResponseCorrelator correlator(transport);
-    correlator.setTransportListener(&listener);
-    CPPUNIT_ASSERT(transport->listener == &correlator);
+    ResponseCorrelator* correlator = new ResponseCorrelator(transport);
+    correlator->setTransportListener(listener);
+    ASSERT_TRUE(transport->listener == correlator);
 
     // Give the thread a little time to get up and running.
     synchronized(&(transport->startedMutex)) {
-        // Start the transport.
-        correlator.start();
+        correlator->start();
         transport->startedMutex.wait();
     }
 
     // Send one request.
     Pointer<MyCommand> cmd(new MyCommand);
-    Pointer<Response> resp = correlator.request(cmd);
-    CPPUNIT_ASSERT(resp != NULL);
-    CPPUNIT_ASSERT(resp->getCorrelationId() == cmd->getCommandId());
+    Pointer<Response> resp = correlator->request(cmd);
+
+    ASSERT_TRUE(resp != NULL);
+    ASSERT_TRUE(resp->getCorrelationId() == cmd->getCommandId());
 
     // Wait to get the message back asynchronously.
     decaf::lang::Thread::sleep(100);
@@ -354,70 +352,92 @@ void ResponseCorrelatorTest::testBasics() {
     // Since our transport relays our original command back at us as a
     // non-response message, check to make sure we received it and that
     // it is the original command.
-    CPPUNIT_ASSERT(listener.commands.size() == 1);
-    CPPUNIT_ASSERT(listener.exCount == 0);
+    ASSERT_TRUE(listener->commands.size() == 1);
+    ASSERT_TRUE(listener->exCount == 0);
 
-    correlator.close();
+    correlator->close();
+
+    // Explicit cleanup: release cmd to avoid MSVC debug runtime hang
+    // when deleting BaseCommand-derived objects.
+    resp.reset(NULL);
+    (void)cmd.release();
+    delete correlator;
+    transport.reset(NULL);
+    delete listener;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ResponseCorrelatorTest::testOneway(){
+TEST_F(ResponseCorrelatorTest, testOneway){
 
-    MyListener listener;
+    // Use heap-allocated objects to control destruction order and avoid
+    // MSVC debug runtime hang when destroying Pointer<MyCommand>.
+    MyListener* listener = new MyListener();
     Pointer<MyTransport> transport(new MyTransport());
-    ResponseCorrelator correlator(transport);
-    correlator.setTransportListener(&listener);
-    CPPUNIT_ASSERT(transport->listener == &correlator);
+    ResponseCorrelator* correlator = new ResponseCorrelator(transport);
+    correlator->setTransportListener(listener);
+    ASSERT_TRUE(transport->listener == correlator);
 
     // Give the thread a little time to get up and running.
     synchronized( &(transport->startedMutex) ) {
-
-        // Start the transport.
-        correlator.start();
-
+        correlator->start();
         transport->startedMutex.wait();
     }
 
-    // Send many oneway request (we'll get them back asynchronously).
+    // Send many oneway requests (we'll get them back asynchronously).
+    // Keep all command Pointers alive in a vector so the transport thread
+    // is never the last owner (which would trigger delete and MSVC debug runtime hang).
     const unsigned int numCommands = 1000;
+    std::vector< Pointer<MyCommand> > commands;
+    commands.reserve(numCommands);
     for (unsigned int ix = 0; ix < numCommands; ++ix) {
         Pointer<MyCommand> command(new MyCommand());
-        correlator.oneway(command);
+        commands.push_back(command);
+        correlator->oneway(command);
     }
 
     // Give the thread a little time to get all the messages back.
     decaf::lang::Thread::sleep(500);
 
     // Make sure we got them all back.
-    CPPUNIT_ASSERT(listener.commands.size() == numCommands);
-    CPPUNIT_ASSERT(listener.exCount == 0);
+    ASSERT_TRUE(listener->commands.size() == numCommands);
+    ASSERT_TRUE(listener->exCount == 0);
 
-    correlator.close();
+    correlator->close();
+
+    // Release all command pointers to prevent delete of MyCommand (MSVC debug hang).
+    for (unsigned int ix = 0; ix < commands.size(); ++ix) {
+        (void)commands[ix].release();
+    }
+    commands.clear();
+
+    delete correlator;
+    transport.reset(NULL);
+    delete listener;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ResponseCorrelatorTest::testTransportException(){
+TEST_F(ResponseCorrelatorTest, testTransportException){
 
-    MyListener listener;
+    // Use heap-allocated objects to control destruction order and avoid
+    // MSVC debug runtime hang when destroying Pointer<MyCommand>.
+    MyListener* listener = new MyListener();
     Pointer<MyBrokenTransport> transport(new MyBrokenTransport());
-    ResponseCorrelator correlator(transport);
-    correlator.setTransportListener(&listener);
-    CPPUNIT_ASSERT(transport->listener == &correlator);
+    ResponseCorrelator* correlator = new ResponseCorrelator(transport);
+    correlator->setTransportListener(listener);
+    ASSERT_TRUE(transport->listener == correlator);
 
     // Give the thread a little time to get up and running.
     synchronized( &(transport->startedMutex) ) {
-        // Start the transport.
-        correlator.start();
-
+        correlator->start();
         transport->startedMutex.wait();
     }
 
     // Send one request.
     Pointer<MyCommand> cmd(new MyCommand);
     try {
-        correlator.request(cmd, 1000);
+        correlator->request(cmd, 1000);
     } catch (IOException& ex) {
-        CPPUNIT_ASSERT(false);
+        ASSERT_TRUE(false);
     }
 
     // Wait to make sure we get the asynchronous message back.
@@ -426,26 +446,34 @@ void ResponseCorrelatorTest::testTransportException(){
     // Since our transport relays our original command back at us as a
     // non-response message, check to make sure we received it and that
     // it is the original command.
-    CPPUNIT_ASSERT(listener.commands.size() == 0);
-    CPPUNIT_ASSERT(listener.exCount == 1);
+    ASSERT_TRUE(listener->commands.size() == 0);
+    ASSERT_TRUE(listener->exCount == 1);
 
-    correlator.close();
+    correlator->close();
+
+    // Explicit cleanup: release cmd to avoid MSVC debug runtime hang.
+    (void)cmd.release();
+    delete correlator;
+    transport.reset(NULL);
+    delete listener;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ResponseCorrelatorTest::testMultiRequests(){
+TEST_F(ResponseCorrelatorTest, testMultiRequests){
 
-    MyListener listener;
+    // Use heap-allocated objects to control destruction order and avoid
+    // MSVC debug runtime hang when destroying Pointer<MyCommand>.
+    MyListener* listener = new MyListener();
     Pointer<MyTransport> transport(new MyTransport());
-    ResponseCorrelator correlator(transport);
-    correlator.setTransportListener(&listener);
-    CPPUNIT_ASSERT(transport->listener == &correlator);
+    ResponseCorrelator* correlator = new ResponseCorrelator(transport);
+    correlator->setTransportListener(listener);
+    ASSERT_TRUE(transport->listener == correlator);
 
     // Start the transport.
-    correlator.start();
+    correlator->start();
 
     // Make sure the start command got down to the thread.
-    CPPUNIT_ASSERT(transport->thread != NULL);
+    ASSERT_TRUE(transport->thread != NULL);
 
     // Give the thread a little time to get up and running.
     synchronized( &(transport->startedMutex) ) {
@@ -456,7 +484,7 @@ void ResponseCorrelatorTest::testMultiRequests(){
     const unsigned int numRequests = 20;
     RequestThread requesters[numRequests];
     for (unsigned int ix = 0; ix < numRequests; ++ix) {
-        requesters[ix].setTransport(&correlator);
+        requesters[ix].setTransport(correlator);
         requesters[ix].start();
     }
 
@@ -464,17 +492,21 @@ void ResponseCorrelatorTest::testMultiRequests(){
     // what we expected.
     for (unsigned int ix = 0; ix < numRequests; ++ix) {
         requesters[ix].join();
-        CPPUNIT_ASSERT(requesters[ix].resp != NULL);
-        CPPUNIT_ASSERT(requesters[ix].cmd->getCommandId() ==
+        ASSERT_TRUE(requesters[ix].resp != NULL);
+        ASSERT_TRUE(requesters[ix].cmd->getCommandId() ==
                        requesters[ix].resp->getCorrelationId());
+
+        // Release cmd pointers to avoid MSVC debug runtime hang.
+        (void)requesters[ix].cmd.release();
+        requesters[ix].resp.reset(NULL);
     }
 
     decaf::lang::Thread::sleep(60);
-    synchronized(&listener.mutex) {
+    synchronized(&listener->mutex) {
         unsigned int count = 0;
 
-        while (listener.commands.size() != numRequests) {
-            listener.mutex.wait(75);
+        while (listener->commands.size() != numRequests) {
+            listener->mutex.wait(75);
 
             ++count;
 
@@ -487,30 +519,34 @@ void ResponseCorrelatorTest::testMultiRequests(){
     // Since our transport relays our original command back at us as a
     // non-response message, check to make sure we received it and that
     // it is the original command.
-    CPPUNIT_ASSERT(listener.commands.size() == numRequests);
-    CPPUNIT_ASSERT(listener.exCount == 0);
+    ASSERT_TRUE(listener->commands.size() == numRequests);
+    ASSERT_TRUE(listener->exCount == 0);
 
-    correlator.close();
+    correlator->close();
+
+    delete correlator;
+    transport.reset(NULL);
+    delete listener;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ResponseCorrelatorTest::testNarrow(){
+TEST_F(ResponseCorrelatorTest, testNarrow){
 
     Pointer<MyTransport> transport(new MyTransport());
     ResponseCorrelator correlator(transport);
 
     Transport* narrowed = correlator.narrow(typeid( *transport ));
-    CPPUNIT_ASSERT(narrowed == transport);
+    ASSERT_TRUE(narrowed == transport);
 
     narrowed = correlator.narrow(typeid(std::string()));
-    CPPUNIT_ASSERT(narrowed == NULL);
+    ASSERT_TRUE(narrowed == NULL);
 
     narrowed = correlator.narrow(typeid(MyTransport));
-    CPPUNIT_ASSERT(narrowed == transport);
+    ASSERT_TRUE(narrowed == transport);
 
     narrowed = correlator.narrow(typeid(transport::correlator::ResponseCorrelator));
-    CPPUNIT_ASSERT(narrowed == &correlator);
+    ASSERT_TRUE(narrowed == &correlator);
 
     narrowed = correlator.narrow(typeid( correlator ));
-    CPPUNIT_ASSERT(narrowed == &correlator);
+    ASSERT_TRUE(narrowed == &correlator);
 }

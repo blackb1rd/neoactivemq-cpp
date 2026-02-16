@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "ArrayListTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/ArrayList.h>
@@ -28,6 +28,18 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
+    class ArrayListTest : public ::testing::Test {
+protected:
+
+        static const int SIZE;
+
+    public:
+
+        ArrayListTest();
+        virtual ~ArrayListTest();
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 const int ArrayListTest::SIZE = 256;
 
@@ -36,38 +48,38 @@ namespace {
 
     void populate( ArrayList<int>& list, int n ) {
 
-        CPPUNIT_ASSERT( list.isEmpty() );
+        ASSERT_TRUE(list.isEmpty());
 
         for( int i = 0; i < n; ++i ) {
             list.add( i );
         }
 
-        CPPUNIT_ASSERT( !list.isEmpty());
-        CPPUNIT_ASSERT_EQUAL( n, list.size() );
+        ASSERT_TRUE(!list.isEmpty());
+        ASSERT_EQ(n, list.size());
     }
 
     void populate( ArrayList<std::string>& list, int n ) {
 
-        CPPUNIT_ASSERT( list.isEmpty() );
+        ASSERT_TRUE(list.isEmpty());
 
         for( int i = 0; i < n; ++i ) {
             list.add( Integer::toString( i ) );
         }
 
-        CPPUNIT_ASSERT( !list.isEmpty());
-        CPPUNIT_ASSERT_EQUAL( n, list.size() );
+        ASSERT_TRUE(!list.isEmpty());
+        ASSERT_EQ(n, list.size());
     }
 
     void populate( std::vector<int>& list, int n ) {
 
-        CPPUNIT_ASSERT( list.empty() );
+        ASSERT_TRUE(list.empty());
 
         for( int i = 0; i < n; ++i ) {
             list.push_back( i );
         }
 
-        CPPUNIT_ASSERT( !list.empty());
-        CPPUNIT_ASSERT_EQUAL( n, (int)list.size() );
+        ASSERT_TRUE(!list.empty());
+        ASSERT_EQ(n, (int)list.size());
     }
 
     template< typename E>
@@ -95,19 +107,19 @@ ArrayListTest::~ArrayListTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testConstructor1() {
+TEST_F(ArrayListTest, testConstructor1) {
 
     ArrayList<int> array;
-    CPPUNIT_ASSERT( array.isEmpty() );
-    CPPUNIT_ASSERT( array.size() == 0 );
+    ASSERT_TRUE(array.isEmpty());
+    ASSERT_TRUE(array.size() == 0);
 
     ArrayList<std::string> strArray;
-    CPPUNIT_ASSERT( strArray.isEmpty() );
-    CPPUNIT_ASSERT( strArray.size() == 0 );
+    ASSERT_TRUE(strArray.isEmpty());
+    ASSERT_TRUE(strArray.size() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testConstructor2() {
+TEST_F(ArrayListTest, testConstructor2) {
 
     StlList<int> intsList;
 
@@ -116,65 +128,62 @@ void ArrayListTest::testConstructor2() {
     }
 
     ArrayList<int> array( intsList );
-    CPPUNIT_ASSERT( !array.isEmpty() );
-    CPPUNIT_ASSERT( array.size() == SIZE );
+    ASSERT_TRUE(!array.isEmpty());
+    ASSERT_TRUE(array.size() == SIZE);
 
     for( int i = 0; i < SIZE; ++i ) {
-        CPPUNIT_ASSERT_EQUAL( intsList.get( i ), array.get( i ) );
+        ASSERT_EQ(intsList.get( i ), array.get( i ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testClear() {
+TEST_F(ArrayListTest, testClear) {
 
     ArrayList<int> array( 100 );
-    CPPUNIT_ASSERT_MESSAGE( "List size should be zero", 0 == array.size() );
-    CPPUNIT_ASSERT_MESSAGE( "List should indicate its empty", array.isEmpty() );
+    ASSERT_TRUE(0 == array.size()) << ("List size should be zero");
+    ASSERT_TRUE(array.isEmpty()) << ("List should indicate its empty");
     array.add( 25 );
     array.clear();
-    CPPUNIT_ASSERT_MESSAGE( "List size should be zero", 0 == array.size() );
-    CPPUNIT_ASSERT_MESSAGE( "List should indicate its empty", array.isEmpty() );
+    ASSERT_TRUE(0 == array.size()) << ("List size should be zero");
+    ASSERT_TRUE(array.isEmpty()) << ("List should indicate its empty");
 
     ArrayList<int> array1;
-    CPPUNIT_ASSERT_MESSAGE( "List size should be zero", 0 == array1.size() );
-    CPPUNIT_ASSERT_MESSAGE( "List should indicate its empty", array1.isEmpty() );
+    ASSERT_TRUE(0 == array1.size()) << ("List size should be zero");
+    ASSERT_TRUE(array1.isEmpty()) << ("List should indicate its empty");
     array1.add( 25 );
     array1.clear();
-    CPPUNIT_ASSERT_MESSAGE( "List size should be zero", 0 == array1.size() );
-    CPPUNIT_ASSERT_MESSAGE( "List should indicate its empty", array1.isEmpty() );
+    ASSERT_TRUE(0 == array1.size()) << ("List size should be zero");
+    ASSERT_TRUE(array1.isEmpty()) << ("List should indicate its empty");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testConstructor3() {
+TEST_F(ArrayListTest, testConstructor3) {
 
     ArrayList<int> array( 100 );
-    CPPUNIT_ASSERT( array.isEmpty() );
-    CPPUNIT_ASSERT( array.size() == 0 );
+    ASSERT_TRUE(array.isEmpty());
+    ASSERT_TRUE(array.size() == 0);
 
     ArrayList<std::string> strArray( 42 );
-    CPPUNIT_ASSERT( strArray.isEmpty() );
-    CPPUNIT_ASSERT( strArray.size() == 0 );
+    ASSERT_TRUE(strArray.isEmpty());
+    ASSERT_TRUE(strArray.size() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAdd1() {
+TEST_F(ArrayListTest, testAdd1) {
 
     ArrayList<int> array( 100 );
     array.add( 25 );
-    CPPUNIT_ASSERT_MESSAGE( "Failed to add Object", array.get( 0 ) == 25 );
+    ASSERT_TRUE(array.get( 0 ) == 25) << ("Failed to add Object");
 
     ArrayList<int> array1;
     array1.add( 25 );
-    CPPUNIT_ASSERT_MESSAGE( "Failed to add Object", array1.get( 0 ) == 25 );
+    ASSERT_TRUE(array1.get( 0 ) == 25) << ("Failed to add Object");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IllegalArgumentException",
-        ArrayList<int>( -1 ),
-        IllegalArgumentException );
+    ASSERT_THROW(ArrayList<int>( -1 ), IllegalArgumentException) << ("Should throw an IllegalArgumentException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAdd2() {
+TEST_F(ArrayListTest, testAdd2) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -182,37 +191,30 @@ void ArrayListTest::testAdd2() {
     populate( mirror, SIZE );
 
     array.add( 50, 42 );
-    CPPUNIT_ASSERT_MESSAGE( "Failed to add Object", array.get( 50 ) == 42 );
-    CPPUNIT_ASSERT_MESSAGE( "Failed to fix up list after insert",
-                            array.get( 51 ) == mirror[50] && ( array.get( 52 ) == mirror[51] ) );
+    ASSERT_TRUE(array.get( 50 ) == 42) << ("Failed to add Object");
+    ASSERT_TRUE(array.get( 51 ) == mirror[50] && ( array.get( 52 ) == mirror[51] )) << ("Failed to fix up list after insert");
     int oldItem = array.get( 25 );
     array.add( 25, 0 );
-    CPPUNIT_ASSERT_MESSAGE( "Should have returned zero", array.get( 25 ) == 0 );
-    CPPUNIT_ASSERT_MESSAGE( "Should have returned the old item from slot 25", array.get( 26 ) == oldItem );
+    ASSERT_TRUE(array.get( 25 ) == 0) << ("Should have returned zero");
+    ASSERT_TRUE(array.get( 26 ) == oldItem) << ("Should have returned the old item from slot 25");
 
     array.add( 0, 84 );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Failed to add Object", array.get( 0 ), 84 );
-    CPPUNIT_ASSERT_EQUAL( array.get( 1 ), mirror[0] );
-    CPPUNIT_ASSERT_EQUAL( array.get( 2 ), mirror[1] );
+    ASSERT_EQ(array.get( 0 ), 84) << ("Failed to add Object");
+    ASSERT_EQ(array.get( 1 ), mirror[0]);
+    ASSERT_EQ(array.get( 2 ), mirror[1]);
 
     oldItem = array.get( 0 );
     array.add( 0, 0 );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Should have returned null", 0, array.get( 0 ) );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Should have returned the old item from slot 0", array.get( 1 ), oldItem );
+    ASSERT_EQ(0, array.get( 0 )) << ("Should have returned null");
+    ASSERT_EQ(array.get( 1 ), oldItem) << ("Should have returned the old item from slot 0");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        array.add( -1, 0 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(array.add( -1, 0 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        array.add( array.size() + 1, 0 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(array.add( array.size() + 1, 0 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAdd3() {
+TEST_F(ArrayListTest, testAdd3) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -221,26 +223,26 @@ void ArrayListTest::testAdd3() {
 
     int size = array.size();
     array.add( size, 42 );
-    CPPUNIT_ASSERT( array.size() == SIZE + 1 );
+    ASSERT_TRUE(array.size() == SIZE + 1);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Failed to add Object", array.get( size ), 42 );
-    CPPUNIT_ASSERT_EQUAL( array.get( size - 2 ), mirror[size - 2] );
-    CPPUNIT_ASSERT_EQUAL( array.get( size - 1 ), mirror[size - 1] );
+    ASSERT_EQ(array.get( size ), 42) << ("Failed to add Object");
+    ASSERT_EQ(array.get( size - 2 ), mirror[size - 2]);
+    ASSERT_EQ(array.get( size - 1 ), mirror[size - 1]);
 
     array.removeAt( size );
-    CPPUNIT_ASSERT( array.size() == SIZE );
+    ASSERT_TRUE(array.size() == SIZE);
 
     size = array.size();
     array.add( size, 0 );
-    CPPUNIT_ASSERT( array.size() == SIZE + 1 );
+    ASSERT_TRUE(array.size() == SIZE + 1);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Should have returned 0", 0, array.get( size ) );
-    CPPUNIT_ASSERT_EQUAL( array.get( size - 2 ), mirror[size - 2] );
-    CPPUNIT_ASSERT_EQUAL( array.get( size - 1 ), mirror[size - 1] );
+    ASSERT_EQ(0, array.get( size )) << ("Should have returned 0");
+    ASSERT_EQ(array.get( size - 2 ), mirror[size - 2]);
+    ASSERT_EQ(array.get( size - 1 ), mirror[size - 1]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll1() {
+TEST_F(ArrayListTest, testAddAll1) {
 
     ArrayList<int> array;
     populate( array, 100 );
@@ -248,29 +250,26 @@ void ArrayListTest::testAddAll1() {
     populate( mirror, 100 );
 
     array.addAll( 50, array );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Returned incorrect size after adding to existing list", 200, array.size() );
+    ASSERT_EQ(200, array.size()) << ("Returned incorrect size after adding to existing list");
 
     for( int i = 0; i < 50; i++ ) {
-        CPPUNIT_ASSERT_MESSAGE( "Manipulated elements < index", array.get( i ) == mirror[i] );
+        ASSERT_TRUE(array.get( i ) == mirror[i]) << ("Manipulated elements < index");
     }
 
     for( int i = 0; i >= 50 && ( i < 150 ); i++ ) {
-        CPPUNIT_ASSERT_MESSAGE( "Failed to ad elements properly", array.get( i ) == mirror[i - 50] );
+        ASSERT_TRUE(array.get( i ) == mirror[i - 50]) << ("Failed to ad elements properly");
     }
 
     for( int i = 0; i >= 150 && ( i < 200 ); i++ ) {
-        CPPUNIT_ASSERT_MESSAGE( "Failed to ad elements properly", array.get( i ) == mirror[i - 100] );
+        ASSERT_TRUE(array.get( i ) == mirror[i - 100]) << ("Failed to ad elements properly");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll2() {
+TEST_F(ArrayListTest, testAddAll2) {
 
     StlList<int> emptyCollection;
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        ArrayList<int>().addAll( -1, emptyCollection ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(ArrayList<int>().addAll( -1, emptyCollection ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 
     {
         std::string data[] = { "1", "2", "3", "4", "5", "6", "7", "8" };
@@ -286,8 +285,7 @@ void ArrayListTest::testAddAll2() {
             list1.removeAt( 0 );
         }
         list1.addAll( list2 );
-        CPPUNIT_ASSERT_MESSAGE( "The object list is not the same as original list",
-                                list1.containsAll( list2 ) && list2.containsAll( list1 ) );
+        ASSERT_TRUE(list1.containsAll( list2 ) && list2.containsAll( list1 )) << ("The object list is not the same as original list");
 
         ArrayList<std::string> list3;
         for( int i = 0; i < 100; i++ ) {
@@ -296,8 +294,7 @@ void ArrayListTest::testAddAll2() {
                 list3.addAll( list1 );
             }
         }
-        CPPUNIT_ASSERT_MESSAGE( "The object list is not the same as original list",
-                                list3.containsAll( list1 ) && list1.containsAll( list3 ) );
+        ASSERT_TRUE(list3.containsAll( list1 ) && list1.containsAll( list3 )) << ("The object list is not the same as original list");
     }
     {
         ArrayList<std::string> list1;
@@ -318,36 +315,30 @@ void ArrayListTest::testAddAll2() {
 
         // Inserted elements should be equal to second array
         for( int i = 0; i < 8; i++ ) {
-            CPPUNIT_ASSERT_EQUAL( data2[i], list1.get( location + i ) );
+            ASSERT_EQ(data2[i], list1.get( location + i ));
         }
         // Elements after inserted location should
         // be equals to related elements in first array
         for( int i = location + 1; i < 6; i++ ) {
-            CPPUNIT_ASSERT_EQUAL( data1[i], list1.get( i + 8 - 1 ) );
+            ASSERT_EQ(data1[i], list1.get( i + 8 - 1 ));
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll3() {
+TEST_F(ArrayListTest, testAddAll3) {
 
     ArrayList<int> list;
     list.addAll( 0, list );
     list.addAll( list.size(), list );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        list.addAll( -1, list ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(list.addAll( -1, list ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        list.addAll( list.size() + 1, list ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(list.addAll( list.size() + 1, list ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll4() {
+TEST_F(ArrayListTest, testAddAll4) {
 
     ArrayList<std::string> array;
     ArrayList<std::string> blist;
@@ -359,13 +350,13 @@ void ArrayListTest::testAddAll4() {
     blist.removeAt( 0 );
     blist.addAll( 0, array );
 
-    CPPUNIT_ASSERT_EQUAL( std::string("a"), blist.get(0) );
-    CPPUNIT_ASSERT_EQUAL( std::string("b"), blist.get(1) );
-    CPPUNIT_ASSERT_EQUAL( std::string("d"), blist.get(2) );
+    ASSERT_EQ(std::string("a"), blist.get(0));
+    ASSERT_EQ(std::string("b"), blist.get(1));
+    ASSERT_EQ(std::string("d"), blist.get(2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll5() {
+TEST_F(ArrayListTest, testAddAll5) {
 
     ArrayList<std::string> array;
     populate( array, 100 );
@@ -373,18 +364,14 @@ void ArrayListTest::testAddAll5() {
     ArrayList<std::string> l;
     l.addAll( array );
     for( int i = 0; i < array.size(); i++ ) {
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Failed to add elements properly",
-                                      l.get(i), array.get( i ) );
+        ASSERT_EQ(l.get(i), array.get( i )) << ("Failed to add elements properly");
     }
     array.addAll( array );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Returned incorrect size after adding to existing list",
-                                  200, array.size());
+    ASSERT_EQ(200, array.size()) << ("Returned incorrect size after adding to existing list");
 
     for( int i = 0; i < 100; i++ ) {
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Added to list in incorrect order",
-                                      array.get(i), l.get(i) );
-        CPPUNIT_ASSERT_EQUAL_MESSAGE( "Failed to add to existing list",
-                                      array.get(i + 100), l.get(i) );
+        ASSERT_EQ(array.get(i), l.get(i)) << ("Added to list in incorrect order");
+        ASSERT_EQ(array.get(i + 100), l.get(i)) << ("Failed to add to existing list");
     }
 
     ArrayList<int> originalList( 12 );
@@ -399,12 +386,12 @@ void ArrayListTest::testAddAll5() {
     for( int j = 0; j < 11; j++ ) {
         additionalList.add( j );
     }
-    CPPUNIT_ASSERT( originalList.addAll( additionalList ) );
-    CPPUNIT_ASSERT_EQUAL( 21, originalList.size() );
+    ASSERT_TRUE(originalList.addAll( additionalList ));
+    ASSERT_EQ(21, originalList.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll6() {
+TEST_F(ArrayListTest, testAddAll6) {
 
     ArrayList<int> arrayListA;
     arrayListA.add( 1 );
@@ -412,27 +399,27 @@ void ArrayListTest::testAddAll6() {
     arrayListB.add( 1 );
     arrayListA.addAll( 1, arrayListB );
     int size = arrayListA.size();
-    CPPUNIT_ASSERT_EQUAL( 2, size );
+    ASSERT_EQ(2, size);
     for( int index = 0; index < size; index++ ) {
-        CPPUNIT_ASSERT_EQUAL( 1, arrayListA.get( index ) );
+        ASSERT_EQ(1, arrayListA.get( index ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll7() {
+TEST_F(ArrayListTest, testAddAll7) {
 
     ArrayList<int> arrayList;
     arrayList.add( 1 );
     arrayList.addAll( 1, arrayList );
     int size = arrayList.size();
-    CPPUNIT_ASSERT_EQUAL( 2, size );
+    ASSERT_EQ(2, size);
     for( int index = 0; index < size; index++ ) {
-        CPPUNIT_ASSERT_EQUAL( 1, arrayList.get( index ) );
+        ASSERT_EQ(1, arrayList.get( index ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll8() {
+TEST_F(ArrayListTest, testAddAll8) {
 
     ArrayList<std::string> arrayList;
     arrayList.add( "1" );
@@ -451,33 +438,33 @@ void ArrayListTest::testAddAll8() {
 
     list.addAll( 6, arrayList );
 
-    CPPUNIT_ASSERT_EQUAL( 11, list.size() );
-    CPPUNIT_ASSERT( !list.contains( "q" ) );
+    ASSERT_EQ(11, list.size());
+    ASSERT_TRUE(!list.contains( "q" ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testAddAll9() {
+TEST_F(ArrayListTest, testAddAll9) {
 
     ArrayList<std::string> list;
     list.add( "one" );
     list.add( "two" );
-    CPPUNIT_ASSERT_EQUAL( 2, list.size() );
+    ASSERT_EQ(2, list.size());
 
     list.removeAt( 0 );
-    CPPUNIT_ASSERT_EQUAL( 1, list.size() );
+    ASSERT_EQ(1, list.size());
 
     ArrayList<std::string> collection;
     collection.add( "1" );
     collection.add( "2" );
     collection.add( "3" );
-    CPPUNIT_ASSERT_EQUAL( 3, collection.size() );
+    ASSERT_EQ(3, collection.size());
 
     list.addAll( 0, collection );
-    CPPUNIT_ASSERT_EQUAL( 4, list.size() );
+    ASSERT_EQ(4, list.size());
 
     list.removeAt( 0 );
     list.removeAt( 0 );
-    CPPUNIT_ASSERT_EQUAL( 2, list.size() );
+    ASSERT_EQ(2, list.size());
 
     collection.add( "4" );
     collection.add( "5" );
@@ -489,30 +476,27 @@ void ArrayListTest::testAddAll9() {
     collection.add( "11" );
     collection.add( "12" );
 
-    CPPUNIT_ASSERT_EQUAL( 12, collection.size() );
+    ASSERT_EQ(12, collection.size());
 
     list.addAll( 0, collection );
-    CPPUNIT_ASSERT_EQUAL( 14, list.size() );
+    ASSERT_EQ(14, list.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testContains() {
+TEST_F(ArrayListTest, testContains) {
 
     ArrayList<int> array;
     populate( array, SIZE );
     std::vector<int> mirror;
     populate( mirror, SIZE );
 
-    CPPUNIT_ASSERT_MESSAGE( "Returned false for valid element",
-                            array.contains( mirror[ 99 ] ) );
-    CPPUNIT_ASSERT_MESSAGE( "Returned false for equal element",
-                            array.contains( 8 ) );
-    CPPUNIT_ASSERT_MESSAGE( "Returned true for invalid element",
-                            !array.contains( 9999 ) );
+    ASSERT_TRUE(array.contains( mirror[ 99 ] )) << ("Returned false for valid element");
+    ASSERT_TRUE(array.contains( 8 )) << ("Returned false for equal element");
+    ASSERT_TRUE(!array.contains( 9999 )) << ("Returned true for invalid element");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testEnsureCapacity() {
+TEST_F(ArrayListTest, testEnsureCapacity) {
 
     int capacity = 20;
     int testValue = 2048;
@@ -526,15 +510,12 @@ void ArrayListTest::testEnsureCapacity() {
     array.add( i, testValue );
     int location = array.indexOf( testValue );
     array.ensureCapacity( capacity );
-    CPPUNIT_ASSERT_MESSAGE( "EnsureCapacity moved objects around in array1.",
-                            location == array.indexOf( testValue ) );
+    ASSERT_TRUE(location == array.indexOf( testValue )) << ("EnsureCapacity moved objects around in array1.");
     array.removeAt( 0 );
     array.ensureCapacity( capacity );
-    CPPUNIT_ASSERT_MESSAGE( "EnsureCapacity moved objects around in array2.",
-                            --location == array.indexOf(testValue));
+    ASSERT_TRUE(--location == array.indexOf(testValue)) << ("EnsureCapacity moved objects around in array2.");
     array.ensureCapacity( capacity + 2 );
-    CPPUNIT_ASSERT_MESSAGE( "EnsureCapacity did not change location.",
-                            location == array.indexOf(testValue));
+    ASSERT_TRUE(location == array.indexOf(testValue)) << ("EnsureCapacity did not change location.");
 
     ArrayList<std::string> list( 1 );
     list.add( "hello" );
@@ -542,60 +523,57 @@ void ArrayListTest::testEnsureCapacity() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testGet() {
+TEST_F(ArrayListTest, testGet) {
 
     ArrayList<int> array;
     populate( array, SIZE );
     std::vector<int> mirror;
     populate( mirror, SIZE );
 
-    CPPUNIT_ASSERT_MESSAGE( "Returned incorrect element", array.get(22) == mirror[22] );
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        array.get( 9999 ),
-        IndexOutOfBoundsException );
+    ASSERT_TRUE(array.get(22) == mirror[22]) << ("Returned incorrect element");
+    ASSERT_THROW(array.get( 9999 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testIndexOf() {
+TEST_F(ArrayListTest, testIndexOf) {
 
     ArrayList<int> array;
     populate( array, SIZE );
     std::vector<int> mirror;
     populate( mirror, SIZE );
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Returned incorrect index", 87, array.indexOf( mirror[87] ) );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Returned index for invalid Object", -1, array.indexOf( SIZE + 10 ) );
+    ASSERT_EQ(87, array.indexOf( mirror[87] )) << ("Returned incorrect index");
+    ASSERT_EQ(-1, array.indexOf( SIZE + 10 )) << ("Returned index for invalid Object");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testIsEmpty() {
+TEST_F(ArrayListTest, testIsEmpty) {
 
     ArrayList<int> array;
     populate( array, SIZE );
 
-    CPPUNIT_ASSERT_MESSAGE( "isEmpty returned false for new list", ArrayList<int>( 10 ).isEmpty() );
-    CPPUNIT_ASSERT_MESSAGE("Returned true for existing list with elements", !array.isEmpty() );
+    ASSERT_TRUE(ArrayList<int>( 10 ).isEmpty()) << ("isEmpty returned false for new list");
+    ASSERT_TRUE(!array.isEmpty()) << ("Returned true for existing list with elements");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testLastIndexOf() {
+TEST_F(ArrayListTest, testLastIndexOf) {
 
     ArrayList<int> array;
     populate( array, SIZE );
 
     array.add( 99 );
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect index", SIZE, array.lastIndexOf( 99 ) );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned index for invalid Object", -1, array.lastIndexOf( 2048 ) );
+    ASSERT_EQ(SIZE, array.lastIndexOf( 99 )) << ("Returned incorrect index");
+    ASSERT_EQ(-1, array.lastIndexOf( 2048 )) << ("Returned index for invalid Object");
 
     array.trimToSize();
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect index", SIZE, array.lastIndexOf( 99 ) );
+    ASSERT_EQ(SIZE, array.lastIndexOf( 99 )) << ("Returned incorrect index");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testRemove() {
+TEST_F(ArrayListTest, testRemove) {
 
     ArrayList<int> list1;
     populate( list1, SIZE );
@@ -605,41 +583,38 @@ void ArrayListTest::testRemove() {
     list1.remove( 42 );
     list2.remove( 42 );
 
-    CPPUNIT_ASSERT_MESSAGE( "Lists should be equal", list1.equals( list2 ) );
+    ASSERT_TRUE(list1.equals( list2 )) << ("Lists should be equal");
     list1.remove( 42 );
-    CPPUNIT_ASSERT_MESSAGE( "Lists should be equal", list1.equals( list2 ) );
+    ASSERT_TRUE(list1.equals( list2 )) << ("Lists should be equal");
 
-    CPPUNIT_ASSERT( list1.remove( 0 ) );
-    CPPUNIT_ASSERT_MESSAGE( "Lists should not be equal", !list1.equals( list2 ) );
+    ASSERT_TRUE(list1.remove( 0 ));
+    ASSERT_TRUE(!list1.equals( list2 )) << ("Lists should not be equal");
 
     list1.clear();
     populate( list1, SIZE );
 
     for( int i = 0; i < SIZE; i++ ) {
-        CPPUNIT_ASSERT( list1.remove( i ) );
+        ASSERT_TRUE(list1.remove( i ));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testRemoveAt() {
+TEST_F(ArrayListTest, testRemoveAt) {
 
     ArrayList<int> array;
     populate( array, SIZE );
 
     array.removeAt( 10 );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed to remove element", -1, array.indexOf( 10 ) );
+    ASSERT_EQ(-1, array.indexOf( 10 )) << ("Failed to remove element");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        array.removeAt( 9999 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(array.removeAt( 9999 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 
     ArrayList<int> myArray( array );
     array.add( 25, 9999 );
     array.add( 50, 9999 );
     array.removeAt( 50 );
     array.removeAt( 25 );
-    CPPUNIT_ASSERT_MESSAGE("Removing index did not work", array.equals( myArray ) );
+    ASSERT_TRUE(array.equals( myArray )) << ("Removing index did not work");
 
     std::string data[] = { "a", "b", "c", "d", "e", "f", "g" };
     ArrayList<std::string> list;
@@ -647,8 +622,8 @@ void ArrayListTest::testRemoveAt() {
         list.add( data[i] );
     }
 
-    CPPUNIT_ASSERT_MESSAGE( "Removed wrong element 1", list.removeAt(0) == "a" );
-    CPPUNIT_ASSERT_MESSAGE( "Removed wrong element 2", list.removeAt(4) == "f" );
+    ASSERT_TRUE(list.removeAt(0) == "a") << ("Removed wrong element 1");
+    ASSERT_TRUE(list.removeAt(4) == "f") << ("Removed wrong element 2");
 
     ArrayList<int> l( 0 );
     l.add( 5 );
@@ -656,66 +631,54 @@ void ArrayListTest::testRemoveAt() {
     l.removeAt( 0 );
     l.removeAt( 0 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        l.removeAt( -1 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(l.removeAt( -1 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        l.removeAt( 0 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(l.removeAt( 0 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testSet() {
+TEST_F(ArrayListTest, testSet) {
 
     ArrayList<int> array;
     populate( array, SIZE );
 
     array.set( 65, 42 );
 
-    CPPUNIT_ASSERT_MESSAGE( "Failed to set object", array.get( 65 ) == 42 );
+    ASSERT_TRUE(array.get( 65 ) == 42) << ("Failed to set object");
     array.set( 50, 0 );
-    CPPUNIT_ASSERT_MESSAGE( "Setting to null did not work", 0 == array.get( 50 ) );
-    CPPUNIT_ASSERT_MESSAGE( std::string("") + "Setting increased the list's size to: " +
-                            Integer::toString( array.size() ), array.size() == SIZE );
+    ASSERT_TRUE(0 == array.get( 50 )) << ("Setting to null did not work");
+    ASSERT_TRUE(array.size() == SIZE) << (std::string("") + "Setting increased the list's size to: " +
+                            Integer::toString( array.size() ));
 
     array.set( 0, 1 );
-    CPPUNIT_ASSERT_MESSAGE( "Failed to set object", array.get( 0 ) == 1 );
+    ASSERT_TRUE(array.get( 0 ) == 1) << ("Failed to set object");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        array.set( -1, 10 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(array.set( -1, 10 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        array.set( array.size(), 10 ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(array.set( array.size(), 10 ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testSize() {
+TEST_F(ArrayListTest, testSize) {
 
     ArrayList<int> array;
     populate( array, SIZE );
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect size for exiting list", SIZE, array.size() );
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned incorrect size for new list", 0, ArrayList<int>().size());
+    ASSERT_EQ(SIZE, array.size()) << ("Returned incorrect size for exiting list");
+    ASSERT_EQ(0, ArrayList<int>().size()) << ("Returned incorrect size for new list");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testToString() {
+TEST_F(ArrayListTest, testToString) {
 
     ArrayList<int> l(1);
     l.add( 5 );
     std::string result = l.toString();
-    CPPUNIT_ASSERT_MESSAGE( "should produce a non-empty string", !result.empty() );
+    ASSERT_TRUE(!result.empty()) << ("should produce a non-empty string");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testToArray() {
+TEST_F(ArrayListTest, testToArray) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -724,19 +687,19 @@ void ArrayListTest::testToArray() {
     array.set( 75, 0 );
 
     std::vector<int> stlvec = array.toArray();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Returned array of incorrect size", SIZE, (int)stlvec.size() );
+    ASSERT_EQ(SIZE, (int)stlvec.size()) << ("Returned array of incorrect size");
 
     for( int i = 0; i < (int)stlvec.size(); i++ ) {
         if( ( i == 25 ) || ( i == 75 ) ) {
-            CPPUNIT_ASSERT_EQUAL_MESSAGE( "Should be zero but instead got: ", 0, stlvec[i] );
+            ASSERT_EQ(0, stlvec[i]) << ("Should be zero but instead got: ");
         } else {
-            CPPUNIT_ASSERT_EQUAL_MESSAGE( "Returned incorrect array: ", array.get(i), stlvec[i] );
+            ASSERT_EQ(array.get(i), stlvec[i]) << ("Returned incorrect array: ");
         }
     }
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testTrimToSize() {
+TEST_F(ArrayListTest, testTrimToSize) {
 
     ArrayList<int> array;
     populate( array, SIZE );
@@ -749,9 +712,9 @@ void ArrayListTest::testTrimToSize() {
 
     array.trimToSize();
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Returned incorrect size after trim", 25, array.size() );
+    ASSERT_EQ(25, array.size()) << ("Returned incorrect size after trim");
     for( int i = 0; i < array.size(); i++ ) {
-        CPPUNIT_ASSERT_MESSAGE( "Trimmed list contained incorrect elements", array.get(i) == mirror[i] );
+        ASSERT_TRUE(array.get(i) == mirror[i]) << ("Trimmed list contained incorrect elements");
     }
 
     StlList<std::string> list;
@@ -761,14 +724,11 @@ void ArrayListTest::testTrimToSize() {
     std::unique_ptr< Iterator<int> > iter( array.iterator() );
     array.trimToSize();
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an ConcurrentModificationException",
-        iter->next(),
-        ConcurrentModificationException );
+    ASSERT_THROW(iter->next(), ConcurrentModificationException) << ("Should throw an ConcurrentModificationException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testOverrideSize() {
+TEST_F(ArrayListTest, testOverrideSize) {
 
     MockArrayList<std::string> testlist;
 
@@ -783,7 +743,7 @@ void ArrayListTest::testOverrideSize() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testRemoveAll() {
+TEST_F(ArrayListTest, testRemoveAll) {
 
     ArrayList<int> list;
     populate( list, 3 );
@@ -794,22 +754,22 @@ void ArrayListTest::testRemoveAll() {
 
     list.removeAll( collection );
 
-    CPPUNIT_ASSERT_EQUAL( 1, list.size() );
+    ASSERT_EQ(1, list.size());
 
     ArrayList<int> list2;
     list2.removeAll( collection );
-    CPPUNIT_ASSERT_EQUAL( 0, list2.size() );
+    ASSERT_EQ(0, list2.size());
 
     ArrayList<int> list3;
     populate( list3, 3 );
     collection.clear();
 
     list3.removeAll( collection );
-    CPPUNIT_ASSERT_EQUAL( 3, list3.size() );
+    ASSERT_EQ(3, list3.size());
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testRetainAll() {
+TEST_F(ArrayListTest, testRetainAll) {
 
     ArrayList<int> list;
     populate( list, 3 );
@@ -820,40 +780,34 @@ void ArrayListTest::testRetainAll() {
 
     list.retainAll( collection );
 
-    CPPUNIT_ASSERT_EQUAL( 2, list.size() );
+    ASSERT_EQ(2, list.size());
 
     ArrayList<int> list2;
     list2.retainAll( collection );
-    CPPUNIT_ASSERT_EQUAL( 0, list2.size() );
+    ASSERT_EQ(0, list2.size());
 
     ArrayList<int> list3;
     populate( list3, 3 );
     collection.clear();
 
     list3.retainAll( collection );
-    CPPUNIT_ASSERT_EQUAL( 0, list3.size() );
+    ASSERT_EQ(0, list3.size());
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testListIterator1IndexOutOfBoundsException() {
+TEST_F(ArrayListTest, testListIterator1IndexOutOfBoundsException) {
 
     ArrayList<int> list;
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        std::unique_ptr< ListIterator<int> > it( list.listIterator( -1 ) ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(std::unique_ptr< ListIterator<int> > it( list.listIterator( -1 ) ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void ArrayListTest::testListIterator2IndexOutOfBoundsException() {
+TEST_F(ArrayListTest, testListIterator2IndexOutOfBoundsException) {
 
     ArrayList<int> list;
     list.add( 1 );
     list.add( 2 );
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should throw an IndexOutOfBoundsException",
-        std::unique_ptr< ListIterator<int> > it( list.listIterator( 100 ) ),
-        IndexOutOfBoundsException );
+    ASSERT_THROW(std::unique_ptr< ListIterator<int> > it( list.listIterator( 100 ) ), IndexOutOfBoundsException) << ("Should throw an IndexOutOfBoundsException");
 }

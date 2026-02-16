@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "FutureTaskTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/concurrent/FutureTask.h>
@@ -25,6 +25,7 @@
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
 
 #include <typeinfo>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 using namespace std;
 using namespace decaf;
@@ -32,6 +33,14 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
+
+    class FutureTaskTest : public ExecutorsTestSupport {
+public:
+
+        FutureTaskTest();
+        virtual ~FutureTaskTest();
+
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -124,86 +133,80 @@ FutureTaskTest::~FutureTaskTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testConstructor1() {
+TEST_F(FutureTaskTest, testConstructor1) {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        new FutureTask<std::string>(NULL),
-        NullPointerException);
+    ASSERT_THROW(new FutureTask<std::string>(NULL), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testConstructor2() {
+TEST_F(FutureTaskTest, testConstructor2) {
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown a NullPointerException",
-        new FutureTask<std::string>(NULL, std::string("Test")),
-        NullPointerException);
+    ASSERT_THROW(new FutureTask<std::string>(NULL, std::string("Test")), NullPointerException) << ("Should have thrown a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testConstructor3() {
+TEST_F(FutureTaskTest, testConstructor3) {
     FutureTask<int> task(new FutureRunnable(), 10);
-    CPPUNIT_ASSERT(!task.isCancelled());
-    CPPUNIT_ASSERT(!task.isDone());
+    ASSERT_TRUE(!task.isCancelled());
+    ASSERT_TRUE(!task.isDone());
 
     task.run();
 
-    CPPUNIT_ASSERT(!task.isCancelled());
-    CPPUNIT_ASSERT(task.isDone());
+    ASSERT_TRUE(!task.isCancelled());
+    ASSERT_TRUE(task.isDone());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testConstructor4() {
+TEST_F(FutureTaskTest, testConstructor4) {
 
     FutureTask<std::string> task(new FutureCallable<std::string>());
-    CPPUNIT_ASSERT(!task.isCancelled());
-    CPPUNIT_ASSERT(!task.isDone());
+    ASSERT_TRUE(!task.isCancelled());
+    ASSERT_TRUE(!task.isDone());
 
     task.run();
 
-    CPPUNIT_ASSERT(!task.isCancelled());
-    CPPUNIT_ASSERT(task.isDone());
+    ASSERT_TRUE(!task.isCancelled());
+    ASSERT_TRUE(task.isDone());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testIsDone() {
+TEST_F(FutureTaskTest, testIsDone) {
 
     FutureTask<int> task(new NoOpCallable<int>());
     task.run();
-    CPPUNIT_ASSERT(task.isDone());
-    CPPUNIT_ASSERT(!task.isCancelled());
+    ASSERT_TRUE(task.isDone());
+    ASSERT_TRUE(!task.isCancelled());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testRunAndReset() {
+TEST_F(FutureTaskTest, testRunAndReset) {
     PublicFutureTask task(new NoOpCallable<std::string>());
-    CPPUNIT_ASSERT(task.runAndReset());
-    CPPUNIT_ASSERT(!task.isDone());
+    ASSERT_TRUE(task.runAndReset());
+    ASSERT_TRUE(!task.isDone());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testResetAfterCancel() {
+TEST_F(FutureTaskTest, testResetAfterCancel) {
     PublicFutureTask task(new NoOpCallable<std::string>());
-    CPPUNIT_ASSERT(task.cancel(false));
-    CPPUNIT_ASSERT(!task.runAndReset());
-    CPPUNIT_ASSERT(task.isDone());
-    CPPUNIT_ASSERT(task.isCancelled());
+    ASSERT_TRUE(task.cancel(false));
+    ASSERT_TRUE(!task.runAndReset());
+    ASSERT_TRUE(task.isDone());
+    ASSERT_TRUE(task.isCancelled());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testSet() {
+TEST_F(FutureTaskTest, testSet) {
     PublicFutureTask task(new NoOpCallable<std::string>());
     task.set("one");
     try {
-        CPPUNIT_ASSERT_EQUAL(task.get(), std::string("one"));
+        ASSERT_EQ(task.get(), std::string("one"));
     } catch(Exception& e) {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testSetException() {
+TEST_F(FutureTaskTest, testSetException) {
     NoSuchElementException nse;
     PublicFutureTask task(new NoOpCallable<std::string>());
     task.setException(nse);
@@ -213,41 +216,41 @@ void FutureTaskTest::testSetException() {
     } catch(ExecutionException& ee) {
         const NoSuchElementException* cause =
             dynamic_cast<const NoSuchElementException*>(ee.getCause());
-        CPPUNIT_ASSERT(cause != NULL);
+        ASSERT_TRUE(cause != NULL);
     } catch(Exception& e) {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testCancelBeforeRun() {
+TEST_F(FutureTaskTest, testCancelBeforeRun) {
     PublicFutureTask task(new NoOpCallable<std::string>());
-    CPPUNIT_ASSERT(task.cancel(false));
+    ASSERT_TRUE(task.cancel(false));
     task.run();
-    CPPUNIT_ASSERT(task.isDone());
-    CPPUNIT_ASSERT(task.isCancelled());
+    ASSERT_TRUE(task.isDone());
+    ASSERT_TRUE(task.isCancelled());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testCancelBeforeRun2() {
+TEST_F(FutureTaskTest, testCancelBeforeRun2) {
     PublicFutureTask task(new NoOpCallable<std::string>());
-    CPPUNIT_ASSERT(task.cancel(true));
+    ASSERT_TRUE(task.cancel(true));
     task.run();
-    CPPUNIT_ASSERT(task.isDone());
-    CPPUNIT_ASSERT(task.isCancelled());
+    ASSERT_TRUE(task.isDone());
+    ASSERT_TRUE(task.isCancelled());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testCancelAfterRun() {
+TEST_F(FutureTaskTest, testCancelAfterRun) {
     PublicFutureTask task(new NoOpCallable<std::string>());
     task.run();
-    CPPUNIT_ASSERT(!task.cancel(false));
-    CPPUNIT_ASSERT(task.isDone());
-    CPPUNIT_ASSERT(!task.isCancelled());
+    ASSERT_TRUE(!task.cancel(false));
+    ASSERT_TRUE(task.isDone());
+    ASSERT_TRUE(!task.isCancelled());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testCancelInterrupt() {
+TEST_F(FutureTaskTest, testCancelInterrupt) {
 
     FutureTask<std::string> task(new MediumSleepCallable<std::string>(this));
     Thread t(&task);
@@ -255,10 +258,10 @@ void FutureTaskTest::testCancelInterrupt() {
 
     try {
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(task.cancel(true));
+        ASSERT_TRUE(task.cancel(true));
         t.join();
-        CPPUNIT_ASSERT(task.isDone());
-        CPPUNIT_ASSERT(task.isCancelled());
+        ASSERT_TRUE(task.isDone());
+        ASSERT_TRUE(task.isCancelled());
     } catch(InterruptedException& e) {
         unexpectedException();
     }
@@ -299,7 +302,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testCancelNoInterrupt() {
+TEST_F(FutureTaskTest, testCancelNoInterrupt) {
 
     FutureTask<std::string> task(new MediumNoInterruptsSleepCallable<std::string>(this));
     Thread t(&task);
@@ -307,10 +310,10 @@ void FutureTaskTest::testCancelNoInterrupt() {
 
     try {
         Thread::sleep(SHORT_DELAY_MS);
-        CPPUNIT_ASSERT(task.cancel(false));
+        ASSERT_TRUE(task.cancel(false));
         t.join();
-        CPPUNIT_ASSERT(task.isDone());
-        CPPUNIT_ASSERT(task.isCancelled());
+        ASSERT_TRUE(task.isDone());
+        ASSERT_TRUE(task.isCancelled());
     } catch(InterruptedException& e) {
         unexpectedException();
     }
@@ -350,21 +353,21 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testGet1() {
+TEST_F(FutureTaskTest, testGet1) {
 
     FutureTask<std::string> ft(new MediumNoInterruptsSleepCallable<std::string>(this));
     MediumNoInterruptsSleepRunnable runner(this, &ft);
     Thread t(&runner);
 
     try {
-        CPPUNIT_ASSERT(!ft.isDone());
-        CPPUNIT_ASSERT(!ft.isCancelled());
+        ASSERT_TRUE(!ft.isDone());
+        ASSERT_TRUE(!ft.isCancelled());
         t.start();
         Thread::sleep(SHORT_DELAY_MS);
         ft.run();
         t.join();
-        CPPUNIT_ASSERT(ft.isDone());
-        CPPUNIT_ASSERT(!ft.isCancelled());
+        ASSERT_TRUE(ft.isDone());
+        ASSERT_TRUE(!ft.isCancelled());
     } catch(InterruptedException& e) {
         unexpectedException();
     }
@@ -405,20 +408,20 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testTimedGet1() {
+TEST_F(FutureTaskTest, testTimedGet1) {
 
     FutureTask<std::string> ft(new MediumNoInterruptsSleepCallable<std::string>(this));
     GetDelayedFutureTaskRunnable runner(this, &ft);
     Thread t(&runner);
 
     try {
-        CPPUNIT_ASSERT(!ft.isDone());
-        CPPUNIT_ASSERT(!ft.isCancelled());
+        ASSERT_TRUE(!ft.isDone());
+        ASSERT_TRUE(!ft.isCancelled());
         t.start();
         ft.run();
         t.join();
-        CPPUNIT_ASSERT(ft.isDone());
-        CPPUNIT_ASSERT(!ft.isCancelled());
+        ASSERT_TRUE(ft.isDone());
+        ASSERT_TRUE(!ft.isCancelled());
     } catch(InterruptedException& e) {
         unexpectedException();
     }
@@ -490,7 +493,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testTimedGetCancellation() {
+TEST_F(FutureTaskTest, testTimedGetCancellation) {
 
     FutureTask<std::string> ft(new ShortSleepCallable<std::string>(this));
     InterruptedGetDelayedFutureTaskRunnable runner(this, &ft);
@@ -545,7 +548,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testGetCancellation() {
+TEST_F(FutureTaskTest, testGetCancellation) {
 
     FutureTask<std::string> ft(new MediumSleepCallable<std::string>(this));
     CancelledGetFutureTaskRunnable runner(this, &ft);
@@ -594,7 +597,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testGetExecutionException() {
+TEST_F(FutureTaskTest, testGetExecutionException) {
 
     FutureTask<std::string> ft(new ErrorThrowingCallable<std::string>(this));
 
@@ -609,7 +612,7 @@ void FutureTaskTest::testGetExecutionException() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testTimedGetExecutionException2() {
+TEST_F(FutureTaskTest, testTimedGetExecutionException2) {
 
     FutureTask<std::string> ft(new ErrorThrowingCallable<std::string>(this));
 
@@ -660,7 +663,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testGetInterruptedException() {
+TEST_F(FutureTaskTest, testGetInterruptedException) {
 
     FutureTask<std::string> ft(new NoOpCallable<std::string>());
     Thread t(&ft);
@@ -711,7 +714,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testTimedGetInterruptedException2() {
+TEST_F(FutureTaskTest, testTimedGetInterruptedException2) {
     FutureTask<std::string> ft(new NoOpCallable<std::string>());
     InterruptableFutureTaskLongTimeoutGetRunnable runner(this, &ft);
     Thread t(&runner);
@@ -727,7 +730,7 @@ void FutureTaskTest::testTimedGetInterruptedException2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureTaskTest::testGetTimeoutException() {
+TEST_F(FutureTaskTest, testGetTimeoutException) {
     try {
         FutureTask<std::string> ft(new NoOpCallable<std::string>());
         ft.get(1, TimeUnit::MILLISECONDS);

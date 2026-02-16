@@ -205,114 +205,22 @@ add_subdirectory(activemq-cpp/src/main)
 add_subdirectory(activemq-cpp/src/examples)
 
 if(AMQCPP_BUILD_TESTS)
-    find_package(CppUnit CONFIG REQUIRED)
+    find_package(GTest CONFIG REQUIRED)
+
+	list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+	enable_testing()
+
 	add_subdirectory(activemq-cpp/src/test)
 	add_subdirectory(activemq-cpp/src/test-benchmarks)
 	add_subdirectory(activemq-cpp/src/test-integration)
 	add_subdirectory(activemq-cpp/src/test-system)
 
-	# Enable CTest and register the test executables
-	enable_testing()
+	# =========================================================================
+	# Integration & System Test Workflow Targets
+	# These targets automate the full Docker lifecycle + test execution.
+	# =========================================================================
 
-	# Register unit tests
-	add_test(NAME neoactivemq-unit-tests COMMAND neoactivemq-test)
-	set_tests_properties(neoactivemq-unit-tests PROPERTIES
-		TIMEOUT 6000
-		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
-	)
-
-	# Register benchmark tests
-	# Per-test timeout of 300s (5 min) is the default, watchdog dumps flight recorder on hang
-	add_test(NAME neoactivemq-benchmarks COMMAND neoactivemq-benchmark)
-	set_tests_properties(neoactivemq-benchmarks PROPERTIES
-		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
-	)
-
-	# Register integration tests with automatic Docker management
-	# Setup fixture: Start Docker before integration tests
-	add_test(NAME integration-docker-start
-		COMMAND docker compose up -d
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	)
-	set_tests_properties(integration-docker-start PROPERTIES
-		FIXTURES_SETUP IntegrationFixture
-		LABELS "integration;fixture"
-	)
-
-	# Wait for ActiveMQ to be ready (health check)
-	add_test(NAME integration-docker-wait
-		COMMAND ${CMAKE_COMMAND} -E sleep 10
-	)
-	set_tests_properties(integration-docker-wait PROPERTIES
-		FIXTURES_SETUP IntegrationFixture
-		DEPENDS integration-docker-start
-		LABELS "integration;fixture"
-	)
-
-	# The actual integration tests
-	# Per-test timeout of 300s (5 min) is the default, watchdog dumps flight recorder on hang
-	add_test(NAME neoactivemq-integration-tests COMMAND neoactivemq-integration-test)
-	set_tests_properties(neoactivemq-integration-tests PROPERTIES
-		LABELS "integration"
-		FIXTURES_REQUIRED IntegrationFixture
-		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
-	)
-
-	# Cleanup fixture: Stop Docker after integration tests
-	add_test(NAME integration-docker-stop
-		COMMAND docker compose down
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	)
-	set_tests_properties(integration-docker-stop PROPERTIES
-		FIXTURES_CLEANUP IntegrationFixture
-		LABELS "integration;fixture"
-	)
-
-	# Docker targets for integration tests
-	# These targets help start/stop ActiveMQ broker for integration testing
-
-	# Target: Start ActiveMQ broker with Docker Compose
-	add_custom_target(docker-up
-		COMMAND docker compose up -d
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		COMMENT "Starting ActiveMQ broker with Docker Compose..."
-	)
-
-	# Target: Stop ActiveMQ broker
-	add_custom_target(docker-down
-		COMMAND docker compose down
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		COMMENT "Stopping ActiveMQ broker..."
-	)
-
-	# Target: View ActiveMQ logs
-	add_custom_target(docker-logs
-		COMMAND docker compose logs -f activemq
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		COMMENT "Viewing ActiveMQ logs (Ctrl+C to exit)..."
-	)
-
-	# Target: Restart ActiveMQ broker
-	add_custom_target(docker-restart
-		COMMAND docker compose restart
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		COMMENT "Restarting ActiveMQ broker..."
-	)
-
-	# Target: Show Docker container status
-	add_custom_target(docker-ps
-		COMMAND docker compose ps
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		COMMENT "Docker container status:"
-	)
-
-	# Convenience target: Build integration tests and ensure Docker is mentioned
-	add_custom_target(integration-tests
-		DEPENDS neoactivemq-integration-test
-		COMMENT "Integration tests built. Start ActiveMQ with: cmake --build . --target docker-up"
-	)
-
-	# Full integration test workflow target
+	# Integration tests: start single broker, run tests, stop broker
 	add_custom_target(integration-full
 		COMMAND docker compose up -d
 		COMMAND ${CMAKE_COMMAND} -E sleep 10
@@ -324,78 +232,7 @@ if(AMQCPP_BUILD_TESTS)
 		COMMENT "Full integration test workflow (start broker, test, stop broker)..."
 	)
 
-	message(STATUS "Integration test Docker targets available:")
-	message(STATUS "  cmake --build --preset <preset> --target docker-up         # Start ActiveMQ")
-	message(STATUS "  cmake --build --preset <preset> --target docker-down       # Stop ActiveMQ")
-	message(STATUS "  cmake --build --preset <preset> --target docker-logs       # View logs")
-	message(STATUS "  cmake --build --preset <preset> --target integration-full  # Full workflow")
-
-	# =========================================================================
-	# System Tests (failover, multi-connection, high-volume)
-	# Requires: docker compose --profile failover up
-	# =========================================================================
-
-	# Setup fixture: Start Docker with failover profile before system tests
-	add_test(NAME system-docker-start
-		COMMAND docker compose --profile failover up -d
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	)
-	set_tests_properties(system-docker-start PROPERTIES
-		FIXTURES_SETUP SystemFixture
-		LABELS "system;fixture"
-	)
-
-	# Wait for all brokers to be ready
-	add_test(NAME system-docker-wait
-		COMMAND ${CMAKE_COMMAND} -E sleep 15
-	)
-	set_tests_properties(system-docker-wait PROPERTIES
-		FIXTURES_SETUP SystemFixture
-		DEPENDS system-docker-start
-		LABELS "system;fixture"
-	)
-
-	# The actual system tests (failover, multi-connection, high-volume)
-	# Per-test timeout of 600s (10 min) for high-volume tests
-	add_test(NAME neoactivemq-system-tests COMMAND neoactivemq-system-test)
-	set_tests_properties(neoactivemq-system-tests PROPERTIES
-		LABELS "system"
-		FIXTURES_REQUIRED SystemFixture
-		TIMEOUT 1800
-		ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
-	)
-
-	# Cleanup fixture: Stop Docker with failover profile after system tests
-	add_test(NAME system-docker-stop
-		COMMAND docker compose --profile failover down
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	)
-	set_tests_properties(system-docker-stop PROPERTIES
-		FIXTURES_CLEANUP SystemFixture
-		LABELS "system;fixture"
-	)
-
-	# Target: Start all brokers with failover profile
-	add_custom_target(docker-failover-up
-		COMMAND docker compose --profile failover up -d
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		COMMENT "Starting all ActiveMQ brokers (failover profile)..."
-	)
-
-	# Target: Stop all brokers with failover profile
-	add_custom_target(docker-failover-down
-		COMMAND docker compose --profile failover down
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		COMMENT "Stopping all ActiveMQ brokers..."
-	)
-
-	# Convenience target: Build system tests
-	add_custom_target(system-tests
-		DEPENDS neoactivemq-system-test
-		COMMENT "System tests built. Start brokers with: cmake --build . --target docker-failover-up"
-	)
-
-	# Full system test workflow target
+	# System tests: start all brokers (failover profile), run tests, stop brokers
 	add_custom_target(system-full
 		COMMAND docker compose --profile failover up -d
 		COMMAND ${CMAKE_COMMAND} -E sleep 15
@@ -407,10 +244,9 @@ if(AMQCPP_BUILD_TESTS)
 		COMMENT "Full system test workflow (start all brokers, test, stop brokers)..."
 	)
 
-	message(STATUS "System test Docker targets available:")
-	message(STATUS "  cmake --build --preset <preset> --target docker-failover-up   # Start all brokers")
-	message(STATUS "  cmake --build --preset <preset> --target docker-failover-down # Stop all brokers")
-	message(STATUS "  cmake --build --preset <preset> --target system-full          # Full workflow")
+	message(STATUS "Test workflow targets:")
+	message(STATUS "  cmake --build --preset <preset> --target integration-full  # Integration tests (auto Docker)")
+	message(STATUS "  cmake --build --preset <preset> --target system-full       # System tests (auto Docker)")
 endif()
 
 # Installation rules

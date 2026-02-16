@@ -15,7 +15,21 @@
  * limitations under the License.
  */
 
-#include "OpenwireVirtualTopicTest.h"
+#include <activemq/test/VirtualTopicTest.h>
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    class OpenwireVirtualTopicTest : public VirtualTopicTest {
+    private:
+public:
+        OpenwireVirtualTopicTest();
+        virtual ~OpenwireVirtualTopicTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
 
 using namespace activemq;
 using namespace activemq::test;
@@ -28,3 +42,9 @@ OpenwireVirtualTopicTest::OpenwireVirtualTopicTest() {
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireVirtualTopicTest::~OpenwireVirtualTopicTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(OpenwireVirtualTopicTest, testVirtualTopicSyncReceiveAutoAck) { testVirtualTopicSyncReceiveAutoAck(); }
+TEST_F(OpenwireVirtualTopicTest, testVirtualTopicSyncReceiveClinetAck) { testVirtualTopicSyncReceiveClinetAck(); }
+TEST_F(OpenwireVirtualTopicTest, testVirtualTopicSyncReceiveTransacted) { testVirtualTopicSyncReceiveTransacted(); }

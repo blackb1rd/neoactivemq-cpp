@@ -15,59 +15,85 @@
  * limitations under the License.
  */
 
-#include "CmsAccessorTest.h"
+#include <gtest/gtest.h>
 #include <activemq/cmsutil/DynamicDestinationResolver.h>
 #include <activemq/cmsutil/ResourceLifecycleManager.h>
 #include "DummyConnectionFactory.h"
+#include <activemq/cmsutil/CmsAccessor.h>
 
 using namespace activemq;
 using namespace activemq::cmsutil;
 
+    class CmsAccessorTest : public ::testing::Test
+    {
+    protected:
+
+        class MyAccessor : public CmsAccessor {
+        public:
+
+            virtual ~MyAccessor() {}
+
+            virtual cms::Connection* createConnection() {
+                return CmsAccessor::createConnection();
+            }
+
+            virtual cms::Session* createSession(cms::Connection* con) {
+                return CmsAccessor::createSession(con);
+            }
+        };
+
+        MyAccessor* accessor;
+        DummyConnectionFactory* cf;
+
+        void SetUp() override;
+        void TearDown() override;
+    };
+
+
 ////////////////////////////////////////////////////////////////////////////////
-void CmsAccessorTest::setUp() {
+void CmsAccessorTest::SetUp() {
     cf = new DummyConnectionFactory();
     accessor = new MyAccessor();
     accessor->setConnectionFactory(cf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsAccessorTest::tearDown() {
+void CmsAccessorTest::TearDown() {
     delete accessor;
     delete cf;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsAccessorTest::testConnectionFactory() {
+TEST_F(CmsAccessorTest, testConnectionFactory) {
 
-    CPPUNIT_ASSERT(accessor->getConnectionFactory() == cf);
+    ASSERT_TRUE(accessor->getConnectionFactory() == cf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsAccessorTest::testAckMode() {
+TEST_F(CmsAccessorTest, testAckMode) {
 
-    CPPUNIT_ASSERT(accessor->getSessionAcknowledgeMode() == cms::Session::AUTO_ACKNOWLEDGE);
+    ASSERT_TRUE(accessor->getSessionAcknowledgeMode() == cms::Session::AUTO_ACKNOWLEDGE);
 
     accessor->setSessionAcknowledgeMode(cms::Session::CLIENT_ACKNOWLEDGE);
 
-    CPPUNIT_ASSERT(accessor->getSessionAcknowledgeMode() == cms::Session::CLIENT_ACKNOWLEDGE) ;
+    ASSERT_TRUE(accessor->getSessionAcknowledgeMode() == cms::Session::CLIENT_ACKNOWLEDGE) ;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsAccessorTest::testCreateResources() {
+TEST_F(CmsAccessorTest, testCreateResources) {
 
     cms::Connection* c = accessor->createConnection();
-    CPPUNIT_ASSERT( c != NULL);
+    ASSERT_TRUE(c != NULL);
 
     cms::Session* s = accessor->createSession(c);
-    CPPUNIT_ASSERT( s != NULL);
+    ASSERT_TRUE(s != NULL);
 
-    CPPUNIT_ASSERT(s->getAcknowledgeMode() == cms::Session::AUTO_ACKNOWLEDGE);
+    ASSERT_TRUE(s->getAcknowledgeMode() == cms::Session::AUTO_ACKNOWLEDGE);
 
     accessor->setSessionAcknowledgeMode(cms::Session::CLIENT_ACKNOWLEDGE);
 
     s = accessor->createSession(c);
-    CPPUNIT_ASSERT( s != NULL);
+    ASSERT_TRUE(s != NULL);
 
-    CPPUNIT_ASSERT(s->getAcknowledgeMode() == cms::Session::CLIENT_ACKNOWLEDGE);
+    ASSERT_TRUE(s->getAcknowledgeMode() == cms::Session::CLIENT_ACKNOWLEDGE);
 }
-

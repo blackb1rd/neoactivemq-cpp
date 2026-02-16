@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "OpenWireFormatTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/util/Properties.h>
 #include <activemq/wireformat/openwire/OpenWireFormatFactory.h>
@@ -34,8 +34,11 @@ using namespace activemq::exceptions;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 
+    class OpenWireFormatTest : public ::testing::Test {
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
-void OpenWireFormatTest::testProviderInfoInWireFormat() {
+TEST_F(OpenWireFormatTest, testProviderInfoInWireFormat) {
     ActiveMQConnectionMetaData meta;
 
     OpenWireFormatFactory factory;
@@ -44,9 +47,7 @@ void OpenWireFormatTest::testProviderInfoInWireFormat() {
     Pointer<OpenWireFormat> myWireFormat =
             factory.createWireFormat(properties).dynamicCast<OpenWireFormat>();
 
-    CPPUNIT_ASSERT_EQUAL(meta.getCMSProviderName(),
-            myWireFormat->getPreferedWireFormatInfo()->getProperties().getString("ProviderName"));
-    CPPUNIT_ASSERT_EQUAL(meta.getProviderVersion(),
-            myWireFormat->getPreferedWireFormatInfo()->getProperties().getString("ProviderVersion"));
-    CPPUNIT_ASSERT(!myWireFormat->getPreferedWireFormatInfo()->getProperties().getString("PlatformDetails").empty());
+    ASSERT_EQ(meta.getCMSProviderName(), myWireFormat->getPreferedWireFormatInfo()->getProperties().getString("ProviderName"));
+    ASSERT_EQ(meta.getProviderVersion(), myWireFormat->getPreferedWireFormatInfo()->getProperties().getString("ProviderVersion"));
+    ASSERT_TRUE(!myWireFormat->getPreferedWireFormatInfo()->getProperties().getString("PlatformDetails").empty());
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "WriterTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/io/Writer.h>
 #include <decaf/nio/CharBuffer.h>
@@ -26,6 +26,14 @@ using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::nio;
 using namespace decaf::lang::exceptions;
+
+    class WriterTest : public ::testing::Test {
+public:
+
+        WriterTest();
+        virtual ~WriterTest();
+
+    };
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -104,7 +112,7 @@ WriterTest::~WriterTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WriterTest::testWriteChar() {
+TEST_F(WriterTest, testWriteChar) {
 
     std::string testString = "My Test String";
     MockWriter writer( 20 );
@@ -115,11 +123,11 @@ void WriterTest::testWriteChar() {
     }
 
     std::vector<char> result = writer.getContents();
-    CPPUNIT_ASSERT_EQUAL( testString, std::string( result.begin(), result.end() ) );
+    ASSERT_EQ(testString, std::string( result.begin(), result.end() ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WriterTest::testWriteVector() {
+TEST_F(WriterTest, testWriteVector) {
 
     std::string testString = "My Test String";
     MockWriter writer( 20 );
@@ -128,11 +136,11 @@ void WriterTest::testWriteVector() {
     writer.write( buffer );
 
     std::vector<char> result = writer.getContents();
-    CPPUNIT_ASSERT_EQUAL( testString, std::string( result.begin(), result.end() ) );
+    ASSERT_EQ(testString, std::string( result.begin(), result.end() ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WriterTest::testWriteString() {
+TEST_F(WriterTest, testWriteString) {
 
     std::string testString = "My Test String";
     MockWriter writer( 20 );
@@ -140,11 +148,11 @@ void WriterTest::testWriteString() {
     writer.write( testString );
 
     std::vector<char> result = writer.getContents();
-    CPPUNIT_ASSERT_EQUAL( testString, std::string( result.begin(), result.end() ) );
+    ASSERT_EQ(testString, std::string( result.begin(), result.end() ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WriterTest::testWriteStringOffsetCount() {
+TEST_F(WriterTest, testWriteStringOffsetCount) {
 
     std::string testString = "My Test String";
     MockWriter writer( 20 );
@@ -152,24 +160,24 @@ void WriterTest::testWriteStringOffsetCount() {
     writer.write( testString, 0, (int)testString.length() );
 
     std::vector<char> result = writer.getContents();
-    CPPUNIT_ASSERT_EQUAL( testString, std::string( result.begin(), result.end() ) );
+    ASSERT_EQ(testString, std::string( result.begin(), result.end() ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WriterTest::testAppendChar() {
+TEST_F(WriterTest, testAppendChar) {
 
     char testChar = ' ';
     MockWriter writer(20);
 
     writer.append( testChar );
 
-    CPPUNIT_ASSERT_EQUAL( testChar, writer.getContents()[0] );
+    ASSERT_EQ(testChar, writer.getContents()[0]);
 
     writer.close();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WriterTest::testAppendCharSequence() {
+TEST_F(WriterTest, testAppendCharSequence) {
 
     std::string testString = "My Test String";
     MockWriter writer( 20 );
@@ -181,7 +189,7 @@ void WriterTest::testAppendCharSequence() {
     writer.append( buffer );
 
     std::vector<char> result = writer.getContents();
-    CPPUNIT_ASSERT_EQUAL( testString, std::string( result.begin(), result.end() ) );
+    ASSERT_EQ(testString, std::string( result.begin(), result.end() ));
 
     writer.close();
 
@@ -189,7 +197,7 @@ void WriterTest::testAppendCharSequence() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WriterTest::testAppendCharSequenceIntInt() {
+TEST_F(WriterTest, testAppendCharSequenceIntInt) {
 
     std::string testString = "My Test String";
     MockWriter writer(20);
@@ -201,7 +209,7 @@ void WriterTest::testAppendCharSequenceIntInt() {
     writer.append( buffer, 1, 3 );
 
     std::vector<char> result = writer.getContents();
-    CPPUNIT_ASSERT_EQUAL( testString.substr( 1, 2 ), std::string( result.begin(), result.end() ) );
+    ASSERT_EQ(testString.substr( 1, 2 ), std::string( result.begin(), result.end() ));
 
     writer.close();
 

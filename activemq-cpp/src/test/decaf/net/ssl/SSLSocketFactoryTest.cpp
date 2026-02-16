@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "SSLSocketFactoryTest.h"
+#include <gtest/gtest.h>
 
 #include <decaf/net/ssl/SSLSocketFactory.h>
 #include <decaf/net/Socket.h>
@@ -26,6 +26,14 @@ using namespace decaf::io;
 using namespace decaf::net;
 using namespace decaf::net::ssl;
 
+    class SSLSocketFactoryTest : public ::testing::Test {
+public:
+
+        SSLSocketFactoryTest();
+        virtual ~SSLSocketFactoryTest();
+
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 SSLSocketFactoryTest::SSLSocketFactoryTest() {
 }
@@ -35,23 +43,20 @@ SSLSocketFactoryTest::~SSLSocketFactoryTest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SSLSocketFactoryTest::testGetDefault() {
+TEST_F(SSLSocketFactoryTest, testGetDefault) {
 
     SocketFactory* factory = SSLSocketFactory::getDefault();
 
-    CPPUNIT_ASSERT( factory != NULL );
+    ASSERT_TRUE(factory != NULL);
 
 #ifdef HAVE_OPENSSL
 
     std::unique_ptr<Socket> sock( factory->createSocket() );
-    CPPUNIT_ASSERT( sock.get() != NULL );
+    ASSERT_TRUE(sock.get() != NULL);
 
 #else
 
-    CPPUNIT_ASSERT_THROW_MESSAGE(
-        "Should have thrown an IOException",
-        factory->createSocket(),
-        IOException );
+    ASSERT_THROW(factory->createSocket(), IOException) << ("Should have thrown an IOException");
 
 #endif
 }

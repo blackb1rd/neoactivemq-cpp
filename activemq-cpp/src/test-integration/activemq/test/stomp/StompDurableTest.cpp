@@ -15,7 +15,24 @@
  * limitations under the License.
  */
 
-#include "StompDurableTest.h"
+#include <activemq/test/DurableTest.h>
+
+namespace activemq{
+namespace test{
+namespace stomp{
+    class StompDurableTest : public DurableTest {
+std::string subscriptionName;
+    public:
+        StompDurableTest();
+        virtual ~StompDurableTest();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getStompURL();
+        }
+        virtual std::string getSubscriptionName() const {
+            return cmsProvider->getConnection()->getClientID();
+        }
+    };
+}}}
 
 using namespace activemq;
 using namespace activemq::test;
@@ -28,3 +45,7 @@ StompDurableTest::StompDurableTest() : DurableTest(), subscriptionName() {
 ////////////////////////////////////////////////////////////////////////////////
 StompDurableTest::~StompDurableTest() {
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Test registration
+TEST_F(StompDurableTest, DISABLED_testDurableConsumer) { testDurableConsumer(); }

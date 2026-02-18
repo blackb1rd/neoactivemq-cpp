@@ -40,6 +40,12 @@
 #include <decaf/util/concurrent/Mutex.h>
 #include <activemq/util/AMQLog.h>
 
+#ifdef _WIN32
+    #include <winsock2.h>
+#else
+    #include <fcntl.h>
+#endif
+
 using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
@@ -187,6 +193,20 @@ void OpenSSLSocket::connect(const std::string& host, int port, int timeout) {
 
             BIO_set_fd(bio, (int )fd->getValue(), BIO_NOCLOSE);
             SSL_set_bio(this->parameters->getSSL(), bio, bio);
+
+            // ASIO may leave the socket in non-blocking mode after async_connect.
+            // OpenSSL's BIO_s_socket() expects a blocking socket for SSL_connect,
+            // SSL_read, and SSL_write to work correctly without manual retry loops.
+            int nativeFd = (int)fd->getValue();
+#ifdef _WIN32
+            unsigned long blockingMode = 0;
+            ioctlsocket(static_cast<SOCKET>(nativeFd), FIONBIO, &blockingMode);
+#else
+            int flags = fcntl(nativeFd, F_GETFL, 0);
+            if (flags != -1) {
+                fcntl(nativeFd, F_SETFL, flags & ~O_NONBLOCK);
+            }
+#endif
 
             // Later when startHandshake is called we will check for this common name
             // in the provided certificate
@@ -376,14 +396,27 @@ void OpenSSLSocket::startHandshake() {
 
                 int result = SSL_connect(this->parameters->getSSL());
 
-                // Checks the error status
-                switch (SSL_get_error(this->parameters->getSSL(), result)) {
+                int sslError = SSL_get_error(this->parameters->getSSL(), result);
+                switch (sslError) {
                 case SSL_ERROR_NONE:
                     break;
+                case SSL_ERROR_WANT_READ:
+                case SSL_ERROR_WANT_WRITE:
+                    AMQ_LOG_ERROR("OpenSSLSocket", "SSL_connect() returned "
+                        << (sslError == SSL_ERROR_WANT_READ ? "SSL_ERROR_WANT_READ" : "SSL_ERROR_WANT_WRITE")
+                        << " - socket may be in non-blocking mode");
+                    SSLSocket::close();
+                    throw OpenSSLSocketException(__FILE__, __LINE__);
                 case SSL_ERROR_SSL:
-                case SSL_ERROR_ZERO_RETURN:
+                    AMQ_LOG_ERROR("OpenSSLSocket", "SSL_connect() failed with SSL_ERROR_SSL");
+                    SSLSocket::close();
+                    throw OpenSSLSocketException(__FILE__, __LINE__);
                 case SSL_ERROR_SYSCALL:
-                               default:
+                    AMQ_LOG_ERROR("OpenSSLSocket", "SSL_connect() failed with SSL_ERROR_SYSCALL, result=" << result);
+                    SSLSocket::close();
+                    throw OpenSSLSocketException(__FILE__, __LINE__);
+                default:
+                    AMQ_LOG_ERROR("OpenSSLSocket", "SSL_connect() failed with error code " << sslError);
                     SSLSocket::close();
                     throw OpenSSLSocketException(__FILE__, __LINE__);
                 }
@@ -409,7 +442,9 @@ void OpenSSLSocket::startHandshake() {
 
                 int result = SSL_accept(this->parameters->getSSL());
 
-                if (result != SSL_ERROR_NONE) {
+                int sslError = SSL_get_error(this->parameters->getSSL(), result);
+                if (sslError != SSL_ERROR_NONE) {
+                    AMQ_LOG_ERROR("OpenSSLSocket", "SSL_accept() failed with error code " << sslError);
                     SSLSocket::close();
                     throw OpenSSLSocketException(__FILE__, __LINE__);
                 }

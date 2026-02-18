@@ -355,10 +355,6 @@ int main(int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED) {
     // the trusted root.  If using client authentication you also need to specify
     // the location of the client Certificate.
     //
-    //     System::setProperty( "decaf.net.ssl.keyStore", "<path>/client.pem" );
-    //     System::setProperty( "decaf.net.ssl.keyStorePassword", "password" );
-    //     System::setProperty( "decaf.net.ssl.trustStore", "<path>/rootCA.pem" );
-    //
     // The you just specify the ssl transport in the URI, for example:
     //
     //     ssl://localhost:61617

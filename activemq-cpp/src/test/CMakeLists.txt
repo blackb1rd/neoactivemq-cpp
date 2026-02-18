@@ -78,9 +78,13 @@ add_unit_test_module(
   LABELS activemq threads
 )
 
-# ─── Module 6: activemq-transport (14 tests) ─────────────────────────────────
+# ─── Module 6: activemq-transport (13 tests + 1 SSL) ─────────────────────────
 # MockBrokerService.cpp is needed by FailoverTransportTest and
 # SingleBrokerReconnectTest but contains no TEST_F macros.
+set(_transport_ssl_sources)
+if(AMQCPP_USE_SSL)
+    list(APPEND _transport_ssl_sources activemq/transport/tcp/SslTransportTest.cpp)
+endif()
 add_unit_test_module(
   NAME neoactivemq-unit-activemq-transport
   SOURCES
@@ -97,7 +101,7 @@ add_unit_test_module(
     activemq/transport/mock/MockTransportFactoryTest.cpp
     activemq/transport/tcp/TcpTransportTest.cpp
     activemq/transport/tcp/SingleBrokerReconnectTest.cpp
-    activemq/transport/tcp/SslTransportTest.cpp
+    ${_transport_ssl_sources}
   EXTRA_SOURCES
     activemq/mock/MockBrokerService.cpp
   LABELS activemq transport
@@ -195,14 +199,20 @@ add_unit_test_module(
   LABELS activemq wireformat
 )
 
-# ─── Module 9: decaf-internal (16 tests) ─────────────────────────────────────
+# ─── Module 9: decaf-internal (14 tests + 2 SSL) ─────────────────────────────
+set(_decaf_internal_ssl_sources)
+if(AMQCPP_USE_SSL)
+    list(APPEND _decaf_internal_ssl_sources
+        decaf/internal/net/ssl/DefaultSSLSocketFactoryTest.cpp
+        decaf/internal/net/ssl/openssl/OpenSSLSocketTest.cpp
+    )
+endif()
 add_unit_test_module(
   NAME neoactivemq-unit-decaf-internal
   SOURCES
     decaf/internal/net/URIEncoderDecoderTest.cpp
     decaf/internal/net/URIHelperTest.cpp
-    decaf/internal/net/ssl/DefaultSSLSocketFactoryTest.cpp
-    decaf/internal/net/ssl/openssl/OpenSSLSocketTest.cpp
+    ${_decaf_internal_ssl_sources}
     decaf/internal/nio/BufferFactoryTest.cpp
     decaf/internal/nio/ByteArrayBufferTest.cpp
     decaf/internal/nio/CharArrayBufferTest.cpp
@@ -268,7 +278,11 @@ add_unit_test_module(
   LABELS decaf lang
 )
 
-# ─── Module 12: decaf-net (12 tests, includes ssl) ───────────────────────────
+# ─── Module 12: decaf-net (11 tests + 1 SSL) ─────────────────────────────────
+set(_decaf_net_ssl_sources)
+if(AMQCPP_USE_SSL)
+    list(APPEND _decaf_net_ssl_sources decaf/net/ssl/SSLSocketFactoryTest.cpp)
+endif()
 add_unit_test_module(
   NAME neoactivemq-unit-decaf-net
   SOURCES
@@ -283,7 +297,7 @@ add_unit_test_module(
     decaf/net/URLDecoderTest.cpp
     decaf/net/URLEncoderTest.cpp
     decaf/net/URLTest.cpp
-    decaf/net/ssl/SSLSocketFactoryTest.cpp
+    ${_decaf_net_ssl_sources}
   LABELS decaf net
 )
 

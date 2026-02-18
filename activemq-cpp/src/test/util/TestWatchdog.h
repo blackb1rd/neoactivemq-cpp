@@ -84,17 +84,17 @@ private:
                 auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
 
                 if (elapsedSeconds >= testTimeoutSeconds) {
-                    std::cerr << std::endl << "ERROR: " << timeoutLabel << " timed out after "
-                              << elapsedSeconds << " seconds: " << testName << std::endl;
-
-                    // Dump Flight Recorder log entries for debugging
-                    std::cerr << std::endl << "=== Flight Recorder Dump (last "
-                              << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
-                    activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
-                    std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
-
-                    std::cerr << "Forcibly terminating process due to " << timeoutLabel << " timeout..." << std::endl;
-                    std::cerr.flush();
+                    // Write to both streams so CTest captures it regardless of redirection.
+                    for (std::ostream* out : {&std::cout, &std::cerr}) {
+                        *out << std::endl << "ERROR: " << timeoutLabel << " timed out after "
+                             << elapsedSeconds << " seconds: " << testName << std::endl;
+                        *out << std::endl << "=== TIMEOUT - Flight Recorder Dump (last "
+                             << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+                        activemq::util::AMQLogger::dumpFlightRecorder(*out);
+                        *out << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
+                        *out << "Forcibly terminating process due to " << timeoutLabel << " timeout..." << std::endl;
+                        out->flush();
+                    }
                     std::_Exit(-1);
                 }
             }
@@ -157,9 +157,26 @@ public:
         testRunning.store(true, std::memory_order_release);
     }
 
-    void OnTestEnd(const ::testing::TestInfo& /*test_info*/) override {
-        std::lock_guard<std::mutex> lock(mutex);
-        testRunning.store(false, std::memory_order_release);
+    void OnTestEnd(const ::testing::TestInfo& test_info) override {
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            testRunning.store(false, std::memory_order_release);
+        }
+
+        // On test failure, immediately dump the flight recorder so it appears
+        // in CTest's per-test captured output (before the global end-of-suite dump).
+        if (test_info.result() != nullptr && !test_info.result()->Passed()) {
+            const std::string name = std::string(test_info.test_suite_name()) + "." + test_info.name();
+            // Write to both stdout and stderr so CTest captures it regardless of redirection.
+            for (std::ostream* out : {&std::cout, &std::cerr}) {
+                *out << std::endl
+                     << "=== FAILED: " << name << " - Flight Recorder Dump (last "
+                     << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+                activemq::util::AMQLogger::dumpFlightRecorder(*out);
+                *out << "=== End Flight Recorder Dump ===" << std::endl;
+                out->flush();
+            }
+        }
     }
 
     /**

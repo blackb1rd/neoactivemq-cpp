@@ -381,25 +381,33 @@ void BackupTransportPool::onBackupTransportFailure(BackupTransport* failedTransp
 
     synchronized(&this->impl->backups) {
 
-        bool found = false;
+        // Use a Pointer to keep the BackupTransport alive after iter->remove().
+        // iter->remove() drops the list's Pointer (the only other holder), which would
+        // immediately destroy the BackupTransport and make failedTransport a dangling
+        // pointer before we can read isPriority()/getUri()/getTransport().
+        Pointer<BackupTransport> found;
         std::unique_ptr<Iterator<Pointer<BackupTransport> > > iter(this->impl->backups.iterator());
 
         while (iter->hasNext()) {
-            if (iter->next() == failedTransport) {
+            Pointer<BackupTransport> next = iter->next();
+            if (next.get() == failedTransport) {
                 iter->remove();
-                found = true;
+                found = next;  // Keep alive while we access its data below
                 break;
             }
         }
 
-        if (found) {
-            if (failedTransport->isPriority() && this->impl->priorityBackups > 0) {
+        if (found != NULL) {
+            if (found->isPriority() && this->impl->priorityBackups > 0) {
                 this->impl->priorityBackups--;
             }
 
-            this->uriPool->addURI(failedTransport->getUri());
-            this->closeTask->add(failedTransport->getTransport());
+            this->uriPool->addURI(found->getUri());
+            this->closeTask->add(found->getTransport());
             this->taskRunner->wakeup();
+            // Clear the transport so the BackupTransport destructor (when 'found'
+            // goes out of scope) doesn't close it a second time.
+            found->setTransport(Pointer<Transport>());
         }
     }
 }

@@ -31,14 +31,32 @@
 #include <condition_variable>
 #include <stdexcept>
 
-#ifdef _WIN32
-#include <windows.h>
-static LONG WINAPI flightRecorderExceptionFilter(EXCEPTION_POINTERS* /*exInfo*/) {
-    std::cerr << std::endl << "=== CRASH DETECTED - Flight Recorder Dump (last "
+static void dumpFlightRecorderToAll(const char* header) {
+    std::cout << std::endl << header
+              << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+    activemq::util::AMQLogger::dumpFlightRecorder(std::cout);
+    std::cout << "=== End Flight Recorder Dump ===" << std::endl;
+    std::cout.flush();
+    // Also write to stderr so it appears even if stdout is redirected differently
+    std::cerr << std::endl << header
               << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
     activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
     std::cerr << "=== End Flight Recorder Dump ===" << std::endl;
     std::cerr.flush();
+}
+
+// Called by std::terminate() — fires when an exception escapes a noexcept context
+// or when std::terminate() is called directly. This catches crashes that bypass
+// SetUnhandledExceptionFilter (e.g. abort() called from the C++ runtime).
+static void flightRecorderTerminateHandler() {
+    dumpFlightRecorderToAll("=== TERMINATE CALLED - Flight Recorder Dump (last ");
+    std::abort();
+}
+
+#ifdef _WIN32
+#include <windows.h>
+static LONG WINAPI flightRecorderExceptionFilter(EXCEPTION_POINTERS* /*exInfo*/) {
+    dumpFlightRecorderToAll("=== CRASH DETECTED - Flight Recorder Dump (last ");
     return EXCEPTION_CONTINUE_SEARCH;
 }
 #else
@@ -62,6 +80,11 @@ int main( int argc, char **argv ) {
     activemq::util::AMQLogger::initializeFlightRecorder(0.005);
     // Enable DEBUG level logging globally to record entries to flight recorder
     activemq::util::AMQLogger::setLevel(activemq::util::AMQLogLevel::DEBUG);
+
+    // Install terminate handler: fires when std::terminate() is called (e.g. exception
+    // thrown from a noexcept function, or unhandled exception in a thread). On Windows
+    // this path bypasses SetUnhandledExceptionFilter, so it must be handled separately.
+    std::set_terminate(flightRecorderTerminateHandler);
 
     // Install crash handler to dump Flight Recorder on segfault / access violation
 #ifdef _WIN32
@@ -175,12 +198,11 @@ int main( int argc, char **argv ) {
                           << timeoutSeconds << " seconds" << std::endl;
 
                 // Dump Flight Recorder log entries for debugging
-                std::cerr << std::endl << "=== Flight Recorder Dump (last "
-                          << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
-                activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
-                std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
+                dumpFlightRecorderToAll("=== GLOBAL TIMEOUT - Flight Recorder Dump (last ");
+                std::cerr << std::endl;
 
                 std::cerr << "Forcibly terminating process due to timeout..." << std::endl;
+                std::cerr.flush();
                 std::_Exit(-1);
             }
         }
@@ -193,13 +215,9 @@ int main( int argc, char **argv ) {
 
     // If tests failed, dump flight recorder
     if( result != 0 ) {
+        std::cout << std::endl << "ERROR: Test execution failed" << std::endl;
         std::cerr << std::endl << "ERROR: Test execution failed" << std::endl;
-
-        // Dump Flight Recorder log entries for debugging
-        std::cerr << std::endl << "=== Flight Recorder Dump (last "
-                  << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
-        activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
-        std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
+        dumpFlightRecorderToAll("=== FAILURE - Flight Recorder Dump (last ");
     }
 
     // Shutdown watchdog

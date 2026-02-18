@@ -952,35 +952,32 @@ void Threading::destroyThread(ThreadHandle* thread) {
 
     if (!thread->osThread) {
 
-        // If the thread was created but never started then we need to wake it
-        // up from the suspended state so that it can terminate, we mark it
-        // canceled to ensure it doesn't call its runnable.
-        if (thread->state.load(std::memory_order_acquire) == Thread::NEW) {
-            PlatformThread::lockMutex(thread->mutex);
+        PlatformThread::lockMutex(thread->mutex);
 
-            if (thread->state.load(std::memory_order_acquire) == Thread::NEW && thread->suspended == true) {
-                thread->canceled = true;
-                thread->suspended = false;
-                PlatformThread::notifyAll(thread->condition);
-            }
-
-            PlatformThread::unlockMutex(thread->mutex);
+        // If the thread was created but never started, signal it to cancel so
+        // it wakes from its suspended state and exits without running user code.
+        if (thread->state.load(std::memory_order_acquire) == Thread::NEW && thread->suspended == true) {
+            thread->canceled = true;
+            thread->suspended = false;
+            PlatformThread::notifyAll(thread->condition);
         }
 
-        // Only join if the thread is not already terminated
-        // Check the state while holding the thread's mutex to ensure proper synchronization
-        PlatformThread::lockMutex(thread->mutex);
-        int currentState = thread->state.load(std::memory_order_seq_cst);
+        // Wait until the OS thread fully terminates. Using a condition wait rather
+        // than Threading::join avoids an early-return bug where join sees state==NEW
+        // (thread signaled to cancel but not yet transitioned to TERMINATED) and
+        // returns immediately, leaving OS threads still running when the library is
+        // torn down (use-after-free on library->globalLock / library->activeThreads).
+        while (thread->state.load(std::memory_order_seq_cst) != Thread::TERMINATED) {
+            PlatformThread::waitOnCondition(thread->condition, thread->mutex);
+        }
+
+        decaf_thread_t handle = thread->handle;
         PlatformThread::unlockMutex(thread->mutex);
 
-        if (currentState != Thread::TERMINATED) {
-            try {
-                // Use a timeout as a safety measure to prevent infinite hangs in destructor
-                // If the thread hasn't terminated after 10 seconds, there's likely a bug,
-                // but we don't want to hang forever in the destructor
-                Threading::join(thread, 0, 0);
-            } catch (InterruptedException& ex) {}
-        }
+        // Join the std::thread to release its OS resources. Safe to call even if
+        // Thread::join() was already called, since joinable() returns false then.
+        PlatformThread::joinThread(handle);
+
     } else {
         PlatformThread::detachOSThread(thread->handle);
     }

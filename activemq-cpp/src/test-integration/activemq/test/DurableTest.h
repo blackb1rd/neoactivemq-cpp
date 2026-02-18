@@ -25,7 +25,7 @@ namespace activemq{
 namespace test{
 
     class DurableTest : public CMSTestFixture {
-    private:
+    protected:
 
         static const int MSG_COUNT = 10;
 

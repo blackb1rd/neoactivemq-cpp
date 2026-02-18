@@ -16,14 +16,16 @@
  */
 
 #include <activemq/test/JmsMessageGroupsTest.h>
+#include <activemq/exceptions/ActiveMQException.h>
+
+#include <decaf/lang/Thread.h>
+#include <decaf/util/UUID.h>
 
 namespace activemq {
 namespace test {
 namespace openwire {
     class OpenwireJmsMessageGroupsTest : public JmsMessageGroupsTest {
 public:
-        OpenwireJmsMessageGroupsTest();
-        virtual ~OpenwireJmsMessageGroupsTest();
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
@@ -33,15 +35,32 @@ public:
 using namespace activemq;
 using namespace activemq::test;
 using namespace activemq::test::openwire;
+using namespace activemq::exceptions;
+using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenwireJmsMessageGroupsTest::OpenwireJmsMessageGroupsTest() {
+TEST_F(OpenwireJmsMessageGroupsTest, testMessageSend) {
+
+    try {
+
+        std::string GROUPID = "TEST-GROUP-ID";
+
+        // Create CMS Object for Comms
+        cms::Session* session( cmsProvider->getSession() );
+        cms::MessageConsumer* consumer = cmsProvider->getConsumer();
+        cms::MessageProducer* producer = cmsProvider->getProducer();
+        producer->setDeliveryMode( DeliveryMode::NON_PERSISTENT );
+
+        std::unique_ptr<cms::TextMessage> txtMessage( session->createTextMessage( "TEST MESSAGE" ) );
+        txtMessage->setStringProperty( "JMSXGroupID", GROUPID );
+
+        // Send some text messages
+        producer->send( txtMessage.get() );
+
+        std::unique_ptr<cms::Message> message( consumer->receive( 2000 ) );
+        ASSERT_TRUE(message.get() != NULL);
+        ASSERT_TRUE(message->getStringProperty( "JMSXGroupID" ) == GROUPID);
+    }
+    AMQ_CATCH_RETHROW( ActiveMQException )
+    AMQ_CATCHALL_THROW( ActiveMQException )
 }
-
-////////////////////////////////////////////////////////////////////////////////
-OpenwireJmsMessageGroupsTest::~OpenwireJmsMessageGroupsTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Test registration
-TEST_F(OpenwireJmsMessageGroupsTest, testMessageSend) { testMessageSend(); }

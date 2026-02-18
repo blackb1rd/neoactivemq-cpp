@@ -56,7 +56,7 @@ namespace test {
 namespace openwire {
 
     class OpenwireXATransactionsTest : public ::testing::Test {
-    private:
+    protected:
 
         static const int batchCount;
         static const int batchSize;
@@ -65,8 +65,11 @@ namespace openwire {
 
     public:
 
-        OpenwireXATransactionsTest();
-        virtual ~OpenwireXATransactionsTest();
+        OpenwireXATransactionsTest() : txIdGen() {
+        }
+
+        virtual ~OpenwireXATransactionsTest() {
+        }
 
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
@@ -75,20 +78,7 @@ namespace openwire {
         void SetUp() override {}
         void TearDown() override {}
 
-        void testCreateXAConnectionFactory();
-        void testCreateXAConnection();
-        void testCreateXASession();
-        void testGetXAResource();
-        void testSendReceiveOutsideTX();
-        void testSendReceiveTransactedBatches();
-        void testSendRollback();
-        void testWithTTLSet();
-        void testSendRollbackCommitRollback();
-        void testXAResource_Exception1();
-        void testXAResource_Exception2();
-        void testXAResource_Exception3();
-
-    private:
+    protected:
 
         cms::Xid* createXid() const;
 
@@ -104,15 +94,33 @@ const int OpenwireXATransactionsTest::batchCount = 10;
 const int OpenwireXATransactionsTest::batchSize = 20;
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenwireXATransactionsTest::OpenwireXATransactionsTest() : txIdGen() {
+cms::Xid* OpenwireXATransactionsTest::createXid() const {
+
+    std::string branchQualStr = UUID::randomUUID().toString();
+    std::string globalTxIdStr = this->txIdGen.generateId();
+
+    std::vector<unsigned char> branchQual( branchQualStr.begin(), branchQualStr.end() );
+    std::vector<unsigned char> globalTxId( globalTxIdStr.begin(), globalTxIdStr.end() );
+
+    if( (int)branchQual.size() > Xid::MAXBQUALSIZE ) {
+        branchQual.resize( Xid::MAXBQUALSIZE );
+    }
+
+    if( (int)globalTxId.size() > Xid::MAXGTRIDSIZE ) {
+        globalTxId.resize( Xid::MAXGTRIDSIZE );
+    }
+
+    XATransactionId* id = new XATransactionId();
+
+    id->setFormatId( 0 );
+    id->setBranchQualifier( branchQual );
+    id->setGlobalTransactionId( globalTxId );
+
+    return id;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenwireXATransactionsTest::~OpenwireXATransactionsTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireXATransactionsTest::testCreateXAConnectionFactory() {
+TEST_F(OpenwireXATransactionsTest, testCreateXAConnectionFactory) {
 
     std::unique_ptr<XAConnectionFactory> factory(
         XAConnectionFactory::createCMSXAConnectionFactory( getBrokerURL() ) );
@@ -129,7 +137,7 @@ void OpenwireXATransactionsTest::testCreateXAConnectionFactory() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireXATransactionsTest::testCreateXAConnection() {
+TEST_F(OpenwireXATransactionsTest, testCreateXAConnection) {
 
     std::unique_ptr<XAConnectionFactory> factory(
         XAConnectionFactory::createCMSXAConnectionFactory( getBrokerURL() ) );
@@ -149,7 +157,7 @@ void OpenwireXATransactionsTest::testCreateXAConnection() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireXATransactionsTest::testCreateXASession() {
+TEST_F(OpenwireXATransactionsTest, testCreateXASession) {
 
     std::unique_ptr<XAConnectionFactory> factory(
         XAConnectionFactory::createCMSXAConnectionFactory( getBrokerURL() ) );
@@ -172,7 +180,7 @@ void OpenwireXATransactionsTest::testCreateXASession() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireXATransactionsTest::testGetXAResource() {
+TEST_F(OpenwireXATransactionsTest, testGetXAResource) {
 
     std::unique_ptr<XAConnectionFactory> factory(
         XAConnectionFactory::createCMSXAConnectionFactory( getBrokerURL() ) );
@@ -192,7 +200,7 @@ void OpenwireXATransactionsTest::testGetXAResource() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireXATransactionsTest::testSendReceiveOutsideTX() {
+TEST_F(OpenwireXATransactionsTest, testSendReceiveOutsideTX) {
 
     std::unique_ptr<XAConnectionFactory> factory(
         XAConnectionFactory::createCMSXAConnectionFactory( getBrokerURL() ) );
@@ -229,33 +237,7 @@ void OpenwireXATransactionsTest::testSendReceiveOutsideTX() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Xid* OpenwireXATransactionsTest::createXid() const {
-
-    std::string branchQualStr = UUID::randomUUID().toString();
-    std::string globalTxIdStr = this->txIdGen.generateId();
-
-    std::vector<unsigned char> branchQual( branchQualStr.begin(), branchQualStr.end() );
-    std::vector<unsigned char> globalTxId( globalTxIdStr.begin(), globalTxIdStr.end() );
-
-    if( (int)branchQual.size() > Xid::MAXBQUALSIZE ) {
-        branchQual.resize( Xid::MAXBQUALSIZE );
-    }
-
-    if( (int)globalTxId.size() > Xid::MAXGTRIDSIZE ) {
-        globalTxId.resize( Xid::MAXGTRIDSIZE );
-    }
-
-    XATransactionId* id = new XATransactionId();
-
-    id->setFormatId( 0 );
-    id->setBranchQualifier( branchQual );
-    id->setGlobalTransactionId( globalTxId );
-
-    return id;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireXATransactionsTest::testSendReceiveTransactedBatches() {
+TEST_F(OpenwireXATransactionsTest, testSendReceiveTransactedBatches) {
 
     std::unique_ptr<XAConnectionFactory> factory(
         XAConnectionFactory::createCMSXAConnectionFactory( getBrokerURL() ) );
@@ -315,7 +297,7 @@ void OpenwireXATransactionsTest::testSendReceiveTransactedBatches() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireXATransactionsTest::testSendRollback() {
+TEST_F(OpenwireXATransactionsTest, testSendRollback) {
 
     std::unique_ptr<XAConnectionFactory> factory(
         XAConnectionFactory::createCMSXAConnectionFactory( getBrokerURL() ) );
@@ -392,7 +374,7 @@ void OpenwireXATransactionsTest::testSendRollback() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireXATransactionsTest::testSendRollbackCommitRollback() {
+TEST_F(OpenwireXATransactionsTest, testSendRollbackCommitRollback) {
 
     std::unique_ptr<XAConnectionFactory> factory(
         XAConnectionFactory::createCMSXAConnectionFactory( getBrokerURL() ) );
@@ -477,7 +459,7 @@ void OpenwireXATransactionsTest::testSendRollbackCommitRollback() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireXATransactionsTest::testWithTTLSet() {
+TEST_F(OpenwireXATransactionsTest, testWithTTLSet) {
 
     std::unique_ptr<XAConnectionFactory> factory(
         XAConnectionFactory::createCMSXAConnectionFactory( getBrokerURL() ) );
@@ -536,7 +518,7 @@ void OpenwireXATransactionsTest::testWithTTLSet() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireXATransactionsTest::testXAResource_Exception1() {
+TEST_F(OpenwireXATransactionsTest, testXAResource_Exception1) {
 
     std::unique_ptr<XAConnectionFactory> factory(
         XAConnectionFactory::createCMSXAConnectionFactory( getBrokerURL() ) );
@@ -565,7 +547,7 @@ void OpenwireXATransactionsTest::testXAResource_Exception1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireXATransactionsTest::testXAResource_Exception2() {
+TEST_F(OpenwireXATransactionsTest, testXAResource_Exception2) {
 
     std::unique_ptr<XAConnectionFactory> factory(
         XAConnectionFactory::createCMSXAConnectionFactory( getBrokerURL() ) );
@@ -594,7 +576,7 @@ void OpenwireXATransactionsTest::testXAResource_Exception2() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireXATransactionsTest::testXAResource_Exception3() {
+TEST_F(OpenwireXATransactionsTest, testXAResource_Exception3) {
 
     std::unique_ptr<XAConnectionFactory> factory(
         XAConnectionFactory::createCMSXAConnectionFactory( getBrokerURL() ) );
@@ -622,19 +604,3 @@ void OpenwireXATransactionsTest::testXAResource_Exception3() {
 
     xaResource->forget( ixId.get() );
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Test registration
-TEST_F(OpenwireXATransactionsTest, testCreateXAConnectionFactory) { testCreateXAConnectionFactory(); }
-TEST_F(OpenwireXATransactionsTest, testCreateXAConnection) { testCreateXAConnection(); }
-TEST_F(OpenwireXATransactionsTest, testCreateXASession) { testCreateXASession(); }
-TEST_F(OpenwireXATransactionsTest, testGetXAResource) { testGetXAResource(); }
-TEST_F(OpenwireXATransactionsTest, testSendReceiveOutsideTX) { testSendReceiveOutsideTX(); }
-TEST_F(OpenwireXATransactionsTest, testSendReceiveTransactedBatches) { testSendReceiveTransactedBatches(); }
-TEST_F(OpenwireXATransactionsTest, testSendRollback) { testSendRollback(); }
-TEST_F(OpenwireXATransactionsTest, testWithTTLSet) { testWithTTLSet(); }
-TEST_F(OpenwireXATransactionsTest, testSendRollbackCommitRollback) { testSendRollbackCommitRollback(); }
-TEST_F(OpenwireXATransactionsTest, testXAResource_Exception1) { testXAResource_Exception1(); }
-TEST_F(OpenwireXATransactionsTest, testXAResource_Exception2) { testXAResource_Exception2(); }
-TEST_F(OpenwireXATransactionsTest, testXAResource_Exception3) { testXAResource_Exception3(); }
-

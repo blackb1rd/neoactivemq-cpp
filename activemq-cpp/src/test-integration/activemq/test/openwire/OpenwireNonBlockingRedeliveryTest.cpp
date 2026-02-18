@@ -22,19 +22,13 @@ namespace activemq {
 namespace test {
 namespace openwire {
     class OpenwireNonBlockingRedeliveryTest : public CMSTestFixture {
-public:
-        OpenwireNonBlockingRedeliveryTest();
-        virtual ~OpenwireNonBlockingRedeliveryTest();
+    public:
         void SetUp() override {}
         void TearDown() override {}
-        virtual std::string getBrokerURL() const;
-        void testConsumerMessagesAreNotOrdered();
-        void testMessageDeleiveredWhenNonBlockingEnabled();
-        void testMessageRedeliveriesAreInOrder();
-        void testMessageDeleiveryDoesntStop();
-        void testNonBlockingMessageDeleiveryIsDelayed();
-        void testNonBlockingMessageDeleiveryWithRollbacks();
-        void testNonBlockingMessageDeleiveryWithAllRolledBack();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL() +
+                "?connection.nonBlockingRedelivery=true";
+        }
     };
 }}}
 
@@ -269,24 +263,92 @@ namespace {
             }
         }
     };
+
+    class ReceivedListener : public cms::MessageListener {
+    private:
+
+        LinkedHashSet< Pointer<MessageId> >* received;
+
+    public:
+
+        ReceivedListener(LinkedHashSet< Pointer<MessageId> >* received) :
+            cms::MessageListener(), received(received) {
+        }
+
+        virtual ~ReceivedListener() {
+        }
+
+        virtual void onMessage(const cms::Message* message) {
+            const commands::Message* amqMessage =
+                dynamic_cast<const commands::Message*>(message);
+
+            received->add(amqMessage->getMessageId());
+        }
+
+    };
+
+    class SomeRollbacksListener : public cms::MessageListener {
+    private:
+
+        int count;
+        Pointer<Session> session;
+        LinkedHashSet< Pointer<MessageId> >* received;
+
+    public:
+
+        SomeRollbacksListener(Pointer<Session> session, LinkedHashSet< Pointer<MessageId> >* received) :
+            cms::MessageListener(), count(0), session(session), received(received) {
+        }
+
+        virtual ~SomeRollbacksListener() {}
+
+        virtual void onMessage(const cms::Message* message) {
+            const commands::Message* amqMessage =
+                dynamic_cast<const commands::Message*>(message);
+
+            if (++count > 10) {
+                try {
+                    session->rollback();
+                    count = 0;
+                } catch (CMSException& e) {
+                }
+            } else {
+                received->add(amqMessage->getMessageId());
+                try {
+                    session->commit();
+                } catch (CMSException& e) {
+                }
+            }
+        }
+
+    };
+
+    class RollbacksListener : public cms::MessageListener {
+    private:
+
+        Pointer<Session> session;
+
+    public:
+
+        RollbacksListener(Pointer<Session> session) :
+            cms::MessageListener(), session(session) {
+        }
+
+        virtual ~RollbacksListener() {
+        }
+
+        virtual void onMessage(const cms::Message* message) {
+            try {
+                session->rollback();
+            } catch (CMSException& e) {
+            }
+        }
+
+    };
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenwireNonBlockingRedeliveryTest::OpenwireNonBlockingRedeliveryTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-OpenwireNonBlockingRedeliveryTest::~OpenwireNonBlockingRedeliveryTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::string OpenwireNonBlockingRedeliveryTest::getBrokerURL() const {
-    return activemq::util::IntegrationCommon::getInstance().getOpenwireURL() +
-        "?connection.nonBlockingRedelivery=true";
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireNonBlockingRedeliveryTest::testConsumerMessagesAreNotOrdered() {
+TEST_F(OpenwireNonBlockingRedeliveryTest, testConsumerMessagesAreNotOrdered) {
 
     LinkedList<int> messages;
 
@@ -322,34 +384,7 @@ void OpenwireNonBlockingRedeliveryTest::testConsumerMessagesAreNotOrdered() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
-
-    class ReceivedListener : public cms::MessageListener {
-    private:
-
-        LinkedHashSet< Pointer<MessageId> >* received;
-
-    public:
-
-        ReceivedListener(LinkedHashSet< Pointer<MessageId> >* received) :
-            cms::MessageListener(), received(received) {
-        }
-
-        virtual ~ReceivedListener() {
-        }
-
-        virtual void onMessage(const cms::Message* message) {
-            const commands::Message* amqMessage =
-                dynamic_cast<const commands::Message*>(message);
-
-            received->add(amqMessage->getMessageId());
-        }
-
-    };
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireNonBlockingRedeliveryTest::testMessageDeleiveredWhenNonBlockingEnabled() {
+TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageDeleiveredWhenNonBlockingEnabled) {
 
     LinkedHashSet< Pointer<MessageId> > received;
     LinkedHashSet< Pointer<MessageId> > beforeRollback;
@@ -391,7 +426,7 @@ void OpenwireNonBlockingRedeliveryTest::testMessageDeleiveredWhenNonBlockingEnab
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireNonBlockingRedeliveryTest::testMessageRedeliveriesAreInOrder() {
+TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageRedeliveriesAreInOrder) {
 
     LinkedHashSet< Pointer<MessageId> > received;
     LinkedHashSet< Pointer<MessageId> > beforeRollback;
@@ -447,7 +482,7 @@ void OpenwireNonBlockingRedeliveryTest::testMessageRedeliveriesAreInOrder() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireNonBlockingRedeliveryTest::testMessageDeleiveryDoesntStop() {
+TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageDeleiveryDoesntStop) {
 
     LinkedHashSet< Pointer<MessageId> > received;
     LinkedHashSet< Pointer<MessageId> > beforeRollback;
@@ -491,7 +526,7 @@ void OpenwireNonBlockingRedeliveryTest::testMessageDeleiveryDoesntStop() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireNonBlockingRedeliveryTest::testNonBlockingMessageDeleiveryIsDelayed() {
+TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryIsDelayed) {
 
     LinkedHashSet< Pointer<MessageId> > received;
 
@@ -531,47 +566,7 @@ void OpenwireNonBlockingRedeliveryTest::testNonBlockingMessageDeleiveryIsDelayed
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
-
-    class SomeRollbacksListener : public cms::MessageListener {
-    private:
-
-        int count;
-        Pointer<Session> session;
-        LinkedHashSet< Pointer<MessageId> >* received;
-
-    public:
-
-        SomeRollbacksListener(Pointer<Session> session, LinkedHashSet< Pointer<MessageId> >* received) :
-            cms::MessageListener(), count(0), session(session), received(received) {
-        }
-
-        virtual ~SomeRollbacksListener() {}
-
-        virtual void onMessage(const cms::Message* message) {
-            const commands::Message* amqMessage =
-                dynamic_cast<const commands::Message*>(message);
-
-            if (++count > 10) {
-                try {
-                    session->rollback();
-                    count = 0;
-                } catch (CMSException& e) {
-                }
-            } else {
-                received->add(amqMessage->getMessageId());
-                try {
-                    session->commit();
-                } catch (CMSException& e) {
-                }
-            }
-        }
-
-    };
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireNonBlockingRedeliveryTest::testNonBlockingMessageDeleiveryWithRollbacks() {
+TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryWithRollbacks) {
 
     LinkedHashSet< Pointer<MessageId> > received;
 
@@ -612,34 +607,7 @@ void OpenwireNonBlockingRedeliveryTest::testNonBlockingMessageDeleiveryWithRollb
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
-
-    class RollbacksListener : public cms::MessageListener {
-    private:
-
-        Pointer<Session> session;
-
-    public:
-
-        RollbacksListener(Pointer<Session> session) :
-            cms::MessageListener(), session(session) {
-        }
-
-        virtual ~RollbacksListener() {
-        }
-
-        virtual void onMessage(const cms::Message* message) {
-            try {
-                session->rollback();
-            } catch (CMSException& e) {
-            }
-        }
-
-    };
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireNonBlockingRedeliveryTest::testNonBlockingMessageDeleiveryWithAllRolledBack() {
+TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryWithAllRolledBack) {
 
     LinkedHashSet< Pointer<MessageId> > received;
     LinkedHashSet< Pointer<MessageId> > dlqed;
@@ -684,12 +652,3 @@ void OpenwireNonBlockingRedeliveryTest::testNonBlockingMessageDeleiveryWithAllRo
 
     destroyDestination(getBrokerURL(), destinationName);
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Test registration
-TEST_F(OpenwireNonBlockingRedeliveryTest, testConsumerMessagesAreNotOrdered) { testConsumerMessagesAreNotOrdered(); }
-TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageDeleiveredWhenNonBlockingEnabled) { testMessageDeleiveredWhenNonBlockingEnabled(); }
-TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageDeleiveryDoesntStop) { testMessageDeleiveryDoesntStop(); }
-TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryIsDelayed) { testNonBlockingMessageDeleiveryIsDelayed(); }
-TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryWithRollbacks) { testNonBlockingMessageDeleiveryWithRollbacks(); }
-TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryWithAllRolledBack) { testNonBlockingMessageDeleiveryWithAllRolledBack(); }

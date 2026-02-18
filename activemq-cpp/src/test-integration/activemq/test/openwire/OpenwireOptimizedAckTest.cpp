@@ -22,16 +22,13 @@ namespace activemq {
 namespace test {
 namespace openwire {
     class OpenwireOptimizedAckTest : public CMSTestFixture {
-public:
-        OpenwireOptimizedAckTest();
-        virtual ~OpenwireOptimizedAckTest();
+    public:
         void SetUp() override {}
         void TearDown() override {}
-        virtual std::string getBrokerURL() const;
-        void testOptimizedAckSettings();
-        void testOptimizedAckWithExpiredMsgs();
-        void testOptimizedAckWithExpiredMsgsSync();
-        void testOptimizedAckWithExpiredMsgsSync2();
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL() +
+                "?connection.optimizeAcknowledge=true&cms.prefetchPolicy.all=100";
+        }
     };
 }}}
 
@@ -85,21 +82,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenwireOptimizedAckTest::OpenwireOptimizedAckTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-OpenwireOptimizedAckTest::~OpenwireOptimizedAckTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::string OpenwireOptimizedAckTest::getBrokerURL() const {
-    return activemq::util::IntegrationCommon::getInstance().getOpenwireURL() +
-        "?connection.optimizeAcknowledge=true&cms.prefetchPolicy.all=100";
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireOptimizedAckTest::testOptimizedAckSettings() {
+TEST_F(OpenwireOptimizedAckTest, testOptimizedAckSettings) {
 
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
@@ -136,7 +119,7 @@ void OpenwireOptimizedAckTest::testOptimizedAckSettings() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireOptimizedAckTest::testOptimizedAckWithExpiredMsgs() {
+TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgs) {
 
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
@@ -186,7 +169,7 @@ void OpenwireOptimizedAckTest::testOptimizedAckWithExpiredMsgs() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireOptimizedAckTest::testOptimizedAckWithExpiredMsgsSync() {
+TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync) {
 
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
@@ -229,7 +212,7 @@ void OpenwireOptimizedAckTest::testOptimizedAckWithExpiredMsgsSync() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireOptimizedAckTest::testOptimizedAckWithExpiredMsgsSync2() {
+TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync2) {
 
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
@@ -274,10 +257,3 @@ void OpenwireOptimizedAckTest::testOptimizedAckWithExpiredMsgsSync2() {
     session->close();
     connection->close();
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Test registration
-TEST_F(OpenwireOptimizedAckTest, testOptimizedAckSettings) { testOptimizedAckSettings(); }
-TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgs) { testOptimizedAckWithExpiredMsgs(); }
-TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync) { testOptimizedAckWithExpiredMsgsSync(); }
-TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync2) { testOptimizedAckWithExpiredMsgsSync2(); }

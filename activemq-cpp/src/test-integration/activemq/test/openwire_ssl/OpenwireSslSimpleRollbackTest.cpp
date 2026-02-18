@@ -16,21 +16,103 @@
  */
 
 #include <activemq/test/SimpleRollbackTest.h>
+#include <activemq/util/CMSListener.h>
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/exceptions/ActiveMQException.h>
 
-namespace activemq {
-namespace test {
-namespace openwire_ssl {
+#include <decaf/lang/Thread.h>
+#include <decaf/util/UUID.h>
+
+#include <sstream>
+
+namespace activemq{
+namespace test{
+namespace openwire_ssl{
     class OpenwireSslSimpleRollbackTest : public SimpleRollbackTest {
-    public:
-        OpenwireSslSimpleRollbackTest() {}
-        virtual ~OpenwireSslSimpleRollbackTest() {}
+public:
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL();
         }
     };
 }}}
 
+using namespace std;
+using namespace cms;
+using namespace activemq;
+using namespace activemq::test;
 using namespace activemq::test::openwire_ssl;
+using namespace activemq::util;
+using namespace activemq::exceptions;
+using namespace decaf::lang;
+using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslSimpleRollbackTest, testRollbacks) { testRollbacks(); }
+TEST_F(OpenwireSslSimpleRollbackTest, testRollbacks) {
+
+    try {
+
+        // Create CMS Object for Comms
+        cms::Session* session(cmsProvider->getSession());
+
+        CMSListener listener(session);
+
+        cms::MessageConsumer* consumer = cmsProvider->getConsumer();
+        consumer->setMessageListener(&listener);
+        cms::MessageProducer* producer = cmsProvider->getProducer();
+        producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
+
+        std::unique_ptr<cms::TextMessage> txtMessage(session->createTextMessage());
+
+        for (unsigned int i = 0; i < IntegrationCommon::defaultMsgCount; ++i) {
+            ostringstream lcStream;
+            lcStream << "SimpleTest - Message #" << i << ends;
+            txtMessage->setText(lcStream.str());
+            producer->send(txtMessage.get());
+        }
+
+        session->commit();
+        Thread::sleep(50);
+
+        // Wait for the messages to get here
+        listener.asyncWaitForMessages(IntegrationCommon::defaultMsgCount);
+        unsigned int numReceived = listener.getNumReceived();
+        ASSERT_TRUE(numReceived == IntegrationCommon::defaultMsgCount);
+
+        session->commit();
+        Thread::sleep(50);
+
+        for (unsigned int i = 0; i < 5; ++i) {
+            ostringstream lcStream;
+            lcStream << "SimpleTest - Message #" << i << ends;
+            txtMessage->setText(lcStream.str());
+            producer->send(txtMessage.get());
+        }
+
+        listener.reset();
+        session->rollback();
+        Thread::sleep(50);
+
+        listener.reset();
+        txtMessage->setText("SimpleTest - Message after Rollback");
+        producer->send(txtMessage.get());
+        session->commit();
+
+        // Wait for the messages to get here
+        listener.asyncWaitForMessages(1);
+        ASSERT_TRUE(listener.getNumReceived() == 1);
+
+        listener.reset();
+        txtMessage->setText("SimpleTest - Message after Rollback");
+        producer->send(txtMessage.get());
+        session->commit();
+
+        // Wait for the messages to get here
+        listener.asyncWaitForMessages(1);
+        ASSERT_TRUE(listener.getNumReceived() == 1);
+        session->commit();
+
+    } catch (std::exception& ex) {
+        std::cout << ex.what() << std::endl;
+        throw ex;
+    }
+}

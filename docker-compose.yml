@@ -1,6 +1,5 @@
 services:
   # Default single broker for basic integration tests
-  # Configure with: ACTIVEMQ_IMAGE=rmohr/activemq:5.15.9 docker compose up
   activemq:
     image: ${ACTIVEMQ_IMAGE:-apache/activemq-classic:5.18.7}
     container_name: activemq-test
@@ -72,10 +71,9 @@ services:
   # Supported ActiveMQ versions (set ACTIVEMQ_IMAGE env var):
   #   - apache/activemq-classic:5.18.7 (default)
   #   - apache/activemq-classic:6.2.0
-  #   - rmohr/activemq:5.15.9
   #
   # Example:
-  #   ACTIVEMQ_IMAGE=rmohr/activemq:5.15.9 docker compose --profile failover up -d
+  #   ACTIVEMQ_IMAGE=apache/activemq-classic:6.2.0 docker compose --profile failover up -d
   # ============================================================================
 
   # Broker 1 for failover testing (primary)

@@ -204,7 +204,7 @@ jobs:
       run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
 
     - name: Run benchmarks
-      run: ctest --preset ${{ matrix.config.preset }} -L benchmark --output-on-failure --timeout 600
+      run: ctest --preset ${{ matrix.config.preset }} -L ^benchmark$ --output-on-failure --timeout 600
 
     - name: Upload test results
       if: failure()
@@ -227,12 +227,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Use release build for integration tests (one config to avoid excessive combinations)
+        # Use no-SSL release build for non-SSL integration tests
         config:
-          - { preset: x64-linux-release-test, build_type: Release }
+          - { preset: x64-linux-release-no-ssl-test, build_type: Release }
         # Test with multiple ActiveMQ versions
         activemq:
-          - { name: "AMQ-5.15", image: "rmohr/activemq:5.15.9" }
           - { name: "AMQ-5.18", image: "apache/activemq-classic:5.18.7" }
           - { name: "AMQ-6.2", image: "apache/activemq-classic:6.2.0" }
 
@@ -418,7 +417,6 @@ jobs:
           - { preset: x64-linux-release-test, build_type: Release }
         # Test with multiple ActiveMQ versions
         activemq:
-          - { name: "AMQ-5.15", image: "rmohr/activemq:5.15.9" }
           - { name: "AMQ-5.18", image: "apache/activemq-classic:5.18.7" }
           - { name: "AMQ-6.2", image: "apache/activemq-classic:6.2.0" }
 
@@ -753,13 +751,114 @@ jobs:
         path: output/build/${{ matrix.config.preset }}/
 
     - name: Run benchmarks
-      run: ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -L benchmark --output-on-failure --timeout 600
+      run: ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -L ^benchmark$ --output-on-failure --timeout 600
 
     - name: Upload test results
       if: failure()
       uses: actions/upload-artifact@v6
       with:
         name: test-results-${{ matrix.config.preset }}-benchmark
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # Windows SSL integration tests - mirrors linux-ssl-integration-test
+  windows-ssl-integration-test:
+    name: Windows SSL Integration Test
+    runs-on: windows-latest
+    needs: windows-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x64-windows-release-test, build_type: Release, arch: amd64, ssl: true }
+        activemq:
+          - { name: "AMQ-5.18", image: "apache/activemq-classic:5.18.7" }
+          - { name: "AMQ-6.2", image: "apache/activemq-classic:6.2.0" }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install Ninja
+      run: choco install ninja -y
+
+    - name: Switch Docker to Linux containers
+      run: '& "$env:ProgramFiles\Docker\Docker\DockerCli.exe" -SwitchLinuxEngine'
+
+    - name: Setup MSVC Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.config.arch }}
+
+    - name: Set VCPKG_ROOT environment variable
+      shell: bash
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      shell: bash
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: windows-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Start SSL broker (${{ matrix.activemq.name }})
+      shell: bash
+      run: |
+        echo "Starting SSL-enabled ActiveMQ using image: ${{ matrix.activemq.image }}"
+        ACTIVEMQ_IMAGE=${{ matrix.activemq.image }} docker compose --profile ssl up -d
+        echo "Waiting for SSL broker to be ready..."
+        timeout 60 bash -c 'until docker compose --profile ssl ps | grep -q "healthy"; do sleep 2; done' || true
+        sleep 10
+
+    - name: Show broker status
+      shell: bash
+      run: docker compose --profile ssl ps
+
+    - name: Show broker logs (startup)
+      shell: bash
+      run: docker compose --profile ssl logs --tail 50
+
+    - name: Run OpenWire SSL integration tests (${{ matrix.activemq.name }})
+      run: ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -L integration-openwire-ssl --output-on-failure --timeout 900
+      env:
+        SSL_CERT_FILE: ${{ github.workspace }}/docker/ssl/certs/ca.pem
+
+    - name: Show broker logs on failure
+      if: failure()
+      shell: bash
+      run: |
+        echo "=== ActiveMQ SSL broker logs ==="
+        docker compose --profile ssl logs --tail 200 || true
+
+    - name: Stop SSL broker
+      if: always()
+      shell: bash
+      run: docker compose --profile ssl down
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-windows-ssl-integration-${{ matrix.activemq.name }}
         path: |
           output/build/${{ matrix.config.preset }}/Testing/Temporary/
           output/build/${{ matrix.config.preset }}/**/*.log

@@ -148,10 +148,7 @@ cmake --build --preset <preset> --target integration-full
 SSL integration tests validate the SSL/TLS transport layer against an SSL-enabled ActiveMQ broker.
 
 ```bash
-# Generate self-signed certificates
-bash docker/ssl/generate-certs.sh
-
-# Start the SSL-enabled broker
+# Start the SSL-enabled broker (certificates are generated automatically)
 docker compose --profile ssl up -d
 
 # Run SSL integration tests

@@ -359,11 +359,6 @@ jobs:
     - name: Make test executables runnable
       run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
 
-    - name: Generate SSL certificates
-      run: |
-        chmod +x docker/ssl/generate-certs.sh
-        bash docker/ssl/generate-certs.sh
-
     - name: Start SSL broker (${{ matrix.activemq.name }})
       run: |
         echo "Starting SSL-enabled ActiveMQ using image: ${{ matrix.activemq.image }}"

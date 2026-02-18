@@ -22,19 +22,33 @@ services:
   # SSL INTEGRATION TEST BROKER
   # Use with: docker compose --profile ssl up
   #
-  # Requires SSL certificates to be generated first:
-  #   bash docker/ssl/generate-certs.sh
+  # Certificates are generated automatically by the ssl-cert-generator service.
   #
   # Exposes:
   #   - Port 61617: SSL OpenWire (ssl://)
   #   - Port 8165: Web Console (remapped to avoid conflict with default broker)
   # ============================================================================
 
+  # Generate SSL certificates for ActiveMQ SSL testing
+  ssl-cert-generator:
+    image: alpine/openssl:latest
+    container_name: activemq-ssl-cert-generator
+    profiles: ["ssl"]
+    volumes:
+      - ./docker/ssl/generate-certs-entrypoint.sh:/generate-certs.sh:ro
+      - ./docker/ssl/certs:/certs
+    entrypoint: ["/bin/sh"]
+    command: ["/generate-certs.sh"]
+    restart: "no"
+
   # Broker with SSL transport connector for SSL integration testing
   activemq-ssl:
     image: ${ACTIVEMQ_IMAGE:-apache/activemq-classic:5.18.7}
     container_name: activemq-ssl-test
     profiles: ["ssl"]
+    depends_on:
+      ssl-cert-generator:
+        condition: service_completed_successfully
     ports:
       - "127.0.0.1:61617:61617"  # SSL OpenWire (localhost only)
       - "127.0.0.1:8165:8161"    # Web Console (localhost only, remapped to avoid conflict with default broker)

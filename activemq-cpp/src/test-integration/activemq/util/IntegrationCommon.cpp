@@ -41,8 +41,7 @@ IntegrationCommon::IntegrationCommon()
     this->openwireURL = this->urlCommon + "61616?transport.trace=false";
 
     // SSL URL for SSL integration testing
-    // Requires: docker compose --profile ssl up
-    // Requires: SSL certificates generated via docker/ssl/generate-certs.sh
+    // Requires: docker compose --profile ssl up (certificates generated automatically)
     this->sslOpenwireURL = "ssl://localhost:61617?transport.trace=false";
 
     // Multi-broker URLs for failover testing

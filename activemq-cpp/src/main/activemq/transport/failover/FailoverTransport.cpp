@@ -1377,8 +1377,10 @@ bool FailoverTransport::iterate() {
             this->impl->propagateFailureToExceptionListener();
 
             // Clear failure after propagating to allow continued reconnection
-            // Only if we're transitioning to a different reconnect limit
+            // Only if we're transitioning to a different reconnect limit.
+            // startupMaxReconnectAttempts == 0 means "fail fast on first connect" — never transition.
             bool transitioningToDifferentLimit = wasFirstConnection &&
+                this->impl->startupMaxReconnectAttempts > 0 &&
                 this->impl->startupMaxReconnectAttempts != this->impl->maxReconnectAttempts;
 
             if (transitioningToDifferentLimit) {

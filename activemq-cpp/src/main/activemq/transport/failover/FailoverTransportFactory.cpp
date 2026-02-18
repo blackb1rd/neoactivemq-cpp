@@ -88,11 +88,12 @@ Pointer<Transport> FailoverTransportFactory::doCreateComposite(const decaf::net:
         int maxReconnectAttempts = Integer::parseInt(topLvlProperties.getProperty("maxReconnectAttempts", "20"));
         transport->setMaxReconnectAttempts(maxReconnectAttempts);
 
-        // Default startupMaxReconnectAttempts to maxReconnectAttempts if not explicitly set
+        // Default startupMaxReconnectAttempts to 0 (try once on initial connect, no retry).
+        // After the first successful connection, maxReconnectAttempts governs reconnection.
         std::string startupMaxStr = topLvlProperties.getProperty("startupMaxReconnectAttempts", "");
         int startupMaxReconnectAttempts;
         if (startupMaxStr.empty()) {
-            startupMaxReconnectAttempts = maxReconnectAttempts;
+            startupMaxReconnectAttempts = 0;
         } else {
             startupMaxReconnectAttempts = Integer::parseInt(startupMaxStr);
         }

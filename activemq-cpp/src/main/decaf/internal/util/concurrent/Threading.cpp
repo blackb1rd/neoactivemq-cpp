@@ -975,12 +975,20 @@ void Threading::destroyThread(ThreadHandle* thread) {
 
         if (currentState != Thread::TERMINATED) {
             try {
-                // Use a timeout as a safety measure to prevent infinite hangs in destructor
-                // If the thread hasn't terminated after 10 seconds, there's likely a bug,
-                // but we don't want to hang forever in the destructor
                 Threading::join(thread, 0, 0);
             } catch (InterruptedException& ex) {}
         }
+
+        // Threading::join returns immediately for threads in NEW state (never started
+        // via start()) without calling the underlying std::thread::join(). When
+        // destroyThread wakes a suspended NEW thread (canceled=true above), the OS
+        // thread will still run threadExit() and access library state (globalLock, etc.).
+        // We must block here until the std::thread has fully returned before allowing
+        // cleanup to proceed -- otherwise the thread may access freed library state
+        // during shutdown (e.g. Threading::shutdown() deletes library->globalLock while
+        // the thread is still running threadExit(), causing a segfault).
+        // This call is a no-op if the thread was already joined via the path above.
+        PlatformThread::joinThread(thread->handle);
     } else {
         PlatformThread::detachOSThread(thread->handle);
     }

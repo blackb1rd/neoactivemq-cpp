@@ -26,8 +26,8 @@ services:
   #   bash docker/ssl/generate-certs.sh
   #
   # Exposes:
-  #   - Port 61616: Standard OpenWire (tcp://)
   #   - Port 61617: SSL OpenWire (ssl://)
+  #   - Port 8165: Web Console (remapped to avoid conflict with default broker)
   # ============================================================================
 
   # Broker with SSL transport connector for SSL integration testing
@@ -36,9 +36,8 @@ services:
     container_name: activemq-ssl-test
     profiles: ["ssl"]
     ports:
-      - "127.0.0.1:61616:61616"  # OpenWire (localhost only)
       - "127.0.0.1:61617:61617"  # SSL OpenWire (localhost only)
-      - "127.0.0.1:8161:8161"    # Web Console (localhost only)
+      - "127.0.0.1:8165:8161"    # Web Console (localhost only, remapped to avoid conflict with default broker)
     volumes:
       - ./docker/ssl/activemq-ssl.xml:/opt/activemq/conf/activemq.xml:ro
       - ./docker/ssl/certs:/opt/activemq/conf/certs:ro

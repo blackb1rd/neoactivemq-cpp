@@ -1,8 +1,7 @@
 <!--
     ActiveMQ broker configuration with SSL transport connector for integration testing.
 
-    This configuration adds an SSL transport connector on port 61617 in addition
-    to the default OpenWire connector on port 61616.
+    This configuration provides an SSL-only transport connector on port 61617.
 
     Certificate files are expected to be mounted at /opt/activemq/conf/certs/
 -->
@@ -70,9 +69,7 @@
         </systemUsage>
 
         <transportConnectors>
-            <!-- Standard OpenWire connector -->
-            <transportConnector name="openwire" uri="tcp://0.0.0.0:61616?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600"/>
-            <!-- SSL OpenWire connector -->
+            <!-- SSL OpenWire connector (SSL-only, no plaintext tcp) -->
             <transportConnector name="ssl" uri="ssl://0.0.0.0:61617?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600&amp;needClientAuth=false"/>
         </transportConnectors>
 

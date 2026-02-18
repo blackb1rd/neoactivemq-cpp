@@ -130,8 +130,15 @@ To run integration tests:
 # Start an ActiveMQ broker
 docker compose up -d
 
-# Run integration tests
+# Run all integration tests (OpenWire + STOMP)
 ctest --preset <preset> -L integration --output-on-failure
+
+# Or run specific protocols:
+# Run only OpenWire tests (non-SSL)
+ctest --preset <preset> -L integration-openwire --output-on-failure
+
+# Run only STOMP tests
+ctest --preset <preset> -L integration-stomp --output-on-failure
 
 # Stop the broker
 docker compose down
@@ -151,8 +158,8 @@ SSL integration tests validate the SSL/TLS transport layer against an SSL-enable
 # Start the SSL-enabled broker (certificates are generated automatically)
 docker compose --profile ssl up -d
 
-# Run SSL integration tests
-SSL_CERT_FILE=docker/ssl/certs/ca.pem ctest --preset <preset> -L integration-ssl --output-on-failure
+# Run OpenWire SSL integration tests
+SSL_CERT_FILE=docker/ssl/certs/ca.pem ctest --preset <preset> -L integration-openwire-ssl --output-on-failure
 
 # Stop the broker
 docker compose --profile ssl down

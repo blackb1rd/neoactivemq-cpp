@@ -282,8 +282,11 @@ jobs:
     - name: Show broker status
       run: docker compose ps
 
-    - name: Run integration tests (${{ matrix.activemq.name }})
-      run: ctest --preset ${{ matrix.config.preset }} -L integration --output-on-failure --timeout 900
+    - name: Run OpenWire integration tests (${{ matrix.activemq.name }})
+      run: ctest --preset ${{ matrix.config.preset }} -L integration-openwire --output-on-failure --timeout 900
+
+    - name: Run STOMP integration tests (${{ matrix.activemq.name }})
+      run: ctest --preset ${{ matrix.config.preset }} -L integration-stomp --output-on-failure --timeout 900
 
     - name: Show broker logs on failure
       if: failure()
@@ -373,8 +376,8 @@ jobs:
     - name: Show broker logs (startup)
       run: docker compose --profile ssl logs --tail 50
 
-    - name: Run SSL integration tests (${{ matrix.activemq.name }})
-      run: ctest --preset ${{ matrix.config.preset }} -L integration-ssl --output-on-failure --timeout 900
+    - name: Run OpenWire SSL integration tests (${{ matrix.activemq.name }})
+      run: ctest --preset ${{ matrix.config.preset }} -L integration-openwire-ssl --output-on-failure --timeout 900
       env:
         SSL_CERT_FILE: ${{ github.workspace }}/docker/ssl/certs/ca.pem
 

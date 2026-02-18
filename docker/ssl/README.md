@@ -101,13 +101,32 @@ docker compose --profile ssl up
 
 ### Running Tests
 
+The SSL integration tests provide comprehensive validation of the SSL/TLS transport layer (29 tests total, mirroring all OpenWire test functionality).
+
 ```bash
 # Build tests
 cmake --build --preset x86-windows-debug-test
 
-# Run SSL integration tests
-ctest --preset x86-windows-debug-test -R SSL
+# Run all SSL integration tests (29 tests)
+SSL_CERT_FILE=docker/ssl/certs/ca.pem ctest --preset x86-windows-debug-test -L integration-openwire-ssl --output-on-failure
+
+# Or run all integration tests (OpenWire + OpenWire SSL + STOMP)
+ctest --preset x86-windows-debug-test -L integration --output-on-failure
 ```
+
+**SSL Test Coverage:**
+- ✅ All acknowledgment modes (client, individual, optimized)
+- ✅ Advisory messages
+- ✅ Async sending and callbacks
+- ✅ Message selectors and groups
+- ✅ Durable subscriptions
+- ✅ Transactions (local and XA)
+- ✅ Redelivery policies and session recovery
+- ✅ Temporary destinations
+- ✅ Message compression and priority
+- ✅ Queue browsing and virtual topics
+- ✅ Slow consumers and expiration
+- ✅ Enhanced connection features
 
 ## Troubleshooting
 

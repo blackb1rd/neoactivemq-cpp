@@ -152,20 +152,32 @@ cmake --build --preset <preset> --target integration-full
 
 ### 3.3 SSL Integration Tests (Linux only)
 
-SSL integration tests validate the SSL/TLS transport layer against an SSL-enabled ActiveMQ broker.
+SSL integration tests provide **comprehensive validation** of the SSL/TLS transport layer against an SSL-enabled ActiveMQ broker. The SSL test suite mirrors the complete OpenWire test suite (29 tests) to ensure SSL transport works for all features.
 
 ```bash
 # Start the SSL-enabled broker (certificates are generated automatically)
 docker compose --profile ssl up -d
 
-# Run OpenWire SSL integration tests
+# Run all OpenWire SSL integration tests (29 comprehensive tests)
 SSL_CERT_FILE=docker/ssl/certs/ca.pem ctest --preset <preset> -L integration-openwire-ssl --output-on-failure
 
 # Stop the broker
 docker compose --profile ssl down
 ```
 
-The SSL tests cover: basic send/receive, connection lifecycle, transactions, durable subscriptions, message compression, queue browsing, virtual topics, and more -- all over SSL transport.
+**SSL Test Coverage:**
+- ✅ All acknowledgment modes (client, individual, optimized)
+- ✅ Advisory messages
+- ✅ Async sending and callbacks
+- ✅ Message selectors and groups
+- ✅ Durable subscriptions
+- ✅ Transactions (local and XA)
+- ✅ Redelivery policies and session recovery
+- ✅ Temporary destinations
+- ✅ Message compression and priority
+- ✅ Queue browsing and virtual topics
+- ✅ Slow consumers and expiration
+- ✅ Enhanced connection features
 
 ### 3.4 Integration Benchmark Tests
 

@@ -18,6 +18,7 @@
 #ifndef _DECAF_INTERNAL_NET_SOCKETFILEDESCRIPTOR_H_
 #define _DECAF_INTERNAL_NET_SOCKETFILEDESCRIPTOR_H_
 
+#include <cstdint>
 #include <decaf/util/Config.h>
 
 #include <decaf/io/FileDescriptor.h>

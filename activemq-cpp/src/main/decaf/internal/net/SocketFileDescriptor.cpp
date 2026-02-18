@@ -16,6 +16,7 @@
  */
 
 #include "SocketFileDescriptor.h"
+#include <cstdint>
 
 using namespace decaf;
 using namespace decaf::io;

@@ -18,6 +18,7 @@
 #ifndef _DECAF_IO_FILEDESCRIPTOR_H_
 #define _DECAF_IO_FILEDESCRIPTOR_H_
 
+#include <cstdint>
 #include <decaf/util/Config.h>
 
 namespace decaf {

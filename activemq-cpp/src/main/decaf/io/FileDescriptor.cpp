@@ -30,7 +30,7 @@ FileDescriptor::FileDescriptor() : descriptor( -1 ), readonly( false ) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-FileDescriptor::FileDescriptor(long value, bool readonly) : descriptor(value), readonly(readonly) {
+FileDescriptor::FileDescriptor(intptr_t value, bool readonly) : descriptor(value), readonly(readonly) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////

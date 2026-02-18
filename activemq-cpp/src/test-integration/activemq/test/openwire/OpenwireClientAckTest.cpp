@@ -23,16 +23,9 @@ namespace test {
 namespace openwire {
     class OpenwireClientAckTest : public CMSTestFixture {
 public:
-        OpenwireClientAckTest();
-        virtual ~OpenwireClientAckTest();
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
-        void testAckedMessageAreConsumed();
-        void testLastMessageAcked();
-        void testUnAckedMessageAreNotConsumedOnSessionClose();
-        void testAckedMessageAreConsumedAsync();
-        void testUnAckedMessageAreNotConsumedOnSessionCloseAsync();
     };
 }}}
 
@@ -85,15 +78,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenwireClientAckTest::OpenwireClientAckTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-OpenwireClientAckTest::~OpenwireClientAckTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireClientAckTest::testAckedMessageAreConsumed() {
+TEST_F(OpenwireClientAckTest, testAckedMessageAreConsumed) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -124,7 +109,7 @@ void OpenwireClientAckTest::testAckedMessageAreConsumed() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireClientAckTest::testLastMessageAcked() {
+TEST_F(OpenwireClientAckTest, testLastMessageAcked) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -163,7 +148,7 @@ void OpenwireClientAckTest::testLastMessageAcked() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireClientAckTest::testUnAckedMessageAreNotConsumedOnSessionClose() {
+TEST_F(OpenwireClientAckTest, testUnAckedMessageAreNotConsumedOnSessionClose) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -195,7 +180,7 @@ void OpenwireClientAckTest::testUnAckedMessageAreNotConsumedOnSessionClose() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireClientAckTest::testAckedMessageAreConsumedAsync() {
+TEST_F(OpenwireClientAckTest, testAckedMessageAreConsumedAsync) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -229,7 +214,7 @@ void OpenwireClientAckTest::testAckedMessageAreConsumedAsync() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireClientAckTest::testUnAckedMessageAreNotConsumedOnSessionCloseAsync() {
+TEST_F(OpenwireClientAckTest, testUnAckedMessageAreNotConsumedOnSessionCloseAsync) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -263,11 +248,3 @@ void OpenwireClientAckTest::testUnAckedMessageAreNotConsumedOnSessionCloseAsync(
 
     session->close();
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Test registration
-TEST_F(OpenwireClientAckTest, testAckedMessageAreConsumed) { testAckedMessageAreConsumed(); }
-TEST_F(OpenwireClientAckTest, testLastMessageAcked) { testLastMessageAcked(); }
-TEST_F(OpenwireClientAckTest, testUnAckedMessageAreNotConsumedOnSessionClose) { testUnAckedMessageAreNotConsumedOnSessionClose(); }
-TEST_F(OpenwireClientAckTest, testUnAckedMessageAreNotConsumedOnSessionCloseAsync) { testUnAckedMessageAreNotConsumedOnSessionCloseAsync(); }
-TEST_F(OpenwireClientAckTest, testAckedMessageAreConsumedAsync) { testAckedMessageAreConsumedAsync(); }

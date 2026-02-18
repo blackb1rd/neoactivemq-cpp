@@ -1,6 +1,6 @@
-# Build system tests under src/test-system
+# Build integration benchmark tests under src/test-integration-benchmarks
 #
-# IMPORTANT: System tests require multiple running ActiveMQ brokers.
+# IMPORTANT: Integration benchmark tests require multiple running ActiveMQ brokers.
 # Before running these tests, start all brokers using Docker Compose:
 #
 #   docker compose --profile failover up -d
@@ -11,15 +11,15 @@
 #   - activemq3: Independent broker on port 61619
 #
 # To run specific test suites:
-#   ./neoactivemq-system-test -test OpenwireFailoverIntegrationTest
-#   ./neoactivemq-system-test -test OpenwireMultiConnectionTest
-#   ./neoactivemq-system-test -test OpenwireHighVolumeListenerTest
+#   ./neoactivemq-integration-benchmark-test -test OpenwireFailoverIntegrationTest
+#   ./neoactivemq-integration-benchmark-test -test OpenwireMultiConnectionTest
+#   ./neoactivemq-integration-benchmark-test -test OpenwireHighVolumeListenerTest
 #
 # To stop the brokers after testing:
 #   docker compose --profile failover down
 #
-# NOTE: System tests are designed to run SEPARATELY from unit and integration
-# tests because they:
+# NOTE: Integration benchmark tests are designed to run SEPARATELY from unit and
+# integration tests because they:
 #   - Require multiple broker instances
 #   - Test high-volume scenarios (10k+ messages)
 #   - May take longer to complete
@@ -28,7 +28,7 @@
 # Reuse utility files from test-integration
 set(TEST_INTEGRATION_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../test-integration)
 
-set(SYSTEM_TEST_SRCS
+set(INTEGRATION_BENCHMARK_TEST_SRCS
   # Top level launcher
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 
@@ -38,18 +38,18 @@ set(SYSTEM_TEST_SRCS
   ${TEST_INTEGRATION_DIR}/activemq/util/CMSProvider.cpp
   ${TEST_INTEGRATION_DIR}/activemq/util/IntegrationCommon.cpp
 
-  # System tests - Failover and Multi-Connection
+  # Integration benchmark tests - Failover and Multi-Connection
   activemq/test/openwire/OpenwireFailoverIntegrationTest.cpp
   activemq/test/openwire/OpenwireMultiConnectionTest.cpp
   activemq/test/openwire/OpenwireHighVolumeListenerTest.cpp
 )
 
-set(SYSTEM_TEST_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
+set(INTEGRATION_BENCHMARK_TEST_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
 
-# Build a single system test harness
-list(REMOVE_ITEM SYSTEM_TEST_SRCS ${SYSTEM_TEST_MAIN})
-add_executable(neoactivemq-system-test ${SYSTEM_TEST_MAIN} ${SYSTEM_TEST_SRCS})
-target_include_directories(neoactivemq-system-test PRIVATE
+# Build a single integration benchmark test harness
+list(REMOVE_ITEM INTEGRATION_BENCHMARK_TEST_SRCS ${INTEGRATION_BENCHMARK_TEST_MAIN})
+add_executable(neoactivemq-integration-benchmark-test ${INTEGRATION_BENCHMARK_TEST_MAIN} ${INTEGRATION_BENCHMARK_TEST_SRCS})
+target_include_directories(neoactivemq-integration-benchmark-test PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../main
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -62,14 +62,14 @@ target_include_directories(neoactivemq-system-test PRIVATE
 
 # Add /bigobj flag for MSVC to handle large object files with many sections
 if(MSVC)
-  target_compile_options(neoactivemq-system-test PRIVATE /bigobj)
+  target_compile_options(neoactivemq-integration-benchmark-test PRIVATE /bigobj)
   # Allow duplicate symbols - templates instantiated in both DLL and test exe
-  target_link_options(neoactivemq-system-test PRIVATE /FORCE:MULTIPLE)
+  target_link_options(neoactivemq-integration-benchmark-test PRIVATE /FORCE:MULTIPLE)
 endif()
 
 # Define DLL import macros when linking against shared library on Windows
 if(AMQCPP_SHARED_LIB AND WIN32)
-  target_compile_definitions(neoactivemq-system-test PRIVATE
+  target_compile_definitions(neoactivemq-integration-benchmark-test PRIVATE
     DECAF_DLL
     CMS_DLL
     AMQCPP_DLL
@@ -77,16 +77,16 @@ if(AMQCPP_SHARED_LIB AND WIN32)
 endif()
 
 # Link to the consolidated library and Google Test
-target_link_libraries(neoactivemq-system-test PRIVATE neoactivemq-cpp GTest::gtest)
+target_link_libraries(neoactivemq-integration-benchmark-test PRIVATE neoactivemq-cpp GTest::gtest)
 
 include(StaticTestDiscovery)
-static_discover_tests(neoactivemq-system-test
-  TEST_PREFIX "system/"
+static_discover_tests(neoactivemq-integration-benchmark-test
+  TEST_PREFIX "integration-benchmark/"
   SOURCES
     activemq/test/openwire/OpenwireFailoverIntegrationTest.cpp
     activemq/test/openwire/OpenwireHighVolumeListenerTest.cpp
     activemq/test/openwire/OpenwireMultiConnectionTest.cpp
-  LABELS system
+  LABELS integration-benchmark
   PROPERTIES
     TIMEOUT 600
     ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"

@@ -1,6 +1,5 @@
 services:
   # Default single broker for basic integration tests
-  # Configure with: ACTIVEMQ_IMAGE=rmohr/activemq:5.15.9 docker compose up
   activemq:
     image: ${ACTIVEMQ_IMAGE:-apache/activemq-classic:5.18.7}
     container_name: activemq-test
@@ -19,16 +18,62 @@ services:
     restart: unless-stopped
 
   # ============================================================================
+  # SSL INTEGRATION TEST BROKER
+  # Use with: docker compose --profile ssl up
+  #
+  # Certificates are generated automatically by the ssl-cert-generator service.
+  #
+  # Exposes:
+  #   - Port 61617: SSL OpenWire (ssl://)
+  #   - Port 8165: Web Console (remapped to avoid conflict with default broker)
+  # ============================================================================
+
+  # Generate SSL certificates for ActiveMQ SSL testing
+  ssl-cert-generator:
+    image: alpine/openssl:latest
+    container_name: activemq-ssl-cert-generator
+    profiles: ["ssl"]
+    volumes:
+      - ./docker/ssl/generate-certs-entrypoint.sh:/generate-certs.sh:ro
+      - ./docker/ssl/certs:/certs
+    entrypoint: ["/bin/sh"]
+    command: ["/generate-certs.sh"]
+    restart: "no"
+
+  # Broker with SSL transport connector for SSL integration testing
+  activemq-ssl:
+    image: ${ACTIVEMQ_IMAGE:-apache/activemq-classic:5.18.7}
+    container_name: activemq-ssl-test
+    profiles: ["ssl"]
+    depends_on:
+      ssl-cert-generator:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:61617:61617"  # SSL OpenWire (localhost only)
+      - "127.0.0.1:8165:8161"    # Web Console (localhost only, remapped to avoid conflict with default broker)
+    volumes:
+      - ./docker/ssl/activemq-ssl.xml:/opt/apache-activemq/conf/activemq.xml:ro
+      - ./docker/ssl/certs:/opt/apache-activemq/conf/certs:ro
+    environment:
+      - ACTIVEMQ_OPTS=-Xms512m -Xmx2g -Djetty.host=0.0.0.0
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8161/admin || curl -sf http://localhost:8161/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # ============================================================================
   # FAILOVER AND MULTI-CONNECTION TEST BROKERS
   # Use with: docker compose --profile failover up
   #
   # Supported ActiveMQ versions (set ACTIVEMQ_IMAGE env var):
   #   - apache/activemq-classic:5.18.7 (default)
   #   - apache/activemq-classic:6.2.0
-  #   - rmohr/activemq:5.15.9
   #
   # Example:
-  #   ACTIVEMQ_IMAGE=rmohr/activemq:5.15.9 docker compose --profile failover up -d
+  #   ACTIVEMQ_IMAGE=apache/activemq-classic:6.2.0 docker compose --profile failover up -d
   # ============================================================================
 
   # Broker 1 for failover testing (primary)

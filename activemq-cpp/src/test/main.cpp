@@ -31,6 +31,29 @@
 #include <condition_variable>
 #include <stdexcept>
 
+#ifdef _WIN32
+#include <windows.h>
+static LONG WINAPI flightRecorderExceptionFilter(EXCEPTION_POINTERS* /*exInfo*/) {
+    std::cerr << std::endl << "=== CRASH DETECTED - Flight Recorder Dump (last "
+              << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+    activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
+    std::cerr << "=== End Flight Recorder Dump ===" << std::endl;
+    std::cerr.flush();
+    return EXCEPTION_CONTINUE_SEARCH;
+}
+#else
+#include <signal.h>
+static void flightRecorderSignalHandler(int sig) {
+    std::cerr << std::endl << "=== SIGNAL " << sig << " - Flight Recorder Dump (last "
+              << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+    activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
+    std::cerr << "=== End Flight Recorder Dump ===" << std::endl;
+    std::cerr.flush();
+    signal(sig, SIG_DFL);
+    raise(sig);
+}
+#endif
+
 int main( int argc, char **argv ) {
 
     activemq::library::ActiveMQCPP::initializeLibrary();
@@ -39,6 +62,21 @@ int main( int argc, char **argv ) {
     activemq::util::AMQLogger::initializeFlightRecorder(0.005);
     // Enable DEBUG level logging globally to record entries to flight recorder
     activemq::util::AMQLogger::setLevel(activemq::util::AMQLogLevel::DEBUG);
+
+    // Install crash handler to dump Flight Recorder on segfault / access violation
+#ifdef _WIN32
+    SetUnhandledExceptionFilter(flightRecorderExceptionFilter);
+#else
+    struct sigaction sa = {};
+    sa.sa_handler = flightRecorderSignalHandler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESETHAND;
+    sigaction(SIGSEGV, &sa, nullptr);
+    sigaction(SIGABRT, &sa, nullptr);
+    sigaction(SIGFPE,  &sa, nullptr);
+    sigaction(SIGBUS,  &sa, nullptr);
+    sigaction(SIGILL,  &sa, nullptr);
+#endif
     // Enable record-only mode: skip formatting overhead, only record to flight recorder
     // Logs will be formatted and printed only on failure/timeout (lazy formatting)
     activemq::util::AMQLogger::setRecordOnlyMode(true);

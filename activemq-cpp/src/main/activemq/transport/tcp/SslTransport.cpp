@@ -39,7 +39,13 @@ using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 SslTransport::SslTransport(const Pointer<Transport> next, const decaf::net::URI& location) :
-    TcpTransport(next, location), sslSocket(NULL) {
+    TcpTransport(next, location), sslSocket(NULL), properties() {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+SslTransport::SslTransport(const Pointer<Transport> next, const decaf::net::URI& location,
+                         const decaf::util::Properties& properties) :
+    TcpTransport(next, location), sslSocket(NULL), properties(properties) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,6 +88,13 @@ void SslTransport::configureSocket(Socket* socket) {
         std::vector<std::string> serverNames;
         serverNames.push_back(this->getLocation().getHost());
         params.setServerNames(serverNames);
+
+        // Apply peer verification setting from URI properties if specified
+        if (this->properties.hasProperty("socket.disablePeerVerification")) {
+            bool disablePeerVerification = Boolean::parseBoolean(
+                this->properties.getProperty("socket.disablePeerVerification", "false"));
+            params.setPeerVerificationEnabled(!disablePeerVerification);
+        }
 
         sslSocket->setSSLParameters(params);
 

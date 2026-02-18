@@ -19,9 +19,7 @@
 
 #include <decaf/lang/exceptions/NullPointerException.h>
 
-#ifdef HAVE_OPENSSL
 #include <openssl/ssl.h>
-#endif
 
 #include <memory>
 
@@ -33,12 +31,11 @@ using namespace decaf::internal::net;
 using namespace decaf::internal::net::ssl;
 using namespace decaf::internal::net::ssl::openssl;
 
-#ifdef HAVE_OPENSSL
-
 ////////////////////////////////////////////////////////////////////////////////
 OpenSSLParameters::OpenSSLParameters(SSL_CTX* context) : needClientAuth(false),
                                                          wantClientAuth(false),
                                                          useClientMode(true),
+                                                         peerVerificationEnabled(true),
                                                          context(context),
                                                          ssl(NULL),
                                                          enabledCipherSuites(),
@@ -53,15 +50,11 @@ OpenSSLParameters::OpenSSLParameters(SSL_CTX* context) : needClientAuth(false),
     this->ssl = SSL_new(context);
 }
 
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////
 OpenSSLParameters::~OpenSSLParameters() {
 
     try {
-#ifdef HAVE_OPENSSL
         SSL_free(this->ssl);
-#endif
     }
     DECAF_CATCH_NOTHROW(Exception)
     DECAF_CATCHALL_NOTHROW()
@@ -113,8 +106,6 @@ void OpenSSLParameters::setServerNames(const std::vector<std::string>& serverNam
 ////////////////////////////////////////////////////////////////////////////////
 OpenSSLParameters* OpenSSLParameters::clone() const {
 
-#ifdef HAVE_OPENSSL
-
     std::unique_ptr<OpenSSLParameters> cloned( new OpenSSLParameters( this->context ) );
 
     cloned->enabledProtocols = this->enabledProtocols;
@@ -123,12 +114,7 @@ OpenSSLParameters* OpenSSLParameters::clone() const {
     cloned->needClientAuth = this->needClientAuth;
     cloned->wantClientAuth = this->wantClientAuth;
     cloned->useClientMode = this->useClientMode;
+    cloned->peerVerificationEnabled = this->peerVerificationEnabled;
 
     return cloned.release();
-
-#else
-
-    return NULL;
-
-#endif
 }

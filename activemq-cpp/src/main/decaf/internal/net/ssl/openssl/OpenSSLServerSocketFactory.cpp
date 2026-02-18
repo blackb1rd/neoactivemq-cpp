@@ -26,9 +26,7 @@
 
 #include <memory>
 
-#ifdef HAVE_OPENSSL
 #include <openssl/ssl.h>
-#endif
 
 using namespace decaf;
 using namespace decaf::lang;

@@ -14,9 +14,9 @@
 #     apache/activemq-classic:5.18.7
 #
 # NOTE: Failover, multi-connection, and high-volume tests have been moved to
-# test-system directory. Run those with:
+# test-integration-benchmarks directory. Run those with:
 #   docker compose --profile failover up -d
-#   ./neoactivemq-system-test
+#   ./neoactivemq-integration-benchmark-test
 #
 # To stop the broker after testing:
 #   docker-compose down
@@ -83,6 +83,36 @@ set(INTEGRATION_TEST_SRCS
   # Additional OpenWire protocol specification tests
   activemq/test/openwire/OpenwireMessageSelectorTest.cpp
 
+  # OpenWire SSL protocol tests (require SSL broker: docker compose --profile ssl up)
+  activemq/test/openwire_ssl/OpenwireSslAdvisoryTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslAsyncSenderTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslClientAckTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslCmsConnectionStartStopTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslCmsSendWithAsyncCallbackTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslCmsTemplateTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslDurableTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslEnhancedConnectionTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslExpirationTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslIndividualAckTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslJmsMessageGroupsTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslJmsRecoverTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMapMessageTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMessageCompressionTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMessageListenerRedeliveryTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMessagePriorityTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMessageSelectorTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslNonBlockingRedeliveryTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslOptimizedAckTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslQueueBrowserTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslRedeliveryPolicyTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslSimpleRollbackTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslSimpleTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslSlowListenerTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslTempDestinationTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslTransactionTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslVirtualTopicTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslXATransactionsTest.cpp
+
   # STOMP protocol tests
   activemq/test/stomp/StompAdvisoryTest.cpp
   activemq/test/stomp/StompAsyncSenderTest.cpp
@@ -134,9 +164,9 @@ target_link_libraries(neoactivemq-integration-test PRIVATE neoactivemq-cpp GTest
 
 include(StaticTestDiscovery)
 
-# Collect openwire + stomp test sources for static test discovery
-# (these files contain the TEST_F macros after header merge)
-set(INTEGRATION_TEST_DISCOVERY_SRCS
+# OpenWire integration tests (non-SSL)
+# Requires: docker compose up (default broker on port 61616)
+set(INTEGRATION_OPENWIRE_TEST_DISCOVERY_SRCS
   activemq/test/openwire/OpenwireAdvisoryTest.cpp
   activemq/test/openwire/OpenwireAsyncSenderTest.cpp
   activemq/test/openwire/OpenwireClientAckTest.cpp
@@ -165,6 +195,65 @@ set(INTEGRATION_TEST_DISCOVERY_SRCS
   activemq/test/openwire/OpenwireVirtualTopicTest.cpp
   activemq/test/openwire/OpenwireXATransactionsTest.cpp
   activemq/test/openwire/OpenwireMessageSelectorTest.cpp
+)
+
+static_discover_tests(neoactivemq-integration-test
+  TEST_PREFIX "integration/activemq/test/openwire/"
+  SOURCES ${INTEGRATION_OPENWIRE_TEST_DISCOVERY_SRCS}
+  LABELS "integration;integration-openwire"
+  PROPERTIES
+    TIMEOUT 300
+    ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
+)
+
+# OpenWire SSL integration tests
+# Requires: docker compose --profile ssl up (SSL broker on port 61617)
+set(INTEGRATION_OPENWIRE_SSL_TEST_DISCOVERY_SRCS
+  activemq/test/openwire_ssl/OpenwireSslAdvisoryTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslAsyncSenderTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslClientAckTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslCmsConnectionStartStopTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslCmsSendWithAsyncCallbackTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslCmsTemplateTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslDurableTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslEnhancedConnectionTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslExpirationTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslIndividualAckTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslJmsMessageGroupsTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslJmsRecoverTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMapMessageTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMessageCompressionTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMessageListenerRedeliveryTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMessagePriorityTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMessageSelectorTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslNonBlockingRedeliveryTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslOptimizedAckTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslQueueBrowserTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslRedeliveryPolicyTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslSimpleRollbackTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslSimpleTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslSlowListenerTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslTempDestinationTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslTransactionTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslVirtualTopicTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslXATransactionsTest.cpp
+)
+
+# Set SSL certificate file path (convert to native path for Windows compatibility)
+file(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/docker/ssl/certs/ca.pem" SSL_CERT_FILE_PATH)
+
+static_discover_tests(neoactivemq-integration-test
+  TEST_PREFIX "integration/activemq/test/openwire-ssl/"
+  SOURCES ${INTEGRATION_OPENWIRE_SSL_TEST_DISCOVERY_SRCS}
+  LABELS "integration;integration-openwire-ssl"
+  PROPERTIES
+    TIMEOUT 300
+    ENVIRONMENT "SSL_CERT_FILE=${SSL_CERT_FILE_PATH}"
+)
+
+# STOMP integration tests
+# Requires: docker compose up (default broker on port 61613)
+set(INTEGRATION_STOMP_TEST_DISCOVERY_SRCS
   activemq/test/stomp/StompAdvisoryTest.cpp
   activemq/test/stomp/StompAsyncSenderTest.cpp
   activemq/test/stomp/StompBulkMessageTest.cpp
@@ -180,9 +269,9 @@ set(INTEGRATION_TEST_DISCOVERY_SRCS
 )
 
 static_discover_tests(neoactivemq-integration-test
-  TEST_PREFIX "integration/"
-  SOURCES ${INTEGRATION_TEST_DISCOVERY_SRCS}
-  LABELS integration
+  TEST_PREFIX "integration/activemq/test/stomp/"
+  SOURCES ${INTEGRATION_STOMP_TEST_DISCOVERY_SRCS}
+  LABELS "integration;integration-stomp"
   PROPERTIES
     TIMEOUT 300
     ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"

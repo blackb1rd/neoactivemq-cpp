@@ -22,16 +22,7 @@ namespace activemq {
 namespace test {
 namespace openwire {
     class OpenwireIndividualAckTest : public CMSTestFixture {
-public:
-        OpenwireIndividualAckTest();
-        virtual ~OpenwireIndividualAckTest();
-        void testAckedMessageAreConsumed();
-        void testLastMessageAcked();
-        void testUnAckedMessageAreNotConsumedOnSessionClose();
-        void testIndividualAcknowledgeMultiMessages_AcknowledgeFirstTest();
-        void testManyMessageAckedAfterMessageConsumption();
-        void testManyMessageAckedAfterAllConsumption();
-        void tesIndividualAcksWithClosedConsumerAndAudit();
+    public:
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
@@ -52,15 +43,7 @@ using namespace activemq::test::openwire;
 using namespace activemq::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenwireIndividualAckTest::OpenwireIndividualAckTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-OpenwireIndividualAckTest::~OpenwireIndividualAckTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireIndividualAckTest::testAckedMessageAreConsumed() {
+TEST_F(OpenwireIndividualAckTest, testAckedMessageAreConsumed) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -91,7 +74,7 @@ void OpenwireIndividualAckTest::testAckedMessageAreConsumed() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireIndividualAckTest::testLastMessageAcked() {
+TEST_F(OpenwireIndividualAckTest, testLastMessageAcked) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -137,7 +120,7 @@ void OpenwireIndividualAckTest::testLastMessageAcked() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireIndividualAckTest::testUnAckedMessageAreNotConsumedOnSessionClose() {
+TEST_F(OpenwireIndividualAckTest, testUnAckedMessageAreNotConsumedOnSessionClose) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -169,7 +152,7 @@ void OpenwireIndividualAckTest::testUnAckedMessageAreNotConsumedOnSessionClose()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireIndividualAckTest::testIndividualAcknowledgeMultiMessages_AcknowledgeFirstTest() {
+TEST_F(OpenwireIndividualAckTest, testIndividualAcknowledgeMultiMessages_AcknowledgeFirstTest) {
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
 
@@ -215,7 +198,7 @@ void OpenwireIndividualAckTest::testIndividualAcknowledgeMultiMessages_Acknowled
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireIndividualAckTest::testManyMessageAckedAfterMessageConsumption() {
+TEST_F(OpenwireIndividualAckTest, testManyMessageAckedAfterMessageConsumption) {
     int messageCount = 20;
     std::unique_ptr<Message> msg;
 
@@ -255,7 +238,7 @@ void OpenwireIndividualAckTest::testManyMessageAckedAfterMessageConsumption() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireIndividualAckTest::testManyMessageAckedAfterAllConsumption() {
+TEST_F(OpenwireIndividualAckTest, testManyMessageAckedAfterAllConsumption) {
     int messageCount = 20;
     std::unique_ptr<Message> msg;
 
@@ -301,7 +284,7 @@ void OpenwireIndividualAckTest::testManyMessageAckedAfterAllConsumption() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireIndividualAckTest::tesIndividualAcksWithClosedConsumerAndAudit() {
+TEST_F(OpenwireIndividualAckTest, tesIndividualAcksWithClosedConsumerAndAudit) {
     int messageCount = 20;
     std::unique_ptr<Message> msg;
 
@@ -339,13 +322,3 @@ void OpenwireIndividualAckTest::tesIndividualAcksWithClosedConsumerAndAudit() {
 
     connection->close();
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Test registration
-TEST_F(OpenwireIndividualAckTest, testAckedMessageAreConsumed) { testAckedMessageAreConsumed(); }
-TEST_F(OpenwireIndividualAckTest, testLastMessageAcked) { testLastMessageAcked(); }
-TEST_F(OpenwireIndividualAckTest, testUnAckedMessageAreNotConsumedOnSessionClose) { testUnAckedMessageAreNotConsumedOnSessionClose(); }
-TEST_F(OpenwireIndividualAckTest, testIndividualAcknowledgeMultiMessages_AcknowledgeFirstTest) { testIndividualAcknowledgeMultiMessages_AcknowledgeFirstTest(); }
-TEST_F(OpenwireIndividualAckTest, testManyMessageAckedAfterMessageConsumption) { testManyMessageAckedAfterMessageConsumption(); }
-TEST_F(OpenwireIndividualAckTest, testManyMessageAckedAfterAllConsumption) { testManyMessageAckedAfterAllConsumption(); }
-TEST_F(OpenwireIndividualAckTest, tesIndividualAcksWithClosedConsumerAndAudit) { tesIndividualAcksWithClosedConsumerAndAudit(); }

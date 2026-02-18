@@ -29,7 +29,7 @@
 
 #include <activemq/transport/mock/MockTransportFactory.h>
 #include <activemq/transport/tcp/TcpTransportFactory.h>
-#ifdef HAVE_OPENSSL
+#ifdef AMQCPP_USE_SSL
 #include <activemq/transport/tcp/SslTransportFactory.h>
 #endif
 #include <activemq/transport/failover/FailoverTransportFactory.h>
@@ -111,11 +111,11 @@ void ActiveMQCPP::registerTransports() {
     TransportRegistry::initialize();
 
     TransportRegistry::getInstance().registerFactory("tcp", new TcpTransportFactory());
-#ifdef HAVE_OPENSSL
+#ifdef AMQCPP_USE_SSL
     TransportRegistry::getInstance().registerFactory("ssl", new SslTransportFactory());
 #endif
     TransportRegistry::getInstance().registerFactory("nio", new TcpTransportFactory());
-#ifdef HAVE_OPENSSL
+#ifdef AMQCPP_USE_SSL
     TransportRegistry::getInstance().registerFactory("nio+ssl", new SslTransportFactory());
 #endif
     TransportRegistry::getInstance().registerFactory("mock", new MockTransportFactory());

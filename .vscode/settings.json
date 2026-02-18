@@ -141,5 +141,6 @@
         "test": {
             "enabled": true
         }
-    }
+    },
+    "cmake.ctest.testSuiteDelimiter": "/"
 }

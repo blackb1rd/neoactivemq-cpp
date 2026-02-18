@@ -49,7 +49,7 @@ TEST_F(SSLSocketFactoryTest, testGetDefault) {
 
     ASSERT_TRUE(factory != NULL);
 
-#ifdef HAVE_OPENSSL
+#ifdef AMQCPP_USE_SSL
 
     std::unique_ptr<Socket> sock( factory->createSocket() );
     ASSERT_TRUE(sock.get() != NULL);

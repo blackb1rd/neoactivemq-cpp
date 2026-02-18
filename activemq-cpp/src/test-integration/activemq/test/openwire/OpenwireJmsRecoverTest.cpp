@@ -60,21 +60,11 @@ namespace test {
 namespace openwire {
 
     class OpenwireJmsRecoverTest : public ::testing::Test {
-    private:
+    protected:
 
-        cms::ConnectionFactory* factory;
-        cms::Connection* connection;
-        cms::Destination* destination;
-
-    private:
-
-        OpenwireJmsRecoverTest(const OpenwireJmsRecoverTest&);
-        OpenwireJmsRecoverTest& operator= (const OpenwireJmsRecoverTest&);
-
-    public:
-
-        OpenwireJmsRecoverTest();
-        virtual ~OpenwireJmsRecoverTest();
+        cms::ConnectionFactory* factory = nullptr;
+        cms::Connection* connection = nullptr;
+        cms::Destination* destination = nullptr;
 
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
@@ -82,15 +72,6 @@ namespace openwire {
 
         void SetUp() override;
         void TearDown() override;
-
-        void testQueueSynchRecover();
-        void testQueueAsynchRecover();
-        void testTopicSynchRecover();
-        void testTopicAsynchRecover();
-        void testQueueAsynchRecoverWithAutoAck();
-        void testTopicAsynchRecoverWithAutoAck();
-
-    private:
 
         void doTestSynchRecover();
         void doTestAsynchRecover();
@@ -102,15 +83,6 @@ namespace openwire {
 
 using namespace activemq::test;
 using namespace activemq::test::openwire;
-
-////////////////////////////////////////////////////////////////////////////////
-OpenwireJmsRecoverTest::OpenwireJmsRecoverTest() :
-    factory(), connection(), destination() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-OpenwireJmsRecoverTest::~OpenwireJmsRecoverTest() {
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 void OpenwireJmsRecoverTest::SetUp() {
@@ -125,42 +97,6 @@ void OpenwireJmsRecoverTest::TearDown() {
     delete factory;
     delete connection;
     delete destination;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireJmsRecoverTest::testQueueSynchRecover() {
-    destination = new ActiveMQQueue(string("Queue-") + Long::toString(System::currentTimeMillis()));
-    doTestSynchRecover();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireJmsRecoverTest::testQueueAsynchRecover() {
-    destination = new ActiveMQQueue(string("Queue-") + Long::toString(System::currentTimeMillis()));
-    doTestAsynchRecover();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireJmsRecoverTest::testTopicSynchRecover() {
-    destination = new ActiveMQTopic(string("Topic-") + Long::toString(System::currentTimeMillis()));
-    doTestSynchRecover();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireJmsRecoverTest::testTopicAsynchRecover() {
-    destination = new ActiveMQTopic(string("Topic-") + Long::toString(System::currentTimeMillis()));
-    doTestAsynchRecover();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireJmsRecoverTest::testQueueAsynchRecoverWithAutoAck() {
-    destination = new ActiveMQQueue(string("Queue-") + Long::toString(System::currentTimeMillis()));
-    doTestAsynchRecoverWithAutoAck();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireJmsRecoverTest::testTopicAsynchRecoverWithAutoAck() {
-    destination = new ActiveMQTopic(string("Topic-") + Long::toString(System::currentTimeMillis()));
-    doTestAsynchRecoverWithAutoAck();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -366,10 +302,32 @@ void OpenwireJmsRecoverTest::doTestAsynchRecoverWithAutoAck() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Test registration
-TEST_F(OpenwireJmsRecoverTest, testQueueSynchRecover) { testQueueSynchRecover(); }
-TEST_F(OpenwireJmsRecoverTest, testQueueAsynchRecover) { testQueueAsynchRecover(); }
-TEST_F(OpenwireJmsRecoverTest, testTopicSynchRecover) { testTopicSynchRecover(); }
-TEST_F(OpenwireJmsRecoverTest, testTopicAsynchRecover) { testTopicAsynchRecover(); }
-TEST_F(OpenwireJmsRecoverTest, testQueueAsynchRecoverWithAutoAck) { testQueueAsynchRecoverWithAutoAck(); }
-TEST_F(OpenwireJmsRecoverTest, testTopicAsynchRecoverWithAutoAck) { testTopicAsynchRecoverWithAutoAck(); }
+TEST_F(OpenwireJmsRecoverTest, testQueueSynchRecover) {
+    destination = new ActiveMQQueue(string("Queue-") + Long::toString(System::currentTimeMillis()));
+    doTestSynchRecover();
+}
+
+TEST_F(OpenwireJmsRecoverTest, testQueueAsynchRecover) {
+    destination = new ActiveMQQueue(string("Queue-") + Long::toString(System::currentTimeMillis()));
+    doTestAsynchRecover();
+}
+
+TEST_F(OpenwireJmsRecoverTest, testTopicSynchRecover) {
+    destination = new ActiveMQTopic(string("Topic-") + Long::toString(System::currentTimeMillis()));
+    doTestSynchRecover();
+}
+
+TEST_F(OpenwireJmsRecoverTest, testTopicAsynchRecover) {
+    destination = new ActiveMQTopic(string("Topic-") + Long::toString(System::currentTimeMillis()));
+    doTestAsynchRecover();
+}
+
+TEST_F(OpenwireJmsRecoverTest, testQueueAsynchRecoverWithAutoAck) {
+    destination = new ActiveMQQueue(string("Queue-") + Long::toString(System::currentTimeMillis()));
+    doTestAsynchRecoverWithAutoAck();
+}
+
+TEST_F(OpenwireJmsRecoverTest, testTopicAsynchRecoverWithAutoAck) {
+    destination = new ActiveMQTopic(string("Topic-") + Long::toString(System::currentTimeMillis()));
+    doTestAsynchRecoverWithAutoAck();
+}

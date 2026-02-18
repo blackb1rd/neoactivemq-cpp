@@ -180,8 +180,10 @@ void TcpSocket::create() {
         }
 
         // Initialize the Socket's FileDescriptor with the native handle
+        // On Windows x64, native_handle() returns SOCKET which is 64-bit (UINT_PTR)
+        // Use intptr_t to properly store the handle without truncation
         auto nativeHandle = this->impl->socket->native_handle();
-        this->fd = new SocketFileDescriptor(static_cast<long>(nativeHandle));
+        this->fd = new SocketFileDescriptor(static_cast<intptr_t>(nativeHandle));
         AMQ_LOG_DEBUG("TcpSocket", "create() completed, handle=" << nativeHandle);
     }
     DECAF_CATCH_RETHROW(decaf::io::IOException)
@@ -409,10 +411,14 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout) {
 
         asio::error_code ec;
 
-        // Resolve the hostname
-        AMQ_LOG_DEBUG("TcpSocket", "connect() resolving hostname...");
+        // Resolve the hostname using IPv4 only to match the IPv4 socket opened in create().
+        // Resolving without a protocol hint returns both IPv6 and IPv4 endpoints; when the
+        // broker only listens on IPv4 (e.g. Docker on Windows), the IPv6 attempt can take
+        // ~2 seconds to fail before falling back to IPv4.  Restricting to IPv4 avoids this
+        // delay, which matters for timing-sensitive tests (e.g. message expiration tests).
+        AMQ_LOG_DEBUG("TcpSocket", "connect() resolving hostname (IPv4)...");
         asio::ip::tcp::resolver resolver(this->impl->ioContext);
-        auto endpoints = resolver.resolve(hostname, std::to_string(port), ec);
+        auto endpoints = resolver.resolve(asio::ip::tcp::v4(), hostname, std::to_string(port), ec);
 
         if (ec) {
             AMQ_LOG_ERROR("TcpSocket", "connect() resolve failed: " << ec.message());
@@ -1151,4 +1157,9 @@ bool TcpSocket::isConnected() const {
 ////////////////////////////////////////////////////////////////////////////////
 bool TcpSocket::isClosed() const {
     return this->impl->closed.get();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TcpSocketImpl* TcpSocket::getSocketImpl() {
+    return this->impl;
 }

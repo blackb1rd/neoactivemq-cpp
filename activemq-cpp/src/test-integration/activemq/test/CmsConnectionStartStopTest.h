@@ -28,7 +28,7 @@ namespace activemq{
 namespace test{
 
     class CmsConnectionStartStopTest : public CMSTestFixture {
-    private:
+    protected:
 
         decaf::lang::Pointer<cms::Connection> startedConnection;
         decaf::lang::Pointer<cms::Connection> stoppedConnection;

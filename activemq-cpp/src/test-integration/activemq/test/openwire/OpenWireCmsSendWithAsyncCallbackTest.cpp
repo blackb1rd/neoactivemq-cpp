@@ -22,28 +22,16 @@ namespace activemq {
 namespace test {
 namespace openwire {
     class OpenWireCmsSendWithAsyncCallbackTest : public CmsSendWithAsyncCallbackTest {
-    private:
-public:
-        OpenWireCmsSendWithAsyncCallbackTest();
-        virtual ~OpenWireCmsSendWithAsyncCallbackTest();
+    public:
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
     };
 }}}
 
-using namespace activemq;
-using namespace activemq::test;
 using namespace activemq::test::openwire;
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenWireCmsSendWithAsyncCallbackTest::OpenWireCmsSendWithAsyncCallbackTest() {
+TEST_F(OpenWireCmsSendWithAsyncCallbackTest, testAsyncCallbackIsFaster) {
+    testAsyncCallbackIsFaster();
 }
-
-////////////////////////////////////////////////////////////////////////////////
-OpenWireCmsSendWithAsyncCallbackTest::~OpenWireCmsSendWithAsyncCallbackTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Test registration
-TEST_F(OpenWireCmsSendWithAsyncCallbackTest, testAsyncCallbackIsFaster) { testAsyncCallbackIsFaster(); }

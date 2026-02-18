@@ -30,5 +30,8 @@ configure
 output/
 .cache/
 
+# Generated SSL certificates for integration testing
+docker/ssl/certs/
+
 
 

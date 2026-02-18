@@ -183,8 +183,19 @@ namespace tcp {
          */
         void write(const unsigned char* buffer, int size, int offset, int length);
 
+        /**
+         * Get access to the underlying TcpSocketImpl for advanced operations.
+         * This is primarily used by SSL socket implementations that need direct
+         * access to the ASIO socket.
+         *
+         * @return pointer to the TcpSocketImpl, or NULL if not available
+         */
+        TcpSocketImpl* getSocketImpl();
+
     };
 
 }}}}
 
 #endif /*_DECAF_INTERNAL_NET_TCP_TCPSOCKET_H_*/
+
+

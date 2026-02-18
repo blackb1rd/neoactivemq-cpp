@@ -18,6 +18,7 @@
 #ifndef _DECAF_IO_FILEDESCRIPTOR_H_
 #define _DECAF_IO_FILEDESCRIPTOR_H_
 
+#include <cstdint>
 #include <decaf/util/Config.h>
 
 namespace decaf {
@@ -52,12 +53,14 @@ namespace io {
 
     protected:
 
-        long descriptor;
+        // Use intptr_t to properly store file/socket handles on all platforms
+        // On Windows x64, SOCKET is 64-bit (UINT_PTR) which doesn't fit in 32-bit long
+        intptr_t descriptor;
         bool readonly;
 
     protected:
 
-        FileDescriptor(long value, bool readonly);
+        FileDescriptor(intptr_t value, bool readonly);
 
     public:
 

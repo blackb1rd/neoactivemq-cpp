@@ -18,9 +18,15 @@
 #include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/core/ActiveMQConnection.h>
 #include <activemq/core/ActiveMQSession.h>
+#include <activemq/commands/ActiveMQTempTopic.h>
+#include <activemq/commands/ActiveMQTempQueue.h>
+#include <activemq/commands/ActiveMQMessage.h>
 #include <activemq/commands/Message.h>
 #include <activemq/commands/ConnectionInfo.h>
+#include <activemq/commands/DestinationInfo.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/CMSListener.h>
+#include <activemq/util/AdvisorySupport.h>
 
 #include <decaf/lang/exceptions/ClassCastException.h>
 #include <decaf/lang/Pointer.h>
@@ -38,6 +44,7 @@
 #include <cms/ConnectionFactory.h>
 #include <cms/Connection.h>
 #include <cms/Message.h>
+#include <cms/Destination.h>
 #include <cms/TextMessage.h>
 
 #include <memory>
@@ -49,15 +56,67 @@ namespace test {
 namespace openwire {
     class OpenwireAdvisoryTest : public AdvisoryTest {
 public:
-        OpenwireAdvisoryTest();
-        virtual ~OpenwireAdvisoryTest();
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
-        void testConnectionAdvisories();
-        void testConcurrentTempDestCreation();
     };
 }}}
+
+namespace {
+
+    class ConnectionLoadThread : public decaf::lang::Thread {
+    private:
+
+        cms::ConnectionFactory* factory;
+        bool noErrors;
+        std::string errorMessage;
+
+    public:
+
+        ConnectionLoadThread(cms::ConnectionFactory* factory) :
+            Thread(), factory(factory), noErrors(true), errorMessage() {
+        }
+
+        virtual ~ConnectionLoadThread() {}
+
+        bool isNoErrors() const {
+            return this->noErrors;
+        }
+
+        std::string getErrorMessage() const {
+            return this->errorMessage;
+        }
+
+        virtual void run() {
+
+            try {
+                for (unsigned int i = 0; i < 50; ++i) {
+                    std::unique_ptr<cms::Connection> connection(factory->createConnection());
+                    connection->start();
+                    std::unique_ptr<cms::Session> session(connection->createSession(cms::Session::AUTO_ACKNOWLEDGE));
+
+                    for (unsigned int j = 0; j < 100; ++j) {
+                        std::unique_ptr<cms::Queue> queue(session->createTemporaryQueue());
+                        std::unique_ptr<cms::MessageProducer> producer(session->createProducer(queue.get()));
+                    }
+
+                    decaf::util::concurrent::TimeUnit::MILLISECONDS.sleep(20);
+                    connection->close();
+                }
+            } catch (cms::CMSException& e) {
+                noErrors = false;
+                errorMessage = std::string("CMSException: ") + e.what();
+            } catch (std::exception& e) {
+                noErrors = false;
+                errorMessage = std::string("std::exception: ") + e.what();
+            } catch(...) {
+                noErrors = false;
+                errorMessage = "Unknown exception";
+            }
+        }
+    };
+
+}
 
 using namespace cms;
 using namespace std;
@@ -72,17 +131,10 @@ using namespace activemq::commands;
 using namespace activemq::exceptions;
 using namespace activemq::test;
 using namespace activemq::test::openwire;
+using namespace activemq::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenwireAdvisoryTest::OpenwireAdvisoryTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-OpenwireAdvisoryTest::~OpenwireAdvisoryTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireAdvisoryTest::testConnectionAdvisories() {
+TEST_F(OpenwireAdvisoryTest, testConnectionAdvisories) {
 
     std::unique_ptr<ConnectionFactory> factory(ConnectionFactory::createCMSConnectionFactory(getBrokerURL()));
     ASSERT_TRUE(factory.get() != NULL);
@@ -131,64 +183,7 @@ void OpenwireAdvisoryTest::testConnectionAdvisories() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
-
-    class ConnectionLoadThread : public Thread {
-    private:
-
-        ConnectionFactory* factory;
-        bool noErrors;
-        std::string errorMessage;
-
-    public:
-
-        ConnectionLoadThread(ConnectionFactory* factory) :
-            Thread(), factory(factory), noErrors(true), errorMessage() {
-        }
-
-        virtual ~ConnectionLoadThread() {}
-
-        bool isNoErrors() const {
-            return this->noErrors;
-        }
-
-        std::string getErrorMessage() const {
-            return this->errorMessage;
-        }
-
-        virtual void run() {
-
-            try {
-                for (unsigned int i = 0; i < 50; ++i) {
-                    std::unique_ptr<Connection> connection(factory->createConnection());
-                    connection->start();
-                    std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
-
-                    for (unsigned int j = 0; j < 100; ++j) {
-                        std::unique_ptr<Queue> queue(session->createTemporaryQueue());
-                        std::unique_ptr<MessageProducer> producer(session->createProducer(queue.get()));
-                    }
-
-                    TimeUnit::MILLISECONDS.sleep(20);
-                    connection->close();
-                }
-            } catch (cms::CMSException& e) {
-                noErrors = false;
-                errorMessage = std::string("CMSException: ") + e.what();
-            } catch (std::exception& e) {
-                noErrors = false;
-                errorMessage = std::string("std::exception: ") + e.what();
-            } catch(...) {
-                noErrors = false;
-                errorMessage = "Unknown exception";
-            }
-        }
-    };
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireAdvisoryTest::testConcurrentTempDestCreation() {
+TEST_F(OpenwireAdvisoryTest, testConcurrentTempDestCreation) {
 
     std::unique_ptr<ConnectionFactory> factory(
         ConnectionFactory::createCMSConnectionFactory(getBrokerURL()));
@@ -207,7 +202,55 @@ void OpenwireAdvisoryTest::testConcurrentTempDestCreation() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Test registration
-TEST_F(OpenwireAdvisoryTest, testConnectionAdvisories) { testConnectionAdvisories(); }
-TEST_F(OpenwireAdvisoryTest, testConcurrentTempDestCreation) { testConcurrentTempDestCreation(); }
-TEST_F(OpenwireAdvisoryTest, testTempDestinationCompositeAdvisoryTopic) { testTempDestinationCompositeAdvisoryTopic(); }
+TEST_F(OpenwireAdvisoryTest, testTempDestinationCompositeAdvisoryTopic) {
+
+    std::unique_ptr<ConnectionFactory> factory(
+        ConnectionFactory::createCMSConnectionFactory(getBrokerURL()));
+    ASSERT_TRUE(factory.get() != NULL);
+
+    std::unique_ptr<Connection> connection(factory->createConnection());
+    ASSERT_TRUE(connection.get() != NULL);
+
+    std::unique_ptr<Session> session(connection->createSession());
+    ASSERT_TRUE(session.get() != NULL);
+
+    std::unique_ptr<ActiveMQDestination> composite(
+        AdvisorySupport::getTempDestinationCompositeAdvisoryTopic());
+
+    std::unique_ptr<MessageConsumer> consumer(session->createConsumer(dynamic_cast<Topic*>(composite.get())));
+
+    connection->start();
+
+    // Create one of each
+    std::unique_ptr<Topic> tempTopic(session->createTemporaryTopic());
+    std::unique_ptr<Queue> tempQueue(session->createTemporaryQueue());
+
+    // Create a consumer to ensure destination creation based on protocol.
+    std::unique_ptr<MessageConsumer> tempTopicConsumer(session->createConsumer(tempTopic.get()));
+    std::unique_ptr<MessageConsumer> tempQueueConsumer(session->createConsumer(tempQueue.get()));
+
+    // Should be an advisory for each
+    std::unique_ptr<cms::Message> advisory1(consumer->receive(2000));
+    ASSERT_TRUE(advisory1.get() != NULL);
+    std::unique_ptr<cms::Message> advisory2(consumer->receive(2000));
+    ASSERT_TRUE(advisory2.get() != NULL);
+
+    ActiveMQMessage* tempTopicAdvisory = dynamic_cast<ActiveMQMessage*>(advisory1.get());
+    ActiveMQMessage* tempQueueAdvisory = dynamic_cast<ActiveMQMessage*>(advisory2.get());
+
+    // Create one of each
+    std::unique_ptr<Topic> topic(session->createTopic(UUID::randomUUID().toString()));
+    std::unique_ptr<Queue> queue(session->createQueue(UUID::randomUUID().toString()));
+
+    // Create a producer to ensure destination creation based on protocol.
+    std::unique_ptr<MessageProducer> topicProducer(session->createProducer(topic.get()));
+    std::unique_ptr<MessageProducer> queueProducer(session->createProducer(queue.get()));
+
+    // Should not be an advisory for each
+    std::unique_ptr<cms::Message> advisory3(consumer->receive(500));
+    ASSERT_TRUE(advisory3.get() == NULL);
+    std::unique_ptr<cms::Message> advisory4(consumer->receive(500));
+    ASSERT_TRUE(advisory4.get() == NULL);
+
+    connection->close();
+}

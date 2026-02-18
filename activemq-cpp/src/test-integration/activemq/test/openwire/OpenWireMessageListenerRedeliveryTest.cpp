@@ -22,17 +22,12 @@ namespace activemq {
 namespace test {
 namespace openwire {
     class OpenWireMessageListenerRedeliveryTest : public CMSTestFixture {
-    private:
-public:
-        OpenWireMessageListenerRedeliveryTest();
-        virtual ~OpenWireMessageListenerRedeliveryTest();
+    public:
+        void SetUp() override {}
+        void TearDown() override {}
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
-        void testQueueRollbackConsumerListener();
-        void testQueueSessionListenerExceptionRetry();
-        void testQueueSessionListenerExceptionDlq();
-        void testTransactedQueueSessionListenerExceptionDlq();
     };
 }}}
 
@@ -249,15 +244,7 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenWireMessageListenerRedeliveryTest::OpenWireMessageListenerRedeliveryTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-OpenWireMessageListenerRedeliveryTest::~OpenWireMessageListenerRedeliveryTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenWireMessageListenerRedeliveryTest::testQueueRollbackConsumerListener() {
+TEST_F(OpenWireMessageListenerRedeliveryTest, testQueueRollbackConsumerListener) {
 
     std::unique_ptr<cms::Connection> connection(createConnection(getBrokerURL()));
     connection->start();
@@ -313,7 +300,7 @@ void OpenWireMessageListenerRedeliveryTest::testQueueRollbackConsumerListener() 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenWireMessageListenerRedeliveryTest::testQueueSessionListenerExceptionRetry() {
+TEST_F(OpenWireMessageListenerRedeliveryTest, testQueueSessionListenerExceptionRetry) {
 
     std::unique_ptr<cms::Connection> connection(createConnection(getBrokerURL()));
     connection->start();
@@ -352,7 +339,7 @@ void OpenWireMessageListenerRedeliveryTest::testQueueSessionListenerExceptionRet
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenWireMessageListenerRedeliveryTest::testQueueSessionListenerExceptionDlq() {
+TEST_F(OpenWireMessageListenerRedeliveryTest, testQueueSessionListenerExceptionDlq) {
 
     const std::string TEST_NAME = "testQueueSessionListenerExceptionDlq";
 
@@ -402,7 +389,7 @@ void OpenWireMessageListenerRedeliveryTest::testQueueSessionListenerExceptionDlq
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenWireMessageListenerRedeliveryTest::testTransactedQueueSessionListenerExceptionDlq() {
+TEST_F(OpenWireMessageListenerRedeliveryTest, testTransactedQueueSessionListenerExceptionDlq) {
 
     const std::string TEST_NAME = "testTransactedQueueSessionListenerExceptionDlq";
 
@@ -451,10 +438,3 @@ void OpenWireMessageListenerRedeliveryTest::testTransactedQueueSessionListenerEx
 
     connection->close();
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Test registration
-TEST_F(OpenWireMessageListenerRedeliveryTest, testQueueRollbackConsumerListener) { testQueueRollbackConsumerListener(); }
-TEST_F(OpenWireMessageListenerRedeliveryTest, testQueueSessionListenerExceptionRetry) { testQueueSessionListenerExceptionRetry(); }
-TEST_F(OpenWireMessageListenerRedeliveryTest, testQueueSessionListenerExceptionDlq) { testQueueSessionListenerExceptionDlq(); }
-TEST_F(OpenWireMessageListenerRedeliveryTest, testTransactedQueueSessionListenerExceptionDlq) { testTransactedQueueSessionListenerExceptionDlq(); }

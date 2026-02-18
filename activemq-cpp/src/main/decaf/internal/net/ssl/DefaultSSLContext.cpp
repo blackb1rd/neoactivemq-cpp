@@ -74,8 +74,6 @@ DefaultSSLContext::~DefaultSSLContext() {
 ////////////////////////////////////////////////////////////////////////////////
 SSLContext* DefaultSSLContext::getContext() {
 
-#ifdef HAVE_OPENSSL
-
     if( defaultSSLContext == NULL ) {
 
         std::unique_ptr<SecureRandom> random( new SecureRandom() );
@@ -92,8 +90,6 @@ SSLContext* DefaultSSLContext::getContext() {
         Network::getNetworkRuntime()->addAsResource( defaultSSLContext );
         Network::getNetworkRuntime()->addShutdownTask( new ShutdownTask( &defaultSSLContext ) );
     }
-
-#endif
 
     return defaultSSLContext;
 }

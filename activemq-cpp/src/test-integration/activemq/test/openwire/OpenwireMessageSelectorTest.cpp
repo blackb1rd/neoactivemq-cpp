@@ -18,64 +18,6 @@
 #include <activemq/util/IntegrationCommon.h>
 #include <activemq/test/CMSTestFixture.h>
 
-namespace activemq {
-namespace test {
-namespace openwire {
-    /**
-     * Tests the OpenWire message selector feature.
-     * Message selectors use SQL92-like syntax to filter messages
-     * based on message properties and headers.
-     */
-    class OpenwireMessageSelectorTest : public CMSTestFixture {
-public:
-        OpenwireMessageSelectorTest();
-        virtual ~OpenwireMessageSelectorTest();
-        virtual std::string getBrokerURL() const {
-            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
-        }
-        /**
-         * Test selector with string property comparison.
-         */
-        void testStringPropertySelector();
-        /**
-         * Test selector with integer property comparison.
-         */
-        void testIntPropertySelector();
-        /**
-         * Test selector with boolean property.
-         */
-        void testBooleanPropertySelector();
-        /**
-         * Test compound selector with AND/OR operators.
-         */
-        void testCompoundSelector();
-        /**
-         * Test selector with LIKE operator for pattern matching.
-         */
-        void testSelectorWithLike();
-        /**
-         * Test selector with IN operator for value lists.
-         */
-        void testSelectorWithIn();
-        /**
-         * Test selector with BETWEEN operator for ranges.
-         */
-        void testSelectorWithBetween();
-        /**
-         * Test selector with IS NULL / IS NOT NULL operators.
-         */
-        void testSelectorWithIsNull();
-        /**
-         * Test selector on JMSType header.
-         */
-        void testJMSTypeSelector();
-        /**
-         * Test selector on JMSPriority header.
-         */
-        void testJMSPrioritySelector();
-    };
-}}}
-
 #include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/exceptions/ActiveMQException.h>
 
@@ -94,18 +36,27 @@ using namespace decaf::lang;
 using namespace activemq;
 using namespace activemq::core;
 using namespace activemq::test;
+
+namespace activemq {
+namespace test {
+namespace openwire {
+    /**
+     * Tests the OpenWire message selector feature.
+     * Message selectors use SQL92-like syntax to filter messages
+     * based on message properties and headers.
+     */
+    class OpenwireMessageSelectorTest : public CMSTestFixture {
+    public:
+        virtual std::string getBrokerURL() const {
+            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+        }
+    };
+}}}
+
 using namespace activemq::test::openwire;
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenwireMessageSelectorTest::OpenwireMessageSelectorTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-OpenwireMessageSelectorTest::~OpenwireMessageSelectorTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireMessageSelectorTest::testStringPropertySelector() {
+TEST_F(OpenwireMessageSelectorTest, testStringPropertySelector) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -149,7 +100,7 @@ void OpenwireMessageSelectorTest::testStringPropertySelector() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireMessageSelectorTest::testIntPropertySelector() {
+TEST_F(OpenwireMessageSelectorTest, testIntPropertySelector) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -186,7 +137,7 @@ void OpenwireMessageSelectorTest::testIntPropertySelector() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireMessageSelectorTest::testBooleanPropertySelector() {
+TEST_F(OpenwireMessageSelectorTest, testBooleanPropertySelector) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -221,7 +172,7 @@ void OpenwireMessageSelectorTest::testBooleanPropertySelector() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireMessageSelectorTest::testCompoundSelector() {
+TEST_F(OpenwireMessageSelectorTest, testCompoundSelector) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -264,7 +215,7 @@ void OpenwireMessageSelectorTest::testCompoundSelector() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireMessageSelectorTest::testSelectorWithLike() {
+TEST_F(OpenwireMessageSelectorTest, testSelectorWithLike) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -305,7 +256,7 @@ void OpenwireMessageSelectorTest::testSelectorWithLike() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireMessageSelectorTest::testSelectorWithIn() {
+TEST_F(OpenwireMessageSelectorTest, testSelectorWithIn) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -346,7 +297,7 @@ void OpenwireMessageSelectorTest::testSelectorWithIn() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireMessageSelectorTest::testSelectorWithBetween() {
+TEST_F(OpenwireMessageSelectorTest, testSelectorWithBetween) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -381,7 +332,7 @@ void OpenwireMessageSelectorTest::testSelectorWithBetween() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireMessageSelectorTest::testSelectorWithIsNull() {
+TEST_F(OpenwireMessageSelectorTest, testSelectorWithIsNull) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -416,7 +367,7 @@ void OpenwireMessageSelectorTest::testSelectorWithIsNull() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireMessageSelectorTest::testJMSTypeSelector() {
+TEST_F(OpenwireMessageSelectorTest, testJMSTypeSelector) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -451,7 +402,7 @@ void OpenwireMessageSelectorTest::testJMSTypeSelector() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireMessageSelectorTest::testJMSPrioritySelector() {
+TEST_F(OpenwireMessageSelectorTest, testJMSPrioritySelector) {
 
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
@@ -486,16 +437,3 @@ void OpenwireMessageSelectorTest::testJMSPrioritySelector() {
 
     session->close();
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Test registration
-TEST_F(OpenwireMessageSelectorTest, testStringPropertySelector) { testStringPropertySelector(); }
-TEST_F(OpenwireMessageSelectorTest, testIntPropertySelector) { testIntPropertySelector(); }
-TEST_F(OpenwireMessageSelectorTest, testBooleanPropertySelector) { testBooleanPropertySelector(); }
-TEST_F(OpenwireMessageSelectorTest, testCompoundSelector) { testCompoundSelector(); }
-TEST_F(OpenwireMessageSelectorTest, testSelectorWithLike) { testSelectorWithLike(); }
-TEST_F(OpenwireMessageSelectorTest, testSelectorWithIn) { testSelectorWithIn(); }
-TEST_F(OpenwireMessageSelectorTest, testSelectorWithBetween) { testSelectorWithBetween(); }
-TEST_F(OpenwireMessageSelectorTest, testSelectorWithIsNull) { testSelectorWithIsNull(); }
-TEST_F(OpenwireMessageSelectorTest, testJMSTypeSelector) { testJMSTypeSelector(); }
-TEST_F(OpenwireMessageSelectorTest, testJMSPrioritySelector) { testJMSPrioritySelector(); }

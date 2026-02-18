@@ -675,7 +675,7 @@ else()
 endif()
 
 # SSL/TLS support - conditionally add SSL sources when OpenSSL is available
-if(OpenSSL_FOUND)
+if(AMQCPP_USE_SSL)
     list(APPEND ACTIVEMQ_CPP_SOURCES
         # activemq SSL transport
         activemq/transport/tcp/SslTransport.cpp
@@ -722,8 +722,8 @@ target_include_directories(neoactivemq-cpp
 )
 
 # OpenSSL support
-if(OpenSSL_FOUND)
-  target_compile_definitions(neoactivemq-cpp PUBLIC HAVE_OPENSSL)
+if(AMQCPP_USE_SSL)
+  target_compile_definitions(neoactivemq-cpp PUBLIC AMQCPP_USE_SSL)
   target_link_libraries(neoactivemq-cpp PUBLIC OpenSSL::SSL OpenSSL::Crypto)
 endif()
 

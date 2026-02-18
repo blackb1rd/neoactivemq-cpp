@@ -17,24 +17,21 @@
 
 #include <activemq/util/IntegrationCommon.h>
 #include <activemq/test/AsyncSenderTest.h>
+#include <activemq/util/CMSListener.h>
+#include <activemq/core/ActiveMQConnectionFactory.h>
+#include <activemq/core/ActiveMQConnection.h>
 
 namespace activemq {
 namespace test {
 namespace openwire {
     class OpenwireAsyncSenderTest : public AsyncSenderTest {
 public:
-        OpenwireAsyncSenderTest();
-        virtual ~OpenwireAsyncSenderTest();
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL() +
                    "&connection.useAsyncSend=true";
         }
-        virtual void testOpenWireConnector();
     };
 }}}
-
-#include <activemq/core/ActiveMQConnectionFactory.h>
-#include <activemq/core/ActiveMQConnection.h>
 
 using namespace std;
 using namespace cms;
@@ -45,15 +42,44 @@ using namespace activemq::core;
 using namespace activemq::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenwireAsyncSenderTest::OpenwireAsyncSenderTest() {
+TEST_F(OpenwireAsyncSenderTest, testAsyncSends) {
+
+    try {
+
+        // Create CMS Object for Comms
+        cms::Session* session( cmsProvider->getSession() );
+
+        CMSListener listener( session );
+
+        cms::MessageConsumer* consumer = cmsProvider->getConsumer();
+        consumer->setMessageListener( &listener );
+        cms::MessageProducer* producer = cmsProvider->getProducer();
+        producer->setDeliveryMode( DeliveryMode::NON_PERSISTENT );
+
+        std::unique_ptr<cms::TextMessage> txtMessage( session->createTextMessage( "TEST MESSAGE" ) );
+        std::unique_ptr<cms::BytesMessage> bytesMessage( session->createBytesMessage() );
+
+        for( unsigned int i = 0; i < IntegrationCommon::defaultMsgCount; ++i ) {
+            producer->send( txtMessage.get() );
+        }
+
+        for( unsigned int i = 0; i < IntegrationCommon::defaultMsgCount; ++i ) {
+            producer->send( bytesMessage.get() );
+        }
+
+        // Wait for the messages to get here
+        listener.asyncWaitForMessages( IntegrationCommon::defaultMsgCount * 2 );
+
+        unsigned int numReceived = listener.getNumReceived();
+        ASSERT_TRUE(numReceived == IntegrationCommon::defaultMsgCount * 2);
+
+    } catch(...) {
+        ASSERT_TRUE(false);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenwireAsyncSenderTest::~OpenwireAsyncSenderTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireAsyncSenderTest::testOpenWireConnector() {
+TEST_F(OpenwireAsyncSenderTest, testOpenWireConnector) {
 
     try{
 
@@ -76,8 +102,3 @@ void OpenwireAsyncSenderTest::testOpenWireConnector() {
         ASSERT_TRUE(false);
     }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Test registration
-TEST_F(OpenwireAsyncSenderTest, testAsyncSends) { testAsyncSends(); }
-TEST_F(OpenwireAsyncSenderTest, testOpenWireConnector) { testOpenWireConnector(); }

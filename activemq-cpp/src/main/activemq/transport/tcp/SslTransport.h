@@ -44,6 +44,7 @@ namespace tcp {
     private:
 
         decaf::net::ssl::SSLSocket* sslSocket;
+        decaf::util::Properties properties;
 
         SslTransport(const SslTransport&);
         SslTransport& operator=(const SslTransport&);
@@ -60,6 +61,19 @@ namespace tcp {
          *      The URI of the host this transport is to connect to.
          */
         SslTransport(const Pointer<Transport> next, const decaf::net::URI& location);
+
+        /**
+         * Creates a new instance of the SslTransport with URI properties.
+         *
+         * @param next
+         *      The next transport in the chain
+         * @param location
+         *      The URI of the host this transport is to connect to.
+         * @param properties
+         *      The properties parsed from the URI query string.
+         */
+        SslTransport(const Pointer<Transport> next, const decaf::net::URI& location,
+                    const decaf::util::Properties& properties);
 
         virtual ~SslTransport();
 

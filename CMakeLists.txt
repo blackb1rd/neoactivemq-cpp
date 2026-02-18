@@ -174,18 +174,7 @@ option(AMQCPP_USE_SSL "Enable OpenSSL support (required when ON)" OFF)
 
 if(AMQCPP_USE_SSL)
 	find_package(OpenSSL REQUIRED)
-	message(STATUS "AMQCPP: SSL support enabled; OpenSSL will be required.")
-
-	# If OpenSSL was found, define HAVE_OPENSSL for the code so sources
-	# can use `#ifdef HAVE_OPENSSL` to enable OpenSSL-dependent features.
-	if(OpenSSL_FOUND)
-		message(STATUS "AMQCPP: Found OpenSSL ${OPENSSL_VERSION}")
-		add_compile_definitions(HAVE_OPENSSL)
-		set(AMQCPP_HAVE_OPENSSL ON CACHE INTERNAL "OpenSSL available")
-	else()
-		message(STATUS "AMQCPP: OpenSSL not found; HAVE_OPENSSL will not be defined")
-		set(AMQCPP_HAVE_OPENSSL OFF CACHE INTERNAL "OpenSSL available")
-	endif()
+	message(STATUS "AMQCPP: SSL support enabled; found OpenSSL ${OPENSSL_VERSION}")
 else()
 	find_package(OpenSSL QUIET)
 	message(STATUS "AMQCPP: SSL support disabled; OpenSSL will be optional.")
@@ -213,7 +202,7 @@ if(AMQCPP_BUILD_TESTS)
 	add_subdirectory(activemq-cpp/src/test)
 	add_subdirectory(activemq-cpp/src/test-benchmarks)
 	add_subdirectory(activemq-cpp/src/test-integration)
-	add_subdirectory(activemq-cpp/src/test-system)
+	add_subdirectory(activemq-cpp/src/test-integration-benchmarks)
 
 	# =========================================================================
 	# Integration & System Test Workflow Targets
@@ -232,21 +221,21 @@ if(AMQCPP_BUILD_TESTS)
 		COMMENT "Full integration test workflow (start broker, test, stop broker)..."
 	)
 
-	# System tests: start all brokers (failover profile), run tests, stop brokers
-	add_custom_target(system-full
+	# Integration benchmark tests: start all brokers (failover profile), run tests, stop brokers
+	add_custom_target(integration-benchmark-full
 		COMMAND docker compose --profile failover up -d
 		COMMAND ${CMAKE_COMMAND} -E sleep 15
-		COMMAND ${CMAKE_COMMAND} -E echo "Running system tests..."
-		COMMAND $<TARGET_FILE:neoactivemq-system-test>
+		COMMAND ${CMAKE_COMMAND} -E echo "Running integration benchmark tests..."
+		COMMAND $<TARGET_FILE:neoactivemq-integration-benchmark-test>
 		COMMAND docker compose --profile failover down
 		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		DEPENDS neoactivemq-system-test
-		COMMENT "Full system test workflow (start all brokers, test, stop brokers)..."
+		DEPENDS neoactivemq-integration-benchmark-test
+		COMMENT "Full integration benchmark test workflow (start all brokers, test, stop brokers)..."
 	)
 
 	message(STATUS "Test workflow targets:")
-	message(STATUS "  cmake --build --preset <preset> --target integration-full  # Integration tests (auto Docker)")
-	message(STATUS "  cmake --build --preset <preset> --target system-full       # System tests (auto Docker)")
+	message(STATUS "  cmake --build --preset <preset> --target integration-full            # Integration tests (auto Docker)")
+	message(STATUS "  cmake --build --preset <preset> --target integration-benchmark-full  # Integration benchmark tests (auto Docker)")
 endif()
 
 # Installation rules

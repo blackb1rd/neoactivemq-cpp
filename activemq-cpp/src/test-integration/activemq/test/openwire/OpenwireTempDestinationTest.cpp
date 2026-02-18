@@ -21,19 +21,7 @@ namespace activemq{
 namespace test{
 namespace openwire{
     class OpenwireTempDestinationTest : public CMSTestFixture {
-public:
-        OpenwireTempDestinationTest() {}
-        virtual ~OpenwireTempDestinationTest() {}
-        void testBasics();
-        void testTwoConnections();
-        void testTempDestOnlyConsumedByLocalConn();
-        void testTempQueueHoldsMessagesWithConsumers();
-        void testTempQueueHoldsMessagesWithoutConsumers();
-        void testTmpQueueWorksUnderLoad();
-        void testPublishFailsForClosedConnection();
-        void testPublishFailsForDestoryedTempDestination();
-        void testDeleteDestinationWithSubscribersFails();
-        void testCloseConnectionWithManyTempDests();
+    public:
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
@@ -199,7 +187,7 @@ namespace openwire {
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-void OpenwireTempDestinationTest::testBasics() {
+TEST_F(OpenwireTempDestinationTest, testBasics) {
 
     try{
 
@@ -223,7 +211,7 @@ void OpenwireTempDestinationTest::testBasics() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void OpenwireTempDestinationTest::testTwoConnections() {
+TEST_F(OpenwireTempDestinationTest, testTwoConnections) {
 
     std::string destination = "REQUEST-TOPIC";
 
@@ -253,7 +241,7 @@ void OpenwireTempDestinationTest::testTwoConnections() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void OpenwireTempDestinationTest::testTempDestOnlyConsumedByLocalConn() {
+TEST_F(OpenwireTempDestinationTest, testTempDestOnlyConsumedByLocalConn) {
 
     std::unique_ptr<ActiveMQConnectionFactory> factory(
         new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
@@ -287,7 +275,7 @@ void OpenwireTempDestinationTest::testTempDestOnlyConsumedByLocalConn() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void OpenwireTempDestinationTest::testTempQueueHoldsMessagesWithConsumers() {
+TEST_F(OpenwireTempDestinationTest, testTempQueueHoldsMessagesWithConsumers) {
 
     std::unique_ptr<TemporaryQueue> queue(cmsProvider->getSession()->createTemporaryQueue());
     std::unique_ptr<MessageConsumer> consumer(cmsProvider->getSession()->createConsumer(queue.get()));
@@ -303,7 +291,7 @@ void OpenwireTempDestinationTest::testTempQueueHoldsMessagesWithConsumers() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void OpenwireTempDestinationTest::testTempQueueHoldsMessagesWithoutConsumers() {
+TEST_F(OpenwireTempDestinationTest, testTempQueueHoldsMessagesWithoutConsumers) {
 
     std::unique_ptr<TemporaryQueue> queue(cmsProvider->getSession()->createTemporaryQueue());
     std::unique_ptr<MessageProducer> producer(cmsProvider->getSession()->createProducer(queue.get()));
@@ -319,7 +307,7 @@ void OpenwireTempDestinationTest::testTempQueueHoldsMessagesWithoutConsumers() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void OpenwireTempDestinationTest::testTmpQueueWorksUnderLoad() {
+TEST_F(OpenwireTempDestinationTest, testTmpQueueWorksUnderLoad) {
 
     int count = 500;
     int dataSize = 1024;
@@ -354,7 +342,7 @@ void OpenwireTempDestinationTest::testTmpQueueWorksUnderLoad() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void OpenwireTempDestinationTest::testPublishFailsForClosedConnection() {
+TEST_F(OpenwireTempDestinationTest, testPublishFailsForClosedConnection) {
 
     Pointer<ActiveMQConnectionFactory> factory(
         new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
@@ -385,7 +373,7 @@ void OpenwireTempDestinationTest::testPublishFailsForClosedConnection() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void OpenwireTempDestinationTest::testPublishFailsForDestoryedTempDestination() {
+TEST_F(OpenwireTempDestinationTest, testPublishFailsForDestoryedTempDestination) {
 
     Pointer<ActiveMQConnectionFactory> factory(
         new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
@@ -416,7 +404,7 @@ void OpenwireTempDestinationTest::testPublishFailsForDestoryedTempDestination() 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void OpenwireTempDestinationTest::testDeleteDestinationWithSubscribersFails() {
+TEST_F(OpenwireTempDestinationTest, testDeleteDestinationWithSubscribersFails) {
 
     std::unique_ptr<TemporaryQueue> queue(cmsProvider->getSession()->createTemporaryQueue());
     std::unique_ptr<MessageConsumer> consumer(cmsProvider->getSession()->createConsumer(queue.get()));
@@ -426,7 +414,7 @@ void OpenwireTempDestinationTest::testDeleteDestinationWithSubscribersFails() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void OpenwireTempDestinationTest::testCloseConnectionWithManyTempDests() {
+TEST_F(OpenwireTempDestinationTest, testCloseConnectionWithManyTempDests) {
 
     ArrayList< Pointer<TemporaryQueue> > tempQueues;
     ArrayList< Pointer<MessageProducer> > producers;
@@ -443,16 +431,3 @@ void OpenwireTempDestinationTest::testCloseConnectionWithManyTempDests() {
     tempQueues.clear();
     producers.clear();
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Test registration
-TEST_F(OpenwireTempDestinationTest, testBasics) { testBasics(); }
-TEST_F(OpenwireTempDestinationTest, testTwoConnections) { testTwoConnections(); }
-TEST_F(OpenwireTempDestinationTest, testTempDestOnlyConsumedByLocalConn) { testTempDestOnlyConsumedByLocalConn(); }
-TEST_F(OpenwireTempDestinationTest, testTempQueueHoldsMessagesWithConsumers) { testTempQueueHoldsMessagesWithConsumers(); }
-TEST_F(OpenwireTempDestinationTest, testTempQueueHoldsMessagesWithoutConsumers) { testTempQueueHoldsMessagesWithoutConsumers(); }
-TEST_F(OpenwireTempDestinationTest, testTmpQueueWorksUnderLoad) { testTmpQueueWorksUnderLoad(); }
-TEST_F(OpenwireTempDestinationTest, testPublishFailsForClosedConnection) { testPublishFailsForClosedConnection(); }
-TEST_F(OpenwireTempDestinationTest, testPublishFailsForDestoryedTempDestination) { testPublishFailsForDestoryedTempDestination(); }
-TEST_F(OpenwireTempDestinationTest, testDeleteDestinationWithSubscribersFails) { testDeleteDestinationWithSubscribersFails(); }
-TEST_F(OpenwireTempDestinationTest, testCloseConnectionWithManyTempDests) { testCloseConnectionWithManyTempDests(); }

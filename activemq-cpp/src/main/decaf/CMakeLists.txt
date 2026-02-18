@@ -37,8 +37,8 @@ target_include_directories(decaf
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-if(OpenSSL_FOUND)
-  target_compile_definitions(decaf PUBLIC HAVE_OPENSSL)
+if(AMQCPP_USE_SSL)
+  target_compile_definitions(decaf PUBLIC AMQCPP_USE_SSL)
   target_link_libraries(decaf PUBLIC OpenSSL::SSL OpenSSL::Crypto)
 endif()
 

@@ -16,6 +16,7 @@
  */
 
 #include "SocketFileDescriptor.h"
+#include <cstdint>
 
 using namespace decaf;
 using namespace decaf::io;
@@ -23,7 +24,7 @@ using namespace decaf::internal;
 using namespace decaf::internal::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketFileDescriptor::SocketFileDescriptor( long value ) : FileDescriptor( value, false ) {
+SocketFileDescriptor::SocketFileDescriptor( intptr_t value ) : FileDescriptor( value, false ) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -31,6 +32,6 @@ SocketFileDescriptor::~SocketFileDescriptor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long SocketFileDescriptor::getValue() const {
+intptr_t SocketFileDescriptor::getValue() const {
     return this->descriptor;
 }

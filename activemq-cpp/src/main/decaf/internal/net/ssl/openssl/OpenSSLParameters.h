@@ -23,9 +23,7 @@
 #include <string>
 #include <vector>
 
-#ifdef HAVE_OPENSSL
 #include <openssl/ssl.h>
-#endif
 
 namespace decaf {
 namespace internal {
@@ -44,11 +42,10 @@ namespace openssl {
         bool needClientAuth;
         bool wantClientAuth;
         bool useClientMode;
+        bool peerVerificationEnabled;
 
-#ifdef HAVE_OPENSSL
         SSL_CTX* context;
         SSL* ssl;
-#endif
 
         std::vector<std::string> enabledCipherSuites;
         std::vector<std::string> enabledProtocols;
@@ -61,9 +58,7 @@ namespace openssl {
 
     public:
 
-#ifdef HAVE_OPENSSL
         OpenSSLParameters(SSL_CTX* context);
-#endif
 
         virtual ~OpenSSLParameters();
 
@@ -93,6 +88,14 @@ namespace openssl {
             this->useClientMode = value;
         }
 
+        bool getPeerVerificationEnabled() const {
+            return this->peerVerificationEnabled;
+        }
+
+        void setPeerVerificationEnabled(bool value) {
+            this->peerVerificationEnabled = value;
+        }
+
         std::vector<std::string> getSupportedCipherSuites() const;
 
         std::vector<std::string> getSupportedProtocols() const;
@@ -109,8 +112,6 @@ namespace openssl {
 
         void setServerNames(const std::vector<std::string>& serverNames);
 
-#ifdef HAVE_OPENSSL
-
         SSL_CTX* getSSLContext() const {
             return this->context;
         }
@@ -118,8 +119,6 @@ namespace openssl {
         SSL* getSSL() const {
             return this->ssl;
         }
-
-#endif
 
         /**
          * Creates a clone of this object such that all settings are transferred to a new

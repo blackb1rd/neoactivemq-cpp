@@ -46,10 +46,6 @@ using namespace decaf::lang;
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
 
-    std::unique_ptr<cms::ConnectionFactory> factory;
-    std::unique_ptr<cms::Connection> connection;
-    std::unique_ptr<cms::Destination> destination;
-
     class MyMessageListener: public cms::MessageListener {
     public:
 
@@ -84,11 +80,11 @@ namespace {
         }
     };
 
-    double benchmarkNonCallbackRate(int count) {
+    double benchmarkNonCallbackRate(int count, cms::Connection* connection, cms::Destination* destination) {
         std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
 
         std::unique_ptr<ActiveMQProducer> producer(
-                dynamic_cast<ActiveMQProducer*>(session->createProducer(destination.get())));
+                dynamic_cast<ActiveMQProducer*>(session->createProducer(destination)));
         producer->setDeliveryMode(DeliveryMode::PERSISTENT);
 
         long long start = System::currentTimeMillis();
@@ -101,13 +97,13 @@ namespace {
         return 1000.0 * count / (double)((System::currentTimeMillis() - start));
     }
 
-    double benchmarkCallbackRate(int count) {
+    double benchmarkCallbackRate(int count, cms::Connection* connection, cms::Destination* destination) {
         std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
         CountDownLatch messagesSent(count);
         MyAsyncCallback onComplete(&messagesSent);
 
         std::unique_ptr<ActiveMQProducer> producer(
-                dynamic_cast<ActiveMQProducer*>(session->createProducer(destination.get())));
+                dynamic_cast<ActiveMQProducer*>(session->createProducer(destination)));
         producer->setDeliveryMode(DeliveryMode::PERSISTENT);
 
         long long start = System::currentTimeMillis();
@@ -146,9 +142,9 @@ void CmsSendWithAsyncCallbackTest::SetUp() {
 ////////////////////////////////////////////////////////////////////////////////
 void CmsSendWithAsyncCallbackTest::TearDown() {
 
-    factory.reset(NULL);
-    connection.reset(NULL);
-    destination.reset(NULL);
+    factory.reset();
+    connection.reset();
+    destination.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -165,11 +161,11 @@ void CmsSendWithAsyncCallbackTest::testAsyncCallbackIsFaster() {
     consumer->setMessageListener(&listener);
 
     // warmup...
-    benchmarkNonCallbackRate(20);
-    benchmarkCallbackRate(20);
+    benchmarkNonCallbackRate(20, connection.get(), destination.get());
+    benchmarkCallbackRate(20, connection.get(), destination.get());
 
-    double callbackRate = benchmarkCallbackRate(30);
-    double nonCallbackRate = benchmarkNonCallbackRate(30);
+    double callbackRate = benchmarkCallbackRate(30, connection.get(), destination.get());
+    double nonCallbackRate = benchmarkNonCallbackRate(30, connection.get(), destination.get());
 
     ASSERT_TRUE(callbackRate > 0);
     ASSERT_TRUE(nonCallbackRate > 0);

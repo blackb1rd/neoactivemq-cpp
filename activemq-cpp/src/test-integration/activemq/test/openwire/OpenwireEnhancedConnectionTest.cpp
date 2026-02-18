@@ -57,34 +57,15 @@ namespace openwire {
 
     class OpenwireEnhancedConnectionTest : public ::testing::Test {
     public:
-
-        OpenwireEnhancedConnectionTest();
-        virtual ~OpenwireEnhancedConnectionTest();
-
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
-
-        void SetUp() override {}
-        void TearDown() override {}
-
-        void testDestinationSource();
-        void testDestinationSourceGetters();
-
     };
 
 }}}
 
 using namespace activemq::test;
 using namespace activemq::test::openwire;
-
-////////////////////////////////////////////////////////////////////////////////
-OpenwireEnhancedConnectionTest::OpenwireEnhancedConnectionTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-OpenwireEnhancedConnectionTest::~OpenwireEnhancedConnectionTest() {
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace {
@@ -152,7 +133,65 @@ namespace {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireEnhancedConnectionTest::testDestinationSourceGetters() {
+TEST_F(OpenwireEnhancedConnectionTest, testDestinationSource) {
+
+    TestDestinationListener listener;
+
+    std::unique_ptr<ConnectionFactory> factory(
+        ConnectionFactory::createCMSConnectionFactory( getBrokerURL() ) );
+    ASSERT_TRUE(factory.get() != NULL);
+
+    std::unique_ptr<Connection> connection( factory->createConnection() );
+    ASSERT_TRUE(connection.get() != NULL);
+
+    std::unique_ptr<Session> session( connection->createSession() );
+    ASSERT_TRUE(session.get() != NULL);
+
+    ActiveMQConnection* amq = dynamic_cast<ActiveMQConnection*>(connection.get());
+    ASSERT_TRUE(amq != NULL);
+
+    cms::EnhancedConnection* enhanced = dynamic_cast<cms::EnhancedConnection*>(connection.get());
+    ASSERT_TRUE(enhanced != NULL);
+
+    std::unique_ptr<cms::DestinationSource> source(enhanced->getDestinationSource());
+    ASSERT_TRUE(source.get() != NULL);
+
+    source->setListener(&listener);
+
+    connection->start();
+    source->start();
+
+    TimeUnit::SECONDS.sleep(2);
+
+    int currTempQueueCount = (int)source->getTemporaryQueues().size();
+    int currTempTopicCount = (int)source->getTemporaryTopics().size();
+
+    std::unique_ptr<Destination> destination1(session->createTemporaryQueue());
+    std::unique_ptr<Destination> destination2(session->createTemporaryTopic());
+    std::unique_ptr<Destination> destination3(session->createTemporaryQueue());
+    std::unique_ptr<Destination> destination4(session->createTemporaryTopic());
+    std::unique_ptr<Destination> destination5(session->createTemporaryQueue());
+    std::unique_ptr<Destination> destination6(session->createTemporaryTopic());
+
+    TimeUnit::SECONDS.sleep(2);
+
+    std::vector<cms::TemporaryQueue*> tempQueues = source->getTemporaryQueues();
+    std::vector<cms::TemporaryTopic*> tempTopics = source->getTemporaryTopics();
+
+    ASSERT_EQ(currTempQueueCount + 3, (int)tempQueues.size());
+    ASSERT_EQ(currTempTopicCount + 3, (int)tempTopics.size());
+
+    for (int i = 0; i < 3; ++i) {
+        delete tempQueues[i];
+        delete tempTopics[i];
+    }
+
+    source->stop();
+    connection->close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(OpenwireEnhancedConnectionTest, testDestinationSourceGetters) {
 
     TestDestinationListener listener;
 
@@ -234,66 +273,3 @@ void OpenwireEnhancedConnectionTest::testDestinationSourceGetters() {
     source->stop();
     connection->close();
 }
-
-////////////////////////////////////////////////////////////////////////////////
-void OpenwireEnhancedConnectionTest::testDestinationSource() {
-
-    TestDestinationListener listener;
-
-    std::unique_ptr<ConnectionFactory> factory(
-        ConnectionFactory::createCMSConnectionFactory( getBrokerURL() ) );
-    ASSERT_TRUE(factory.get() != NULL);
-
-    std::unique_ptr<Connection> connection( factory->createConnection() );
-    ASSERT_TRUE(connection.get() != NULL);
-
-    std::unique_ptr<Session> session( connection->createSession() );
-    ASSERT_TRUE(session.get() != NULL);
-
-    ActiveMQConnection* amq = dynamic_cast<ActiveMQConnection*>(connection.get());
-    ASSERT_TRUE(amq != NULL);
-
-    cms::EnhancedConnection* enhanced = dynamic_cast<cms::EnhancedConnection*>(connection.get());
-    ASSERT_TRUE(enhanced != NULL);
-
-    std::unique_ptr<cms::DestinationSource> source(enhanced->getDestinationSource());
-    ASSERT_TRUE(source.get() != NULL);
-
-    source->setListener(&listener);
-
-    connection->start();
-    source->start();
-
-    TimeUnit::SECONDS.sleep(2);
-
-    int currTempQueueCount = (int)source->getTemporaryQueues().size();
-    int currTempTopicCount = (int)source->getTemporaryTopics().size();
-
-    std::unique_ptr<Destination> destination1(session->createTemporaryQueue());
-    std::unique_ptr<Destination> destination2(session->createTemporaryTopic());
-    std::unique_ptr<Destination> destination3(session->createTemporaryQueue());
-    std::unique_ptr<Destination> destination4(session->createTemporaryTopic());
-    std::unique_ptr<Destination> destination5(session->createTemporaryQueue());
-    std::unique_ptr<Destination> destination6(session->createTemporaryTopic());
-
-    TimeUnit::SECONDS.sleep(2);
-
-    std::vector<cms::TemporaryQueue*> tempQueues = source->getTemporaryQueues();
-    std::vector<cms::TemporaryTopic*> tempTopics = source->getTemporaryTopics();
-
-    ASSERT_EQ(currTempQueueCount + 3, (int)tempQueues.size());
-    ASSERT_EQ(currTempTopicCount + 3, (int)tempTopics.size());
-
-    for (int i = 0; i < 3; ++i) {
-        delete tempQueues[i];
-        delete tempTopics[i];
-    }
-
-    source->stop();
-    connection->close();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Test registration
-TEST_F(OpenwireEnhancedConnectionTest, testDestinationSource) { testDestinationSource(); }
-TEST_F(OpenwireEnhancedConnectionTest, testDestinationSourceGetters) { testDestinationSourceGetters(); }

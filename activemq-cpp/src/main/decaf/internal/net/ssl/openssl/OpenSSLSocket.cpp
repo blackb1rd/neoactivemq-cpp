@@ -100,11 +100,17 @@ namespace openssl {
 
         // Separate mutexes for read and write paths.
         //
-        // OpenSSL 1.1.0+ allows concurrent SSL_read + SSL_write on the same
-        // SSL* from different threads, but NOT concurrent SSL_read + SSL_read
-        // or SSL_write + SSL_write.  These mutexes enforce the latter
-        // constraint while preserving full-duplex I/O between the IOTransport
-        // reader thread and the main (writer) thread.
+        // In TLS 1.2 (the only version negotiated — TLS 1.3 is disabled via
+        // SSL_OP_NO_TLSv1_3 in OpenSSLContextSpi), concurrent SSL_read +
+        // SSL_write on the same SSL* from different threads is safe: OpenSSL
+        // 1.1.0+ allows it and the two directions use independent keys and
+        // sequence numbers.  These mutexes prevent concurrent SSL_read + SSL_read
+        // and concurrent SSL_write + SSL_write, which are NOT allowed.
+        //
+        // NOTE: Do NOT enable TLS 1.3 without replacing these two mutexes with a
+        // single I/O lock.  TLS 1.3 allows SSL_read() to internally call
+        // SSL_write() (e.g. for KeyUpdate responses), which would race with an
+        // application SSL_write() that only holds writeMutex.
         std::mutex readMutex;
         std::mutex writeMutex;
 

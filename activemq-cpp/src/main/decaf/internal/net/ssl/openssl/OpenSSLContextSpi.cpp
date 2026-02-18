@@ -176,7 +176,19 @@ void OpenSSLContextSpi::providerInit( SecureRandom* random ) {
         }
 #endif
 
-        SSL_CTX_set_options( this->data->openSSLContext, SSL_OP_ALL | SSL_OP_NO_SSLv2 );
+        // SSL_OP_NO_TLSv1_3: Force TLS 1.2 and below.
+        //
+        // TLS 1.3 introduces post-handshake messages (NewSessionTicket, KeyUpdate)
+        // that cause SSL_read() to internally trigger SSL_write() calls for responses.
+        // This codebase uses separate readMutex/writeMutex to allow concurrent
+        // SSL_read + SSL_write (full-duplex), which is safe in TLS 1.2.  However,
+        // with TLS 1.3 an SSL_read() call on the IOTransport reader thread may
+        // internally write while the main thread is simultaneously calling SSL_write(),
+        // corrupting the TLS write sequence numbers and producing a bad_record_mac
+        // alert at the broker.  Disabling TLS 1.3 avoids this race until the
+        // transport layer is refactored to use asio::ssl::stream (which handles
+        // TLS 1.3 post-handshake I/O correctly).
+        SSL_CTX_set_options( this->data->openSSLContext, SSL_OP_ALL | SSL_OP_NO_SSLv2 | SSL_OP_NO_TLSv1_3 );
         SSL_CTX_set_mode( this->data->openSSLContext, SSL_MODE_AUTO_RETRY );
 
         // The Password Callback for cases where we need to open a Cert.

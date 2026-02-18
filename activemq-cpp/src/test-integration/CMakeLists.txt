@@ -84,8 +84,20 @@ set(INTEGRATION_TEST_SRCS
   activemq/test/openwire/OpenwireMessageSelectorTest.cpp
 
   # OpenWire SSL protocol tests (require SSL broker: docker compose --profile ssl up)
-  activemq/test/openwire_ssl/OpenwireSslSimpleTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslCmsConnectionStartStopTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslCmsTemplateTest.cpp
   activemq/test/openwire_ssl/OpenwireSslConnectionTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslDurableTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslExpirationTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMapMessageTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMessageCompressionTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMessagePriorityTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslQueueBrowserTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslSimpleRollbackTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslSimpleTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslSlowListenerTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslTransactionTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslVirtualTopicTest.cpp
 
   # STOMP protocol tests
   activemq/test/stomp/StompAdvisoryTest.cpp
@@ -195,8 +207,20 @@ static_discover_tests(neoactivemq-integration-test
 # SSL integration tests - discovered separately with their own label
 # These require an SSL-enabled broker: docker compose --profile ssl up
 set(INTEGRATION_SSL_TEST_DISCOVERY_SRCS
-  activemq/test/openwire_ssl/OpenwireSslSimpleTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslCmsConnectionStartStopTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslCmsTemplateTest.cpp
   activemq/test/openwire_ssl/OpenwireSslConnectionTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslDurableTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslExpirationTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMapMessageTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMessageCompressionTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslMessagePriorityTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslQueueBrowserTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslSimpleRollbackTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslSimpleTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslSlowListenerTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslTransactionTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslVirtualTopicTest.cpp
 )
 
 static_discover_tests(neoactivemq-integration-test

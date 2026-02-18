@@ -20,22 +20,19 @@
 namespace activemq {
 namespace test {
 namespace openwire_ssl {
-
     class OpenwireSslSimpleTest : public SimpleTest {
     public:
-
         OpenwireSslSimpleTest() {}
         virtual ~OpenwireSslSimpleTest() {}
-
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL();
         }
     };
-
 }}}
 
+using namespace activemq::test::openwire_ssl;
+
 ////////////////////////////////////////////////////////////////////////////////
-// Test registration - reuses all SimpleTest test methods over SSL transport
 TEST_F(OpenwireSslSimpleTest, testAutoAck) { testAutoAck(); }
 TEST_F(OpenwireSslSimpleTest, testClientAck) { testClientAck(); }
 TEST_F(OpenwireSslSimpleTest, testProducerWithNullDestination) { testProducerWithNullDestination(); }

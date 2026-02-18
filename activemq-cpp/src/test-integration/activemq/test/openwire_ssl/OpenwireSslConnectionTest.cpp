@@ -24,10 +24,12 @@
 #include <cms/MessageProducer.h>
 #include <cms/MessageConsumer.h>
 #include <cms/TextMessage.h>
+#include <cms/BytesMessage.h>
 #include <decaf/lang/Thread.h>
 
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace activemq {
 namespace test {
@@ -183,6 +185,79 @@ namespace openwire_ssl {
             std::unique_ptr<cms::Message> received(consumer->receive(5000));
             ASSERT_TRUE(received.get() != nullptr)
                 << "Failed to receive message " << i << " of " << NUM_MESSAGES;
+        }
+
+        consumer->close();
+        producer->close();
+        session->close();
+        connection->close();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    TEST_F(OpenwireSslConnectionTest, testSslBytesMessage) {
+        // Verify BytesMessage send/receive over SSL
+        activemq::core::ActiveMQConnectionFactory factory(getBrokerURL());
+
+        std::unique_ptr<cms::Connection> connection(factory.createConnection());
+        connection->start();
+
+        std::unique_ptr<cms::Session> session(
+            connection->createSession(cms::Session::AUTO_ACKNOWLEDGE));
+        std::unique_ptr<cms::Queue> queue(
+            session->createQueue("OpenwireSslConnectionTest.testSslBytesMessage"));
+        std::unique_ptr<cms::MessageProducer> producer(
+            session->createProducer(queue.get()));
+        std::unique_ptr<cms::MessageConsumer> consumer(
+            session->createConsumer(queue.get()));
+
+        std::unique_ptr<cms::BytesMessage> bytesMsg(session->createBytesMessage());
+        std::vector<unsigned char> payload = {0xDE, 0xAD, 0xBE, 0xEF, 0x01, 0x02, 0x03};
+        bytesMsg->writeBytes(payload);
+        producer->send(bytesMsg.get());
+
+        std::unique_ptr<cms::Message> received(consumer->receive(5000));
+        ASSERT_TRUE(received.get() != nullptr);
+
+        cms::BytesMessage* recvBytes = dynamic_cast<cms::BytesMessage*>(received.get());
+        ASSERT_TRUE(recvBytes != nullptr);
+        ASSERT_EQ(static_cast<int>(payload.size()), recvBytes->getBodyLength());
+
+        consumer->close();
+        producer->close();
+        session->close();
+        connection->close();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    TEST_F(OpenwireSslConnectionTest, testSslClientAcknowledge) {
+        // Verify CLIENT_ACKNOWLEDGE mode works over SSL
+        activemq::core::ActiveMQConnectionFactory factory(getBrokerURL());
+
+        std::unique_ptr<cms::Connection> connection(factory.createConnection());
+        connection->start();
+
+        std::unique_ptr<cms::Session> session(
+            connection->createSession(cms::Session::CLIENT_ACKNOWLEDGE));
+        std::unique_ptr<cms::Queue> queue(
+            session->createQueue("OpenwireSslConnectionTest.testSslClientAcknowledge"));
+        std::unique_ptr<cms::MessageProducer> producer(
+            session->createProducer(queue.get()));
+        std::unique_ptr<cms::MessageConsumer> consumer(
+            session->createConsumer(queue.get()));
+
+        // Send messages
+        for (int i = 0; i < 5; i++) {
+            std::unique_ptr<cms::TextMessage> msg(
+                session->createTextMessage("SSL ClientAck Message " + std::to_string(i)));
+            producer->send(msg.get());
+        }
+
+        // Receive and acknowledge
+        for (int i = 0; i < 5; i++) {
+            std::unique_ptr<cms::Message> received(consumer->receive(5000));
+            ASSERT_TRUE(received.get() != nullptr)
+                << "Failed to receive message " << i;
+            received->acknowledge();
         }
 
         consumer->close();

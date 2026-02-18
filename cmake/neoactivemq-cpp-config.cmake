@@ -12,7 +12,7 @@ find_dependency(asio CONFIG REQUIRED)
 find_dependency(ZLIB REQUIRED)
 
 # Optional: OpenSSL support
-if(@AMQCPP_HAVE_OPENSSL@)
+if(@AMQCPP_USE_SSL@)
     find_dependency(OpenSSL)
 endif()
 

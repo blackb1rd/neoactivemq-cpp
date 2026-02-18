@@ -17,16 +17,14 @@
 
 #include "OpenSSLSocket.h"
 
-#ifdef HAVE_OPENSSL
-    #include <openssl/ssl.h>
-    #include <openssl/tls1.h>
-    #include <openssl/x509.h>
-    #include <openssl/x509v3.h>
-    #include <openssl/bio.h>
-    #include <openssl/err.h>
-    #include <asio/ip/tcp.hpp>
-    #include <asio/io_context.hpp>
-#endif
+#include <openssl/ssl.h>
+#include <openssl/tls1.h>
+#include <openssl/x509.h>
+#include <openssl/x509v3.h>
+#include <openssl/bio.h>
+#include <openssl/err.h>
+#include <asio/ip/tcp.hpp>
+#include <asio/io_context.hpp>
 
 #include <decaf/net/SocketImpl.h>
 #include <decaf/net/SocketOptions.h>
@@ -124,7 +122,6 @@ namespace openssl {
         ~SocketData() {
         }
 
-#ifdef HAVE_OPENSSL
         static int verifyCallback(int verified, X509_STORE_CTX* store DECAF_UNUSED) {
             if (!verified) {
                 // Trap debug info here about why the Certificate failed to validate.
@@ -132,7 +129,6 @@ namespace openssl {
 
             return verified;
         }
-#endif
 
     };
 
@@ -203,7 +199,6 @@ void OpenSSLSocket::connect(const std::string& host, int port, int timeout) {
 
     try {
 
-#ifdef HAVE_OPENSSL
 
         // Perform the actual Socket connection work
         SSLSocket::connect(host, port, timeout);
@@ -254,9 +249,6 @@ void OpenSSLSocket::connect(const std::string& host, int port, int timeout) {
 
             AMQ_LOG_DEBUG("OpenSSLSocket", "SSL socket configured with socket BIO, set to blocking mode");
         }
-#else
-        throw SocketException( __FILE__, __LINE__, "Not Supported" );
-#endif
     }
     DECAF_CATCH_RETHROW(IOException)
     DECAF_CATCH_RETHROW(IllegalArgumentException)
@@ -408,7 +400,6 @@ void OpenSSLSocket::startHandshake() {
 
     try {
 
-#ifdef HAVE_OPENSSL
         synchronized( &(this->data->handshakeLock ) ) {
 
             if (this->data->handshakeStarted) {
@@ -498,9 +489,6 @@ void OpenSSLSocket::startHandshake() {
 
             this->data->handshakeCompleted = true;
         }
-#else
-        throw IOException( __FILE__, __LINE__, "SSL Not Supported." );
-#endif
     }
     DECAF_CATCH_RETHROW(IOException)
     DECAF_CATCHALL_THROW(IOException)
@@ -579,7 +567,6 @@ int OpenSSLSocket::read(unsigned char* buffer, int size, int offset, int length)
                 "length parameter out of Bounds: %d.", length);
         }
 
-#ifdef HAVE_OPENSSL
 
         if (!this->data->handshakeCompleted) {
             this->startHandshake();
@@ -643,9 +630,6 @@ int OpenSSLSocket::read(unsigned char* buffer, int size, int offset, int length)
             }
         }
 
-#else
-        throw SocketException( __FILE__, __LINE__, "Not Supported" );
-#endif
     }
     DECAF_CATCH_RETHROW(IOException)
     DECAF_CATCH_RETHROW(NullPointerException)
@@ -687,7 +671,6 @@ void OpenSSLSocket::write(const unsigned char* buffer, int size, int offset, int
                 "length parameter out of Bounds: %d.", length);
         }
 
-#ifdef HAVE_OPENSSL
 
         if (!this->data->handshakeCompleted) {
             this->startHandshake();
@@ -722,9 +705,6 @@ void OpenSSLSocket::write(const unsigned char* buffer, int size, int offset, int
             }
         }
 
-#else
-        throw SocketException( __FILE__, __LINE__, "Not Supported" );
-#endif
     }
     DECAF_CATCH_RETHROW(IOException)
     DECAF_CATCH_RETHROW(NullPointerException)
@@ -737,16 +717,12 @@ int OpenSSLSocket::available() {
 
     try {
 
-#ifdef HAVE_OPENSSL
         if (!isClosed()) {
             SSL* ssl = this->parameters->getSSL();
             if (ssl) {
                 return SSL_pending(ssl);
             }
         }
-#else
-        throw SocketException( __FILE__, __LINE__, "Not Supported" );
-#endif
 
         return -1;
     }

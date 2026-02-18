@@ -30,11 +30,9 @@
 
 #include <cstring>
 
-#ifdef HAVE_OPENSSL
 #include <openssl/ssl.h>
 #include <openssl/rand.h>
 #include <openssl/x509.h>
-#endif
 
 #ifdef _WIN32
 #include <windows.h>
@@ -73,11 +71,7 @@ namespace openssl {
 
         static std::string defaultCipherList;
 
-#ifdef HAVE_OPENSSL
         SSL_CTX* openSSLContext;
-#else
-        void* openSSLContext;
-#endif
 
     private:
 
@@ -96,11 +90,9 @@ namespace openssl {
 
         ~ContextData() {
 
-#ifdef HAVE_OPENSSL
             try{
                 SSL_CTX_free( this->openSSLContext );
             } catch(...) {}
-#endif
         }
 
         // Returns to OpenSSL the password for a Certificate.
@@ -150,7 +142,6 @@ void OpenSSLContextSpi::providerInit( SecureRandom* random ) {
 
     try{
 
-#ifdef HAVE_OPENSSL
 
         // OpenSSL 1.1+ initialises itself; no explicit init calls are needed.
         this->data = new ContextData();
@@ -218,7 +209,6 @@ void OpenSSLContextSpi::providerInit( SecureRandom* random ) {
         random->nextBytes( seed );
         RAND_seed( (void*)( &seed[0] ), (int)seed.size() );
 
-#endif
     }
     DECAF_CATCH_RETHROW( NullPointerException )
     DECAF_CATCH_RETHROW( KeyManagementException )

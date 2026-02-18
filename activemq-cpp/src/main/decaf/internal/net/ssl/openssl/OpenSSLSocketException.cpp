@@ -17,9 +17,7 @@
 
 #include "OpenSSLSocketException.h"
 
-#ifdef HAVE_OPENSSL
 #include <openssl/err.h>
-#endif
 
 #include <activemq/util/AMQLog.h>
 
@@ -104,14 +102,12 @@ std::string OpenSSLSocketException::getErrorString() const {
 
     std::string returnValue = "Error occurred while accessing an OpenSSL library method:";
 
-#ifdef HAVE_OPENSSL
     for( unsigned long e = ERR_get_error(); e; e = ERR_get_error() ) {
         char msg[256];
         ERR_error_string_n(e, msg, sizeof msg);
         returnValue += "\n";
         returnValue += msg;
     }
-#endif
 
     return returnValue;
 }

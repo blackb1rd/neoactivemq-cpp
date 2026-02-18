@@ -174,18 +174,7 @@ option(AMQCPP_USE_SSL "Enable OpenSSL support (required when ON)" OFF)
 
 if(AMQCPP_USE_SSL)
 	find_package(OpenSSL REQUIRED)
-	message(STATUS "AMQCPP: SSL support enabled; OpenSSL will be required.")
-
-	# If OpenSSL was found, define HAVE_OPENSSL for the code so sources
-	# can use `#ifdef HAVE_OPENSSL` to enable OpenSSL-dependent features.
-	if(OpenSSL_FOUND)
-		message(STATUS "AMQCPP: Found OpenSSL ${OPENSSL_VERSION}")
-		add_compile_definitions(HAVE_OPENSSL)
-		set(AMQCPP_HAVE_OPENSSL ON CACHE INTERNAL "OpenSSL available")
-	else()
-		message(STATUS "AMQCPP: OpenSSL not found; HAVE_OPENSSL will not be defined")
-		set(AMQCPP_HAVE_OPENSSL OFF CACHE INTERNAL "OpenSSL available")
-	endif()
+	message(STATUS "AMQCPP: SSL support enabled; found OpenSSL ${OPENSSL_VERSION}")
 else()
 	find_package(OpenSSL QUIET)
 	message(STATUS "AMQCPP: SSL support disabled; OpenSSL will be optional.")

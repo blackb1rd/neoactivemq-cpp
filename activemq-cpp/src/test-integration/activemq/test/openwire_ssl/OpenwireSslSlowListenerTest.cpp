@@ -54,7 +54,7 @@ namespace test{
 
 namespace activemq{
 namespace test{
-namespace openwire_ssl{
+namespace openwire_ssl {
     class OpenwireSslSlowListenerTest : public SlowListenerTest {
 public:
         virtual std::string getBrokerURL() const {

@@ -53,8 +53,8 @@ services:
       - "127.0.0.1:61617:61617"  # SSL OpenWire (localhost only)
       - "127.0.0.1:8165:8161"    # Web Console (localhost only, remapped to avoid conflict with default broker)
     volumes:
-      - ./docker/ssl/activemq-ssl.xml:/opt/activemq/conf/activemq.xml:ro
-      - ./docker/ssl/certs:/opt/activemq/conf/certs:ro
+      - ./docker/ssl/activemq-ssl.xml:/opt/apache-activemq/conf/activemq.xml:ro
+      - ./docker/ssl/certs:/opt/apache-activemq/conf/certs:ro
     environment:
       - ACTIVEMQ_OPTS=-Xms512m -Xmx2g -Djetty.host=0.0.0.0
     healthcheck:

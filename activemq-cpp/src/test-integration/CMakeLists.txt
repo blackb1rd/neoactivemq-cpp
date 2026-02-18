@@ -90,7 +90,6 @@ set(INTEGRATION_TEST_SRCS
   activemq/test/openwire_ssl/OpenwireSslCmsConnectionStartStopTest.cpp
   activemq/test/openwire_ssl/OpenwireSslCmsSendWithAsyncCallbackTest.cpp
   activemq/test/openwire_ssl/OpenwireSslCmsTemplateTest.cpp
-  activemq/test/openwire_ssl/OpenwireSslConnectionTest.cpp
   activemq/test/openwire_ssl/OpenwireSslDurableTest.cpp
   activemq/test/openwire_ssl/OpenwireSslEnhancedConnectionTest.cpp
   activemq/test/openwire_ssl/OpenwireSslExpirationTest.cpp
@@ -216,7 +215,6 @@ set(INTEGRATION_OPENWIRE_SSL_TEST_DISCOVERY_SRCS
   activemq/test/openwire_ssl/OpenwireSslCmsConnectionStartStopTest.cpp
   activemq/test/openwire_ssl/OpenwireSslCmsSendWithAsyncCallbackTest.cpp
   activemq/test/openwire_ssl/OpenwireSslCmsTemplateTest.cpp
-  activemq/test/openwire_ssl/OpenwireSslConnectionTest.cpp
   activemq/test/openwire_ssl/OpenwireSslDurableTest.cpp
   activemq/test/openwire_ssl/OpenwireSslEnhancedConnectionTest.cpp
   activemq/test/openwire_ssl/OpenwireSslExpirationTest.cpp
@@ -241,13 +239,16 @@ set(INTEGRATION_OPENWIRE_SSL_TEST_DISCOVERY_SRCS
   activemq/test/openwire_ssl/OpenwireSslXATransactionsTest.cpp
 )
 
+# Set SSL certificate file path (convert to native path for Windows compatibility)
+file(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/docker/ssl/certs/ca.pem" SSL_CERT_FILE_PATH)
+
 static_discover_tests(neoactivemq-integration-test
   TEST_PREFIX "integration/activemq/test/openwire-ssl/"
   SOURCES ${INTEGRATION_OPENWIRE_SSL_TEST_DISCOVERY_SRCS}
   LABELS "integration;integration-openwire-ssl"
   PROPERTIES
     TIMEOUT 300
-    ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
+    ENVIRONMENT "SSL_CERT_FILE=${SSL_CERT_FILE_PATH}"
 )
 
 # STOMP integration tests

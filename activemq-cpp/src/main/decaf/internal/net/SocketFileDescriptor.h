@@ -34,7 +34,7 @@ namespace net {
     class DECAF_API SocketFileDescriptor : public decaf::io::FileDescriptor {
     public:
 
-        SocketFileDescriptor( long value );
+        SocketFileDescriptor( intptr_t value );
 
         virtual ~SocketFileDescriptor();
 
@@ -43,7 +43,7 @@ namespace net {
          *
          * @return a FileDescriptor value.
          */
-        long getValue() const;
+        intptr_t getValue() const;
 
     };
 

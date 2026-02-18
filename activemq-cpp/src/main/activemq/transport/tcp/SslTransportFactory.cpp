@@ -52,7 +52,7 @@ Pointer<Transport> SslTransportFactory::doCreateComposite(const decaf::net::URI&
 
         Pointer<Transport> transport(new IOTransport(wireFormat));
 
-        transport.reset(new SslTransport(transport, location));
+        transport.reset(new SslTransport(transport, location, properties));
 
         // Give this class and any derived classes a chance to apply value that
         // are set in the properties object.

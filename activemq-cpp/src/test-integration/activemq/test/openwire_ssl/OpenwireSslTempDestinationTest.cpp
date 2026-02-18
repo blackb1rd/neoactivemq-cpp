@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include <activemq/test/openwire/TempDestinationTest.h>
+#include <activemq/test/CMSTestFixture.h>
 
 namespace activemq{
 namespace test{
-namespace openwire_ssl{
-    class OpenwireSslTempDestinationTest : public openwire::TempDestinationTest {
+namespace openwire_ssl {
+    class OpenwireSslTempDestinationTest : public CMSTestFixture {
     public:
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL();
@@ -28,10 +28,406 @@ namespace openwire_ssl{
     };
 }}}
 
-#include <activemq/test/openwire/TempDestinationTest.cpp>
+#include <decaf/lang/Thread.h>
+#include <decaf/util/concurrent/Mutex.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
+#include <decaf/util/UUID.h>
+#include <decaf/util/ArrayList.h>
+#include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/core/ActiveMQConnectionFactory.h>
+#include <decaf/util/ArrayList.h>
 
+using namespace std;
+using namespace cms;
+using namespace activemq;
+using namespace activemq::core;
+using namespace activemq::test;
 using namespace activemq::test::openwire_ssl;
+using namespace activemq::util;
+using namespace activemq::exceptions;
+using namespace decaf;
+using namespace decaf::util;
+using namespace decaf::util::concurrent;
+using namespace decaf::lang;
 
+namespace activemq {
+namespace test {
+namespace openwire_ssl {
+
+    class Requester : public cms::MessageListener,
+                      public decaf::lang::Runnable {
+    private:
+
+        std::unique_ptr<CMSProvider> cmsProvider;
+        std::unique_ptr<cms::MessageConsumer> tempTopicConsumer;
+
+        unsigned int numReceived;
+        unsigned int messageCount;
+
+        decaf::util::concurrent::CountDownLatch ready;
+        decaf::util::concurrent::CountDownLatch responses;
+
+    public:
+
+        Requester(const std::string& url, const std::string& destination, unsigned int messageCount ) :
+            cmsProvider(), tempTopicConsumer(), numReceived(0), messageCount(messageCount), ready(1), responses(messageCount) {
+
+            this->cmsProvider.reset( new CMSProvider( url ) );
+            this->cmsProvider->setDestinationName( destination );
+
+            this->cmsProvider->getProducer()->setDeliveryMode( DeliveryMode::NON_PERSISTENT );
+
+            this->tempTopicConsumer.reset(
+                cmsProvider->getSession()->createConsumer(
+                    cmsProvider->getTempDestination() ) );
+            this->tempTopicConsumer->setMessageListener( this );
+        }
+
+        virtual ~Requester() {}
+
+        virtual unsigned int getNumReceived() const {
+            return this->numReceived;
+        }
+
+        virtual void waitUnitReady() {
+            this->ready.await();
+        }
+
+        virtual void awaitAllResponses() {
+            this->responses.await( 2000 * this->messageCount );
+        }
+
+        virtual void run() {
+
+            try {
+
+                std::unique_ptr<cms::TextMessage> message(
+                    this->cmsProvider->getSession()->createTextMessage() );
+                message->setCMSReplyTo( this->cmsProvider->getTempDestination() );
+
+                this->ready.countDown();
+
+                for( unsigned int i = 0; i < messageCount; ++i ) {
+                    this->cmsProvider->getProducer()->send( message.get() );
+                }
+
+            } catch( CMSException& e ) {
+                e.printStackTrace();
+            }
+        }
+
+        virtual void onMessage( const cms::Message* message ) {
+
+            try {
+
+                this->numReceived++;
+                this->responses.countDown();
+
+            } catch( CMSException& e ) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    class Responder : public cms::MessageListener {
+    private:
+
+        std::unique_ptr<CMSProvider> cmsProvider;
+
+        unsigned int numReceived;
+        unsigned int messageCount;
+
+        decaf::util::concurrent::CountDownLatch requests;
+
+    public:
+
+        Responder(const std::string& url, const std::string& destination, unsigned int messageCount) :
+            cmsProvider(), numReceived(0), messageCount(messageCount), requests(messageCount) {
+
+            this->cmsProvider.reset(new CMSProvider(url));
+            this->cmsProvider->setDestinationName(destination);
+            this->cmsProvider->getNoDestProducer()->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
+            this->cmsProvider->getConsumer()->setMessageListener(this);
+        }
+
+        virtual ~Responder() {}
+
+        virtual unsigned int getNumReceived() const {
+            return this->numReceived;
+        }
+
+        virtual void awaitAllRequests() {
+            this->requests.await( 2000 * this->messageCount );
+        }
+
+        virtual void onMessage( const cms::Message* message ) {
+
+            try {
+
+                if( message->getCMSReplyTo() != NULL ) {
+
+                    std::unique_ptr<cms::Message> response(
+                        cmsProvider->getSession()->createMessage() );
+
+                    // Send it back to the replyTo Destination
+                    this->cmsProvider->getNoDestProducer()->send(
+                        message->getCMSReplyTo(), response.get() );
+
+                    this->requests.countDown();
+                }
+
+                this->numReceived++;
+
+            } catch( CMSException& e ) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+}}}
+
+///////////////////////////////////////////////////////////////////////////////
+TEST_F(OpenwireSslTempDestinationTest, testBasics) {
+
+    try{
+
+        std::unique_ptr<cms::MessageConsumer> tempConsumer(
+            cmsProvider->getSession()->createConsumer(
+                cmsProvider->getTempDestination() ) );
+
+        std::unique_ptr<TextMessage> message(
+            cmsProvider->getSession()->createTextMessage() );
+
+        // Fire a message to the temporary topic
+        cmsProvider->getNoDestProducer()->send(
+            cmsProvider->getTempDestination(), message.get() );
+
+        std::unique_ptr<cms::Message> received( tempConsumer->receive( 3000 ) );
+
+        ASSERT_TRUE(received.get() != NULL);
+    }
+    AMQ_CATCH_RETHROW( ActiveMQException )
+    AMQ_CATCHALL_THROW( ActiveMQException )
+}
+
+///////////////////////////////////////////////////////////////////////////////
+TEST_F(OpenwireSslTempDestinationTest, testTwoConnections) {
+
+    std::string destination = "REQUEST-TOPIC";
+
+    std::unique_ptr<Requester> requester(
+        new Requester( cmsProvider->getBrokerURL(), destination, 10 ) );
+    std::unique_ptr<Responder> responder(
+        new Responder( cmsProvider->getBrokerURL(), destination, 10 ) );
+
+    // Launch the Consumers in new Threads.
+    Thread requestorThread( requester.get() );
+    requestorThread.start();
+
+    // Responder should get all its requests first
+    responder->awaitAllRequests();
+
+    // Now the Requester should get all its responses.
+    requester->awaitAllResponses();
+
+    // Check that the responder received all the required requests
+    ASSERT_TRUE(responder->getNumReceived() == 10);
+
+    // Check that the requester received all the required responses
+    ASSERT_TRUE(requester->getNumReceived() == 10);
+
+    // Shutdown the Requester.
+    requestorThread.join();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 TEST_F(OpenwireSslTempDestinationTest, testTempDestOnlyConsumedByLocalConn) {
-    openwire::TempDestinationTest::testTempDestOnlyConsumedByLocalConn();
+
+    std::unique_ptr<ActiveMQConnectionFactory> factory(
+        new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
+    factory->setAlwaysSyncSend(true);
+
+    std::unique_ptr<Connection> tempConnection(factory->createConnection());
+    tempConnection->start();
+    std::unique_ptr<Session> tempSession(tempConnection->createSession());
+    std::unique_ptr<TemporaryQueue> queue(tempSession->createTemporaryQueue());
+    std::unique_ptr<MessageProducer> producer(tempSession->createProducer(queue.get()));
+    producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
+    std::unique_ptr<TextMessage> message(tempSession->createTextMessage("First"));
+    producer->send(message.get());
+
+    // temp destination should not be consume when using another connection
+    std::unique_ptr<Connection> otherConnection(factory->createConnection());
+    std::unique_ptr<Session> otherSession(otherConnection->createSession());
+    std::unique_ptr<TemporaryQueue> otherQueue(otherSession->createTemporaryQueue());
+    std::unique_ptr<MessageConsumer> consumer(otherSession->createConsumer(otherQueue.get()));
+    std::unique_ptr<Message> msg(consumer->receive(3000));
+    ASSERT_TRUE(msg.get() == NULL);
+
+    // should throw InvalidDestinationException when consuming a temp
+    // destination from another connection
+    ASSERT_THROW(otherSession->createConsumer(queue.get()), InvalidDestinationException) << ("Should throw a CMS InvalidDestinationException");
+
+    // should be able to consume temp destination from the same connection
+    consumer.reset(tempSession->createConsumer(queue.get()));
+    msg.reset(consumer->receive(3000));
+    ASSERT_TRUE(msg.get() != NULL);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+TEST_F(OpenwireSslTempDestinationTest, testTempQueueHoldsMessagesWithConsumers) {
+
+    std::unique_ptr<TemporaryQueue> queue(cmsProvider->getSession()->createTemporaryQueue());
+    std::unique_ptr<MessageConsumer> consumer(cmsProvider->getSession()->createConsumer(queue.get()));
+    std::unique_ptr<MessageProducer> producer(cmsProvider->getSession()->createProducer(queue.get()));
+    producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
+    std::unique_ptr<TextMessage> message(cmsProvider->getSession()->createTextMessage("Hello"));
+    producer->send(message.get());
+
+    std::unique_ptr<Message> message2(consumer->receive(3000));
+    ASSERT_TRUE(message2.get() != NULL);
+    ASSERT_TRUE(dynamic_cast<TextMessage*>(message2.get()) != NULL) << ("Expected message to be a TextMessage");
+    ASSERT_TRUE(dynamic_cast<TextMessage*>(message2.get())->getText() == message->getText()) << (std::string("Expected message to be a '") + message->getText() + "'");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+TEST_F(OpenwireSslTempDestinationTest, testTempQueueHoldsMessagesWithoutConsumers) {
+
+    std::unique_ptr<TemporaryQueue> queue(cmsProvider->getSession()->createTemporaryQueue());
+    std::unique_ptr<MessageProducer> producer(cmsProvider->getSession()->createProducer(queue.get()));
+    producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
+    std::unique_ptr<TextMessage> message(cmsProvider->getSession()->createTextMessage("Hello"));
+    producer->send(message.get());
+
+    std::unique_ptr<MessageConsumer> consumer(cmsProvider->getSession()->createConsumer(queue.get()));
+    std::unique_ptr<Message> message2(consumer->receive(3000));
+    ASSERT_TRUE(message2.get() != NULL);
+    ASSERT_TRUE(dynamic_cast<TextMessage*>(message2.get()) != NULL) << ("Expected message to be a TextMessage");
+    ASSERT_TRUE(dynamic_cast<TextMessage*>(message2.get())->getText() == message->getText()) << (std::string("Expected message to be a '") + message->getText() + "'");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+TEST_F(OpenwireSslTempDestinationTest, testTmpQueueWorksUnderLoad) {
+
+    int count = 500;
+    int dataSize = 1024;
+
+    ArrayList<Pointer<BytesMessage> > list(count);
+    std::unique_ptr<TemporaryQueue> queue(cmsProvider->getSession()->createTemporaryQueue());
+    std::unique_ptr<MessageProducer> producer(cmsProvider->getSession()->createProducer(queue.get()));
+    producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
+
+    unsigned char data[1024];
+    for (int i = 0; i < dataSize; ++i) {
+        data[i] = 255;
+    }
+
+    for (int i = 0; i < count; i++) {
+        Pointer<BytesMessage> message(cmsProvider->getSession()->createBytesMessage());
+        message->writeBytes(data, 0, dataSize);
+        message->setIntProperty("c", i);
+        producer->send(message.get());
+        list.add(message);
+    }
+
+    std::unique_ptr<MessageConsumer> consumer(cmsProvider->getSession()->createConsumer(queue.get()));
+    for (int i = 0; i < count; i++) {
+        Pointer<Message> message2(consumer->receive(2000));
+        ASSERT_TRUE(message2 != NULL);
+        ASSERT_EQ(i, message2->getIntProperty("c"));
+        ASSERT_TRUE(dynamic_cast<BytesMessage*>(message2.get()) != NULL) << ("Expected message to be a BytesMessage");
+    }
+
+    list.clear();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+TEST_F(OpenwireSslTempDestinationTest, testPublishFailsForClosedConnection) {
+
+    Pointer<ActiveMQConnectionFactory> factory(
+        new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
+    factory->setAlwaysSyncSend(true);
+
+    std::unique_ptr<Connection> tempConnection(factory->createConnection());
+    tempConnection->start();
+
+    std::unique_ptr<Session> tempSession(tempConnection->createSession());
+    std::unique_ptr<TemporaryQueue> queue(tempSession->createTemporaryQueue());
+
+    Thread::sleep(2000);
+
+    // This message delivery should work since the temp connection is still open.
+    std::unique_ptr<MessageProducer> producer(cmsProvider->getSession()->createProducer(queue.get()));
+    producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
+    std::unique_ptr<TextMessage> message(cmsProvider->getSession()->createTextMessage("First"));
+    producer->send(message.get());
+    Thread::sleep(2000);
+
+    // Closing the connection should destroy the temp queue that was created.
+    tempConnection->close();
+    Thread::sleep(5000);
+
+    message.reset(cmsProvider->getSession()->createTextMessage("Hello"));
+
+    ASSERT_THROW(producer->send(message.get()), cms::InvalidDestinationException) << ("Should throw a InvalidDestinationException since temp destination should not exist anymore.");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+TEST_F(OpenwireSslTempDestinationTest, testPublishFailsForDestoryedTempDestination) {
+
+    Pointer<ActiveMQConnectionFactory> factory(
+        new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
+    factory->setAlwaysSyncSend(true);
+
+    std::unique_ptr<Connection> tempConnection(factory->createConnection());
+    tempConnection->start();
+
+    std::unique_ptr<Session> tempSession(tempConnection->createSession());
+    std::unique_ptr<TemporaryQueue> queue(tempSession->createTemporaryQueue());
+
+    Thread::sleep(2000);
+
+    // This message delivery should work since the temp connection is still open.
+    std::unique_ptr<MessageProducer> producer(cmsProvider->getSession()->createProducer(queue.get()));
+    producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
+    std::unique_ptr<TextMessage> message(cmsProvider->getSession()->createTextMessage("First"));
+    producer->send(message.get());
+    Thread::sleep(2000);
+
+    // deleting the Queue will cause sends to fail
+    queue->destroy();
+    Thread::sleep(5000); // Wait a little bit to let the delete take effect.
+
+    message.reset(cmsProvider->getSession()->createTextMessage("Hello"));
+
+    ASSERT_THROW(producer->send(message.get()), InvalidDestinationException) << ("Should throw a InvalidDestinationException since temp destination should not exist anymore.");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+TEST_F(OpenwireSslTempDestinationTest, testDeleteDestinationWithSubscribersFails) {
+
+    std::unique_ptr<TemporaryQueue> queue(cmsProvider->getSession()->createTemporaryQueue());
+    std::unique_ptr<MessageConsumer> consumer(cmsProvider->getSession()->createConsumer(queue.get()));
+
+    // This message delivery should NOT work since the temp connection is now closed.
+    ASSERT_THROW(queue->destroy(), CMSException) << ("Should fail with CMSException as Subscribers are active");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+TEST_F(OpenwireSslTempDestinationTest, testCloseConnectionWithManyTempDests) {
+
+    ArrayList< Pointer<TemporaryQueue> > tempQueues;
+    ArrayList< Pointer<MessageProducer> > producers;
+
+    for (int i = 0; i < 25; ++i) {
+        Pointer<TemporaryQueue> tempQueue(cmsProvider->getSession()->createTemporaryQueue());
+        tempQueues.add(tempQueue);
+        Pointer<MessageProducer> producer(cmsProvider->getSession()->createProducer(tempQueue.get()));
+        producers.add(producer);
+    }
+
+    cmsProvider->getConnection()->close();
+
+    tempQueues.clear();
+    producers.clear();
 }

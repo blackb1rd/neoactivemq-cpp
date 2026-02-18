@@ -25,7 +25,7 @@
 
 namespace activemq{
 namespace test{
-namespace openwire_ssl{
+namespace openwire_ssl {
     class OpenwireSslTransactionTest : public TransactionTest {
     public:
         virtual std::string getBrokerURL() const {

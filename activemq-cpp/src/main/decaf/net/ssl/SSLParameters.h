@@ -35,6 +35,7 @@ namespace ssl {
         std::vector<std::string> serverNames;
         bool needClientAuth;
         bool wantClientAuth;
+        bool peerVerificationEnabled;
 
     public:
 
@@ -159,6 +160,27 @@ namespace ssl {
          */
         std::vector<std::string> getServerNames() const {
             return this->serverNames;
+        }
+
+        /**
+         * Sets whether peer certificate verification should be enabled.
+         * When disabled, the SSL connection will not verify the server's certificate.
+         * This should only be disabled for testing purposes.
+         *
+         * @param enabled
+         *      true to enable peer verification (default), false to disable.
+         */
+        void setPeerVerificationEnabled(bool enabled) {
+            this->peerVerificationEnabled = enabled;
+        }
+
+        /**
+         * Gets whether peer certificate verification is enabled.
+         *
+         * @return true if peer verification is enabled, false otherwise.
+         */
+        bool getPeerVerificationEnabled() const {
+            return this->peerVerificationEnabled;
         }
 
     };

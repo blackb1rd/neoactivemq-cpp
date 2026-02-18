@@ -44,6 +44,7 @@ namespace openssl {
         bool needClientAuth;
         bool wantClientAuth;
         bool useClientMode;
+        bool peerVerificationEnabled;
 
 #ifdef HAVE_OPENSSL
         SSL_CTX* context;
@@ -91,6 +92,14 @@ namespace openssl {
 
         void setUseClientMode( bool value ) {
             this->useClientMode = value;
+        }
+
+        bool getPeerVerificationEnabled() const {
+            return this->peerVerificationEnabled;
+        }
+
+        void setPeerVerificationEnabled(bool value) {
+            this->peerVerificationEnabled = value;
         }
 
         std::vector<std::string> getSupportedCipherSuites() const;

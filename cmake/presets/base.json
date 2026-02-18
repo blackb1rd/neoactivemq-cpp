@@ -37,6 +37,7 @@
       "hidden": true,
       "cacheVariables": {
         "AMQCPP_BUILD_TESTS": true,
+        "AMQCPP_USE_SSL": true,
         "VCPKG_MANIFEST_FEATURES": "tests;ssl"
       }
     },

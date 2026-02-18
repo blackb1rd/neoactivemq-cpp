@@ -21,32 +21,19 @@
 #include <decaf/net/ssl/SSLParameters.h>
 #include <decaf/security/SecureRandom.h>
 #include <decaf/security/KeyManagementException.h>
-#include <decaf/lang/Thread.h>
 #include <decaf/lang/Pointer.h>
-#include <decaf/lang/ArrayPointer.h>
 #include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/internal/net/ssl/openssl/OpenSSLSocketException.h>
 #include <decaf/internal/net/ssl/openssl/OpenSSLSocketFactory.h>
 #include <decaf/internal/net/ssl/openssl/OpenSSLServerSocketFactory.h>
 
-#ifdef HAVE_STRINGS_H
-#include <strings.h>
-#endif
-
-#ifdef HAVE_STRING_H
-#include <string.h>
-#endif
+#include <cstring>
 
 #ifdef HAVE_OPENSSL
 #include <openssl/ssl.h>
-#include <openssl/evp.h>
 #include <openssl/rand.h>
-#include <openssl/conf.h>
 #include <openssl/x509.h>
-#define SSL_LOCK_MUTEX CRYPTO_LOCK
-#else
-#define SSL_LOCK_MUTEX 1
 #endif
 
 #ifdef _WIN32
@@ -84,7 +71,6 @@ namespace openssl {
         Pointer<SecureRandom> random;
         std::string password;
 
-        static Mutex* locks;
         static std::string defaultCipherList;
 
 #ifdef HAVE_OPENSSL
@@ -100,14 +86,12 @@ namespace openssl {
 
     public:
 
-        ContextData( int size ) : monitor(),
-                                  clientSocketFactory(),
-                                  serverSocketFactory(),
-                                  random(),
-                                  password(),
-                                  openSSLContext(NULL) {
-
-            ContextData::locks = new Mutex[size];
+        ContextData() : monitor(),
+                        clientSocketFactory(),
+                        serverSocketFactory(),
+                        random(),
+                        password(),
+                        openSSLContext(NULL) {
         }
 
         ~ContextData() {
@@ -117,17 +101,6 @@ namespace openssl {
                 SSL_CTX_free( this->openSSLContext );
             } catch(...) {}
 #endif
-            delete [] locks;
-        }
-
-        // Used to allow OpenSSL to tell us when to lock / unlock a mutex for it.
-        static void lockCallback( int mode, int type, const char *, int ) {
-
-            if( mode & SSL_LOCK_MUTEX ) {
-                locks[type].lock();
-            } else {
-                locks[type].unlock();
-            }
         }
 
         // Returns to OpenSSL the password for a Certificate.
@@ -145,15 +118,8 @@ namespace openssl {
             return 0;
         }
 
-        static unsigned long getThreadId() {
-            // Convert std::thread::id to unsigned long for OpenSSL callback
-            std::thread::id tid = Thread::currentThread()->getId();
-            return static_cast<unsigned long>(std::hash<std::thread::id>{}(tid));
-        }
-
     };
 
-    Mutex* ContextData::locks = NULL;
     std::string ContextData::defaultCipherList = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH";
 
 }}}}}
@@ -166,13 +132,7 @@ OpenSSLContextSpi::OpenSSLContextSpi() : data( NULL ) {
 OpenSSLContextSpi::~OpenSSLContextSpi() {
     try{
 
-#ifdef HAVE_OPENSSL
-    // Clean up all the OpenSSL resources.
-#if defined(OPENSSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER < 0x10100000L)
-    CRYPTO_set_locking_callback( 0 );
-#endif
-    EVP_cleanup();
-#endif
+    // OpenSSL 1.1+ cleans up its own resources; nothing to do here.
 
         delete this->data;
     }
@@ -192,89 +152,35 @@ void OpenSSLContextSpi::providerInit( SecureRandom* random ) {
 
 #ifdef HAVE_OPENSSL
 
-        // General library initialization.
-    #ifdef WIN32
-        /* CRYPTO_malloc_init was removed/changed in OpenSSL 1.1+.  Only call
-         * it on older OpenSSL versions. For OpenSSL >= 1.1 the library
-         * initializes allocation functions internally. Use the
-         * OPENSSL_VERSION_NUMBER macro to detect the version.
-         */
-#if defined(OPENSSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER < 0x10100000L)
-        CRYPTO_malloc_init();
-#endif
-    #endif
-        SSL_load_error_strings();
-        SSL_library_init();
-        OpenSSL_add_all_algorithms();
-
-        // Initialize our data object and store the RNG for later.
-        /* CRYPTO_num_locks and custom locking callbacks are required for
-         * OpenSSL < 1.1.0. Newer OpenSSL versions manage internal locking
-         * themselves and these functions are no-ops or removed. Guard
-         * usage to support both older and newer OpenSSL builds.
-         */
-    #if defined(OPENSSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER < 0x10100000L)
-        this->data = new ContextData( CRYPTO_num_locks() );
-    #else
-        this->data = new ContextData( 1 );
-    #endif
+        // OpenSSL 1.1+ initialises itself; no explicit init calls are needed.
+        this->data = new ContextData();
         this->data->random.reset( random );
-        this->data->openSSLContext = SSL_CTX_new( SSLv23_method() );
-
-        // Setup the Crypto Library Thread callbacks.
-        /* Only set the id callback for OpenSSL < 1.1.0. Newer versions
-         * manage thread id/locking internally.
-         */
-    #if defined(OPENSSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER < 0x10100000L)
-        CRYPTO_set_id_callback( &ContextData::getThreadId );
-    #endif
-        /* Only install a locking callback on OpenSSL < 1.1.0; the API is
-         * no-op or unnecessary on newer OpenSSL versions.
-         */
-    #if defined(OPENSSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER < 0x10100000L)
-        CRYPTO_set_locking_callback( &ContextData::lockCallback );
-    #endif
+        this->data->openSSLContext = SSL_CTX_new( TLS_method() );
 
         // Load the Library default CA paths and Context Options.
         SSL_CTX_set_default_verify_paths( this->data->openSSLContext );
 
 #ifdef _WIN32
-        // On Windows, also load certificates from the Windows Certificate Store
-        // This allows OpenSSL to trust certificates that Windows trusts (like Amazon's certificates)
-        HCERTSTORE hStore = CertOpenSystemStoreA(NULL, "ROOT");
-        if (hStore) {
+        // On Windows, OpenSSL does not consult the Windows Certificate Store
+        // automatically, so enumerate ROOT and CA system stores and inject
+        // each certificate into the context's trust store.
+        {
             X509_STORE* store = SSL_CTX_get_cert_store(this->data->openSSLContext);
-            PCCERT_CONTEXT pContext = NULL;
-            int certsAdded = 0;
-
-            while ((pContext = CertEnumCertificatesInStore(hStore, pContext)) != NULL) {
-                const unsigned char* encoded = pContext->pbCertEncoded;
-                X509* x509 = d2i_X509(NULL, &encoded, pContext->cbCertEncoded);
-                if (x509) {
-                    if (X509_STORE_add_cert(store, x509) == 1) {
-                        certsAdded++;
-                    }
-                    X509_free(x509);
-                }
-            }
-
-            CertCloseStore(hStore, 0);
-
-            // Also load intermediate certificates from CA store
-            hStore = CertOpenSystemStoreA(NULL, "CA");
-            if (hStore) {
-                pContext = NULL;
-                while ((pContext = CertEnumCertificatesInStore(hStore, pContext)) != NULL) {
-                    const unsigned char* encoded = pContext->pbCertEncoded;
-                    X509* x509 = d2i_X509(NULL, &encoded, pContext->cbCertEncoded);
-                    if (x509) {
-                        if (X509_STORE_add_cert(store, x509) == 1) {
-                            certsAdded++;
+            const char* winStores[] = { "ROOT", "CA" };
+            for (const char* storeName : winStores) {
+                HCERTSTORE hStore = CertOpenSystemStoreA(NULL, storeName);
+                if (hStore) {
+                    PCCERT_CONTEXT pContext = NULL;
+                    while ((pContext = CertEnumCertificatesInStore(hStore, pContext)) != NULL) {
+                        const unsigned char* encoded = pContext->pbCertEncoded;
+                        X509* x509 = d2i_X509(NULL, &encoded, pContext->cbCertEncoded);
+                        if (x509) {
+                            X509_STORE_add_cert(store, x509);
+                            X509_free(x509);
                         }
-                        X509_free(x509);
                     }
+                    CertCloseStore(hStore, 0);
                 }
-                CertCloseStore(hStore, 0);
             }
         }
 #endif
@@ -303,25 +209,6 @@ void OpenSSLContextSpi::providerInit( SecureRandom* random ) {
                 throw OpenSSLSocketException( __FILE__, __LINE__ );
             }
             if( SSL_CTX_use_PrivateKey_file( this->data->openSSLContext, keyStorePath.c_str(), SSL_FILETYPE_PEM ) != 1 ) {
-                throw OpenSSLSocketException( __FILE__, __LINE__ );
-            }
-        }
-
-        // Here we load the configured TrustStore, this is where the trusted certificates are stored
-        // and are used to validate that we trust the Certificate sent by the server or client.
-        // A server might not need this if its not going to enforce client authentication.
-        std::string trustStorePath = System::getProperty( "decaf.net.ssl.trustStore" );
-
-        // OpenSSL sort of assumes that the trust store files won't require a password so we just
-        // ignore the trustStorePassword for now.
-        // std::string trustStorePassword = System::getProperty( "decaf.net.ssl.trustStorePassword" );
-
-        // We only consider trust store's that consist of a PEM encoded file, we could try and
-        // check for the extension and assume its a directory if not there, but the OpenSSL
-        // directory restrictions for Certificates make using a directory rather complicated
-        // for the user so only do it if someone asks really nicely.
-        if( !trustStorePath.empty() ) {
-            if( SSL_CTX_load_verify_locations( this->data->openSSLContext, trustStorePath.c_str(), NULL ) != 1 ) {
                 throw OpenSSLSocketException( __FILE__, __LINE__ );
             }
         }

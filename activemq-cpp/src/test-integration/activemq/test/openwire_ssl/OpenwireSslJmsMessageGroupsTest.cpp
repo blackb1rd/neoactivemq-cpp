@@ -15,23 +15,52 @@
  * limitations under the License.
  */
 
-#include <activemq/test/openwire/JmsMessageGroupsTest.h>
+#include <activemq/test/JmsMessageGroupsTest.h>
+#include <activemq/exceptions/ActiveMQException.h>
 
-namespace activemq{
-namespace test{
-namespace openwire_ssl{
-    class OpenwireSslJmsMessageGroupsTest : public openwire::JmsMessageGroupsTest {
-    public:
+#include <decaf/lang/Thread.h>
+#include <decaf/util/UUID.h>
+
+namespace activemq {
+namespace test {
+namespace openwire_ssl {
+    class OpenwireSslJmsMessageGroupsTest : public JmsMessageGroupsTest {
+public:
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL();
         }
     };
 }}}
 
-#include <activemq/test/openwire/JmsMessageGroupsTest.cpp>
-
+using namespace activemq;
+using namespace activemq::test;
 using namespace activemq::test::openwire_ssl;
+using namespace activemq::exceptions;
+using namespace cms;
 
-TEST_F(OpenwireSslJmsMessageGroupsTest, testSendReceiveMessageGroups) {
-    openwire::JmsMessageGroupsTest::testSendReceiveMessageGroups();
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(OpenwireSslJmsMessageGroupsTest, testMessageSend) {
+
+    try {
+
+        std::string GROUPID = "TEST-GROUP-ID";
+
+        // Create CMS Object for Comms
+        cms::Session* session( cmsProvider->getSession() );
+        cms::MessageConsumer* consumer = cmsProvider->getConsumer();
+        cms::MessageProducer* producer = cmsProvider->getProducer();
+        producer->setDeliveryMode( DeliveryMode::NON_PERSISTENT );
+
+        std::unique_ptr<cms::TextMessage> txtMessage( session->createTextMessage( "TEST MESSAGE" ) );
+        txtMessage->setStringProperty( "JMSXGroupID", GROUPID );
+
+        // Send some text messages
+        producer->send( txtMessage.get() );
+
+        std::unique_ptr<cms::Message> message( consumer->receive( 2000 ) );
+        ASSERT_TRUE(message.get() != NULL);
+        ASSERT_TRUE(message->getStringProperty( "JMSXGroupID" ) == GROUPID);
+    }
+    AMQ_CATCH_RETHROW( ActiveMQException )
+    AMQ_CATCHALL_THROW( ActiveMQException )
 }

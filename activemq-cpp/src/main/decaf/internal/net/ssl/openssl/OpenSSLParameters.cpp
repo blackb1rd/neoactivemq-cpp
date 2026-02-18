@@ -39,6 +39,7 @@ using namespace decaf::internal::net::ssl::openssl;
 OpenSSLParameters::OpenSSLParameters(SSL_CTX* context) : needClientAuth(false),
                                                          wantClientAuth(false),
                                                          useClientMode(true),
+                                                         peerVerificationEnabled(true),
                                                          context(context),
                                                          ssl(NULL),
                                                          enabledCipherSuites(),
@@ -123,6 +124,7 @@ OpenSSLParameters* OpenSSLParameters::clone() const {
     cloned->needClientAuth = this->needClientAuth;
     cloned->wantClientAuth = this->wantClientAuth;
     cloned->useClientMode = this->useClientMode;
+    cloned->peerVerificationEnabled = this->peerVerificationEnabled;
 
     return cloned.release();
 

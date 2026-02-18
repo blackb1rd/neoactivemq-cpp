@@ -3,7 +3,7 @@
 
     This configuration provides an SSL-only transport connector on port 61617.
 
-    Certificate files are expected to be mounted at /opt/activemq/conf/certs/
+    Certificate files are expected to be mounted at /opt/apache-activemq/conf/certs/
 -->
 <beans
   xmlns="http://www.springframework.org/schema/beans"
@@ -19,20 +19,17 @@
         </property>
     </bean>
 
-    <!-- SSL context configuration -->
-    <bean id="sslContext" class="org.apache.activemq.broker.SslContext">
-        <property name="keyStore" value="/opt/activemq/conf/certs/broker.p12"/>
-        <property name="keyStoreType" value="PKCS12"/>
-        <property name="keyStorePassword" value="password"/>
-        <property name="trustStore" value="/opt/activemq/conf/certs/broker-truststore.p12"/>
-        <property name="trustStoreType" value="PKCS12"/>
-        <property name="trustStorePassword" value="password"/>
-    </bean>
-
     <broker xmlns="http://activemq.apache.org/schema/core"
             brokerName="localhost"
-            dataDirectory="${activemq.data}"
-            sslContext="#sslContext">
+            dataDirectory="${activemq.data}">
+
+        <sslContext>
+            <sslContext
+                keyStore="file:/opt/apache-activemq/conf/certs/broker.p12"
+                keyStorePassword="password"
+                trustStore="file:/opt/apache-activemq/conf/certs/broker-truststore.p12"
+                trustStorePassword="password"/>
+        </sslContext>
 
         <destinationPolicy>
             <policyMap>

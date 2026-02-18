@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-#include <activemq/test/openwire/CmsSendWithAsyncCallbackTest.h>
+#include <activemq/util/IntegrationCommon.h>
+#include <activemq/test/CmsSendWithAsyncCallbackTest.h>
 
-namespace activemq{
-namespace test{
-namespace openwire_ssl{
-    class OpenwireSslCmsSendWithAsyncCallbackTest : public openwire::CmsSendWithAsyncCallbackTest {
+namespace activemq {
+namespace test {
+namespace openwire_ssl {
+    class OpenwireSslCmsSendWithAsyncCallbackTest : public CmsSendWithAsyncCallbackTest {
     public:
         virtual std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL();
@@ -28,10 +29,9 @@ namespace openwire_ssl{
     };
 }}}
 
-#include <activemq/test/openwire/CmsSendWithAsyncCallbackTest.cpp>
-
 using namespace activemq::test::openwire_ssl;
 
-TEST_F(OpenwireSslCmsSendWithAsyncCallbackTest, testAsyncSendWithOnSuccess) {
-    openwire::CmsSendWithAsyncCallbackTest::testAsyncSendWithOnSuccess();
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(OpenwireSslCmsSendWithAsyncCallbackTest, testAsyncCallbackIsFaster) {
+    testAsyncCallbackIsFaster();
 }

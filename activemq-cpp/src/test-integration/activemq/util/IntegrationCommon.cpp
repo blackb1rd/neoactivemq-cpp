@@ -16,9 +16,11 @@
  */
 
 #include "IntegrationCommon.h"
+#include <decaf/lang/System.h>
 
 using namespace activemq;
 using namespace util;
+using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
 const int IntegrationCommon::defaultDelay = 1000;
@@ -42,6 +44,7 @@ IntegrationCommon::IntegrationCommon()
 
     // SSL URL for SSL integration testing
     // Requires: docker compose --profile ssl up (certificates generated automatically)
+    // Peer verification uses ca.pem injected via SSL_CERT_FILE by CTest (see CMakeLists.txt)
     this->sslOpenwireURL = "ssl://localhost:61617?transport.trace=false";
 
     // Multi-broker URLs for failover testing

@@ -837,10 +837,6 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { runner: macos-13, preset: x64-osx-debug-test, arch: x64, build_type: Debug, ssl: true }
-          - { runner: macos-13, preset: x64-osx-release-test, arch: x64, build_type: Release, ssl: true }
-          - { runner: macos-13, preset: x64-osx-debug-no-ssl-test, arch: x64, build_type: Debug, ssl: false }
-          - { runner: macos-13, preset: x64-osx-release-no-ssl-test, arch: x64, build_type: Release, ssl: false }
           - { runner: macos-latest, preset: arm64-osx-debug-test, arch: arm64, build_type: Debug, ssl: true }
           - { runner: macos-latest, preset: arm64-osx-release-test, arch: arm64, build_type: Release, ssl: true }
           - { runner: macos-latest, preset: arm64-osx-debug-no-ssl-test, arch: arm64, build_type: Debug, ssl: false }
@@ -905,10 +901,6 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { runner: macos-13, preset: x64-osx-debug-test, arch: x64, build_type: Debug, ssl: true }
-          - { runner: macos-13, preset: x64-osx-release-test, arch: x64, build_type: Release, ssl: true }
-          - { runner: macos-13, preset: x64-osx-debug-no-ssl-test, arch: x64, build_type: Debug, ssl: false }
-          - { runner: macos-13, preset: x64-osx-release-no-ssl-test, arch: x64, build_type: Release, ssl: false }
           - { runner: macos-latest, preset: arm64-osx-debug-test, arch: arm64, build_type: Debug, ssl: true }
           - { runner: macos-latest, preset: arm64-osx-release-test, arch: arm64, build_type: Release, ssl: true }
           - { runner: macos-latest, preset: arm64-osx-debug-no-ssl-test, arch: arm64, build_type: Debug, ssl: false }
@@ -974,10 +966,6 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { runner: macos-13, preset: x64-osx-debug-test, arch: x64, build_type: Debug, ssl: true }
-          - { runner: macos-13, preset: x64-osx-release-test, arch: x64, build_type: Release, ssl: true }
-          - { runner: macos-13, preset: x64-osx-debug-no-ssl-test, arch: x64, build_type: Debug, ssl: false }
-          - { runner: macos-13, preset: x64-osx-release-no-ssl-test, arch: x64, build_type: Release, ssl: false }
           - { runner: macos-latest, preset: arm64-osx-debug-test, arch: arm64, build_type: Debug, ssl: true }
           - { runner: macos-latest, preset: arm64-osx-release-test, arch: arm64, build_type: Release, ssl: true }
           - { runner: macos-latest, preset: arm64-osx-debug-no-ssl-test, arch: arm64, build_type: Debug, ssl: false }
@@ -1040,13 +1028,6 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          # Intel x64 builds
-          - { runner: macos-13, preset: x64-osx-debug, arch: x64 }
-          - { runner: macos-13, preset: x64-osx-release, arch: x64 }
-          - { runner: macos-13, preset: x64-osx-debug-static, arch: x64 }
-          - { runner: macos-13, preset: x64-osx-release-static, arch: x64 }
-          - { runner: macos-13, preset: x64-osx-debug-no-ssl, arch: x64 }
-          - { runner: macos-13, preset: x64-osx-release-no-ssl, arch: x64 }
           # Apple Silicon arm64 builds
           - { runner: macos-latest, preset: arm64-osx-debug, arch: arm64 }
           - { runner: macos-latest, preset: arm64-osx-release, arch: arm64 }

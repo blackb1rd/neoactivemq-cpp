@@ -249,34 +249,45 @@ Or use the CMake helper target:
 cmake --build --preset <preset> --target integration-full
 ```
 
-### 3.3 SSL Integration Tests (Linux only)
+### 3.3 SSL Integration Tests
 
-SSL integration tests provide **comprehensive validation** of the SSL/TLS transport layer against an SSL-enabled ActiveMQ broker. The SSL test suite mirrors the complete OpenWire test suite (29 tests) to ensure SSL transport works for all features.
+SSL integration tests validate the SSL/TLS transport layer against an SSL-enabled ActiveMQ broker. The SSL test suite mirrors the complete OpenWire test suite (29 tests). CI runs these on Linux; they can also be run locally on any platform with Docker.
+
+**How it works:** running `docker compose --profile ssl up` starts a `ssl-cert-generator` container first. It checks whether valid certificates already exist; if they are missing or expiring within 30 days it generates new ones, then exits. The `activemq-ssl` broker starts only after certificate generation succeeds.
 
 ```bash
-# Start the SSL-enabled broker (certificates are generated automatically)
+# Start the SSL-enabled broker (certificates auto-generated on first run)
 docker compose --profile ssl up -d
 
-# Run all OpenWire SSL integration tests (29 comprehensive tests)
+# View logs (cert generator + broker)
+docker compose --profile ssl logs -f
+
+# Run all OpenWire SSL integration tests (29 tests)
 SSL_CERT_FILE=docker/ssl/certs/ca.pem ctest --preset <preset> -L integration-openwire-ssl --output-on-failure
 
 # Stop the broker
 docker compose --profile ssl down
 ```
 
-**SSL Test Coverage:**
-- All acknowledgment modes (client, individual, optimized)
-- Advisory messages
-- Async sending and callbacks
-- Message selectors and groups
-- Durable subscriptions
-- Transactions (local and XA)
-- Redelivery policies and session recovery
-- Temporary destinations
-- Message compression and priority
-- Queue browsing and virtual topics
-- Slow consumers and expiration
-- Enhanced connection features
+**Generated certificates** (written to `docker/ssl/certs/` on first start):
+
+| File | Description |
+|------|-------------|
+| `ca.pem` | CA certificate — passed to the client via `SSL_CERT_FILE` |
+| `ca-key.pem` | CA private key — used only during cert generation |
+| `broker.p12` | Broker keystore (PKCS12) — loaded by ActiveMQ |
+| `broker-truststore.p12` | Broker truststore (PKCS12) — loaded by ActiveMQ |
+
+Certificates are valid for 10 years and regenerate automatically when missing or expiring within 30 days. To force regeneration:
+
+```bash
+rm -rf docker/ssl/certs/*.pem docker/ssl/certs/*.p12
+docker compose --profile ssl up -d
+```
+
+**SSL Test Coverage:** All acknowledgment modes, advisory messages, async sending and callbacks, message selectors and groups, durable subscriptions, transactions (local and XA), redelivery policies, session recovery, temporary destinations, message compression and priority, queue browsing, virtual topics, slow consumers, expiration, and enhanced connection features.
+
+> **Security note:** The generated certificates are self-signed and intended for testing only. The keystore password is `password` and should never be used in production. For production use, obtain certificates from a trusted CA.
 
 ### 3.4 Integration Benchmark Tests
 
@@ -414,3 +425,28 @@ If preset is not recognized:
 - Ensure you're in the project root directory
 - Check `CMakePresets.json` exists
 - Update CMake to version 3.27 or later (3.31+ on Windows)
+
+### 10.4 SSL Test Failures
+
+If SSL integration tests fail:
+
+1. Verify certificates were generated: `ls docker/ssl/certs/`
+2. Confirm the SSL broker is running: `docker compose --profile ssl ps`
+3. Check broker logs: `docker compose --profile ssl logs activemq-ssl`
+4. Check certificate validity: `openssl x509 -in docker/ssl/certs/ca.pem -noout -dates`
+5. Ensure `SSL_CERT_FILE` points to `docker/ssl/certs/ca.pem` when running tests
+
+If port 61617 is already in use, update the port mapping in `docker-compose.yml`:
+
+```yaml
+ports:
+  - "127.0.0.1:61627:61617"  # map to a different local port
+```
+
+To force certificate regeneration:
+
+```bash
+docker compose --profile ssl down
+rm -rf docker/ssl/certs/*.pem docker/ssl/certs/*.p12
+docker compose --profile ssl up -d
+```

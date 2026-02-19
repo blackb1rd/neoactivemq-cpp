@@ -99,6 +99,7 @@ int main( int argc, char **argv ) {
     sigaction(SIGFPE,  &sa, nullptr);
     sigaction(SIGBUS,  &sa, nullptr);
     sigaction(SIGILL,  &sa, nullptr);
+    sigaction(SIGTRAP, &sa, nullptr);  // ARM64 macOS: BRK instruction (e.g. abstract class dtor)
 #endif
     // Enable record-only mode: skip formatting overhead, only record to flight recorder
     // Logs will be formatted and printed only on failure/timeout (lazy formatting)

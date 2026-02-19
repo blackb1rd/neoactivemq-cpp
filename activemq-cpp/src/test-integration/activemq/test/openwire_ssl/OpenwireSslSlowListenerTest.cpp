@@ -57,7 +57,7 @@ namespace test{
 namespace openwire_ssl {
     class OpenwireSslSlowListenerTest : public SlowListenerTest {
 public:
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL();
         }
     };

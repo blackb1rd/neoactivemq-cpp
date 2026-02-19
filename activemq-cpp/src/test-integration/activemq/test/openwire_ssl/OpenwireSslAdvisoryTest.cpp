@@ -56,7 +56,7 @@ namespace test {
 namespace openwire_ssl {
     class OpenwireSslAdvisoryTest : public AdvisoryTest {
 public:
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL();
         }
     };

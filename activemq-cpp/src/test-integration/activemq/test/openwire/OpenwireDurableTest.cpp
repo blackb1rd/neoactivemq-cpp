@@ -25,10 +25,10 @@ namespace test{
 namespace openwire{
     class OpenwireDurableTest : public DurableTest {
 public:
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
-        virtual std::string getSubscriptionName() const;
+        std::string getSubscriptionName() const override;
     };
 }}}
 

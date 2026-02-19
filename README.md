@@ -154,7 +154,15 @@ Presets follow the naming pattern `<arch>-<os>-<compiler>-<build_type>[-<variant
 
 ### 2.4 Quick Start - macOS
 
-1. Configure the project (Apple Silicon):
+1. Install build tools via Homebrew:
+
+   ```bash
+   brew install cmake ninja sccache
+   ```
+
+   > **Note:** Clang is provided by Xcode Command Line Tools. Install them with `xcode-select --install` if not already installed.
+
+2. Configure the project (Apple Silicon):
 
    ```bash
    cmake --preset arm64-osx-debug-test
@@ -166,7 +174,7 @@ Presets follow the naming pattern `<arch>-<os>-<compiler>-<build_type>[-<variant
    cmake --preset x64-osx-debug-test
    ```
 
-2. Build the project:
+3. Build the project:
 
    ```bash
    cmake --build --preset arm64-osx-debug-test

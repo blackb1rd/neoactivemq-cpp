@@ -24,7 +24,7 @@ namespace stomp{
 public:
         StompSimpleRollbackTest();
         virtual ~StompSimpleRollbackTest();
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getStompURL();
         }
     };

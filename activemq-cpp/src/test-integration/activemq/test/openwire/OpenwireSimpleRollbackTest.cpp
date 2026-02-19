@@ -30,7 +30,7 @@ namespace test{
 namespace openwire{
     class OpenwireSimpleRollbackTest : public SimpleRollbackTest {
 public:
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
     };

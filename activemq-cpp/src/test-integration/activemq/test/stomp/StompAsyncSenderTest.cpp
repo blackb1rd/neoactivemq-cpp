@@ -25,7 +25,7 @@ namespace stomp{
 public:
         StompAsyncSenderTest();
         virtual ~StompAsyncSenderTest();
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getStompURL() +
                    "&connection.useAsyncSend=true";
         }

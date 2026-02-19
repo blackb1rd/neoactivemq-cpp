@@ -57,7 +57,7 @@ namespace test{
 namespace openwire{
     class OpenwireSlowListenerTest : public SlowListenerTest {
 public:
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
     };

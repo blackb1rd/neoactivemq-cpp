@@ -71,7 +71,7 @@ namespace openwire {
         virtual ~OpenwireXATransactionsTest() {
         }
 
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
 

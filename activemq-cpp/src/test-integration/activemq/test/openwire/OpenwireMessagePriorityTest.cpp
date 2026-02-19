@@ -67,7 +67,7 @@ namespace test {
 namespace openwire {
     class OpenwireMessagePriorityTest : public MessagePriorityTest {
 public:
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
     };

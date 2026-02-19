@@ -25,10 +25,10 @@ std::string subscriptionName;
     public:
         StompDurableTest();
         virtual ~StompDurableTest();
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getStompURL();
         }
-        virtual std::string getSubscriptionName() const {
+        std::string getSubscriptionName() const override {
             return cmsProvider->getConnection()->getClientID();
         }
     };

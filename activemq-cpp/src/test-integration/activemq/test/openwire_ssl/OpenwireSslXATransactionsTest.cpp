@@ -71,7 +71,7 @@ namespace openwire_ssl {
         virtual ~OpenwireSslXATransactionsTest() {
         }
 
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL();
         }
 

@@ -2,6 +2,36 @@
 
 NeoActiveMQ CPP is a modernized C++17 messaging library that can use multiple protocols to talk to a MOM (e.g. ActiveMQ). This is a fork of Apache ActiveMQ CPP with updated build system and modern C++ standards.
 
+## Table of Contents
+
+- [1. Prerequisites](#1-prerequisites)
+  - [1.1 Required Tools](#11-required-tools)
+  - [1.2 Automatic Dependency Management](#12-automatic-dependency-management)
+- [2. Building with CMake Presets](#2-building-with-cmake-presets)
+  - [2.1 Available Presets](#21-available-presets)
+  - [2.2 Quick Start - Windows](#22-quick-start---windows)
+  - [2.3 Quick Start - Linux](#23-quick-start---linux)
+  - [2.4 Quick Start - macOS](#24-quick-start---macos)
+  - [2.5 Installation](#25-installation)
+- [3. Running Tests](#3-running-tests)
+  - [3.1 Unit Tests](#31-unit-tests)
+  - [3.2 Integration Tests](#32-integration-tests)
+  - [3.3 SSL Integration Tests](#33-ssl-integration-tests)
+  - [3.4 Integration Benchmark Tests](#34-integration-benchmark-tests)
+- [4. Examples](#4-examples)
+- [5. Using in Your Project](#5-using-in-your-project)
+  - [5.1 With CMake](#51-with-cmake)
+  - [5.2 Build Options](#52-build-options)
+- [6. Project Structure](#6-project-structure)
+- [7. Compiler Strategy](#7-compiler-strategy)
+- [8. Notes for Windows Users](#8-notes-for-windows-users)
+- [9. Notes for Linux/macOS Users](#9-notes-for-linuxmacos-users)
+- [10. Troubleshooting](#10-troubleshooting)
+  - [10.1 CMake Configuration Fails](#101-cmake-configuration-fails)
+  - [10.2 Build Fails](#102-build-fails)
+  - [10.3 Preset Not Found](#103-preset-not-found)
+  - [10.4 SSL Test Failures](#104-ssl-test-failures)
+
 ## 1. Prerequisites
 
 ### 1.1 Required Tools

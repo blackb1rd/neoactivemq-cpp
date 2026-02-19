@@ -43,6 +43,7 @@ using namespace decaf::lang::exceptions;
     class IOTransportTest : public ::testing::Test {
     };
 
+namespace {
 
 ////////////////////////////////////////////////////////////////////////////////
 class MyCommand : public commands::BaseCommand {
@@ -208,6 +209,8 @@ public:
      */
     virtual void transportResumed() {}
 };
+
+} // anonymous namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 // This will just test that we can start and stop the

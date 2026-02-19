@@ -245,6 +245,17 @@
         "release",
         "no-ssl"
       ]
+    },
+    {
+      "name": "arm64-osx-asan-test",
+      "inherits": [
+        "arm64",
+        "macos",
+        "test",
+        "vcpkg-arm64-osx",
+        "debug",
+        "asan"
+      ]
     }
   ],
   "buildPresets": [
@@ -327,6 +338,10 @@
     {
       "name": "arm64-osx-release-no-ssl-test",
       "configurePreset": "arm64-osx-release-no-ssl-test"
+    },
+    {
+      "name": "arm64-osx-asan-test",
+      "configurePreset": "arm64-osx-asan-test"
     }
   ],
   "testPresets": [
@@ -379,6 +394,11 @@
       "name": "arm64-osx-release-no-ssl-test",
       "inherits": "macos-test",
       "configurePreset": "arm64-osx-release-no-ssl-test"
+    },
+    {
+      "name": "arm64-osx-asan-test",
+      "inherits": "macos-test",
+      "configurePreset": "arm64-osx-asan-test"
     }
   ],
   "packagePresets": [

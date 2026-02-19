@@ -535,7 +535,8 @@ TEST_F(ResponseCorrelatorTest, testNarrow){
     Pointer<MyTransport> transport(new MyTransport());
     ResponseCorrelator correlator(transport);
 
-    Transport* narrowed = correlator.narrow(typeid( *transport ));
+    MyTransport& transportRef = *transport;
+    Transport* narrowed = correlator.narrow(typeid( transportRef ));
     ASSERT_TRUE(narrowed == transport);
 
     narrowed = correlator.narrow(typeid(std::string()));

@@ -128,9 +128,37 @@ namespace openssl {
         ~SocketData() {
         }
 
-        static int verifyCallback(int verified, X509_STORE_CTX* store DECAF_UNUSED) {
+        static int verifyCallback(int verified, X509_STORE_CTX* store) {
             if (!verified) {
-                // Trap debug info here about why the Certificate failed to validate.
+                int err = X509_STORE_CTX_get_error(store);
+                int depth = X509_STORE_CTX_get_error_depth(store);
+                const char* errStr = X509_verify_cert_error_string(err);
+
+                char subject[256] = {0};
+                char issuer[256] = {0};
+                char notBefore[64] = {0};
+                char notAfter[64] = {0};
+                X509* cert = X509_STORE_CTX_get_current_cert(store);
+                if (cert) {
+                    X509_NAME_oneline(X509_get_subject_name(cert), subject, sizeof(subject));
+                    X509_NAME_oneline(X509_get_issuer_name(cert), issuer, sizeof(issuer));
+
+                    BIO* bio = BIO_new(BIO_s_mem());
+                    if (bio) {
+                        ASN1_TIME_print(bio, X509_get0_notBefore(cert));
+                        BIO_read(bio, notBefore, sizeof(notBefore) - 1);
+                        BIO_reset(bio);
+                        ASN1_TIME_print(bio, X509_get0_notAfter(cert));
+                        BIO_read(bio, notAfter, sizeof(notAfter) - 1);
+                        BIO_free(bio);
+                    }
+                }
+
+                AMQ_LOG_WARN("OpenSSLSocket", "Certificate verification failed at depth " << depth
+                    << ": error " << err << " (" << (errStr ? errStr : "unknown") << ")"
+                    << " | subject=" << subject
+                    << " | issuer=" << issuer
+                    << " | valid=" << notBefore << " to " << notAfter);
             }
 
             return verified;

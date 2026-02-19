@@ -20,7 +20,7 @@ on:
 jobs:
   # Linux build job (builds and uploads artifacts for test jobs)
   linux-build-test:
-    name: Linux Build (Test)
+    name: Linux Clang Build (Test)
     runs-on: ubuntu-latest
 
     env:
@@ -30,10 +30,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { preset: x64-linux-debug-test, build_type: Debug, ssl: true }
-          - { preset: x64-linux-release-test, build_type: Release, ssl: true }
-          - { preset: x64-linux-debug-no-ssl-test, build_type: Debug, ssl: false }
-          - { preset: x64-linux-release-no-ssl-test, build_type: Release, ssl: false }
+          - { preset: x64-linux-clang-debug-test, build_type: Debug, ssl: true }
+          - { preset: x64-linux-clang-release-test, build_type: Release, ssl: true }
+          - { preset: x64-linux-clang-debug-no-ssl-test, build_type: Debug, ssl: false }
+          - { preset: x64-linux-clang-release-no-ssl-test, build_type: Release, ssl: false }
 
     steps:
     - name: Checkout code
@@ -42,7 +42,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build
+        sudo apt-get install -y ninja-build clang
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -85,7 +85,7 @@ jobs:
 
   # Linux unit test jobs (run in parallel after build)
   linux-unit-test:
-    name: Linux Unit Test (${{ matrix.config.preset }})
+    name: Linux Clang Unit Test (${{ matrix.config.preset }})
     runs-on: ubuntu-latest
     needs: linux-build-test
 
@@ -96,10 +96,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { preset: x64-linux-debug-test, build_type: Debug, ssl: true }
-          - { preset: x64-linux-release-test, build_type: Release, ssl: true }
-          - { preset: x64-linux-debug-no-ssl-test, build_type: Debug, ssl: false }
-          - { preset: x64-linux-release-no-ssl-test, build_type: Release, ssl: false }
+          - { preset: x64-linux-clang-debug-test, build_type: Debug, ssl: true }
+          - { preset: x64-linux-clang-release-test, build_type: Release, ssl: true }
+          - { preset: x64-linux-clang-debug-no-ssl-test, build_type: Debug, ssl: false }
+          - { preset: x64-linux-clang-release-no-ssl-test, build_type: Release, ssl: false }
 
     steps:
     - name: Checkout code
@@ -108,7 +108,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build
+        sudo apt-get install -y ninja-build clang
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -152,7 +152,7 @@ jobs:
 
   # Linux benchmark jobs (run in parallel after build)
   linux-benchmark:
-    name: Linux Benchmark
+    name: Linux Clang Benchmark
     runs-on: ubuntu-latest
     needs: linux-build-test
 
@@ -163,10 +163,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { preset: x64-linux-debug-test, build_type: Debug, ssl: true }
-          - { preset: x64-linux-release-test, build_type: Release, ssl: true }
-          - { preset: x64-linux-debug-no-ssl-test, build_type: Debug, ssl: false }
-          - { preset: x64-linux-release-no-ssl-test, build_type: Release, ssl: false }
+          - { preset: x64-linux-clang-debug-test, build_type: Debug, ssl: true }
+          - { preset: x64-linux-clang-release-test, build_type: Release, ssl: true }
+          - { preset: x64-linux-clang-debug-no-ssl-test, build_type: Debug, ssl: false }
+          - { preset: x64-linux-clang-release-no-ssl-test, build_type: Release, ssl: false }
 
     steps:
     - name: Checkout code
@@ -175,7 +175,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build
+        sudo apt-get install -y ninja-build clang
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -229,7 +229,7 @@ jobs:
       matrix:
         # Use no-SSL release build for non-SSL integration tests
         config:
-          - { preset: x64-linux-release-no-ssl-test, build_type: Release }
+          - { preset: x64-linux-clang-release-no-ssl-test, build_type: Release }
         # Test with multiple ActiveMQ versions
         activemq:
           - { name: "AMQ-5.18", image: "apache/activemq-classic:5.18.7" }
@@ -242,7 +242,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build
+        sudo apt-get install -y ninja-build clang
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -320,7 +320,7 @@ jobs:
       matrix:
         # Only test with SSL-enabled presets (release build)
         config:
-          - { preset: x64-linux-release-test, build_type: Release }
+          - { preset: x64-linux-clang-release-test, build_type: Release }
         # Test with ActiveMQ versions that support SSL
         activemq:
           - { name: "AMQ-5.18", image: "apache/activemq-classic:5.18.7" }
@@ -333,7 +333,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build
+        sudo apt-get install -y ninja-build clang
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -414,7 +414,7 @@ jobs:
       matrix:
         # Use release build for integration benchmark tests (one config to avoid excessive combinations)
         config:
-          - { preset: x64-linux-release-test, build_type: Release }
+          - { preset: x64-linux-clang-release-test, build_type: Release }
         # Test with multiple ActiveMQ versions
         activemq:
           - { name: "AMQ-5.18", image: "apache/activemq-classic:5.18.7" }
@@ -427,7 +427,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build
+        sudo apt-get install -y ninja-build clang
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -503,14 +503,14 @@ jobs:
       fail-fast: false
       matrix:
         preset:
-          - x64-linux-debug
-          - x64-linux-release
-          - x64-linux-debug-static
-          - x64-linux-release-static
-          - x64-linux-debug-no-ssl
-          - x64-linux-release-no-ssl
-          - x64-linux-debug-static-no-ssl
-          - x64-linux-release-static-no-ssl
+          - x64-linux-gcc-debug
+          - x64-linux-gcc-release
+          - x64-linux-gcc-debug-static
+          - x64-linux-gcc-release-static
+          - x64-linux-gcc-debug-no-ssl
+          - x64-linux-gcc-release-no-ssl
+          - x64-linux-gcc-debug-static-no-ssl
+          - x64-linux-gcc-release-static-no-ssl
 
     steps:
     - name: Checkout code
@@ -553,7 +553,7 @@ jobs:
 
   # Windows build job (builds and uploads artifacts for test jobs)
   windows-build-test:
-    name: Windows Build (Test)
+    name: Windows Clang-CL Build (Test)
     runs-on: windows-latest
 
     env:
@@ -563,12 +563,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { preset: x86-windows-debug-test, build_type: Debug, arch: amd64_x86, ssl: true }
-          - { preset: x86-windows-release-test, build_type: Release, arch: amd64_x86, ssl: true }
-          - { preset: x64-windows-debug-test, build_type: Debug, arch: amd64, ssl: true }
-          - { preset: x64-windows-release-test, build_type: Release, arch: amd64, ssl: true }
-          - { preset: x64-windows-debug-no-ssl-test, build_type: Debug, arch: amd64, ssl: false }
-          - { preset: x64-windows-release-no-ssl-test, build_type: Release, arch: amd64, ssl: false }
+          - { preset: x64-windows-clang-debug-test, build_type: Debug, arch: amd64, ssl: true }
+          - { preset: x64-windows-clang-release-test, build_type: Release, arch: amd64, ssl: true }
+          - { preset: x64-windows-clang-debug-no-ssl-test, build_type: Debug, arch: amd64, ssl: false }
+          - { preset: x64-windows-clang-release-no-ssl-test, build_type: Release, arch: amd64, ssl: false }
 
     steps:
     - name: Checkout code
@@ -625,7 +623,7 @@ jobs:
 
   # Windows unit test jobs (run in parallel after build, no Docker on Windows CI)
   windows-unit-test:
-    name: Windows Unit Test (${{ matrix.config.preset }})
+    name: Windows Clang-CL Unit Test (${{ matrix.config.preset }})
     runs-on: windows-latest
     needs: windows-build-test
 
@@ -636,12 +634,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { preset: x86-windows-debug-test, build_type: Debug, arch: amd64_x86, ssl: true }
-          - { preset: x86-windows-release-test, build_type: Release, arch: amd64_x86, ssl: true }
-          - { preset: x64-windows-debug-test, build_type: Debug, arch: amd64, ssl: true }
-          - { preset: x64-windows-release-test, build_type: Release, arch: amd64, ssl: true }
-          - { preset: x64-windows-debug-no-ssl-test, build_type: Debug, arch: amd64, ssl: false }
-          - { preset: x64-windows-release-no-ssl-test, build_type: Release, arch: amd64, ssl: false }
+          - { preset: x64-windows-clang-debug-test, build_type: Debug, arch: amd64, ssl: true }
+          - { preset: x64-windows-clang-release-test, build_type: Release, arch: amd64, ssl: true }
+          - { preset: x64-windows-clang-debug-no-ssl-test, build_type: Debug, arch: amd64, ssl: false }
+          - { preset: x64-windows-clang-release-no-ssl-test, build_type: Release, arch: amd64, ssl: false }
 
     steps:
     - name: Checkout code
@@ -706,12 +702,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { preset: x86-windows-debug-test, build_type: Debug, arch: amd64_x86, ssl: true }
-          - { preset: x86-windows-release-test, build_type: Release, arch: amd64_x86, ssl: true }
-          - { preset: x64-windows-debug-test, build_type: Debug, arch: amd64, ssl: true }
-          - { preset: x64-windows-release-test, build_type: Release, arch: amd64, ssl: true }
-          - { preset: x64-windows-debug-no-ssl-test, build_type: Debug, arch: amd64, ssl: false }
-          - { preset: x64-windows-release-no-ssl-test, build_type: Release, arch: amd64, ssl: false }
+          - { preset: x64-windows-clang-debug-test, build_type: Debug, arch: amd64, ssl: true }
+          - { preset: x64-windows-clang-release-test, build_type: Release, arch: amd64, ssl: true }
+          - { preset: x64-windows-clang-debug-no-ssl-test, build_type: Debug, arch: amd64, ssl: false }
+          - { preset: x64-windows-clang-release-no-ssl-test, build_type: Release, arch: amd64, ssl: false }
 
     steps:
     - name: Checkout code
@@ -775,17 +769,17 @@ jobs:
       matrix:
         config:
           # x86 builds (shared with SSL only)
-          - { preset: x86-windows-debug, build_type: Debug, arch: x86 }
-          - { preset: x86-windows-release, build_type: Release, arch: x86 }
+          - { preset: x86-windows-cl-debug, build_type: Debug, arch: x86 }
+          - { preset: x86-windows-cl-release, build_type: Release, arch: x86 }
           # x64 builds (all variants)
-          - { preset: x64-windows-debug, build_type: Debug, arch: x64 }
-          - { preset: x64-windows-release, build_type: Release, arch: x64 }
-          - { preset: x64-windows-debug-static, build_type: Debug, arch: x64 }
-          - { preset: x64-windows-release-static, build_type: Release, arch: x64 }
-          - { preset: x64-windows-debug-no-ssl, build_type: Debug, arch: x64 }
-          - { preset: x64-windows-release-no-ssl, build_type: Release, arch: x64 }
-          - { preset: x64-windows-debug-static-no-ssl, build_type: Debug, arch: x64 }
-          - { preset: x64-windows-release-static-no-ssl, build_type: Release, arch: x64 }
+          - { preset: x64-windows-cl-debug, build_type: Debug, arch: x64 }
+          - { preset: x64-windows-cl-release, build_type: Release, arch: x64 }
+          - { preset: x64-windows-cl-debug-static, build_type: Debug, arch: x64 }
+          - { preset: x64-windows-cl-release-static, build_type: Release, arch: x64 }
+          - { preset: x64-windows-cl-debug-no-ssl, build_type: Debug, arch: x64 }
+          - { preset: x64-windows-cl-release-no-ssl, build_type: Release, arch: x64 }
+          - { preset: x64-windows-cl-debug-static-no-ssl, build_type: Debug, arch: x64 }
+          - { preset: x64-windows-cl-release-static-no-ssl, build_type: Release, arch: x64 }
 
     steps:
     - name: Checkout code
@@ -830,3 +824,270 @@ jobs:
 
     - name: Install
       run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}
+
+  # macOS build job (builds and uploads artifacts for test jobs)
+  macos-build-test:
+    name: macOS Build (Test)
+    runs-on: ${{ matrix.config.runner }}
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { runner: macos-13, preset: x64-osx-debug-test, arch: x64, build_type: Debug, ssl: true }
+          - { runner: macos-13, preset: x64-osx-release-test, arch: x64, build_type: Release, ssl: true }
+          - { runner: macos-13, preset: x64-osx-debug-no-ssl-test, arch: x64, build_type: Debug, ssl: false }
+          - { runner: macos-13, preset: x64-osx-release-no-ssl-test, arch: x64, build_type: Release, ssl: false }
+          - { runner: macos-latest, preset: arm64-osx-debug-test, arch: arm64, build_type: Debug, ssl: true }
+          - { runner: macos-latest, preset: arm64-osx-release-test, arch: arm64, build_type: Release, ssl: true }
+          - { runner: macos-latest, preset: arm64-osx-debug-no-ssl-test, arch: arm64, build_type: Debug, ssl: false }
+          - { runner: macos-latest, preset: arm64-osx-release-no-ssl-test, arch: arm64, build_type: Release, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: brew install ninja
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.config.preset }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.config.preset }} -j $(nproc 2>/dev/null || sysctl -n hw.logicalcpu)
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Install
+      run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }}
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v6
+      with:
+        name: macos-build-${{ matrix.config.preset }}
+        path: |
+          output/build/${{ matrix.config.preset }}/bin/
+          output/build/${{ matrix.config.preset }}/lib/
+        retention-days: 1
+
+  # macOS unit test jobs (run in parallel after build)
+  macos-unit-test:
+    name: macOS Unit Test (${{ matrix.config.preset }})
+    runs-on: ${{ matrix.config.runner }}
+    needs: macos-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { runner: macos-13, preset: x64-osx-debug-test, arch: x64, build_type: Debug, ssl: true }
+          - { runner: macos-13, preset: x64-osx-release-test, arch: x64, build_type: Release, ssl: true }
+          - { runner: macos-13, preset: x64-osx-debug-no-ssl-test, arch: x64, build_type: Debug, ssl: false }
+          - { runner: macos-13, preset: x64-osx-release-no-ssl-test, arch: x64, build_type: Release, ssl: false }
+          - { runner: macos-latest, preset: arm64-osx-debug-test, arch: arm64, build_type: Debug, ssl: true }
+          - { runner: macos-latest, preset: arm64-osx-release-test, arch: arm64, build_type: Release, ssl: true }
+          - { runner: macos-latest, preset: arm64-osx-debug-no-ssl-test, arch: arm64, build_type: Debug, ssl: false }
+          - { runner: macos-latest, preset: arm64-osx-release-no-ssl-test, arch: arm64, build_type: Release, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: brew install ninja
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: macos-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Make test executables runnable
+      run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
+
+    - name: Run unit tests
+      run: |
+        ctest --preset ${{ matrix.config.preset }} \
+          -L unit -j $(nproc 2>/dev/null || sysctl -n hw.logicalcpu) --output-on-failure --timeout 300
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-${{ matrix.config.preset }}-unit-${{ strategy.job-index }}
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # macOS benchmark jobs (run in parallel after build)
+  macos-benchmark:
+    name: macOS Benchmark
+    runs-on: ${{ matrix.config.runner }}
+    needs: macos-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { runner: macos-13, preset: x64-osx-debug-test, arch: x64, build_type: Debug, ssl: true }
+          - { runner: macos-13, preset: x64-osx-release-test, arch: x64, build_type: Release, ssl: true }
+          - { runner: macos-13, preset: x64-osx-debug-no-ssl-test, arch: x64, build_type: Debug, ssl: false }
+          - { runner: macos-13, preset: x64-osx-release-no-ssl-test, arch: x64, build_type: Release, ssl: false }
+          - { runner: macos-latest, preset: arm64-osx-debug-test, arch: arm64, build_type: Debug, ssl: true }
+          - { runner: macos-latest, preset: arm64-osx-release-test, arch: arm64, build_type: Release, ssl: true }
+          - { runner: macos-latest, preset: arm64-osx-debug-no-ssl-test, arch: arm64, build_type: Debug, ssl: false }
+          - { runner: macos-latest, preset: arm64-osx-release-no-ssl-test, arch: arm64, build_type: Release, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: brew install ninja
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: macos-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Make test executables runnable
+      run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
+
+    - name: Run benchmarks
+      run: ctest --preset ${{ matrix.config.preset }} -L ^benchmark$ --output-on-failure --timeout 600
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-${{ matrix.config.preset }}-benchmark
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # macOS builds without tests (all variants)
+  macos-build:
+    name: macOS Build
+    runs-on: ${{ matrix.config.runner }}
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          # Intel x64 builds
+          - { runner: macos-13, preset: x64-osx-debug, arch: x64 }
+          - { runner: macos-13, preset: x64-osx-release, arch: x64 }
+          - { runner: macos-13, preset: x64-osx-debug-static, arch: x64 }
+          - { runner: macos-13, preset: x64-osx-release-static, arch: x64 }
+          - { runner: macos-13, preset: x64-osx-debug-no-ssl, arch: x64 }
+          - { runner: macos-13, preset: x64-osx-release-no-ssl, arch: x64 }
+          # Apple Silicon arm64 builds
+          - { runner: macos-latest, preset: arm64-osx-debug, arch: arm64 }
+          - { runner: macos-latest, preset: arm64-osx-release, arch: arm64 }
+          - { runner: macos-latest, preset: arm64-osx-debug-static, arch: arm64 }
+          - { runner: macos-latest, preset: arm64-osx-release-static, arch: arm64 }
+          - { runner: macos-latest, preset: arm64-osx-debug-no-ssl, arch: arm64 }
+          - { runner: macos-latest, preset: arm64-osx-release-no-ssl, arch: arm64 }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: brew install ninja
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.config.preset }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.config.preset }} -j $(nproc 2>/dev/null || sysctl -n hw.logicalcpu)
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Install
+      run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }}

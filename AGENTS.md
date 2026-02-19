@@ -7,15 +7,15 @@ This project uses **CMake with presets**. Always use CMake presets for configura
 ### Configure
 
 ```powershell
-# Configure with a preset (e.g., x86-windows-debug-test)
-cmake --preset x86-windows-debug-test
+# Configure with a preset (e.g., x86-windows-cl-debug-test)
+cmake --preset x86-windows-cl-debug-test
 ```
 
 ### Build
 
 ```powershell
 # Build using the configured preset
-cmake --build --preset x86-windows-debug-test
+cmake --build --preset x86-windows-cl-debug-test
 ```
 
 ### Available Presets
@@ -29,7 +29,7 @@ cmake --list-presets
 
 ```powershell
 # Run all unit tests via CTest after building
-ctest --preset x86-windows-debug-test
+ctest --preset x86-windows-cl-debug-test
 ```
 
 ## Important Notes

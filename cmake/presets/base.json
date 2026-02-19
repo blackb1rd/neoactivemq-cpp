@@ -66,6 +66,14 @@
       }
     },
     {
+      "name": "arm64",
+      "hidden": true,
+      "architecture": {
+        "strategy": "external",
+        "value": "arm64"
+      }
+    },
+    {
       "name": "debug",
       "hidden": true,
       "cacheVariables": {

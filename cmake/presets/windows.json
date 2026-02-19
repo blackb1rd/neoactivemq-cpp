@@ -26,6 +26,22 @@
       }
     },
     {
+      "name": "windows-clang-cl",
+      "inherits": [
+        "base"
+      ],
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
       "name": "vcpkg-x86-windows",
       "hidden": true,
       "environment": {
@@ -40,7 +56,7 @@
       }
     },
     {
-      "name": "x86-windows-debug",
+      "name": "x86-windows-cl-debug",
       "inherits": [
         "x86",
         "windows",
@@ -49,7 +65,7 @@
       ]
     },
     {
-      "name": "x86-windows-debug-test",
+      "name": "x86-windows-cl-debug-test",
       "inherits": [
         "x86",
         "windows",
@@ -59,7 +75,7 @@
       ]
     },
     {
-      "name": "x86-windows-release",
+      "name": "x86-windows-cl-release",
       "inherits": [
         "x86",
         "windows",
@@ -68,7 +84,7 @@
       ]
     },
     {
-      "name": "x86-windows-release-test",
+      "name": "x86-windows-cl-release-test",
       "inherits": [
         "x86",
         "windows",
@@ -78,7 +94,7 @@
       ]
     },
     {
-      "name": "x64-windows-debug",
+      "name": "x64-windows-cl-debug",
       "inherits": [
         "x64",
         "windows",
@@ -87,7 +103,7 @@
       ]
     },
     {
-      "name": "x64-windows-debug-test",
+      "name": "x64-windows-cl-debug-test",
       "inherits": [
         "x64",
         "windows",
@@ -97,7 +113,7 @@
       ]
     },
     {
-      "name": "x64-windows-release",
+      "name": "x64-windows-cl-release",
       "inherits": [
         "x64",
         "windows",
@@ -106,7 +122,7 @@
       ]
     },
     {
-      "name": "x64-windows-release-test",
+      "name": "x64-windows-cl-release-test",
       "inherits": [
         "x64",
         "windows",
@@ -116,7 +132,7 @@
       ]
     },
     {
-      "name": "x64-windows-debug-static",
+      "name": "x64-windows-cl-debug-static",
       "inherits": [
         "x64",
         "windows",
@@ -126,7 +142,7 @@
       ]
     },
     {
-      "name": "x64-windows-release-static",
+      "name": "x64-windows-cl-release-static",
       "inherits": [
         "x64",
         "windows",
@@ -136,7 +152,7 @@
       ]
     },
     {
-      "name": "x64-windows-debug-no-ssl",
+      "name": "x64-windows-cl-debug-no-ssl",
       "inherits": [
         "x64",
         "windows",
@@ -146,7 +162,7 @@
       ]
     },
     {
-      "name": "x64-windows-release-no-ssl",
+      "name": "x64-windows-cl-release-no-ssl",
       "inherits": [
         "x64",
         "windows",
@@ -156,7 +172,7 @@
       ]
     },
     {
-      "name": "x64-windows-debug-static-no-ssl",
+      "name": "x64-windows-cl-debug-static-no-ssl",
       "inherits": [
         "x64",
         "windows",
@@ -167,7 +183,7 @@
       ]
     },
     {
-      "name": "x64-windows-release-static-no-ssl",
+      "name": "x64-windows-cl-release-static-no-ssl",
       "inherits": [
         "x64",
         "windows",
@@ -178,7 +194,7 @@
       ]
     },
     {
-      "name": "x64-windows-debug-no-ssl-test",
+      "name": "x64-windows-cl-debug-no-ssl-test",
       "inherits": [
         "x64",
         "windows",
@@ -189,10 +205,70 @@
       ]
     },
     {
-      "name": "x64-windows-release-no-ssl-test",
+      "name": "x64-windows-cl-release-no-ssl-test",
       "inherits": [
         "x64",
         "windows",
+        "test-no-ssl",
+        "vcpkg-x64-windows",
+        "release",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "x64-windows-clang-debug",
+      "inherits": [
+        "x64",
+        "windows-clang-cl",
+        "vcpkg-x64-windows",
+        "debug"
+      ]
+    },
+    {
+      "name": "x64-windows-clang-debug-test",
+      "inherits": [
+        "x64",
+        "windows-clang-cl",
+        "test",
+        "vcpkg-x64-windows",
+        "debug"
+      ]
+    },
+    {
+      "name": "x64-windows-clang-release",
+      "inherits": [
+        "x64",
+        "windows-clang-cl",
+        "vcpkg-x64-windows",
+        "release"
+      ]
+    },
+    {
+      "name": "x64-windows-clang-release-test",
+      "inherits": [
+        "x64",
+        "windows-clang-cl",
+        "test",
+        "vcpkg-x64-windows",
+        "release"
+      ]
+    },
+    {
+      "name": "x64-windows-clang-debug-no-ssl-test",
+      "inherits": [
+        "x64",
+        "windows-clang-cl",
+        "test-no-ssl",
+        "vcpkg-x64-windows",
+        "debug",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "x64-windows-clang-release-no-ssl-test",
+      "inherits": [
+        "x64",
+        "windows-clang-cl",
         "test-no-ssl",
         "vcpkg-x64-windows",
         "release",
@@ -202,68 +278,92 @@
   ],
   "buildPresets": [
     {
-      "name": "x86-windows-debug",
-      "configurePreset": "x86-windows-debug"
+      "name": "x86-windows-cl-debug",
+      "configurePreset": "x86-windows-cl-debug"
     },
     {
-      "name": "x86-windows-debug-test",
-      "configurePreset": "x86-windows-debug-test"
+      "name": "x86-windows-cl-debug-test",
+      "configurePreset": "x86-windows-cl-debug-test"
     },
     {
-      "name": "x86-windows-release",
-      "configurePreset": "x86-windows-release"
+      "name": "x86-windows-cl-release",
+      "configurePreset": "x86-windows-cl-release"
     },
     {
-      "name": "x86-windows-release-test",
-      "configurePreset": "x86-windows-release-test"
+      "name": "x86-windows-cl-release-test",
+      "configurePreset": "x86-windows-cl-release-test"
     },
     {
-      "name": "x64-windows-debug",
-      "configurePreset": "x64-windows-debug"
+      "name": "x64-windows-cl-debug",
+      "configurePreset": "x64-windows-cl-debug"
     },
     {
-      "name": "x64-windows-debug-test",
-      "configurePreset": "x64-windows-debug-test"
+      "name": "x64-windows-cl-debug-test",
+      "configurePreset": "x64-windows-cl-debug-test"
     },
     {
-      "name": "x64-windows-release",
-      "configurePreset": "x64-windows-release"
+      "name": "x64-windows-cl-release",
+      "configurePreset": "x64-windows-cl-release"
     },
     {
-      "name": "x64-windows-release-test",
-      "configurePreset": "x64-windows-release-test"
+      "name": "x64-windows-cl-release-test",
+      "configurePreset": "x64-windows-cl-release-test"
     },
     {
-      "name": "x64-windows-debug-static",
-      "configurePreset": "x64-windows-debug-static"
+      "name": "x64-windows-cl-debug-static",
+      "configurePreset": "x64-windows-cl-debug-static"
     },
     {
-      "name": "x64-windows-release-static",
-      "configurePreset": "x64-windows-release-static"
+      "name": "x64-windows-cl-release-static",
+      "configurePreset": "x64-windows-cl-release-static"
     },
     {
-      "name": "x64-windows-debug-no-ssl",
-      "configurePreset": "x64-windows-debug-no-ssl"
+      "name": "x64-windows-cl-debug-no-ssl",
+      "configurePreset": "x64-windows-cl-debug-no-ssl"
     },
     {
-      "name": "x64-windows-release-no-ssl",
-      "configurePreset": "x64-windows-release-no-ssl"
+      "name": "x64-windows-cl-release-no-ssl",
+      "configurePreset": "x64-windows-cl-release-no-ssl"
     },
     {
-      "name": "x64-windows-debug-static-no-ssl",
-      "configurePreset": "x64-windows-debug-static-no-ssl"
+      "name": "x64-windows-cl-debug-static-no-ssl",
+      "configurePreset": "x64-windows-cl-debug-static-no-ssl"
     },
     {
-      "name": "x64-windows-release-static-no-ssl",
-      "configurePreset": "x64-windows-release-static-no-ssl"
+      "name": "x64-windows-cl-release-static-no-ssl",
+      "configurePreset": "x64-windows-cl-release-static-no-ssl"
     },
     {
-      "name": "x64-windows-debug-no-ssl-test",
-      "configurePreset": "x64-windows-debug-no-ssl-test"
+      "name": "x64-windows-cl-debug-no-ssl-test",
+      "configurePreset": "x64-windows-cl-debug-no-ssl-test"
     },
     {
-      "name": "x64-windows-release-no-ssl-test",
-      "configurePreset": "x64-windows-release-no-ssl-test"
+      "name": "x64-windows-cl-release-no-ssl-test",
+      "configurePreset": "x64-windows-cl-release-no-ssl-test"
+    },
+    {
+      "name": "x64-windows-clang-debug",
+      "configurePreset": "x64-windows-clang-debug"
+    },
+    {
+      "name": "x64-windows-clang-debug-test",
+      "configurePreset": "x64-windows-clang-debug-test"
+    },
+    {
+      "name": "x64-windows-clang-release",
+      "configurePreset": "x64-windows-clang-release"
+    },
+    {
+      "name": "x64-windows-clang-release-test",
+      "configurePreset": "x64-windows-clang-release-test"
+    },
+    {
+      "name": "x64-windows-clang-debug-no-ssl-test",
+      "configurePreset": "x64-windows-clang-debug-no-ssl-test"
+    },
+    {
+      "name": "x64-windows-clang-release-no-ssl-test",
+      "configurePreset": "x64-windows-clang-release-no-ssl-test"
     }
   ],
   "testPresets": [
@@ -275,188 +375,208 @@
       }
     },
     {
-      "name": "x86-windows-debug-test",
+      "name": "x86-windows-cl-debug-test",
       "inherits": "windows-test",
-      "configurePreset": "x86-windows-debug-test"
+      "configurePreset": "x86-windows-cl-debug-test"
     },
     {
-      "name": "x86-windows-release-test",
+      "name": "x86-windows-cl-release-test",
       "inherits": "windows-test",
-      "configurePreset": "x86-windows-release-test"
+      "configurePreset": "x86-windows-cl-release-test"
     },
     {
-      "name": "x64-windows-debug-test",
+      "name": "x64-windows-cl-debug-test",
       "inherits": "windows-test",
-      "configurePreset": "x64-windows-debug-test"
+      "configurePreset": "x64-windows-cl-debug-test"
     },
     {
-      "name": "x64-windows-release-test",
+      "name": "x64-windows-cl-release-test",
       "inherits": "windows-test",
-      "configurePreset": "x64-windows-release-test"
+      "configurePreset": "x64-windows-cl-release-test"
     },
     {
-      "name": "x64-windows-debug-no-ssl-test",
+      "name": "x64-windows-cl-debug-no-ssl-test",
       "inherits": "windows-test",
-      "configurePreset": "x64-windows-debug-no-ssl-test"
+      "configurePreset": "x64-windows-cl-debug-no-ssl-test"
     },
     {
-      "name": "x64-windows-release-no-ssl-test",
+      "name": "x64-windows-cl-release-no-ssl-test",
       "inherits": "windows-test",
-      "configurePreset": "x64-windows-release-no-ssl-test"
+      "configurePreset": "x64-windows-cl-release-no-ssl-test"
+    },
+    {
+      "name": "x64-windows-clang-debug-test",
+      "inherits": "windows-test",
+      "configurePreset": "x64-windows-clang-debug-test"
+    },
+    {
+      "name": "x64-windows-clang-release-test",
+      "inherits": "windows-test",
+      "configurePreset": "x64-windows-clang-release-test"
+    },
+    {
+      "name": "x64-windows-clang-debug-no-ssl-test",
+      "inherits": "windows-test",
+      "configurePreset": "x64-windows-clang-debug-no-ssl-test"
+    },
+    {
+      "name": "x64-windows-clang-release-no-ssl-test",
+      "inherits": "windows-test",
+      "configurePreset": "x64-windows-clang-release-no-ssl-test"
     }
   ],
   "workflowPresets": [
     {
-      "name": "x86-windows-debug",
+      "name": "x86-windows-cl-debug",
       "steps": [
         {
           "type": "configure",
-          "name": "x86-windows-debug"
+          "name": "x86-windows-cl-debug"
         },
         {
           "type": "build",
-          "name": "x86-windows-debug"
+          "name": "x86-windows-cl-debug"
         }
       ]
     },
     {
-      "name": "x86-windows-debug-test",
+      "name": "x86-windows-cl-debug-test",
       "steps": [
         {
           "type": "configure",
-          "name": "x86-windows-debug-test"
+          "name": "x86-windows-cl-debug-test"
         },
         {
           "type": "build",
-          "name": "x86-windows-debug-test"
+          "name": "x86-windows-cl-debug-test"
         },
         {
           "type": "test",
-          "name": "x86-windows-debug-test"
+          "name": "x86-windows-cl-debug-test"
         }
       ]
     },
     {
-      "name": "x86-windows-release",
+      "name": "x86-windows-cl-release",
       "steps": [
         {
           "type": "configure",
-          "name": "x86-windows-release"
+          "name": "x86-windows-cl-release"
         },
         {
           "type": "build",
-          "name": "x86-windows-release"
+          "name": "x86-windows-cl-release"
         }
       ]
     },
     {
-      "name": "x86-windows-release-test",
+      "name": "x86-windows-cl-release-test",
       "steps": [
         {
           "type": "configure",
-          "name": "x86-windows-release-test"
+          "name": "x86-windows-cl-release-test"
         },
         {
           "type": "build",
-          "name": "x86-windows-release-test"
+          "name": "x86-windows-cl-release-test"
         },
         {
           "type": "test",
-          "name": "x86-windows-release-test"
+          "name": "x86-windows-cl-release-test"
         }
       ]
     },
     {
-      "name": "x64-windows-debug",
+      "name": "x64-windows-cl-debug",
       "steps": [
         {
           "type": "configure",
-          "name": "x64-windows-debug"
+          "name": "x64-windows-cl-debug"
         },
         {
           "type": "build",
-          "name": "x64-windows-debug"
+          "name": "x64-windows-cl-debug"
         }
       ]
     },
     {
-      "name": "x64-windows-debug-test",
+      "name": "x64-windows-cl-debug-test",
       "steps": [
         {
           "type": "configure",
-          "name": "x64-windows-debug-test"
+          "name": "x64-windows-cl-debug-test"
         },
         {
           "type": "build",
-          "name": "x64-windows-debug-test"
+          "name": "x64-windows-cl-debug-test"
         },
         {
           "type": "test",
-          "name": "x64-windows-debug-test"
+          "name": "x64-windows-cl-debug-test"
         }
       ]
     },
     {
-      "name": "x64-windows-release",
+      "name": "x64-windows-cl-release",
       "steps": [
         {
           "type": "configure",
-          "name": "x64-windows-release"
+          "name": "x64-windows-cl-release"
         },
         {
           "type": "build",
-          "name": "x64-windows-release"
+          "name": "x64-windows-cl-release"
         }
       ]
     },
     {
-      "name": "x64-windows-release-test",
+      "name": "x64-windows-cl-release-test",
       "steps": [
         {
           "type": "configure",
-          "name": "x64-windows-release-test"
+          "name": "x64-windows-cl-release-test"
         },
         {
           "type": "build",
-          "name": "x64-windows-release-test"
+          "name": "x64-windows-cl-release-test"
         },
         {
           "type": "test",
-          "name": "x64-windows-release-test"
+          "name": "x64-windows-cl-release-test"
         }
       ]
     },
     {
-      "name": "x64-windows-debug-no-ssl-test",
+      "name": "x64-windows-cl-debug-no-ssl-test",
       "steps": [
         {
           "type": "configure",
-          "name": "x64-windows-debug-no-ssl-test"
+          "name": "x64-windows-cl-debug-no-ssl-test"
         },
         {
           "type": "build",
-          "name": "x64-windows-debug-no-ssl-test"
+          "name": "x64-windows-cl-debug-no-ssl-test"
         },
         {
           "type": "test",
-          "name": "x64-windows-debug-no-ssl-test"
+          "name": "x64-windows-cl-debug-no-ssl-test"
         }
       ]
     },
     {
-      "name": "x64-windows-release-no-ssl-test",
+      "name": "x64-windows-cl-release-no-ssl-test",
       "steps": [
         {
           "type": "configure",
-          "name": "x64-windows-release-no-ssl-test"
+          "name": "x64-windows-cl-release-no-ssl-test"
         },
         {
           "type": "build",
-          "name": "x64-windows-release-no-ssl-test"
+          "name": "x64-windows-cl-release-no-ssl-test"
         },
         {
           "type": "test",
-          "name": "x64-windows-release-no-ssl-test"
+          "name": "x64-windows-cl-release-no-ssl-test"
         }
       ]
     }

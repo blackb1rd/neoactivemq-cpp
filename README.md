@@ -8,12 +8,13 @@ NeoActiveMQ CPP is a modernized C++17 messaging library that can use multiple pr
 
 | Tool | Recommended Version |
 |------|-------------------|
-| CMake | >= 3.15 |
+| CMake | >= 3.27 (>= 3.31 on Windows) |
 | vcpkg | latest |
 | C++ Compiler | C++17 support required |
 | MSVC | >= 2019 (Windows) |
-| GCC | >= 7.0 (Linux) |
-| Clang | >= 5.0 (macOS/Linux) |
+| Clang-CL | >= 14 (Windows, for test builds) |
+| GCC | >= 7.0 (Linux, non-test builds) |
+| Clang | >= 14 (Linux/macOS) |
 
 ### 1.2 Automatic Dependency Management
 
@@ -37,63 +38,149 @@ To see all available presets:
 cmake --list-presets
 ```
 
-Common presets:
+Presets follow the naming pattern `<arch>-<os>-<compiler>-<build_type>[-<variant>]`:
+
+**Windows (MSVC cl.exe — standard builds):**
 
 | Preset | Description |
 |--------|-------------|
-| `x86-windows-debug-test` | Windows 32-bit Debug with tests |
-| `x86-windows-release` | Windows 32-bit Release |
-| `x64-windows-debug-test` | Windows 64-bit Debug with tests |
-| `x64-windows-release` | Windows 64-bit Release |
-| `x64-linux-debug-test` | Linux 64-bit Debug with tests |
-| `x64-linux-release` | Linux 64-bit Release |
+| `x86-windows-cl-debug` | Windows 32-bit Debug |
+| `x86-windows-cl-release` | Windows 32-bit Release |
+| `x64-windows-cl-debug` | Windows 64-bit Debug |
+| `x64-windows-cl-release` | Windows 64-bit Release |
+| `x64-windows-cl-debug-static` | Windows 64-bit Debug, static runtime |
+| `x64-windows-cl-release-static` | Windows 64-bit Release, static runtime |
+| `x64-windows-cl-debug-no-ssl` | Windows 64-bit Debug, no SSL |
+| `x64-windows-cl-release-no-ssl` | Windows 64-bit Release, no SSL |
+
+**Windows (MSVC cl.exe — test builds):**
+
+| Preset | Description |
+|--------|-------------|
+| `x86-windows-cl-debug-test` | Windows 32-bit Debug with tests |
+| `x86-windows-cl-release-test` | Windows 32-bit Release with tests |
+| `x64-windows-cl-debug-test` | Windows 64-bit Debug with tests |
+| `x64-windows-cl-release-test` | Windows 64-bit Release with tests |
+| `x64-windows-cl-debug-no-ssl-test` | Windows 64-bit Debug with tests, no SSL |
+| `x64-windows-cl-release-no-ssl-test` | Windows 64-bit Release with tests, no SSL |
+
+**Windows (clang-cl — test builds, used in CI):**
+
+| Preset | Description |
+|--------|-------------|
+| `x64-windows-clang-debug-test` | Windows 64-bit Debug with tests |
+| `x64-windows-clang-release-test` | Windows 64-bit Release with tests |
+| `x64-windows-clang-debug-no-ssl-test` | Windows 64-bit Debug with tests, no SSL |
+| `x64-windows-clang-release-no-ssl-test` | Windows 64-bit Release with tests, no SSL |
+
+**Linux (GCC — standard builds):**
+
+| Preset | Description |
+|--------|-------------|
+| `x64-linux-gcc-debug` | Linux 64-bit Debug |
+| `x64-linux-gcc-release` | Linux 64-bit Release |
+| `x64-linux-gcc-debug-static` | Linux 64-bit Debug, static |
+| `x64-linux-gcc-release-static` | Linux 64-bit Release, static |
+| `x64-linux-gcc-debug-no-ssl` | Linux 64-bit Debug, no SSL |
+| `x64-linux-gcc-release-no-ssl` | Linux 64-bit Release, no SSL |
+
+**Linux (GCC — test builds):**
+
+| Preset | Description |
+|--------|-------------|
+| `x64-linux-gcc-debug-test` | Linux 64-bit Debug with tests |
+| `x64-linux-gcc-release-test` | Linux 64-bit Release with tests |
+| `x64-linux-gcc-debug-no-ssl-test` | Linux 64-bit Debug with tests, no SSL |
+| `x64-linux-gcc-release-no-ssl-test` | Linux 64-bit Release with tests, no SSL |
+
+**Linux (Clang — test builds, used in CI):**
+
+| Preset | Description |
+|--------|-------------|
+| `x64-linux-clang-debug-test` | Linux 64-bit Debug with tests |
+| `x64-linux-clang-release-test` | Linux 64-bit Release with tests |
+| `x64-linux-clang-debug-no-ssl-test` | Linux 64-bit Debug with tests, no SSL |
+| `x64-linux-clang-release-no-ssl-test` | Linux 64-bit Release with tests, no SSL |
+
+**macOS (Clang):**
+
+| Preset | Description |
+|--------|-------------|
+| `x64-osx-debug` | macOS Intel Debug |
+| `x64-osx-release` | macOS Intel Release |
+| `x64-osx-debug-test` | macOS Intel Debug with tests |
+| `x64-osx-release-test` | macOS Intel Release with tests |
+| `arm64-osx-debug` | macOS Apple Silicon Debug |
+| `arm64-osx-release` | macOS Apple Silicon Release |
+| `arm64-osx-debug-test` | macOS Apple Silicon Debug with tests |
+| `arm64-osx-release-test` | macOS Apple Silicon Release with tests |
 
 ### 2.2 Quick Start - Windows
 
 1. Configure the project:
 
    ```bash
-   cmake --preset x86-windows-debug-test
+   cmake --preset x64-windows-cl-debug-test
    ```
 
    This will:
    - Download and build all dependencies via vcpkg
    - Configure the build with tests enabled
-   - Generate build files in `output/build/x86-windows-debug-test/`
+   - Generate build files in `output/build/x64-windows-cl-debug-test/`
 
 2. Build the project:
 
    ```bash
-   cmake --build --preset x86-windows-debug-test
+   cmake --build --preset x64-windows-cl-debug-test
    ```
 
    The build output will be in:
    - Libraries: `output/build/<preset-name>/lib/`
    - Executables: `output/build/<preset-name>/bin/`
 
-### 2.3 Quick Start - Linux/macOS
+### 2.3 Quick Start - Linux
 
 1. Configure the project:
 
    ```bash
-   cmake --preset x64-linux-debug-test
+   cmake --preset x64-linux-gcc-debug-test
    ```
 
 2. Build the project:
 
    ```bash
-   cmake --build --preset x64-linux-debug-test
+   cmake --build --preset x64-linux-gcc-debug-test
    ```
 
-### 2.4 Installation
+### 2.4 Quick Start - macOS
 
-To install the library to the system:
+1. Configure the project (Apple Silicon):
+
+   ```bash
+   cmake --preset arm64-osx-debug-test
+   ```
+
+   Or for Intel Macs:
+
+   ```bash
+   cmake --preset x64-osx-debug-test
+   ```
+
+2. Build the project:
+
+   ```bash
+   cmake --build --preset arm64-osx-debug-test
+   ```
+
+### 2.5 Installation
+
+To install the library:
 
 ```bash
 cmake --install output/build/<preset-name> --prefix /usr/local
 ```
 
-Or on Windows with administrator privileges:
+Or on Windows:
 
 ```bash
 cmake --install output/build/<preset-name> --prefix "C:/Program Files/neoactivemq-cpp"
@@ -108,12 +195,16 @@ This installs:
 
 ### 3.1 Unit Tests
 
-The test executables are built automatically when using a preset with `-test` in the name (e.g., `x86-windows-debug-test`).
+Test executables are built automatically when using a preset with `-test` in the name. Test builds use Clang on Linux/macOS and clang-cl on Windows for consistent diagnostics across platforms.
 
 To run unit tests via CTest:
 
 ```bash
-ctest --preset x86-windows-debug-test -L unit
+# Linux (GCC)
+ctest --preset x64-linux-gcc-debug-test -L unit
+
+# Windows (MSVC)
+ctest --preset x64-windows-cl-debug-test -L unit
 ```
 
 ### 3.2 Integration Tests
@@ -166,18 +257,18 @@ docker compose --profile ssl down
 ```
 
 **SSL Test Coverage:**
-- ✅ All acknowledgment modes (client, individual, optimized)
-- ✅ Advisory messages
-- ✅ Async sending and callbacks
-- ✅ Message selectors and groups
-- ✅ Durable subscriptions
-- ✅ Transactions (local and XA)
-- ✅ Redelivery policies and session recovery
-- ✅ Temporary destinations
-- ✅ Message compression and priority
-- ✅ Queue browsing and virtual topics
-- ✅ Slow consumers and expiration
-- ✅ Enhanced connection features
+- All acknowledgment modes (client, individual, optimized)
+- Advisory messages
+- Async sending and callbacks
+- Message selectors and groups
+- Durable subscriptions
+- Transactions (local and XA)
+- Redelivery policies and session recovery
+- Temporary destinations
+- Message compression and priority
+- Queue browsing and virtual topics
+- Slow consumers and expiration
+- Enhanced connection features
 
 ### 3.4 Integration Benchmark Tests
 
@@ -242,7 +333,7 @@ The following CMake options can be configured:
 To customize a preset, pass options during configuration:
 
 ```bash
-cmake --preset x86-windows-debug-test -DBUILD_EXAMPLES=OFF
+cmake --preset x64-windows-cl-debug-test -DBUILD_EXAMPLES=OFF
 ```
 
 ## 6. Project Structure
@@ -260,44 +351,58 @@ activemq-cpp/src/test-integration/      Integration tests
 activemq-cpp/src/test-integration-benchmarks/  Failover & high-volume benchmark tests
 activemq-cpp/src/examples/             Example applications
 cmake/                                 CMake configuration files
+  presets/                             Platform-specific preset files
 docker/ssl/                            SSL certificate generation and broker config
 output/build/                          Build output directory (created by CMake)
 ```
 
-## 7. Notes for Windows Users
+## 7. Compiler Strategy
+
+This project supports multiple compilers. CI uses Clang/clang-cl for test builds (similar to the Chromium project), but all compilers can be used locally:
+
+| Platform | Standard Builds | Test Builds (local) | Test Builds (CI) |
+|----------|----------------|---------------------|------------------|
+| Windows | MSVC (`cl.exe`) | MSVC (`cl.exe`) | clang-cl |
+| Linux | GCC | GCC | Clang |
+| macOS | Clang | Clang | Clang |
+
+CI uses Clang/clang-cl to benefit from better diagnostics, improved sanitizer support, and consistent cross-platform behavior.
+
+## 8. Notes for Windows Users
 
 - Visual Studio 2019 or later is required for C++17 support
-- No need to manually install dependencies -- vcpkg handles everything
+- No need to manually install dependencies — vcpkg handles everything
 - The Platform SDK is included with Visual Studio 2019+
+- clang-cl is included with Visual Studio 2019+ (LLVM toolset component)
 - When linking applications:
   - **Static library** (default): No special considerations
   - **Shared library**: Ensure runtime library matches (MD vs MT flags)
 
-## 8. Notes for Linux/macOS Users
+## 9. Notes for Linux/macOS Users
 
-- GCC 7+ or Clang 5+ required for C++17 support
+- Clang 14+ recommended for test builds; GCC 7+ supported for standard builds
 - vcpkg automatically downloads and builds all dependencies
-- No need for manual `apt-get` or `yum` package installations
+- No need for manual `apt-get` or `yum` package installations for library dependencies
 - For system-wide installation, use `sudo` with `cmake --install`
 
-## 9. Troubleshooting
+## 10. Troubleshooting
 
-### 9.1 CMake Configuration Fails
+### 10.1 CMake Configuration Fails
 
 If CMake can't find the compiler:
 - Ensure Visual Studio is installed (Windows)
 - Ensure GCC/Clang is in PATH (Linux/macOS)
 - Try running from Visual Studio Developer Command Prompt (Windows)
 
-### 9.2 Build Fails
+### 10.2 Build Fails
 
 If build fails with missing dependencies:
 - Delete `output/build/<preset-name>` and reconfigure
 - vcpkg will re-download dependencies
 
-### 9.3 Preset Not Found
+### 10.3 Preset Not Found
 
 If preset is not recognized:
 - Ensure you're in the project root directory
 - Check `CMakePresets.json` exists
-- Update CMake to version 3.15 or later
+- Update CMake to version 3.27 or later (3.31+ on Windows)

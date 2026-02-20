@@ -827,7 +827,7 @@ void FailoverTransport::close() {
             transportToStop->close();
         }
 
-        this->impl->taskRunner->shutdown(TimeUnit::MINUTES.toMillis(5));
+        this->impl->taskRunner->shutdown(TimeUnit::SECONDS.toMillis(30));
     }
     AMQ_CATCH_RETHROW(IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
@@ -1075,7 +1075,12 @@ bool FailoverTransport::iterate() {
         << ", connectFailures=" << this->impl->connectFailures
         << ", closed=" << this->impl->closed);
 
-    synchronized(&this->impl->reconnectMutex) {
+    {
+        // Use an explicit Lock instead of the synchronized macro so we can temporarily
+        // release reconnectMutex during the reconnect delay sleep.  This lets close()
+        // acquire the mutex, set closed=true, and interrupt the sleep via
+        // sleepMutex.notifyAll() without waiting up to 30 seconds for the sleep to expire.
+        Lock reconnectLock(&this->impl->reconnectMutex);
 
         if (this->impl->isClosedOrFailed()) {
             this->impl->reconnectMutex.notifyAll();
@@ -1172,17 +1177,55 @@ bool FailoverTransport::iterate() {
                     }
                 }
 
-                // Sleep for the reconnectDelay if there's no backup and we aren't trying
-                // for the first time, or we were disposed for some reason.
+                // Capture the reconnect delay before releasing reconnectMutex.
+                // The actual sleep happens OUTSIDE reconnectMutex (below) so that close()
+                // can acquire the mutex, set closed=true, and interrupt the sleep via
+                // sleepMutex.notifyAll().  Previously the sleep held reconnectMutex,
+                // which blocked close() for the full reconnectDelay (up to 30 seconds).
+                long long sleepDelay = 0;
                 if (transport == NULL && !this->impl->firstConnection &&
                     (this->impl->reconnectDelay > 0) && !this->impl->closed) {
-                    synchronized (&this->impl->sleepMutex) {
+                    sleepDelay = this->impl->reconnectDelay;
+                }
+
+                // Release reconnectMutex before sleeping so close() can acquire it and:
+                //   1. Set closed=true immediately
+                //   2. Signal sleepMutex to wake us up early
+                reconnectLock.unlock();
+
+                // Sleep OUTSIDE reconnectMutex - close() can now interrupt us via
+                // sleepMutex.notifyAll() without waiting for us to finish sleeping.
+                if (sleepDelay > 0) {
+                    synchronized(&this->impl->sleepMutex) {
                         try {
-                            this->impl->sleepMutex.wait(this->impl->reconnectDelay);
+                            this->impl->sleepMutex.wait(sleepDelay);
                         } catch (InterruptedException& e) {
                             Thread::currentThread()->interrupt();
                         }
                     }
+                }
+
+                // Re-acquire reconnectMutex after sleep to proceed with reconnection.
+                reconnectLock.lock();
+
+                // Re-check state: close()/handleTransportFailure() may have run while we slept.
+                if (this->impl->isClosedOrFailed()) {
+                    this->impl->reconnectMutex.notifyAll();
+                    if (transport != NULL) {
+                        this->impl->closeTask->add(transport);
+                        this->impl->taskRunner->wakeup();
+                        transport.reset(NULL);
+                    }
+                    return false;
+                }
+
+                if (this->impl->isConnectionStateValid()) {
+                    if (transport != NULL) {
+                        this->impl->closeTask->add(transport);
+                        this->impl->taskRunner->wakeup();
+                        transport.reset(NULL);
+                    }
+                    return false;
                 }
 
                 while ((transport != NULL || !connectList->isEmpty()) && this->impl->connectedTransport == NULL && !this->impl->closed) {

@@ -1,0 +1,552 @@
+name: CI Linux Clang
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
+  workflow_dispatch:
+
+jobs:
+  # Linux build job (builds and uploads artifacts for test jobs)
+  linux-build-test:
+    name: Linux Clang Build (Test)
+    runs-on: ubuntu-latest
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x64-linux-clang-debug-test, build_type: Debug, ssl: true }
+          - { preset: x64-linux-clang-release-test, build_type: Release, ssl: true }
+          - { preset: x64-linux-clang-debug-no-ssl-test, build_type: Debug, ssl: false }
+          - { preset: x64-linux-clang-release-no-ssl-test, build_type: Release, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build clang
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.config.preset }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.config.preset }} -j $(nproc)
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Install
+      run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }}
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v6
+      with:
+        name: linux-build-${{ matrix.config.preset }}
+        path: |
+          output/build/${{ matrix.config.preset }}/bin/
+          output/build/${{ matrix.config.preset }}/lib/
+        retention-days: 1
+
+  # Linux unit test jobs (run in parallel after build)
+  linux-unit-test:
+    name: Linux Clang Unit Test (${{ matrix.config.preset }})
+    runs-on: ubuntu-latest
+    needs: linux-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x64-linux-clang-debug-test, build_type: Debug, ssl: true }
+          - { preset: x64-linux-clang-release-test, build_type: Release, ssl: true }
+          - { preset: x64-linux-clang-debug-no-ssl-test, build_type: Debug, ssl: false }
+          - { preset: x64-linux-clang-release-no-ssl-test, build_type: Release, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build clang
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: linux-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Make test executables runnable
+      run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
+
+    - name: Run unit tests
+      run: |
+        ctest --preset ${{ matrix.config.preset }} \
+          -L unit -j $(nproc) --output-on-failure --timeout 300
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-${{ matrix.config.preset }}-unit-${{ strategy.job-index }}
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # Linux benchmark jobs (run in parallel after build)
+  linux-benchmark:
+    name: Linux Clang Benchmark
+    runs-on: ubuntu-latest
+    needs: linux-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x64-linux-clang-debug-test, build_type: Debug, ssl: true }
+          - { preset: x64-linux-clang-release-test, build_type: Release, ssl: true }
+          - { preset: x64-linux-clang-debug-no-ssl-test, build_type: Debug, ssl: false }
+          - { preset: x64-linux-clang-release-no-ssl-test, build_type: Release, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build clang
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: linux-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Make test executables runnable
+      run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
+
+    - name: Run benchmarks
+      run: ctest --preset ${{ matrix.config.preset }} -L ^benchmark$ --output-on-failure --timeout 600
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-${{ matrix.config.preset }}-benchmark
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # Linux integration tests - run with multiple ActiveMQ versions
+  linux-integration-test:
+    name: Linux Integration Test
+    runs-on: ubuntu-latest
+    needs: linux-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Use no-SSL release build for non-SSL integration tests
+        config:
+          - { preset: x64-linux-clang-release-no-ssl-test, build_type: Release }
+        # Test with multiple ActiveMQ versions
+        activemq:
+          - { name: "AMQ-5.18", image: "apache/activemq-classic:5.18.7" }
+          - { name: "AMQ-6.2", image: "apache/activemq-classic:6.2.0" }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build clang
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: linux-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Make test executables runnable
+      run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
+
+    - name: Start ActiveMQ (${{ matrix.activemq.name }})
+      run: |
+        echo "Starting ActiveMQ using image: ${{ matrix.activemq.image }}"
+        ACTIVEMQ_IMAGE=${{ matrix.activemq.image }} docker compose up -d
+        echo "Waiting for ActiveMQ to be ready..."
+        timeout 60 bash -c 'until docker compose ps | grep -q "healthy"; do sleep 2; done' || true
+        sleep 10
+
+    - name: Show broker status
+      run: docker compose ps
+
+    - name: Run OpenWire integration tests (${{ matrix.activemq.name }})
+      run: ctest --preset ${{ matrix.config.preset }} -L ^integration-openwire$ --output-on-failure --timeout 900
+
+    - name: Run STOMP integration tests (${{ matrix.activemq.name }})
+      run: ctest --preset ${{ matrix.config.preset }} -L ^integration-stomp$ --output-on-failure --timeout 900
+
+    - name: Show broker logs on failure
+      if: failure()
+      run: |
+        echo "=== ActiveMQ logs ==="
+        docker compose logs --tail 100 || true
+
+    - name: Stop ActiveMQ
+      if: always()
+      run: docker compose down
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-integration-${{ matrix.activemq.name }}
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # Linux SSL integration tests - run with SSL-enabled broker
+  linux-ssl-integration-test:
+    name: Linux SSL Integration Test
+    runs-on: ubuntu-latest
+    needs: linux-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Only test with SSL-enabled presets (release build)
+        config:
+          - { preset: x64-linux-clang-release-test, build_type: Release }
+        # Test with ActiveMQ versions that support SSL
+        activemq:
+          - { name: "AMQ-5.18", image: "apache/activemq-classic:5.18.7" }
+          - { name: "AMQ-6.2", image: "apache/activemq-classic:6.2.0" }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build clang
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: linux-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Make test executables runnable
+      run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
+
+    - name: Start SSL broker (${{ matrix.activemq.name }})
+      run: |
+        echo "Starting SSL-enabled ActiveMQ using image: ${{ matrix.activemq.image }}"
+        ACTIVEMQ_IMAGE=${{ matrix.activemq.image }} docker compose --profile ssl up -d
+        echo "Waiting for SSL broker to be ready..."
+        timeout 60 bash -c 'until docker compose --profile ssl ps | grep -q "healthy"; do sleep 2; done' || true
+        sleep 10
+
+    - name: Show broker status
+      run: docker compose --profile ssl ps
+
+    - name: Show broker logs (startup)
+      run: docker compose --profile ssl logs --tail 50
+
+    - name: Run OpenWire SSL integration tests (${{ matrix.activemq.name }})
+      run: ctest --preset ${{ matrix.config.preset }} -L integration-openwire-ssl --output-on-failure --timeout 900
+      env:
+        SSL_CERT_FILE: ${{ github.workspace }}/docker/ssl/certs/ca.pem
+
+    - name: Show broker logs on failure
+      if: failure()
+      run: |
+        echo "=== ActiveMQ SSL broker logs ==="
+        docker compose --profile ssl logs --tail 200 || true
+
+    - name: Stop SSL broker
+      if: always()
+      run: docker compose --profile ssl down
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-ssl-integration-${{ matrix.activemq.name }}
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # Linux integration benchmark tests - run separately with multiple ActiveMQ versions
+  # Tests failover, multi-connection, and high-volume scenarios
+  linux-integration-benchmark-test:
+    name: Linux Integration Benchmark Test
+    runs-on: ubuntu-latest
+    needs: linux-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Use release build for integration benchmark tests (one config to avoid excessive combinations)
+        config:
+          - { preset: x64-linux-clang-release-test, build_type: Release }
+        # Test with multiple ActiveMQ versions
+        activemq:
+          - { name: "AMQ-5.18", image: "apache/activemq-classic:5.18.7" }
+          - { name: "AMQ-6.2", image: "apache/activemq-classic:6.2.0" }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build clang
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: linux-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Make test executables runnable
+      run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
+
+    - name: Start all brokers (${{ matrix.activemq.name }})
+      run: |
+        echo "Starting ActiveMQ brokers using image: ${{ matrix.activemq.image }}"
+        ACTIVEMQ_IMAGE=${{ matrix.activemq.image }} docker compose --profile failover up -d
+        echo "Waiting for all brokers to be ready..."
+        sleep 30
+
+    - name: Show broker status
+      run: docker compose --profile failover ps
+
+    - name: Run integration benchmark tests (${{ matrix.activemq.name }})
+      run: ctest --preset ${{ matrix.config.preset }} -L integration-benchmark --output-on-failure --timeout 1800
+
+    - name: Show broker logs on failure
+      if: failure()
+      run: |
+        echo "=== activemq-failover-1 logs ==="
+        docker compose --profile failover logs activemq1 --tail 100 || true
+        echo "=== activemq-failover-2 logs ==="
+        docker compose --profile failover logs activemq2 --tail 100 || true
+        echo "=== activemq-multi-3 logs ==="
+        docker compose --profile failover logs activemq3 --tail 100 || true
+
+    - name: Stop all brokers
+      if: always()
+      run: docker compose --profile failover down
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-integration-benchmark-${{ matrix.activemq.name }}
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # Linux builds without tests (all variants)
+  linux-build:
+    name: Linux Build
+    runs-on: ubuntu-latest
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        preset:
+          - x64-linux-gcc-debug
+          - x64-linux-gcc-release
+          - x64-linux-gcc-debug-static
+          - x64-linux-gcc-release-static
+          - x64-linux-gcc-debug-no-ssl
+          - x64-linux-gcc-release-no-ssl
+          - x64-linux-gcc-debug-static-no-ssl
+          - x64-linux-gcc-release-static-no-ssl
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.preset }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.preset }} -j $(nproc)
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Install
+      run: cmake --install output/build/${{ matrix.preset }} --prefix output/install/${{ matrix.preset }}

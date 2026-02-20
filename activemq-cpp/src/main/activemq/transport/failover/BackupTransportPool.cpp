@@ -281,87 +281,130 @@ bool BackupTransportPool::isPending() const {
 ////////////////////////////////////////////////////////////////////////////////
 bool BackupTransportPool::iterate() {
 
+    // Fast exit if the pool is being torn down or has been disabled.
+    if (this->impl->closed || !this->isEnabled()) {
+        return false;
+    }
+
     bool needsRetry = false;
+    bool wakeupParent = false;
     LinkedList<URI> failures;
 
-    synchronized(&this->impl->backups) {
+    // Determine which URI pool to use.  Prefer broker-pushed updates when
+    // available.  URIPool is internally synchronized so no external lock is
+    // needed here.
+    Pointer<URIPool> activeUriPool = this->uriPool;
+    if (!this->updates->isEmpty()) {
+        activeUriPool = this->updates;
+    }
 
-        Pointer<URIPool> uriPool = this->uriPool;
+    while (!this->impl->closed && this->isEnabled()) {
 
-        // We prefer the Broker updated URIs list if it has any URIs.
-        if (!updates->isEmpty()) {
-            uriPool = updates;
+        URI connectTo;
+        bool foundWork = false;
+
+        // Brief critical section: check whether we still need a backup and
+        // dequeue one URI to try.  We release the lock immediately so that
+        // close()/setEnabled(false) are never blocked for the full TCP
+        // connect duration.
+        synchronized(&this->impl->backups) {
+            if (impl->shouldBuildBackup()) {
+                try {
+                    connectTo = activeUriPool->getURI();
+                    foundWork = true;
+                } catch (NoSuchElementException&) {
+                    // No URIs available right now; exit the loop.
+                }
+            }
         }
 
-        bool wakeupParent = false;
+        if (!foundWork) {
+            break;
+        }
 
-        while (impl->shouldBuildBackup()) {
+        // Attempt the TCP connection WITHOUT holding the backups lock.
+        // This is the critical change: previously the lock was held here,
+        // which blocked setEnabled(false) (called by close() while holding
+        // reconnectMutex) for the full connect-timeout duration, causing a
+        // lock-ordering stall of up to 300 s.
+        Pointer<BackupTransport> backup(new BackupTransport(this));
+        backup->setUri(connectTo);
 
-            URI connectTo;
+        try {
+            Pointer<Transport> transport = createTransport(connectTo);
+            transport->setTransportListener(backup.get());
+            transport->start();  // May block for TCP connect timeout — must NOT hold backups lock.
 
-            // Try for a URI, if one isn't free return and indicate this task
-            // is done for now, the next time a backup is requested this task
-            // will become pending again and we will attempt to fill the pool.
-            // This will break the loop once we've tried all possible UIRs.
-            try {
-                connectTo = uriPool->getURI();
-            } catch (NoSuchElementException& ex) {
-                break;
-            }
+            // Re-acquire the lock to add the backup to the pool, but first
+            // check whether a shutdown occurred while we were connecting.
+            bool closedOrDisabled = false;
+            synchronized(&this->impl->backups) {
+                if (this->impl->closed || !this->isEnabled()) {
+                    closedOrDisabled = true;
+                } else {
+                    backup->setTransport(transport);
 
-            Pointer<BackupTransport> backup(new BackupTransport(this));
-            backup->setUri(connectTo);
+                    if (priorityUriPool->contains(connectTo) ||
+                        (priorityUriPool->isEmpty() && activeUriPool->isPriority(connectTo))) {
+                        backup->setPriority(true);
 
-            try {
-                Pointer<Transport> transport = createTransport(connectTo);
+                        if (!parent->isConnectedToPriority()) {
+                            wakeupParent = true;
+                        }
+                    }
 
-                transport->setTransportListener(backup.get());
-                transport->start();
-                backup->setTransport(transport);
-
-                if (priorityUriPool->contains(connectTo) || (priorityUriPool->isEmpty() && uriPool->isPriority(connectTo))) {
-                    backup->setPriority(true);
-
-                    if (!parent->isConnectedToPriority()) {
-                        wakeupParent = true;
+                    // Put priority connections first so a reconnect picks them
+                    // up automatically.
+                    if (backup->isPriority()) {
+                        this->impl->priorityBackups++;
+                        this->impl->backups.addFirst(backup);
+                    } else {
+                        this->impl->backups.addLast(backup);
                     }
                 }
-
-                // Put any priority connections first so a reconnect picks them
-                // up automatically.
-                if (backup->isPriority()) {
-                    this->impl->priorityBackups++;
-                    this->impl->backups.addFirst(backup);
-                } else {
-                    this->impl->backups.addLast(backup);
-                }
-
-            } catch (...) {
-                // Store it in the list of URIs that didn't work, once done we
-                // return those to the pool.
-                failures.add(connectTo);
             }
 
-            // We connected to a priority backup and the parent isn't already using one
-            // so wake it up and quit the backups process for now.
-            if (wakeupParent) {
-                this->parent->reconnect(false);
+            if (closedOrDisabled) {
+                // A shutdown raced our connect.  Hand the transport to the
+                // async close task and return the URI for future retries.
+                transport->setTransportListener(NULL);
+                this->closeTask->add(transport);
+                activeUriPool->addURI(connectTo);
                 break;
             }
+
+        } catch (...) {
+            // Connection failed; collect the URI and try the next one.
+            failures.add(connectTo);
         }
 
-        // return all failures to the URI Pool, we can try again later.
-        uriPool->addURIs(failures);
+        // We connected to a priority backup and the parent is not already
+        // using one.  Break out so we can call reconnect() outside any lock
+        // (calling it inside the backups lock risks an ABBA deadlock with
+        // reconnectMutex, which close() holds while calling setEnabled()).
+        if (wakeupParent) {
+            break;
+        }
+    }
 
-        // Check if we still need more backups after this attempt
+    // Return all failed URIs to the pool (URIPool is internally synchronized).
+    activeUriPool->addURIs(failures);
+
+    // Check whether more work remains and clear the pending flag.
+    synchronized(&this->impl->backups) {
         needsRetry = impl->shouldBuildBackup();
-
         this->impl->pending = false;
+    }
+
+    // Notify the parent to reconnect to the newly-available priority backup.
+    // Called OUTSIDE any lock to avoid the ABBA deadlock with reconnectMutex.
+    if (wakeupParent && !this->impl->closed) {
+        this->parent->reconnect(false);
     }
 
     // Rate-limit retry attempts when we couldn't fill the backup pool
     // (e.g., target broker isn't available yet). Uses an interruptible
-    // wait so close() can wake us immediately.
+    // wait so close() can wake us immediately via retryMutex.notifyAll().
     if (needsRetry && !this->impl->closed) {
         synchronized(&this->impl->retryMutex) {
             if (!this->impl->closed) {

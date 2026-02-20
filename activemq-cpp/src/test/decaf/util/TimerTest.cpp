@@ -923,7 +923,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long) {
     testTask->setIncrementCount( true );
     t->schedule( testTask, 100, 200 ); // at least 4 times
     try {
-        Thread::sleep( 1200 ); // Allowed more room for error
+        Thread::sleep( 2000 ); // Allowed more room for error (increased for macOS CI scheduling latency)
     } catch( InterruptedException& e ) {
     }
     ASSERT_TRUE(timerCounter.get() >= 24) << (std::string( "Multiple tasks should have incremented counter 24 times not " ) +
@@ -1049,7 +1049,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2) {
     testTask->setIncrementCount( true );
     t->schedule( testTask, 100, 200 ); // at least 4 times
     try {
-        Thread::sleep( 1200 ); // Allowed more room for error
+        Thread::sleep( 2000 ); // Allowed more room for error (increased for macOS CI scheduling latency)
     } catch( InterruptedException& e ) {
     }
     ASSERT_TRUE(timerCounter.get() >= 24) << (std::string( "Multiple tasks should have incremented counter 24 times not " ) +

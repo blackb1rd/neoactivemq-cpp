@@ -1635,7 +1635,7 @@ namespace {
         virtual void run() {
             try {
                 lock->writeLock().lock();
-                cond->awaitNanos(ReentrantReadWriteLockTest::SHORT_DELAY_MS * 2 * 1000000);
+                cond->awaitNanos((long long)ReentrantReadWriteLockTest::LONG_DELAY_MS * 1000000LL);
                 lock->writeLock().unlock();
                 test->threadShouldThrow();
             } catch(InterruptedException& success) {

@@ -55,7 +55,7 @@ if(WIN32)
   if(AMQCPP_SHARED_LIB)
     set_target_properties(decaf PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
   endif()
-  target_link_libraries(decaf PRIVATE ws2_32)
+  target_link_libraries(decaf PRIVATE ws2_32 bcrypt)
   target_compile_definitions(decaf PRIVATE _WIN32_WINNT=0x0601)
 endif()
 

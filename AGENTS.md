@@ -42,6 +42,23 @@ ctest --preset x86-windows-cl-debug-test
 
 ## Coding Guidelines
 
+### Avoid `auto`
+
+- **DO NOT** use `auto` for variable type deduction
+- **ALWAYS** write the explicit type name
+- **REASON**: Explicit types make code easier to read, review, and reason about, especially in a multi-threaded codebase where the type of a variable directly communicates ownership and lifetime
+
+**Example:**
+```cpp
+// BAD: type is hidden
+auto localImpl = this->impl;
+auto it = tasks.begin();
+
+// GOOD: type is explicit
+std::shared_ptr<CompositeTaskRunnerImpl> localImpl = this->impl;
+LinkedList<CompositeTask*>::iterator it = tasks.begin();
+```
+
 ### Avoid Static Storage
 
 - **DO NOT** use `static` or `static thread_local` for storing state

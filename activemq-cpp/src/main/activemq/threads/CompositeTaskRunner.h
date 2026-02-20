@@ -27,6 +27,7 @@
 #include <decaf/lang/Runnable.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/lang/Pointer.h>
+#include <memory>
 
 namespace activemq {
 namespace threads {
@@ -44,7 +45,7 @@ namespace threads {
                                            public decaf::lang::Runnable {
     private:
 
-        CompositeTaskRunnerImpl* impl;
+        std::shared_ptr<CompositeTaskRunnerImpl> impl;
 
     private:
 

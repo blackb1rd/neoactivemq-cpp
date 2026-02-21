@@ -24,6 +24,7 @@
 #include <decaf/util/concurrent/CountDownLatch.h>
 
 #include <map>
+#include <memory>
 #include <string>
 
 using namespace std;
@@ -454,8 +455,8 @@ namespace {
     class Gate {
     private:
 
-        CountDownLatch* enterLatch;
-        CountDownLatch* leaveLatch;
+        std::shared_ptr<CountDownLatch> enterLatch;
+        std::shared_ptr<CountDownLatch> leaveLatch;
         Mutex mutex;
         bool closed;
 
@@ -466,12 +467,12 @@ namespace {
 
     public:
 
-        Gate() : enterLatch(NULL), leaveLatch(NULL), mutex(), closed(true) {}
+        Gate() : enterLatch(), leaveLatch(), mutex(), closed(true) {}
         virtual ~Gate() {}
 
         void open(int count) {
-            leaveLatch = new CountDownLatch(count);
-            enterLatch = new CountDownLatch(count);
+            leaveLatch = std::make_shared<CountDownLatch>(count);
+            enterLatch = std::make_shared<CountDownLatch>(count);
             mutex.lock();
             closed = false;
             mutex.notifyAll();
@@ -491,13 +492,19 @@ namespace {
         }
 
         void leave() {
-            leaveLatch->countDown();
+            // Capture a local shared_ptr before calling countDown(). This prevents a
+            // use-after-free: countDown() unparks the awaiting thread, which may call
+            // close() and reset leaveLatch before doReleaseShared() finishes. The local
+            // copy keeps the CountDownLatch (and its SynchronizerState) alive until
+            // countDown() returns.
+            std::shared_ptr<CountDownLatch> l = leaveLatch;
+            l->countDown();
         }
 
         void close() {
             leaveLatch->await();
-            delete leaveLatch;
-            delete enterLatch;
+            leaveLatch.reset();
+            enterLatch.reset();
         }
     };
 

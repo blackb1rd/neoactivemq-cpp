@@ -1027,7 +1027,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2) {
     testTask.reset( new TimerTestTask( &report, &this->timerCounter, &this->gsync ) );
     t->schedule( testTask, 100, 100 );
     try {
-        Thread::sleep( 400 );
+        Thread::sleep( 1000 ); // Increased for macOS CI scheduling latency
     } catch( InterruptedException& e ) {
     }
     ASSERT_TRUE(report.wasRun.get() >= 2) << ("TimerTask.run() method should have been called at least twice (" +

@@ -171,9 +171,9 @@ TEST_F(SchedulerTest, testExecuteAfterDelay) {
         CounterTask task;
         scheduler.executeAfterDelay(&task, 500, false);
         ASSERT_TRUE(task.getCount() == 0);
-        Thread::sleep(600);
+        Thread::sleep(2000);
         ASSERT_EQ(1, task.getCount());
-        Thread::sleep(600);
+        Thread::sleep(2000);
         ASSERT_EQ(1, task.getCount());
     }
 

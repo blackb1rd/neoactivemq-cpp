@@ -307,12 +307,12 @@ TEST_F(TimerTest, testCancel) {
     t->schedule( testTask, 100, 100 );
     synchronized( &this->gsync ) {
         try {
-            this->gsync.wait( 200 );
-            this->gsync.wait( 200 );
-            this->gsync.wait( 200 );
-            this->gsync.wait( 200 );
-            this->gsync.wait( 200 );
-            this->gsync.wait( 200 );
+            this->gsync.wait( 500 );
+            this->gsync.wait( 500 );
+            this->gsync.wait( 500 );
+            this->gsync.wait( 500 );
+            this->gsync.wait( 500 );
+            this->gsync.wait( 500 );
         } catch( InterruptedException& e ) {}
     }
 

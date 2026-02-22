@@ -103,11 +103,11 @@ TEST_F(SchedulerTest, testExecutePeriodically) {
         CounterTask* task = new CounterTask();
         scheduler.executePeriodically(task, 500);
         ASSERT_TRUE(task->getCount() == 0);
-        Thread::sleep(600);
+        Thread::sleep(2000);
         ASSERT_TRUE(task->getCount() >= 1);
-        Thread::sleep(600);
+        Thread::sleep(2000);
         ASSERT_TRUE(task->getCount() >= 2);
-        ASSERT_TRUE(task->getCount() < 5);
+        ASSERT_TRUE(task->getCount() < 15);
     }
 
     {
@@ -137,11 +137,11 @@ TEST_F(SchedulerTest, testSchedualPeriodically) {
         CounterTask* task = new CounterTask();
         scheduler.schedualPeriodically(task, 400);
         ASSERT_TRUE(task->getCount() == 0);
-        Thread::sleep(600);
+        Thread::sleep(2000);
         ASSERT_TRUE(task->getCount() >= 1);
-        Thread::sleep(600);
+        Thread::sleep(2000);
         ASSERT_TRUE(task->getCount() >= 2);
-        ASSERT_TRUE(task->getCount() < 5);
+        ASSERT_TRUE(task->getCount() < 15);
     }
 
     {

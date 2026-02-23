@@ -66,7 +66,7 @@ namespace openwire_ssl {
         cms::Connection* connection = nullptr;
         cms::Destination* destination = nullptr;
 
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL();
         }
 

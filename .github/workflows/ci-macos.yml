@@ -1,0 +1,267 @@
+name: CI macOS
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
+  workflow_dispatch:
+
+jobs:
+  # macOS build job (builds and uploads artifacts for test jobs)
+  macos-build-test:
+    name: macOS Build (Test)
+    runs-on: ${{ matrix.config.runner }}
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { runner: macos-latest, preset: arm64-osx-debug-test, arch: arm64, build_type: Debug, ssl: true }
+          - { runner: macos-latest, preset: arm64-osx-release-test, arch: arm64, build_type: Release, ssl: true }
+          - { runner: macos-latest, preset: arm64-osx-debug-no-ssl-test, arch: arm64, build_type: Debug, ssl: false }
+          - { runner: macos-latest, preset: arm64-osx-release-no-ssl-test, arch: arm64, build_type: Release, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: brew install ninja
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.config.preset }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.config.preset }} -j $(nproc 2>/dev/null || sysctl -n hw.logicalcpu)
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Install
+      run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }}
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v6
+      with:
+        name: macos-build-${{ matrix.config.preset }}
+        path: |
+          output/build/${{ matrix.config.preset }}/bin/
+          output/build/${{ matrix.config.preset }}/lib/
+        retention-days: 1
+
+  # macOS unit test jobs (run in parallel after build)
+  macos-unit-test:
+    name: macOS Unit Test (${{ matrix.config.preset }})
+    runs-on: ${{ matrix.config.runner }}
+    needs: macos-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { runner: macos-latest, preset: arm64-osx-debug-test, arch: arm64, build_type: Debug, ssl: true }
+          - { runner: macos-latest, preset: arm64-osx-release-test, arch: arm64, build_type: Release, ssl: true }
+          - { runner: macos-latest, preset: arm64-osx-debug-no-ssl-test, arch: arm64, build_type: Debug, ssl: false }
+          - { runner: macos-latest, preset: arm64-osx-release-no-ssl-test, arch: arm64, build_type: Release, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: brew install ninja
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: macos-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Make test executables runnable
+      run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
+
+    - name: Run unit tests
+      run: |
+        ctest --preset ${{ matrix.config.preset }} \
+          -L unit -j $(nproc 2>/dev/null || sysctl -n hw.logicalcpu) --output-on-failure --timeout 300
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-${{ matrix.config.preset }}-unit-${{ strategy.job-index }}
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # macOS benchmark jobs (run in parallel after build)
+  macos-benchmark:
+    name: macOS Benchmark
+    runs-on: ${{ matrix.config.runner }}
+    needs: macos-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { runner: macos-latest, preset: arm64-osx-debug-test, arch: arm64, build_type: Debug, ssl: true }
+          - { runner: macos-latest, preset: arm64-osx-release-test, arch: arm64, build_type: Release, ssl: true }
+          - { runner: macos-latest, preset: arm64-osx-debug-no-ssl-test, arch: arm64, build_type: Debug, ssl: false }
+          - { runner: macos-latest, preset: arm64-osx-release-no-ssl-test, arch: arm64, build_type: Release, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: brew install ninja
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: macos-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Make test executables runnable
+      run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
+
+    - name: Run benchmarks
+      run: ctest --preset ${{ matrix.config.preset }} -L ^benchmark$ --output-on-failure --timeout 600
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-${{ matrix.config.preset }}-benchmark
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # macOS builds without tests (all variants)
+  macos-build:
+    name: macOS Build
+    runs-on: ${{ matrix.config.runner }}
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          # Apple Silicon arm64 builds
+          - { runner: macos-latest, preset: arm64-osx-debug, arch: arm64 }
+          - { runner: macos-latest, preset: arm64-osx-release, arch: arm64 }
+          - { runner: macos-latest, preset: arm64-osx-debug-static, arch: arm64 }
+          - { runner: macos-latest, preset: arm64-osx-release-static, arch: arm64 }
+          - { runner: macos-latest, preset: arm64-osx-debug-no-ssl, arch: arm64 }
+          - { runner: macos-latest, preset: arm64-osx-release-no-ssl, arch: arm64 }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: brew install ninja
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
+
+    - name: Create vcpkg binary cache directory
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.config.preset }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.config.preset }} -j $(nproc 2>/dev/null || sysctl -n hw.logicalcpu)
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Install
+      run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }}

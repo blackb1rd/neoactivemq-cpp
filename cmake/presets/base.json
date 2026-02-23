@@ -66,6 +66,14 @@
       }
     },
     {
+      "name": "arm64",
+      "hidden": true,
+      "architecture": {
+        "strategy": "external",
+        "value": "arm64"
+      }
+    },
+    {
       "name": "debug",
       "hidden": true,
       "cacheVariables": {
@@ -91,6 +99,15 @@
       "hidden": true,
       "cacheVariables": {
         "AMQCPP_USE_SSL": false
+      }
+    },
+    {
+      "name": "asan",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "-fsanitize=address -fno-omit-frame-pointer",
+        "CMAKE_C_FLAGS": "-fsanitize=address -fno-omit-frame-pointer",
+        "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address"
       }
     }
   ]

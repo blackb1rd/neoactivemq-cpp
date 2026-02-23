@@ -47,7 +47,7 @@ namespace openwire {
      */
     class OpenwireMessageSelectorTest : public CMSTestFixture {
     public:
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
     };

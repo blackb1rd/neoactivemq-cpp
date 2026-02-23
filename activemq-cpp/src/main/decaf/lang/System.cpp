@@ -50,6 +50,8 @@
 #endif
 #ifdef HAVE_SYS_SYSCTL_H
 #include <sys/sysctl.h>
+#elif defined(__APPLE__)
+#include <sys/sysctl.h>
 #endif
 #ifdef HAVE_STRING_H
 #include <string.h>

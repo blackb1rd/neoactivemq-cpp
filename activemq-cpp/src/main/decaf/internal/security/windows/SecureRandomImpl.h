@@ -26,13 +26,10 @@ namespace decaf {
 namespace internal {
 namespace security {
 
-    class SRNGData;
-
     /**
-     * Secure Random Number Generator for Windows based platforms that attempts to obtain
-     * secure bytes with high entropy from known sources.  If the platform does not have
-     * a source of secure bytes then the platform random number generator is used if one
-     * exists otherwise the Decaf RNG is used as a last resort.
+     * Secure Random Number Generator for Windows based platforms that uses
+     * BCryptGenRandom to obtain cryptographically secure random bytes from the
+     * OS-preferred algorithm provider.
      *
      * @since 1.0
      */
@@ -41,10 +38,6 @@ namespace security {
 
         SecureRandomImpl( const SecureRandomImpl& );
         SecureRandomImpl& operator= ( const SecureRandomImpl& );
-
-    private:
-
-        SRNGData* config;
 
     public:
 

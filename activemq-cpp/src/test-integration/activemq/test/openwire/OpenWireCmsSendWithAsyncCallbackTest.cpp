@@ -23,7 +23,7 @@ namespace test {
 namespace openwire {
     class OpenWireCmsSendWithAsyncCallbackTest : public CmsSendWithAsyncCallbackTest {
     public:
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
     };

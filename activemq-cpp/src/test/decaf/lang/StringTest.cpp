@@ -978,7 +978,7 @@ TEST_F(StringTest, testOperatorLessCString) {
     ASSERT_TRUE(upper < lower) << ("Failed comparison");
     ASSERT_TRUE(!(upper < "HELLOWORLD")) << ("Failed comparison");
 
-    ASSERT_THROW((upper < NULL), NullPointerException) << ("Should have thrown a NullPointerException");
+    ASSERT_THROW((void)(upper < NULL), NullPointerException) << ("Should have thrown a NullPointerException");
 
     // test lhs as std::string
     ASSERT_TRUE("aaab" < String("aaac")) << ("Failed comparison");
@@ -1018,7 +1018,7 @@ TEST_F(StringTest, testOperatorGreaterCString) {
     ASSERT_TRUE(lower > upper) << ("Failed comparison");
     ASSERT_TRUE(!(lower > "helloworld")) << ("Failed comparison");
 
-    ASSERT_THROW((lower < NULL), NullPointerException) << ("Should have thrown a NullPointerException");
+    ASSERT_THROW((void)(lower < NULL), NullPointerException) << ("Should have thrown a NullPointerException");
 
     // test lhs as C string
     ASSERT_TRUE("aaac" > String("aaab")) << ("Failed comparison");

@@ -24,7 +24,7 @@ namespace stomp{
 public:
         StompExpirationTest();
         virtual ~StompExpirationTest();
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getStompURL();
         }
     };

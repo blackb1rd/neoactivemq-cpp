@@ -25,7 +25,7 @@ namespace openwire {
     public:
         void SetUp() override {}
         void TearDown() override {}
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL() +
                 "?connection.nonBlockingRedelivery=true";
         }

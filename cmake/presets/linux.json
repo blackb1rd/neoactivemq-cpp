@@ -30,6 +30,26 @@
       }
     },
     {
+      "name": "linux-clang",
+      "inherits": [
+        "base"
+      ],
+      "hidden": true,
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "environment": {
+        "VCPKG_FORCE_SYSTEM_BINARIES": "1"
+      }
+    },
+    {
       "name": "vcpkg-x64-linux",
       "hidden": true,
       "environment": {
@@ -37,7 +57,7 @@
       }
     },
     {
-      "name": "x64-linux-debug",
+      "name": "x64-linux-gcc-debug",
       "inherits": [
         "x64",
         "linux",
@@ -46,7 +66,7 @@
       ]
     },
     {
-      "name": "x64-linux-debug-test",
+      "name": "x64-linux-gcc-debug-test",
       "inherits": [
         "x64",
         "linux",
@@ -56,7 +76,7 @@
       ]
     },
     {
-      "name": "x64-linux-release",
+      "name": "x64-linux-gcc-release",
       "inherits": [
         "x64",
         "linux",
@@ -65,7 +85,7 @@
       ]
     },
     {
-      "name": "x64-linux-release-test",
+      "name": "x64-linux-gcc-release-test",
       "inherits": [
         "x64",
         "linux",
@@ -75,7 +95,7 @@
       ]
     },
     {
-      "name": "x64-linux-debug-static",
+      "name": "x64-linux-gcc-debug-static",
       "inherits": [
         "x64",
         "linux",
@@ -85,7 +105,7 @@
       ]
     },
     {
-      "name": "x64-linux-release-static",
+      "name": "x64-linux-gcc-release-static",
       "inherits": [
         "x64",
         "linux",
@@ -95,7 +115,7 @@
       ]
     },
     {
-      "name": "x64-linux-debug-no-ssl",
+      "name": "x64-linux-gcc-debug-no-ssl",
       "inherits": [
         "x64",
         "linux",
@@ -105,7 +125,7 @@
       ]
     },
     {
-      "name": "x64-linux-release-no-ssl",
+      "name": "x64-linux-gcc-release-no-ssl",
       "inherits": [
         "x64",
         "linux",
@@ -115,7 +135,7 @@
       ]
     },
     {
-      "name": "x64-linux-debug-static-no-ssl",
+      "name": "x64-linux-gcc-debug-static-no-ssl",
       "inherits": [
         "x64",
         "linux",
@@ -126,7 +146,7 @@
       ]
     },
     {
-      "name": "x64-linux-release-static-no-ssl",
+      "name": "x64-linux-gcc-release-static-no-ssl",
       "inherits": [
         "x64",
         "linux",
@@ -137,7 +157,7 @@
       ]
     },
     {
-      "name": "x64-linux-debug-no-ssl-test",
+      "name": "x64-linux-gcc-debug-no-ssl-test",
       "inherits": [
         "x64",
         "linux",
@@ -148,10 +168,70 @@
       ]
     },
     {
-      "name": "x64-linux-release-no-ssl-test",
+      "name": "x64-linux-gcc-release-no-ssl-test",
       "inherits": [
         "x64",
         "linux",
+        "test-no-ssl",
+        "vcpkg-x64-linux",
+        "release",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "x64-linux-clang-debug",
+      "inherits": [
+        "x64",
+        "linux-clang",
+        "vcpkg-x64-linux",
+        "debug"
+      ]
+    },
+    {
+      "name": "x64-linux-clang-debug-test",
+      "inherits": [
+        "x64",
+        "linux-clang",
+        "test",
+        "vcpkg-x64-linux",
+        "debug"
+      ]
+    },
+    {
+      "name": "x64-linux-clang-release",
+      "inherits": [
+        "x64",
+        "linux-clang",
+        "vcpkg-x64-linux",
+        "release"
+      ]
+    },
+    {
+      "name": "x64-linux-clang-release-test",
+      "inherits": [
+        "x64",
+        "linux-clang",
+        "test",
+        "vcpkg-x64-linux",
+        "release"
+      ]
+    },
+    {
+      "name": "x64-linux-clang-debug-no-ssl-test",
+      "inherits": [
+        "x64",
+        "linux-clang",
+        "test-no-ssl",
+        "vcpkg-x64-linux",
+        "debug",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "x64-linux-clang-release-no-ssl-test",
+      "inherits": [
+        "x64",
+        "linux-clang",
         "test-no-ssl",
         "vcpkg-x64-linux",
         "release",
@@ -161,52 +241,76 @@
   ],
   "buildPresets": [
     {
-      "name": "x64-linux-debug",
-      "configurePreset": "x64-linux-debug"
+      "name": "x64-linux-gcc-debug",
+      "configurePreset": "x64-linux-gcc-debug"
     },
     {
-      "name": "x64-linux-debug-test",
-      "configurePreset": "x64-linux-debug-test"
+      "name": "x64-linux-gcc-debug-test",
+      "configurePreset": "x64-linux-gcc-debug-test"
     },
     {
-      "name": "x64-linux-release",
-      "configurePreset": "x64-linux-release"
+      "name": "x64-linux-gcc-release",
+      "configurePreset": "x64-linux-gcc-release"
     },
     {
-      "name": "x64-linux-release-test",
-      "configurePreset": "x64-linux-release-test"
+      "name": "x64-linux-gcc-release-test",
+      "configurePreset": "x64-linux-gcc-release-test"
     },
     {
-      "name": "x64-linux-debug-static",
-      "configurePreset": "x64-linux-debug-static"
+      "name": "x64-linux-gcc-debug-static",
+      "configurePreset": "x64-linux-gcc-debug-static"
     },
     {
-      "name": "x64-linux-release-static",
-      "configurePreset": "x64-linux-release-static"
+      "name": "x64-linux-gcc-release-static",
+      "configurePreset": "x64-linux-gcc-release-static"
     },
     {
-      "name": "x64-linux-debug-no-ssl",
-      "configurePreset": "x64-linux-debug-no-ssl"
+      "name": "x64-linux-gcc-debug-no-ssl",
+      "configurePreset": "x64-linux-gcc-debug-no-ssl"
     },
     {
-      "name": "x64-linux-release-no-ssl",
-      "configurePreset": "x64-linux-release-no-ssl"
+      "name": "x64-linux-gcc-release-no-ssl",
+      "configurePreset": "x64-linux-gcc-release-no-ssl"
     },
     {
-      "name": "x64-linux-debug-static-no-ssl",
-      "configurePreset": "x64-linux-debug-static-no-ssl"
+      "name": "x64-linux-gcc-debug-static-no-ssl",
+      "configurePreset": "x64-linux-gcc-debug-static-no-ssl"
     },
     {
-      "name": "x64-linux-release-static-no-ssl",
-      "configurePreset": "x64-linux-release-static-no-ssl"
+      "name": "x64-linux-gcc-release-static-no-ssl",
+      "configurePreset": "x64-linux-gcc-release-static-no-ssl"
     },
     {
-      "name": "x64-linux-debug-no-ssl-test",
-      "configurePreset": "x64-linux-debug-no-ssl-test"
+      "name": "x64-linux-gcc-debug-no-ssl-test",
+      "configurePreset": "x64-linux-gcc-debug-no-ssl-test"
     },
     {
-      "name": "x64-linux-release-no-ssl-test",
-      "configurePreset": "x64-linux-release-no-ssl-test"
+      "name": "x64-linux-gcc-release-no-ssl-test",
+      "configurePreset": "x64-linux-gcc-release-no-ssl-test"
+    },
+    {
+      "name": "x64-linux-clang-debug",
+      "configurePreset": "x64-linux-clang-debug"
+    },
+    {
+      "name": "x64-linux-clang-debug-test",
+      "configurePreset": "x64-linux-clang-debug-test"
+    },
+    {
+      "name": "x64-linux-clang-release",
+      "configurePreset": "x64-linux-clang-release"
+    },
+    {
+      "name": "x64-linux-clang-release-test",
+      "configurePreset": "x64-linux-clang-release-test"
+    },
+    {
+      "name": "x64-linux-clang-debug-no-ssl-test",
+      "configurePreset": "x64-linux-clang-debug-no-ssl-test"
+    },
+    {
+      "name": "x64-linux-clang-release-no-ssl-test",
+      "configurePreset": "x64-linux-clang-release-no-ssl-test"
     }
   ],
   "testPresets": [
@@ -221,24 +325,44 @@
       }
     },
     {
-      "name": "x64-linux-debug-test",
+      "name": "x64-linux-gcc-debug-test",
       "inherits": "linux-test",
-      "configurePreset": "x64-linux-debug-test"
+      "configurePreset": "x64-linux-gcc-debug-test"
     },
     {
-      "name": "x64-linux-release-test",
+      "name": "x64-linux-gcc-release-test",
       "inherits": "linux-test",
-      "configurePreset": "x64-linux-release-test"
+      "configurePreset": "x64-linux-gcc-release-test"
     },
     {
-      "name": "x64-linux-debug-no-ssl-test",
+      "name": "x64-linux-gcc-debug-no-ssl-test",
       "inherits": "linux-test",
-      "configurePreset": "x64-linux-debug-no-ssl-test"
+      "configurePreset": "x64-linux-gcc-debug-no-ssl-test"
     },
     {
-      "name": "x64-linux-release-no-ssl-test",
+      "name": "x64-linux-gcc-release-no-ssl-test",
       "inherits": "linux-test",
-      "configurePreset": "x64-linux-release-no-ssl-test"
+      "configurePreset": "x64-linux-gcc-release-no-ssl-test"
+    },
+    {
+      "name": "x64-linux-clang-debug-test",
+      "inherits": "linux-test",
+      "configurePreset": "x64-linux-clang-debug-test"
+    },
+    {
+      "name": "x64-linux-clang-release-test",
+      "inherits": "linux-test",
+      "configurePreset": "x64-linux-clang-release-test"
+    },
+    {
+      "name": "x64-linux-clang-debug-no-ssl-test",
+      "inherits": "linux-test",
+      "configurePreset": "x64-linux-clang-debug-no-ssl-test"
+    },
+    {
+      "name": "x64-linux-clang-release-no-ssl-test",
+      "inherits": "linux-test",
+      "configurePreset": "x64-linux-clang-release-no-ssl-test"
     }
   ],
   "packagePresets": [
@@ -252,15 +376,15 @@
       ]
     },
     {
-      "name": "x64-linux-debug",
-      "configurePreset": "x64-linux-debug",
+      "name": "x64-linux-gcc-debug",
+      "configurePreset": "x64-linux-gcc-debug",
       "inherits": [
         "linux-common"
       ]
     },
     {
-      "name": "x64-linux-release",
-      "configurePreset": "x64-linux-release",
+      "name": "x64-linux-gcc-release",
+      "configurePreset": "x64-linux-gcc-release",
       "inherits": [
         "linux-common"
       ]
@@ -268,96 +392,96 @@
   ],
   "workflowPresets": [
     {
-      "name": "x64-linux-debug",
+      "name": "x64-linux-gcc-debug",
       "steps": [
         {
           "type": "configure",
-          "name": "x64-linux-debug"
+          "name": "x64-linux-gcc-debug"
         },
         {
           "type": "build",
-          "name": "x64-linux-debug"
+          "name": "x64-linux-gcc-debug"
         }
       ]
     },
     {
-      "name": "x64-linux-debug-test",
+      "name": "x64-linux-gcc-debug-test",
       "steps": [
         {
           "type": "configure",
-          "name": "x64-linux-debug-test"
+          "name": "x64-linux-gcc-debug-test"
         },
         {
           "type": "build",
-          "name": "x64-linux-debug-test"
+          "name": "x64-linux-gcc-debug-test"
         },
         {
           "type": "test",
-          "name": "x64-linux-debug-test"
+          "name": "x64-linux-gcc-debug-test"
         }
       ]
     },
     {
-      "name": "x64-linux-release",
+      "name": "x64-linux-gcc-release",
       "steps": [
         {
           "type": "configure",
-          "name": "x64-linux-release"
+          "name": "x64-linux-gcc-release"
         },
         {
           "type": "build",
-          "name": "x64-linux-release"
+          "name": "x64-linux-gcc-release"
         }
       ]
     },
     {
-      "name": "x64-linux-release-test",
+      "name": "x64-linux-gcc-release-test",
       "steps": [
         {
           "type": "configure",
-          "name": "x64-linux-release-test"
+          "name": "x64-linux-gcc-release-test"
         },
         {
           "type": "build",
-          "name": "x64-linux-release-test"
+          "name": "x64-linux-gcc-release-test"
         },
         {
           "type": "test",
-          "name": "x64-linux-release-test"
+          "name": "x64-linux-gcc-release-test"
         }
       ]
     },
     {
-      "name": "x64-linux-debug-no-ssl-test",
+      "name": "x64-linux-gcc-debug-no-ssl-test",
       "steps": [
         {
           "type": "configure",
-          "name": "x64-linux-debug-no-ssl-test"
+          "name": "x64-linux-gcc-debug-no-ssl-test"
         },
         {
           "type": "build",
-          "name": "x64-linux-debug-no-ssl-test"
+          "name": "x64-linux-gcc-debug-no-ssl-test"
         },
         {
           "type": "test",
-          "name": "x64-linux-debug-no-ssl-test"
+          "name": "x64-linux-gcc-debug-no-ssl-test"
         }
       ]
     },
     {
-      "name": "x64-linux-release-no-ssl-test",
+      "name": "x64-linux-gcc-release-no-ssl-test",
       "steps": [
         {
           "type": "configure",
-          "name": "x64-linux-release-no-ssl-test"
+          "name": "x64-linux-gcc-release-no-ssl-test"
         },
         {
           "type": "build",
-          "name": "x64-linux-release-no-ssl-test"
+          "name": "x64-linux-gcc-release-no-ssl-test"
         },
         {
           "type": "test",
-          "name": "x64-linux-release-no-ssl-test"
+          "name": "x64-linux-gcc-release-no-ssl-test"
         }
       ]
     }

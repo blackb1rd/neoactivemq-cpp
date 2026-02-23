@@ -21,6 +21,7 @@
 #include <activemq/util/Config.h>
 #include <activemq/util/AMQLog.h>
 #include <activemq/library/ActiveMQCPP.h>
+#include <decaf/internal/util/concurrent/Threading.h>
 #include <iostream>
 #include <string>
 #include <memory>
@@ -99,6 +100,7 @@ int main( int argc, char **argv ) {
     sigaction(SIGFPE,  &sa, nullptr);
     sigaction(SIGBUS,  &sa, nullptr);
     sigaction(SIGILL,  &sa, nullptr);
+    sigaction(SIGTRAP, &sa, nullptr);  // ARM64 macOS: BRK instruction (e.g. abstract class dtor)
 #endif
     // Enable record-only mode: skip formatting overhead, only record to flight recorder
     // Logs will be formatted and printed only on failure/timeout (lazy formatting)
@@ -182,6 +184,11 @@ int main( int argc, char **argv ) {
 
         std::thread testThread([&]() {
             testResult.store( RUN_ALL_TESTS() );
+            // Detach this std::thread from the Decaf threading library before it exits.
+            // Calling Mutex::wait() during tests causes Threading::attachToCurrentThread()
+            // to register this thread in library->osThreads. Without this call,
+            // Threading::shutdown() would crash trying to clean up the stale proxy Thread.
+            decaf::internal::util::concurrent::Threading::releaseCurrentThreadHandle();
             {
                 std::lock_guard<std::mutex> lock(mtx);
                 completed.store(true);

@@ -158,6 +158,9 @@ namespace inactivity {
                 IOException ex(__FILE__, __LINE__,
                     (std::string("Channel was inactive for too long: ") + remote).c_str());
                 this->parent->onException(ex);
+                // onException() may destroy 'this' via the transport teardown chain.
+                // compareAndSet already cleared 'failed' to false, so return false directly.
+                return false;
             }
 
             return this->failed.get();
@@ -197,6 +200,9 @@ namespace inactivity {
                     this->parent->oneway(info);
                 } catch (IOException& e) {
                     this->parent->onException(e);
+                    // onException() may destroy 'this' via the transport teardown chain.
+                    // compareAndSet already cleared 'write' to false, so return false directly.
+                    return false;
                 }
             }
 

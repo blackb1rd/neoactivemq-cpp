@@ -22,7 +22,7 @@ namespace test{
 namespace openwire{
     class OpenwireSimpleTest : public SimpleTest {
     public:
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
     };

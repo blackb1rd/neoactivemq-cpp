@@ -1,0 +1,632 @@
+{
+  "version": 7,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 27,
+    "patch": 0
+  },
+  "include": [
+    "base.json"
+  ],
+  "configurePresets": [
+    {
+      "name": "macos",
+      "inherits": [
+        "base"
+      ],
+      "hidden": true,
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "vcpkg-x64-osx",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_OSX_ARCHITECTURES": "x86_64"
+      },
+      "environment": {
+        "VCPKG_DEFAULT_TRIPLET": "x64-osx"
+      }
+    },
+    {
+      "name": "vcpkg-arm64-osx",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_OSX_ARCHITECTURES": "arm64"
+      },
+      "environment": {
+        "VCPKG_DEFAULT_TRIPLET": "arm64-osx"
+      }
+    },
+    {
+      "name": "x64-osx-debug",
+      "inherits": [
+        "x64",
+        "macos",
+        "vcpkg-x64-osx",
+        "debug"
+      ]
+    },
+    {
+      "name": "x64-osx-debug-test",
+      "inherits": [
+        "x64",
+        "macos",
+        "test",
+        "vcpkg-x64-osx",
+        "debug"
+      ]
+    },
+    {
+      "name": "x64-osx-release",
+      "inherits": [
+        "x64",
+        "macos",
+        "vcpkg-x64-osx",
+        "release"
+      ]
+    },
+    {
+      "name": "x64-osx-release-test",
+      "inherits": [
+        "x64",
+        "macos",
+        "test",
+        "vcpkg-x64-osx",
+        "release"
+      ]
+    },
+    {
+      "name": "x64-osx-debug-static",
+      "inherits": [
+        "x64",
+        "macos",
+        "vcpkg-x64-osx",
+        "debug",
+        "static"
+      ]
+    },
+    {
+      "name": "x64-osx-release-static",
+      "inherits": [
+        "x64",
+        "macos",
+        "vcpkg-x64-osx",
+        "release",
+        "static"
+      ]
+    },
+    {
+      "name": "x64-osx-debug-no-ssl",
+      "inherits": [
+        "x64",
+        "macos",
+        "vcpkg-x64-osx",
+        "debug",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "x64-osx-release-no-ssl",
+      "inherits": [
+        "x64",
+        "macos",
+        "vcpkg-x64-osx",
+        "release",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "x64-osx-debug-no-ssl-test",
+      "inherits": [
+        "x64",
+        "macos",
+        "test-no-ssl",
+        "vcpkg-x64-osx",
+        "debug",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "x64-osx-release-no-ssl-test",
+      "inherits": [
+        "x64",
+        "macos",
+        "test-no-ssl",
+        "vcpkg-x64-osx",
+        "release",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "arm64-osx-debug",
+      "inherits": [
+        "arm64",
+        "macos",
+        "vcpkg-arm64-osx",
+        "debug"
+      ]
+    },
+    {
+      "name": "arm64-osx-debug-test",
+      "inherits": [
+        "arm64",
+        "macos",
+        "test",
+        "vcpkg-arm64-osx",
+        "debug"
+      ]
+    },
+    {
+      "name": "arm64-osx-release",
+      "inherits": [
+        "arm64",
+        "macos",
+        "vcpkg-arm64-osx",
+        "release"
+      ]
+    },
+    {
+      "name": "arm64-osx-release-test",
+      "inherits": [
+        "arm64",
+        "macos",
+        "test",
+        "vcpkg-arm64-osx",
+        "release"
+      ]
+    },
+    {
+      "name": "arm64-osx-debug-static",
+      "inherits": [
+        "arm64",
+        "macos",
+        "vcpkg-arm64-osx",
+        "debug",
+        "static"
+      ]
+    },
+    {
+      "name": "arm64-osx-release-static",
+      "inherits": [
+        "arm64",
+        "macos",
+        "vcpkg-arm64-osx",
+        "release",
+        "static"
+      ]
+    },
+    {
+      "name": "arm64-osx-debug-no-ssl",
+      "inherits": [
+        "arm64",
+        "macos",
+        "vcpkg-arm64-osx",
+        "debug",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "arm64-osx-release-no-ssl",
+      "inherits": [
+        "arm64",
+        "macos",
+        "vcpkg-arm64-osx",
+        "release",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "arm64-osx-debug-no-ssl-test",
+      "inherits": [
+        "arm64",
+        "macos",
+        "test-no-ssl",
+        "vcpkg-arm64-osx",
+        "debug",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "arm64-osx-release-no-ssl-test",
+      "inherits": [
+        "arm64",
+        "macos",
+        "test-no-ssl",
+        "vcpkg-arm64-osx",
+        "release",
+        "no-ssl"
+      ]
+    },
+    {
+      "name": "arm64-osx-asan-test",
+      "inherits": [
+        "arm64",
+        "macos",
+        "test",
+        "vcpkg-arm64-osx",
+        "debug",
+        "asan"
+      ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "x64-osx-debug",
+      "configurePreset": "x64-osx-debug"
+    },
+    {
+      "name": "x64-osx-debug-test",
+      "configurePreset": "x64-osx-debug-test"
+    },
+    {
+      "name": "x64-osx-release",
+      "configurePreset": "x64-osx-release"
+    },
+    {
+      "name": "x64-osx-release-test",
+      "configurePreset": "x64-osx-release-test"
+    },
+    {
+      "name": "x64-osx-debug-static",
+      "configurePreset": "x64-osx-debug-static"
+    },
+    {
+      "name": "x64-osx-release-static",
+      "configurePreset": "x64-osx-release-static"
+    },
+    {
+      "name": "x64-osx-debug-no-ssl",
+      "configurePreset": "x64-osx-debug-no-ssl"
+    },
+    {
+      "name": "x64-osx-release-no-ssl",
+      "configurePreset": "x64-osx-release-no-ssl"
+    },
+    {
+      "name": "x64-osx-debug-no-ssl-test",
+      "configurePreset": "x64-osx-debug-no-ssl-test"
+    },
+    {
+      "name": "x64-osx-release-no-ssl-test",
+      "configurePreset": "x64-osx-release-no-ssl-test"
+    },
+    {
+      "name": "arm64-osx-debug",
+      "configurePreset": "arm64-osx-debug"
+    },
+    {
+      "name": "arm64-osx-debug-test",
+      "configurePreset": "arm64-osx-debug-test"
+    },
+    {
+      "name": "arm64-osx-release",
+      "configurePreset": "arm64-osx-release"
+    },
+    {
+      "name": "arm64-osx-release-test",
+      "configurePreset": "arm64-osx-release-test"
+    },
+    {
+      "name": "arm64-osx-debug-static",
+      "configurePreset": "arm64-osx-debug-static"
+    },
+    {
+      "name": "arm64-osx-release-static",
+      "configurePreset": "arm64-osx-release-static"
+    },
+    {
+      "name": "arm64-osx-debug-no-ssl",
+      "configurePreset": "arm64-osx-debug-no-ssl"
+    },
+    {
+      "name": "arm64-osx-release-no-ssl",
+      "configurePreset": "arm64-osx-release-no-ssl"
+    },
+    {
+      "name": "arm64-osx-debug-no-ssl-test",
+      "configurePreset": "arm64-osx-debug-no-ssl-test"
+    },
+    {
+      "name": "arm64-osx-release-no-ssl-test",
+      "configurePreset": "arm64-osx-release-no-ssl-test"
+    },
+    {
+      "name": "arm64-osx-asan-test",
+      "configurePreset": "arm64-osx-asan-test"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "macos-test",
+      "hidden": true,
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "timeout": 300
+      }
+    },
+    {
+      "name": "x64-osx-debug-test",
+      "inherits": "macos-test",
+      "configurePreset": "x64-osx-debug-test"
+    },
+    {
+      "name": "x64-osx-release-test",
+      "inherits": "macos-test",
+      "configurePreset": "x64-osx-release-test"
+    },
+    {
+      "name": "x64-osx-debug-no-ssl-test",
+      "inherits": "macos-test",
+      "configurePreset": "x64-osx-debug-no-ssl-test"
+    },
+    {
+      "name": "x64-osx-release-no-ssl-test",
+      "inherits": "macos-test",
+      "configurePreset": "x64-osx-release-no-ssl-test"
+    },
+    {
+      "name": "arm64-osx-debug-test",
+      "inherits": "macos-test",
+      "configurePreset": "arm64-osx-debug-test"
+    },
+    {
+      "name": "arm64-osx-release-test",
+      "inherits": "macos-test",
+      "configurePreset": "arm64-osx-release-test"
+    },
+    {
+      "name": "arm64-osx-debug-no-ssl-test",
+      "inherits": "macos-test",
+      "configurePreset": "arm64-osx-debug-no-ssl-test"
+    },
+    {
+      "name": "arm64-osx-release-no-ssl-test",
+      "inherits": "macos-test",
+      "configurePreset": "arm64-osx-release-no-ssl-test"
+    },
+    {
+      "name": "arm64-osx-asan-test",
+      "inherits": "macos-test",
+      "configurePreset": "arm64-osx-asan-test"
+    }
+  ],
+  "packagePresets": [
+    {
+      "name": "macos-common",
+      "hidden": true,
+      "generators": [
+        "TGZ",
+        "ZIP"
+      ]
+    },
+    {
+      "name": "x64-osx-debug",
+      "configurePreset": "x64-osx-debug",
+      "inherits": [
+        "macos-common"
+      ]
+    },
+    {
+      "name": "x64-osx-release",
+      "configurePreset": "x64-osx-release",
+      "inherits": [
+        "macos-common"
+      ]
+    },
+    {
+      "name": "arm64-osx-debug",
+      "configurePreset": "arm64-osx-debug",
+      "inherits": [
+        "macos-common"
+      ]
+    },
+    {
+      "name": "arm64-osx-release",
+      "configurePreset": "arm64-osx-release",
+      "inherits": [
+        "macos-common"
+      ]
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "x64-osx-debug",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "x64-osx-debug"
+        },
+        {
+          "type": "build",
+          "name": "x64-osx-debug"
+        }
+      ]
+    },
+    {
+      "name": "x64-osx-debug-test",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "x64-osx-debug-test"
+        },
+        {
+          "type": "build",
+          "name": "x64-osx-debug-test"
+        },
+        {
+          "type": "test",
+          "name": "x64-osx-debug-test"
+        }
+      ]
+    },
+    {
+      "name": "x64-osx-release",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "x64-osx-release"
+        },
+        {
+          "type": "build",
+          "name": "x64-osx-release"
+        }
+      ]
+    },
+    {
+      "name": "x64-osx-release-test",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "x64-osx-release-test"
+        },
+        {
+          "type": "build",
+          "name": "x64-osx-release-test"
+        },
+        {
+          "type": "test",
+          "name": "x64-osx-release-test"
+        }
+      ]
+    },
+    {
+      "name": "x64-osx-debug-no-ssl-test",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "x64-osx-debug-no-ssl-test"
+        },
+        {
+          "type": "build",
+          "name": "x64-osx-debug-no-ssl-test"
+        },
+        {
+          "type": "test",
+          "name": "x64-osx-debug-no-ssl-test"
+        }
+      ]
+    },
+    {
+      "name": "x64-osx-release-no-ssl-test",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "x64-osx-release-no-ssl-test"
+        },
+        {
+          "type": "build",
+          "name": "x64-osx-release-no-ssl-test"
+        },
+        {
+          "type": "test",
+          "name": "x64-osx-release-no-ssl-test"
+        }
+      ]
+    },
+    {
+      "name": "arm64-osx-debug",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "arm64-osx-debug"
+        },
+        {
+          "type": "build",
+          "name": "arm64-osx-debug"
+        }
+      ]
+    },
+    {
+      "name": "arm64-osx-debug-test",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "arm64-osx-debug-test"
+        },
+        {
+          "type": "build",
+          "name": "arm64-osx-debug-test"
+        },
+        {
+          "type": "test",
+          "name": "arm64-osx-debug-test"
+        }
+      ]
+    },
+    {
+      "name": "arm64-osx-release",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "arm64-osx-release"
+        },
+        {
+          "type": "build",
+          "name": "arm64-osx-release"
+        }
+      ]
+    },
+    {
+      "name": "arm64-osx-release-test",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "arm64-osx-release-test"
+        },
+        {
+          "type": "build",
+          "name": "arm64-osx-release-test"
+        },
+        {
+          "type": "test",
+          "name": "arm64-osx-release-test"
+        }
+      ]
+    },
+    {
+      "name": "arm64-osx-debug-no-ssl-test",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "arm64-osx-debug-no-ssl-test"
+        },
+        {
+          "type": "build",
+          "name": "arm64-osx-debug-no-ssl-test"
+        },
+        {
+          "type": "test",
+          "name": "arm64-osx-debug-no-ssl-test"
+        }
+      ]
+    },
+    {
+      "name": "arm64-osx-release-no-ssl-test",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "arm64-osx-release-no-ssl-test"
+        },
+        {
+          "type": "build",
+          "name": "arm64-osx-release-no-ssl-test"
+        },
+        {
+          "type": "test",
+          "name": "arm64-osx-release-no-ssl-test"
+        }
+      ]
+    }
+  ]
+}

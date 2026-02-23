@@ -7,15 +7,15 @@ This project uses **CMake with presets**. Always use CMake presets for configura
 ### Configure
 
 ```powershell
-# Configure with a preset (e.g., x86-windows-debug-test)
-cmake --preset x86-windows-debug-test
+# Configure with a preset (e.g., x86-windows-cl-debug-test)
+cmake --preset x86-windows-cl-debug-test
 ```
 
 ### Build
 
 ```powershell
 # Build using the configured preset
-cmake --build --preset x86-windows-debug-test
+cmake --build --preset x86-windows-cl-debug-test
 ```
 
 ### Available Presets
@@ -29,7 +29,7 @@ cmake --list-presets
 
 ```powershell
 # Run all unit tests via CTest after building
-ctest --preset x86-windows-debug-test
+ctest --preset x86-windows-cl-debug-test
 ```
 
 ## Important Notes
@@ -41,6 +41,23 @@ ctest --preset x86-windows-debug-test
 - The build output is in `output/build/<preset-name>/`
 
 ## Coding Guidelines
+
+### Avoid `auto`
+
+- **DO NOT** use `auto` for variable type deduction
+- **ALWAYS** write the explicit type name
+- **REASON**: Explicit types make code easier to read, review, and reason about, especially in a multi-threaded codebase where the type of a variable directly communicates ownership and lifetime
+
+**Example:**
+```cpp
+// BAD: type is hidden
+auto localImpl = this->impl;
+auto it = tasks.begin();
+
+// GOOD: type is explicit
+std::shared_ptr<CompositeTaskRunnerImpl> localImpl = this->impl;
+LinkedList<CompositeTask*>::iterator it = tasks.begin();
+```
 
 ### Avoid Static Storage
 

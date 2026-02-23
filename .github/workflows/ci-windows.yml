@@ -1,0 +1,504 @@
+name: CI Windows
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
+  workflow_dispatch:
+
+jobs:
+  # Windows Clang-CL build job (builds and uploads artifacts for test jobs)
+  windows-build-test:
+    name: Windows Clang-CL Build (Test)
+    runs-on: windows-latest
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x64-windows-clang-debug-test, build_type: Debug, arch: amd64, ssl: true }
+          - { preset: x64-windows-clang-release-test, build_type: Release, arch: amd64, ssl: true }
+          - { preset: x64-windows-clang-debug-no-ssl-test, build_type: Debug, arch: amd64, ssl: false }
+          - { preset: x64-windows-clang-release-no-ssl-test, build_type: Release, arch: amd64, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install Ninja
+      run: choco install ninja -y
+
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
+
+    - name: Setup MSVC Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.config.arch }}
+
+    - name: Set VCPKG_ROOT environment variable
+      shell: bash
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      shell: bash
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.config.preset }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Install
+      run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v6
+      with:
+        name: windows-build-${{ matrix.config.preset }}
+        path: |
+          output/build/${{ matrix.config.preset }}/bin/
+          output/build/${{ matrix.config.preset }}/lib/
+        retention-days: 1
+
+  # Windows Clang-CL unit test jobs (run in parallel after build, no Docker on Windows CI)
+  windows-unit-test:
+    name: Windows Clang-CL Unit Test (${{ matrix.config.preset }})
+    runs-on: windows-latest
+    needs: windows-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x64-windows-clang-debug-test, build_type: Debug, arch: amd64, ssl: true }
+          - { preset: x64-windows-clang-release-test, build_type: Release, arch: amd64, ssl: true }
+          - { preset: x64-windows-clang-debug-no-ssl-test, build_type: Debug, arch: amd64, ssl: false }
+          - { preset: x64-windows-clang-release-no-ssl-test, build_type: Release, arch: amd64, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install Ninja
+      run: choco install ninja -y
+
+    - name: Setup MSVC Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.config.arch }}
+
+    - name: Set VCPKG_ROOT environment variable
+      shell: bash
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      shell: bash
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: windows-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Run unit tests
+      run: |
+        ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -L unit -j $env:NUMBER_OF_PROCESSORS --output-on-failure --timeout 300
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-${{ matrix.config.preset }}-unit-${{ strategy.job-index }}
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # Windows Clang-CL benchmark jobs (run in parallel after build)
+  windows-benchmark:
+    name: Windows Benchmark
+    runs-on: windows-latest
+    needs: windows-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x64-windows-clang-debug-test, build_type: Debug, arch: amd64, ssl: true }
+          - { preset: x64-windows-clang-release-test, build_type: Release, arch: amd64, ssl: true }
+          - { preset: x64-windows-clang-debug-no-ssl-test, build_type: Debug, arch: amd64, ssl: false }
+          - { preset: x64-windows-clang-release-no-ssl-test, build_type: Release, arch: amd64, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install Ninja
+      run: choco install ninja -y
+
+    - name: Setup MSVC Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.config.arch }}
+
+    - name: Set VCPKG_ROOT environment variable
+      shell: bash
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      shell: bash
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: windows-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Run benchmarks
+      run: ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -L ^benchmark$ --output-on-failure --timeout 600
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-${{ matrix.config.preset }}-benchmark
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # Windows builds without tests (all variants)
+  windows-build:
+    name: Windows Build
+    runs-on: windows-latest
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          # x86 builds (shared with SSL only)
+          - { preset: x86-windows-cl-debug, build_type: Debug, arch: x86 }
+          - { preset: x86-windows-cl-release, build_type: Release, arch: x86 }
+          # x64 builds (all variants)
+          - { preset: x64-windows-cl-debug, build_type: Debug, arch: x64 }
+          - { preset: x64-windows-cl-release, build_type: Release, arch: x64 }
+          - { preset: x64-windows-cl-debug-static, build_type: Debug, arch: x64 }
+          - { preset: x64-windows-cl-release-static, build_type: Release, arch: x64 }
+          - { preset: x64-windows-cl-debug-no-ssl, build_type: Debug, arch: x64 }
+          - { preset: x64-windows-cl-release-no-ssl, build_type: Release, arch: x64 }
+          - { preset: x64-windows-cl-debug-static-no-ssl, build_type: Debug, arch: x64 }
+          - { preset: x64-windows-cl-release-static-no-ssl, build_type: Release, arch: x64 }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install Ninja
+      run: choco install ninja -y
+
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
+
+    - name: Setup MSVC Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.config.arch }}
+
+    - name: Set VCPKG_ROOT environment variable
+      shell: bash
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      shell: bash
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.config.preset }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Install
+      run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}
+
+  # Windows CL build job (builds and uploads artifacts for test jobs)
+  windows-cl-build-test:
+    name: Windows CL Build (Test)
+    runs-on: windows-latest
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,readwrite"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x86-windows-cl-debug-test, build_type: Debug, arch: x86, ssl: true }
+          - { preset: x86-windows-cl-release-test, build_type: Release, arch: x86, ssl: true }
+          - { preset: x64-windows-cl-debug-test, build_type: Debug, arch: x64, ssl: true }
+          - { preset: x64-windows-cl-release-test, build_type: Release, arch: x64, ssl: true }
+          - { preset: x64-windows-cl-debug-no-ssl-test, build_type: Debug, arch: x64, ssl: false }
+          - { preset: x64-windows-cl-release-no-ssl-test, build_type: Release, arch: x64, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install Ninja
+      run: choco install ninja -y
+
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
+
+    - name: Setup MSVC Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.config.arch }}
+
+    - name: Set VCPKG_ROOT environment variable
+      shell: bash
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      shell: bash
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.config.preset }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+
+    - name: Install
+      run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }} --config ${{ matrix.config.build_type }}
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v6
+      with:
+        name: windows-build-${{ matrix.config.preset }}
+        path: |
+          output/build/${{ matrix.config.preset }}/bin/
+          output/build/${{ matrix.config.preset }}/lib/
+        retention-days: 1
+
+  # Windows CL unit test jobs (run in parallel after build)
+  windows-cl-unit-test:
+    name: Windows CL Unit Test (${{ matrix.config.preset }})
+    runs-on: windows-latest
+    needs: windows-cl-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x86-windows-cl-debug-test, build_type: Debug, arch: x86, ssl: true }
+          - { preset: x86-windows-cl-release-test, build_type: Release, arch: x86, ssl: true }
+          - { preset: x64-windows-cl-debug-test, build_type: Debug, arch: x64, ssl: true }
+          - { preset: x64-windows-cl-release-test, build_type: Release, arch: x64, ssl: true }
+          - { preset: x64-windows-cl-debug-no-ssl-test, build_type: Debug, arch: x64, ssl: false }
+          - { preset: x64-windows-cl-release-no-ssl-test, build_type: Release, arch: x64, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install Ninja
+      run: choco install ninja -y
+
+    - name: Setup MSVC Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.config.arch }}
+
+    - name: Set VCPKG_ROOT environment variable
+      shell: bash
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      shell: bash
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: windows-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Run unit tests
+      run: |
+        ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -L unit -j $env:NUMBER_OF_PROCESSORS --output-on-failure --timeout 300
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-${{ matrix.config.preset }}-unit-${{ strategy.job-index }}
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # Windows CL benchmark jobs (run in parallel after build)
+  windows-cl-benchmark:
+    name: Windows CL Benchmark
+    runs-on: windows-latest
+    needs: windows-cl-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x86-windows-cl-debug-test, build_type: Debug, arch: x86, ssl: true }
+          - { preset: x86-windows-cl-release-test, build_type: Release, arch: x86, ssl: true }
+          - { preset: x64-windows-cl-debug-test, build_type: Debug, arch: x64, ssl: true }
+          - { preset: x64-windows-cl-release-test, build_type: Release, arch: x64, ssl: true }
+          - { preset: x64-windows-cl-debug-no-ssl-test, build_type: Debug, arch: x64, ssl: false }
+          - { preset: x64-windows-cl-release-no-ssl-test, build_type: Release, arch: x64, ssl: false }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install Ninja
+      run: choco install ninja -y
+
+    - name: Setup MSVC Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.config.arch }}
+
+    - name: Set VCPKG_ROOT environment variable
+      shell: bash
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg binary cache directory
+      shell: bash
+      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: ${{ github.workspace }}/.cache/vcpkg/archives
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        name: windows-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Run benchmarks
+      run: ctest --preset ${{ matrix.config.preset }} -C ${{ matrix.config.build_type }} -L ^benchmark$ --output-on-failure --timeout 600
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v6
+      with:
+        name: test-results-${{ matrix.config.preset }}-benchmark
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log

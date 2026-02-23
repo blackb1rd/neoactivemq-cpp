@@ -26,7 +26,7 @@ namespace test {
 namespace openwire {
     class OpenwireAsyncSenderTest : public AsyncSenderTest {
 public:
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL() +
                    "&connection.useAsyncSend=true";
         }

@@ -36,6 +36,8 @@ using namespace decaf::io;
     class ResponseCorrelatorTest : public ::testing::Test {
     };
 
+namespace {
+
 ////////////////////////////////////////////////////////////////////////////////
 
     class MyCommand : public commands::BaseCommand {
@@ -176,19 +178,17 @@ using namespace decaf::io;
                             Pointer<Command> cmd = requests.front();
                             requests.pop();
 
-                            // Only send a response if one is required.
-                            Pointer<Response> resp;
-                            if (cmd->isResponseRequired()) {
-                                resp = createResponse(cmd);
-                            }
-
                             mutex.unlock();
 
                             // Send both the response and the original
                             // command back to the correlator.
                             if (listener != NULL) {
-                                if (resp != NULL) {
-                                    listener->onCommand(resp);
+                                // Only send a response if one is required.
+                                // Avoid constructing a null Pointer<Response> to prevent
+                                // unnecessary AtomicInteger heap allocation/deallocation
+                                // racing with the test thread on macOS.
+                                if (cmd->isResponseRequired()) {
+                                    listener->onCommand(createResponse(cmd));
                                 }
                                 listener->onCommand(cmd);
                             }
@@ -322,6 +322,7 @@ using namespace decaf::io;
         }
     };
 
+} // anonymous namespace
 
 TEST_F(ResponseCorrelatorTest, testBasics) {
 
@@ -535,7 +536,8 @@ TEST_F(ResponseCorrelatorTest, testNarrow){
     Pointer<MyTransport> transport(new MyTransport());
     ResponseCorrelator correlator(transport);
 
-    Transport* narrowed = correlator.narrow(typeid( *transport ));
+    MyTransport& transportRef = *transport;
+    Transport* narrowed = correlator.narrow(typeid( transportRef ));
     ASSERT_TRUE(narrowed == transport);
 
     narrowed = correlator.narrow(typeid(std::string()));

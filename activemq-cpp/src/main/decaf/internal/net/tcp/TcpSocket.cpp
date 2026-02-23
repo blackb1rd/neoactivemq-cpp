@@ -994,41 +994,41 @@ int TcpSocket::read(unsigned char* buffer, int size, int offset, int length) {
         asio::error_code ec;
         std::size_t bytesRead = 0;
 
+        // Use shared_ptr for synchronization state to prevent use-after-free if lambda executes
+        // after the waiting thread has returned (e.g., on timeout or cancellation).
+        struct ReadState {
+            std::mutex mutex;
+            std::condition_variable cv;
+            bool complete;
+            asio::error_code error;
+            std::size_t bytes;
+            ReadState() : complete(false), bytes(0) {}
+        };
+        auto state = std::make_shared<ReadState>();
+
+        this->impl->socket->async_read_some(
+            asio::buffer(buffer + offset, length),
+            [state](const asio::error_code& error, std::size_t bytes) {
+                AMQ_LOG_DEBUG("TcpSocket", "async_read_some callback: error=" << error.message() << " bytes=" << bytes);
+                {
+                    std::lock_guard<std::mutex> lock(state->mutex);
+                    state->error = error;
+                    state->bytes = bytes;
+                    state->complete = true;
+                }
+                state->cv.notify_one();
+            }
+        );
+
         if (this->impl->soTimeout > 0) {
             AMQ_LOG_DEBUG("TcpSocket", "read() async with timeout=" << this->impl->soTimeout << " length=" << length);
-            // Async read with timeout
-            // Use shared_ptr for synchronization state to prevent use-after-free if lambda executes after timeout
-            struct ReadState {
-                std::mutex mutex;
-                std::condition_variable cv;
-                bool complete;
-                asio::error_code error;
-                std::size_t bytes;
-                ReadState() : complete(false), bytes(0) {}
-            };
-            auto state = std::make_shared<ReadState>();
-
-            this->impl->socket->async_read_some(
-                asio::buffer(buffer + offset, length),
-                [state](const asio::error_code& error, std::size_t bytes) {
-                    AMQ_LOG_DEBUG("TcpSocket", "async_read_some callback: error=" << error.message() << " bytes=" << bytes);
-                    {
-                        std::lock_guard<std::mutex> lock(state->mutex);
-                        state->error = error;
-                        state->bytes = bytes;
-                        state->complete = true;
-                    }
-                    state->cv.notify_one();
-                }
-            );
-
             // Wait with timeout
             std::unique_lock<std::mutex> lock(state->mutex);
             if (!state->cv.wait_for(lock, std::chrono::milliseconds(this->impl->soTimeout),
                                    [&state]{ return state->complete; })) {
                 AMQ_LOG_DEBUG("TcpSocket", "read() TIMEOUT after " << this->impl->soTimeout << "ms, cancelling");
-                // Timeout - cancel operation but don't wait for completion
-                // The lambda will still execute but state will be kept alive by shared_ptr
+                // Timeout - cancel operation but don't wait for completion.
+                // The lambda will still execute but state will be kept alive by shared_ptr.
                 this->impl->socket->cancel();
                 throw SocketTimeoutException(__FILE__, __LINE__, "Read timed out");
             }
@@ -1042,8 +1042,8 @@ int TcpSocket::read(unsigned char* buffer, int size, int offset, int length) {
                 throw IOException(__FILE__, __LINE__, "The connection is closed");
             }
 
-            // If operation was cancelled (e.g., due to timeout or close), we should have already thrown
-            // If we reach here with operation_aborted, it's a race condition - treat as timeout
+            // If operation was cancelled (e.g., due to timeout or close), we should have already thrown.
+            // If we reach here with operation_aborted, it's a race condition - treat as timeout.
             if (ec == asio::error::operation_aborted) {
                 if (isClosed()) {
                     throw IOException(__FILE__, __LINE__, "The connection is closed");
@@ -1051,14 +1051,27 @@ int TcpSocket::read(unsigned char* buffer, int size, int offset, int length) {
                 throw SocketTimeoutException(__FILE__, __LINE__, "Read timed out");
             }
         } else {
-            // Blocking read - read_some() blocks until SOME data is available (not necessarily all requested)
-            // This matches the behavior of APR's apr_socket_recv() in the original Apache ActiveMQ-CPP
-            bytesRead = this->impl->socket->read_some(
-                asio::buffer(buffer + offset, length), ec);
+            AMQ_LOG_DEBUG("TcpSocket", "read() async blocking (polling) length=" << length);
+            // "Blocking" read implemented via async I/O with periodic close-check polling.
+            // Synchronous read_some() cannot be safely interrupted when socket->close() is called
+            // concurrently from the transport teardown path (undefined behaviour per POSIX/ASIO
+            // threading rules on shared objects).  Using async + condition variable ensures the
+            // reader thread wakes within ~100 ms of the socket being closed.
+            std::unique_lock<std::mutex> lock(state->mutex);
+            while (!state->complete) {
+                state->cv.wait_for(lock, std::chrono::milliseconds(100));
+                if (!state->complete && isClosed()) {
+                    // socket->close() has already cancelled the pending async op.
+                    // Throw immediately - 'state' is kept alive by the lambda's shared_ptr
+                    // capture, so the eventual operation_aborted callback is safe to execute.
+                    throw IOException(__FILE__, __LINE__, "The connection is closed");
+                }
+            }
+            ec = state->error;
+            bytesRead = state->bytes;
 
-            // Warn if we got 0 bytes without EOF - this shouldn't normally happen with blocking reads
-            if (bytesRead == 0 && !ec) {
-                AMQ_LOG_DEBUG("TcpSocket", "WARNING: read_some returned 0 bytes with no error");
+            if (ec == asio::error::operation_aborted || isClosed()) {
+                throw IOException(__FILE__, __LINE__, "The connection is closed");
             }
         }
 

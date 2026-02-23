@@ -57,7 +57,7 @@ namespace openwire {
 
     class OpenwireEnhancedConnectionTest : public ::testing::Test {
     public:
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const {
             return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
         }
     };

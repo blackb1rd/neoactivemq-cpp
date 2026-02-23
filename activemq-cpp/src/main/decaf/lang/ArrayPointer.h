@@ -29,6 +29,7 @@
 #include <memory>
 #include <typeinfo>
 #include <algorithm>
+#include <type_traits>
 
 namespace decaf {
 namespace lang {
@@ -62,9 +63,15 @@ namespace lang {
             T* value;
             int length;
             decaf::util::concurrent::atomic::AtomicInteger refs;
+            void (*arrayDeleter)(T*);
 
-            ArrayData() : value(NULL), length(0), refs(1) {}
-            ArrayData(T* value, int length) : value(value), length(length), refs(1) {
+            static void defaultArrayDeleter(T* p) {
+                delete[] p;
+            }
+
+            ArrayData() : value(NULL), length(0), refs(1), arrayDeleter(&defaultArrayDeleter) {}
+            ArrayData(T* value, int length, void (*deleter)(T*) = &defaultArrayDeleter)
+                : value(value), length(length), refs(1), arrayDeleter(deleter) {
                 if( value != NULL && length <= 0 ) {
                     throw decaf::lang::exceptions::IllegalArgumentException(
                         __FILE__, __LINE__, "Non-NULL array pointer cannot have a size <= zero" );
@@ -119,6 +126,7 @@ namespace lang {
         ArrayPointer(int size) : array(NULL), onDelete(onDeleteFunc) {
 
             if (size == 0) {
+                this->array = new ArrayData();
                 return;
             }
 
@@ -146,6 +154,7 @@ namespace lang {
         ArrayPointer(int size, const T& fillWith) : array(NULL), onDelete(onDeleteFunc) {
 
             if (size == 0) {
+                this->array = new ArrayData();
                 return;
             }
 
@@ -181,6 +190,35 @@ namespace lang {
         }
 
         /**
+         * Explicit Constructor for derived-to-base array ownership transfer.
+         *
+         * Stores a type-correct deleter so delete[] uses the original allocated type U,
+         * avoiding undefined behavior when T is abstract (Apple clang 17 traps the
+         * abstract D1 destructor called by delete[] through a base pointer).
+         *
+         * @param value
+         *      Pointer to a derived-type array being transferred to this owner.
+         * @param size
+         *      The size of the array.
+         */
+        template<typename U>
+        explicit ArrayPointer(U* value, int size,
+            typename std::enable_if<
+                std::is_convertible<U*, T*>::value &&
+                !std::is_same<U, T>::value
+            >::type* = NULL)
+            : array(NULL), onDelete(onDeleteFunc) {
+
+            try {
+                this->array = new ArrayData(static_cast<T*>(value), size, &typedArrayDeleter<U>);
+            } catch (std::exception& ex) {
+                throw ex;
+            } catch (...) {
+                throw std::bad_alloc();
+            }
+        }
+
+        /**
          * Copy constructor. Copies the value contained in the ArrayPointer to the new
          * instance and increments the reference counter.
          */
@@ -207,6 +245,20 @@ namespace lang {
          */
         void reset(T* value, int size = 0) {
             ArrayPointer(value, size).swap(*this);
+        }
+
+        /**
+         * Resets the ArrayPointer to hold a new derived-type array value, storing a
+         * type-correct deleter so delete[] uses the original allocated type U.
+         */
+        template<typename U>
+        typename std::enable_if<
+            std::is_convertible<U*, T*>::value &&
+            !std::is_same<U, T>::value
+        >::type
+        reset(U* value, int size = 0) {
+            ArrayPointer temp(value, size);
+            temp.swap(*this);
         }
 
         /**
@@ -366,9 +418,17 @@ namespace lang {
 
     private:
 
+        // Type-correct deletion for derived-to-base array ownership.
+        // Casts back to the original allocated type U before calling delete[],
+        // avoiding the abstract D1 destructor trap in Apple clang 17.
+        template<typename U>
+        static void typedArrayDeleter(T* p) {
+            delete[] static_cast<U*>(p);
+        }
+
         // Internal Static deletion function.
         static void onDeleteFunc(ArrayData* value) {
-            delete [] value->value;
+            value->arrayDeleter(value->value);
             delete value;
         }
 

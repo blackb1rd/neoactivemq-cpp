@@ -25,7 +25,7 @@ namespace stomp{
 public:
         StompCmsTemplateTest();
         virtual ~StompCmsTemplateTest();
-        virtual std::string getBrokerURL() const {
+        std::string getBrokerURL() const override {
             return activemq::util::IntegrationCommon::getInstance().getStompURL();
         }
     };

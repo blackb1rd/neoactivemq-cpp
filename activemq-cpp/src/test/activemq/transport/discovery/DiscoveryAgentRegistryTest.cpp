@@ -32,61 +32,90 @@ using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class DiscoveryAgentRegistryTest : public ::testing::Test {
+class DiscoveryAgentRegistryTest : public ::testing::Test
+{
 public:
+    DiscoveryAgentRegistryTest();
+    virtual ~DiscoveryAgentRegistryTest();
 
-        DiscoveryAgentRegistryTest();
-        virtual ~DiscoveryAgentRegistryTest();
-
-        void test();
-
-    };
-
+    void test();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class MockDiscoveryAgent : public DiscoveryAgent {
-    public:
+class MockDiscoveryAgent : public DiscoveryAgent
+{
+public:
+    virtual void start()
+    {
+    }
 
-        virtual void start() {}
-        virtual void stop() {}
-        virtual void setDiscoveryListener(DiscoveryListener* listener) {}
-        virtual void registerService(const std::string& name) {}
-        virtual void serviceFailed(const activemq::commands::DiscoveryEvent& event) {}
-        virtual std::string toString() const { return "MockDiscoveryAgent"; }
-        virtual URI getDiscoveryURI() const { return URI(); }
-        virtual void setDiscoveryURI(const URI& discoveryURI) {}
-    };
+    virtual void stop()
+    {
+    }
 
-    class MockDiscoveryAgentFactory : public DiscoveryAgentFactory {
-    public:
+    virtual void setDiscoveryListener(DiscoveryListener* listener)
+    {
+    }
 
-        virtual ~MockDiscoveryAgentFactory() {}
+    virtual void registerService(const std::string& name)
+    {
+    }
 
-        virtual decaf::lang::Pointer<DiscoveryAgent> createAgent(const decaf::net::URI& agentURI) {
-            return Pointer<DiscoveryAgent>(new MockDiscoveryAgent);
-        }
+    virtual void serviceFailed(const activemq::commands::DiscoveryEvent& event)
+    {
+    }
 
-    };
+    virtual std::string toString() const
+    {
+        return "MockDiscoveryAgent";
+    }
 
+    virtual URI getDiscoveryURI() const
+    {
+        return URI();
+    }
+
+    virtual void setDiscoveryURI(const URI& discoveryURI)
+    {
+    }
+};
+
+class MockDiscoveryAgentFactory : public DiscoveryAgentFactory
+{
+public:
+    virtual ~MockDiscoveryAgentFactory()
+    {
+    }
+
+    virtual decaf::lang::Pointer<DiscoveryAgent> createAgent(
+        const decaf::net::URI& agentURI)
+    {
+        return Pointer<DiscoveryAgent>(new MockDiscoveryAgent);
+    }
+};
+
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+DiscoveryAgentRegistryTest::DiscoveryAgentRegistryTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryAgentRegistryTest::DiscoveryAgentRegistryTest() {
+DiscoveryAgentRegistryTest::~DiscoveryAgentRegistryTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryAgentRegistryTest::~DiscoveryAgentRegistryTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void DiscoveryAgentRegistryTest::test() {
-
+void DiscoveryAgentRegistryTest::test()
+{
     DiscoveryAgentRegistry& registry = DiscoveryAgentRegistry::getInstance();
     registry.registerFactory("mock", new MockDiscoveryAgentFactory);
 
-    ASSERT_EQ(1, (int) registry.getAgentNames().size());
+    ASSERT_EQ(1, (int)registry.getAgentNames().size());
 
     DiscoveryAgentFactory* factory = registry.findFactory("mock");
     ASSERT_TRUE(factory != NULL);

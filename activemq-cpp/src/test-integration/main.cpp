@@ -15,51 +15,63 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include <util/teamcity/TeamCityProgressListener.h>
-#include <util/TestWatchdog.h>
-#include <activemq/util/Config.h>
-#include <activemq/util/AMQLog.h>
 #include <activemq/library/ActiveMQCPP.h>
+#include <activemq/util/AMQLog.h>
+#include <activemq/util/Config.h>
+#include <gtest/gtest.h>
+#include <util/TestWatchdog.h>
+#include <util/teamcity/TeamCityProgressListener.h>
+
 #include <iostream>
-#include <string>
 #include <memory>
+#include <string>
 
-int main( int argc, char **argv ) {
-
+int main(int argc, char** argv)
+{
     activemq::library::ActiveMQCPP::initializeLibrary();
 
     // Initialize Flight Recorder with 0.5% of system memory for debugging
     activemq::util::AMQLogger::initializeFlightRecorder(0.005);
     // Enable DEBUG level logging globally to record entries to flight recorder
-    activemq::util::AMQLogger::setLevel(activemq::util::AMQLogLevel::DEBUG);
-    // Enable record-only mode: skip formatting overhead, only record to flight recorder
-    // Logs will be formatted and printed only on failure/timeout (lazy formatting)
+    activemq::util::AMQLogger::setLevel(activemq::util::AMQLogLevel::DBG);
+    // Enable record-only mode: skip formatting overhead, only record to flight
+    // recorder Logs will be formatted and printed only on failure/timeout (lazy
+    // formatting)
     activemq::util::AMQLogger::setRecordOnlyMode(true);
 
-    long long testTimeoutSeconds = 300; // Per-test timeout: 5 minutes default
-    bool useTeamCity = false;
+    long long testTimeoutSeconds = 300;  // Per-test timeout: 5 minutes default
+    bool      useTeamCity        = false;
 
     // Let GTest parse --gtest_* flags first
     ::testing::InitGoogleTest(&argc, argv);
 
     // Parse custom flags
-    for( int i = 1; i < argc; ++i ) {
-        const std::string arg( argv[i] );
-        if( arg == "-teamcity" ) {
+    for (int i = 1; i < argc; ++i)
+    {
+        const std::string arg(argv[i]);
+        if (arg == "-teamcity")
+        {
             useTeamCity = true;
-        } else if( arg == "-test-timeout" ) {
-            if( ( i + 1 ) >= argc ) {
-                std::cout << "-test-timeout requires a timeout value in seconds" << std::endl;
+        }
+        else if (arg == "-test-timeout")
+        {
+            if ((i + 1) >= argc)
+            {
+                std::cout << "-test-timeout requires a timeout value in seconds"
+                          << std::endl;
                 return -1;
             }
-            try {
-                testTimeoutSeconds = std::stoll( argv[++i] );
-                if( testTimeoutSeconds < 0 ) {
+            try
+            {
+                testTimeoutSeconds = std::stoll(argv[++i]);
+                if (testTimeoutSeconds < 0)
+                {
                     std::cout << "Timeout value must be positive" << std::endl;
                     return -1;
                 }
-            } catch( std::exception& ex ) {
+            }
+            catch (std::exception& ex)
+            {
                 std::cout << "Invalid timeout value specified on command line: "
                           << argv[i] << std::endl;
                 return -1;
@@ -70,38 +82,49 @@ int main( int argc, char **argv ) {
     // Configure GTest event listeners
     auto& listeners = ::testing::UnitTest::GetInstance()->listeners();
 
-    if( useTeamCity ) {
-        delete listeners.Release( listeners.default_result_printer() );
-        listeners.Append( new test::util::teamcity::TeamCityProgressListener() );
+    if (useTeamCity)
+    {
+        delete listeners.Release(listeners.default_result_printer());
+        listeners.Append(new test::util::teamcity::TeamCityProgressListener());
     }
 
     // Add watchdog listener for per-test timeout (0 = disabled)
     std::unique_ptr<test::util::TestWatchdog> watchdog;
-    if( testTimeoutSeconds > 0 ) {
-        watchdog.reset( new test::util::TestWatchdog( testTimeoutSeconds, true, "Integration test" ) );
-        listeners.Append( watchdog.get() );
+    if (testTimeoutSeconds > 0)
+    {
+        watchdog.reset(new test::util::TestWatchdog(testTimeoutSeconds,
+                                                    true,
+                                                    "Integration test"));
+        listeners.Append(watchdog.get());
     }
 
     int result;
 
-    try {
+    try
+    {
         result = RUN_ALL_TESTS();
 
         // Shutdown watchdog before checking results
-        if( watchdog ) {
+        if (watchdog)
+        {
             watchdog->shutdown();
-            listeners.Release( watchdog.get() );
+            listeners.Release(watchdog.get());
         }
 
         // If tests failed, dump flight recorder
-        if( result != 0 ) {
-            std::cerr << std::endl << "ERROR: Test execution failed" << std::endl;
+        if (result != 0)
+        {
+            std::cerr << std::endl
+                      << "ERROR: Test execution failed" << std::endl;
 
             // Dump Flight Recorder log entries for debugging
-            std::cerr << std::endl << "=== Flight Recorder Dump (last "
-                      << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+            std::cerr << std::endl
+                      << "=== Flight Recorder Dump (last "
+                      << activemq::util::AMQLogger::flightRecorderSize()
+                      << " entries) ===" << std::endl;
             activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
-            std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
+            std::cerr << "=== End Flight Recorder Dump ===" << std::endl
+                      << std::endl;
         }
 
         // Shutdown Flight Recorder
@@ -111,17 +134,21 @@ int main( int argc, char **argv ) {
 
         return result;
     }
-    catch(...) {
+    catch (...)
+    {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "- AN ERROR HAS OCCURED:                -" << std::endl;
         std::cout << "- Do you have a Broker Running?        -" << std::endl;
         std::cout << "----------------------------------------" << std::endl;
 
         // Dump Flight Recorder log entries for debugging
-        std::cerr << std::endl << "=== Flight Recorder Dump (last "
-                  << activemq::util::AMQLogger::flightRecorderSize() << " entries) ===" << std::endl;
+        std::cerr << std::endl
+                  << "=== Flight Recorder Dump (last "
+                  << activemq::util::AMQLogger::flightRecorderSize()
+                  << " entries) ===" << std::endl;
         activemq::util::AMQLogger::dumpFlightRecorder(std::cerr);
-        std::cerr << "=== End Flight Recorder Dump ===" << std::endl << std::endl;
+        std::cerr << "=== End Flight Recorder Dump ===" << std::endl
+                  << std::endl;
 
         // Shutdown Flight Recorder
         activemq::util::AMQLogger::shutdownFlightRecorder();

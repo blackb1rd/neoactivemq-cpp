@@ -21,5 +21,6 @@ using namespace activemq;
 using namespace activemq::threads;
 
 ////////////////////////////////////////////////////////////////////////////////
-CompositeTask::~CompositeTask() {}
-
+CompositeTask::~CompositeTask()
+{
+}

@@ -17,18 +17,20 @@
 #ifndef _DECAF_IO_INTERRUPTEDIOEXCEPTION_H_
 #define _DECAF_IO_INTERRUPTEDIOEXCEPTION_H_
 
-#include <decaf/lang/Exception.h>
 #include <decaf/io/IOException.h>
+#include <decaf/lang/Exception.h>
 
-namespace decaf {
-namespace io {
+namespace decaf
+{
+namespace io
+{
 
     /*
      * Signals that an I/O exception of some sort has occurred.
      */
-    class DECAF_API InterruptedIOException : public io::IOException {
+    class DECAF_API InterruptedIOException : public io::IOException
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -53,11 +55,16 @@ namespace io {
          *
          * @param file The file name where exception occurs
          * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
+         * @param cause The exception that was the cause for this one to be
+         * thrown.
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        InterruptedIOException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        InterruptedIOException(const char*           file,
+                               const int             lineNumber,
+                               const std::exception* cause,
+                               const char*           msg,
+                               ...);
 
         /**
          * Constructor
@@ -75,23 +82,27 @@ namespace io {
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        InterruptedIOException(const char* file, const int lineNumber, const char* msg, ...);
+        InterruptedIOException(const char* file,
+                               const int   lineNumber,
+                               const char* msg,
+                               ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
          * @return a new exception that is a copy of this one.
          */
-        virtual InterruptedIOException* clone() const {
+        virtual InterruptedIOException* clone() const
+        {
             return new InterruptedIOException(*this);
         }
 
         virtual ~InterruptedIOException() throw();
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /*_DECAF_IO_INTERRUPTEDIOEXCEPTION_H_*/

@@ -22,30 +22,45 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalThreadStateException::IllegalThreadStateException() : Exception() {
+IllegalThreadStateException::IllegalThreadStateException()
+    : Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalThreadStateException::~IllegalThreadStateException() throw () {
+IllegalThreadStateException::~IllegalThreadStateException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalThreadStateException::IllegalThreadStateException(const Exception& ex) : Exception() {
-    *(Exception*) this = ex;
+IllegalThreadStateException::IllegalThreadStateException(const Exception& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalThreadStateException::IllegalThreadStateException(const IllegalThreadStateException& ex) : Exception() {
-    *(Exception*) this = ex;
+IllegalThreadStateException::IllegalThreadStateException(
+    const IllegalThreadStateException& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalThreadStateException::IllegalThreadStateException(const std::exception* cause) : Exception(cause) {
+IllegalThreadStateException::IllegalThreadStateException(
+    const std::exception* cause)
+    : Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalThreadStateException::IllegalThreadStateException(const char* file, const int lineNumber, const char* msg, ...) : Exception() {
-
+IllegalThreadStateException::IllegalThreadStateException(const char* file,
+                                                         const int   lineNumber,
+                                                         const char* msg,
+                                                         ...)
+    : Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +70,14 @@ IllegalThreadStateException::IllegalThreadStateException(const char* file, const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalThreadStateException::IllegalThreadStateException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : Exception(cause) {
-
+IllegalThreadStateException::IllegalThreadStateException(
+    const char*           file,
+    const int             lineNumber,
+    const std::exception* cause,
+    const char*           msg,
+    ...)
+    : Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

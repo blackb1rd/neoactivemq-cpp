@@ -22,49 +22,59 @@
 
 #include <decaf/internal/util/Resource.h>
 
-namespace decaf {
-namespace internal {
-namespace util {
+namespace decaf
+{
+namespace internal
+{
+    namespace util
+    {
 
-    /**
-     * A Generic Resource wraps some type and will delete it when the Resource itself
-     * is deleted.
-     *
-     * @since 1.0
-     */
-    template<typename T>
-    class GenericResource: public Resource {
-    private:
+        /**
+         * A Generic Resource wraps some type and will delete it when the
+         * Resource itself is deleted.
+         *
+         * @since 1.0
+         */
+        template <typename T>
+        class GenericResource : public Resource
+        {
+        private:
+            T* managed;
 
-        T* managed;
+        private:
+            GenericResource(const GenericResource&);
+            GenericResource& operator=(const GenericResource&);
 
-    private:
-
-        GenericResource(const GenericResource&);
-        GenericResource& operator=(const GenericResource&);
-
-    public:
-
-        explicit GenericResource(T* value) : managed(value) {
-        }
-
-        virtual ~GenericResource() {
-            try {
-                delete managed;
-            } catch (...) {
+        public:
+            explicit GenericResource(T* value)
+                : managed(value)
+            {
             }
-        }
 
-        T* getManaged() const {
-            return this->managed;
-        }
+            virtual ~GenericResource()
+            {
+                try
+                {
+                    delete managed;
+                }
+                catch (...)
+                {
+                }
+            }
 
-        void setManaged(T* value) {
-            this->managed = value;
-        }
+            T* getManaged() const
+            {
+                return this->managed;
+            }
 
-    };
+            void setManaged(T* value)
+            {
+                this->managed = value;
+            }
+        };
 
-}}}
+    }  // namespace util
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_UTIL_GENERICRESOURCE_H_ */

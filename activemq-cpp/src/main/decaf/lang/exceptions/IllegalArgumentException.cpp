@@ -22,30 +22,44 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalArgumentException::IllegalArgumentException() : Exception() {
+IllegalArgumentException::IllegalArgumentException()
+    : Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalArgumentException::~IllegalArgumentException() throw () {
+IllegalArgumentException::~IllegalArgumentException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalArgumentException::IllegalArgumentException(const Exception& ex) : Exception() {
-    *(Exception*) this = ex;
+IllegalArgumentException::IllegalArgumentException(const Exception& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalArgumentException::IllegalArgumentException(const IllegalArgumentException& ex) : Exception() {
-    *(Exception*) this = ex;
+IllegalArgumentException::IllegalArgumentException(
+    const IllegalArgumentException& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalArgumentException::IllegalArgumentException(const std::exception* cause) : Exception(cause) {
+IllegalArgumentException::IllegalArgumentException(const std::exception* cause)
+    : Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalArgumentException::IllegalArgumentException(const char* file, const int lineNumber, const char* msg, ...) : Exception() {
-
+IllegalArgumentException::IllegalArgumentException(const char* file,
+                                                   const int   lineNumber,
+                                                   const char* msg,
+                                                   ...)
+    : Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +69,13 @@ IllegalArgumentException::IllegalArgumentException(const char* file, const int l
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalArgumentException::IllegalArgumentException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : Exception(cause) {
-
+IllegalArgumentException::IllegalArgumentException(const char* file,
+                                                   const int   lineNumber,
+                                                   const std::exception* cause,
+                                                   const char*           msg,
+                                                   ...)
+    : Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

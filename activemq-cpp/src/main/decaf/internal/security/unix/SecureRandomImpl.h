@@ -22,44 +22,48 @@
 
 #include <decaf/security/SecureRandomSpi.h>
 
-namespace decaf {
-namespace internal {
-namespace security {
+namespace decaf
+{
+namespace internal
+{
+    namespace security
+    {
 
-    class SRNGData;
+        class SRNGData;
 
-    /**
-     * Secure Random Number Generator for Unix based platforms that attempts to obtain
-     * secure bytes with high entropy from known sources.  If the platform does not have
-     * a source of secure bytes then the platform random number generator is used if one
-     * exists otherwise the Decaf RNG is used as a last resort.
-     *
-     * @since 1.0
-     */
-    class DECAF_API SecureRandomImpl : public decaf::security::SecureRandomSpi {
-    private:
+        /**
+         * Secure Random Number Generator for Unix based platforms that attempts
+         * to obtain secure bytes with high entropy from known sources.  If the
+         * platform does not have a source of secure bytes then the platform
+         * random number generator is used if one exists otherwise the Decaf RNG
+         * is used as a last resort.
+         *
+         * @since 1.0
+         */
+        class DECAF_API SecureRandomImpl
+            : public decaf::security::SecureRandomSpi
+        {
+        private:
+            SecureRandomImpl(const SecureRandomImpl&);
+            SecureRandomImpl& operator=(const SecureRandomImpl&);
 
-        SecureRandomImpl( const SecureRandomImpl& );
-        SecureRandomImpl& operator= ( const SecureRandomImpl& );
+        private:
+            SRNGData* config;
 
-    private:
+        public:
+            SecureRandomImpl();
 
-        SRNGData* config;
+            virtual ~SecureRandomImpl();
 
-    public:
+            virtual void providerSetSeed(const unsigned char* seed, int size);
 
-        SecureRandomImpl();
+            virtual void providerNextBytes(unsigned char* bytes, int numBytes);
 
-        virtual ~SecureRandomImpl();
+            virtual unsigned char* providerGenerateSeed(int numBytes);
+        };
 
-        virtual void providerSetSeed( const unsigned char* seed, int size );
-
-        virtual void providerNextBytes( unsigned char* bytes, int numBytes );
-
-        virtual unsigned char* providerGenerateSeed( int numBytes );
-
-    };
-
-}}}
+    }  // namespace security
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_SECURITY_SECURERANDOMIMPL_H_ */

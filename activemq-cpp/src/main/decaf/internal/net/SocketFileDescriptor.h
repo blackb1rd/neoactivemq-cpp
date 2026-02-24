@@ -18,36 +18,40 @@
 #ifndef _DECAF_INTERNAL_NET_SOCKETFILEDESCRIPTOR_H_
 #define _DECAF_INTERNAL_NET_SOCKETFILEDESCRIPTOR_H_
 
-#include <cstdint>
 #include <decaf/util/Config.h>
+#include <cstdint>
 
 #include <decaf/io/FileDescriptor.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
-
-    /**
-     * File Descriptor type used internally by Decaf Socket objects.
-     *
-     * @since 1.0
-     */
-    class DECAF_API SocketFileDescriptor : public decaf::io::FileDescriptor {
-    public:
-
-        SocketFileDescriptor( intptr_t value );
-
-        virtual ~SocketFileDescriptor();
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
 
         /**
-         * Gets the OS Level FileDescriptor
+         * File Descriptor type used internally by Decaf Socket objects.
          *
-         * @return a FileDescriptor value.
+         * @since 1.0
          */
-        intptr_t getValue() const;
+        class DECAF_API SocketFileDescriptor : public decaf::io::FileDescriptor
+        {
+        public:
+            SocketFileDescriptor(intptr_t value);
 
-    };
+            virtual ~SocketFileDescriptor();
 
-}}}
+            /**
+             * Gets the OS Level FileDescriptor
+             *
+             * @return a FileDescriptor value.
+             */
+            intptr_t getValue() const;
+        };
+
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_SOCKETFILEDESCRIPTOR_H_ */

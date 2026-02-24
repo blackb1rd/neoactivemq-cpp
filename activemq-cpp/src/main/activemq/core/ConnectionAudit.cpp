@@ -20,9 +20,9 @@
 #include <decaf/util/LinkedHashMap.h>
 #include <decaf/util/StlMap.h>
 
-#include <activemq/core/Dispatcher.h>
-#include <activemq/core/ActiveMQMessageAudit.h>
 #include <activemq/commands/ActiveMQDestination.h>
+#include <activemq/core/ActiveMQMessageAudit.h>
+#include <activemq/core/Dispatcher.h>
 
 using namespace activemq;
 using namespace activemq::core;
@@ -37,82 +37,118 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
-    class ConnectionAuditImpl {
+    class ConnectionAuditImpl
+    {
     private:
-
         ConnectionAuditImpl(const ConnectionAuditImpl&);
-        ConnectionAuditImpl& operator= (const ConnectionAuditImpl&);
+        ConnectionAuditImpl& operator=(const ConnectionAuditImpl&);
 
     public:
-
         Mutex mutex;
 
-        StlMap<Pointer<ActiveMQDestination>, Pointer<ActiveMQMessageAudit>, ActiveMQDestination::COMPARATOR> destinations;
-        LinkedHashMap<Dispatcher*, Pointer<ActiveMQMessageAudit> > dispatchers;
+        StlMap<Pointer<ActiveMQDestination>,
+               Pointer<ActiveMQMessageAudit>,
+               ActiveMQDestination::COMPARATOR>
+                                                                  destinations;
+        LinkedHashMap<Dispatcher*, Pointer<ActiveMQMessageAudit>> dispatchers;
 
-        ConnectionAuditImpl() : mutex(), destinations(), dispatchers(1000) {
+        ConnectionAuditImpl()
+            : mutex(),
+              destinations(),
+              dispatchers(1000)
+        {
         }
     };
-}}
+}  // namespace core
+}  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionAudit::ConnectionAudit() : impl(new ConnectionAuditImpl),
-                                     checkForDuplicates(true),
-                                     auditDepth(ActiveMQMessageAudit::DEFAULT_WINDOW_SIZE),
-                                     auditMaximumProducerNumber(ActiveMQMessageAudit::MAXIMUM_PRODUCER_COUNT) {
+ConnectionAudit::ConnectionAudit()
+    : impl(new ConnectionAuditImpl),
+      checkForDuplicates(true),
+      auditDepth(ActiveMQMessageAudit::DEFAULT_WINDOW_SIZE),
+      auditMaximumProducerNumber(ActiveMQMessageAudit::MAXIMUM_PRODUCER_COUNT)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionAudit::ConnectionAudit(int auditDepth, int maxProducers) :
-    impl(new ConnectionAuditImpl),
-    checkForDuplicates(true),
-    auditDepth(auditDepth),
-    auditMaximumProducerNumber(maxProducers) {
+ConnectionAudit::ConnectionAudit(int auditDepth, int maxProducers)
+    : impl(new ConnectionAuditImpl),
+      checkForDuplicates(true),
+      auditDepth(auditDepth),
+      auditMaximumProducerNumber(maxProducers)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionAudit::~ConnectionAudit() {
-    try {
+ConnectionAudit::~ConnectionAudit()
+{
+    try
+    {
         delete this->impl;
     }
     AMQ_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionAudit::removeDispatcher(Dispatcher* dispatcher) {
-    synchronized(&this->impl->mutex) {
-        try {
+void ConnectionAudit::removeDispatcher(Dispatcher* dispatcher)
+{
+    synchronized(&this->impl->mutex)
+    {
+        try
+        {
             this->impl->dispatchers.remove(dispatcher);
-        } catch (NoSuchElementException& ex) {
+        }
+        catch (NoSuchElementException& ex)
+        {
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ConnectionAudit::isDuplicate(Dispatcher* dispatcher, Pointer<commands::Message> message) {
-    synchronized(&this->impl->mutex) {
-        if (checkForDuplicates && message != NULL) {
-            Pointer<ActiveMQDestination> destination = message->getDestination();
-            if (destination != NULL) {
-                if (destination->isQueue()) {
+bool ConnectionAudit::isDuplicate(Dispatcher*                dispatcher,
+                                  Pointer<commands::Message> message)
+{
+    synchronized(&this->impl->mutex)
+    {
+        if (checkForDuplicates && message != NULL)
+        {
+            Pointer<ActiveMQDestination> destination =
+                message->getDestination();
+            if (destination != NULL)
+            {
+                if (destination->isQueue())
+                {
                     Pointer<ActiveMQMessageAudit> audit;
-                    try {
+                    try
+                    {
                         audit = this->impl->destinations.get(destination);
-                    } catch (NoSuchElementException& ex) {
-                        audit.reset(new ActiveMQMessageAudit(auditDepth, auditMaximumProducerNumber));
+                    }
+                    catch (NoSuchElementException& ex)
+                    {
+                        audit.reset(new ActiveMQMessageAudit(
+                            auditDepth,
+                            auditMaximumProducerNumber));
                         this->impl->destinations.put(destination, audit);
                     }
                     bool result = audit->isDuplicate(message->getMessageId());
                     return result;
                 }
                 Pointer<ActiveMQMessageAudit> audit;
-                try {
+                try
+                {
                     audit = this->impl->dispatchers.get(dispatcher);
-                } catch (NoSuchElementException& ex) {
-                    audit.reset(new ActiveMQMessageAudit(auditDepth, auditMaximumProducerNumber));
+                }
+                catch (NoSuchElementException& ex)
+                {
+                    audit.reset(
+                        new ActiveMQMessageAudit(auditDepth,
+                                                 auditMaximumProducerNumber));
                     this->impl->dispatchers.put(dispatcher, audit);
                 }
                 bool result = audit->isDuplicate(message->getMessageId());
@@ -124,21 +160,40 @@ bool ConnectionAudit::isDuplicate(Dispatcher* dispatcher, Pointer<commands::Mess
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionAudit::rollbackDuplicate(Dispatcher* dispatcher, Pointer<commands::Message> message) {
-    synchronized(&this->impl->mutex) {
-        if (checkForDuplicates && message != NULL) {
-            Pointer<ActiveMQDestination> destination = message->getDestination();
-            if (destination != NULL) {
-                if (destination->isQueue()) {
-                    try {
-                        Pointer<ActiveMQMessageAudit> audit = this->impl->destinations.get(destination);
+void ConnectionAudit::rollbackDuplicate(Dispatcher*                dispatcher,
+                                        Pointer<commands::Message> message)
+{
+    synchronized(&this->impl->mutex)
+    {
+        if (checkForDuplicates && message != NULL)
+        {
+            Pointer<ActiveMQDestination> destination =
+                message->getDestination();
+            if (destination != NULL)
+            {
+                if (destination->isQueue())
+                {
+                    try
+                    {
+                        Pointer<ActiveMQMessageAudit> audit =
+                            this->impl->destinations.get(destination);
                         audit->rollback(message->getMessageId());
-                    } catch (NoSuchElementException& ex) {}
-                } else {
-                    try {
-                        Pointer<ActiveMQMessageAudit> audit = this->impl->dispatchers.get(dispatcher);
+                    }
+                    catch (NoSuchElementException& ex)
+                    {
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        Pointer<ActiveMQMessageAudit> audit =
+                            this->impl->dispatchers.get(dispatcher);
                         audit->rollback(message->getMessageId());
-                    } catch (NoSuchElementException& ex) {}
+                    }
+                    catch (NoSuchElementException& ex)
+                    {
+                    }
                 }
             }
         }

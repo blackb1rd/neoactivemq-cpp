@@ -25,106 +25,115 @@
 
 #include <decaf/util/StlMap.h>
 
-namespace activemq {
-namespace library {
+namespace activemq
+{
+namespace library
+{
     class ActiveMQCPP;
-}
-namespace transport {
-namespace discovery {
+}  // namespace library
 
-    class DiscoveryAgentFactory;
+namespace transport
+{
+    namespace discovery
+    {
 
-    /**
-     * Registry of all Discovery Agent Factories that are available to the client
-     * at runtime.  New Agents must have a factory registered here before an attempt
-     * to create a DiscoveryTansport which uses that agent.
-     *
-     * @since 3.9.0
-     */
-    class AMQCPP_API DiscoveryAgentRegistry {
-    private:
-
-        decaf::util::StlMap<std::string, DiscoveryAgentFactory*> registry;
-
-    private:
-
-        DiscoveryAgentRegistry();
-        DiscoveryAgentRegistry(const DiscoveryAgentRegistry& registry);
-        DiscoveryAgentRegistry& operator=(const DiscoveryAgentRegistry& registry);
-
-    public:
-
-        virtual ~DiscoveryAgentRegistry();
+        class DiscoveryAgentFactory;
 
         /**
-         * Gets a Registered DiscoveryAgentFactory from the Registry and returns it
-         * if there is not a registered format factory with the given name an exception
-         * is thrown.
+         * Registry of all Discovery Agent Factories that are available to the
+         * client at runtime.  New Agents must have a factory registered here
+         * before an attempt to create a DiscoveryTansport which uses that
+         * agent.
          *
-         * @param name
-         *        The name of the Factory to find in the Registry.
-         *
-         * @return the Factory registered under the given name.
-         *
-         * @throws NoSuchElementException if no factory is registered with that name.
+         * @since 3.9.0
          */
-        DiscoveryAgentFactory* findFactory(const std::string& name) const;
+        class AMQCPP_API DiscoveryAgentRegistry
+        {
+        private:
+            decaf::util::StlMap<std::string, DiscoveryAgentFactory*> registry;
 
-        /**
-         * Registers a new DiscoveryAgentFactory with this Registry.  If a Factory with the
-         * given name is already registered it is overwritten with the new one.  Once a
-         * factory is added to the Registry its lifetime is controlled by the Registry, it
-         * will be deleted once the Registry has been deleted.
-         *
-         * @param name
-         *        The name of the new Factory to register.
-         * @param factory
-         *        The new Factory to add to the Registry.
-         *
-         * @throws IllegalArgumentException is name is the empty string.
-         * @throws NullPointerException if the Factory is Null.
-         */
-        void registerFactory(const std::string& name, DiscoveryAgentFactory* factory);
+        private:
+            DiscoveryAgentRegistry();
+            DiscoveryAgentRegistry(const DiscoveryAgentRegistry& registry);
+            DiscoveryAgentRegistry& operator=(
+                const DiscoveryAgentRegistry& registry);
 
-        /**
-         * Unregisters the Factory with the given name and deletes that instance of the
-         * Factory.
-         *
-         * @param name
-         *        Name of the Factory to unregister and destroy
-         */
-        void unregisterFactory(const std::string& name);
+        public:
+            virtual ~DiscoveryAgentRegistry();
 
-        /**
-         * Removes all Factories and deletes the instances of the Factory objects.
-         */
-        void unregisterAllFactories();
+            /**
+             * Gets a Registered DiscoveryAgentFactory from the Registry and
+             * returns it if there is not a registered format factory with the
+             * given name an exception is thrown.
+             *
+             * @param name
+             *        The name of the Factory to find in the Registry.
+             *
+             * @return the Factory registered under the given name.
+             *
+             * @throws NoSuchElementException if no factory is registered with
+             * that name.
+             */
+            DiscoveryAgentFactory* findFactory(const std::string& name) const;
 
-        /**
-         * Retrieves a list of the names of all the Registered Agents in this
-         * Registry.
-         *
-         * @return stl vector of strings with all the Agent names registered.
-         */
-        std::vector<std::string> getAgentNames() const;
+            /**
+             * Registers a new DiscoveryAgentFactory with this Registry.  If a
+             * Factory with the given name is already registered it is
+             * overwritten with the new one.  Once a factory is added to the
+             * Registry its lifetime is controlled by the Registry, it will be
+             * deleted once the Registry has been deleted.
+             *
+             * @param name
+             *        The name of the new Factory to register.
+             * @param factory
+             *        The new Factory to add to the Registry.
+             *
+             * @throws IllegalArgumentException is name is the empty string.
+             * @throws NullPointerException if the Factory is Null.
+             */
+            void registerFactory(const std::string&     name,
+                                 DiscoveryAgentFactory* factory);
 
-    public:
+            /**
+             * Unregisters the Factory with the given name and deletes that
+             * instance of the Factory.
+             *
+             * @param name
+             *        Name of the Factory to unregister and destroy
+             */
+            void unregisterFactory(const std::string& name);
 
-        /**
-         * Gets the single instance of the TransportRegistry
-         * @return reference to the single instance of this Registry
-         */
-        static DiscoveryAgentRegistry& getInstance();
+            /**
+             * Removes all Factories and deletes the instances of the Factory
+             * objects.
+             */
+            void unregisterAllFactories();
 
-    private:
+            /**
+             * Retrieves a list of the names of all the Registered Agents in
+             * this Registry.
+             *
+             * @return stl vector of strings with all the Agent names
+             * registered.
+             */
+            std::vector<std::string> getAgentNames() const;
 
-        static void initialize();
-        static void shutdown();
+        public:
+            /**
+             * Gets the single instance of the TransportRegistry
+             * @return reference to the single instance of this Registry
+             */
+            static DiscoveryAgentRegistry& getInstance();
 
-        friend class activemq::library::ActiveMQCPP;
+        private:
+            static void initialize();
+            static void shutdown();
 
-    };
+            friend class activemq::library::ActiveMQCPP;
+        };
 
-}}}
+    }  // namespace discovery
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_DISCOVERY_DISCOVERYAGENTREGISTRY_H_ */

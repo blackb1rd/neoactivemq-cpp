@@ -17,147 +17,154 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/StlSet.h>
-#include <decaf/util/LinkedList.h>
 #include <decaf/util/Iterator.h>
+#include <decaf/util/LinkedList.h>
+#include <decaf/util/StlSet.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 
-    class SetTest : public ::testing::Test
-    {
+class SetTest : public ::testing::Test
+{
 public:
-
-        SetTest();
-
-    };
+    SetTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-SetTest::SetTest(){
+SetTest::SetTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SetTest, testConstructor1){
-
+TEST_F(SetTest, testConstructor1)
+{
     StlSet<int> set;
 
     ASSERT_TRUE(set.size() == 0);
     ASSERT_TRUE(set.isEmpty());
 
-    set.add( 1 );
+    set.add(1);
 
     ASSERT_TRUE(set.size() == 1);
     ASSERT_TRUE(!set.isEmpty());
 
-    set.add( 1 );
+    set.add(1);
 
     ASSERT_TRUE(set.size() == 1);
     ASSERT_TRUE(!set.isEmpty());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SetTest, testConstructor2){
-
+TEST_F(SetTest, testConstructor2)
+{
     StlSet<int> set1;
 
-    for( int i = 0; i < 50; ++i ) {
-        set1.add( i );
+    for (int i = 0; i < 50; ++i)
+    {
+        set1.add(i);
     }
 
-    StlSet<int> set2( set1 );
+    StlSet<int> set2(set1);
 
     ASSERT_TRUE(set1.size() == set2.size());
 
-    for( int i = 0; i < 50; ++i ) {
-        ASSERT_TRUE(set2.contains( i ));
+    for (int i = 0; i < 50; ++i)
+    {
+        ASSERT_TRUE(set2.contains(i));
     }
 
-    ASSERT_TRUE(set2.equals( set1 ));
+    ASSERT_TRUE(set2.equals(set1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SetTest, testConstructor3){
-
+TEST_F(SetTest, testConstructor3)
+{
     LinkedList<int> collection;
 
-    for( int i = 0; i < 50; ++i ) {
-        collection.add( i );
+    for (int i = 0; i < 50; ++i)
+    {
+        collection.add(i);
     }
 
-    StlSet<int> set( collection );
+    StlSet<int> set(collection);
 
     ASSERT_TRUE(collection.size() == set.size());
 
-    for( int i = 0; i < 50; ++i ) {
-        ASSERT_TRUE(set.contains( i ));
+    for (int i = 0; i < 50; ++i)
+    {
+        ASSERT_TRUE(set.contains(i));
     }
 
-    ASSERT_TRUE(set.equals( collection ));
+    ASSERT_TRUE(set.equals(collection));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SetTest, testCopy1) {
-
+TEST_F(SetTest, testCopy1)
+{
     StlSet<int> set1;
 
-    for( int i = 0; i < 50; ++i ) {
-        set1.add( i );
+    for (int i = 0; i < 50; ++i)
+    {
+        set1.add(i);
     }
 
     StlSet<int> set2;
 
-    set2.copy( set1 );
+    set2.copy(set1);
 
     ASSERT_TRUE(set1.size() == set2.size());
 
-    for( int i = 0; i < 50; ++i ) {
-        ASSERT_TRUE(set2.contains( i ));
+    for (int i = 0; i < 50; ++i)
+    {
+        ASSERT_TRUE(set2.contains(i));
     }
 
-    ASSERT_TRUE(set2.equals( set1 ));
+    ASSERT_TRUE(set2.equals(set1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SetTest, testCopy2) {
-
+TEST_F(SetTest, testCopy2)
+{
     LinkedList<int> collection;
 
-    for( int i = 0; i < 50; ++i ) {
-        collection.add( i );
+    for (int i = 0; i < 50; ++i)
+    {
+        collection.add(i);
     }
 
     StlSet<int> set;
 
-    set.copy( collection );
+    set.copy(collection);
 
     ASSERT_TRUE(collection.size() == set.size());
 
-    for( int i = 0; i < 50; ++i ) {
-        ASSERT_TRUE(set.contains( i ));
+    for (int i = 0; i < 50; ++i)
+    {
+        ASSERT_TRUE(set.contains(i));
     }
 
-    ASSERT_TRUE(set.equals( collection ));
+    ASSERT_TRUE(set.equals(collection));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SetTest, testContains){
-
+TEST_F(SetTest, testContains)
+{
     StlSet<string> set;
-    ASSERT_TRUE(set.contains( "bob" ) == false);
+    ASSERT_TRUE(set.contains("bob") == false);
 
-    set.add( "bob" );
+    set.add("bob");
 
-    ASSERT_TRUE(set.contains( "bob" ) == true);
-    ASSERT_TRUE(set.contains( "fred" ) == false);
+    ASSERT_TRUE(set.contains("bob") == true);
+    ASSERT_TRUE(set.contains("fred") == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SetTest, testClear){
-
+TEST_F(SetTest, testClear)
+{
     StlSet<string> set;
-    set.add( "bob" );
-    set.add( "fred" );
+    set.add("bob");
+    set.add("fred");
 
     ASSERT_TRUE(set.size() == 2);
     set.clear();
@@ -165,11 +172,11 @@ TEST_F(SetTest, testClear){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SetTest, testIsEmpty){
-
+TEST_F(SetTest, testIsEmpty)
+{
     StlSet<string> set;
-    set.add( "bob" );
-    set.add( "fred" );
+    set.add("bob");
+    set.add("fred");
 
     ASSERT_TRUE(set.isEmpty() == false);
     set.clear();
@@ -177,49 +184,51 @@ TEST_F(SetTest, testIsEmpty){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SetTest, testSize){
-
+TEST_F(SetTest, testSize)
+{
     StlSet<string> set;
 
     ASSERT_TRUE(set.size() == 0);
-    set.add( "bob" );
+    set.add("bob");
     ASSERT_TRUE(set.size() == 1);
-    set.add( "fred" );
+    set.add("fred");
     ASSERT_TRUE(set.size() == 2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SetTest, testAdd){
+TEST_F(SetTest, testAdd)
+{
     StlSet<string> set;
 
-    set.add( "fred" );
-    set.add( "fred" );
-    set.add( "fred" );
+    set.add("fred");
+    set.add("fred");
+    set.add("fred");
     ASSERT_TRUE(set.contains("fred") == true);
     ASSERT_TRUE(set.size() == 1);
-    set.remove( "fred" );
+    set.remove("fred");
     ASSERT_TRUE(set.contains("fred") == false);
     ASSERT_TRUE(set.isEmpty());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SetTest, testRemove){
+TEST_F(SetTest, testRemove)
+{
     StlSet<string> set;
 
-    set.add( "fred" );
-    ASSERT_TRUE(set.contains( "fred" ) == true);
-    set.remove( "fred" );
-    ASSERT_TRUE(set.contains( "fred" ) == false);
+    set.add("fred");
+    ASSERT_TRUE(set.contains("fred") == true);
+    set.remove("fred");
+    ASSERT_TRUE(set.contains("fred") == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SetTest, testToArray){
-
+TEST_F(SetTest, testToArray)
+{
     StlSet<string> set;
 
-    set.add( "fred1" );
-    set.add( "fred2" );
-    set.add( "fred3" );
+    set.add("fred1");
+    set.add("fred2");
+    set.add("fred3");
     ASSERT_TRUE(set.size() == 3);
 
     std::vector<std::string> array = set.toArray();
@@ -228,20 +237,21 @@ TEST_F(SetTest, testToArray){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SetTest, testIterator){
-
+TEST_F(SetTest, testIterator)
+{
     StlSet<string> set;
 
-    set.add( "fred1" );
-    set.add( "fred2" );
-    set.add( "fred3" );
+    set.add("fred1");
+    set.add("fred2");
+    set.add("fred3");
 
     Iterator<string>* iterator1 = set.iterator();
     ASSERT_TRUE(iterator1 != NULL);
     ASSERT_TRUE(iterator1->hasNext() == true);
 
     int count = 0;
-    while( iterator1->hasNext() ) {
+    while (iterator1->hasNext())
+    {
         iterator1->next();
         ++count;
     }
@@ -250,7 +260,8 @@ TEST_F(SetTest, testIterator){
 
     Iterator<string>* iterator2 = set.iterator();
 
-    while( iterator2->hasNext() ) {
+    while (iterator2->hasNext())
+    {
         iterator2->next();
         iterator2->remove();
     }

@@ -18,19 +18,21 @@
 #ifndef _DECAF_NET_SOCKETERROR_H_
 #define _DECAF_NET_SOCKETERROR_H_
 
-#include <string>
 #include <decaf/util/Config.h>
+#include <string>
 
-namespace decaf{
-namespace net{
+namespace decaf
+{
+namespace net
+{
 
     /**
      * Static utility class to simplify handling of error codes
      * for socket operations.
      */
-    class DECAF_API SocketError {
+    class DECAF_API SocketError
+    {
     public:
-
         /**
          * Gets the last error appropriate for the platform.
          */
@@ -42,6 +44,7 @@ namespace net{
         static std::string getErrorString();
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /*_DECAF_NET_SOCKETERROR_H_*/

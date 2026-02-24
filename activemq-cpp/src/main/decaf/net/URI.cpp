@@ -17,12 +17,12 @@
 
 #include "URI.h"
 
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/Character.h>
-#include <decaf/net/URL.h>
+#include <decaf/internal/net/URIEncoderDecoder.h>
 #include <decaf/internal/net/URIHelper.h>
 #include <decaf/internal/util/StringUtils.h>
-#include <decaf/internal/net/URIEncoderDecoder.h>
+#include <decaf/lang/Character.h>
+#include <decaf/lang/Integer.h>
+#include <decaf/net/URL.h>
 
 using namespace std;
 using namespace decaf;
@@ -35,40 +35,56 @@ using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 const std::string URI::unreserved = "_-!.~\'()*";
-const std::string URI::punct = ",;:$&+=";
-const std::string URI::reserved = punct + "?/[]@";
-const std::string URI::someLegal = unreserved + punct;
-const std::string URI::allLegal = unreserved + reserved;
+const std::string URI::punct      = ",;:$&+=";
+const std::string URI::reserved   = punct + "?/[]@";
+const std::string URI::someLegal  = unreserved + punct;
+const std::string URI::allLegal   = unreserved + reserved;
 
 ////////////////////////////////////////////////////////////////////////////////
-URI::URI() : uri(), uriString() {
+URI::URI()
+    : uri(),
+      uriString()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URI::URI(const URI& uri) : uri(uri.uri), uriString(uri.uriString) {
+URI::URI(const URI& uri)
+    : uri(uri.uri),
+      uriString(uri.uriString)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URI::URI(const std::string& uri) : uri(), uriString(uri) {
+URI::URI(const std::string& uri)
+    : uri(),
+      uriString(uri)
+{
     this->parseURI(uri, false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URI::URI(const std::string& scheme, const std::string& ssp, const std::string& fragment) : uri(), uriString() {
-
+URI::URI(const std::string& scheme,
+         const std::string& ssp,
+         const std::string& fragment)
+    : uri(),
+      uriString()
+{
     std::string uri = "";
 
-    if (scheme != "") {
+    if (scheme != "")
+    {
         uri.append(scheme);
         uri.append(":");
     }
 
-    if (ssp != "") {
+    if (ssp != "")
+    {
         // QUOTE ILLEGAL CHARACTERS
         uri.append(quoteComponent(ssp, allLegal));
     }
 
-    if (fragment != "") {
+    if (fragment != "")
+    {
         uri.append("#");
         // QUOTE ILLEGAL CHARACTERS
         uri.append(quoteComponent(fragment, allLegal));
@@ -79,67 +95,84 @@ URI::URI(const std::string& scheme, const std::string& ssp, const std::string& f
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URI::URI(const std::string& scheme, const std::string& userInfo,
-         const std::string& host, int port,
-         const std::string& path, const std::string& query,
-         const std::string& fragment) : uri(), uriString() {
-
-    if (scheme == "" && userInfo == "" && host == "" && path == "" && query == "" && fragment == "") {
+URI::URI(const std::string& scheme,
+         const std::string& userInfo,
+         const std::string& host,
+         int                port,
+         const std::string& path,
+         const std::string& query,
+         const std::string& fragment)
+    : uri(),
+      uriString()
+{
+    if (scheme == "" && userInfo == "" && host == "" && path == "" &&
+        query == "" && fragment == "")
+    {
         return;
     }
 
-    if (scheme != "" && !path.empty() && path.at(0) != '/') {
+    if (scheme != "" && !path.empty() && path.at(0) != '/')
+    {
         throw URISyntaxException(
-            __FILE__, __LINE__, path,
-            "URI::URI - Path string: %s starts with invalid char '/'" );
+            __FILE__,
+            __LINE__,
+            path,
+            "URI::URI - Path string: %s starts with invalid char '/'");
     }
 
     std::string uri = "";
-    if (scheme != "") {
+    if (scheme != "")
+    {
         uri.append(scheme);
         uri.append(":");
     }
 
     uri.append("//");
 
-    if (userInfo != "") {
+    if (userInfo != "")
+    {
         // QUOTE ILLEGAL CHARACTERS in userinfo
         uri.append(quoteComponent(userInfo, someLegal));
         uri.append("@");
     }
 
-    if (host != "") {
+    if (host != "")
+    {
         std::string newHost = host;
 
         // check for ipv6 addresses that hasn't been enclosed
         // in square brackets
         if (host.find(":") != std::string::npos &&
             host.find("]") == std::string::npos &&
-            host.find("[") == std::string::npos) {
-
+            host.find("[") == std::string::npos)
+        {
             newHost = std::string("[") + host + "]";
         }
 
         uri.append(newHost);
     }
 
-    if (port != -1) {
+    if (port != -1)
+    {
         uri.append(":");
         uri.append(Integer::toString(port));
     }
 
-    if (path != "") {
+    if (path != "")
+    {
         // QUOTE ILLEGAL CHARS
         uri.append(quoteComponent(path, "/@" + someLegal));
     }
 
-    if (query != "") {
+    if (query != "")
+    {
         uri.append("?");
         // QUOTE ILLEGAL CHARS
         uri.append(quoteComponent(query, allLegal));
     }
 
-    if (fragment != "") {
+    if (fragment != "")
+    {
         // QUOTE ILLEGAL CHARS
         uri.append("#");
         uri.append(quoteComponent(fragment, allLegal));
@@ -149,50 +182,63 @@ URI::URI(const std::string& scheme, const std::string& userInfo,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URI::URI(const std::string& scheme, const std::string& host,
-         const std::string& path, const std::string& fragment) : uri(), uriString() {
-
-    if (scheme == "" && host == "" && path == "" && fragment == "") {
+URI::URI(const std::string& scheme,
+         const std::string& host,
+         const std::string& path,
+         const std::string& fragment)
+    : uri(),
+      uriString()
+{
+    if (scheme == "" && host == "" && path == "" && fragment == "")
+    {
         return;
     }
 
-    if (scheme != "" && !path.empty() && path.at(0) != '/') {
+    if (scheme != "" && !path.empty() && path.at(0) != '/')
+    {
         throw URISyntaxException(
-            __FILE__, __LINE__, path,
-            "URI::URI - Path string: %s starts with invalid char '/'" );
+            __FILE__,
+            __LINE__,
+            path,
+            "URI::URI - Path string: %s starts with invalid char '/'");
     }
 
     std::string uri = "";
-    if (scheme != "") {
+    if (scheme != "")
+    {
         uri.append(scheme);
         uri.append(":");
     }
 
-    if (host != "") {
+    if (host != "")
+    {
         uri.append("//");
     }
 
-    if (host != "") {
+    if (host != "")
+    {
         std::string newHost = host;
 
         // check for ipv6 addresses that hasn't been enclosed
         // in square brackets
         if (host.find(":") != std::string::npos &&
             host.find("]") == std::string::npos &&
-            host.find("[") == std::string::npos) {
-
+            host.find("[") == std::string::npos)
+        {
             newHost = std::string("[") + host + "]";
         }
 
         uri.append(newHost);
     }
 
-    if (path != "") {
+    if (path != "")
+    {
         // QUOTE ILLEGAL CHARS
         uri.append(quoteComponent(path, "/@" + someLegal));
     }
 
-    if (fragment != "") {
+    if (fragment != "")
+    {
         // QUOTE ILLEGAL CHARS
         uri.append("#");
         uri.append(quoteComponent(fragment, allLegal));
@@ -202,42 +248,54 @@ URI::URI(const std::string& scheme, const std::string& host,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URI::URI(const std::string& scheme, const std::string& authority,
-         const std::string& path, const std::string& query,
-         const std::string& fragment) : uri(), uriString() {
-
-    if (scheme != "" && !path.empty() && path.at(0) != '/') {
-         throw URISyntaxException(
-            __FILE__, __LINE__, path,
-            "URI::URI - Path String %s must start with a '/'" );
-     }
+URI::URI(const std::string& scheme,
+         const std::string& authority,
+         const std::string& path,
+         const std::string& query,
+         const std::string& fragment)
+    : uri(),
+      uriString()
+{
+    if (scheme != "" && !path.empty() && path.at(0) != '/')
+    {
+        throw URISyntaxException(
+            __FILE__,
+            __LINE__,
+            path,
+            "URI::URI - Path String %s must start with a '/'");
+    }
 
     std::string uri = "";
 
-    if (scheme != "") {
+    if (scheme != "")
+    {
         uri.append(scheme);
         uri.append(":");
     }
 
     uri.append("//");
 
-    if (authority != "") {
+    if (authority != "")
+    {
         // QUOTE ILLEGAL CHARS
         uri.append(quoteComponent(authority, "@[]" + someLegal));
     }
 
-    if (path != "") {
+    if (path != "")
+    {
         // QUOTE ILLEGAL CHARS
         uri.append(quoteComponent(path, "/@" + someLegal));
     }
 
-    if (query != "") {
+    if (query != "")
+    {
         // QUOTE ILLEGAL CHARS
         uri.append("?");
         uri.append(quoteComponent(query, allLegal));
     }
 
-    if (fragment != "") {
+    if (fragment != "")
+    {
         // QUOTE ILLEGAL CHARS
         uri.append("#");
         uri.append(quoteComponent(fragment, allLegal));
@@ -247,8 +305,10 @@ URI::URI(const std::string& scheme, const std::string& authority,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URI::parseURI(const std::string& uri, bool forceServer) {
-    try {
+void URI::parseURI(const std::string& uri, bool forceServer)
+{
+    try
+    {
         this->uri = URIHelper().parseURI(uri, forceServer);
     }
     DECAF_CATCH_RETHROW(URISyntaxException)
@@ -256,105 +316,153 @@ void URI::parseURI(const std::string& uri, bool forceServer) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int URI::compareTo( const URI& uri ) const {
-
+int URI::compareTo(const URI& uri) const
+{
     int ret = 0;
 
     // compare schemes
-    if (this->uri.getScheme() == "" && uri.getScheme() != "") {
+    if (this->uri.getScheme() == "" && uri.getScheme() != "")
+    {
         return -1;
-    } else if (this->uri.getScheme() != "" && uri.getScheme() == "") {
+    }
+    else if (this->uri.getScheme() != "" && uri.getScheme() == "")
+    {
         return 1;
-    } else if (this->uri.getScheme() != "" && uri.getScheme() != "") {
-        ret = StringUtils::compareIgnoreCase(this->uri.getScheme().c_str(), uri.getScheme().c_str());
-        if (ret != 0) {
+    }
+    else if (this->uri.getScheme() != "" && uri.getScheme() != "")
+    {
+        ret = StringUtils::compareIgnoreCase(this->uri.getScheme().c_str(),
+                                             uri.getScheme().c_str());
+        if (ret != 0)
+        {
             return ret > 0 ? 1 : -1;
         }
     }
 
     // compare opacities
-    if (!this->uri.isOpaque() && uri.isOpaque()) {
+    if (!this->uri.isOpaque() && uri.isOpaque())
+    {
         return -1;
-    } else if (this->uri.isOpaque() && !uri.isOpaque()) {
+    }
+    else if (this->uri.isOpaque() && !uri.isOpaque())
+    {
         return 1;
-    } else if (this->uri.isOpaque() && uri.isOpaque()) {
+    }
+    else if (this->uri.isOpaque() && uri.isOpaque())
+    {
         ret = StringUtils::compare(this->getSchemeSpecificPart().c_str(),
                                    uri.getSchemeSpecificPart().c_str());
-        if (ret != 0) {
+        if (ret != 0)
+        {
             return ret > 0 ? 1 : -1;
         }
-    } else {
-
+    }
+    else
+    {
         // otherwise both must be hierarchical
 
         // compare authorities
-        if (this->uri.getAuthority() != "" && uri.getAuthority() == "") {
+        if (this->uri.getAuthority() != "" && uri.getAuthority() == "")
+        {
             return 1;
-        } else if (this->uri.getAuthority() == "" && uri.getAuthority() != "") {
+        }
+        else if (this->uri.getAuthority() == "" && uri.getAuthority() != "")
+        {
             return -1;
-        } else if (this->uri.getAuthority() != "" && uri.getAuthority() != "") {
-
-            if (this->uri.getHost() != "" && uri.getHost() != "") {
-
+        }
+        else if (this->uri.getAuthority() != "" && uri.getAuthority() != "")
+        {
+            if (this->uri.getHost() != "" && uri.getHost() != "")
+            {
                 // both are server based, so compare userinfo, host, port
-                if (this->getUserInfo() != "" && uri.getUserInfo() == "") {
+                if (this->getUserInfo() != "" && uri.getUserInfo() == "")
+                {
                     return 1;
-                } else if (this->getUserInfo() == "" && uri.getUserInfo() != "") {
+                }
+                else if (this->getUserInfo() == "" && uri.getUserInfo() != "")
+                {
                     return -1;
-                } else if (this->getUserInfo() != "" && uri.getUserInfo() != "") {
+                }
+                else if (this->getUserInfo() != "" && uri.getUserInfo() != "")
+                {
                     ret = StringUtils::compare(this->getUserInfo().c_str(),
                                                uri.getUserInfo().c_str());
-                    if (ret != 0) {
+                    if (ret != 0)
+                    {
                         return ret > 0 ? 1 : -1;
                     }
                 }
 
                 // userinfo's are the same, compare hostname
-                ret = StringUtils::compareIgnoreCase(this->uri.getHost().c_str(), uri.getHost().c_str());
-                if (ret != 0) {
+                ret =
+                    StringUtils::compareIgnoreCase(this->uri.getHost().c_str(),
+                                                   uri.getHost().c_str());
+                if (ret != 0)
+                {
                     return ret > 0 ? 1 : -1;
                 }
 
                 // compare port
-                if (this->getPort() != uri.getPort()) {
+                if (this->getPort() != uri.getPort())
+                {
                     return (getPort() - uri.getPort()) > 0 ? 1 : -1;
                 }
-            } else {
+            }
+            else
+            {
                 // one or both are registry based, compare the whole authority
-                ret = StringUtils::compare(this->uri.getAuthority().c_str(), uri.getAuthority().c_str());
-                if (ret != 0) {
+                ret = StringUtils::compare(this->uri.getAuthority().c_str(),
+                                           uri.getAuthority().c_str());
+                if (ret != 0)
+                {
                     return ret > 0 ? 1 : -1;
                 }
             }
         }
 
         // authorities are the same, compare paths
-        ret = StringUtils::compare(this->getPath().c_str(), uri.getPath().c_str());
-        if (ret != 0) {
+        ret = StringUtils::compare(this->getPath().c_str(),
+                                   uri.getPath().c_str());
+        if (ret != 0)
+        {
             return ret > 0 ? 1 : -1;
         }
 
         // compare queries
-        if (this->getQuery() != "" && uri.getQuery() == "") {
+        if (this->getQuery() != "" && uri.getQuery() == "")
+        {
             return 1;
-        } else if (this->getQuery() == "" && uri.getQuery() != "") {
+        }
+        else if (this->getQuery() == "" && uri.getQuery() != "")
+        {
             return -1;
-        } else if (this->getQuery() != "" && uri.getQuery() != "") {
-            ret = StringUtils::compare(this->getQuery().c_str(), uri.getQuery().c_str());
-            if (ret != 0) {
+        }
+        else if (this->getQuery() != "" && uri.getQuery() != "")
+        {
+            ret = StringUtils::compare(this->getQuery().c_str(),
+                                       uri.getQuery().c_str());
+            if (ret != 0)
+            {
                 return ret > 0 ? 1 : -1;
             }
         }
     }
 
     // everything else is identical, so compare fragments
-    if (this->getFragment() != "" && uri.getFragment() == "") {
+    if (this->getFragment() != "" && uri.getFragment() == "")
+    {
         return 1;
-    } else if (this->getFragment() == "" && uri.getFragment() != "") {
+    }
+    else if (this->getFragment() == "" && uri.getFragment() != "")
+    {
         return -1;
-    } else if (this->getFragment() != "" && uri.getFragment() != "") {
-        ret = StringUtils::compare(this->getFragment().c_str(), uri.getFragment().c_str());
-        if (ret != 0) {
+    }
+    else if (this->getFragment() != "" && uri.getFragment() != "")
+    {
+        ret = StringUtils::compare(this->getFragment().c_str(),
+                                   uri.getFragment().c_str());
+        if (ret != 0)
+        {
             return ret > 0 ? 1 : -1;
         }
     }
@@ -364,129 +472,158 @@ int URI::compareTo( const URI& uri ) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool URI::equals( const URI& uri ) const {
-
+bool URI::equals(const URI& uri) const
+{
     if ((uri.uri.getFragment() == "" && this->uri.getFragment() != "") ||
-        (uri.uri.getFragment() != "" && this->uri.getFragment() == "")) {
-
+        (uri.uri.getFragment() != "" && this->uri.getFragment() == ""))
+    {
         return false;
-
-    } else if (uri.uri.getFragment() != "" && this->uri.getFragment() != "") {
-
-        if (!equalsHexCaseInsensitive(uri.uri.getFragment(), this->uri.getFragment())) {
+    }
+    else if (uri.uri.getFragment() != "" && this->uri.getFragment() != "")
+    {
+        if (!equalsHexCaseInsensitive(uri.uri.getFragment(),
+                                      this->uri.getFragment()))
+        {
             return false;
         }
     }
 
     if ((uri.uri.getScheme() == "" && this->uri.getScheme() != "") ||
-        (uri.uri.getScheme() != "" && this->uri.getScheme() == "")) {
-
+        (uri.uri.getScheme() != "" && this->uri.getScheme() == ""))
+    {
         return false;
-
-    } else if (uri.uri.getScheme() != "" && this->uri.getScheme() != "") {
-
-        if (StringUtils::compareIgnoreCase(uri.uri.getScheme().c_str(), this->uri.getScheme().c_str()) != 0) {
+    }
+    else if (uri.uri.getScheme() != "" && this->uri.getScheme() != "")
+    {
+        if (StringUtils::compareIgnoreCase(uri.uri.getScheme().c_str(),
+                                           this->uri.getScheme().c_str()) != 0)
+        {
             return false;
         }
     }
 
-    if (uri.uri.isOpaque() && this->uri.isOpaque()) {
-
-        return equalsHexCaseInsensitive(
-            uri.uri.getSchemeSpecificPart(), this->uri.getSchemeSpecificPart());
-
-    } else if (!uri.uri.isOpaque() && !this->uri.isOpaque()) {
-
-        if (!equalsHexCaseInsensitive(this->uri.getPath(), uri.uri.getPath())) {
+    if (uri.uri.isOpaque() && this->uri.isOpaque())
+    {
+        return equalsHexCaseInsensitive(uri.uri.getSchemeSpecificPart(),
+                                        this->uri.getSchemeSpecificPart());
+    }
+    else if (!uri.uri.isOpaque() && !this->uri.isOpaque())
+    {
+        if (!equalsHexCaseInsensitive(this->uri.getPath(), uri.uri.getPath()))
+        {
             return false;
         }
 
         if ((uri.uri.getQuery() != "" && this->uri.getQuery() == "") ||
-            (uri.uri.getQuery() == "" && this->uri.getQuery() != "")) {
-
+            (uri.uri.getQuery() == "" && this->uri.getQuery() != ""))
+        {
             return false;
-
-        } else if(uri.uri.getQuery() != "" && this->uri.getQuery() != "") {
-            if (!equalsHexCaseInsensitive(uri.uri.getQuery(), this->uri.getQuery())) {
+        }
+        else if (uri.uri.getQuery() != "" && this->uri.getQuery() != "")
+        {
+            if (!equalsHexCaseInsensitive(uri.uri.getQuery(),
+                                          this->uri.getQuery()))
+            {
                 return false;
             }
         }
 
-        if( ( uri.uri.getAuthority() != "" && this->uri.getAuthority() == "" ) ||
-            ( uri.uri.getAuthority() == "" && this->uri.getAuthority() != "" ) ) {
-
+        if ((uri.uri.getAuthority() != "" && this->uri.getAuthority() == "") ||
+            (uri.uri.getAuthority() == "" && this->uri.getAuthority() != ""))
+        {
             return false;
-
-        } else if (uri.uri.getAuthority() != "" && this->uri.getAuthority() != "") {
-
+        }
+        else if (uri.uri.getAuthority() != "" && this->uri.getAuthority() != "")
+        {
             if ((uri.uri.getHost() != "" && this->uri.getHost() == "") ||
-                (uri.uri.getHost() == "" && this->uri.getHost() != "")) {
-
+                (uri.uri.getHost() == "" && this->uri.getHost() != ""))
+            {
                 return false;
-
-            } else if (uri.uri.getHost() == "" && this->uri.getHost() == "") {
-
+            }
+            else if (uri.uri.getHost() == "" && this->uri.getHost() == "")
+            {
                 // both are registry based, so compare the whole authority
-                return equalsHexCaseInsensitive(
-                    uri.uri.getAuthority(), this->uri.getAuthority());
+                return equalsHexCaseInsensitive(uri.uri.getAuthority(),
+                                                this->uri.getAuthority());
+            }
+            else
+            {  // uri.host != "" && host != "", so server-based
 
-            } else { // uri.host != "" && host != "", so server-based
-
-                if (StringUtils::compareIgnoreCase(uri.uri.getHost().c_str(), this->uri.getHost().c_str()) != 0) {
+                if (StringUtils::compareIgnoreCase(
+                        uri.uri.getHost().c_str(),
+                        this->uri.getHost().c_str()) != 0)
+                {
                     return false;
                 }
 
-                if (this->uri.getPort() != uri.uri.getPort()) {
+                if (this->uri.getPort() != uri.uri.getPort())
+                {
                     return false;
                 }
 
-                if ((uri.uri.getUserInfo() != "" && this->uri.getUserInfo() == "") ||
-                    (uri.uri.getUserInfo() == "" && this->uri.getUserInfo() != "")) {
-
+                if ((uri.uri.getUserInfo() != "" &&
+                     this->uri.getUserInfo() == "") ||
+                    (uri.uri.getUserInfo() == "" &&
+                     this->uri.getUserInfo() != ""))
+                {
                     return false;
-
-                } else if (uri.uri.getUserInfo() != "" && this->uri.getUserInfo() != "") {
-                    return equalsHexCaseInsensitive(this->uri.getUserInfo(), uri.uri.getUserInfo());
-                } else {
+                }
+                else if (uri.uri.getUserInfo() != "" &&
+                         this->uri.getUserInfo() != "")
+                {
+                    return equalsHexCaseInsensitive(this->uri.getUserInfo(),
+                                                    uri.uri.getUserInfo());
+                }
+                else
+                {
                     return true;
                 }
             }
-        } else {
+        }
+        else
+        {
             // no authority
             return true;
         }
-
-    } else {
+    }
+    else
+    {
         // one is opaque, the other hierarchical
         return false;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool URI::operator==(const URI& value) const {
+bool URI::operator==(const URI& value) const
+{
     return compareTo(value) == 0 ? true : false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool URI::operator<(const URI& value) const {
+bool URI::operator<(const URI& value) const
+{
     return compareTo(value) == -1 ? true : false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URI URI::create(const std::string uri) {
-
-    try {
+URI URI::create(const std::string uri)
+{
+    try
+    {
         return URI(uri);
-    } catch (URISyntaxException& e) {
+    }
+    catch (URISyntaxException& e)
+    {
         throw IllegalArgumentException(e);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::quoteComponent(const std::string& component, const std::string& legalset) {
-
-    try {
-
+std::string URI::quoteComponent(const std::string& component,
+                                const std::string& legalset)
+{
+    try
+    {
         /*
          * Use a different encoder than URLEncoder since: 1. chars like "/",
          * "#", "@" etc needs to be preserved instead of being encoded, 2.
@@ -500,9 +637,10 @@ std::string URI::quoteComponent(const std::string& component, const std::string&
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::encodeOthers(const std::string& src) const {
-
-    try {
+std::string URI::encodeOthers(const std::string& src) const
+{
+    try
+    {
         /*
          * Use a different encoder than URLEncoder since: 1. chars like "/",
          * "#", "@" etc needs to be preserved instead of being encoded, 2.
@@ -516,13 +654,15 @@ std::string URI::encodeOthers(const std::string& src) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::decode(const std::string& src) const {
-
-    if (src == "") {
+std::string URI::decode(const std::string& src) const
+{
+    if (src == "")
+    {
         return src;
     }
 
-    try {
+    try
+    {
         return URIEncoderDecoder::decode(src);
     }
     DECAF_CATCH_RETHROW(decaf::lang::Exception)
@@ -530,28 +670,34 @@ std::string URI::decode(const std::string& src) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool URI::equalsHexCaseInsensitive(const std::string& first, const std::string& second) const {
-
-    if (first.find('%') != second.find('%')) {
+bool URI::equalsHexCaseInsensitive(const std::string& first,
+                                   const std::string& second) const
+{
+    if (first.find('%') != second.find('%'))
+    {
         return StringUtils::compare(first.c_str(), second.c_str()) == 0;
     }
 
-    std::size_t index = 0;
+    std::size_t index     = 0;
     std::size_t previndex = 0;
 
-    while ((index = first.find('%', previndex)) != string::npos && second.find('%', previndex) == index) {
-
+    while ((index = first.find('%', previndex)) != string::npos &&
+           second.find('%', previndex) == index)
+    {
         bool match = first.substr(previndex, index - previndex) ==
                      second.substr(previndex, index - previndex);
 
-        if (!match) {
+        if (!match)
+        {
             return false;
         }
 
         match = StringUtils::compareIgnoreCase(
-            first.substr(index + 1, 3).c_str(), second.substr(index + 1, 3).c_str()) == 0;
+                    first.substr(index + 1, 3).c_str(),
+                    second.substr(index + 1, 3).c_str()) == 0;
 
-        if (!match) {
+        if (!match)
+        {
             return false;
         }
 
@@ -563,23 +709,26 @@ bool URI::equalsHexCaseInsensitive(const std::string& first, const std::string& 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::convertHexToLowerCase(const std::string& s) const {
-
+std::string URI::convertHexToLowerCase(const std::string& s) const
+{
     string result = "";
 
-    if (s.find('%') == string::npos) {
+    if (s.find('%') == string::npos)
+    {
         return s;
     }
 
-    std::size_t index = 0;
+    std::size_t index     = 0;
     std::size_t previndex = 0;
 
-    while ((index = s.find('%', previndex)) != string::npos) {
+    while ((index = s.find('%', previndex)) != string::npos)
+    {
         result.append(s.substr(previndex, (index - previndex) + 1));
 
         string temp = s.substr(index + 1, 3);
 
-        for (size_t i = 0; i < temp.length(); ++i) {
+        for (size_t i = 0; i < temp.length(); ++i)
+        {
             result.append(1, Character::toLowerCase(temp.at(i)));
         }
 
@@ -591,80 +740,92 @@ std::string URI::convertHexToLowerCase(const std::string& s) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::normalize(const std::string& path) const {
-
-    if (path == "") {
+std::string URI::normalize(const std::string& path) const
+{
+    if (path == "")
+    {
         return path;
     }
 
     // count the number of '/'s, to determine number of segments
-    std::size_t index = -1;
-    std::size_t pathlen = path.length();
-    unsigned int size = 0;
+    std::size_t  index   = -1;
+    std::size_t  pathlen = path.length();
+    unsigned int size    = 0;
 
-    if (pathlen > 0 && path.at(0) != '/') {
+    if (pathlen > 0 && path.at(0) != '/')
+    {
         size++;
     }
 
-    while ((index = path.find('/', index + 1)) != string::npos) {
-        if (index + 1 < pathlen && path.at(index + 1) != '/') {
+    while ((index = path.find('/', index + 1)) != string::npos)
+    {
+        if (index + 1 < pathlen && path.at(index + 1) != '/')
+        {
             size++;
         }
     }
 
     std::vector<string> seglist(size);
-    std::vector<bool> include(size);
+    std::vector<bool>   include(size);
 
     // break the path into segments and store in the list
     std::size_t current = 0;
-    std::size_t index2 = 0;
+    std::size_t index2  = 0;
 
     index = (pathlen > 0 && path.at(0) == '/') ? 1 : 0;
-    while ((index2 = path.find('/', index + 1)) != string::npos) {
+    while ((index2 = path.find('/', index + 1)) != string::npos)
+    {
         seglist[current++] = path.substr(index, index2 - index);
-        index = index2 + 1;
+        index              = index2 + 1;
     }
 
     // if current==size, then the last character was a slash
     // and there are no more segments
-    if (current < size) {
+    if (current < size)
+    {
         seglist[current] = path.substr(index);
     }
 
     // determine which segments get included in the normalized path
-    for (unsigned int i = 0; i < size; i++) {
-
+    for (unsigned int i = 0; i < size; i++)
+    {
         include[i] = true;
 
-        if (seglist[i] == "..") {
-
+        if (seglist[i] == "..")
+        {
             int remove = i - 1;
 
             // search back to find a segment to remove, if possible
-            while (remove > -1 && !include[remove]) {
+            while (remove > -1 && !include[remove])
+            {
                 remove--;
             }
 
             // if we find a segment to remove, remove it and the ".."
             // segment
-            if (remove > -1 && !(seglist[remove] == "..")) {
+            if (remove > -1 && !(seglist[remove] == ".."))
+            {
                 include[remove] = false;
-                include[i] = false;
+                include[i]      = false;
             }
-
-        } else if (seglist[i] == ".") {
+        }
+        else if (seglist[i] == ".")
+        {
             include[i] = false;
         }
     }
 
     // put the path back together
     string newpath;
-    if (path.at(0) == '/') {
+    if (path.at(0) == '/')
+    {
         newpath.append("/");
     }
 
-    for (unsigned int i = 0; i < seglist.size(); i++) {
-        if (include[i]) {
+    for (unsigned int i = 0; i < seglist.size(); i++)
+    {
+        if (include[i])
+        {
             newpath.append(seglist[i]);
             newpath.append("/");
         }
@@ -673,8 +834,9 @@ std::string URI::normalize(const std::string& path) const {
     // if we used at least one segment and the path previously ended with
     // a slash and the last segment is still used, then delete the extra
     // trailing '/'
-    if (path.at(path.length() - 1) != '/' && seglist.size() > 0 && include[seglist.size() - 1]) {
-
+    if (path.at(path.length() - 1) != '/' && seglist.size() > 0 &&
+        include[seglist.size() - 1])
+    {
         newpath.erase(newpath.length() - 1, 1);
     }
 
@@ -682,10 +844,11 @@ std::string URI::normalize(const std::string& path) const {
 
     // check for a ':' in the first segment if one exists,
     // prepend "./" to normalize
-    index = result.find(':');
+    index  = result.find(':');
     index2 = result.find('/');
 
-    if (index != string::npos && (index < index2 || index2 == string::npos)) {
+    if (index != string::npos && (index < index2 || index2 == string::npos))
+    {
         newpath.insert(0, "./");
         result = newpath;
     }
@@ -694,16 +857,18 @@ std::string URI::normalize(const std::string& path) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URI URI::normalize() const {
-
-    if (isOpaque()) {
+URI URI::normalize() const
+{
+    if (isOpaque())
+    {
         return *this;
     }
 
     string normalizedPath = normalize(this->uri.getPath());
 
     // if the path is already normalized, return this
-    if (this->uri.getPath() == normalizedPath) {
+    if (this->uri.getPath() == normalizedPath)
+    {
         return *this;
     }
 
@@ -717,20 +882,23 @@ URI URI::normalize() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URI::setSchemeSpecificPart() {
-
+void URI::setSchemeSpecificPart()
+{
     // ssp = [//authority][path][?query]
     string ssp;
 
-    if (this->uri.getAuthority() != "") {
+    if (this->uri.getAuthority() != "")
+    {
         ssp.append(string("//") + this->uri.getAuthority());
     }
 
-    if (this->uri.getPath() != "") {
+    if (this->uri.getPath() != "")
+    {
         ssp.append(this->uri.getPath());
     }
 
-    if (this->uri.getQuery() != "") {
+    if (this->uri.getQuery() != "")
+    {
         ssp.append("?" + this->uri.getQuery());
     }
 
@@ -741,11 +909,12 @@ void URI::setSchemeSpecificPart() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URI URI::parseServerAuthority() const {
-
+URI URI::parseServerAuthority() const
+{
     URI newURI = *this;
 
-    if (!newURI.uri.isServerAuthority()) {
+    if (!newURI.uri.isServerAuthority())
+    {
         newURI.uri = URIHelper().parseAuthority(true, this->uri.getAuthority());
     }
 
@@ -753,36 +922,40 @@ URI URI::parseServerAuthority() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URI URI::relativize( const URI& relative ) const {
-
-    if (relative.isOpaque() || this->isOpaque()) {
+URI URI::relativize(const URI& relative) const
+{
+    if (relative.isOpaque() || this->isOpaque())
+    {
         return relative;
     }
 
-    if (this->uri.getScheme() == "" ? relative.uri.getScheme() != "" :
-        this->uri.getScheme() != relative.uri.getScheme()) {
-
+    if (this->uri.getScheme() == ""
+            ? relative.uri.getScheme() != ""
+            : this->uri.getScheme() != relative.uri.getScheme())
+    {
         return relative;
     }
 
-    if (this->uri.getAuthority() == "" ? relative.uri.getAuthority() != "" :
-        this->uri.getAuthority() != relative.uri.getAuthority()) {
-
+    if (this->uri.getAuthority() == ""
+            ? relative.uri.getAuthority() != ""
+            : this->uri.getAuthority() != relative.uri.getAuthority())
+    {
         return relative;
     }
 
     // normalize both paths
-    string thisPath = normalize( this->uri.getPath() );
-    string relativePath = normalize( relative.uri.getPath() );
+    string thisPath     = normalize(this->uri.getPath());
+    string relativePath = normalize(relative.uri.getPath());
 
     /*
      * if the paths aren't equal, then we need to determine if this URI's
      * path is a parent path (begins with) the relative URI's path
      */
-    if (thisPath != relativePath) {
-
+    if (thisPath != relativePath)
+    {
         // if this URI's path doesn't end in a '/', add one
-        if (thisPath.empty() || thisPath.at(thisPath.length() - 1) != '/') {
+        if (thisPath.empty() || thisPath.at(thisPath.length() - 1) != '/')
+        {
             thisPath = thisPath + '/';
         }
 
@@ -791,7 +964,8 @@ URI URI::relativize( const URI& relative ) const {
          * then just return the relative URI; the URIs have nothing in
          * common
          */
-        if (relativePath.find(thisPath) != 0) {
+        if (relativePath.find(thisPath) != 0)
+        {
             return relative;
         }
     }
@@ -807,16 +981,18 @@ URI URI::relativize( const URI& relative ) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URI URI::resolve(const URI& relative) const {
-
-    if (relative.isAbsolute() || this->isOpaque()) {
+URI URI::resolve(const URI& relative) const
+{
+    if (relative.isAbsolute() || this->isOpaque())
+    {
         return relative;
     }
 
     URI result;
-    if (relative.uri.getPath() == "" && relative.uri.getScheme() == "" && relative.uri.getAuthority() == ""
-            && relative.uri.getQuery() == "" && relative.uri.getFragment() != "") {
-
+    if (relative.uri.getPath() == "" && relative.uri.getScheme() == "" &&
+        relative.uri.getAuthority() == "" && relative.uri.getQuery() == "" &&
+        relative.uri.getFragment() != "")
+    {
         // if the relative URI only consists of fragment,
         // the resolved URI is very similar to this URI,
         // except that it has the fragment from the relative URI.
@@ -829,8 +1005,8 @@ URI URI::resolve(const URI& relative) const {
         return result;
     }
 
-    if (relative.uri.getAuthority() != "") {
-
+    if (relative.uri.getAuthority() != "")
+    {
         // if the relative URI has authority,
         // the resolved URI is almost the same as the relative URI,
         // except that it has the scheme of this URI.
@@ -838,9 +1014,9 @@ URI URI::resolve(const URI& relative) const {
         result.uri.setScheme(this->uri.getScheme());
         result.uri.setAbsolute(this->uri.isAbsolute());
         result.uriString = "";
-
-    } else {
-
+    }
+    else
+    {
         // since relative URI has no authority,
         // the resolved URI is very similar to this URI,
         // except that it has the query and fragment of the relative URI,
@@ -850,13 +1026,17 @@ URI URI::resolve(const URI& relative) const {
         result.uri.setQuery(relative.uri.getQuery());
         result.uriString = "";
 
-        if (relative.uri.getPath().at(0) == '/') {
+        if (relative.uri.getPath().at(0) == '/')
+        {
             result.uri.setPath(relative.uri.getPath());
-        } else {
+        }
+        else
+        {
             // resolve a relative reference
             std::size_t endindex = this->uri.getPath().find_last_of('/') + 1;
-            result.uri.setPath(normalize(
-                this->uri.getPath().substr(0, endindex) + relative.uri.getPath()));
+            result.uri.setPath(
+                normalize(this->uri.getPath().substr(0, endindex) +
+                          relative.uri.getPath()));
         }
 
         // re-calculate the scheme specific part since
@@ -868,42 +1048,50 @@ URI URI::resolve(const URI& relative) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URI URI::resolve(const std::string& relative) const {
+URI URI::resolve(const std::string& relative) const
+{
     return resolve(create(relative));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-string URI::toString() const {
-
-    if (this->uriString == "") {
-
+string URI::toString() const
+{
+    if (this->uriString == "")
+    {
         string result = "";
 
-        if (this->uri.getScheme() != "") {
+        if (this->uri.getScheme() != "")
+        {
             result.append(this->uri.getScheme());
             result.append(":");
         }
 
-        if (this->isOpaque()) {
+        if (this->isOpaque())
+        {
             result.append(this->uri.getSchemeSpecificPart());
-        } else {
-
-            if (this->uri.getAuthority() != "") {
+        }
+        else
+        {
+            if (this->uri.getAuthority() != "")
+            {
                 result.append("//");
                 result.append(this->uri.getAuthority());
             }
 
-            if (this->uri.getPath() != "") {
+            if (this->uri.getPath() != "")
+            {
                 result.append(this->uri.getPath());
             }
 
-            if (this->uri.getQuery() != "") {
+            if (this->uri.getQuery() != "")
+            {
                 result.append("?");
                 result.append(this->uri.getQuery());
             }
         }
 
-        if (this->uri.getFragment() != "") {
+        if (this->uri.getFragment() != "")
+        {
             result.append("#");
             result.append(this->uri.getFragment());
         }
@@ -915,97 +1103,117 @@ string URI::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URL URI::toURL() const {
-
-    if (!this->isAbsolute()) {
+URL URI::toURL() const
+{
+    if (!this->isAbsolute())
+    {
         throw IllegalArgumentException(
-            __FILE__, __LINE__, "URI is not absolute, cannot convert to an URL.");
+            __FILE__,
+            __LINE__,
+            "URI is not absolute, cannot convert to an URL.");
     }
 
     return URL(this->toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::getAuthority() const {
+std::string URI::getAuthority() const
+{
     return this->decode(this->uri.getAuthority());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::getFragment() const {
+std::string URI::getFragment() const
+{
     return this->decode(this->uri.getFragment());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::getHost() const {
+std::string URI::getHost() const
+{
     return this->uri.getHost();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::getPath() const {
+std::string URI::getPath() const
+{
     return this->decode(this->uri.getPath());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int URI::getPort() const {
+int URI::getPort() const
+{
     return this->uri.getPort();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::getQuery() const {
+std::string URI::getQuery() const
+{
     return this->decode(this->uri.getQuery());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::getRawAuthority() const {
+std::string URI::getRawAuthority() const
+{
     return this->uri.getAuthority();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::getRawFragment() const {
+std::string URI::getRawFragment() const
+{
     return this->uri.getFragment();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::getRawPath() const {
+std::string URI::getRawPath() const
+{
     return this->uri.getPath();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::getRawQuery() const {
+std::string URI::getRawQuery() const
+{
     return this->uri.getQuery();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::getRawSchemeSpecificPart() const {
+std::string URI::getRawSchemeSpecificPart() const
+{
     return this->uri.getSchemeSpecificPart();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::getRawUserInfo() const {
+std::string URI::getRawUserInfo() const
+{
     return this->uri.getUserInfo();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::getScheme() const {
+std::string URI::getScheme() const
+{
     return this->uri.getScheme();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::getSchemeSpecificPart() const {
+std::string URI::getSchemeSpecificPart() const
+{
     return this->decode(this->uri.getSchemeSpecificPart());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URI::getUserInfo() const {
+std::string URI::getUserInfo() const
+{
     return this->decode(this->uri.getUserInfo());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool URI::isAbsolute() const {
+bool URI::isAbsolute() const
+{
     return this->uri.isAbsolute();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool URI::isOpaque() const {
+bool URI::isOpaque() const
+{
     return this->uri.isOpaque();
 }

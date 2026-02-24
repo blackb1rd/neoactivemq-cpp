@@ -22,34 +22,38 @@
 
 #include <string>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
     class ContentHandler;
 
     /**
-     * Defines a factory interface for content handlers. An implementation of this interface
-     * must map a MIME type into an instance of ContentHandler.
+     * Defines a factory interface for content handlers. An implementation of
+     * this interface must map a MIME type into an instance of ContentHandler.
      *
      * @since 1.0
      */
-    class DECAF_API ContentHandlerFactory {
+    class DECAF_API ContentHandlerFactory
+    {
     public:
-
         virtual ~ContentHandlerFactory();
 
         /**
          * Creates a content handler to handle contentType.
          *
          * @param contentType
-         *      specifies the content type which is handled by the returned ContentHandler.
+         *      specifies the content type which is handled by the returned
+         * ContentHandler.
          *
          * @return content handler object for a specific content type.
          */
-        virtual ContentHandler* createContentHandler(const std::string& contentType) = 0;
-
+        virtual ContentHandler* createContentHandler(
+            const std::string& contentType) = 0;
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /* _DECAF_NET_CONTENTHANDLERFACTORY_H_ */

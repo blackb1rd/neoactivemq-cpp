@@ -19,15 +19,17 @@
 
 #include <decaf/io/IOException.h>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
     /**
      * Exception for errors when manipulating sockets.
      */
-    class DECAF_API SocketException : public io::IOException {
+    class DECAF_API SocketException : public io::IOException
+    {
     public:
-
         SocketException();
 
         SocketException(const lang::Exception& ex);
@@ -41,11 +43,16 @@ namespace net {
          *
          * @param file The file name where exception occurs
          * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
+         * @param cause The exception that was the cause for this one to be
+         * thrown.
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        SocketException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        SocketException(const char*           file,
+                        const int             lineNumber,
+                        const std::exception* cause,
+                        const char*           msg,
+                        ...);
 
         /**
          * Constructor
@@ -65,23 +72,28 @@ namespace net {
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        SocketException(const char* file, const int lineNumber, const char* msg, ...);
+        SocketException(const char* file,
+                        const int   lineNumber,
+                        const char* msg,
+                        ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
-         * @return a new Exception instance that is a copy of this Exception object.
+         * @return a new Exception instance that is a copy of this Exception
+         * object.
          */
-        virtual SocketException* clone() const {
+        virtual SocketException* clone() const
+        {
             return new SocketException(*this);
         }
 
         virtual ~SocketException() throw();
-
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
-#endif // _DECAF_NET_SOCKETEXCEPTION_H_
+#endif  // _DECAF_NET_SOCKETEXCEPTION_H_

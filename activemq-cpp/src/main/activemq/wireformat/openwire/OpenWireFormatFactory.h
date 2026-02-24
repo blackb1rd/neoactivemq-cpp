@@ -18,45 +18,55 @@
 #ifndef _ACTIVEMQ_WIREFORMAT_OPENWIRE_OPENWIREFORMATFACTORY_H_
 #define _ACTIVEMQ_WIREFORMAT_OPENWIRE_OPENWIREFORMATFACTORY_H_
 
+#include <activemq/commands/WireFormatInfo.h>
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormatFactory.h>
-#include <activemq/commands/WireFormatInfo.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/util/Properties.h>
 
-namespace activemq{
-namespace wireformat{
-namespace openwire{
+namespace activemq
+{
+namespace wireformat
+{
+    namespace openwire
+    {
 
-    using decaf::lang::Pointer;
+        using decaf::lang::Pointer;
 
-    class AMQCPP_API OpenWireFormatFactory : public wireformat::WireFormatFactory {
-    public:
+        class AMQCPP_API OpenWireFormatFactory
+            : public wireformat::WireFormatFactory
+        {
+        public:
+            /**
+             * Constructor - Sets Defaults for all properties, these are all
+             * subject to change once the <code>createWireFormat</code> method
+             * is called.
+             *
+             * URL options
+             * --------------------
+             * wireFormat.stackTraceEnabled
+             * wireFormat.cacheEnabled
+             * wireFormat.tcpNoDelayEnabled
+             * wireFormat.tightEncodingEnabled
+             * wireFormat.sizePrefixDisabled
+             * wireFormat.maxInactivityDuration
+             * wireFormat.maxInactivityDurationInitialDelay
+             */
+            OpenWireFormatFactory()
+            {
+            }
 
-        /**
-         * Constructor - Sets Defaults for all properties, these are all
-         * subject to change once the <code>createWireFormat</code> method
-         * is called.
-         *
-         * URL options
-         * --------------------
-         * wireFormat.stackTraceEnabled
-         * wireFormat.cacheEnabled
-         * wireFormat.tcpNoDelayEnabled
-         * wireFormat.tightEncodingEnabled
-         * wireFormat.sizePrefixDisabled
-         * wireFormat.maxInactivityDuration
-         * wireFormat.maxInactivityDurationInitialDelay
-         */
-        OpenWireFormatFactory() {}
+            virtual ~OpenWireFormatFactory()
+            {
+            }
 
-        virtual ~OpenWireFormatFactory() {}
+            virtual Pointer<wireformat::WireFormat> createWireFormat(
+                const decaf::util::Properties& properties);
+        };
 
-        virtual Pointer<wireformat::WireFormat> createWireFormat(const decaf::util::Properties& properties);
-
-    };
-
-}}}
+    }  // namespace openwire
+}  // namespace wireformat
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_WIREFORMAT_OPENWIRE_OPENWIREFORMATFACTORY_H_*/

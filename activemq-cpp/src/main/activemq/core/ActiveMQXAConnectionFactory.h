@@ -20,25 +20,28 @@
 
 #include <activemq/util/Config.h>
 
-#include <cms/XAConnectionFactory.h>
 #include <activemq/core/ActiveMQConnectionFactory.h>
+#include <cms/XAConnectionFactory.h>
 #include <decaf/net/URI.h>
 #include <decaf/util/Properties.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     using decaf::lang::Pointer;
 
-    class AMQCPP_API ActiveMQXAConnectionFactory : public cms::XAConnectionFactory,
-                                                   public ActiveMQConnectionFactory {
+    class AMQCPP_API ActiveMQXAConnectionFactory
+        : public cms::XAConnectionFactory,
+          public ActiveMQConnectionFactory
+    {
     private:
-
         ActiveMQXAConnectionFactory(const ActiveMQXAConnectionFactory&);
-        ActiveMQXAConnectionFactory& operator= (const ActiveMQXAConnectionFactory&);
+        ActiveMQXAConnectionFactory& operator=(
+            const ActiveMQXAConnectionFactory&);
 
     public:
-
         ActiveMQXAConnectionFactory();
 
         /**
@@ -58,23 +61,24 @@ namespace core {
          * @param password to authenticate with, defaults to ""
          */
         ActiveMQXAConnectionFactory(const decaf::net::URI& uri,
-                                    const std::string& username = "",
-                                    const std::string& password = "");
+                                    const std::string&     username = "",
+                                    const std::string&     password = "");
 
         virtual ~ActiveMQXAConnectionFactory();
 
         virtual cms::XAConnection* createXAConnection();
 
-        virtual cms::XAConnection* createXAConnection(const std::string& userName,
-                                                      const std::string& password);
+        virtual cms::XAConnection* createXAConnection(
+            const std::string& userName,
+            const std::string& password);
 
     protected:
-
-        virtual ActiveMQConnection* createActiveMQConnection(const Pointer<transport::Transport>& transport,
-                                                             const Pointer<decaf::util::Properties>& properties);
-
+        virtual ActiveMQConnection* createActiveMQConnection(
+            const Pointer<transport::Transport>&    transport,
+            const Pointer<decaf::util::Properties>& properties);
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_ACTIVEMQXACONNECTIONFACTORY_H_ */

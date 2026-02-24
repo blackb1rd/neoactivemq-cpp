@@ -18,13 +18,11 @@
 #include <gtest/gtest.h>
 
 #include <activemq/commands/ActiveMQDestination.h>
-#include <activemq/commands/ActiveMQTopic.h>
 #include <activemq/commands/ActiveMQQueue.h>
-#include <activemq/util/ActiveMQProperties.h>
+#include <activemq/commands/ActiveMQTopic.h>
 #include <activemq/util/ActiveMQMessageTransformation.h>
+#include <activemq/util/ActiveMQProperties.h>
 
-#include <cms/Destination.h>
-#include <cms/Destination.h>
 #include <cms/Destination.h>
 
 #include <decaf/lang/Pointer.h>
@@ -37,68 +35,89 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-class ActiveMQMessageTransformationTest : public ::testing::Test {};
+class ActiveMQMessageTransformationTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class CustomCmsTopic : public cms::Topic {
-    private:
+class CustomCmsTopic : public cms::Topic
+{
+private:
+    std::string                        name;
+    activemq::util::ActiveMQProperties props;
 
-        std::string name;
-        activemq::util::ActiveMQProperties props;
+public:
+    CustomCmsTopic()
+        : cms::Topic(),
+          name("TEST-CMS-TOPIC"),
+          props()
+    {
+    }
 
-    public:
+    virtual std::string getTopicName() const
+    {
+        return name;
+    }
 
-        CustomCmsTopic() : cms::Topic(), name("TEST-CMS-TOPIC"), props() {
+    virtual cms::Destination::DestinationType getDestinationType() const
+    {
+        return cms::Destination::TOPIC;
+    }
 
+    virtual cms::Destination* clone() const
+    {
+        return new CustomCmsTopic();
+    }
+
+    virtual void copy(const cms::Destination& source)
+    {
+    }
+
+    virtual bool equals(const cms::Destination& other) const
+    {
+        if (dynamic_cast<const CustomCmsTopic*>(&other) != NULL)
+        {
+            return true;
         }
 
-        virtual std::string getTopicName() const {
-            return name;
-        }
+        return false;
+    }
 
-        virtual cms::Destination::DestinationType getDestinationType() const {
-            return cms::Destination::TOPIC;
-        }
+    virtual const cms::CMSProperties& getCMSProperties() const
+    {
+        return props;
+    }
+};
 
-        virtual cms::Destination* clone() const {
-            return new CustomCmsTopic();
-        }
-
-        virtual void copy(const cms::Destination& source) {
-        }
-
-        virtual bool equals(const cms::Destination& other) const {
-
-            if (dynamic_cast<const CustomCmsTopic*>(&other) != NULL) {
-                return true;
-            }
-
-            return false;
-        }
-
-        virtual const cms::CMSProperties& getCMSProperties() const {
-            return props;
-        }
-
-    };
-
-}
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQMessageTransformationTest, testTransformDestination) {
-
-    CustomCmsTopic customTopic;
+TEST_F(ActiveMQMessageTransformationTest, testTransformDestination)
+{
+    CustomCmsTopic             customTopic;
     const ActiveMQDestination* transformed;
 
-    ASSERT_THROW(ActiveMQMessageTransformation::transformDestination(&customTopic, NULL), NullPointerException) << ("Should throw an NullPointerException");
+    ASSERT_THROW(
+        ActiveMQMessageTransformation::transformDestination(&customTopic, NULL),
+        NullPointerException)
+        << ("Should throw an NullPointerException");
 
-    ASSERT_THROW(ActiveMQMessageTransformation::transformDestination(NULL, NULL), NullPointerException) << ("Should throw an NullPointerException");
+    ASSERT_THROW(
+        ActiveMQMessageTransformation::transformDestination(NULL, NULL),
+        NullPointerException)
+        << ("Should throw an NullPointerException");
 
-    ASSERT_THROW(ActiveMQMessageTransformation::transformDestination(NULL, &transformed), NullPointerException) << ("Should throw an NullPointerException");
+    ASSERT_THROW(
+        ActiveMQMessageTransformation::transformDestination(NULL, &transformed),
+        NullPointerException)
+        << ("Should throw an NullPointerException");
 
-    ASSERT_TRUE(ActiveMQMessageTransformation::transformDestination(&customTopic, &transformed));
+    ASSERT_TRUE(
+        ActiveMQMessageTransformation::transformDestination(&customTopic,
+                                                            &transformed));
     ASSERT_TRUE(transformed != NULL);
     ASSERT_TRUE(transformed->isTopic());
     ASSERT_TRUE(!transformed->isQueue());
@@ -112,7 +131,9 @@ TEST_F(ActiveMQMessageTransformationTest, testTransformDestination) {
 
     ActiveMQQueue queue("ActiveMQ.Test.Queue");
 
-    ASSERT_TRUE(!ActiveMQMessageTransformation::transformDestination(&queue, &transformed));
+    ASSERT_TRUE(
+        !ActiveMQMessageTransformation::transformDestination(&queue,
+                                                             &transformed));
     ASSERT_TRUE(transformed != NULL);
     ASSERT_TRUE(!transformed->isTopic());
     ASSERT_TRUE(transformed->isQueue());

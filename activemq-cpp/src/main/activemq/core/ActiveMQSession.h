@@ -17,41 +17,42 @@
 #ifndef _ACTIVEMQ_CORE_ACTIVEMQSESSION_H_
 #define _ACTIVEMQ_CORE_ACTIVEMQSESSION_H_
 
-#include <cms/Session.h>
 #include <cms/ExceptionListener.h>
+#include <cms/Session.h>
 
-#include <activemq/util/Config.h>
+#include <activemq/commands/SessionInfo.h>
 #include <activemq/core/kernels/ActiveMQConsumerKernel.h>
 #include <activemq/core/kernels/ActiveMQProducerKernel.h>
 #include <activemq/core/kernels/ActiveMQSessionKernel.h>
-#include <activemq/commands/SessionInfo.h>
+#include <activemq/util/Config.h>
 
 #include <decaf/lang/Pointer.h>
 
-#include <string>
 #include <memory>
+#include <string>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     using decaf::lang::Pointer;
     using decaf::util::concurrent::atomic::AtomicBoolean;
 
     class ActiveMQConnection;
 
-    class AMQCPP_API ActiveMQSession : public virtual cms::Session {
+    class AMQCPP_API ActiveMQSession : public virtual cms::Session
+    {
     protected:
-
         Pointer<activemq::core::kernels::ActiveMQSessionKernel> kernel;
 
     private:
-
         ActiveMQSession(const ActiveMQSession&);
         ActiveMQSession& operator=(const ActiveMQSession&);
 
     public:
-
-        ActiveMQSession(Pointer<activemq::core::kernels::ActiveMQSessionKernel> kernel);
+        ActiveMQSession(
+            Pointer<activemq::core::kernels::ActiveMQSessionKernel> kernel);
 
         virtual ~ActiveMQSession();
 
@@ -69,12 +70,12 @@ namespace core {
          * Indicates whether or not the session is currently in the started
          * state.
          */
-        bool isStarted() const {
+        bool isStarted() const
+        {
             return this->kernel->isStarted();
         }
 
-    public:   // Implements Methods
-
+    public:  // Implements Methods
         virtual void close();
 
         virtual void commit();
@@ -83,25 +84,31 @@ namespace core {
 
         virtual void recover();
 
-        virtual cms::MessageConsumer* createConsumer(const cms::Destination* destination);
+        virtual cms::MessageConsumer* createConsumer(
+            const cms::Destination* destination);
 
-        virtual cms::MessageConsumer* createConsumer(const cms::Destination* destination,
-                                                     const std::string& selector);
+        virtual cms::MessageConsumer* createConsumer(
+            const cms::Destination* destination,
+            const std::string&      selector);
 
-        virtual cms::MessageConsumer* createConsumer(const cms::Destination* destination,
-                                                     const std::string& selector,
-                                                     bool noLocal);
+        virtual cms::MessageConsumer* createConsumer(
+            const cms::Destination* destination,
+            const std::string&      selector,
+            bool                    noLocal);
 
-        virtual cms::MessageConsumer* createDurableConsumer(const cms::Topic* destination,
-                                                            const std::string& name,
-                                                            const std::string& selector,
-                                                            bool noLocal = false);
+        virtual cms::MessageConsumer* createDurableConsumer(
+            const cms::Topic*  destination,
+            const std::string& name,
+            const std::string& selector,
+            bool               noLocal = false);
 
-        virtual cms::MessageProducer* createProducer(const cms::Destination* destination);
+        virtual cms::MessageProducer* createProducer(
+            const cms::Destination* destination);
 
         virtual cms::QueueBrowser* createBrowser(const cms::Queue* queue);
 
-        virtual cms::QueueBrowser* createBrowser(const cms::Queue* queue, const std::string& selector);
+        virtual cms::QueueBrowser* createBrowser(const cms::Queue*  queue,
+                                                 const std::string& selector);
 
         virtual cms::Queue* createQueue(const std::string& queueName);
 
@@ -115,7 +122,8 @@ namespace core {
 
         virtual cms::BytesMessage* createBytesMessage();
 
-        virtual cms::BytesMessage* createBytesMessage(const unsigned char* bytes, int bytesSize);
+        virtual cms::BytesMessage* createBytesMessage(const unsigned char* bytes,
+                                                      int bytesSize);
 
         virtual cms::StreamMessage* createStreamMessage();
 
@@ -125,18 +133,19 @@ namespace core {
 
         virtual cms::MapMessage* createMapMessage();
 
-        virtual cms::Session::AcknowledgeMode getAcknowledgeMode() const {
+        virtual cms::Session::AcknowledgeMode getAcknowledgeMode() const
+        {
             return this->kernel->getAcknowledgeMode();
         }
 
-        virtual bool isTransacted() const {
+        virtual bool isTransacted() const
+        {
             return this->kernel->isTransacted();
         }
 
         virtual void unsubscribe(const std::string& name);
 
-   public:  // ActiveMQSession specific Methods
-
+    public:  // ActiveMQSession specific Methods
         /**
          * This method gets any registered exception listener of this sessions
          * connection and returns it.  Mainly intended for use by the objects
@@ -144,18 +153,22 @@ namespace core {
          * exceptions that occur in the context of another thread.
          * @return cms::ExceptionListener pointer or NULL
          */
-        cms::ExceptionListener* getExceptionListener() {
+        cms::ExceptionListener* getExceptionListener()
+        {
             return this->kernel->getExceptionListener();
         }
 
         /**
-         * Set an MessageTransformer instance that is passed on to all MessageProducer and MessageConsumer
-         * objects created from this Session.
+         * Set an MessageTransformer instance that is passed on to all
+         * MessageProducer and MessageConsumer objects created from this
+         * Session.
          *
          * @param transformer
-         *      Pointer to the cms::MessageTransformer to set on all MessageConsumers and MessageProducers.
+         *      Pointer to the cms::MessageTransformer to set on all
+         * MessageConsumers and MessageProducers.
          */
-        virtual void setMessageTransformer(cms::MessageTransformer* transformer) {
+        virtual void setMessageTransformer(cms::MessageTransformer* transformer)
+        {
             this->kernel->setMessageTransformer(transformer);
         }
 
@@ -164,7 +177,8 @@ namespace core {
          *
          * @return the pointer to the currently set cms::MessageTransformer.
          */
-        virtual cms::MessageTransformer* getMessageTransformer() const {
+        virtual cms::MessageTransformer* getMessageTransformer() const
+        {
             return this->kernel->getMessageTransformer();
         }
 
@@ -173,7 +187,8 @@ namespace core {
          * session is closed than this method throws an exception.
          * @return SessionInfo Reference
          */
-        const commands::SessionInfo& getSessionInfo() const {
+        const commands::SessionInfo& getSessionInfo() const
+        {
             return this->kernel->getSessionInfo();
         }
 
@@ -182,19 +197,21 @@ namespace core {
          * is closed than this method throws an exception.
          * @return SessionId Reference
          */
-        const commands::SessionId& getSessionId() const {
+        const commands::SessionId& getSessionId() const
+        {
             return this->kernel->getSessionId();
         }
 
         /**
          * Gets the ActiveMQConnection that is associated with this session.
          */
-        ActiveMQConnection* getConnection() const {
+        ActiveMQConnection* getConnection() const
+        {
             return this->kernel->getConnection();
         }
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CORE_ACTIVEMQSESSION_H_*/

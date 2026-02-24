@@ -20,55 +20,59 @@
 
 #include <decaf/util/Config.h>
 
-#include <decaf/util/Random.h>
 #include <decaf/security/SecureRandomSpi.h>
+#include <decaf/util/Random.h>
 
 #include <memory>
 
-namespace decaf {
-namespace security {
+namespace decaf
+{
+namespace security
+{
 
     /**
      * @since 1.0
      */
-    class DECAF_API SecureRandom : public decaf::util::Random {
+    class DECAF_API SecureRandom : public decaf::util::Random
+    {
     private:
-
         std::unique_ptr<SecureRandomSpi> secureRandom;
 
     public:
-
         /**
-         * Creates a new instance of a secure random number generator that implements the
-         * default random number algorithm.
+         * Creates a new instance of a secure random number generator that
+         * implements the default random number algorithm.
          *
-         * The SecureRandom instance that is created with this constructor is unseeded and
-         * can be seeded by calling the setSeed method.  Calls to nextBytes on an unseeded
-         * SecureRandom result in the object seeding itself.
+         * The SecureRandom instance that is created with this constructor is
+         * unseeded and can be seeded by calling the setSeed method.  Calls to
+         * nextBytes on an unseeded SecureRandom result in the object seeding
+         * itself.
          */
         SecureRandom();
 
         /**
-         * Creates a new instance of a secure random number generator that implements the
-         * default random number algorithm.
+         * Creates a new instance of a secure random number generator that
+         * implements the default random number algorithm.
          *
-         * The SecureRandom instance created by this constructor is seeded using the passed
-         * byte array.
+         * The SecureRandom instance created by this constructor is seeded using
+         * the passed byte array.
          *
          * @param seed
-         *      The seed bytes to use to seed this secure random number generator.
+         *      The seed bytes to use to seed this secure random number
+         * generator.
          */
         SecureRandom(const std::vector<unsigned char>& seed);
 
         /**
-         * Creates a new instance of a secure random number generator that implements the
-         * default random number algorithm.
+         * Creates a new instance of a secure random number generator that
+         * implements the default random number algorithm.
          *
-         * The SecureRandom instance created by this constructor is seeded using the passed
-         * byte array.
+         * The SecureRandom instance created by this constructor is seeded using
+         * the passed byte array.
          *
          * @param seed
-         *      The seed bytes to use to seed this secure random number generator.
+         *      The seed bytes to use to seed this secure random number
+         * generator.
          * @param size
          *      The number of bytes in the seed buffer.
          *
@@ -80,7 +84,6 @@ namespace security {
         virtual ~SecureRandom();
 
     public:  // Virtual Methods
-
         virtual void nextBytes(std::vector<unsigned char>& buf);
 
         virtual void nextBytes(unsigned char* buf, int size);
@@ -88,8 +91,8 @@ namespace security {
         virtual void setSeed(unsigned long long seed);
 
         /**
-         * Supplements or sets the seed of this secure random number generator, calls to this
-         * method never reduces randomness.
+         * Supplements or sets the seed of this secure random number generator,
+         * calls to this method never reduces randomness.
          *
          * @param seed
          *      A vector of bytes that is used update the seed of the RNG.
@@ -97,11 +100,12 @@ namespace security {
         virtual void setSeed(const std::vector<unsigned char>& seed);
 
         /**
-         * Supplements or sets the seed of this secure random number generator, calls to this
-         * method never reduces randomness.
+         * Supplements or sets the seed of this secure random number generator,
+         * calls to this method never reduces randomness.
          *
          * @param seed
-         *      The seed bytes to use to seed this secure random number generator.
+         *      The seed bytes to use to seed this secure random number
+         * generator.
          * @param size
          *      The number of bytes in the seed buffer.
          *
@@ -111,11 +115,10 @@ namespace security {
         virtual void setSeed(const unsigned char* seed, int size);
 
     protected:  // Virtual method used by all non-virtual methods in Random.
-
         virtual int next(int bits);
-
     };
 
-}}
+}  // namespace security
+}  // namespace decaf
 
 #endif /* _DECAF_SECURITY_SECURERANDOM_H_ */

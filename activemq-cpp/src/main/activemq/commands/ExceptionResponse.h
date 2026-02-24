@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BrokerError.h>
@@ -30,8 +30,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -44,22 +46,19 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API ExceptionResponse : public Response {
+    class AMQCPP_API ExceptionResponse : public Response
+    {
     protected:
-
         Pointer<BrokerError> exception;
 
     public:
-
         const static unsigned char ID_EXCEPTIONRESPONSE = 31;
 
     private:
-
         ExceptionResponse(const ExceptionResponse&);
-        ExceptionResponse& operator= (const ExceptionResponse&);
+        ExceptionResponse& operator=(const ExceptionResponse&);
 
     public:
-
         ExceptionResponse();
 
         virtual ~ExceptionResponse();
@@ -75,11 +74,11 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const Pointer<BrokerError>& getException() const;
-        virtual Pointer<BrokerError>& getException();
+        virtual Pointer<BrokerError>&       getException();
         virtual void setException(const Pointer<BrokerError>& exception);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_EXCEPTIONRESPONSE_H_*/

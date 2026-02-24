@@ -18,15 +18,18 @@
 #ifndef _DECAF_NIO_READONLYBUFFEREXCEPTION_H_
 #define _DECAF_NIO_READONLYBUFFEREXCEPTION_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace nio {
+namespace decaf
+{
+namespace nio
+{
 
-    class DECAF_API ReadOnlyBufferException : public lang::exceptions::UnsupportedOperationException {
+    class DECAF_API ReadOnlyBufferException
+        : public lang::exceptions::UnsupportedOperationException
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -53,12 +56,16 @@ namespace nio {
          *
          * @param file The file name where exception occurs
          * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
+         * @param cause The exception that was the cause for this one to be
+         * thrown.
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        ReadOnlyBufferException(const char* file, const int lineNumber,
-                                const std::exception* cause, const char* msg, ...);
+        ReadOnlyBufferException(const char*           file,
+                                const int             lineNumber,
+                                const std::exception* cause,
+                                const char*           msg,
+                                ...);
 
         /**
          * Constructor
@@ -76,21 +83,25 @@ namespace nio {
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        ReadOnlyBufferException(const char* file, const int lineNumber, const char* msg, ...);
+        ReadOnlyBufferException(const char* file,
+                                const int   lineNumber,
+                                const char* msg,
+                                ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          */
-        virtual ReadOnlyBufferException* clone() const {
+        virtual ReadOnlyBufferException* clone() const
+        {
             return new ReadOnlyBufferException(*this);
         }
 
-        virtual ~ReadOnlyBufferException() throw ();
-
+        virtual ~ReadOnlyBufferException() throw();
     };
 
-}}
+}  // namespace nio
+}  // namespace decaf
 
 #endif /*_DECAF_NIO_READONLYBUFFEREXCEPTION_H_*/

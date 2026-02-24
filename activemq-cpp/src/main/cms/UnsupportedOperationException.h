@@ -18,37 +18,40 @@
 #ifndef _CMS_UNSUPPORTEDOPERATIONEXCEPTION_H_
 #define _CMS_UNSUPPORTEDOPERATIONEXCEPTION_H_
 
-#include <cms/Config.h>
 #include <cms/CMSException.h>
+#include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
 
-    /**
-     * This exception must be thrown when a CMS client attempts use a CMS method that is not
-     * implemented or not supported by the CMS Provider in use.
-     *
-     * @since 2.0
-     */
-    class CMS_API UnsupportedOperationException : public CMSException {
-    public:
+/**
+ * This exception must be thrown when a CMS client attempts use a CMS method
+ * that is not implemented or not supported by the CMS Provider in use.
+ *
+ * @since 2.0
+ */
+class CMS_API UnsupportedOperationException : public CMSException
+{
+public:
+    UnsupportedOperationException();
 
-        UnsupportedOperationException();
+    UnsupportedOperationException(const UnsupportedOperationException& ex);
 
-        UnsupportedOperationException(const UnsupportedOperationException& ex);
+    UnsupportedOperationException(const std::string& message);
 
-        UnsupportedOperationException(const std::string& message);
+    UnsupportedOperationException(const std::string&    message,
+                                  const std::exception* cause);
 
-        UnsupportedOperationException(const std::string& message, const std::exception* cause);
+    UnsupportedOperationException(
+        const std::string&                              message,
+        const std::exception*                           cause,
+        const std::vector<std::pair<std::string, int>>& stackTrace);
 
-        UnsupportedOperationException(const std::string& message, const std::exception* cause,
-                                      const std::vector<std::pair<std::string, int> >& stackTrace);
+    virtual ~UnsupportedOperationException() throw();
 
-        virtual ~UnsupportedOperationException() throw();
+    virtual UnsupportedOperationException* clone();
+};
 
-        virtual UnsupportedOperationException* clone();
-
-    };
-
-}
+}  // namespace cms
 
 #endif /* _CMS_UNSUPPORTEDOPERATIONEXCEPTION_H_ */

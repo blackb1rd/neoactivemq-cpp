@@ -22,40 +22,46 @@ using namespace decaf::internal;
 using namespace decaf::internal::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-URIType::URIType(const std::string& source) : source(source),
-                                              scheme(),
-                                              schemeSpecificPart(),
-                                              authority(),
-                                              userinfo(),
-                                              host(),
-                                              port(-1),
-                                              path(),
-                                              query(),
-                                              fragment(),
-                                              opaque(false),
-                                              absolute(false),
-                                              serverAuthority(false),
-                                              valid(false),
-                                              hashCode(-1) {
+URIType::URIType(const std::string& source)
+    : source(source),
+      scheme(),
+      schemeSpecificPart(),
+      authority(),
+      userinfo(),
+      host(),
+      port(-1),
+      path(),
+      query(),
+      fragment(),
+      opaque(false),
+      absolute(false),
+      serverAuthority(false),
+      valid(false),
+      hashCode(-1)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URIType::URIType() : source(),
-                     scheme(),
-                     schemeSpecificPart(),
-                     authority(),
-                     userinfo(),
-                     host(),
-                     port( -1 ),
-                     path(),
-                     query(),
-                     fragment(),
-                     opaque(false),
-                     absolute(false),
-                     serverAuthority(false),
-                     valid(false),
-                     hashCode(-1) {
+URIType::URIType()
+    : source(),
+      scheme(),
+      schemeSpecificPart(),
+      authority(),
+      userinfo(),
+      host(),
+      port(-1),
+      path(),
+      query(),
+      fragment(),
+      opaque(false),
+      absolute(false),
+      serverAuthority(false),
+      valid(false),
+      hashCode(-1)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URIType::~URIType() {}
+URIType::~URIType()
+{
+}

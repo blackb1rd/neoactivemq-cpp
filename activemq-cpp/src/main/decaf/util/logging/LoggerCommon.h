@@ -17,26 +17,31 @@
 #ifndef _DECAF_UTIL_LOGGING_LOGGERCOMMON_H_
 #define _DECAF_UTIL_LOGGING_LOGGERCOMMON_H_
 
-namespace decaf{
-namespace util{
-namespace logging{
-
-    /**
-     * Defines an enumeration for logging levels
-     */
-    enum Levels
+namespace decaf
+{
+namespace util
+{
+    namespace logging
     {
-        Off,
-        Null,
-        Markblock,
-        Debug,
-        Info,
-        Warn,
-        Error,
-        Fatal,
-        Throwing
-    };
 
-}}}
+        /**
+         * Defines an enumeration for logging levels
+         */
+        enum Levels
+        {
+            Off,
+            Null,
+            Markblock,
+            Debug,
+            Info,
+            Warn,
+            Error,
+            Fatal,
+            Throwing
+        };
+
+    }  // namespace logging
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_LOGGING_LOGGERCOMMON_H_ */

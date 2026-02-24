@@ -21,22 +21,23 @@
 #include <activemq/util/Config.h>
 #include <decaf/util/concurrent/Mutex.h>
 
-namespace activemq {
-namespace util {
+namespace activemq
+{
+namespace util
+{
 
     /**
      * This class is used to generate a sequence of long long values that
      * are incremented each time a new value is requested.  This class is
      * thread safe so the ids can be requested in different threads safely.
      */
-    class AMQCPP_API LongSequenceGenerator {
+    class AMQCPP_API LongSequenceGenerator
+    {
     private:
-
-        long long lastSequenceId;
+        long long                      lastSequenceId;
         decaf::util::concurrent::Mutex mutex;
 
     public:
-
         LongSequenceGenerator();
         virtual ~LongSequenceGenerator();
 
@@ -49,9 +50,9 @@ namespace util {
          * @return the last id that was generated.
          */
         long long getLastSequenceId();
-
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_UTIL_LONGSEQUENCEGENERATOR_H_*/

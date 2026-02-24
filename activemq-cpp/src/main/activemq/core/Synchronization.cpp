@@ -21,5 +21,6 @@ using namespace activemq;
 using namespace activemq::core;
 
 ////////////////////////////////////////////////////////////////////////////////
-Synchronization::~Synchronization() {}
-
+Synchronization::~Synchronization()
+{
+}

@@ -20,14 +20,14 @@
 #include <activemq/transport/discovery/DiscoveredBrokerData.h>
 #include <activemq/transport/discovery/DiscoveryListener.h>
 
-#include <decaf/net/URI.h>
 #include <decaf/lang/Thread.h>
+#include <decaf/net/URI.h>
 #include <decaf/util/HashMap.h>
+#include <decaf/util/concurrent/LinkedBlockingQueue.h>
 #include <decaf/util/concurrent/Mutex.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
 #include <decaf/util/concurrent/TimeUnit.h>
-#include <decaf/util/concurrent/LinkedBlockingQueue.h>
+#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 
 using namespace activemq;
 using namespace activemq::commands;
@@ -43,233 +43,302 @@ using namespace decaf::util::concurrent::atomic;
 
 ////////////////////////////////////////////////////////////////////////////////
 const int AbstractDiscoveryAgent::DEFAULT_INITIAL_RECONNECT_DELAY = 5000;
-const int AbstractDiscoveryAgent::DEFAULT_BACKOFF_MULTIPLIER = 2;
-const int AbstractDiscoveryAgent::DEFAULT_MAX_RECONNECT_DELAY = 30000;
-const int AbstractDiscoveryAgent::WORKER_KILL_TIME_SECONDS = 1000;
-const int AbstractDiscoveryAgent::HEARTBEAT_MISS_BEFORE_DEATH = 10;
-const int AbstractDiscoveryAgent::DEFAULT_KEEPALIVE_INTERVAL = 500;
+const int AbstractDiscoveryAgent::DEFAULT_BACKOFF_MULTIPLIER      = 2;
+const int AbstractDiscoveryAgent::DEFAULT_MAX_RECONNECT_DELAY     = 30000;
+const int AbstractDiscoveryAgent::WORKER_KILL_TIME_SECONDS        = 1000;
+const int AbstractDiscoveryAgent::HEARTBEAT_MISS_BEFORE_DEATH     = 10;
+const int AbstractDiscoveryAgent::DEFAULT_KEEPALIVE_INTERVAL      = 500;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace transport {
-namespace discovery {
+namespace activemq
+{
+namespace transport
+{
+    namespace discovery
+    {
 
-    class AbstractDiscoveryAgentImpl {
-    private:
+        class AbstractDiscoveryAgentImpl
+        {
+        private:
+            AbstractDiscoveryAgentImpl(const AbstractDiscoveryAgentImpl&);
+            AbstractDiscoveryAgentImpl& operator=(
+                const AbstractDiscoveryAgentImpl&);
 
-        AbstractDiscoveryAgentImpl(const AbstractDiscoveryAgentImpl&);
-        AbstractDiscoveryAgentImpl& operator=(const AbstractDiscoveryAgentImpl&);
+        public:
+            long long initialReconnectDelay;
+            long long maxReconnectDelay;
+            long long backOffMultiplier;
+            bool      useExponentialBackOff;
+            int       maxReconnectAttempts;
+            long long keepAliveInterval;
 
-    public:
+            AtomicBoolean               started;
+            Pointer<Thread>             worker;
+            Pointer<ThreadPoolExecutor> executor;
 
-        long long initialReconnectDelay;
-        long long maxReconnectDelay;
-        long long backOffMultiplier;
-        bool useExponentialBackOff;
-        int maxReconnectAttempts;
-        long long keepAliveInterval;
+            HashMap<std::string, Pointer<DiscoveredBrokerData>>
+                  discoveredServices;
+            Mutex discoveredServicesLock;
 
-        AtomicBoolean started;
-        Pointer<Thread> worker;
-        Pointer<ThreadPoolExecutor> executor;
+            URI                discoveryUri;
+            std::string        selfService;
+            std::string        group;
+            DiscoveryListener* listener;
+            long long          lastAdvertizeTime;
+            bool               reportAdvertizeFailed;
 
-        HashMap<std::string, Pointer<DiscoveredBrokerData> > discoveredServices;
-        Mutex discoveredServicesLock;
-
-        URI discoveryUri;
-        std::string selfService;
-        std::string group;
-        DiscoveryListener* listener;
-        long long lastAdvertizeTime;
-        bool reportAdvertizeFailed;
-
-    public:
-
-        AbstractDiscoveryAgentImpl() : initialReconnectDelay(AbstractDiscoveryAgent::DEFAULT_INITIAL_RECONNECT_DELAY),
-                                       maxReconnectDelay(AbstractDiscoveryAgent::DEFAULT_MAX_RECONNECT_DELAY),
-                                       backOffMultiplier(AbstractDiscoveryAgent::DEFAULT_BACKOFF_MULTIPLIER),
-                                       useExponentialBackOff(false),
-                                       maxReconnectAttempts(0),
-                                       keepAliveInterval(AbstractDiscoveryAgent::DEFAULT_KEEPALIVE_INTERVAL),
-                                       started(),
-                                       worker(),
-                                       executor(),
-                                       discoveredServices(),
-                                       discoveredServicesLock(),
-                                       discoveryUri(),
-                                       selfService(),
-                                       group("default"),
-                                       listener(),
-                                       lastAdvertizeTime(0),
-                                       reportAdvertizeFailed(true)
-        {}
-
-        ~AbstractDiscoveryAgentImpl() {
-            if (started.compareAndSet(true, false)) {
-                if (worker == NULL) {
-                    worker->join(5000);
-
-                    if (!worker->isAlive()) {
-                        worker->interrupt();
-                        worker->join(1000);
-                    }
-
-                    worker.reset(NULL);
-                }
-
-                executor->shutdown();
-                executor->awaitTermination(1, TimeUnit::MINUTES);
+        public:
+            AbstractDiscoveryAgentImpl()
+                : initialReconnectDelay(
+                      AbstractDiscoveryAgent::DEFAULT_INITIAL_RECONNECT_DELAY),
+                  maxReconnectDelay(
+                      AbstractDiscoveryAgent::DEFAULT_MAX_RECONNECT_DELAY),
+                  backOffMultiplier(
+                      AbstractDiscoveryAgent::DEFAULT_BACKOFF_MULTIPLIER),
+                  useExponentialBackOff(false),
+                  maxReconnectAttempts(0),
+                  keepAliveInterval(
+                      AbstractDiscoveryAgent::DEFAULT_KEEPALIVE_INTERVAL),
+                  started(),
+                  worker(),
+                  executor(),
+                  discoveredServices(),
+                  discoveredServicesLock(),
+                  discoveryUri(),
+                  selfService(),
+                  group("default"),
+                  listener(),
+                  lastAdvertizeTime(0),
+                  reportAdvertizeFailed(true)
+            {
             }
 
-        }
+            ~AbstractDiscoveryAgentImpl()
+            {
+                if (started.compareAndSet(true, false))
+                {
+                    if (worker == NULL)
+                    {
+                        worker->join(5000);
 
-        Executor& getExecutor() {
-            if (executor == NULL) {
-                synchronized(&discoveredServicesLock) {
-                    if (executor == NULL) {
-                        executor.reset(
-                            new ThreadPoolExecutor(1, 1, 45, TimeUnit::SECONDS,
+                        if (!worker->isAlive())
+                        {
+                            worker->interrupt();
+                            worker->join(1000);
+                        }
+
+                        worker.reset(NULL);
+                    }
+
+                    executor->shutdown();
+                    executor->awaitTermination(1, TimeUnit::MINUTES);
+                }
+            }
+
+            Executor& getExecutor()
+            {
+                if (executor == NULL)
+                {
+                    synchronized(&discoveredServicesLock)
+                    {
+                        if (executor == NULL)
+                        {
+                            executor.reset(new ThreadPoolExecutor(
+                                1,
+                                1,
+                                45,
+                                TimeUnit::SECONDS,
                                 new LinkedBlockingQueue<Runnable*>()));
+                        }
                     }
                 }
-            }
-            return *executor;
-        }
-
-        /**
-         * Returns true if this Broker has been marked as failed and it is now time to
-         * start a recovery attempt.
-         */
-        bool isTimeForRecovery(Pointer<DiscoveredBrokerData> service) {
-            synchronized(&discoveredServicesLock) {
-
-                if (!service->isFailed()) {
-                    return false;
-                }
-
-                int maxReconnectAttempts = this->maxReconnectAttempts;
-
-                // Are we done trying to recover this guy?
-                if (maxReconnectAttempts > 0 && service->getFailureCount() > maxReconnectAttempts) {
-                    return false;
-                }
-
-                // Is it not yet time?
-                if (System::currentTimeMillis() < service->getNextRecoveryTime()) {
-                    return false;
-                }
-
-                service->setFailed(false);
-                return true;
+                return *executor;
             }
 
-            return false;
-        }
-
-        void updateHeartBeat(Pointer<DiscoveredBrokerData> service) {
-            synchronized(&discoveredServicesLock) {
-
-                service->setLastHeartBeatTime(System::currentTimeMillis());
-
-                // Consider that the broker recovery has succeeded if it has not failed in 60 seconds.
-                if (!service->isFailed() && service->getFailureCount() > 0 &&
-                    (service->getLastHeartBeatTime() - service->getNextRecoveryTime()) > TimeUnit::MINUTES.toSeconds(60)) {
-
-                    service->setFailureCount(0);
-                    service->setNextRecoveryTime(System::currentTimeMillis());
-                }
-            }
-        }
-
-        bool markFailed(Pointer<DiscoveredBrokerData> service) {
-            synchronized(&discoveredServicesLock) {
-
-                if (!service->isFailed()) {
-                    service->setFailed(true);
-                    service->setFailureCount(service->getFailureCount() + 1);
-
-                    long long reconnectDelay = 0;
-                    if (!useExponentialBackOff) {
-                        reconnectDelay = initialReconnectDelay;
-                    } else {
-                        reconnectDelay = (long) Math::pow((double)backOffMultiplier, (double)service->getFailureCount());
-                        reconnectDelay = Math::min(reconnectDelay, maxReconnectDelay);
+            /**
+             * Returns true if this Broker has been marked as failed and it is
+             * now time to start a recovery attempt.
+             */
+            bool isTimeForRecovery(Pointer<DiscoveredBrokerData> service)
+            {
+                synchronized(&discoveredServicesLock)
+                {
+                    if (!service->isFailed())
+                    {
+                        return false;
                     }
 
-                    service->setNextRecoveryTime(System::currentTimeMillis() + reconnectDelay);
+                    int maxReconnectAttempts = this->maxReconnectAttempts;
+
+                    // Are we done trying to recover this guy?
+                    if (maxReconnectAttempts > 0 &&
+                        service->getFailureCount() > maxReconnectAttempts)
+                    {
+                        return false;
+                    }
+
+                    // Is it not yet time?
+                    if (System::currentTimeMillis() <
+                        service->getNextRecoveryTime())
+                    {
+                        return false;
+                    }
+
+                    service->setFailed(false);
                     return true;
                 }
+
+                return false;
             }
-            return false;
-        }
-    };
 
-    class ServiceAddedRunnable : public Runnable {
-    private:
+            void updateHeartBeat(Pointer<DiscoveredBrokerData> service)
+            {
+                synchronized(&discoveredServicesLock)
+                {
+                    service->setLastHeartBeatTime(System::currentTimeMillis());
 
-        AbstractDiscoveryAgent* agent;
-        Pointer<DiscoveredBrokerData> event;
-
-    public:
-
-        ServiceAddedRunnable(AbstractDiscoveryAgent* agent, Pointer<DiscoveredBrokerData> event) :
-            Runnable(), agent(agent), event(event) {
-        }
-        virtual ~ServiceAddedRunnable() {}
-
-        virtual void run() {
-            DiscoveryListener* listener = agent->getDiscoveryListener();
-            if (listener != NULL) {
-                listener->onServiceAdd(event.get());
+                    // Consider that the broker recovery has succeeded if it has
+                    // not failed in 60 seconds.
+                    if (!service->isFailed() &&
+                        service->getFailureCount() > 0 &&
+                        (service->getLastHeartBeatTime() -
+                         service->getNextRecoveryTime()) >
+                            TimeUnit::MINUTES.toSeconds(60))
+                    {
+                        service->setFailureCount(0);
+                        service->setNextRecoveryTime(
+                            System::currentTimeMillis());
+                    }
+                }
             }
-        }
-    };
 
-    class ServiceRemovedRunnable : public Runnable {
-    private:
+            bool markFailed(Pointer<DiscoveredBrokerData> service)
+            {
+                synchronized(&discoveredServicesLock)
+                {
+                    if (!service->isFailed())
+                    {
+                        service->setFailed(true);
+                        service->setFailureCount(service->getFailureCount() +
+                                                 1);
 
-        AbstractDiscoveryAgent* agent;
-        Pointer<DiscoveredBrokerData> event;
+                        long long reconnectDelay = 0;
+                        if (!useExponentialBackOff)
+                        {
+                            reconnectDelay = initialReconnectDelay;
+                        }
+                        else
+                        {
+                            reconnectDelay = (long)Math::pow(
+                                (double)backOffMultiplier,
+                                (double)service->getFailureCount());
+                            reconnectDelay =
+                                Math::min(reconnectDelay, maxReconnectDelay);
+                        }
 
-    public:
-
-        ServiceRemovedRunnable(AbstractDiscoveryAgent* agent, Pointer<DiscoveredBrokerData> event) :
-            Runnable(), agent(agent), event(event) {}
-        virtual ~ServiceRemovedRunnable() {}
-
-        virtual void run() {
-            DiscoveryListener* listener = agent->getDiscoveryListener();
-            if (listener != NULL) {
-                listener->onServiceRemove(event.get());
+                        service->setNextRecoveryTime(
+                            System::currentTimeMillis() + reconnectDelay);
+                        return true;
+                    }
+                }
+                return false;
             }
-        }
-    };
+        };
 
-}}}
+        class ServiceAddedRunnable : public Runnable
+        {
+        private:
+            AbstractDiscoveryAgent*       agent;
+            Pointer<DiscoveredBrokerData> event;
+
+        public:
+            ServiceAddedRunnable(AbstractDiscoveryAgent*       agent,
+                                 Pointer<DiscoveredBrokerData> event)
+                : Runnable(),
+                  agent(agent),
+                  event(event)
+            {
+            }
+
+            virtual ~ServiceAddedRunnable()
+            {
+            }
+
+            virtual void run()
+            {
+                DiscoveryListener* listener = agent->getDiscoveryListener();
+                if (listener != NULL)
+                {
+                    listener->onServiceAdd(event.get());
+                }
+            }
+        };
+
+        class ServiceRemovedRunnable : public Runnable
+        {
+        private:
+            AbstractDiscoveryAgent*       agent;
+            Pointer<DiscoveredBrokerData> event;
+
+        public:
+            ServiceRemovedRunnable(AbstractDiscoveryAgent*       agent,
+                                   Pointer<DiscoveredBrokerData> event)
+                : Runnable(),
+                  agent(agent),
+                  event(event)
+            {
+            }
+
+            virtual ~ServiceRemovedRunnable()
+            {
+            }
+
+            virtual void run()
+            {
+                DiscoveryListener* listener = agent->getDiscoveryListener();
+                if (listener != NULL)
+                {
+                    listener->onServiceRemove(event.get());
+                }
+            }
+        };
+
+    }  // namespace discovery
+}  // namespace transport
+}  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractDiscoveryAgent::AbstractDiscoveryAgent() : DiscoveryAgent(), impl(new AbstractDiscoveryAgentImpl) {
+AbstractDiscoveryAgent::AbstractDiscoveryAgent()
+    : DiscoveryAgent(),
+      impl(new AbstractDiscoveryAgentImpl)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractDiscoveryAgent::~AbstractDiscoveryAgent() {
-    try {
+AbstractDiscoveryAgent::~AbstractDiscoveryAgent()
+{
+    try
+    {
         delete this->impl;
     }
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool AbstractDiscoveryAgent::isStarted() const {
+bool AbstractDiscoveryAgent::isStarted() const
+{
     return impl->started.get();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::start() {
-    if (impl->started.compareAndSet(false, true)) {
+void AbstractDiscoveryAgent::start()
+{
+    if (impl->started.compareAndSet(false, true))
+    {
         doStart();
 
-        if (impl->worker == NULL) {
+        if (impl->worker == NULL)
+        {
             impl->worker.reset(new Thread(this));
             impl->worker->start();
         }
@@ -279,15 +348,20 @@ void AbstractDiscoveryAgent::start() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::stop() {
-    // Changing the isStarted flag will signal the thread that it needs to shut down.
-    if (impl->started.compareAndSet(true, false)) {
+void AbstractDiscoveryAgent::stop()
+{
+    // Changing the isStarted flag will signal the thread that it needs to shut
+    // down.
+    if (impl->started.compareAndSet(true, false))
+    {
         doStop();
 
-        if (impl->worker == NULL) {
+        if (impl->worker == NULL)
+        {
             impl->worker->join(WORKER_KILL_TIME_SECONDS);
 
-            if (!impl->worker->isAlive()) {
+            if (!impl->worker->isAlive())
+            {
                 impl->worker->interrupt();
                 impl->worker->join(WORKER_KILL_TIME_SECONDS);
             }
@@ -301,31 +375,44 @@ void AbstractDiscoveryAgent::stop() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::run() {
-
+void AbstractDiscoveryAgent::run()
+{
     Thread::currentThread()->setName("Discovery Agent Thread.");
 
-    while (impl->started.get()) {
+    while (impl->started.get())
+    {
         doTimeKeepingServices();
-        try {
+        try
+        {
             doDiscovery();
-        } catch (InterruptedException& ex) {
+        }
+        catch (InterruptedException& ex)
+        {
             return;
-        } catch (Exception& ignore) {
+        }
+        catch (Exception& ignore)
+        {
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::registerService(const std::string& name) {
+void AbstractDiscoveryAgent::registerService(const std::string& name)
+{
     impl->selfService = name;
-    if (impl->started.get()) {
-        try {
+    if (impl->started.get())
+    {
+        try
+        {
             doAdvertizeSelf();
-        } catch (Exception& e) {
-            // If a the advertise fails, chances are all subsequent sends will fail
-            // too.. No need to keep reporting the same error over and over.
-            if (impl->reportAdvertizeFailed) {
+        }
+        catch (Exception& e)
+        {
+            // If a the advertise fails, chances are all subsequent sends will
+            // fail too.. No need to keep reporting the same error over and
+            // over.
+            if (impl->reportAdvertizeFailed)
+            {
                 impl->reportAdvertizeFailed = false;
             }
         }
@@ -333,123 +420,154 @@ void AbstractDiscoveryAgent::registerService(const std::string& name) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::serviceFailed(const activemq::commands::DiscoveryEvent& event) {
-
+void AbstractDiscoveryAgent::serviceFailed(
+    const activemq::commands::DiscoveryEvent& event)
+{
     Pointer<DiscoveredBrokerData> service;
-    synchronized(&impl->discoveredServicesLock) {
-        try {
+    synchronized(&impl->discoveredServicesLock)
+    {
+        try
+        {
             service = impl->discoveredServices.get(event.getServiceName());
-        } catch (NoSuchElementException& ex) {}
+        }
+        catch (NoSuchElementException& ex)
+        {
+        }
     }
 
-    if (service != NULL && impl->markFailed(service)) {
+    if (service != NULL && impl->markFailed(service))
+    {
         fireServiceRemovedEvent(service);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::setDiscoveryListener(DiscoveryListener* listener) {
+void AbstractDiscoveryAgent::setDiscoveryListener(DiscoveryListener* listener)
+{
     this->impl->listener = listener;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryListener* AbstractDiscoveryAgent::getDiscoveryListener() const {
+DiscoveryListener* AbstractDiscoveryAgent::getDiscoveryListener() const
+{
     return this->impl->listener;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::setDiscoveryURI(const URI& discoveryURI) {
+void AbstractDiscoveryAgent::setDiscoveryURI(const URI& discoveryURI)
+{
     impl->discoveryUri = discoveryURI;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URI AbstractDiscoveryAgent::getDiscoveryURI() const {
+URI AbstractDiscoveryAgent::getDiscoveryURI() const
+{
     return impl->discoveryUri;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::setServiceName(const std::string& name) {
+void AbstractDiscoveryAgent::setServiceName(const std::string& name)
+{
     impl->selfService = name;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string AbstractDiscoveryAgent::getServiceName() const {
+std::string AbstractDiscoveryAgent::getServiceName() const
+{
     return impl->selfService;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::setKeepAliveInterval(long long interval) {
+void AbstractDiscoveryAgent::setKeepAliveInterval(long long interval)
+{
     impl->keepAliveInterval = interval;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long AbstractDiscoveryAgent::getKeepAliveInterval() const {
+long long AbstractDiscoveryAgent::getKeepAliveInterval() const
+{
     return impl->keepAliveInterval;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::setInitialReconnectDelay(long long initialReconnectDelay) {
+void AbstractDiscoveryAgent::setInitialReconnectDelay(
+    long long initialReconnectDelay)
+{
     impl->initialReconnectDelay = initialReconnectDelay;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long AbstractDiscoveryAgent::getInitialReconnectDelay() const {
+long long AbstractDiscoveryAgent::getInitialReconnectDelay() const
+{
     return impl->initialReconnectDelay;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::setMaxReconnectAttempts(int maxReconnectAttempts) {
+void AbstractDiscoveryAgent::setMaxReconnectAttempts(int maxReconnectAttempts)
+{
     impl->maxReconnectAttempts = maxReconnectAttempts;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int AbstractDiscoveryAgent::getMaxReconnectAttempts() const {
+int AbstractDiscoveryAgent::getMaxReconnectAttempts() const
+{
     return impl->maxReconnectAttempts;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::setMaxReconnectDelay(long long maxReconnectDelay) {
+void AbstractDiscoveryAgent::setMaxReconnectDelay(long long maxReconnectDelay)
+{
     impl->maxReconnectDelay = maxReconnectDelay;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long AbstractDiscoveryAgent::getMaxReconnectDelay() const {
+long long AbstractDiscoveryAgent::getMaxReconnectDelay() const
+{
     return impl->maxReconnectDelay;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::setUseExponentialBackOff(bool useExponentialBackOff) {
+void AbstractDiscoveryAgent::setUseExponentialBackOff(bool useExponentialBackOff)
+{
     impl->useExponentialBackOff = useExponentialBackOff;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool AbstractDiscoveryAgent::isUseExponentialBackOff() const {
+bool AbstractDiscoveryAgent::isUseExponentialBackOff() const
+{
     return impl->useExponentialBackOff;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::setBackOffMultiplier(long long multiplier) {
+void AbstractDiscoveryAgent::setBackOffMultiplier(long long multiplier)
+{
     impl->backOffMultiplier = multiplier;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long AbstractDiscoveryAgent::getBackOffMultiplier() const {
+long long AbstractDiscoveryAgent::getBackOffMultiplier() const
+{
     return impl->backOffMultiplier;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::setGroup(const std::string& group) {
+void AbstractDiscoveryAgent::setGroup(const std::string& group)
+{
     impl->group = group;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string AbstractDiscoveryAgent::getGroup() const {
+std::string AbstractDiscoveryAgent::getGroup() const
+{
     return impl->group;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::fireServiceRemovedEvent(Pointer<DiscoveredBrokerData> event) {
-    if (impl->listener != NULL && impl->started.get()) {
+void AbstractDiscoveryAgent::fireServiceRemovedEvent(
+    Pointer<DiscoveredBrokerData> event)
+{
+    if (impl->listener != NULL && impl->started.get())
+    {
         // Have the listener process the event async so that
         // he does not block this thread since we are doing time sensitive
         // processing of events.
@@ -458,8 +576,11 @@ void AbstractDiscoveryAgent::fireServiceRemovedEvent(Pointer<DiscoveredBrokerDat
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::fireServiceAddedEvent(Pointer<DiscoveredBrokerData> event) {
-    if (impl->listener != NULL && impl->started.get()) {
+void AbstractDiscoveryAgent::fireServiceAddedEvent(
+    Pointer<DiscoveredBrokerData> event)
+{
+    if (impl->listener != NULL && impl->started.get())
+    {
         // Have the listener process the event async so that
         // he does not block this thread since we are doing time sensitive
         // processing of events.
@@ -468,25 +589,35 @@ void AbstractDiscoveryAgent::fireServiceAddedEvent(Pointer<DiscoveredBrokerData>
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::processLiveService(const std::string& brokerName, const std::string& service) {
-
-    if (getServiceName().empty() || service != getServiceName()) {
+void AbstractDiscoveryAgent::processLiveService(const std::string& brokerName,
+                                                const std::string& service)
+{
+    if (getServiceName().empty() || service != getServiceName())
+    {
         Pointer<DiscoveredBrokerData> remoteBroker;
-        synchronized(&impl->discoveredServicesLock) {
-            try {
+        synchronized(&impl->discoveredServicesLock)
+        {
+            try
+            {
                 remoteBroker = impl->discoveredServices.get(service);
-            } catch (NoSuchElementException& ignored) {
+            }
+            catch (NoSuchElementException& ignored)
+            {
             }
         }
 
-        if (remoteBroker == NULL) {
+        if (remoteBroker == NULL)
+        {
             remoteBroker.reset(new DiscoveredBrokerData(brokerName, service));
             impl->discoveredServices.put(service, remoteBroker);
             fireServiceAddedEvent(remoteBroker);
             doAdvertizeSelf();
-        } else {
+        }
+        else
+        {
             impl->updateHeartBeat(remoteBroker);
-            if (impl->isTimeForRecovery(remoteBroker)) {
+            if (impl->isTimeForRecovery(remoteBroker))
+            {
                 fireServiceAddedEvent(remoteBroker);
             }
         }
@@ -494,32 +625,38 @@ void AbstractDiscoveryAgent::processLiveService(const std::string& brokerName, c
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::processDeadService(const std::string& service) {
-
-    if (service != getServiceName()) {
-
+void AbstractDiscoveryAgent::processDeadService(const std::string& service)
+{
+    if (service != getServiceName())
+    {
         Pointer<DiscoveredBrokerData> remoteBroker;
-        synchronized(&impl->discoveredServicesLock) {
-            try {
+        synchronized(&impl->discoveredServicesLock)
+        {
+            try
+            {
                 remoteBroker = impl->discoveredServices.get(service);
-            } catch (NoSuchElementException& ignored) {
+            }
+            catch (NoSuchElementException& ignored)
+            {
             }
         }
 
-        if (remoteBroker != NULL && !remoteBroker->isFailed()) {
+        if (remoteBroker != NULL && !remoteBroker->isFailed())
+        {
             fireServiceRemovedEvent(remoteBroker);
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::doTimeKeepingServices() {
-
-    if (impl->started.get()) {
+void AbstractDiscoveryAgent::doTimeKeepingServices()
+{
+    if (impl->started.get())
+    {
         long long currentTime = System::currentTimeMillis();
         if (currentTime < impl->lastAdvertizeTime ||
-            ((currentTime - impl->keepAliveInterval) > impl->lastAdvertizeTime)) {
-
+            ((currentTime - impl->keepAliveInterval) > impl->lastAdvertizeTime))
+        {
             doAdvertizeSelf();
             impl->lastAdvertizeTime = currentTime;
         }
@@ -528,19 +665,25 @@ void AbstractDiscoveryAgent::doTimeKeepingServices() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgent::doExpireOldServices() {
-    long long expireTime = System::currentTimeMillis() -
+void AbstractDiscoveryAgent::doExpireOldServices()
+{
+    long long expireTime =
+        System::currentTimeMillis() -
         (impl->keepAliveInterval * HEARTBEAT_MISS_BEFORE_DEATH);
 
-    std::vector< Pointer<DiscoveredBrokerData> > services;
-    synchronized(&impl->discoveredServicesLock) {
+    std::vector<Pointer<DiscoveredBrokerData>> services;
+    synchronized(&impl->discoveredServicesLock)
+    {
         services = impl->discoveredServices.values().toArray();
     }
 
-    std::vector< Pointer<DiscoveredBrokerData> >::iterator iter = services.begin();
-    for (; iter != services.end(); ++iter) {
+    std::vector<Pointer<DiscoveredBrokerData>>::iterator iter =
+        services.begin();
+    for (; iter != services.end(); ++iter)
+    {
         Pointer<DiscoveredBrokerData> service = *iter;
-        if (service->getLastHeartBeatTime() < expireTime) {
+        if (service->getLastHeartBeatTime() < expireTime)
+        {
             processDeadService(service->getServiceName());
         }
     }

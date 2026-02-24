@@ -17,46 +17,48 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/net/ssl/SSLSocketFactory.h>
-#include <decaf/net/Socket.h>
 #include <decaf/io/IOException.h>
+#include <decaf/net/Socket.h>
+#include <decaf/net/ssl/SSLSocketFactory.h>
 
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::net;
 using namespace decaf::net::ssl;
 
-    class SSLSocketFactoryTest : public ::testing::Test {
+class SSLSocketFactoryTest : public ::testing::Test
+{
 public:
-
-        SSLSocketFactoryTest();
-        virtual ~SSLSocketFactoryTest();
-
-    };
+    SSLSocketFactoryTest();
+    virtual ~SSLSocketFactoryTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLSocketFactoryTest::SSLSocketFactoryTest() {
+SSLSocketFactoryTest::SSLSocketFactoryTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLSocketFactoryTest::~SSLSocketFactoryTest() {
+SSLSocketFactoryTest::~SSLSocketFactoryTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SSLSocketFactoryTest, testGetDefault) {
-
+TEST_F(SSLSocketFactoryTest, testGetDefault)
+{
     SocketFactory* factory = SSLSocketFactory::getDefault();
 
     ASSERT_TRUE(factory != NULL);
 
 #ifdef AMQCPP_USE_SSL
 
-    std::unique_ptr<Socket> sock( factory->createSocket() );
+    std::unique_ptr<Socket> sock(factory->createSocket());
     ASSERT_TRUE(sock.get() != NULL);
 
 #else
 
-    ASSERT_THROW(factory->createSocket(), IOException) << ("Should have thrown an IOException");
+    ASSERT_THROW(factory->createSocket(), IOException)
+        << ("Should have thrown an IOException");
 
 #endif
 }

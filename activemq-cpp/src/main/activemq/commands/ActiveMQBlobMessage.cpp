@@ -24,29 +24,37 @@ using namespace activemq;
 using namespace activemq::commands;
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::string ActiveMQBlobMessage::BINARY_MIME_TYPE = "application/octet-stream";
+const std::string ActiveMQBlobMessage::BINARY_MIME_TYPE =
+    "application/octet-stream";
 const unsigned char ActiveMQBlobMessage::ID_ACTIVEMQBLOBMESSAGE = 29;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQBlobMessage::ActiveMQBlobMessage() : ActiveMQMessageTemplate<cms::Message>(),
-                                             remoteBlobUrl(), mimeType( ActiveMQBlobMessage::BINARY_MIME_TYPE ),
-                                             name(), deletedByBroker( false ) {
+ActiveMQBlobMessage::ActiveMQBlobMessage()
+    : ActiveMQMessageTemplate<cms::Message>(),
+      remoteBlobUrl(),
+      mimeType(ActiveMQBlobMessage::BINARY_MIME_TYPE),
+      name(),
+      deletedByBroker(false)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ActiveMQBlobMessage::getDataStructureType() const {
+unsigned char ActiveMQBlobMessage::getDataStructureType() const
+{
     return ActiveMQBlobMessage::ID_ACTIVEMQBLOBMESSAGE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQBlobMessage* ActiveMQBlobMessage::cloneDataStructure() const {
-    std::unique_ptr<ActiveMQBlobMessage> message( new ActiveMQBlobMessage() );
-    message->copyDataStructure( this );
+ActiveMQBlobMessage* ActiveMQBlobMessage::cloneDataStructure() const
+{
+    std::unique_ptr<ActiveMQBlobMessage> message(new ActiveMQBlobMessage());
+    message->copyDataStructure(this);
     return message.release();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Message* ActiveMQBlobMessage::clone() const {
+cms::Message* ActiveMQBlobMessage::clone() const
+{
     ActiveMQBlobMessage* clone = this->cloneDataStructure();
     clone->setReadOnlyBody(false);
     clone->setReadOnlyProperties(false);
@@ -54,16 +62,19 @@ cms::Message* ActiveMQBlobMessage::clone() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBlobMessage::copyDataStructure( const DataStructure* src ) {
-    ActiveMQMessageTemplate<cms::Message>::copyDataStructure( src );
+void ActiveMQBlobMessage::copyDataStructure(const DataStructure* src)
+{
+    ActiveMQMessageTemplate<cms::Message>::copyDataStructure(src);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQBlobMessage::toString() const{
+std::string ActiveMQBlobMessage::toString() const
+{
     return ActiveMQMessageTemplate<cms::Message>::toString();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQBlobMessage::equals( const DataStructure* value ) const {
-    return ActiveMQMessageTemplate<cms::Message>::equals( value );
+bool ActiveMQBlobMessage::equals(const DataStructure* value) const
+{
+    return ActiveMQMessageTemplate<cms::Message>::equals(value);
 }

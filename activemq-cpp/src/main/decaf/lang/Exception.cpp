@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <stdio.h>
 #include "Exception.h"
-#include <decaf/util/logging/LoggerDefines.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/util/logging/LoggerDefines.h>
+#include <stdio.h>
 
 #include <sstream>
 #include <vector>
@@ -27,12 +27,14 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::util::logging;
 
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
 
-    class ExceptionData {
+    class ExceptionData
+    {
     public:
-
         /**
          * The cause of this exception.
          */
@@ -46,34 +48,51 @@ namespace lang {
         /**
          * The stack trace.
          */
-        std::vector< std::pair< std::string, int> > stackTrace;
+        std::vector<std::pair<std::string, int>> stackTrace;
 
     public:
-
-        ExceptionData() : message(), cause(NULL), stackTrace() {}
-
+        ExceptionData()
+            : message(),
+              cause(NULL),
+              stackTrace()
+        {
+        }
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-Exception::Exception() : Throwable(), data(new ExceptionData) {
+Exception::Exception()
+    : Throwable(),
+      data(new ExceptionData)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Exception::Exception(const Exception& ex) : Throwable(), data(new ExceptionData) {
+Exception::Exception(const Exception& ex)
+    : Throwable(),
+      data(new ExceptionData)
+{
     *this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Exception::Exception(const std::exception* cause) : Throwable(), data(new ExceptionData) {
+Exception::Exception(const std::exception* cause)
+    : Throwable(),
+      data(new ExceptionData)
+{
     this->initCause(cause);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Exception::Exception(const char* file, const int lineNumber, const char* msg, ...) :
-    Throwable(), data(new ExceptionData) {
-
+Exception::Exception(const char* file,
+                     const int   lineNumber,
+                     const char* msg,
+                     ...)
+    : Throwable(),
+      data(new ExceptionData)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -84,9 +103,14 @@ Exception::Exception(const char* file, const int lineNumber, const char* msg, ..
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Exception::Exception(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) :
-    Throwable(), data(new ExceptionData) {
-
+Exception::Exception(const char*           file,
+                     const int             lineNumber,
+                     const std::exception* cause,
+                     const char*           msg,
+                     ...)
+    : Throwable(),
+      data(new ExceptionData)
+{
     va_list vargs;
     va_start(vargs, msg);
     this->buildMessage(msg, vargs);
@@ -100,12 +124,14 @@ Exception::Exception(const char* file, const int lineNumber, const std::exceptio
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Exception::~Exception() throw () {
+Exception::~Exception() throw()
+{
     delete this->data;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Exception::setMessage(const char* msg, ...) {
+void Exception::setMessage(const char* msg, ...)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -113,8 +139,8 @@ void Exception::setMessage(const char* msg, ...) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Exception::buildMessage(const char* format, va_list& vargs) {
-
+void Exception::buildMessage(const char* format, va_list& vargs)
+{
     // We need to copy vargs because vsnprintf may consume it.
     va_list copy;
     va_copy(copy, vargs);
@@ -122,15 +148,18 @@ void Exception::buildMessage(const char* format, va_list& vargs) {
     // Start with a reasonable buffer size and grow if needed.
     std::size_t size = 1024;
     std::string result;
-    while (true) {
+    while (true)
+    {
         std::vector<char> buf(size);
         int needed = std::vsnprintf(buf.data(), buf.size(), format, copy);
-        if (needed < 0) {
+        if (needed < 0)
+        {
             // Encoding error; give up and set an empty message.
             result.clear();
             break;
         }
-        if (static_cast<std::size_t>(needed) < buf.size()) {
+        if (static_cast<std::size_t>(needed) < buf.size())
+        {
             // Successfully written.
             result.assign(buf.data(), static_cast<std::size_t>(needed));
             break;
@@ -145,45 +174,54 @@ void Exception::buildMessage(const char* format, va_list& vargs) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Exception::setMark(const char* file, const int lineNumber) {
+void Exception::setMark(const char* file, const int lineNumber)
+{
     // Add this mark to the end of the stack trace.
-    this->data->stackTrace.push_back(std::make_pair(std::string(file), (int) lineNumber));
+    this->data->stackTrace.push_back(
+        std::make_pair(std::string(file), (int)lineNumber));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Exception* Exception::clone() const {
+Exception* Exception::clone() const
+{
     return new Exception(*this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::pair<std::string, int> > Exception::getStackTrace() const {
+std::vector<std::pair<std::string, int>> Exception::getStackTrace() const
+{
     return this->data->stackTrace;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Exception::setStackTrace(const std::vector<std::pair<std::string, int> >& trace) {
+void Exception::setStackTrace(
+    const std::vector<std::pair<std::string, int>>& trace)
+{
     this->data->stackTrace = trace;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Exception::printStackTrace() const {
+void Exception::printStackTrace() const
+{
     printStackTrace(std::cerr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Exception::printStackTrace(std::ostream& stream) const {
+void Exception::printStackTrace(std::ostream& stream) const
+{
     stream << getStackTraceString();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Exception::getStackTraceString() const {
-
+std::string Exception::getStackTraceString() const
+{
     // Create the output stream.
     std::ostringstream stream;
 
     // Write the message and each stack entry.
     stream << this->data->message << std::endl;
-    for (unsigned int ix = 0; ix < this->data->stackTrace.size(); ++ix) {
+    for (unsigned int ix = 0; ix < this->data->stackTrace.size(); ++ix)
+    {
         stream << "\tFILE: " << this->data->stackTrace[ix].first;
         stream << ", LINE: " << this->data->stackTrace[ix].second;
         stream << std::endl;
@@ -194,38 +232,44 @@ std::string Exception::getStackTraceString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Exception& Exception::operator =(const Exception& ex) {
-    this->data->message = ex.data->message;
+Exception& Exception::operator=(const Exception& ex)
+{
+    this->data->message    = ex.data->message;
     this->data->stackTrace = ex.data->stackTrace;
-    this->data->cause = ex.data->cause;
+    this->data->cause      = ex.data->cause;
     return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Exception::initCause(const std::exception* cause) {
-
-    if (cause == NULL || cause == this) {
+void Exception::initCause(const std::exception* cause)
+{
+    if (cause == NULL || cause == this)
+    {
         return;
     }
 
     this->data->cause.reset(cause);
 
-    if (this->data->message == "") {
+    if (this->data->message == "")
+    {
         this->data->message = cause->what();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Exception::getMessage() const {
+std::string Exception::getMessage() const
+{
     return this->data->message;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::exception*Exception:: getCause() const {
+const std::exception* Exception::getCause() const
+{
     return this->data->cause.get();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const char* Exception::what() const throw () {
+const char* Exception::what() const throw()
+{
     return this->data->message.c_str();
 }

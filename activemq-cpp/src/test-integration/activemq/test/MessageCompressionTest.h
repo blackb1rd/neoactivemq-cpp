@@ -21,12 +21,14 @@
 #include <activemq/test/CMSTestFixture.h>
 #include <activemq/util/IntegrationCommon.h>
 
-namespace activemq {
-namespace test {
+namespace activemq
+{
+namespace test
+{
 
-    class MessageCompressionTest : public CMSTestFixture {
+    class MessageCompressionTest : public CMSTestFixture
+    {
     public:
-
         MessageCompressionTest();
         virtual ~MessageCompressionTest();
 
@@ -34,9 +36,9 @@ namespace test {
         void testBytesMessageCompression();
         void testStreamMessageCompression();
         void testMapMessageCompression();
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TEST_MESSAGECOMPRESSIONTEST_H_ */

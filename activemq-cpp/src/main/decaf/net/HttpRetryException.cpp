@@ -22,26 +22,38 @@ using namespace decaf::net;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-HttpRetryException::HttpRetryException() : io::IOException() {
+HttpRetryException::HttpRetryException()
+    : io::IOException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-HttpRetryException::~HttpRetryException() throw() {
+HttpRetryException::~HttpRetryException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-HttpRetryException::HttpRetryException(const Exception& ex) : io::IOException() {
-    *(Exception*) this = ex;
+HttpRetryException::HttpRetryException(const Exception& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-HttpRetryException::HttpRetryException(const HttpRetryException& ex) : io::IOException() {
-    *(Exception*) this = ex;
+HttpRetryException::HttpRetryException(const HttpRetryException& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-HttpRetryException::HttpRetryException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : io::IOException(cause) {
-
+HttpRetryException::HttpRetryException(const char*           file,
+                                       const int             lineNumber,
+                                       const std::exception* cause,
+                                       const char*           msg,
+                                       ...)
+    : io::IOException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -51,12 +63,18 @@ HttpRetryException::HttpRetryException(const char* file, const int lineNumber, c
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-HttpRetryException::HttpRetryException(const std::exception* cause) : io::IOException(cause) {
+HttpRetryException::HttpRetryException(const std::exception* cause)
+    : io::IOException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-HttpRetryException::HttpRetryException(const char* file, const int lineNumber, const char* msg, ...) : io::IOException() {
-
+HttpRetryException::HttpRetryException(const char* file,
+                                       const int   lineNumber,
+                                       const char* msg,
+                                       ...)
+    : io::IOException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

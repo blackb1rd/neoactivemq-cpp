@@ -29,12 +29,13 @@ using namespace activemq;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::stomp;
 
-    class StompWireFormatFactoryTest : public ::testing::Test {
-    };
+class StompWireFormatFactoryTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StompWireFormatFactoryTest, testCreateWireFormat) {
-
+TEST_F(StompWireFormatFactoryTest, testCreateWireFormat)
+{
     StompWireFormatFactory factory;
 
     Properties properties;

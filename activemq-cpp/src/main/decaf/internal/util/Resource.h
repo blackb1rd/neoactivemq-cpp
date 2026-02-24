@@ -20,23 +20,27 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace internal {
-namespace util {
+namespace decaf
+{
+namespace internal
+{
+    namespace util
+    {
 
-    /**
-     * Interface for all Managed Resources in Decaf, these objects are added to the
-     * Runtime System and are destroyed at shutdown.
-     *
-     * @since 1.0
-     */
-    class DECAF_API Resource {
-    public:
+        /**
+         * Interface for all Managed Resources in Decaf, these objects are added
+         * to the Runtime System and are destroyed at shutdown.
+         *
+         * @since 1.0
+         */
+        class DECAF_API Resource
+        {
+        public:
+            virtual ~Resource();
+        };
 
-        virtual ~Resource();
-
-    };
-
-}}}
+    }  // namespace util
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_UTIL_RESOURCE_H_ */

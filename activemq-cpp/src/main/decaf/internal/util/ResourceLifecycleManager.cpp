@@ -28,21 +28,26 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-ResourceLifecycleManager::ResourceLifecycleManager() : resources() {
+ResourceLifecycleManager::ResourceLifecycleManager()
+    : resources()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ResourceLifecycleManager::~ResourceLifecycleManager() {
-    try {
+ResourceLifecycleManager::~ResourceLifecycleManager()
+{
+    try
+    {
         this->destroyResources();
     }
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ResourceLifecycleManager::addResource(Resource* value) {
-
-    if (value == NULL) {
+void ResourceLifecycleManager::addResource(Resource* value)
+{
+    if (value == NULL)
+    {
         return;
     }
 
@@ -50,13 +55,15 @@ void ResourceLifecycleManager::addResource(Resource* value) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ResourceLifecycleManager::destroyResources() {
+void ResourceLifecycleManager::destroyResources()
+{
+    try
+    {
+        std::unique_ptr<Iterator<Resource*>> iterator(
+            this->resources.iterator());
 
-    try {
-
-        std::unique_ptr<Iterator<Resource*> > iterator(this->resources.iterator());
-
-        while (iterator->hasNext()) {
+        while (iterator->hasNext())
+        {
             delete iterator->next();
         }
 

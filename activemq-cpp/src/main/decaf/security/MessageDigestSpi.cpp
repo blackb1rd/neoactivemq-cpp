@@ -24,19 +24,27 @@ using namespace decaf::security;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageDigestSpi::MessageDigestSpi() : SecuritySpi() {
+MessageDigestSpi::MessageDigestSpi()
+    : SecuritySpi()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageDigestSpi::~MessageDigestSpi() {
+MessageDigestSpi::~MessageDigestSpi()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool MessageDigestSpi::isCloneable() const {
+bool MessageDigestSpi::isCloneable() const
+{
     return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageDigestSpi* MessageDigestSpi::clone() {
-    throw CloneNotSupportedException(__FILE__, __LINE__, "This MessageDisgestSpi cannot be cloned.");
+MessageDigestSpi* MessageDigestSpi::clone()
+{
+    throw CloneNotSupportedException(
+        __FILE__,
+        __LINE__,
+        "This MessageDisgestSpi cannot be cloned.");
 }

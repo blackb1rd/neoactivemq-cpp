@@ -23,37 +23,38 @@ using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-TimeoutException::TimeoutException() : decaf::lang::Exception() {
+TimeoutException::TimeoutException()
+    : decaf::lang::Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TimeoutException::TimeoutException(const decaf::lang::Exception& ex) : decaf::lang::Exception() {
-    *(Exception*) this = ex;
+TimeoutException::TimeoutException(const decaf::lang::Exception& ex)
+    : decaf::lang::Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TimeoutException::TimeoutException(const TimeoutException& ex) : decaf::lang::Exception() {
-    *(Exception*) this = ex;
+TimeoutException::TimeoutException(const TimeoutException& ex)
+    : decaf::lang::Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TimeoutException::TimeoutException(const std::exception* cause) : decaf::lang::Exception(cause) {
+TimeoutException::TimeoutException(const std::exception* cause)
+    : decaf::lang::Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TimeoutException::TimeoutException(const char* file, const int lineNumber, const char* msg, ...) : decaf::lang::Exception() {
-
-    va_list vargs;
-    va_start( vargs, msg);
-    buildMessage(msg, vargs);
-
-    // Set the first mark for this exception.
-    setMark(file, lineNumber);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-TimeoutException::TimeoutException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : decaf::lang::Exception(cause) {
-
+TimeoutException::TimeoutException(const char* file,
+                                   const int   lineNumber,
+                                   const char* msg,
+                                   ...)
+    : decaf::lang::Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -63,10 +64,28 @@ TimeoutException::TimeoutException(const char* file, const int lineNumber, const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TimeoutException::~TimeoutException() throw () {
+TimeoutException::TimeoutException(const char*           file,
+                                   const int             lineNumber,
+                                   const std::exception* cause,
+                                   const char*           msg,
+                                   ...)
+    : decaf::lang::Exception(cause)
+{
+    va_list vargs;
+    va_start(vargs, msg);
+    buildMessage(msg, vargs);
+
+    // Set the first mark for this exception.
+    setMark(file, lineNumber);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TimeoutException* TimeoutException::clone() const {
+TimeoutException::~TimeoutException() throw()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TimeoutException* TimeoutException::clone() const
+{
     return new TimeoutException(*this);
 }

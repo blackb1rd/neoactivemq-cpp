@@ -20,26 +20,30 @@
 
 #include <memory>
 
-#include <gtest/gtest.h>
 #include <activemq/util/CMSProvider.h>
 #include <activemq/util/IntegrationCommon.h>
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Thread.h>
 
-namespace activemq {
-namespace test {
+namespace activemq
+{
+namespace test
+{
 
-    class CMSTestFixture : public ::testing::Test {
+    class CMSTestFixture : public ::testing::Test
+    {
     protected:
-
         std::unique_ptr<util::CMSProvider> cmsProvider;
 
     public:
-
-        CMSTestFixture() : cmsProvider() {
+        CMSTestFixture()
+            : cmsProvider()
+        {
         }
 
-        virtual ~CMSTestFixture() {
+        virtual ~CMSTestFixture()
+        {
         }
 
         /**
@@ -49,19 +53,21 @@ namespace test {
          */
         virtual std::string getBrokerURL() const = 0;
 
-        void SetUp() override {
-            cmsProvider.reset( new util::CMSProvider( getBrokerURL() ) );
+        void SetUp() override
+        {
+            cmsProvider.reset(new util::CMSProvider(getBrokerURL()));
         };
 
-        void TearDown() override {
+        void TearDown() override
+        {
             // Wait a small period of time to allow the messages to all get
             // processed.
-            decaf::lang::Thread::sleep( 50 );
-            cmsProvider.reset( NULL );
+            decaf::lang::Thread::sleep(50);
+            cmsProvider.reset(NULL);
         };
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TEST_CMSTESTFIXTURE_H_ */

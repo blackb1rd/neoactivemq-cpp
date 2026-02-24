@@ -17,12 +17,12 @@
 
 #include "ActiveMQMessageAudit.h"
 
-#include <activemq/util/IdGenerator.h>
-#include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/commands/ProducerId.h>
+#include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/IdGenerator.h>
 
-#include <decaf/util/LRUCache.h>
 #include <decaf/util/BitSet.h>
+#include <decaf/util/LRUCache.h>
 #include <decaf/util/concurrent/Mutex.h>
 
 #include <string>
@@ -39,47 +39,56 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-AMQCPP_API const int ActiveMQMessageAudit::DEFAULT_WINDOW_SIZE = 2048;
+AMQCPP_API const int ActiveMQMessageAudit::DEFAULT_WINDOW_SIZE    = 2048;
 AMQCPP_API const int ActiveMQMessageAudit::MAXIMUM_PRODUCER_COUNT = 64;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
-    class MessageAuditImpl {
+    class MessageAuditImpl
+    {
     private:
-
         MessageAuditImpl(const MessageAuditImpl&);
-        MessageAuditImpl& operator= (const MessageAuditImpl&);
+        MessageAuditImpl& operator=(const MessageAuditImpl&);
 
     public:
-
-        int auditDepth;
-        int maximumNumberOfProducersToTrack;
+        int   auditDepth;
+        int   maximumNumberOfProducersToTrack;
         Mutex mutex;
 
-        LRUCache<std::string, Pointer<BitSet> > map;
+        LRUCache<std::string, Pointer<BitSet>> map;
 
-        MessageAuditImpl() : auditDepth(2048),
-                             maximumNumberOfProducersToTrack(64),
-                             mutex(),
-                             map() {
+        MessageAuditImpl()
+            : auditDepth(2048),
+              maximumNumberOfProducersToTrack(64),
+              mutex(),
+              map()
+        {
         }
 
-        MessageAuditImpl(int auditDepth, int maximumNumberOfProducersToTrack) :
-            auditDepth(auditDepth),
-            maximumNumberOfProducersToTrack(maximumNumberOfProducersToTrack),
-            mutex(),
-            map() {
+        MessageAuditImpl(int auditDepth, int maximumNumberOfProducersToTrack)
+            : auditDepth(auditDepth),
+              maximumNumberOfProducersToTrack(maximumNumberOfProducersToTrack),
+              mutex(),
+              map()
+        {
         }
 
-        void adjustMaxProducersToTrack(int value) {
+        void adjustMaxProducersToTrack(int value)
+        {
             // When value is smaller than current we need to move the entries
             // to a new cache with that setting so that old ones are pruned
             // since putAll will access the entries in the right order,
             // this shouldn't result in wrong cache entries being removed
-            if (value < maximumNumberOfProducersToTrack) {
-                LRUCache<std::string, Pointer<BitSet> > newMap(0, value, 0.75f, true);
+            if (value < maximumNumberOfProducersToTrack)
+            {
+                LRUCache<std::string, Pointer<BitSet>> newMap(0,
+                                                              value,
+                                                              0.75f,
+                                                              true);
                 newMap.putAll(this->map);
                 this->map.clear();
                 this->map.putAll(newMap);
@@ -89,70 +98,88 @@ namespace core {
         }
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQMessageAudit::ActiveMQMessageAudit() : impl(new MessageAuditImpl) {
+ActiveMQMessageAudit::ActiveMQMessageAudit()
+    : impl(new MessageAuditImpl)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQMessageAudit::ActiveMQMessageAudit(int auditDepth, int maximumNumberOfProducersToTrack) :
-    impl(new MessageAuditImpl(auditDepth, maximumNumberOfProducersToTrack)) {
+ActiveMQMessageAudit::ActiveMQMessageAudit(int auditDepth,
+                                           int maximumNumberOfProducersToTrack)
+    : impl(new MessageAuditImpl(auditDepth, maximumNumberOfProducersToTrack))
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQMessageAudit::~ActiveMQMessageAudit() {
-    try {
+ActiveMQMessageAudit::~ActiveMQMessageAudit()
+{
+    try
+    {
         delete this->impl;
     }
     AMQ_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ActiveMQMessageAudit::getAuditDepth() const {
+int ActiveMQMessageAudit::getAuditDepth() const
+{
     return this->impl->auditDepth;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageAudit::setAuditDepth(int value) {
+void ActiveMQMessageAudit::setAuditDepth(int value)
+{
     this->impl->auditDepth = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ActiveMQMessageAudit::getMaximumNumberOfProducersToTrack() const {
+int ActiveMQMessageAudit::getMaximumNumberOfProducersToTrack() const
+{
     return this->impl->maximumNumberOfProducersToTrack;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageAudit::getMaximumNumberOfProducersToTrack(int value) {
+void ActiveMQMessageAudit::getMaximumNumberOfProducersToTrack(int value)
+{
     this->impl->adjustMaxProducersToTrack(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQMessageAudit::isDuplicate(const std::string& id) const {
-    bool answer = false;
-    std::string seed = IdGenerator::getSeedFromId(id);
-    if (!seed.empty()) {
-
-        synchronized(&this->impl->mutex) {
-
+bool ActiveMQMessageAudit::isDuplicate(const std::string& id) const
+{
+    bool        answer = false;
+    std::string seed   = IdGenerator::getSeedFromId(id);
+    if (!seed.empty())
+    {
+        synchronized(&this->impl->mutex)
+        {
             Pointer<BitSet> bits;
-            try {
+            try
+            {
                 bits = this->impl->map.get(seed);
-            } catch (NoSuchElementException& ex) {
+            }
+            catch (NoSuchElementException& ex)
+            {
                 bits.reset(new BitSet(this->impl->auditDepth));
                 this->impl->map.put(seed, bits);
             }
 
             long long index = IdGenerator::getSequenceFromId(id);
-            if (index >= 0) {
-                int scaledIndex = (int) index;
-                if (index > Integer::MAX_VALUE) {
+            if (index >= 0)
+            {
+                int scaledIndex = (int)index;
+                if (index > Integer::MAX_VALUE)
+                {
                     scaledIndex = (int)(index % Integer::MAX_VALUE);
                 }
 
                 answer = bits->get(scaledIndex);
-                if (!answer) {
+                if (!answer)
+                {
                     bits->set(scaledIndex, true);
                 }
             }
@@ -162,34 +189,44 @@ bool ActiveMQMessageAudit::isDuplicate(const std::string& id) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQMessageAudit::isDuplicate(decaf::lang::Pointer<MessageId> msgId) const {
+bool ActiveMQMessageAudit::isDuplicate(
+    decaf::lang::Pointer<MessageId> msgId) const
+{
     bool answer = false;
 
-    if (msgId != NULL) {
+    if (msgId != NULL)
+    {
         Pointer<ProducerId> pid = msgId->getProducerId();
-        if (pid != NULL) {
+        if (pid != NULL)
+        {
             std::string seed = pid->toString();
-            if (!seed.empty()) {
-
-                synchronized(&this->impl->mutex) {
-
+            if (!seed.empty())
+            {
+                synchronized(&this->impl->mutex)
+                {
                     Pointer<BitSet> bits;
-                    try {
+                    try
+                    {
                         bits = this->impl->map.get(seed);
-                    } catch (NoSuchElementException& ex) {
+                    }
+                    catch (NoSuchElementException& ex)
+                    {
                         bits.reset(new BitSet(this->impl->auditDepth));
                         this->impl->map.put(seed, bits);
                     }
 
                     long long index = msgId->getProducerSequenceId();
-                    if (index >= 0) {
-                        int scaledIndex = (int) index;
-                        if (index > Integer::MAX_VALUE) {
+                    if (index >= 0)
+                    {
+                        int scaledIndex = (int)index;
+                        if (index > Integer::MAX_VALUE)
+                        {
                             scaledIndex = (int)(index % Integer::MAX_VALUE);
                         }
 
                         answer = bits->get(scaledIndex);
-                        if (!answer) {
+                        if (!answer)
+                        {
                             bits->set(scaledIndex, true);
                         }
                     }
@@ -201,23 +238,30 @@ bool ActiveMQMessageAudit::isDuplicate(decaf::lang::Pointer<MessageId> msgId) co
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageAudit::rollback(const std::string& msgId) {
+void ActiveMQMessageAudit::rollback(const std::string& msgId)
+{
     std::string seed = IdGenerator::getSeedFromId(msgId);
-    if (!seed.empty()) {
-
-        synchronized(&this->impl->mutex) {
-
+    if (!seed.empty())
+    {
+        synchronized(&this->impl->mutex)
+        {
             Pointer<BitSet> bits;
-            try {
+            try
+            {
                 bits = this->impl->map.get(seed);
-            } catch (NoSuchElementException& ex) {
+            }
+            catch (NoSuchElementException& ex)
+            {
             }
 
-            if (bits != NULL) {
+            if (bits != NULL)
+            {
                 long long index = IdGenerator::getSequenceFromId(msgId);
-                if (index >= 0) {
-                    int scaledIndex = (int) index;
-                    if (index > Integer::MAX_VALUE) {
+                if (index >= 0)
+                {
+                    int scaledIndex = (int)index;
+                    if (index > Integer::MAX_VALUE)
+                    {
                         scaledIndex = (int)(index % Integer::MAX_VALUE);
                     }
 
@@ -229,26 +273,36 @@ void ActiveMQMessageAudit::rollback(const std::string& msgId) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageAudit::rollback(decaf::lang::Pointer<commands::MessageId> msgId) {
-    if (msgId != NULL) {
+void ActiveMQMessageAudit::rollback(
+    decaf::lang::Pointer<commands::MessageId> msgId)
+{
+    if (msgId != NULL)
+    {
         Pointer<ProducerId> pid = msgId->getProducerId();
-        if (pid != NULL) {
+        if (pid != NULL)
+        {
             std::string seed = pid->toString();
-            if (!seed.empty()) {
-
-                synchronized(&this->impl->mutex) {
-
+            if (!seed.empty())
+            {
+                synchronized(&this->impl->mutex)
+                {
                     Pointer<BitSet> bits;
-                    try {
+                    try
+                    {
                         bits = this->impl->map.get(seed);
-                    } catch (NoSuchElementException& ex) {
+                    }
+                    catch (NoSuchElementException& ex)
+                    {
                     }
 
-                    if (bits != NULL) {
+                    if (bits != NULL)
+                    {
                         long long index = msgId->getProducerSequenceId();
-                        if (index >= 0) {
-                            int scaledIndex = (int) index;
-                            if (index > Integer::MAX_VALUE) {
+                        if (index >= 0)
+                        {
+                            int scaledIndex = (int)index;
+                            if (index > Integer::MAX_VALUE)
+                            {
                                 scaledIndex = (int)(index % Integer::MAX_VALUE);
                             }
 
@@ -262,28 +316,34 @@ void ActiveMQMessageAudit::rollback(decaf::lang::Pointer<commands::MessageId> ms
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQMessageAudit::isInOrder(const std::string& msgId) const {
+bool ActiveMQMessageAudit::isInOrder(const std::string& msgId) const
+{
     bool answer = true;
 
-    if (!msgId.empty()) {
+    if (!msgId.empty())
+    {
         std::string seed = IdGenerator::getSeedFromId(msgId);
-        if (!seed.empty()) {
-
-            synchronized(&this->impl->mutex) {
-
+        if (!seed.empty())
+        {
+            synchronized(&this->impl->mutex)
+            {
                 Pointer<BitSet> bits;
-                try {
+                try
+                {
                     bits = this->impl->map.get(seed);
-                } catch (NoSuchElementException& ex) {
+                }
+                catch (NoSuchElementException& ex)
+                {
                     bits.reset(new BitSet(this->impl->auditDepth));
                     this->impl->map.put(seed, bits);
                 }
 
                 long long index = IdGenerator::getSequenceFromId(msgId);
-                if (index >= 0) {
-
-                    int scaledIndex = (int) index;
-                    if (index > Integer::MAX_VALUE) {
+                if (index >= 0)
+                {
+                    int scaledIndex = (int)index;
+                    if (index > Integer::MAX_VALUE)
+                    {
                         scaledIndex = (int)(index % Integer::MAX_VALUE);
                     }
 
@@ -296,29 +356,38 @@ bool ActiveMQMessageAudit::isInOrder(const std::string& msgId) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQMessageAudit::isInOrder(decaf::lang::Pointer<commands::MessageId> msgId) const {
+bool ActiveMQMessageAudit::isInOrder(
+    decaf::lang::Pointer<commands::MessageId> msgId) const
+{
     bool answer = false;
 
-    if (msgId != NULL) {
+    if (msgId != NULL)
+    {
         Pointer<ProducerId> pid = msgId->getProducerId();
-        if (pid != NULL) {
+        if (pid != NULL)
+        {
             std::string seed = pid->toString();
-            if (!seed.empty()) {
-
-                synchronized(&this->impl->mutex) {
-
+            if (!seed.empty())
+            {
+                synchronized(&this->impl->mutex)
+                {
                     Pointer<BitSet> bits;
-                    try {
+                    try
+                    {
                         bits = this->impl->map.get(seed);
-                    } catch (NoSuchElementException& ex) {
+                    }
+                    catch (NoSuchElementException& ex)
+                    {
                         bits.reset(new BitSet(this->impl->auditDepth));
                         this->impl->map.put(seed, bits);
                     }
 
                     long long index = msgId->getProducerSequenceId();
-                    if (index >= 0) {
-                        int scaledIndex = (int) index;
-                        if (index > Integer::MAX_VALUE) {
+                    if (index >= 0)
+                    {
+                        int scaledIndex = (int)index;
+                        if (index > Integer::MAX_VALUE)
+                        {
                             scaledIndex = (int)(index % Integer::MAX_VALUE);
                         }
                         answer = ((bits->length() - 1) == scaledIndex);
@@ -331,21 +400,28 @@ bool ActiveMQMessageAudit::isInOrder(decaf::lang::Pointer<commands::MessageId> m
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long ActiveMQMessageAudit::getLastSeqId(decaf::lang::Pointer<commands::ProducerId> id) const {
+long long ActiveMQMessageAudit::getLastSeqId(
+    decaf::lang::Pointer<commands::ProducerId> id) const
+{
     long result = -1;
-    if (id != NULL) {
+    if (id != NULL)
+    {
         std::string seed = id->toString();
-        if (!seed.empty()) {
-
-            synchronized(&this->impl->mutex) {
-
+        if (!seed.empty())
+        {
+            synchronized(&this->impl->mutex)
+            {
                 Pointer<BitSet> bits;
-                try {
+                try
+                {
                     bits = this->impl->map.get(seed);
-                } catch (NoSuchElementException& ex) {
+                }
+                catch (NoSuchElementException& ex)
+                {
                 }
 
-                if (bits != NULL) {
+                if (bits != NULL)
+                {
                     result = bits->length() - 1;
                 }
             }
@@ -355,6 +431,7 @@ long long ActiveMQMessageAudit::getLastSeqId(decaf::lang::Pointer<commands::Prod
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageAudit::clear() {
+void ActiveMQMessageAudit::clear()
+{
     this->impl->map.clear();
 }

@@ -18,113 +18,128 @@
 #ifndef _ACTIVEMQ_UTIL_CMSPROVIDER_H_
 #define _ACTIVEMQ_UTIL_CMSPROVIDER_H_
 
-#include <string>
 #include <memory>
+#include <string>
 
-#include <cms/ConnectionFactory.h>
 #include <cms/Connection.h>
-#include <cms/MessageConsumer.h>
-#include <cms/MessageProducer.h>
-#include <cms/MessageListener.h>
-#include <cms/Session.h>
+#include <cms/ConnectionFactory.h>
 #include <cms/Destination.h>
+#include <cms/MessageConsumer.h>
+#include <cms/MessageListener.h>
+#include <cms/MessageProducer.h>
+#include <cms/Session.h>
 
 #include <decaf/io/Closeable.h>
 
-namespace activemq {
-namespace util {
+namespace activemq
+{
+namespace util
+{
 
-    class CMSProvider : decaf::io::Closeable {
+    class CMSProvider : decaf::io::Closeable
+    {
     private:
-
-        std::string brokerURL;
+        std::string                   brokerURL;
         cms::Session::AcknowledgeMode ackMode;
-        std::string username;
-        std::string password;
-        std::string clientId;
+        std::string                   username;
+        std::string                   password;
+        std::string                   clientId;
 
         std::string destinationName;
-        bool topic;
-        bool durable;
+        bool        topic;
+        bool        durable;
         std::string subscription;
 
         std::unique_ptr<cms::ConnectionFactory> connectionFactory;
-        std::unique_ptr<cms::Connection> connection;
-        std::unique_ptr<cms::Session> session;
-        std::unique_ptr<cms::MessageConsumer> consumer;
-        std::unique_ptr<cms::MessageProducer> producer;
-        std::unique_ptr<cms::MessageProducer> noDestProducer;
-        std::unique_ptr<cms::Destination> destination;
-        std::unique_ptr<cms::Destination> tempDestination;
+        std::unique_ptr<cms::Connection>        connection;
+        std::unique_ptr<cms::Session>           session;
+        std::unique_ptr<cms::MessageConsumer>   consumer;
+        std::unique_ptr<cms::MessageProducer>   producer;
+        std::unique_ptr<cms::MessageProducer>   noDestProducer;
+        std::unique_ptr<cms::Destination>       destination;
+        std::unique_ptr<cms::Destination>       tempDestination;
 
     public:
+        CMSProvider(const std::string&            brokerURL,
+                    cms::Session::AcknowledgeMode ackMode =
+                        cms::Session::AUTO_ACKNOWLEDGE);
 
-        CMSProvider(const std::string& brokerURL, cms::Session::AcknowledgeMode ackMode = cms::Session::AUTO_ACKNOWLEDGE);
-
-        CMSProvider(const std::string& brokerURL,
-                    const std::string& destinationName,
-                    const std::string& subscription,
-                    cms::Session::AcknowledgeMode ackMode = cms::Session::AUTO_ACKNOWLEDGE);
+        CMSProvider(const std::string&            brokerURL,
+                    const std::string&            destinationName,
+                    const std::string&            subscription,
+                    cms::Session::AcknowledgeMode ackMode =
+                        cms::Session::AUTO_ACKNOWLEDGE);
 
         virtual ~CMSProvider();
 
         virtual void close();
 
-        std::string getBrokerURL() const {
+        std::string getBrokerURL() const
+        {
             return this->brokerURL;
         }
 
-        void setBrokerURL(const std::string& brokerURL) {
+        void setBrokerURL(const std::string& brokerURL)
+        {
             this->brokerURL = brokerURL;
         }
 
-        void setDestinationName(const std::string name) {
+        void setDestinationName(const std::string name)
+        {
             this->destinationName = name;
         }
 
-        std::string getDestinationName() const {
+        std::string getDestinationName() const
+        {
             return this->destinationName;
         }
 
-        void setSubscription(const std::string name) {
+        void setSubscription(const std::string name)
+        {
             this->subscription = name;
         }
 
-        std::string getSubscription() const {
+        std::string getSubscription() const
+        {
             return this->subscription;
         }
 
-        void setTopic(bool value) {
+        void setTopic(bool value)
+        {
             this->topic = value;
         }
 
-        bool isTopic() const {
+        bool isTopic() const
+        {
             return this->topic;
         }
 
-        void setDurable(bool value) {
+        void setDurable(bool value)
+        {
             this->durable = value;
         }
 
-        bool isDurable() const {
+        bool isDurable() const
+        {
             return this->durable;
         }
 
-        void setAckMode(cms::Session::AcknowledgeMode ackMode) {
+        void setAckMode(cms::Session::AcknowledgeMode ackMode)
+        {
             this->ackMode = ackMode;
         }
 
-        cms::Session::AcknowledgeMode getAckMode() const {
+        cms::Session::AcknowledgeMode getAckMode() const
+        {
             return this->ackMode;
         }
 
     public:
-
         /**
          * Initializes a CMSProvider with the Login data for the session that
-         * this provider is managing.  Once called a new Connection to the broker
-         * is made and will remain open until a reconnect is requested or until
-         * the CMSProvider instance is closed.
+         * this provider is managing.  Once called a new Connection to the
+         * broker is made and will remain open until a reconnect is requested or
+         * until the CMSProvider instance is closed.
          */
         virtual void initialize(const std::string& username = "",
                                 const std::string& password = "",
@@ -142,14 +157,15 @@ namespace util {
         virtual void reconnectSession();
 
         /**
-         * Unsubscribes a durable consumer if one has been created and the chosen
-         * wireformat supports it.  The consumer is closed as a result any calls to
-         * it after calling this method will result in an error.
+         * Unsubscribes a durable consumer if one has been created and the
+         * chosen wireformat supports it.  The consumer is closed as a result
+         * any calls to it after calling this method will result in an error.
          */
         virtual void unsubscribe();
 
         /**
-         * Returns the ConnectionFactory object that this Provider has allocated.
+         * Returns the ConnectionFactory object that this Provider has
+         * allocated.
          */
         virtual cms::ConnectionFactory* getConnectionFactory();
 
@@ -174,8 +190,9 @@ namespace util {
         virtual cms::MessageProducer* getProducer();
 
         /**
-         * Returns the MessageProducer object that this Provider has allocated that has
-         * no assigned Destination, message sent must be assigned one at send time.
+         * Returns the MessageProducer object that this Provider has allocated
+         * that has no assigned Destination, message sent must be assigned one
+         * at send time.
          */
         virtual cms::MessageProducer* getNoDestProducer();
 
@@ -185,17 +202,19 @@ namespace util {
         virtual cms::Destination* getDestination();
 
         /**
-         * Returns the Temporary Destination object that this Provider has allocated.
+         * Returns the Temporary Destination object that this Provider has
+         * allocated.
          */
         virtual cms::Destination* getTempDestination();
 
         /**
-         * Destroys a Destination at the Broker side, freeing the resources associated with it.
+         * Destroys a Destination at the Broker side, freeing the resources
+         * associated with it.
          */
         virtual void destroyDestination(const cms::Destination* destination);
-
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_UTIL_CMSPROVIDER_H_*/

@@ -15,73 +15,73 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#include "DummySession.h"
 #include <activemq/cmsutil/DynamicDestinationResolver.h>
 #include <activemq/cmsutil/ResourceLifecycleManager.h>
-#include "DummySession.h"
+#include <gtest/gtest.h>
 
 using namespace activemq;
 using namespace activemq::cmsutil;
 
-    class DynamicDestinationResolverTest : public ::testing::Test {
-    };
+class DynamicDestinationResolverTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(DynamicDestinationResolverTest, testTopics) {
-
-    ResourceLifecycleManager mgr;
+TEST_F(DynamicDestinationResolverTest, testTopics)
+{
+    ResourceLifecycleManager   mgr;
     DynamicDestinationResolver resolver;
     resolver.init(&mgr);
 
     DummySession session(NULL);
 
     // Test topic
-    cms::Destination* testTopic = dynamic_cast<cms::Topic*>(resolver.resolveDestinationName(&session,
-            (std::string)"test", true ));
+    cms::Destination* testTopic = dynamic_cast<cms::Topic*>(
+        resolver.resolveDestinationName(&session, (std::string) "test", true));
 
     ASSERT_TRUE(testTopic != NULL);
 
     // Hello topic
-    cms::Destination* helloTopic = resolver.resolveDestinationName(&session,
-            (std::string)"hello", true );
+    cms::Destination* helloTopic =
+        resolver.resolveDestinationName(&session, (std::string) "hello", true);
 
     ASSERT_TRUE(helloTopic != NULL);
     ASSERT_TRUE(helloTopic != testTopic);
 
-    cms::Destination* testTopic2 = dynamic_cast<cms::Topic*>(resolver.resolveDestinationName(&session,
-                (std::string)"test", true ));
+    cms::Destination* testTopic2 = dynamic_cast<cms::Topic*>(
+        resolver.resolveDestinationName(&session, (std::string) "test", true));
 
     ASSERT_TRUE(testTopic2 != NULL);
     ASSERT_TRUE(testTopic == testTopic2);
 
     mgr.destroy();
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(DynamicDestinationResolverTest, testQueues) {
-
-    ResourceLifecycleManager mgr;
+TEST_F(DynamicDestinationResolverTest, testQueues)
+{
+    ResourceLifecycleManager   mgr;
     DynamicDestinationResolver resolver;
     resolver.init(&mgr);
 
     DummySession session(NULL);
 
     // Queue topic
-    cms::Destination* testQueue = dynamic_cast<cms::Queue*>(resolver.resolveDestinationName(&session,
-            (std::string)"test", false ));
+    cms::Destination* testQueue = dynamic_cast<cms::Queue*>(
+        resolver.resolveDestinationName(&session, (std::string) "test", false));
 
     ASSERT_TRUE(testQueue != NULL);
 
     // Hello queue
-    cms::Destination* helloQueue = resolver.resolveDestinationName(&session,
-            (std::string)"hello", false );
+    cms::Destination* helloQueue =
+        resolver.resolveDestinationName(&session, (std::string) "hello", false);
 
     ASSERT_TRUE(helloQueue != NULL);
     ASSERT_TRUE(helloQueue != testQueue);
 
-    cms::Destination* testQueue2 = dynamic_cast<cms::Queue*>(resolver.resolveDestinationName(&session,
-                (std::string)"test", false ));
+    cms::Destination* testQueue2 = dynamic_cast<cms::Queue*>(
+        resolver.resolveDestinationName(&session, (std::string) "test", false));
 
     ASSERT_TRUE(testQueue2 != NULL);
     ASSERT_TRUE(testQueue == testQueue2);

@@ -21,9 +21,12 @@ using namespace decaf;
 using namespace decaf::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-InetSocketAddress::InetSocketAddress() : SocketAddress() {
+InetSocketAddress::InetSocketAddress()
+    : SocketAddress()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InetSocketAddress::~InetSocketAddress() {
+InetSocketAddress::~InetSocketAddress()
+{
 }

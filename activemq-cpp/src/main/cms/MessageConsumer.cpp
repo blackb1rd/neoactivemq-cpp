@@ -20,7 +20,6 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageConsumer::~MessageConsumer() {
-
+MessageConsumer::~MessageConsumer()
+{
 }
-

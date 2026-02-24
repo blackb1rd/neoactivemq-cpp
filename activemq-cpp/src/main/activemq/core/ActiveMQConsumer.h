@@ -17,38 +17,38 @@
 #ifndef _ACTIVEMQ_CORE_ACTIVEMQCONSUMER_H_
 #define _ACTIVEMQ_CORE_ACTIVEMQCONSUMER_H_
 
+#include <cms/CMSException.h>
+#include <cms/Message.h>
 #include <cms/MessageConsumer.h>
 #include <cms/MessageListener.h>
-#include <cms/Message.h>
-#include <cms/CMSException.h>
 
-#include <activemq/util/Config.h>
-#include <activemq/core/kernels/ActiveMQConsumerKernel.h>
 #include <activemq/commands/ConsumerInfo.h>
 #include <activemq/core/RedeliveryPolicy.h>
+#include <activemq/core/kernels/ActiveMQConsumerKernel.h>
+#include <activemq/util/Config.h>
 
 #include <decaf/lang/Pointer.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     using decaf::lang::Pointer;
 
     class ActiveMQSession;
     class ActiveMQConsumerData;
 
-    class AMQCPP_API ActiveMQConsumer : public cms::MessageConsumer {
+    class AMQCPP_API ActiveMQConsumer : public cms::MessageConsumer
+    {
     private:
-
         ActiveMQConsumerData* config;
 
     private:
-
         ActiveMQConsumer(const ActiveMQConsumer&);
         ActiveMQConsumer& operator=(const ActiveMQConsumer&);
 
     public:
-
         /**
          * Create a new ActiveMQConsumer that contains the pointer to the Kernel
          * that implement the real MessageConsumer functionality.
@@ -56,12 +56,13 @@ namespace core {
          * @param ActiveMQConsumerKernel
          *      This Consumer's functionality kernel.
          */
-        ActiveMQConsumer(const Pointer<activemq::core::kernels::ActiveMQConsumerKernel>& kernel);
+        ActiveMQConsumer(
+            const Pointer<activemq::core::kernels::ActiveMQConsumerKernel>&
+                kernel);
 
         virtual ~ActiveMQConsumer();
 
     public:  // Interface Implementation for cms::MessageConsumer
-
         virtual void start();
 
         virtual void stop();
@@ -78,9 +79,11 @@ namespace core {
 
         virtual cms::MessageListener* getMessageListener() const;
 
-        virtual void setMessageAvailableListener(cms::MessageAvailableListener* listener);
+        virtual void setMessageAvailableListener(
+            cms::MessageAvailableListener* listener);
 
-        virtual cms::MessageAvailableListener* getMessageAvailableListener() const;
+        virtual cms::MessageAvailableListener* getMessageAvailableListener()
+            const;
 
         virtual std::string getMessageSelector() const;
 
@@ -89,7 +92,6 @@ namespace core {
         virtual cms::MessageTransformer* getMessageTransformer() const;
 
     public:
-
         /**
          * Get the Consumer information for this consumer
          * @return Reference to a Consumer Info Object
@@ -114,43 +116,47 @@ namespace core {
 
         /**
          * Sets the RedeliveryPolicy this Consumer should use when a rollback is
-         * performed on a transacted Consumer.  The Consumer takes ownership of the
-         * passed pointer.  The Consumer's redelivery policy can never be null, a
-         * call to this method with a NULL pointer is ignored.
+         * performed on a transacted Consumer.  The Consumer takes ownership of
+         * the passed pointer.  The Consumer's redelivery policy can never be
+         * null, a call to this method with a NULL pointer is ignored.
          *
          * @param policy
-         *      Pointer to a Redelivery Policy object that his Consumer will use.
+         *      Pointer to a Redelivery Policy object that his Consumer will
+         * use.
          */
         void setRedeliveryPolicy(RedeliveryPolicy* policy);
 
         /**
-         * Gets a pointer to this Consumer's Redelivery Policy object, the Consumer
-         * retains ownership of this pointer so the caller should not delete it.
+         * Gets a pointer to this Consumer's Redelivery Policy object, the
+         * Consumer retains ownership of this pointer so the caller should not
+         * delete it.
          *
-         * @return a Pointer to a RedeliveryPolicy that is in use by this Consumer.
+         * @return a Pointer to a RedeliveryPolicy that is in use by this
+         * Consumer.
          */
         RedeliveryPolicy* getRedeliveryPolicy() const;
 
         /**
-         * Gets the error that caused this Consumer to be in a Failed state, or NULL if
-         * there is no Error.
+         * Gets the error that caused this Consumer to be in a Failed state, or
+         * NULL if there is no Error.
          *
          * @return pointer to the error that faulted this Consumer or NULL.
          */
         decaf::lang::Exception* getFailureError() const;
 
         /**
-         * Time in Milliseconds before an automatic acknowledge is done for any outstanding
-         * delivered Messages.  A value less than one means no task is scheduled.
+         * Time in Milliseconds before an automatic acknowledge is done for any
+         * outstanding delivered Messages.  A value less than one means no task
+         * is scheduled.
          *
          * @return time in milliseconds for the scheduled ack task.
          */
         long long getOptimizedAckScheduledAckInterval() const;
 
         /**
-         * Sets the time in Milliseconds to schedule an automatic acknowledge of outstanding
-         * messages when optimize acknowledge is enabled.  A value less than one means disable
-         * any scheduled tasks.
+         * Sets the time in Milliseconds to schedule an automatic acknowledge of
+         * outstanding messages when optimize acknowledge is enabled.  A value
+         * less than one means disable any scheduled tasks.
          *
          * @param value
          *      The time interval to send scheduled acks.
@@ -169,9 +175,9 @@ namespace core {
          *      True if optimize acknowledge is enabled, false otherwise.
          */
         void setOptimizeAcknowledge(bool value);
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CORE_ACTIVEMQCONSUMER_H_*/

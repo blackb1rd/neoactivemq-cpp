@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
+#include <cstdio>
 #include <iostream>
 #include <string>
-#include <cstdio>
 #include <vector>
 
-#include <decaf/lang/Thread.h>
-#include <decaf/lang/Integer.h>
 #include <activemq/library/ActiveMQCPP.h>
+#include <decaf/lang/Integer.h>
+#include <decaf/lang/Thread.h>
 
-#include "TestSenderAndReceiver.h"
 #include "ConnectionFactoryMgr.h"
+#include "TestSenderAndReceiver.h"
 
 using namespace std;
 using namespace cms;
@@ -37,17 +37,19 @@ using namespace activemq::library;
 using namespace cmstemplate;
 
 ////////////////////////////////////////////////////////////////////////////////
-int main(int argc, char** argv) {
-
+int main(int argc, char** argv)
+{
     printf("Test Started\n");
-    int cnt = 25;
+    int cnt  = 25;
     int done = 240;
 
-    if (argc > 1) {
+    if (argc > 1)
+    {
         cnt = Integer::parseInt(argv[1]);
     }
 
-    if (argc > 2) {
+    if (argc > 2)
+    {
         done = Integer::parseInt(argv[2]);
     }
 
@@ -55,15 +57,16 @@ int main(int argc, char** argv) {
 
     ActiveMQCPP::initializeLibrary();
     ConnectionFactoryMgr::initialize();
-    int maxThreads = 30;
+    int maxThreads      = 30;
     int reservedThreads = 3;
     Receiver::initialize(reservedThreads, maxThreads);
 
     std::vector<TestSenderAndReceiver*> sar;
     sar.resize(cnt);
 
-    for (int i = 0; i < cnt; i++) {
-        string topic("topic");
+    for (int i = 0; i < cnt; i++)
+    {
+        string       topic("topic");
         stringstream str;
         str << i;
         topic += str.str();
@@ -73,10 +76,15 @@ int main(int argc, char** argv) {
 
     Thread::sleep(done * 1000);
 
-    for (int i = 0; i < cnt; i++) {
-        try {
+    for (int i = 0; i < cnt; i++)
+    {
+        try
+        {
             sar[i]->close();
-        } catch(...) {}
+        }
+        catch (...)
+        {
+        }
         delete sar[i];
     }
 

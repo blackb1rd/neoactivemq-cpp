@@ -18,28 +18,34 @@
 #ifndef _ACTIVEMQ_COMMANDS_COMMAND_H_
 #define _ACTIVEMQ_COMMANDS_COMMAND_H_
 
-#include <string>
-#include <activemq/util/Config.h>
 #include <activemq/commands/BaseDataStructure.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/Config.h>
 #include <decaf/lang/Pointer.h>
+#include <string>
 
-namespace activemq{
-namespace state{
+namespace activemq
+{
+namespace state
+{
     class CommandVisitor;
-}
-namespace commands{
+}  // namespace state
 
-    class AMQCPP_API Command : public BaseDataStructure {
+namespace commands
+{
+
+    class AMQCPP_API Command : public BaseDataStructure
+    {
     public:
-
-        virtual ~Command() {}
+        virtual ~Command()
+        {
+        }
 
         /**
          * Sets the Command Id of this Message
          * @param id Command Id
          */
-        virtual void setCommandId( int id ) = 0;
+        virtual void setCommandId(int id) = 0;
 
         /**
          * Gets the Command Id of this Message
@@ -51,7 +57,7 @@ namespace commands{
          * Set if this Message requires a Response
          * @param required true if response is required
          */
-        virtual void setResponseRequired( const bool required ) = 0;
+        virtual void setResponseRequired(const bool required) = 0;
 
         /**
          * Is a Response required for this Command
@@ -67,47 +73,49 @@ namespace commands{
 
         /**
          * Allows a Visitor to visit this command and return a response to the
-         * command based on the command type being visited.  The command will call
-         * the proper processXXX method in the visitor.
+         * command based on the command type being visited.  The command will
+         * call the proper processXXX method in the visitor.
          *
-         * @return a Response to the visitor being called or NULL if no response.
+         * @return a Response to the visitor being called or NULL if no
+         * response.
          */
         virtual decaf::lang::Pointer<commands::Command> visit(
-            activemq::state::CommandVisitor* visitor ) = 0;
+            activemq::state::CommandVisitor* visitor) = 0;
 
         /*
          * This section contains a set of short-cut methods for determining if a
-         * Command is of a certain type.  These are the most commonly used Commands
-         * and we save several casts and some ugly code by just adding these here.
+         * Command is of a certain type.  These are the most commonly used
+         * Commands and we save several casts and some ugly code by just adding
+         * these here.
          */
-        virtual bool isBrokerInfo() const = 0;
-        virtual bool isControlCommand() const = 0;
-        virtual bool isConnectionControl() const = 0;
-        virtual bool isConnectionInfo() const = 0;
-        virtual bool isConnectionError() const = 0;
-        virtual bool isConsumerInfo() const = 0;
-        virtual bool isConsumerControl() const = 0;
-        virtual bool isDestinationInfo() const = 0;
-        virtual bool isFlushCommand() const = 0;
-        virtual bool isKeepAliveInfo() const = 0;
-        virtual bool isMessage() const = 0;
-        virtual bool isMessageAck() const = 0;
-        virtual bool isMessagePull() const = 0;
-        virtual bool isMessageDispatch() const = 0;
+        virtual bool isBrokerInfo() const                  = 0;
+        virtual bool isControlCommand() const              = 0;
+        virtual bool isConnectionControl() const           = 0;
+        virtual bool isConnectionInfo() const              = 0;
+        virtual bool isConnectionError() const             = 0;
+        virtual bool isConsumerInfo() const                = 0;
+        virtual bool isConsumerControl() const             = 0;
+        virtual bool isDestinationInfo() const             = 0;
+        virtual bool isFlushCommand() const                = 0;
+        virtual bool isKeepAliveInfo() const               = 0;
+        virtual bool isMessage() const                     = 0;
+        virtual bool isMessageAck() const                  = 0;
+        virtual bool isMessagePull() const                 = 0;
+        virtual bool isMessageDispatch() const             = 0;
         virtual bool isMessageDispatchNotification() const = 0;
-        virtual bool isProducerAck() const = 0;
-        virtual bool isProducerInfo() const = 0;
-        virtual bool isResponse() const = 0;
-        virtual bool isReplayCommand() const = 0;
-        virtual bool isRemoveInfo() const = 0;
-        virtual bool isRemoveSubscriptionInfo() const = 0;
-        virtual bool isSessionInfo() const = 0;
-        virtual bool isShutdownInfo() const = 0;
-        virtual bool isTransactionInfo() const = 0;
-        virtual bool isWireFormatInfo() const = 0;
-
+        virtual bool isProducerAck() const                 = 0;
+        virtual bool isProducerInfo() const                = 0;
+        virtual bool isResponse() const                    = 0;
+        virtual bool isReplayCommand() const               = 0;
+        virtual bool isRemoveInfo() const                  = 0;
+        virtual bool isRemoveSubscriptionInfo() const      = 0;
+        virtual bool isSessionInfo() const                 = 0;
+        virtual bool isShutdownInfo() const                = 0;
+        virtual bool isTransactionInfo() const             = 0;
+        virtual bool isWireFormatInfo() const              = 0;
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_COMMAND_H_*/

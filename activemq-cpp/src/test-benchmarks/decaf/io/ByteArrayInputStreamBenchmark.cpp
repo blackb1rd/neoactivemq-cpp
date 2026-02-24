@@ -24,63 +24,73 @@
 using namespace decaf;
 using namespace decaf::io;
 
-namespace decaf {
-namespace io {
+namespace decaf
+{
+namespace io
+{
 
-    class ByteArrayInputStreamBenchmark : public ::testing::Test {
+    class ByteArrayInputStreamBenchmark : public ::testing::Test
+    {
     protected:
-
         static const int bufferSize = 200000;
 
-        unsigned char* buffer;
+        unsigned char*             buffer;
         std::vector<unsigned char> stlBuffer;
 
-        void SetUp() override {
+        void SetUp() override
+        {
             buffer = new unsigned char[bufferSize];
 
             // init to full String Buffer
             stlBuffer.reserve(bufferSize);
-            for (int ix = 0; ix < bufferSize - 1; ++ix) {
+            for (int ix = 0; ix < bufferSize - 1; ++ix)
+            {
                 buffer[ix] = 65;
                 stlBuffer.push_back(65);
             }
             buffer[bufferSize - 1] = 0;
         }
 
-        void TearDown() override {
-            delete [] buffer;
+        void TearDown() override
+        {
+            delete[] buffer;
         }
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ByteArrayInputStreamBenchmark, runBenchmark) {
-
+TEST_F(ByteArrayInputStreamBenchmark, runBenchmark)
+{
     benchmark::PerformanceTimer timer;
-    int iterations = 100;
+    int                         iterations = 100;
 
-    for( int iter = 0; iter < iterations; ++iter ) {
+    for (int iter = 0; iter < iterations; ++iter)
+    {
         timer.start();
 
         int numRuns = 25;
 
         std::vector<unsigned char> bucket(bufferSize);
-        ByteArrayInputStream bis(buffer, bufferSize);
+        ByteArrayInputStream       bis(buffer, bufferSize);
 
-        for (int iy = 0; iy < numRuns; ++iy) {
+        for (int iy = 0; iy < numRuns; ++iy)
+        {
             ByteArrayInputStream local(buffer, bufferSize);
         }
 
-        for (int iy = 0; iy < numRuns; ++iy) {
-
-            for (std::size_t iz = 0; iz < bufferSize; ++iz) {
-                bucket[iy] = (unsigned char) bis.read();
+        for (int iy = 0; iy < numRuns; ++iy)
+        {
+            for (std::size_t iz = 0; iz < bufferSize; ++iz)
+            {
+                bucket[iy] = (unsigned char)bis.read();
             }
             bis.reset();
         }
 
-        for (int iy = 0; iy < numRuns; ++iy) {
+        for (int iy = 0; iy < numRuns; ++iy)
+        {
             bis.read(&bucket[0], bufferSize, 0, bufferSize);
             bis.reset();
         }
@@ -88,7 +98,7 @@ TEST_F(ByteArrayInputStreamBenchmark, runBenchmark) {
         timer.stop();
     }
 
-    std::cout << typeid( ByteArrayInputStream ).name() << " Benchmark Time = "
-              << timer.getAverageTime() << " Millisecs"
+    std::cout << typeid(ByteArrayInputStream).name()
+              << " Benchmark Time = " << timer.getAverageTime() << " Millisecs"
               << std::endl;
 }

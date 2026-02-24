@@ -21,42 +21,51 @@
 #include <decaf/util/Config.h>
 
 #include <decaf/lang/Runnable.h>
-#include <decaf/util/concurrent/atomic/AtomicInteger.h>
-#include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/lang/exceptions/RuntimeException.h>
 #include <decaf/util/Random.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
+#include <decaf/util/concurrent/atomic/AtomicInteger.h>
 
-#include "Sender.h"
-#include "Receiver.h"
 #include "CmsMessageHandlerDefinitions.h"
+#include "Receiver.h"
+#include "Sender.h"
 
-namespace cms {
-namespace stress {
+namespace cms
+{
+namespace stress
+{
 
-    class TestSenderAndReceiver: public decaf::lang::Runnable,
-                                 public ReceiverListener {
+    class TestSenderAndReceiver : public decaf::lang::Runnable,
+                                  public ReceiverListener
+    {
     private:
-
-        Sender* sender;
-        Receiver* receiver;
-        decaf::lang::Thread* senderThread;
-        BrokerMonitor* monitor;
-        std::string header;
-        bool closing;
-        int sendIndex;
-        int id;
-        int sleep;
-        unsigned int seed;
+        Sender*                                  sender;
+        Receiver*                                receiver;
+        decaf::lang::Thread*                     senderThread;
+        BrokerMonitor*                           monitor;
+        std::string                              header;
+        bool                                     closing;
+        int                                      sendIndex;
+        int                                      id;
+        int                                      sleep;
+        unsigned int                             seed;
         decaf::util::concurrent::CountDownLatch* quit;
-        decaf::util::Random random;
+        decaf::util::Random                      random;
 
     public:
-
-        TestSenderAndReceiver(const std::string& url, const std::string& queueOrTopicName,
-                              const std::string& headerName, bool isTopic, bool isDeliveryPersistent,
-                              BrokerMonitor *monitor, decaf::util::concurrent::CountDownLatch* quit,
-                              int timeToLive, int receiveTimeout, int identifier,
-                              bool useThreadPool = true, int sleep = -1, int seed = 0);
+        TestSenderAndReceiver(const std::string& url,
+                              const std::string& queueOrTopicName,
+                              const std::string& headerName,
+                              bool               isTopic,
+                              bool               isDeliveryPersistent,
+                              BrokerMonitor*     monitor,
+                              decaf::util::concurrent::CountDownLatch* quit,
+                              int  timeToLive,
+                              int  receiveTimeout,
+                              int  identifier,
+                              bool useThreadPool = true,
+                              int  sleep         = -1,
+                              int  seed          = 0);
 
         virtual ~TestSenderAndReceiver();
 
@@ -69,25 +78,25 @@ namespace stress {
         void waitUntilReady();
 
     public:
-
         virtual void onMessage(const std::string& message);
-
     };
 
-    typedef struct {
-        int threadCount;
-        long long startTime;
-        long long endTime;
-        decaf::util::concurrent::atomic::AtomicInteger sent;
-        decaf::util::concurrent::atomic::AtomicInteger received;
-        decaf::util::concurrent::atomic::AtomicInteger sendErrors;
-        decaf::util::concurrent::atomic::AtomicInteger receiveErrors;
-        decaf::util::concurrent::atomic::AtomicInteger invalidMessages;
-        decaf::util::concurrent::atomic::AtomicInteger badSequenceMessages;
-        decaf::util::concurrent::atomic::AtomicInteger sequenceDifferences;
+    typedef struct
+    {
+        int                                             threadCount;
+        long long                                       startTime;
+        long long                                       endTime;
+        decaf::util::concurrent::atomic::AtomicInteger  sent;
+        decaf::util::concurrent::atomic::AtomicInteger  received;
+        decaf::util::concurrent::atomic::AtomicInteger  sendErrors;
+        decaf::util::concurrent::atomic::AtomicInteger  receiveErrors;
+        decaf::util::concurrent::atomic::AtomicInteger  invalidMessages;
+        decaf::util::concurrent::atomic::AtomicInteger  badSequenceMessages;
+        decaf::util::concurrent::atomic::AtomicInteger  sequenceDifferences;
         decaf::util::concurrent::atomic::AtomicInteger* lastSequence;
     } TESTINFO;
 
-}}
+}  // namespace stress
+}  // namespace cms
 
 #endif /** _CMS_STRESS_TESTSENDERANDRECEIVER_H_ */

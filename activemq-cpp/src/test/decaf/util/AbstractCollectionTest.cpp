@@ -17,27 +17,35 @@
 
 #include <gtest/gtest.h>
 
-namespace decaf { namespace util {} }
+namespace decaf
+{
+namespace util
+{
+}
+}  // namespace decaf
+
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 
-    class AbstractCollectionTest : public ::testing::Test {
+class AbstractCollectionTest : public ::testing::Test
+{
 public:
-
-        AbstractCollectionTest();
-        virtual ~AbstractCollectionTest();
-
-    };
+    AbstractCollectionTest();
+    virtual ~AbstractCollectionTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractCollectionTest::AbstractCollectionTest() {
+AbstractCollectionTest::AbstractCollectionTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractCollectionTest::~AbstractCollectionTest() {
+AbstractCollectionTest::~AbstractCollectionTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractCollectionTest, testIterator) {
+TEST_F(AbstractCollectionTest, testIterator)
+{
 }

@@ -16,9 +16,9 @@
  */
 
 #include "LoggingOutputStream.h"
-#include <sstream>
-#include <iomanip>
 #include <activemq/exceptions/ExceptionDefines.h>
+#include <iomanip>
+#include <sstream>
 
 using namespace std;
 using namespace activemq;
@@ -26,20 +26,26 @@ using namespace activemq::io;
 using namespace decaf::io;
 using namespace decaf::lang::exceptions;
 
-LOGDECAF_INITIALIZE( logger, LoggingOutputStream, "activemq.io.LoggingOutputStream")
+LOGDECAF_INITIALIZE(logger,
+                    LoggingOutputStream,
+                    "activemq.io.LoggingOutputStream")
 
 ////////////////////////////////////////////////////////////////////////////////
-LoggingOutputStream::LoggingOutputStream(OutputStream* outputStream, bool own) :
-    decaf::io::FilterOutputStream(outputStream, own) {
+LoggingOutputStream::LoggingOutputStream(OutputStream* outputStream, bool own)
+    : decaf::io::FilterOutputStream(outputStream, own)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-LoggingOutputStream::~LoggingOutputStream() {
+LoggingOutputStream::~LoggingOutputStream()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LoggingOutputStream::doWriteByte(const unsigned char c) {
-    try {
+void LoggingOutputStream::doWriteByte(const unsigned char c)
+{
+    try
+    {
         log(&c, 1);
         FilterOutputStream::doWriteByte(c);
     }
@@ -48,21 +54,33 @@ void LoggingOutputStream::doWriteByte(const unsigned char c) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LoggingOutputStream::doWriteArrayBounded(const unsigned char* buffer, int size, int offset, int length) {
-
-    try {
-
-        if (length == 0) {
+void LoggingOutputStream::doWriteArrayBounded(const unsigned char* buffer,
+                                              int                  size,
+                                              int                  offset,
+                                              int                  length)
+{
+    try
+    {
+        if (length == 0)
+        {
             return;
         }
 
-        if (buffer == NULL) {
-            throw NullPointerException(__FILE__, __LINE__, "LoggingOutputStream::write - Passed Buffer is Null");
+        if (buffer == NULL)
+        {
+            throw NullPointerException(
+                __FILE__,
+                __LINE__,
+                "LoggingOutputStream::write - Passed Buffer is Null");
         }
 
-        if ((offset + length) > size) {
-            throw decaf::lang::exceptions::IndexOutOfBoundsException(__FILE__, __LINE__,
-                    "DataOutputStream::write - given offset + length is greater than buffer size.");
+        if ((offset + length) > size)
+        {
+            throw decaf::lang::exceptions::IndexOutOfBoundsException(
+                __FILE__,
+                __LINE__,
+                "DataOutputStream::write - given offset + length is greater "
+                "than buffer size.");
         }
 
         log(buffer + offset, length);
@@ -76,16 +94,18 @@ void LoggingOutputStream::doWriteArrayBounded(const unsigned char* buffer, int s
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LoggingOutputStream::log(const unsigned char* buffer, int len) {
-
+void LoggingOutputStream::log(const unsigned char* buffer, int len)
+{
     // Write the buffer as hex to a string stream.
     ostringstream ostream;
     ostream << "TCP Trace: Writing:" << endl << '[';
 
-    for (int ix = 0; ix < len; ++ix) {
-        ostream << setw(2) << setfill('0') << std::hex << (int) buffer[ix];
+    for (int ix = 0; ix < len; ++ix)
+    {
+        ostream << setw(2) << setfill('0') << std::hex << (int)buffer[ix];
 
-        if (((ix + 1) % 2) == 0) {
+        if (((ix + 1) % 2) == 0)
+        {
             ostream << ' ';
         }
     }

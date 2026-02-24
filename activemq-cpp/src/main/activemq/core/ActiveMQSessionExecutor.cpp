@@ -17,13 +17,13 @@
 
 #include "ActiveMQSessionExecutor.h"
 
+#include <activemq/commands/ConsumerInfo.h>
 #include <activemq/core/ActiveMQConnection.h>
-#include <activemq/core/kernels/ActiveMQConsumerKernel.h>
-#include <activemq/core/kernels/ActiveMQSessionKernel.h>
 #include <activemq/core/ActiveMQSession.h>
 #include <activemq/core/FifoMessageDispatchChannel.h>
 #include <activemq/core/SimplePriorityMessageDispatchChannel.h>
-#include <activemq/commands/ConsumerInfo.h>
+#include <activemq/core/kernels/ActiveMQConsumerKernel.h>
+#include <activemq/core/kernels/ActiveMQSessionKernel.h>
 #include <activemq/threads/DedicatedTaskRunner.h>
 
 using namespace std;
@@ -37,40 +37,50 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQSessionExecutor::ActiveMQSessionExecutor(ActiveMQSessionKernel* session) :
-    session(session), messageQueue(), taskRunner() {
-
-    if (this->session->getConnection()->isMessagePrioritySupported()) {
+ActiveMQSessionExecutor::ActiveMQSessionExecutor(ActiveMQSessionKernel* session)
+    : session(session),
+      messageQueue(),
+      taskRunner()
+{
+    if (this->session->getConnection()->isMessagePrioritySupported())
+    {
         this->messageQueue.reset(new SimplePriorityMessageDispatchChannel());
-    } else {
+    }
+    else
+    {
         this->messageQueue.reset(new FifoMessageDispatchChannel());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQSessionExecutor::~ActiveMQSessionExecutor() {
-
-    try {
+ActiveMQSessionExecutor::~ActiveMQSessionExecutor()
+{
+    try
+    {
         // Terminate the thread.
         stop();
     }
     AMQ_CATCHALL_NOTHROW()
 
-    try {
+    try
+    {
         // Close out the Message Channel.
         close();
     }
     AMQ_CATCHALL_NOTHROW()
 
-    try {
+    try
+    {
         // Empty the message queue and destroy any remaining messages.
         clear();
     }
     AMQ_CATCHALL_NOTHROW()
 
-    try {
+    try
+    {
         // Ensure that we shutdown the taskRunner Thread before we are done.
-        if (taskRunner != NULL) {
+        if (taskRunner != NULL)
+        {
             taskRunner->shutdown();
             taskRunner.reset(NULL);
         }
@@ -79,35 +89,43 @@ ActiveMQSessionExecutor::~ActiveMQSessionExecutor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionExecutor::execute(const Pointer<MessageDispatch>& dispatch) {
-
-    if (this->session->isSessionAsyncDispatch()) {
+void ActiveMQSessionExecutor::execute(const Pointer<MessageDispatch>& dispatch)
+{
+    if (this->session->isSessionAsyncDispatch())
+    {
         this->messageQueue->enqueue(dispatch);
         this->wakeup();
-    } else {
+    }
+    else
+    {
         this->dispatch(dispatch);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionExecutor::executeFirst(const Pointer<MessageDispatch>& dispatch) {
-
+void ActiveMQSessionExecutor::executeFirst(
+    const Pointer<MessageDispatch>& dispatch)
+{
     // Add the data to the queue.
     this->messageQueue->enqueueFirst(dispatch);
     this->wakeup();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionExecutor::wakeup() {
-
-    if (!this->session->isSessionAsyncDispatch()) {
+void ActiveMQSessionExecutor::wakeup()
+{
+    if (!this->session->isSessionAsyncDispatch())
+    {
         return;
     }
 
     Pointer<TaskRunner> taskRunner;
-    synchronized(messageQueue.get()) {
-        if (this->taskRunner == NULL) {
-            if (!messageQueue->isRunning()) {
+    synchronized(messageQueue.get())
+    {
+        if (this->taskRunner == NULL)
+        {
+            if (!messageQueue->isRunning())
+            {
                 return;
             }
             this->taskRunner.reset(new DedicatedTaskRunner(this));
@@ -121,88 +139,107 @@ void ActiveMQSessionExecutor::wakeup() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionExecutor::start() {
-
-    if (!messageQueue->isRunning()) {
+void ActiveMQSessionExecutor::start()
+{
+    if (!messageQueue->isRunning())
+    {
         messageQueue->start();
-        if (hasUncomsumedMessages()) {
+        if (hasUncomsumedMessages())
+        {
             this->wakeup();
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionExecutor::stop() {
-
+void ActiveMQSessionExecutor::stop()
+{
     Pointer<TaskRunner> taskRunner;
-    synchronized(messageQueue.get()) {
-        if (messageQueue->isRunning()) {
+    synchronized(messageQueue.get())
+    {
+        if (messageQueue->isRunning())
+        {
             messageQueue->stop();
 
             taskRunner = this->taskRunner;
 
-            if (taskRunner != NULL) {
+            if (taskRunner != NULL)
+            {
                 this->taskRunner.reset(NULL);
             }
         }
     }
 
-    if (taskRunner != NULL) {
+    if (taskRunner != NULL)
+    {
         taskRunner->shutdown();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionExecutor::dispatch(const Pointer<MessageDispatch>& dispatch) {
-
-    try {
-
+void ActiveMQSessionExecutor::dispatch(const Pointer<MessageDispatch>& dispatch)
+{
+    try
+    {
         Pointer<ActiveMQConsumerKernel> consumer =
             this->session->lookupConsumerKernel(dispatch->getConsumerId());
 
         // If the consumer is not available, just ignore the message.
         // Otherwise, dispatch the message to the consumer.
-        if (consumer != NULL) {
+        if (consumer != NULL)
+        {
             consumer->dispatch(dispatch);
         }
-
-    } catch (decaf::lang::Exception& ex) {
+    }
+    catch (decaf::lang::Exception& ex)
+    {
         ex.setMark(__FILE__, __LINE__);
-    } catch (std::exception& ex) {
+    }
+    catch (std::exception& ex)
+    {
         ActiveMQException amqex(__FILE__, __LINE__, ex.what());
-    } catch (...) {
+    }
+    catch (...)
+    {
         ActiveMQException amqex(__FILE__, __LINE__, "caught unknown exception");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQSessionExecutor::iterate() {
-
-    try {
-
-        if (this->session->iterateConsumers()) {
+bool ActiveMQSessionExecutor::iterate()
+{
+    try
+    {
+        if (this->session->iterateConsumers())
+        {
             return true;
         }
 
         // No messages left queued on the listeners.. so now dispatch messages
         // queued on the session
         Pointer<MessageDispatch> message = messageQueue->dequeueNoWait();
-        if (message != NULL) {
+        if (message != NULL)
+        {
             dispatch(message);
             return !messageQueue->isEmpty();
         }
 
         return false;
-
-    } catch (decaf::lang::Exception& ex) {
+    }
+    catch (decaf::lang::Exception& ex)
+    {
         ex.setMark(__FILE__, __LINE__);
         session->fire(ex);
         return true;
-    } catch (std::exception& stdex) {
+    }
+    catch (std::exception& stdex)
+    {
         ActiveMQException ex(__FILE__, __LINE__, stdex.what());
         session->fire(ex);
         return true;
-    } catch (...) {
+    }
+    catch (...)
+    {
         ActiveMQException ex(__FILE__, __LINE__, "caught unknown exception");
         session->fire(ex);
         return true;

@@ -16,12 +16,12 @@
  */
 #include "LogWriter.h"
 
-#include <iostream>
-#include <decaf/lang/Thread.h>
 #include <decaf/internal/DecafRuntime.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/util/Config.h>
 #include <decaf/util/concurrent/Concurrent.h>
 #include <decaf/util/concurrent/Mutex.h>
-#include <decaf/util/Config.h>
+#include <iostream>
 
 using namespace std;
 using namespace decaf;
@@ -32,38 +32,43 @@ using namespace decaf::util::concurrent;
 using namespace decaf::util::logging;
 
 ////////////////////////////////////////////////////////////////////////////////
-LogWriter::LogWriter() {
+LogWriter::LogWriter()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-LogWriter::~LogWriter() {
+LogWriter::~LogWriter()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LogWriter::log( const std::string& file DECAF_UNUSED,
-                     const int line DECAF_UNUSED,
-                     const std::string& prefix,
-                     const std::string& message) {
-
+void LogWriter::log(const std::string& file DECAF_UNUSED,
+                    const int line          DECAF_UNUSED,
+                    const std::string&      prefix,
+                    const std::string&      message)
+{
     DecafRuntime* runtime = dynamic_cast<DecafRuntime*>(Runtime::getRuntime());
-    synchronized(runtime->getGlobalLock()) {
-      cout << prefix  << " "
-           << message << " - tid: " << Thread::currentThread()->getId() << endl;
-   }
+    synchronized(runtime->getGlobalLock())
+    {
+        cout << prefix << " " << message
+             << " - tid: " << Thread::currentThread()->getId() << endl;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LogWriter::log(const std::string& message ) {
-
+void LogWriter::log(const std::string& message)
+{
     DecafRuntime* runtime = dynamic_cast<DecafRuntime*>(Runtime::getRuntime());
-    synchronized(runtime->getGlobalLock()) {
-      cout << message << " - tid: " << Thread::currentThread()->getId() << endl;
-   }
+    synchronized(runtime->getGlobalLock())
+    {
+        cout << message << " - tid: " << Thread::currentThread()->getId()
+             << endl;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-LogWriter& LogWriter::getInstance() {
-
+LogWriter& LogWriter::getInstance()
+{
     // This one instance
     static LogWriter instance;
 

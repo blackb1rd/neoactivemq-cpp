@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/exceptions/ExceptionDefines.h>
 #include <cms/MessageNotReadableException.h>
 #include <decaf/lang/Exception.h>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
-#include <activemq/exceptions/ActiveMQException.h>
+#include <gtest/gtest.h>
 #include <string.h>
 
 using namespace activemq;
@@ -29,86 +29,108 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class ActiveMQExceptionTest : public ::testing::Test {};
-
+class ActiveMQExceptionTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
-    void testMethod() {
-        throw cms::MessageNotReadableException( "TEST", NULL );
-    }
+namespace
+{
+void testMethod()
+{
+    throw cms::MessageNotReadableException("TEST", NULL);
 }
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQExceptionTest, testMacros) {
+TEST_F(ActiveMQExceptionTest, testMacros)
+{
+    ASSERT_THROW(testMethod(), cms::CMSException)
+        << ("Should Throw a CMSException");
 
-    ASSERT_THROW(testMethod(), cms::CMSException) << ("Should Throw a CMSException");
-
-    try{
-
-        try{
-            try{
-                throw UnsupportedOperationException( __FILE__, __LINE__, "EXCEPTION" );
+    try
+    {
+        try
+        {
+            try
+            {
+                throw UnsupportedOperationException(__FILE__,
+                                                    __LINE__,
+                                                    "EXCEPTION");
                 FAIL() << ("Should not get this far.");
             }
-            AMQ_CATCH_EXCEPTION_CONVERT( Exception, ActiveMQException )
+            AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
         }
-        AMQ_CATCH_RETHROW( ActiveMQException )
-
-    } catch( ActiveMQException& ex ) {
-
+        AMQ_CATCH_RETHROW(ActiveMQException)
+    }
+    catch (ActiveMQException& ex)
+    {
         ASSERT_TRUE(ex.getCause() != NULL);
 
         const UnsupportedOperationException* cause =
-            dynamic_cast<const UnsupportedOperationException*>( ex.getCause() );
+            dynamic_cast<const UnsupportedOperationException*>(ex.getCause());
 
         ASSERT_TRUE(cause != NULL);
     }
 
-    try{
-        throw ActiveMQException( __FILE__, __LINE__, "TEST" );
-    } catch( std::exception& ex ) {
+    try
+    {
+        throw ActiveMQException(__FILE__, __LINE__, "TEST");
+    }
+    catch (std::exception& ex)
+    {
         return;
     }
 
     FAIL() << ("Should have returned after catching an std exception.");
 
-    try{
-
-        try{
-            try{
-                throw UnsupportedOperationException( __FILE__, __LINE__, "EXCEPTION" );
+    try
+    {
+        try
+        {
+            try
+            {
+                throw UnsupportedOperationException(__FILE__,
+                                                    __LINE__,
+                                                    "EXCEPTION");
                 FAIL() << ("Should not get this far.");
             }
-            AMQ_CATCH_EXCEPTION_CONVERT( Exception, ActiveMQException )
+            AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
         }
-        AMQ_CATCH_RETHROW( ActiveMQException )
-
-    } catch( std::exception& ex ) {
-
-        ActiveMQException* converted = dynamic_cast<ActiveMQException*>( &ex );
+        AMQ_CATCH_RETHROW(ActiveMQException)
+    }
+    catch (std::exception& ex)
+    {
+        ActiveMQException* converted = dynamic_cast<ActiveMQException*>(&ex);
 
         ASSERT_TRUE(converted != NULL);
         ASSERT_TRUE(converted->getCause() != NULL);
 
         const UnsupportedOperationException* cause =
-            dynamic_cast<const UnsupportedOperationException*>( converted->getCause() );
+            dynamic_cast<const UnsupportedOperationException*>(
+                converted->getCause());
 
         ASSERT_TRUE(cause != NULL);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQExceptionTest, testMessage0){
-    const char* text = "This is a test";
-    ActiveMQException ex( __FILE__, __LINE__, text );
-    ASSERT_TRUE(strcmp( ex.getMessage().c_str(), text ) == 0);
+TEST_F(ActiveMQExceptionTest, testMessage0)
+{
+    const char*       text = "This is a test";
+    ActiveMQException ex(__FILE__, __LINE__, text);
+    ASSERT_TRUE(strcmp(ex.getMessage().c_str(), text) == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQExceptionTest, testMessage3){
-    ActiveMQException ex( __FILE__, __LINE__,
-        "This is a test %d %d %d", 1, 100, 1000 );
-    ASSERT_TRUE(strcmp( ex.getMessage().c_str(),
-                    "This is a test 1 100 1000" ) == 0);
+TEST_F(ActiveMQExceptionTest, testMessage3)
+{
+    ActiveMQException ex(__FILE__,
+                         __LINE__,
+                         "This is a test %d %d %d",
+                         1,
+                         100,
+                         1000);
+    ASSERT_TRUE(strcmp(ex.getMessage().c_str(), "This is a test 1 100 1000") ==
+                0);
 }

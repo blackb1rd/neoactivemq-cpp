@@ -15,53 +15,63 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <decaf/nio/Buffer.h>
+#include <gtest/gtest.h>
 
 using namespace decaf;
 using namespace decaf::nio;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class BufferTest : public ::testing::Test {
+class BufferTest : public ::testing::Test
+{
 protected:
+    Buffer* buffer;
 
-        Buffer* buffer;
+    static const int DEFAULT_BUFFER_SIZE;
 
-        static const int DEFAULT_BUFFER_SIZE;
-
-        class MyBuffer : public Buffer {
-        public:
-
-            MyBuffer( int capacity ) : Buffer( capacity ) {
-            }
-
-            virtual ~MyBuffer() {}
-
-            bool isReadOnly() const { return false; }
-        };
-
+    class MyBuffer : public Buffer
+    {
     public:
-
-        BufferTest() : buffer() {}
-
-        void SetUp() override {
-            buffer = new MyBuffer( DEFAULT_BUFFER_SIZE );
+        MyBuffer(int capacity)
+            : Buffer(capacity)
+        {
         }
 
-        void TearDown() override {
-            delete buffer;
-            buffer = NULL;
+        virtual ~MyBuffer()
+        {
         }
 
+        bool isReadOnly() const
+        {
+            return false;
+        }
     };
+
+public:
+    BufferTest()
+        : buffer()
+    {
+    }
+
+    void SetUp() override
+    {
+        buffer = new MyBuffer(DEFAULT_BUFFER_SIZE);
+    }
+
+    void TearDown() override
+    {
+        delete buffer;
+        buffer = NULL;
+    }
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 const int BufferTest::DEFAULT_BUFFER_SIZE = 512;
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferTest, test) {
-
+TEST_F(BufferTest, test)
+{
     // Check that we have setup the array and our initial assumptions on state
     // are correct.  This is the first test run.
     ASSERT_TRUE(buffer != NULL);
@@ -73,28 +83,29 @@ TEST_F(BufferTest, test) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferTest, testCapacity) {
-
+TEST_F(BufferTest, testCapacity)
+{
     ASSERT_TRUE(0 == buffer->position() &&
-                    buffer->position() <= buffer->limit() &&
-                    buffer->limit() <= buffer->capacity());
+                buffer->position() <= buffer->limit() &&
+                buffer->limit() <= buffer->capacity());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferTest, testClear) {
-
+TEST_F(BufferTest, testClear)
+{
     Buffer& ret = buffer->clear();
 
     ASSERT_TRUE(&ret == buffer);
     ASSERT_TRUE(buffer->position() == 0);
     ASSERT_TRUE(buffer->limit() == buffer->capacity());
 
-    ASSERT_THROW(buffer->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
+    ASSERT_THROW(buffer->reset(), InvalidMarkException)
+        << ("Should throw InvalidMarkException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferTest, testFlip) {
-
+TEST_F(BufferTest, testFlip)
+{
     int oldPosition = buffer->position();
 
     Buffer& ret = buffer->flip();
@@ -102,40 +113,42 @@ TEST_F(BufferTest, testFlip) {
     ASSERT_TRUE(buffer->position() == 0);
     ASSERT_TRUE(buffer->limit() == oldPosition);
 
-    ASSERT_THROW(buffer->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
+    ASSERT_THROW(buffer->reset(), InvalidMarkException)
+        << ("Should throw InvalidMarkException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferTest, testHasRemaining) {
-
-    ASSERT_TRUE(buffer->hasRemaining() == ( buffer->position() < buffer->limit() ));
-    buffer->position( buffer->limit() );
+TEST_F(BufferTest, testHasRemaining)
+{
+    ASSERT_TRUE(buffer->hasRemaining() ==
+                (buffer->position() < buffer->limit()));
+    buffer->position(buffer->limit());
     ASSERT_TRUE(!buffer->hasRemaining());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferTest, testIsReadOnly) {
-
+TEST_F(BufferTest, testIsReadOnly)
+{
     ASSERT_TRUE(!buffer->isReadOnly());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferTest, testLimit) {
-
+TEST_F(BufferTest, testLimit)
+{
     ASSERT_TRUE(0 == buffer->position() &&
-                    buffer->position() <= buffer->limit() &&
-                    buffer->limit() <= buffer->capacity());
+                buffer->position() <= buffer->limit() &&
+                buffer->limit() <= buffer->capacity());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferTest, testLimitInt) {
-
-    int oldPosition = buffer->position();
-    Buffer& ret = buffer->limit(buffer->limit());
+TEST_F(BufferTest, testLimitInt)
+{
+    int     oldPosition = buffer->position();
+    Buffer& ret         = buffer->limit(buffer->limit());
     ASSERT_TRUE(&ret == buffer);
 
     buffer->mark();
-    buffer->limit( buffer->capacity() );
+    buffer->limit(buffer->capacity());
     ASSERT_TRUE(buffer->limit() == buffer->capacity());
     // position should not change
     ASSERT_TRUE(buffer->position() == oldPosition);
@@ -150,16 +163,18 @@ TEST_F(BufferTest, testLimitInt) {
     // position should be the new limit
     ASSERT_TRUE(buffer->position() == buffer->limit());
     // mark should be invalid
-    ASSERT_THROW(buffer->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
+    ASSERT_THROW(buffer->reset(), InvalidMarkException)
+        << ("Should throw InvalidMarkException");
 
-    ASSERT_THROW(buffer->limit( buffer->capacity() + 1 ), IllegalArgumentException) << ("Should throw IllegalArgumentException");
+    ASSERT_THROW(buffer->limit(buffer->capacity() + 1), IllegalArgumentException)
+        << ("Should throw IllegalArgumentException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferTest, testMark) {
-
-    int oldPosition = buffer->position();
-    Buffer& ret = buffer->mark();
+TEST_F(BufferTest, testMark)
+{
+    int     oldPosition = buffer->position();
+    Buffer& ret         = buffer->mark();
     ASSERT_TRUE(&ret == buffer);
 
     buffer->mark();
@@ -174,19 +189,20 @@ TEST_F(BufferTest, testMark) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferTest, testPosition) {
-
+TEST_F(BufferTest, testPosition)
+{
     ASSERT_TRUE(0 == buffer->position() &&
-                    buffer->position() <= buffer->limit() &&
-                    buffer->limit() <= buffer->capacity());
+                buffer->position() <= buffer->limit() &&
+                buffer->limit() <= buffer->capacity());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferTest, testPositionInt) {
-
+TEST_F(BufferTest, testPositionInt)
+{
     int oldPosition = buffer->position();
 
-    ASSERT_THROW(buffer->position( buffer->limit() + 1 ), IllegalArgumentException) << ("Should throw IllegalArgumentException");
+    ASSERT_THROW(buffer->position(buffer->limit() + 1), IllegalArgumentException)
+        << ("Should throw IllegalArgumentException");
 
     buffer->mark();
     buffer->position(buffer->position());
@@ -198,15 +214,17 @@ TEST_F(BufferTest, testPositionInt) {
     buffer->position(buffer->limit());
     ASSERT_TRUE(buffer->position() == buffer->limit());
 
-    if (buffer->capacity() > 0) {
-        buffer->limit( buffer->capacity() );
-        buffer->position( buffer->limit() );
+    if (buffer->capacity() > 0)
+    {
+        buffer->limit(buffer->capacity());
+        buffer->position(buffer->limit());
         buffer->mark();
-        buffer->position( buffer->limit() - 1);
+        buffer->position(buffer->limit() - 1);
         ASSERT_TRUE(buffer->position() == buffer->limit() - 1);
 
         // mark should be invalid
-        ASSERT_THROW(buffer->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
+        ASSERT_THROW(buffer->reset(), InvalidMarkException)
+            << ("Should throw InvalidMarkException");
     }
 
     Buffer& ret = buffer->position(0);
@@ -214,13 +232,14 @@ TEST_F(BufferTest, testPositionInt) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferTest, testRemaining) {
-    ASSERT_TRUE(buffer->remaining() == ( buffer->limit() - buffer->position() ));
+TEST_F(BufferTest, testRemaining)
+{
+    ASSERT_TRUE(buffer->remaining() == (buffer->limit() - buffer->position()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferTest, testReset) {
-
+TEST_F(BufferTest, testReset)
+{
     int oldPosition = buffer->position();
 
     buffer->mark();
@@ -237,15 +256,17 @@ TEST_F(BufferTest, testReset) {
     ASSERT_TRUE(&ret == buffer);
 
     buffer->clear();
-    ASSERT_THROW(buffer->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
+    ASSERT_THROW(buffer->reset(), InvalidMarkException)
+        << ("Should throw InvalidMarkException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferTest, testRewind) {
-
+TEST_F(BufferTest, testRewind)
+{
     Buffer& ret = buffer->rewind();
     ASSERT_TRUE(buffer->position() == 0);
     ASSERT_TRUE(&ret == buffer);
 
-    ASSERT_THROW(buffer->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
+    ASSERT_THROW(buffer->reset(), InvalidMarkException)
+        << ("Should throw InvalidMarkException");
 }

@@ -20,5 +20,6 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-DestinationEvent::~DestinationEvent() {
+DestinationEvent::~DestinationEvent()
+{
 }

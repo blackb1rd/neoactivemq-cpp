@@ -20,42 +20,46 @@
 
 #include <decaf/util/Config.h>
 
-#include <vector>
 #include <string>
+#include <vector>
 
-#include <decaf/io/IOException.h>
 #include <decaf/io/EOFException.h>
+#include <decaf/io/IOException.h>
 #include <decaf/io/UTFDataFormatException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 
-namespace decaf {
-namespace io {
+namespace decaf
+{
+namespace io
+{
 
     /**
-     * The DataInput interface provides for reading bytes from a binary stream and reconstructing
-     * from them data in any of the C++ primitive types. There is also a facility for reconstructing
-     * Strings from data in the Java standard modified UTF-8 format.
+     * The DataInput interface provides for reading bytes from a binary stream
+     * and reconstructing from them data in any of the C++ primitive types.
+     * There is also a facility for reconstructing Strings from data in the Java
+     * standard modified UTF-8 format.
      *
-     * It is generally true of all the reading routines in this interface that if end of file is
-     * reached before the desired number of bytes has been read, an EOFException is thrown. If any
-     * byte cannot be read for any reason other than end of file, an IOException other than EOFException
-     * is thrown. for example, an IOException may be thrown if the underlying input stream has been
-     * closed.
+     * It is generally true of all the reading routines in this interface that
+     * if end of file is reached before the desired number of bytes has been
+     * read, an EOFException is thrown. If any byte cannot be read for any
+     * reason other than end of file, an IOException other than EOFException is
+     * thrown. for example, an IOException may be thrown if the underlying input
+     * stream has been closed.
      *
      * @see DataOutput
      * @see DataInputStream
      *
      * @since 1.0
      */
-    class DECAF_API DataInput {
+    class DECAF_API DataInput
+    {
     public:
-
         virtual ~DataInput();
 
         /**
-         * Reads in one byte and returns true if that byte is nonzero, false if that
-         * byte is zero.
+         * Reads in one byte and returns true if that byte is nonzero, false if
+         * that byte is zero.
          *
          * @return the boolean value of the read in byte (0=false, 1=true).
          *
@@ -201,21 +205,26 @@ namespace io {
         virtual std::string readString() = 0;
 
         /**
-         * Reads the next line of text from the input stream. It reads successive bytes, converting
-         * each byte to an ASCII char separately, until it encounters a line terminator or end of
-         * file; the characters read are then returned as a standard String. Note that because this
-         * method processes bytes, it does not support input of the full Unicode character set.
+         * Reads the next line of text from the input stream. It reads
+         * successive bytes, converting each byte to an ASCII char separately,
+         * until it encounters a line terminator or end of file; the characters
+         * read are then returned as a standard String. Note that because this
+         * method processes bytes, it does not support input of the full Unicode
+         * character set.
          *
-         * If end of file is encountered before even one byte can be read, then an empty string is
-         * returned. Otherwise, each byte that is read is converted to type char.  If the character
-         * '\n' is encountered, it is discarded and reading ceases. If the character '\r' is
-         * encountered, it is discarded and, if the following byte converts to the character '\n',
-         * then that is discarded also; reading then ceases. If end of file is encountered before
-         * either of the characters '\n' and '\r' is encountered, reading ceases. Once reading has
-         * ceased, a String is returned that contains all the characters read and not discarded,
-         * taken in order.
+         * If end of file is encountered before even one byte can be read, then
+         * an empty string is returned. Otherwise, each byte that is read is
+         * converted to type char.  If the character
+         * '\n' is encountered, it is discarded and reading ceases. If the
+         * character '\r' is encountered, it is discarded and, if the following
+         * byte converts to the character '\n', then that is discarded also;
+         * reading then ceases. If end of file is encountered before either of
+         * the characters '\n' and '\r' is encountered, reading ceases. Once
+         * reading has ceased, a String is returned that contains all the
+         * characters read and not discarded, taken in order.
          *
-         * @return the next line of text read from the input stream or empty string if at EOF.
+         * @return the next line of text read from the input stream or empty
+         * string if at EOF.
          *
          * @throws IOException if an I/O Error occurs.
          */
@@ -223,18 +232,20 @@ namespace io {
 
         /**
          * Reads a modified UTF-8 encoded string in ASCII format and returns it,
-         * this is only useful if you know for sure that the string that is to be read
-         * was a string that contained all ASCII values (0-255), if so this method will
-         * throw a UTFFormatException.  This method reads String value written from a
-         * Java DataOutputStream and assumes that the length prefix the precedes the
-         * encoded UTF-8 bytes is an unsigned short, which implies that the String will
-         * be no longer than 65535 characters.
+         * this is only useful if you know for sure that the string that is to
+         * be read was a string that contained all ASCII values (0-255), if so
+         * this method will throw a UTFFormatException.  This method reads
+         * String value written from a Java DataOutputStream and assumes that
+         * the length prefix the precedes the encoded UTF-8 bytes is an unsigned
+         * short, which implies that the String will be no longer than 65535
+         * characters.
          *
          * @return The decoded string read from stream.
          *
          * @throws IOException if an I/O Error occurs.
          * @throws EOFException if the end of input is reached.
-         * @throws UTFDataFormatException if the bytes are not valid modified UTF-8 values.
+         * @throws UTFDataFormatException if the bytes are not valid modified
+         * UTF-8 values.
          */
         virtual std::string readUTF() = 0;
 
@@ -280,10 +291,11 @@ namespace io {
          *      than EOFException is thrown.
          *
          * If buffer is NULL, a NullPointerException is thrown. If offset+length
-         * is greater than the length of the array buffer, then an IndexOutOfBoundsException
-         * is thrown. If length is zero, then no bytes are read. Otherwise, the first
-         * byte read is stored into element buffer[off], the next one into buffer[offset+1],
-         * and so on. The number of bytes read is, at most, equal to length.
+         * is greater than the length of the array buffer, then an
+         * IndexOutOfBoundsException is thrown. If length is zero, then no bytes
+         * are read. Otherwise, the first byte read is stored into element
+         * buffer[off], the next one into buffer[offset+1], and so on. The
+         * number of bytes read is, at most, equal to length.
          *
          * @param buffer
          *      The byte array to insert read data into.
@@ -297,9 +309,13 @@ namespace io {
          * @throws IOException if an I/O Error occurs.
          * @throws EOFException if the end of input is reached.
          * @throws NullPointerException if the buffer is NULL.
-         * @throws IndexOutOfBoundsException if the offset + length > size, or an int param is negative.
+         * @throws IndexOutOfBoundsException if the offset + length > size, or
+         * an int param is negative.
          */
-        virtual void readFully(unsigned char* buffer, int size, int offset, int length) = 0;
+        virtual void readFully(unsigned char* buffer,
+                               int            size,
+                               int            offset,
+                               int            length) = 0;
 
         /**
          * Makes an attempt to skip over n bytes of data from the input stream,
@@ -317,9 +333,9 @@ namespace io {
          * @throws IOException if an I/O Error occurs.
          */
         virtual long long skipBytes(long long num) = 0;
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /* _DECAF_IO_DATAINPUT_H_ */

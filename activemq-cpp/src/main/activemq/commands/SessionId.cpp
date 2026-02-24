@@ -45,48 +45,65 @@ using namespace decaf::internal::util;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-SessionId::SessionId() :
-    BaseDataStructure(), connectionId(""), value(0), parentId() {
-
+SessionId::SessionId()
+    : BaseDataStructure(),
+      connectionId(""),
+      value(0),
+      parentId()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SessionId::SessionId(const SessionId& other) :
-    BaseDataStructure(), connectionId(""), value(0), parentId() {
-
+SessionId::SessionId(const SessionId& other)
+    : BaseDataStructure(),
+      connectionId(""),
+      value(0),
+      parentId()
+{
     this->copyDataStructure(&other);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SessionId::SessionId(const ConnectionId* connectionId, long long sessionId) :
-    BaseDataStructure(), connectionId(""), value(0), parentId() {
-
+SessionId::SessionId(const ConnectionId* connectionId, long long sessionId)
+    : BaseDataStructure(),
+      connectionId(""),
+      value(0),
+      parentId()
+{
     this->connectionId = connectionId->getValue();
-    this->value = sessionId;
+    this->value        = sessionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SessionId::SessionId(const ProducerId* producerId) :
-    BaseDataStructure(), connectionId(""), value(0), parentId() {
-
+SessionId::SessionId(const ProducerId* producerId)
+    : BaseDataStructure(),
+      connectionId(""),
+      value(0),
+      parentId()
+{
     this->connectionId = producerId->getConnectionId();
-    this->value = producerId->getSessionId();
+    this->value        = producerId->getSessionId();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SessionId::SessionId(const ConsumerId* consumerId) :
-    BaseDataStructure(), connectionId(""), value(0), parentId() {
-
+SessionId::SessionId(const ConsumerId* consumerId)
+    : BaseDataStructure(),
+      connectionId(""),
+      value(0),
+      parentId()
+{
     this->connectionId = consumerId->getConnectionId();
-    this->value = consumerId->getSessionId();
+    this->value        = consumerId->getSessionId();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SessionId::~SessionId() {
+SessionId::~SessionId()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SessionId* SessionId::cloneDataStructure() const {
+SessionId* SessionId::cloneDataStructure() const
+{
     std::unique_ptr<SessionId> sessionId(new SessionId());
 
     // Copy the data from the base class or classes
@@ -96,18 +113,21 @@ SessionId* SessionId::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SessionId::copyDataStructure(const DataStructure* src) {
-
+void SessionId::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const SessionId* srcPtr = dynamic_cast<const SessionId*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "SessionId::copyDataStructure - src is NULL or invalid");
     }
 
@@ -119,13 +139,14 @@ void SessionId::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char SessionId::getDataStructureType() const {
+unsigned char SessionId::getDataStructureType() const
+{
     return SessionId::ID_SESSIONID;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string SessionId::toString() const {
-
+std::string SessionId::toString() const
+{
     ostringstream stream;
 
     stream << this->connectionId << ":" << this->value;
@@ -134,70 +155,87 @@ std::string SessionId::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool SessionId::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool SessionId::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const SessionId* valuePtr = dynamic_cast<const SessionId*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getConnectionId() != valuePtr->getConnectionId()) {
+    if (this->getConnectionId() != valuePtr->getConnectionId())
+    {
         return false;
     }
-    if (this->getValue() != valuePtr->getValue()) {
+    if (this->getValue() != valuePtr->getValue())
+    {
         return false;
     }
-    if (!BaseDataStructure::equals(value)) {
+    if (!BaseDataStructure::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::string& SessionId::getConnectionId() const {
+const std::string& SessionId::getConnectionId() const
+{
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string& SessionId::getConnectionId() {
+std::string& SessionId::getConnectionId()
+{
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SessionId::setConnectionId(const std::string& connectionId) {
+void SessionId::setConnectionId(const std::string& connectionId)
+{
     this->connectionId = connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long SessionId::getValue() const {
+long long SessionId::getValue() const
+{
     return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SessionId::setValue(long long value) {
+void SessionId::setValue(long long value)
+{
     this->value = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int SessionId::compareTo(const SessionId& value) const {
-
-    if (this == &value) {
+int SessionId::compareTo(const SessionId& value) const
+{
+    if (this == &value)
+    {
         return 0;
     }
 
-    int connectionIdComp = StringUtils::compareIgnoreCase(this->connectionId.c_str(), value.connectionId.c_str());
-    if (connectionIdComp != 0) {
+    int connectionIdComp =
+        StringUtils::compareIgnoreCase(this->connectionId.c_str(),
+                                       value.connectionId.c_str());
+    if (connectionIdComp != 0)
+    {
         return connectionIdComp;
     }
 
-    if (this->value > value.value) {
+    if (this->value > value.value)
+    {
         return 1;
-    } else if(this->value < value.value) {
+    }
+    else if (this->value < value.value)
+    {
         return -1;
     }
 
@@ -205,36 +243,42 @@ int SessionId::compareTo(const SessionId& value) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool SessionId::equals(const SessionId& value) const {
+bool SessionId::equals(const SessionId& value) const
+{
     return this->equals((const DataStructure*)&value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool SessionId::operator==(const SessionId& value) const {
+bool SessionId::operator==(const SessionId& value) const
+{
     return this->compareTo(value) == 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool SessionId::operator<(const SessionId& value) const {
+bool SessionId::operator<(const SessionId& value) const
+{
     return this->compareTo(value) < 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SessionId& SessionId::operator= (const SessionId& other) {
+SessionId& SessionId::operator=(const SessionId& other)
+{
     this->copyDataStructure(&other);
     return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int SessionId::getHashCode() const {
+int SessionId::getHashCode() const
+{
     return decaf::util::HashCode<std::string>()(this->toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const Pointer<ConnectionId>& SessionId::getParentId() const {
-    if (this->parentId == NULL) {
+const Pointer<ConnectionId>& SessionId::getParentId() const
+{
+    if (this->parentId == NULL)
+    {
         this->parentId.reset(new ConnectionId(this));
     }
     return this->parentId;
 }
-

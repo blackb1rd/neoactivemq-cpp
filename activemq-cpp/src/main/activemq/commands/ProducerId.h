@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseDataStructure.h>
@@ -31,8 +31,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -45,25 +47,23 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API ProducerId : public BaseDataStructure, public decaf::lang::Comparable<ProducerId> {
+    class AMQCPP_API ProducerId : public BaseDataStructure,
+                                  public decaf::lang::Comparable<ProducerId>
+    {
     protected:
-
         std::string connectionId;
-        long long value;
-        long long sessionId;
+        long long   value;
+        long long   sessionId;
 
     public:
-
         const static unsigned char ID_PRODUCERID = 123;
 
         typedef decaf::lang::PointerComparator<ProducerId> COMPARATOR;
 
     private:
-
         mutable Pointer<SessionId> parentId;
 
     public:
-
         ProducerId();
 
         ProducerId(const ProducerId& other);
@@ -89,14 +89,14 @@ namespace commands {
         void setProducerSessionKey(std::string sessionKey);
 
         virtual const std::string& getConnectionId() const;
-        virtual std::string& getConnectionId();
+        virtual std::string&       getConnectionId();
         virtual void setConnectionId(const std::string& connectionId);
 
         virtual long long getValue() const;
-        virtual void setValue(long long value);
+        virtual void      setValue(long long value);
 
         virtual long long getSessionId() const;
-        virtual void setSessionId(long long sessionId);
+        virtual void      setSessionId(long long sessionId);
 
         virtual int compareTo(const ProducerId& value) const;
 
@@ -106,12 +106,12 @@ namespace commands {
 
         virtual bool operator<(const ProducerId& value) const;
 
-        ProducerId& operator= (const ProducerId& other);
+        ProducerId& operator=(const ProducerId& other);
 
         int getHashCode() const;
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_PRODUCERID_H_*/

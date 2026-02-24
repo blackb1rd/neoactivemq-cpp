@@ -25,109 +25,130 @@
 
 #include <openssl/ssl.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
-namespace ssl {
-namespace openssl {
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
+        namespace ssl
+        {
+            namespace openssl
+            {
 
-    /**
-     * Container class for parameters that are Common to OpenSSL socket classes.
-     *
-     * @since 1.0
-     */
-    class OpenSSLParameters {
-    private:
+                /**
+                 * Container class for parameters that are Common to OpenSSL
+                 * socket classes.
+                 *
+                 * @since 1.0
+                 */
+                class OpenSSLParameters
+                {
+                private:
+                    bool needClientAuth;
+                    bool wantClientAuth;
+                    bool useClientMode;
+                    bool peerVerificationEnabled;
 
-        bool needClientAuth;
-        bool wantClientAuth;
-        bool useClientMode;
-        bool peerVerificationEnabled;
+                    SSL_CTX* context;
+                    SSL*     ssl;
 
-        SSL_CTX* context;
-        SSL* ssl;
+                    std::vector<std::string> enabledCipherSuites;
+                    std::vector<std::string> enabledProtocols;
+                    std::vector<std::string> serverNames;
 
-        std::vector<std::string> enabledCipherSuites;
-        std::vector<std::string> enabledProtocols;
-        std::vector<std::string> serverNames;
+                private:
+                    OpenSSLParameters(const OpenSSLParameters&);
+                    OpenSSLParameters& operator=(const OpenSSLParameters&);
 
-    private:
+                public:
+                    OpenSSLParameters(SSL_CTX* context);
 
-        OpenSSLParameters(const OpenSSLParameters&);
-        OpenSSLParameters& operator=(const OpenSSLParameters&);
+                    virtual ~OpenSSLParameters();
 
-    public:
+                    bool getNeedClientAuth() const
+                    {
+                        return this->needClientAuth;
+                    }
 
-        OpenSSLParameters(SSL_CTX* context);
+                    void setNeedClientAuth(bool value)
+                    {
+                        this->needClientAuth = value;
+                        this->wantClientAuth = false;
+                    }
 
-        virtual ~OpenSSLParameters();
+                    bool getWantClientAuth() const
+                    {
+                        return this->wantClientAuth;
+                    }
 
-        bool getNeedClientAuth() const {
-            return this->needClientAuth;
-        }
+                    void setWantClientAuth(bool value)
+                    {
+                        this->wantClientAuth = value;
+                        this->needClientAuth = false;
+                    }
 
-        void setNeedClientAuth( bool value ) {
-            this->needClientAuth = value;
-            this->wantClientAuth = false;
-        }
+                    bool getUseClientMode() const
+                    {
+                        return this->useClientMode;
+                    }
 
-        bool getWantClientAuth() const {
-            return this->wantClientAuth;
-        }
+                    void setUseClientMode(bool value)
+                    {
+                        this->useClientMode = value;
+                    }
 
-        void setWantClientAuth( bool value ) {
-            this->wantClientAuth = value;
-            this->needClientAuth = false;
-        }
+                    bool getPeerVerificationEnabled() const
+                    {
+                        return this->peerVerificationEnabled;
+                    }
 
-        bool getUseClientMode() const {
-            return this->useClientMode;
-        }
+                    void setPeerVerificationEnabled(bool value)
+                    {
+                        this->peerVerificationEnabled = value;
+                    }
 
-        void setUseClientMode( bool value ) {
-            this->useClientMode = value;
-        }
+                    std::vector<std::string> getSupportedCipherSuites() const;
 
-        bool getPeerVerificationEnabled() const {
-            return this->peerVerificationEnabled;
-        }
+                    std::vector<std::string> getSupportedProtocols() const;
 
-        void setPeerVerificationEnabled(bool value) {
-            this->peerVerificationEnabled = value;
-        }
+                    std::vector<std::string> getEnabledCipherSuites() const;
 
-        std::vector<std::string> getSupportedCipherSuites() const;
+                    void setEnabledCipherSuites(
+                        const std::vector<std::string>& suites);
 
-        std::vector<std::string> getSupportedProtocols() const;
+                    std::vector<std::string> getEnabledProtocols() const;
 
-        std::vector<std::string> getEnabledCipherSuites() const;
+                    void setEnabledProtocols(
+                        const std::vector<std::string>& protocols);
 
-        void setEnabledCipherSuites(const std::vector<std::string>& suites);
+                    std::vector<std::string> getServerNames() const;
 
-        std::vector<std::string> getEnabledProtocols() const;
+                    void setServerNames(
+                        const std::vector<std::string>& serverNames);
 
-        void setEnabledProtocols(const std::vector<std::string>& protocols);
+                    SSL_CTX* getSSLContext() const
+                    {
+                        return this->context;
+                    }
 
-        std::vector<std::string> getServerNames() const;
+                    SSL* getSSL() const
+                    {
+                        return this->ssl;
+                    }
 
-        void setServerNames(const std::vector<std::string>& serverNames);
+                    /**
+                     * Creates a clone of this object such that all settings are
+                     * transferred to a new instance of an SSL object whose
+                     * parent is the same SSL_CTX as this object's.
+                     */
+                    OpenSSLParameters* clone() const;
+                };
 
-        SSL_CTX* getSSLContext() const {
-            return this->context;
-        }
-
-        SSL* getSSL() const {
-            return this->ssl;
-        }
-
-        /**
-         * Creates a clone of this object such that all settings are transferred to a new
-         * instance of an SSL object whose parent is the same SSL_CTX as this object's.
-         */
-        OpenSSLParameters* clone() const;
-
-    };
-
-}}}}}
+            }  // namespace openssl
+        }  // namespace ssl
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_SSL_OPENSSL_OPENSSLPARAMETERS_H_ */

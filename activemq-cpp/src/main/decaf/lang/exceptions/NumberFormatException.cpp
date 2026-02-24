@@ -22,30 +22,43 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-NumberFormatException::NumberFormatException() : Exception() {
+NumberFormatException::NumberFormatException()
+    : Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NumberFormatException::~NumberFormatException() throw () {
+NumberFormatException::~NumberFormatException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NumberFormatException::NumberFormatException(const Exception& ex) : Exception() {
-    *(Exception*) this = ex;
+NumberFormatException::NumberFormatException(const Exception& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NumberFormatException::NumberFormatException(const NumberFormatException& ex) : Exception() {
-    *(Exception*) this = ex;
+NumberFormatException::NumberFormatException(const NumberFormatException& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NumberFormatException::NumberFormatException(const std::exception* cause) : Exception(cause) {
+NumberFormatException::NumberFormatException(const std::exception* cause)
+    : Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NumberFormatException::NumberFormatException(const char* file, const int lineNumber, const char* msg, ...) : Exception() {
-
+NumberFormatException::NumberFormatException(const char* file,
+                                             const int   lineNumber,
+                                             const char* msg,
+                                             ...)
+    : Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +68,13 @@ NumberFormatException::NumberFormatException(const char* file, const int lineNum
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NumberFormatException::NumberFormatException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : Exception(cause) {
-
+NumberFormatException::NumberFormatException(const char*           file,
+                                             const int             lineNumber,
+                                             const std::exception* cause,
+                                             const char*           msg,
+                                             ...)
+    : Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

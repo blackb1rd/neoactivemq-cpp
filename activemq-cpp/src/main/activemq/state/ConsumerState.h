@@ -23,39 +23,40 @@
 #include <activemq/commands/ConsumerInfo.h>
 #include <decaf/lang/Pointer.h>
 
-#include <string>
 #include <memory>
+#include <string>
 
-namespace activemq {
-namespace state {
+namespace activemq
+{
+namespace state
+{
 
     using namespace decaf::lang;
     using namespace activemq::commands;
 
-    class AMQCPP_API ConsumerState {
+    class AMQCPP_API ConsumerState
+    {
     private:
-
         Pointer<ConsumerInfo> info;
 
     private:
-
         ConsumerState(const ConsumerState&);
         ConsumerState& operator=(const ConsumerState&);
 
     public:
-
         ConsumerState(Pointer<ConsumerInfo> info);
 
         virtual ~ConsumerState();
 
         std::string toString() const;
 
-        const Pointer<ConsumerInfo> getInfo() const {
+        const Pointer<ConsumerInfo> getInfo() const
+        {
             return this->info;
         }
-
     };
 
-}}
+}  // namespace state
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_STATE_CONSUMERSTATE_H_*/

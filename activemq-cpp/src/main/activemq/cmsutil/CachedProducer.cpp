@@ -21,11 +21,12 @@ using namespace cms;
 using namespace activemq::cmsutil;
 
 ////////////////////////////////////////////////////////////////////////////////
-CachedProducer::CachedProducer(cms::MessageProducer* producer) : producer(producer) {
-
+CachedProducer::CachedProducer(cms::MessageProducer* producer)
+    : producer(producer)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CachedProducer::~CachedProducer() {
-
+CachedProducer::~CachedProducer()
+{
 }

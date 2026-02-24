@@ -21,11 +21,13 @@
 #include <activemq/util/Config.h>
 #include <activemq/util/Service.h>
 
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 #include <decaf/util/ArrayList.h>
+#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 
-namespace activemq {
-namespace util {
+namespace activemq
+{
+namespace util
+{
 
     class ServiceListener;
     class ServiceStopper;
@@ -35,27 +37,24 @@ namespace util {
      *
      * @since 3.3.0
      */
-    class AMQCPP_API ServiceSupport : public Service {
+    class AMQCPP_API ServiceSupport : public Service
+    {
     private:
-
         decaf::util::concurrent::atomic::AtomicBoolean started;
         decaf::util::concurrent::atomic::AtomicBoolean stopping;
         decaf::util::concurrent::atomic::AtomicBoolean stopped;
-        decaf::util::ArrayList<ServiceListener*> listeners;
+        decaf::util::ArrayList<ServiceListener*>       listeners;
 
     public:
-
         ServiceSupport(const ServiceSupport&);
         ServiceSupport& operator=(const ServiceSupport&);
 
     public:
-
         ServiceSupport();
 
         virtual ~ServiceSupport();
 
     public:
-
         /**
          * Safely shuts down a service.
          *
@@ -91,19 +90,18 @@ namespace util {
         bool isStopped() const;
 
         /**
-         * Adds the given listener to this Service's list of listeners, call retains
-         * ownership of the pointer.
+         * Adds the given listener to this Service's list of listeners, call
+         * retains ownership of the pointer.
          */
         void addServiceListener(ServiceListener* listener);
 
         /**
-         * Removes the given listener to this Service's list of listeners, call retains
-         * ownership of the pointer.
+         * Removes the given listener to this Service's list of listeners, call
+         * retains ownership of the pointer.
          */
         void removeServiceListener(ServiceListener* llistener);
 
     protected:
-
         /**
          * Performs the actual stop operation on the service, ensuring that all
          * resources held are released, must be implemented in derived class.
@@ -112,12 +110,13 @@ namespace util {
 
         /**
          * Performs the actual start operation on the service, acquiring all the
-         * resources needed to run the service.  Must be implemented in derived class.
+         * resources needed to run the service.  Must be implemented in derived
+         * class.
          */
         virtual void doStart() = 0;
-
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_UTIL_SERVICESUPPORT_H_ */

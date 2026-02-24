@@ -31,15 +31,19 @@ using namespace decaf::internal::security::provider;
 
 ////////////////////////////////////////////////////////////////////////////////
 DefaultSecureRandomProviderService::DefaultSecureRandomProviderService(
-    const Provider* provider, const std::string& algorithmName) :
-        ProviderService(provider, "SecureRandom", algorithmName) {
+    const Provider*    provider,
+    const std::string& algorithmName)
+    : ProviderService(provider, "SecureRandom", algorithmName)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultSecureRandomProviderService::~DefaultSecureRandomProviderService() {
+DefaultSecureRandomProviderService::~DefaultSecureRandomProviderService()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SecuritySpi* DefaultSecureRandomProviderService::newInstance() {
+SecuritySpi* DefaultSecureRandomProviderService::newInstance()
+{
     return new SecureRandomImpl();
 }

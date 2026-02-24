@@ -23,10 +23,11 @@
  * @param type The type of the exception to throw
  * (e.g. ActiveMQException ).
  */
-#define AMQ_CATCH_RETHROW( type ) \
-    catch( type& ex ){ \
-        ex.setMark( __FILE__, __LINE__ ); \
-        throw; \
+#define AMQ_CATCH_RETHROW(type)         \
+    catch (type & ex)                   \
+    {                                   \
+        ex.setMark(__FILE__, __LINE__); \
+        throw;                          \
     }
 
 /**
@@ -35,22 +36,23 @@
  * @param sourceType the type of the exception to be caught.
  * @param targetType the type of the exception to be thrown.
  */
-#define AMQ_CATCH_EXCEPTION_CONVERT( sourceType, targetType ) \
-    catch( sourceType& ex ){ \
-        targetType target( ex ); \
-        target.setMark( __FILE__, __LINE__ ); \
-        throw target; \
+#define AMQ_CATCH_EXCEPTION_CONVERT(sourceType, targetType) \
+    catch (sourceType & ex)                                 \
+    {                                                       \
+        targetType target(ex);                              \
+        target.setMark(__FILE__, __LINE__);                 \
+        throw target;                                       \
     }
 
 /**
  * A catch-all that throws a known exception.
  * @param type the type of exception to be thrown.
  */
-#define AMQ_CATCHALL_THROW( type ) \
-    catch( ... ){ \
-        type ex( __FILE__, __LINE__, \
-            "caught unknown exception" ); \
-        throw ex; \
+#define AMQ_CATCHALL_THROW(type)                                 \
+    catch (...)                                                  \
+    {                                                            \
+        type ex(__FILE__, __LINE__, "caught unknown exception"); \
+        throw ex;                                                \
     }
 
 /**
@@ -58,10 +60,13 @@
  * be to catch any exception in a destructor and mark it, but not
  * throw so that cleanup would continue as normal.
  */
-#define AMQ_CATCHALL_NOTHROW( ) \
-    catch( ... ){ \
-        activemq::exceptions::ActiveMQException ex( __FILE__, __LINE__, \
-            "caught unknown exception, not rethrowing" ); \
+#define AMQ_CATCHALL_NOTHROW()                           \
+    catch (...)                                          \
+    {                                                    \
+        activemq::exceptions::ActiveMQException ex(      \
+            __FILE__,                                    \
+            __LINE__,                                    \
+            "caught unknown exception, not rethrowing"); \
     }
 
 /**
@@ -70,10 +75,10 @@
  * @param type The type of the exception to throw
  * (e.g. ActiveMQException ).
  */
-#define AMQ_CATCH_NOTHROW( type ) \
-    catch( type& ex ){ \
-        ex.setMark( __FILE__, __LINE__ ); \
+#define AMQ_CATCH_NOTHROW(type)         \
+    catch (type & ex)                   \
+    {                                   \
+        ex.setMark(__FILE__, __LINE__); \
     }
-
 
 #endif /*_ACTIVEMQ_EXCEPTIONS_EXCEPTIONDEFINES_H_*/

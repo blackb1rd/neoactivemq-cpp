@@ -27,12 +27,14 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-LoggingTransport::LoggingTransport(const Pointer<Transport> next) : TransportFilter(next) {
+LoggingTransport::LoggingTransport(const Pointer<Transport> next)
+    : TransportFilter(next)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LoggingTransport::onCommand(const Pointer<Command> command) {
-
+void LoggingTransport::onCommand(const Pointer<Command> command)
+{
     std::cout << "RECV: " << command->toString() << std::endl;
 
     // Delegate to the base class.
@@ -40,10 +42,10 @@ void LoggingTransport::onCommand(const Pointer<Command> command) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LoggingTransport::oneway(const Pointer<Command> command) {
-
-    try {
-
+void LoggingTransport::oneway(const Pointer<Command> command)
+{
+    try
+    {
         std::cout << "SEND: " << command->toString() << std::endl;
 
         // Delegate to the base class.
@@ -56,10 +58,10 @@ void LoggingTransport::oneway(const Pointer<Command> command) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> LoggingTransport::request(const Pointer<Command> command) {
-
-    try {
-
+Pointer<Response> LoggingTransport::request(const Pointer<Command> command)
+{
+    try
+    {
         std::cout << "SEND: " << command->toString() << std::endl;
 
         // Delegate to the base class.
@@ -74,10 +76,11 @@ Pointer<Response> LoggingTransport::request(const Pointer<Command> command) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> LoggingTransport::request(const Pointer<Command> command, unsigned int timeout) {
-
-    try {
-
+Pointer<Response> LoggingTransport::request(const Pointer<Command> command,
+                                            unsigned int           timeout)
+{
+    try
+    {
         std::cout << "SEND: " << command->toString() << std::endl;
 
         // Delegate to the base class.

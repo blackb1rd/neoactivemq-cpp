@@ -19,51 +19,52 @@
 #define _CMSTEMPLATE_TESTSENDERANDRECEIVER_H_
 
 #include <decaf/lang/Runnable.h>
-#include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/lang/exceptions/RuntimeException.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
 
-#include "Sender.h"
-#include "Receiver.h"
 #include "CmsMessageHandlerDefinitions.h"
+#include "Receiver.h"
+#include "Sender.h"
 
-namespace cmstemplate {
+namespace cmstemplate
+{
 
-    class TestSenderAndReceiver : public decaf::lang::Runnable,
-                                  public ReceiverListener {
-    private:
+class TestSenderAndReceiver : public decaf::lang::Runnable,
+                              public ReceiverListener
+{
+private:
+    std::unique_ptr<Sender>              sender;
+    std::unique_ptr<Receiver>            receiver;
+    std::unique_ptr<decaf::lang::Thread> senderThread;
+    bool                                 closing;
+    int                                  sendIndex;
+    int                                  receiveIndex;
 
-        std::unique_ptr<Sender> sender;
-        std::unique_ptr<Receiver> receiver;
-        std::unique_ptr<decaf::lang::Thread> senderThread;
-        bool closing;
-        int sendIndex;
-        int receiveIndex;
+private:
+    TestSenderAndReceiver(const TestSenderAndReceiver&);
+    TestSenderAndReceiver& operator=(const TestSenderAndReceiver&);
 
-    private:
+public:
+    TestSenderAndReceiver(const std::string& url,
+                          const std::string& queueOrTopicName,
+                          bool               isTopic,
+                          bool               isDeliveryPersistent,
+                          int                timeToLive,
+                          int                receiveTimeout);
 
-        TestSenderAndReceiver(const TestSenderAndReceiver&);
-        TestSenderAndReceiver& operator= (const TestSenderAndReceiver&);
+    virtual ~TestSenderAndReceiver();
 
-    public:
+    void initialize();
 
-        TestSenderAndReceiver(const std::string& url, const std::string& queueOrTopicName,
-                              bool isTopic, bool isDeliveryPersistent, int timeToLive, int receiveTimeout);
+    virtual void run();
 
-        virtual ~TestSenderAndReceiver();
+    void close();
 
-        void initialize();
+    void waitUntilReady();
 
-        virtual void run();
-
-        void close();
-
-        void waitUntilReady();
-
-    public:
-
-        virtual void onMessage(const std::string& message);
-
-    };
-}
+public:
+    virtual void onMessage(const std::string& message);
+};
+}  // namespace cmstemplate
 
 #endif /** _CMSTEMPLATE_TESTSENDERANDRECEIVER_H_ */

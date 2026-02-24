@@ -38,18 +38,26 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageDispatchNotification::MessageDispatchNotification() :
-    BaseCommand(), consumerId(NULL), destination(NULL), deliverySequenceId(0), messageId(NULL) {
-
+MessageDispatchNotification::MessageDispatchNotification()
+    : BaseCommand(),
+      consumerId(NULL),
+      destination(NULL),
+      deliverySequenceId(0),
+      messageId(NULL)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageDispatchNotification::~MessageDispatchNotification() {
+MessageDispatchNotification::~MessageDispatchNotification()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageDispatchNotification* MessageDispatchNotification::cloneDataStructure() const {
-    std::unique_ptr<MessageDispatchNotification> messageDispatchNotification(new MessageDispatchNotification());
+MessageDispatchNotification* MessageDispatchNotification::cloneDataStructure()
+    const
+{
+    std::unique_ptr<MessageDispatchNotification> messageDispatchNotification(
+        new MessageDispatchNotification());
 
     // Copy the data from the base class or classes
     messageDispatchNotification->copyDataStructure(this);
@@ -58,19 +66,24 @@ MessageDispatchNotification* MessageDispatchNotification::cloneDataStructure() c
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDispatchNotification::copyDataStructure(const DataStructure* src) {
-
+void MessageDispatchNotification::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
-    const MessageDispatchNotification* srcPtr = dynamic_cast<const MessageDispatchNotification*>(src);
+    const MessageDispatchNotification* srcPtr =
+        dynamic_cast<const MessageDispatchNotification*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
-            "MessageDispatchNotification::copyDataStructure - src is NULL or invalid");
+            __FILE__,
+            __LINE__,
+            "MessageDispatchNotification::copyDataStructure - src is NULL or "
+            "invalid");
     }
 
     // Copy the data of the base class or classes
@@ -83,13 +96,14 @@ void MessageDispatchNotification::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char MessageDispatchNotification::getDataStructureType() const {
+unsigned char MessageDispatchNotification::getDataStructureType() const
+{
     return MessageDispatchNotification::ID_MESSAGEDISPATCHNOTIFICATION;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string MessageDispatchNotification::toString() const {
-
+std::string MessageDispatchNotification::toString() const
+{
     ostringstream stream;
 
     stream << "MessageDispatchNotification { "
@@ -97,25 +111,34 @@ std::string MessageDispatchNotification::toString() const {
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "ConsumerId = ";
-    if (this->getConsumerId() != NULL) {
+    if (this->getConsumerId() != NULL)
+    {
         stream << this->getConsumerId()->toString();
-    } else {
+    }
+    else
+    {
         stream << "NULL";
     }
     stream << ", ";
     stream << "Destination = ";
-    if (this->getDestination() != NULL) {
+    if (this->getDestination() != NULL)
+    {
         stream << this->getDestination()->toString();
-    } else {
+    }
+    else
+    {
         stream << "NULL";
     }
     stream << ", ";
     stream << "DeliverySequenceId = " << this->getDeliverySequenceId();
     stream << ", ";
     stream << "MessageId = ";
-    if (this->getMessageId() != NULL) {
+    if (this->getMessageId() != NULL)
+    {
         stream << this->getMessageId()->toString();
-    } else {
+    }
+    else
+    {
         stream << "NULL";
     }
     stream << " }";
@@ -124,104 +147,142 @@ std::string MessageDispatchNotification::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool MessageDispatchNotification::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool MessageDispatchNotification::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
-    const MessageDispatchNotification* valuePtr = dynamic_cast<const MessageDispatchNotification*>(value);
+    const MessageDispatchNotification* valuePtr =
+        dynamic_cast<const MessageDispatchNotification*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getConsumerId() != NULL) {
-        if (!this->getConsumerId()->equals(valuePtr->getConsumerId().get())) {
+    if (this->getConsumerId() != NULL)
+    {
+        if (!this->getConsumerId()->equals(valuePtr->getConsumerId().get()))
+        {
             return false;
         }
-    } else if (valuePtr->getConsumerId() != NULL) {
+    }
+    else if (valuePtr->getConsumerId() != NULL)
+    {
         return false;
     }
-    if (this->getDestination() != NULL) {
-        if (!this->getDestination()->equals(valuePtr->getDestination().get())) {
+    if (this->getDestination() != NULL)
+    {
+        if (!this->getDestination()->equals(valuePtr->getDestination().get()))
+        {
             return false;
         }
-    } else if (valuePtr->getDestination() != NULL) {
+    }
+    else if (valuePtr->getDestination() != NULL)
+    {
         return false;
     }
-    if (this->getDeliverySequenceId() != valuePtr->getDeliverySequenceId()) {
+    if (this->getDeliverySequenceId() != valuePtr->getDeliverySequenceId())
+    {
         return false;
     }
-    if (this->getMessageId() != NULL) {
-        if (!this->getMessageId()->equals(valuePtr->getMessageId().get())) {
+    if (this->getMessageId() != NULL)
+    {
+        if (!this->getMessageId()->equals(valuePtr->getMessageId().get()))
+        {
             return false;
         }
-    } else if (valuePtr->getMessageId() != NULL) {
+    }
+    else if (valuePtr->getMessageId() != NULL)
+    {
         return false;
     }
-    if (!BaseCommand::equals(value)) {
+    if (!BaseCommand::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ConsumerId>& MessageDispatchNotification::getConsumerId() const {
+const decaf::lang::Pointer<ConsumerId>&
+MessageDispatchNotification::getConsumerId() const
+{
     return consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ConsumerId>& MessageDispatchNotification::getConsumerId() {
+decaf::lang::Pointer<ConsumerId>& MessageDispatchNotification::getConsumerId()
+{
     return consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDispatchNotification::setConsumerId(const decaf::lang::Pointer<ConsumerId>& consumerId) {
+void MessageDispatchNotification::setConsumerId(
+    const decaf::lang::Pointer<ConsumerId>& consumerId)
+{
     this->consumerId = consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ActiveMQDestination>& MessageDispatchNotification::getDestination() const {
+const decaf::lang::Pointer<ActiveMQDestination>&
+MessageDispatchNotification::getDestination() const
+{
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ActiveMQDestination>& MessageDispatchNotification::getDestination() {
+decaf::lang::Pointer<ActiveMQDestination>&
+MessageDispatchNotification::getDestination()
+{
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDispatchNotification::setDestination(const decaf::lang::Pointer<ActiveMQDestination>& destination) {
+void MessageDispatchNotification::setDestination(
+    const decaf::lang::Pointer<ActiveMQDestination>& destination)
+{
     this->destination = destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long MessageDispatchNotification::getDeliverySequenceId() const {
+long long MessageDispatchNotification::getDeliverySequenceId() const
+{
     return deliverySequenceId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDispatchNotification::setDeliverySequenceId(long long deliverySequenceId) {
+void MessageDispatchNotification::setDeliverySequenceId(
+    long long deliverySequenceId)
+{
     this->deliverySequenceId = deliverySequenceId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<MessageId>& MessageDispatchNotification::getMessageId() const {
+const decaf::lang::Pointer<MessageId>&
+MessageDispatchNotification::getMessageId() const
+{
     return messageId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<MessageId>& MessageDispatchNotification::getMessageId() {
+decaf::lang::Pointer<MessageId>& MessageDispatchNotification::getMessageId()
+{
     return messageId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDispatchNotification::setMessageId(const decaf::lang::Pointer<MessageId>& messageId) {
+void MessageDispatchNotification::setMessageId(
+    const decaf::lang::Pointer<MessageId>& messageId)
+{
     this->messageId = messageId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> MessageDispatchNotification::visit(activemq::state::CommandVisitor* visitor) {
+decaf::lang::Pointer<commands::Command> MessageDispatchNotification::visit(
+    activemq::state::CommandVisitor* visitor)
+{
     return visitor->processMessageDispatchNotification(this);
 }

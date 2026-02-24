@@ -21,38 +21,50 @@
 #include <gtest/gtest.h>
 #include <string>
 
-namespace test {
-namespace util {
-namespace teamcity {
+namespace test
+{
+namespace util
+{
+    namespace teamcity
+    {
 
-    /**
-     * Google Test event listener that outputs test lifecycle messages in
-     * a format that can be processed by the TeamCity Continuous Integration tool.
-     */
-    class TeamCityProgressListener : public ::testing::EmptyTestEventListener {
-    public:
+        /**
+         * Google Test event listener that outputs test lifecycle messages in
+         * a format that can be processed by the TeamCity Continuous Integration
+         * tool.
+         */
+        class TeamCityProgressListener
+            : public ::testing::EmptyTestEventListener
+        {
+        public:
+            TeamCityProgressListener()
+            {
+            }
 
-        TeamCityProgressListener() {}
-        ~TeamCityProgressListener() {}
+            ~TeamCityProgressListener()
+            {
+            }
 
-        void OnTestSuiteStart(const ::testing::TestSuite& test_suite) override;
-        void OnTestSuiteEnd(const ::testing::TestSuite& test_suite) override;
-        void OnTestStart(const ::testing::TestInfo& test_info) override;
-        void OnTestEnd(const ::testing::TestInfo& test_info) override;
+            void OnTestSuiteStart(
+                const ::testing::TestSuite& test_suite) override;
+            void OnTestSuiteEnd(const ::testing::TestSuite& test_suite) override;
+            void OnTestStart(const ::testing::TestInfo& test_info) override;
+            void OnTestEnd(const ::testing::TestInfo& test_info) override;
 
-    private:
+        private:
+            TeamCityProgressListener(const TeamCityProgressListener&) = delete;
+            void operator=(const TeamCityProgressListener&)           = delete;
 
-        TeamCityProgressListener( const TeamCityProgressListener& ) = delete;
-        void operator =( const TeamCityProgressListener& ) = delete;
+        protected:
+            virtual std::string escape(const std::string& value) const;
+            virtual void        writeOpen(const std::string& name);
+            virtual void        writeProperty(const std::string& name,
+                                              const std::string& value);
+            virtual void        writeClose();
+        };
 
-    protected:
-
-        virtual std::string escape( const std::string& value ) const;
-        virtual void writeOpen( const std::string& name );
-        virtual void writeProperty( const std::string& name, const std::string& value );
-        virtual void writeClose();
-    };
-
-}}}
+    }  // namespace teamcity
+}  // namespace util
+}  // namespace test
 
 #endif /* _TEST_UTIL_TEAMCITY_TEAMCITYPROGRESSLISTENER_H_ */

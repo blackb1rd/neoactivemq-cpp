@@ -26,19 +26,20 @@
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
 #include <decaf/util/concurrent/TimeUnit.h>
 
-namespace cms {
-namespace stress {
+namespace cms
+{
+namespace stress
+{
 
-    class MessagingTask:public decaf::lang::Runnable {
+    class MessagingTask : public decaf::lang::Runnable
+    {
     private:
-
-        Receiver* receiver;
+        Receiver*   receiver;
         std::string message;
 
         static decaf::util::concurrent::ThreadPoolExecutor* threadPoolExecutor;
 
     public:
-
         MessagingTask(Receiver* receiver, const std::string& message);
 
         virtual ~MessagingTask();
@@ -49,9 +50,9 @@ namespace stress {
         static void terminateThreads();
 
         virtual void queue();
-
     };
 
-}}
+}  // namespace stress
+}  // namespace cms
 
 #endif /** _CMS_STRESS_MESSAGINGTASK_H_ */

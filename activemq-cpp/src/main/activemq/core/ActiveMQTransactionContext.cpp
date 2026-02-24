@@ -16,23 +16,23 @@
  */
 #include "ActiveMQTransactionContext.h"
 
-#include <cms/Xid.h>
-#include <cms/XAException.h>
-#include <cms/TransactionInProgressException.h>
-#include <cms/TransactionRolledBackException.h>
-#include <activemq/core/kernels/ActiveMQSessionKernel.h>
+#include <activemq/commands/DataArrayResponse.h>
+#include <activemq/commands/IntegerResponse.h>
+#include <activemq/commands/LocalTransactionId.h>
+#include <activemq/commands/Response.h>
+#include <activemq/commands/TransactionInfo.h>
+#include <activemq/commands/XATransactionId.h>
 #include <activemq/core/ActiveMQConnection.h>
 #include <activemq/core/ActiveMQConstants.h>
-#include <activemq/commands/TransactionInfo.h>
-#include <activemq/commands/Response.h>
-#include <activemq/commands/IntegerResponse.h>
-#include <activemq/commands/DataArrayResponse.h>
-#include <activemq/commands/LocalTransactionId.h>
-#include <activemq/commands/XATransactionId.h>
+#include <activemq/core/kernels/ActiveMQSessionKernel.h>
 #include <activemq/util/CMSExceptionSupport.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <cms/TransactionInProgressException.h>
+#include <cms/TransactionRolledBackException.h>
+#include <cms/XAException.h>
+#include <cms/Xid.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/concurrent/ConcurrentStlMap.h>
 
@@ -51,17 +51,18 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq{
-namespace core{
+namespace activemq
+{
+namespace core
+{
 
-    class TxContextData {
+    class TxContextData
+    {
     private:
-
         TxContextData(const TxContextData&);
         TxContextData& operator=(const TxContextData&);
 
     public:
-
         // Mutex to protect transactionId access (fixes race condition)
         mutable decaf::util::concurrent::Mutex mutex;
 
@@ -70,114 +71,141 @@ namespace core{
 
         // To track XA transactions.
         Pointer<Xid> associatedXid;
-        int beforeEndIndex;
+        int          beforeEndIndex;
 
-        TxContextData() : mutex(), transactionId(), associatedXid(), beforeEndIndex() {
-        }
-
-    };
-
-}}
-
-////////////////////////////////////////////////////////////////////////////////
-namespace {
-
-    class Finally {
-    private:
-
-        Finally(const Finally&);
-        Finally& operator=(const Finally&);
-
-    private:
-
-        decaf::util::StlSet< Pointer<Synchronization> >* syncs;
-
-    public:
-
-        Finally(decaf::util::StlSet<Pointer<Synchronization> >* syncs) : syncs(syncs) {
-        }
-
-        ~Finally() {
-            if (this->syncs != NULL) {
-                this->syncs->clear();
-            }
+        TxContextData()
+            : mutex(),
+              transactionId(),
+              associatedXid(),
+              beforeEndIndex()
+        {
         }
     };
 
-}
+}  // namespace core
+}  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQTransactionContext::ActiveMQTransactionContext(ActiveMQSessionKernel* session, const Properties& properties AMQCPP_UNUSED) :
-    context(new TxContextData()), session(session), connection(), synchronizations() {
+namespace
+{
 
-    try {
+class Finally
+{
+private:
+    Finally(const Finally&);
+    Finally& operator=(const Finally&);
 
-        if (session == NULL) {
+private:
+    decaf::util::StlSet<Pointer<Synchronization>>* syncs;
+
+public:
+    Finally(decaf::util::StlSet<Pointer<Synchronization>>* syncs)
+        : syncs(syncs)
+    {
+    }
+
+    ~Finally()
+    {
+        if (this->syncs != NULL)
+        {
+            this->syncs->clear();
+        }
+    }
+};
+
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+ActiveMQTransactionContext::ActiveMQTransactionContext(
+    ActiveMQSessionKernel*       session,
+    const Properties& properties AMQCPP_UNUSED)
+    : context(new TxContextData()),
+      session(session),
+      connection(),
+      synchronizations()
+{
+    try
+    {
+        if (session == NULL)
+        {
             throw NullPointerException(
-                __FILE__, __LINE__,
+                __FILE__,
+                __LINE__,
                 "ActiveMQTransactionContext::ActiveMQTransactionContext - "
                 "Initialized with a NULL session data");
         }
 
         this->connection = session->getConnection();
     }
-    AMQ_CATCH_RETHROW( ActiveMQException )
-    AMQ_CATCH_EXCEPTION_CONVERT( Exception, ActiveMQException )
-    AMQ_CATCHALL_THROW( ActiveMQException )
+    AMQ_CATCH_RETHROW(ActiveMQException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
+    AMQ_CATCHALL_THROW(ActiveMQException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQTransactionContext::~ActiveMQTransactionContext() {
-    try {
+ActiveMQTransactionContext::~ActiveMQTransactionContext()
+{
+    try
+    {
         delete this->context;
     }
     AMQ_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTransactionContext::addSynchronization(const Pointer<Synchronization>& sync) {
-
-    synchronized(&this->synchronizations) {
+void ActiveMQTransactionContext::addSynchronization(
+    const Pointer<Synchronization>& sync)
+{
+    synchronized(&this->synchronizations)
+    {
         this->synchronizations.add(sync);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTransactionContext::removeSynchronization( const Pointer<Synchronization>& sync ) {
-
-    synchronized(&this->synchronizations) {
+void ActiveMQTransactionContext::removeSynchronization(
+    const Pointer<Synchronization>& sync)
+{
+    synchronized(&this->synchronizations)
+    {
         this->synchronizations.remove(sync);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTransactionContext::begin() {
-
-    try{
-
-        if (isInXATransaction()) {
+void ActiveMQTransactionContext::begin()
+{
+    try
+    {
+        if (isInXATransaction())
+        {
             throw cms::TransactionInProgressException(
-                "Cannot start a local transaction while an XA Transaction is in progress.");
+                "Cannot start a local transaction while an XA Transaction is "
+                "in progress.");
         }
 
-        if (!isInTransaction()) {
-
-            synchronized(&this->synchronizations) {
+        if (!isInTransaction())
+        {
+            synchronized(&this->synchronizations)
+            {
                 this->synchronizations.clear();
             }
 
             Pointer<LocalTransactionId> id(new LocalTransactionId());
-            id->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
+            id->setConnectionId(
+                this->connection->getConnectionInfo().getConnectionId());
             id->setValue(this->connection->getNextLocalTransactionId());
 
             Pointer<TransactionInfo> transactionInfo(new TransactionInfo());
             transactionInfo->setConnectionId(id->getConnectionId());
             transactionInfo->setTransactionId(id);
-            transactionInfo->setType(ActiveMQConstants::TRANSACTION_STATE_BEGIN);
+            transactionInfo->setType(
+                ActiveMQConstants::TRANSACTION_STATE_BEGIN);
 
             this->connection->oneway(transactionInfo);
 
-            synchronized(&this->context->mutex) {
+            synchronized(&this->context->mutex)
+            {
                 this->context->transactionId = id.dynamicCast<TransactionId>();
             }
         }
@@ -189,36 +217,51 @@ void ActiveMQTransactionContext::begin() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTransactionContext::commit() {
-
-    try{
-
-        if (isInXATransaction()) {
-            throw cms::TransactionInProgressException("Cannot Commit a local transaction while an XA Transaction is in progress.");
+void ActiveMQTransactionContext::commit()
+{
+    try
+    {
+        if (isInXATransaction())
+        {
+            throw cms::TransactionInProgressException(
+                "Cannot Commit a local transaction while an XA Transaction is "
+                "in progress.");
         }
 
-        try {
+        try
+        {
             this->beforeEnd();
-        } catch (cms::CMSException& ex) {
+        }
+        catch (cms::CMSException& ex)
+        {
             rollback();
             throw;
         }
 
-        if (isInTransaction()) {
+        if (isInTransaction())
+        {
             Pointer<TransactionInfo> info(new TransactionInfo());
-            info->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
+            info->setConnectionId(
+                this->connection->getConnectionInfo().getConnectionId());
             info->setType(ActiveMQConstants::TRANSACTION_STATE_COMMITONEPHASE);
 
-            synchronized(&this->context->mutex) {
+            synchronized(&this->context->mutex)
+            {
                 info->setTransactionId(this->context->transactionId);
-                // Before we send the command NULL the id in case of an exception.
+                // Before we send the command NULL the id in case of an
+                // exception.
                 this->context->transactionId.reset(NULL);
             }
 
-            try {
-                this->connection->syncRequest(info, this->connection->getRequestTimeout());
+            try
+            {
+                this->connection->syncRequest(
+                    info,
+                    this->connection->getRequestTimeout());
                 this->afterCommit();
-            } catch(cms::CMSException& ex) {
+            }
+            catch (cms::CMSException& ex)
+            {
                 this->afterRollback();
                 throw;
             }
@@ -231,34 +274,45 @@ void ActiveMQTransactionContext::commit() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTransactionContext::rollback() {
-
-    try{
-
-        if (isInXATransaction()) {
-            throw cms::TransactionInProgressException("Cannot Rollback a local transaction while an XA Transaction is in progress.");
+void ActiveMQTransactionContext::rollback()
+{
+    try
+    {
+        if (isInXATransaction())
+        {
+            throw cms::TransactionInProgressException(
+                "Cannot Rollback a local transaction while an XA Transaction "
+                "is in progress.");
         }
 
-        try {
+        try
+        {
             this->beforeEnd();
-        } catch (cms::TransactionRolledBackException& ex) {
+        }
+        catch (cms::TransactionRolledBackException& ex)
+        {
             // Ignore, can occur on failover if the last command was commit.
         }
 
-        if (isInTransaction()) {
-
+        if (isInTransaction())
+        {
             Pointer<TransactionInfo> info(new TransactionInfo());
-            info->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
+            info->setConnectionId(
+                this->connection->getConnectionInfo().getConnectionId());
 
-            synchronized(&this->context->mutex) {
+            synchronized(&this->context->mutex)
+            {
                 info->setTransactionId(this->context->transactionId);
                 info->setType(ActiveMQConstants::TRANSACTION_STATE_ROLLBACK);
 
-                // Before we send the command NULL the id in case of an exception.
+                // Before we send the command NULL the id in case of an
+                // exception.
                 this->context->transactionId.reset(NULL);
             }
 
-            this->connection->syncRequest(info, this->connection->getRequestTimeout());
+            this->connection->syncRequest(
+                info,
+                this->connection->getRequestTimeout());
             this->afterRollback();
         }
     }
@@ -269,56 +323,64 @@ void ActiveMQTransactionContext::rollback() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTransactionContext::beforeEnd() {
-
-    // Notify each registered Synchronization that we are ending this Transaction.
-    synchronized(&this->synchronizations) {
-
-        std::unique_ptr<decaf::util::Iterator< Pointer<Synchronization> > > iter(
+void ActiveMQTransactionContext::beforeEnd()
+{
+    // Notify each registered Synchronization that we are ending this
+    // Transaction.
+    synchronized(&this->synchronizations)
+    {
+        std::unique_ptr<decaf::util::Iterator<Pointer<Synchronization>>> iter(
             this->synchronizations.iterator());
 
-        while (iter->hasNext()) {
+        while (iter->hasNext())
+        {
             iter->next()->beforeEnd();
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTransactionContext::afterCommit() {
-
-    // Notify each registered Synchronization that we committed this Transaction.
-    synchronized(&this->synchronizations) {
-
+void ActiveMQTransactionContext::afterCommit()
+{
+    // Notify each registered Synchronization that we committed this
+    // Transaction.
+    synchronized(&this->synchronizations)
+    {
         Finally finalizer(&this->synchronizations);
 
-        std::unique_ptr<decaf::util::Iterator<Pointer<Synchronization> > > iter(
+        std::unique_ptr<decaf::util::Iterator<Pointer<Synchronization>>> iter(
             this->synchronizations.iterator());
 
-        while (iter->hasNext()) {
+        while (iter->hasNext())
+        {
             iter->next()->afterCommit();
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTransactionContext::afterRollback() {
+void ActiveMQTransactionContext::afterRollback()
+{
+    // Notify each registered Synchronization that we rolled back this
+    // Transaction.
+    synchronized(&this->synchronizations)
+    {
+        Finally finalizer(&this->synchronizations);
 
-    // Notify each registered Synchronization that we rolled back this Transaction.
-    synchronized(&this->synchronizations) {
+        std::unique_ptr<decaf::util::Iterator<Pointer<Synchronization>>> iter(
+            this->synchronizations.iterator());
 
-        Finally finalizer( &this->synchronizations );
-
-        std::unique_ptr<decaf::util::Iterator< Pointer<Synchronization> > > iter(
-            this->synchronizations.iterator() );
-
-        while( iter->hasNext() ) {
+        while (iter->hasNext())
+        {
             iter->next()->afterRollback();
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const Pointer<TransactionId>& ActiveMQTransactionContext::getTransactionId() const {
+const Pointer<TransactionId>& ActiveMQTransactionContext::getTransactionId()
+    const
+{
     // Note: This method returns a reference - caller must ensure thread-safety.
     // The transactionId should only be modified through begin/commit/rollback
     // which are protected by the mutex.
@@ -326,103 +388,129 @@ const Pointer<TransactionId>& ActiveMQTransactionContext::getTransactionId() con
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQTransactionContext::isInTransaction() const {
+bool ActiveMQTransactionContext::isInTransaction() const
+{
     bool result = false;
-    synchronized(&this->context->mutex) {
+    synchronized(&this->context->mutex)
+    {
         result = this->context->transactionId != NULL;
     }
     return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQTransactionContext::isInLocalTransaction() const {
+bool ActiveMQTransactionContext::isInLocalTransaction() const
+{
     bool result = false;
-    synchronized(&this->context->mutex) {
-        result = this->context->transactionId != NULL && this->context->transactionId->isLocalTransactionId();
+    synchronized(&this->context->mutex)
+    {
+        result = this->context->transactionId != NULL &&
+                 this->context->transactionId->isLocalTransactionId();
     }
     return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQTransactionContext::isInXATransaction() const {
+bool ActiveMQTransactionContext::isInXATransaction() const
+{
     bool result = false;
-    synchronized(&this->context->mutex) {
-        result = this->context->transactionId != NULL && this->context->transactionId->isXATransactionId();
+    synchronized(&this->context->mutex)
+    {
+        result = this->context->transactionId != NULL &&
+                 this->context->transactionId->isXATransactionId();
     }
     return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ActiveMQTransactionContext::getTransactionTimeout() const {
+int ActiveMQTransactionContext::getTransactionTimeout() const
+{
     return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQTransactionContext::setTransactionTimeout( int seconds AMQCPP_UNUSED ) {
+bool ActiveMQTransactionContext::setTransactionTimeout(int seconds AMQCPP_UNUSED)
+{
     return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ActiveMQTransactionContext::recover(int flag AMQCPP_UNUSED, Xid** recovered) {
-
+int ActiveMQTransactionContext::recover(int flag AMQCPP_UNUSED, Xid** recovered)
+{
     Pointer<TransactionInfo> info(new TransactionInfo());
-    info->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
+    info->setConnectionId(
+        this->connection->getConnectionInfo().getConnectionId());
     info->setType(ActiveMQConstants::TRANSACTION_STATE_RECOVER);
 
-    try {
-
+    try
+    {
         this->connection->checkClosedOrFailed();
         this->connection->ensureConnectionInfoSent();
 
-        Pointer<Response> response = this->connection->syncRequest(info, this->connection->getRequestTimeout());
-        Pointer<DataArrayResponse> arrayResponse = response.dynamicCast<DataArrayResponse>();
+        Pointer<Response> response = this->connection->syncRequest(
+            info,
+            this->connection->getRequestTimeout());
+        Pointer<DataArrayResponse> arrayResponse =
+            response.dynamicCast<DataArrayResponse>();
 
-        std::vector<Pointer<DataStructure> > array = arrayResponse->getData();
+        std::vector<Pointer<DataStructure>> array = arrayResponse->getData();
 
-        int size = (int) array.size();
+        int size = (int)array.size();
 
-        if (size > 0) {
-
-            // Allocate space for all the recovered Xid's, if client passed us an existing
-            // array then this would leak, but they were warned, so just go with it.
+        if (size > 0)
+        {
+            // Allocate space for all the recovered Xid's, if client passed us
+            // an existing array then this would leak, but they were warned, so
+            // just go with it.
             recovered = new Xid*[array.size()];
 
-            // We need to clone each Xid and then add it to the array, the client is now
-            // responsible for freeing this memory.
-            for (int i = 0; i < size; ++i) {
-                Pointer<XATransactionId> xid = array[i].dynamicCast<XATransactionId>();
+            // We need to clone each Xid and then add it to the array, the
+            // client is now responsible for freeing this memory.
+            for (int i = 0; i < size; ++i)
+            {
+                Pointer<XATransactionId> xid =
+                    array[i].dynamicCast<XATransactionId>();
                 recovered[i] = xid->clone();
             }
         }
 
         return size;
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         throw toXAException(e);
-    } catch (CMSException& e) {
+    }
+    catch (CMSException& e)
+    {
         throw toXAException(e);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTransactionContext::start(const Xid* xid, int flags) {
-
-    if (this->isInLocalTransaction()) {
+void ActiveMQTransactionContext::start(const Xid* xid, int flags)
+{
+    if (this->isInLocalTransaction())
+    {
         throw XAException(XAException::XAER_PROTO);
     }
 
     // Are we already associated?
-    if (this->context->associatedXid != NULL) {
+    if (this->context->associatedXid != NULL)
+    {
         throw new XAException(XAException::XAER_PROTO);
     }
 
-    const char* txSuspendResumeNotSupportMsg = "The suspend/resume of a transaction "
-            "is not supported. Instead it is recommended "
-            "that a new JMS session be created.";
+    const char* txSuspendResumeNotSupportMsg =
+        "The suspend/resume of a transaction "
+        "is not supported. Instead it is recommended "
+        "that a new JMS session be created.";
 
-    if ((flags & TMJOIN) == TMJOIN) {
+    if ((flags & TMJOIN) == TMJOIN)
+    {
         throw XAException(txSuspendResumeNotSupportMsg);
     }
-    if ((flags & TMRESUME) == TMRESUME) {
+    if ((flags & TMRESUME) == TMRESUME)
+    {
         throw XAException(txSuspendResumeNotSupportMsg);
     }
 
@@ -434,52 +522,67 @@ void ActiveMQTransactionContext::start(const Xid* xid, int flags) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ActiveMQTransactionContext::prepare(const Xid* xid) {
-
-    // We allow interleaving multiple transactions, so we don't limit prepare to the associated xid.
+int ActiveMQTransactionContext::prepare(const Xid* xid)
+{
+    // We allow interleaving multiple transactions, so we don't limit prepare to
+    // the associated xid.
     Pointer<XATransactionId> x;
 
-    // THIS SHOULD NEVER HAPPEN because end(xid, TMSUCCESS) should have been called first
-    if (xid == NULL || equals(this->context->associatedXid.get(), xid)) {
+    // THIS SHOULD NEVER HAPPEN because end(xid, TMSUCCESS) should have been
+    // called first
+    if (xid == NULL || equals(this->context->associatedXid.get(), xid))
+    {
         throw XAException(XAException::XAER_PROTO);
-    } else {
+    }
+    else
+    {
         x.reset(new XATransactionId(xid));
     }
 
-    try {
-
+    try
+    {
         Pointer<TransactionInfo> info(new TransactionInfo());
-        info->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
+        info->setConnectionId(
+            this->connection->getConnectionInfo().getConnectionId());
         info->setTransactionId(x);
         info->setType(ActiveMQConstants::TRANSACTION_STATE_PREPARE);
 
         // Find out if the server wants to commit or rollback.
-        Pointer<Response> response = this->connection->syncRequest(info, this->connection->getRequestTimeout());
+        Pointer<Response> response = this->connection->syncRequest(
+            info,
+            this->connection->getRequestTimeout());
 
-        Pointer<IntegerResponse> intResponse = response.dynamicCast<IntegerResponse>();
+        Pointer<IntegerResponse> intResponse =
+            response.dynamicCast<IntegerResponse>();
 
-        if (XAResource::XA_RDONLY == intResponse->getResult()) {
-
+        if (XAResource::XA_RDONLY == intResponse->getResult())
+        {
             // transaction stops now, may be syncs that need a callback
             this->afterCommit();
         }
 
         return intResponse->getResult();
-
-    } catch (Exception& e) {
-
-        try {
+    }
+    catch (Exception& e)
+    {
+        try
+        {
             this->afterRollback();
-        } catch (...) {
+        }
+        catch (...)
+        {
         }
 
         throw toXAException(e);
-
-    } catch (CMSException& e) {
-
-        try {
+    }
+    catch (CMSException& e)
+    {
+        try
+        {
             this->afterRollback();
-        } catch (...) {
+        }
+        catch (...)
+        {
         }
 
         throw toXAException(e);
@@ -489,47 +592,62 @@ int ActiveMQTransactionContext::prepare(const Xid* xid) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTransactionContext::commit(const Xid* xid, bool onePhase) {
-
-    // We allow interleaving multiple transactions, so we don't limit prepare to the associated xid.
+void ActiveMQTransactionContext::commit(const Xid* xid, bool onePhase)
+{
+    // We allow interleaving multiple transactions, so we don't limit prepare to
+    // the associated xid.
     Pointer<XATransactionId> x;
 
-    // THIS SHOULD NEVER HAPPEN because end(xid, TMSUCCESS) should have been called first
-    if (xid == NULL || equals(this->context->associatedXid.get(), xid)) {
+    // THIS SHOULD NEVER HAPPEN because end(xid, TMSUCCESS) should have been
+    // called first
+    if (xid == NULL || equals(this->context->associatedXid.get(), xid))
+    {
         throw XAException(XAException::XAER_PROTO);
-    } else {
+    }
+    else
+    {
         x.reset(new XATransactionId(xid));
     }
 
-    try {
-
+    try
+    {
         this->connection->checkClosedOrFailed();
         this->connection->ensureConnectionInfoSent();
 
         // Let the server know that the tx is rollback.
         Pointer<TransactionInfo> info(new TransactionInfo());
-        info->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
+        info->setConnectionId(
+            this->connection->getConnectionInfo().getConnectionId());
         info->setTransactionId(x);
-        info->setType(onePhase ? ActiveMQConstants::TRANSACTION_STATE_COMMITONEPHASE : ActiveMQConstants::TRANSACTION_STATE_COMMITONEPHASE);
+        info->setType(
+            onePhase ? ActiveMQConstants::TRANSACTION_STATE_COMMITONEPHASE
+                     : ActiveMQConstants::TRANSACTION_STATE_COMMITONEPHASE);
 
-        this->connection->syncRequest(info, this->connection->getRequestTimeout());
+        this->connection->syncRequest(info,
+                                      this->connection->getRequestTimeout());
 
         this->afterCommit();
-
-    } catch (Exception& ex) {
-
-        try {
+    }
+    catch (Exception& ex)
+    {
+        try
+        {
             this->afterRollback();
-        } catch (...) {
+        }
+        catch (...)
+        {
         }
 
         throw toXAException(ex);
-
-    } catch (CMSException& e) {
-
-        try {
+    }
+    catch (CMSException& e)
+    {
+        try
+        {
             this->afterRollback();
-        } catch (...) {
+        }
+        catch (...)
+        {
         }
 
         throw toXAException(e);
@@ -537,165 +655,218 @@ void ActiveMQTransactionContext::commit(const Xid* xid, bool onePhase) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTransactionContext::rollback(const Xid* xid) {
-
-    // We allow interleaving multiple transactions, so we don't limit prepare to the associated xid.
+void ActiveMQTransactionContext::rollback(const Xid* xid)
+{
+    // We allow interleaving multiple transactions, so we don't limit prepare to
+    // the associated xid.
     Pointer<XATransactionId> x;
 
-    if (xid == NULL) {
+    if (xid == NULL)
+    {
         throw XAException(XAException::XAER_PROTO);
     }
 
-    synchronized(&this->context->mutex) {
-        if (equals(this->context->associatedXid.get(), xid)) {
+    synchronized(&this->context->mutex)
+    {
+        if (equals(this->context->associatedXid.get(), xid))
+        {
             x = this->context->transactionId.dynamicCast<XATransactionId>();
-        } else {
+        }
+        else
+        {
             x.reset(new XATransactionId(xid));
         }
     }
 
-    try {
-
+    try
+    {
         this->connection->checkClosedOrFailed();
         this->connection->ensureConnectionInfoSent();
 
         // Let the server know that the tx is rollback.
         Pointer<TransactionInfo> info(new TransactionInfo());
-        info->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
+        info->setConnectionId(
+            this->connection->getConnectionInfo().getConnectionId());
         info->setTransactionId(x);
         info->setType(ActiveMQConstants::TRANSACTION_STATE_ROLLBACK);
 
-        this->connection->syncRequest(info, this->connection->getRequestTimeout());
+        this->connection->syncRequest(info,
+                                      this->connection->getRequestTimeout());
 
         this->afterRollback();
-
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw toXAException(ex);
-    } catch (CMSException& e) {
+    }
+    catch (CMSException& e)
+    {
         throw toXAException(e);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTransactionContext::end(const Xid* xid, int flags) {
-
-    if (isInLocalTransaction()) {
+void ActiveMQTransactionContext::end(const Xid* xid, int flags)
+{
+    if (isInLocalTransaction())
+    {
         throw XAException(XAException::XAER_PROTO);
     }
 
-    if ((flags & (TMSUSPEND | TMFAIL)) != 0) {
-
+    if ((flags & (TMSUSPEND | TMFAIL)) != 0)
+    {
         // You can only suspend the associated xid.
-        if (!equals(this->context->associatedXid.get(), xid)) {
+        if (!equals(this->context->associatedXid.get(), xid))
+        {
             throw XAException(XAException::XAER_PROTO);
         }
 
-        try {
+        try
+        {
             this->beforeEnd();
-        } catch (Exception& e) {
+        }
+        catch (Exception& e)
+        {
             throw toXAException(e);
-        } catch (CMSException& e) {
+        }
+        catch (CMSException& e)
+        {
             throw toXAException(e);
         }
 
         setXid(NULL);
-
-    } else if ((flags & TMSUCCESS) == TMSUCCESS) {
-
+    }
+    else if ((flags & TMSUCCESS) == TMSUCCESS)
+    {
         // set to NULL if this is the current xid.
         // otherwise this could be an asynchronous success call
-        if (equals(this->context->associatedXid.get(), xid)) {
-
-            try {
+        if (equals(this->context->associatedXid.get(), xid))
+        {
+            try
+            {
                 beforeEnd();
-            } catch (Exception& ex) {
+            }
+            catch (Exception& ex)
+            {
                 throw toXAException(ex);
-            } catch (CMSException& e) {
+            }
+            catch (CMSException& e)
+            {
                 throw toXAException(e);
             }
 
             setXid(NULL);
         }
-
-    } else {
+    }
+    else
+    {
         throw XAException(XAException::XAER_INVAL);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTransactionContext::forget(const Xid* xid) {
-
-    // We allow interleaving multiple transactions, so we don't limit prepare to the associated xid.
+void ActiveMQTransactionContext::forget(const Xid* xid)
+{
+    // We allow interleaving multiple transactions, so we don't limit prepare to
+    // the associated xid.
     Pointer<XATransactionId> x;
 
-    if (xid == NULL) {
+    if (xid == NULL)
+    {
         throw XAException(XAException::XAER_PROTO);
     }
 
-    synchronized(&this->context->mutex) {
-        if (equals(this->context->associatedXid.get(), xid)) {
+    synchronized(&this->context->mutex)
+    {
+        if (equals(this->context->associatedXid.get(), xid))
+        {
             x = this->context->transactionId.dynamicCast<XATransactionId>();
-        } else {
+        }
+        else
+        {
             x.reset(new XATransactionId(xid));
         }
     }
 
     // Let the server know that the tx is rollback.
     Pointer<TransactionInfo> info(new TransactionInfo());
-    info->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
+    info->setConnectionId(
+        this->connection->getConnectionInfo().getConnectionId());
     info->setTransactionId(x);
     info->setType(ActiveMQConstants::TRANSACTION_STATE_FORGET);
 
-    try {
-        this->connection->syncRequest(info, this->connection->getRequestTimeout());
-    } catch (Exception& ex) {
+    try
+    {
+        this->connection->syncRequest(info,
+                                      this->connection->getRequestTimeout());
+    }
+    catch (Exception& ex)
+    {
         throw toXAException(ex);
-    } catch (CMSException& e) {
+    }
+    catch (CMSException& e)
+    {
         throw toXAException(e);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQTransactionContext::isSameRM(const XAResource* resource) {
-
-    if (resource == NULL) {
+bool ActiveMQTransactionContext::isSameRM(const XAResource* resource)
+{
+    if (resource == NULL)
+    {
         return false;
     }
 
-    const ActiveMQTransactionContext* cntx = dynamic_cast<const ActiveMQTransactionContext*>(resource);
+    const ActiveMQTransactionContext* cntx =
+        dynamic_cast<const ActiveMQTransactionContext*>(resource);
 
-    if (cntx == NULL) {
+    if (cntx == NULL)
+    {
         return false;
     }
 
-    try {
+    try
+    {
         return getResourceManagerId() == cntx->getResourceManagerId();
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw toXAException(ex);
-    } catch (CMSException& ex) {
+    }
+    catch (CMSException& ex)
+    {
         throw XAException("Could not get the Resource Manager Id.", ex.clone());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTransactionContext::setXid(const Xid* xid) {
-
-    try {
+void ActiveMQTransactionContext::setXid(const Xid* xid)
+{
+    try
+    {
         this->connection->checkClosedOrFailed();
         this->connection->ensureConnectionInfoSent();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         throw toXAException(e);
-    } catch (CMSException& e) {
+    }
+    catch (CMSException& e)
+    {
         throw toXAException(e);
     }
 
-    if (xid != NULL) {
-
+    if (xid != NULL)
+    {
         Pointer<TransactionInfo> info(new TransactionInfo());
-        info->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
+        info->setConnectionId(
+            this->connection->getConnectionInfo().getConnectionId());
 
-        synchronized(&this->context->mutex) {
-            // Associate this new Xid with this Transaction as the root of the TX.
+        synchronized(&this->context->mutex)
+        {
+            // Associate this new Xid with this Transaction as the root of the
+            // TX.
             this->context->associatedXid.reset(xid->clone());
             this->context->transactionId.reset(new XATransactionId(xid));
             info->setTransactionId(this->context->transactionId);
@@ -703,22 +874,30 @@ void ActiveMQTransactionContext::setXid(const Xid* xid) {
 
         info->setType(ActiveMQConstants::TRANSACTION_STATE_BEGIN);
 
-        try {
+        try
+        {
             this->connection->oneway(info);
-        } catch (Exception& e) {
-            throw toXAException(e);
-        } catch (CMSException& e) {
+        }
+        catch (Exception& e)
+        {
             throw toXAException(e);
         }
-
-    } else {
-
+        catch (CMSException& e)
+        {
+            throw toXAException(e);
+        }
+    }
+    else
+    {
         Pointer<TransactionInfo> info;
 
-        synchronized(&this->context->mutex) {
-            if (this->context->transactionId != NULL) {
+        synchronized(&this->context->mutex)
+        {
+            if (this->context->transactionId != NULL)
+            {
                 info.reset(new TransactionInfo());
-                info->setConnectionId(this->connection->getConnectionInfo().getConnectionId());
+                info->setConnectionId(
+                    this->connection->getConnectionInfo().getConnectionId());
                 info->setTransactionId(this->context->transactionId);
                 info->setType(ActiveMQConstants::TRANSACTION_STATE_END);
             }
@@ -728,10 +907,16 @@ void ActiveMQTransactionContext::setXid(const Xid* xid) {
             this->context->transactionId.reset(NULL);
         }
 
-        if (info != NULL) {
-            try {
-                this->connection->syncRequest(info, this->connection->getRequestTimeout());
-            } catch (CMSException& e) {
+        if (info != NULL)
+        {
+            try
+            {
+                this->connection->syncRequest(
+                    info,
+                    this->connection->getRequestTimeout());
+            }
+            catch (CMSException& e)
+            {
                 throw toXAException(e);
             }
         }
@@ -739,37 +924,44 @@ void ActiveMQTransactionContext::setXid(const Xid* xid) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQTransactionContext::equals(const cms::Xid* local, const cms::Xid* remote) {
-
-    if (local == remote) {
+bool ActiveMQTransactionContext::equals(const cms::Xid* local,
+                                        const cms::Xid* remote)
+{
+    if (local == remote)
+    {
         return true;
     }
 
-    if ((local == NULL) ^ (remote == NULL)) {
+    if ((local == NULL) ^ (remote == NULL))
+    {
         return false;
     }
 
-    if (local->getFormatId() != remote->getFormatId()) {
+    if (local->getFormatId() != remote->getFormatId())
+    {
         return false;
-    } else {
-
-        std::vector<unsigned char> localBQual((std::size_t) Xid::MAXBQUALSIZE);
-        std::vector<unsigned char> remoteBQual((std::size_t) Xid::MAXBQUALSIZE);
+    }
+    else
+    {
+        std::vector<unsigned char> localBQual((std::size_t)Xid::MAXBQUALSIZE);
+        std::vector<unsigned char> remoteBQual((std::size_t)Xid::MAXBQUALSIZE);
 
         local->getBranchQualifier(&localBQual[0], Xid::MAXBQUALSIZE);
         remote->getBranchQualifier(&remoteBQual[0], Xid::MAXBQUALSIZE);
 
-        if (localBQual != remoteBQual) {
+        if (localBQual != remoteBQual)
+        {
             return false;
         }
 
-        std::vector<unsigned char> localGTXID((std::size_t) Xid::MAXBQUALSIZE);
-        std::vector<unsigned char> remoteGTXID((std::size_t) Xid::MAXBQUALSIZE);
+        std::vector<unsigned char> localGTXID((std::size_t)Xid::MAXBQUALSIZE);
+        std::vector<unsigned char> remoteGTXID((std::size_t)Xid::MAXBQUALSIZE);
 
         local->getGlobalTransactionId(&localGTXID[0], Xid::MAXGTRIDSIZE);
         remote->getGlobalTransactionId(&remoteGTXID[0], Xid::MAXGTRIDSIZE);
 
-        if (localGTXID != remoteGTXID) {
+        if (localGTXID != remoteGTXID)
+        {
             return false;
         }
     }
@@ -778,20 +970,23 @@ bool ActiveMQTransactionContext::equals(const cms::Xid* local, const cms::Xid* r
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQTransactionContext::getResourceManagerId() const {
+std::string ActiveMQTransactionContext::getResourceManagerId() const
+{
     return this->connection->getResourceManagerId();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-XAException ActiveMQTransactionContext::toXAException(decaf::lang::Exception& ex) {
+XAException ActiveMQTransactionContext::toXAException(decaf::lang::Exception& ex)
+{
     CMSException cmsEx = CMSExceptionSupport::create(ex);
-    XAException xae(ex.getMessage(), cmsEx.clone());
+    XAException  xae(ex.getMessage(), cmsEx.clone());
     xae.setErrorCode(XAException::XAER_RMFAIL);
     return xae;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-XAException ActiveMQTransactionContext::toXAException(cms::CMSException& ex) {
+XAException ActiveMQTransactionContext::toXAException(cms::CMSException& ex)
+{
     XAException xae(ex.getMessage(), ex.clone());
     xae.setErrorCode(XAException::XAER_RMFAIL);
     return xae;

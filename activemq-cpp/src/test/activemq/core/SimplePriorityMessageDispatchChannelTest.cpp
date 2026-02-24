@@ -17,8 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include <activemq/core/SimplePriorityMessageDispatchChannel.h>
 #include <activemq/commands/MessageDispatch.h>
+#include <activemq/core/SimplePriorityMessageDispatchChannel.h>
 #include <decaf/lang/Pointer.h>
 #include <decaf/lang/System.h>
 
@@ -28,12 +28,13 @@ using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
 
-class SimplePriorityMessageDispatchChannelTest : public ::testing::Test {
+class SimplePriorityMessageDispatchChannelTest : public ::testing::Test
+{
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SimplePriorityMessageDispatchChannelTest, testCtor) {
-
+TEST_F(SimplePriorityMessageDispatchChannelTest, testCtor)
+{
     SimplePriorityMessageDispatchChannel channel;
     ASSERT_TRUE(channel.isRunning() == false);
     ASSERT_TRUE(channel.isEmpty() == true);
@@ -42,16 +43,16 @@ TEST_F(SimplePriorityMessageDispatchChannelTest, testCtor) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SimplePriorityMessageDispatchChannelTest, testStart) {
-
+TEST_F(SimplePriorityMessageDispatchChannelTest, testStart)
+{
     SimplePriorityMessageDispatchChannel channel;
     channel.start();
     ASSERT_TRUE(channel.isRunning() == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SimplePriorityMessageDispatchChannelTest, testStop) {
-
+TEST_F(SimplePriorityMessageDispatchChannelTest, testStop)
+{
     SimplePriorityMessageDispatchChannel channel;
     channel.start();
     ASSERT_TRUE(channel.isRunning() == true);
@@ -60,8 +61,8 @@ TEST_F(SimplePriorityMessageDispatchChannelTest, testStop) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SimplePriorityMessageDispatchChannelTest, testClose) {
-
+TEST_F(SimplePriorityMessageDispatchChannelTest, testClose)
+{
     SimplePriorityMessageDispatchChannel channel;
     channel.start();
     ASSERT_TRUE(channel.isRunning() == true);
@@ -75,53 +76,53 @@ TEST_F(SimplePriorityMessageDispatchChannelTest, testClose) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueue) {
-
+TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueue)
+{
     SimplePriorityMessageDispatchChannel channel;
-    Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch2( new MessageDispatch() );
+    Pointer<MessageDispatch>             dispatch1(new MessageDispatch());
+    Pointer<MessageDispatch>             dispatch2(new MessageDispatch());
 
     ASSERT_TRUE(channel.isEmpty() == true);
     ASSERT_TRUE(channel.size() == 0);
 
-    channel.enqueue( dispatch1 );
+    channel.enqueue(dispatch1);
 
     ASSERT_TRUE(channel.isEmpty() == false);
     ASSERT_TRUE(channel.size() == 1);
 
-    channel.enqueue( dispatch2 );
+    channel.enqueue(dispatch2);
 
     ASSERT_TRUE(channel.isEmpty() == false);
     ASSERT_TRUE(channel.size() == 2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueueFront) {
-
+TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueueFront)
+{
     SimplePriorityMessageDispatchChannel channel;
-    Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch2( new MessageDispatch() );
+    Pointer<MessageDispatch>             dispatch1(new MessageDispatch());
+    Pointer<MessageDispatch>             dispatch2(new MessageDispatch());
 
-    Pointer<Message> message1( new Message() );
-    Pointer<Message> message2( new Message() );
+    Pointer<Message> message1(new Message());
+    Pointer<Message> message2(new Message());
 
-    message1->setPriority( 2 );
-    message2->setPriority( 1 );
+    message1->setPriority(2);
+    message2->setPriority(1);
 
-    dispatch1->setMessage( message1 );
-    dispatch2->setMessage( message2 );
+    dispatch1->setMessage(message1);
+    dispatch2->setMessage(message2);
 
     channel.start();
 
     ASSERT_TRUE(channel.isEmpty() == true);
     ASSERT_TRUE(channel.size() == 0);
 
-    channel.enqueueFirst( dispatch1 );
+    channel.enqueueFirst(dispatch1);
 
     ASSERT_TRUE(channel.isEmpty() == false);
     ASSERT_TRUE(channel.size() == 1);
 
-    channel.enqueueFirst( dispatch2 );
+    channel.enqueueFirst(dispatch2);
 
     ASSERT_TRUE(channel.isEmpty() == false);
     ASSERT_TRUE(channel.size() == 2);
@@ -131,30 +132,30 @@ TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueueFront) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SimplePriorityMessageDispatchChannelTest, testPeek) {
-
+TEST_F(SimplePriorityMessageDispatchChannelTest, testPeek)
+{
     SimplePriorityMessageDispatchChannel channel;
-    Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch2( new MessageDispatch() );
+    Pointer<MessageDispatch>             dispatch1(new MessageDispatch());
+    Pointer<MessageDispatch>             dispatch2(new MessageDispatch());
 
-    Pointer<Message> message1( new Message() );
-    Pointer<Message> message2( new Message() );
+    Pointer<Message> message1(new Message());
+    Pointer<Message> message2(new Message());
 
-    message1->setPriority( 2 );
-    message2->setPriority( 1 );
+    message1->setPriority(2);
+    message2->setPriority(1);
 
-    dispatch1->setMessage( message1 );
-    dispatch2->setMessage( message2 );
+    dispatch1->setMessage(message1);
+    dispatch2->setMessage(message2);
 
     ASSERT_TRUE(channel.isEmpty() == true);
     ASSERT_TRUE(channel.size() == 0);
 
-    channel.enqueueFirst( dispatch1 );
+    channel.enqueueFirst(dispatch1);
 
     ASSERT_TRUE(channel.isEmpty() == false);
     ASSERT_TRUE(channel.size() == 1);
 
-    channel.enqueueFirst( dispatch2 );
+    channel.enqueueFirst(dispatch2);
 
     ASSERT_TRUE(channel.isEmpty() == false);
     ASSERT_TRUE(channel.size() == 2);
@@ -170,32 +171,32 @@ TEST_F(SimplePriorityMessageDispatchChannelTest, testPeek) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SimplePriorityMessageDispatchChannelTest, testDequeueNoWait) {
-
+TEST_F(SimplePriorityMessageDispatchChannelTest, testDequeueNoWait)
+{
     SimplePriorityMessageDispatchChannel channel;
 
-    Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch2( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch3( new MessageDispatch() );
+    Pointer<MessageDispatch> dispatch1(new MessageDispatch());
+    Pointer<MessageDispatch> dispatch2(new MessageDispatch());
+    Pointer<MessageDispatch> dispatch3(new MessageDispatch());
 
-    Pointer<Message> message1( new Message() );
-    Pointer<Message> message2( new Message() );
-    Pointer<Message> message3( new Message() );
+    Pointer<Message> message1(new Message());
+    Pointer<Message> message2(new Message());
+    Pointer<Message> message3(new Message());
 
-    message1->setPriority( 2 );
-    message2->setPriority( 3 );
-    message3->setPriority( 1 );
+    message1->setPriority(2);
+    message2->setPriority(3);
+    message3->setPriority(1);
 
-    dispatch1->setMessage( message1 );
-    dispatch2->setMessage( message2 );
-    dispatch3->setMessage( message3 );
+    dispatch1->setMessage(message1);
+    dispatch2->setMessage(message2);
+    dispatch3->setMessage(message3);
 
     ASSERT_TRUE(channel.isRunning() == false);
     ASSERT_TRUE(channel.dequeueNoWait() == NULL);
 
-    channel.enqueue( dispatch1 );
-    channel.enqueue( dispatch2 );
-    channel.enqueue( dispatch3 );
+    channel.enqueue(dispatch1);
+    channel.enqueue(dispatch2);
+    channel.enqueue(dispatch3);
 
     ASSERT_TRUE(channel.dequeueNoWait() == NULL);
     channel.start();
@@ -212,72 +213,72 @@ TEST_F(SimplePriorityMessageDispatchChannelTest, testDequeueNoWait) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SimplePriorityMessageDispatchChannelTest, testDequeue) {
-
+TEST_F(SimplePriorityMessageDispatchChannelTest, testDequeue)
+{
     SimplePriorityMessageDispatchChannel channel;
 
-    Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch2( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch3( new MessageDispatch() );
+    Pointer<MessageDispatch> dispatch1(new MessageDispatch());
+    Pointer<MessageDispatch> dispatch2(new MessageDispatch());
+    Pointer<MessageDispatch> dispatch3(new MessageDispatch());
 
-    Pointer<Message> message1( new Message() );
-    Pointer<Message> message2( new Message() );
-    Pointer<Message> message3( new Message() );
+    Pointer<Message> message1(new Message());
+    Pointer<Message> message2(new Message());
+    Pointer<Message> message3(new Message());
 
-    message1->setPriority( 2 );
-    message2->setPriority( 3 );
-    message3->setPriority( 1 );
+    message1->setPriority(2);
+    message2->setPriority(3);
+    message3->setPriority(1);
 
-    dispatch1->setMessage( message1 );
-    dispatch2->setMessage( message2 );
-    dispatch3->setMessage( message3 );
+    dispatch1->setMessage(message1);
+    dispatch2->setMessage(message2);
+    dispatch3->setMessage(message3);
 
     channel.start();
     ASSERT_TRUE(channel.isRunning() == true);
 
     long long timeStarted = System::currentTimeMillis();
 
-    ASSERT_TRUE(channel.dequeue( 1000 ) == NULL);
+    ASSERT_TRUE(channel.dequeue(1000) == NULL);
 
     ASSERT_TRUE(System::currentTimeMillis() - timeStarted >= 999);
 
-    channel.enqueue( dispatch1 );
-    channel.enqueue( dispatch2 );
-    channel.enqueue( dispatch3 );
+    channel.enqueue(dispatch1);
+    channel.enqueue(dispatch2);
+    channel.enqueue(dispatch3);
     ASSERT_TRUE(channel.isEmpty() == false);
     ASSERT_TRUE(channel.size() == 3);
-    ASSERT_TRUE(channel.dequeue( -1 ) == dispatch2);
-    ASSERT_TRUE(channel.dequeue( 0 ) == dispatch1);
-    ASSERT_TRUE(channel.dequeue( 1000 ) == dispatch3);
+    ASSERT_TRUE(channel.dequeue(-1) == dispatch2);
+    ASSERT_TRUE(channel.dequeue(0) == dispatch1);
+    ASSERT_TRUE(channel.dequeue(1000) == dispatch3);
 
     ASSERT_TRUE(channel.size() == 0);
     ASSERT_TRUE(channel.isEmpty() == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SimplePriorityMessageDispatchChannelTest, testRemoveAll) {
-
+TEST_F(SimplePriorityMessageDispatchChannelTest, testRemoveAll)
+{
     SimplePriorityMessageDispatchChannel channel;
 
-    Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch2( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch3( new MessageDispatch() );
+    Pointer<MessageDispatch> dispatch1(new MessageDispatch());
+    Pointer<MessageDispatch> dispatch2(new MessageDispatch());
+    Pointer<MessageDispatch> dispatch3(new MessageDispatch());
 
-    Pointer<Message> message1( new Message() );
-    Pointer<Message> message2( new Message() );
-    Pointer<Message> message3( new Message() );
+    Pointer<Message> message1(new Message());
+    Pointer<Message> message2(new Message());
+    Pointer<Message> message3(new Message());
 
-    message1->setPriority( 2 );
-    message2->setPriority( 3 );
-    message3->setPriority( 1 );
+    message1->setPriority(2);
+    message2->setPriority(3);
+    message3->setPriority(1);
 
-    dispatch1->setMessage( message1 );
-    dispatch2->setMessage( message2 );
-    dispatch3->setMessage( message3 );
+    dispatch1->setMessage(message1);
+    dispatch2->setMessage(message2);
+    dispatch3->setMessage(message3);
 
-    channel.enqueue( dispatch1 );
-    channel.enqueue( dispatch2 );
-    channel.enqueue( dispatch3 );
+    channel.enqueue(dispatch1);
+    channel.enqueue(dispatch2);
+    channel.enqueue(dispatch3);
 
     channel.start();
     ASSERT_TRUE(channel.isRunning() == true);

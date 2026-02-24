@@ -20,98 +20,100 @@
 
 #include <cms/Config.h>
 #include <cms/DestinationListener.h>
-#include <cms/Topic.h>
 #include <cms/Queue.h>
-#include <cms/TemporaryQueue.h>
-#include <cms/TemporaryTopic.h>
 #include <cms/Startable.h>
 #include <cms/Stoppable.h>
+#include <cms/TemporaryQueue.h>
+#include <cms/TemporaryTopic.h>
+#include <cms/Topic.h>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * Provides an object that will provide a snapshot view of Destinations that
+ * exist on the Message provider.
+ *
+ * @since 3.2
+ */
+class CMS_API DestinationSource : public cms::Startable, public cms::Stoppable
+{
+public:
+    virtual ~DestinationSource();
 
     /**
-     * Provides an object that will provide a snapshot view of Destinations that exist
-     * on the Message provider.
+     * Sets the current listener of Destination events.
      *
-     * @since 3.2
+     * This class does not manage the lifetime of the configured listener, the
+     * client must ensure that it deletes the listener instance at the
+     * appropriate time.
+     *
+     * @param listener
+     *      The new listener to provide destination events to.
      */
-    class CMS_API DestinationSource : public cms::Startable, public cms::Stoppable {
-    public:
+    virtual void setListener(cms::DestinationListener* listener) = 0;
 
-        virtual ~DestinationSource();
+    /**
+     * Gets the currently configured DestiantionListener for this event source.
+     *
+     * The event source instance remains active in this DestinationSource until
+     * it is removed via a call to setListener(null) and should not be deleted
+     * until the client is sure it will not receive any future events.
+     *
+     * @return the configured DestinationListener for this event source or null
+     * if none.
+     */
+    virtual cms::DestinationListener* getListener() const = 0;
 
-        /**
-         * Sets the current listener of Destination events.
-         *
-         * This class does not manage the lifetime of the configured listener, the client
-         * must ensure that it deletes the listener instance at the appropriate time.
-         *
-         * @param listener
-         *      The new listener to provide destination events to.
-         */
-        virtual void setListener(cms::DestinationListener* listener) = 0;
+    /**
+     * Returns a snapshot of the currently known Queues that are active on the
+     * CMS provider, this state can change at any time as Destinations are added
+     * and deleted from the provider.
+     *
+     * The destinations are cloned and placed into the returned vector, the
+     * caller is responsible for deleting these cloned objects.
+     *
+     * @return an STL vector containing the current list of known Queues.
+     */
+    virtual std::vector<cms::Queue*> getQueues() const = 0;
 
-        /**
-         * Gets the currently configured DestiantionListener for this event source.
-         *
-         * The event source instance remains active in this DestinationSource until
-         * it is removed via a call to setListener(null) and should not be deleted
-         * until the client is sure it will not receive any future events.
-         *
-         * @return the configured DestinationListener for this event source or null if none.
-         */
-        virtual cms::DestinationListener* getListener() const = 0;
+    /**
+     * Returns a snapshot of the currently known Queues that are active on the
+     * CMS provider, this state can change at any time as Destinations are added
+     * and deleted from the provider.
+     *
+     * The destinations are cloned and placed into the returned vector, the
+     * caller is responsible for deleting these cloned objects.
+     *
+     * @return an STL vector containing the current list of known Queues.
+     */
+    virtual std::vector<cms::Topic*> getTopics() const = 0;
 
-        /**
-         * Returns a snapshot of the currently known Queues that are active on the CMS
-         * provider, this state can change at any time as Destinations are added and deleted
-         * from the provider.
-         *
-         * The destinations are cloned and placed into the returned vector, the caller is
-         * responsible for deleting these cloned objects.
-         *
-         * @return an STL vector containing the current list of known Queues.
-         */
-        virtual std::vector<cms::Queue*> getQueues() const = 0;
+    /**
+     * Returns a snapshot of the currently known Queues that are active on the
+     * CMS provider, this state can change at any time as Destinations are added
+     * and deleted from the provider.
+     *
+     * The destinations are cloned and placed into the returned vector, the
+     * caller is responsible for deleting these cloned objects.
+     *
+     * @return an STL vector containing the current list of known Queues.
+     */
+    virtual std::vector<cms::TemporaryQueue*> getTemporaryQueues() const = 0;
 
-        /**
-         * Returns a snapshot of the currently known Queues that are active on the CMS
-         * provider, this state can change at any time as Destinations are added and deleted
-         * from the provider.
-         *
-         * The destinations are cloned and placed into the returned vector, the caller is
-         * responsible for deleting these cloned objects.
-         *
-         * @return an STL vector containing the current list of known Queues.
-         */
-        virtual std::vector<cms::Topic*> getTopics() const = 0;
+    /**
+     * Returns a snapshot of the currently known Queues that are active on the
+     * CMS provider, this state can change at any time as Destinations are added
+     * and deleted from the provider.
+     *
+     * The destinations are cloned and placed into the returned vector, the
+     * caller is responsible for deleting these cloned objects.
+     *
+     * @return an STL vector containing the current list of known Queues.
+     */
+    virtual std::vector<cms::TemporaryTopic*> getTemporaryTopics() const = 0;
+};
 
-        /**
-         * Returns a snapshot of the currently known Queues that are active on the CMS
-         * provider, this state can change at any time as Destinations are added and deleted
-         * from the provider.
-         *
-         * The destinations are cloned and placed into the returned vector, the caller is
-         * responsible for deleting these cloned objects.
-         *
-         * @return an STL vector containing the current list of known Queues.
-         */
-        virtual std::vector<cms::TemporaryQueue*> getTemporaryQueues() const = 0;
-
-        /**
-         * Returns a snapshot of the currently known Queues that are active on the CMS
-         * provider, this state can change at any time as Destinations are added and deleted
-         * from the provider.
-         *
-         * The destinations are cloned and placed into the returned vector, the caller is
-         * responsible for deleting these cloned objects.
-         *
-         * @return an STL vector containing the current list of known Queues.
-         */
-        virtual std::vector<cms::TemporaryTopic*> getTemporaryTopics() const = 0;
-
-    };
-
-}
+}  // namespace cms
 
 #endif /* _CMS_DESTINATIONSOURCE_H_ */

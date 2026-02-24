@@ -17,15 +17,15 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/lang/String.h>
-#include <decaf/lang/StringBuilder.h>
-#include <decaf/lang/StringBuffer.h>
-#include <decaf/lang/Short.h>
+#include <decaf/lang/Double.h>
+#include <decaf/lang/Float.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
-#include <decaf/lang/Float.h>
-#include <decaf/lang/Double.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/lang/Short.h>
+#include <decaf/lang/String.h>
+#include <decaf/lang/StringBuffer.h>
+#include <decaf/lang/StringBuilder.h>
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 #include <decaf/lang/exceptions/NegativeArraySizeException.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
@@ -38,50 +38,53 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class StringBuilderTest : public ::testing::Test {
+class StringBuilderTest : public ::testing::Test
+{
 public:
-
-        StringBuilderTest();
-        virtual ~StringBuilderTest();
-
-    };
+    StringBuilderTest();
+    virtual ~StringBuilderTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-StringBuilderTest::StringBuilderTest() {
+StringBuilderTest::StringBuilderTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StringBuilderTest::~StringBuilderTest() {
+StringBuilderTest::~StringBuilderTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testDefaultConstructor) {
+TEST_F(StringBuilderTest, testDefaultConstructor)
+{
     StringBuilder builder;
     ASSERT_EQ(16, builder.capacity());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testConstructorInt) {
-
+TEST_F(StringBuilderTest, testConstructorInt)
+{
     StringBuilder sb(24);
     ASSERT_EQ(24, sb.capacity());
 
-    ASSERT_THROW(StringBuilder(-1), NegativeArraySizeException) << ("Should have thrown a NegativeArraySizeException");
+    ASSERT_THROW(StringBuilder(-1), NegativeArraySizeException)
+        << ("Should have thrown a NegativeArraySizeException");
 
     ASSERT_NO_THROW(StringBuilder(0));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testConstructorString) {
-
+TEST_F(StringBuilderTest, testConstructorString)
+{
     StringBuilder sb("fixture");
     ASSERT_EQ(String("fixture"), sb.toString());
     ASSERT_EQ(String("fixture").length() + 16, sb.capacity());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testAppendBoolean) {
-
+TEST_F(StringBuilderTest, testAppendBoolean)
+{
     StringBuilder sb;
     sb.append(true);
     ASSERT_EQ(String("true"), sb.toString());
@@ -91,7 +94,8 @@ TEST_F(StringBuilderTest, testAppendBoolean) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testAppendChar) {
+TEST_F(StringBuilderTest, testAppendChar)
+{
     StringBuilder sb;
     sb.append('a');
     ASSERT_EQ(String("a"), sb.toString());
@@ -101,8 +105,8 @@ TEST_F(StringBuilderTest, testAppendChar) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testAppendCharArray) {
-
+TEST_F(StringBuilderTest, testAppendCharArray)
+{
     StringBuilder sb;
     sb.append("ab");
     ASSERT_EQ(String("ab"), sb.toString());
@@ -110,12 +114,13 @@ TEST_F(StringBuilderTest, testAppendCharArray) {
     sb.append("cd");
     ASSERT_EQ(String("cd"), sb.toString());
 
-    ASSERT_THROW(sb.append((const char*) NULL), NullPointerException) << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(sb.append((const char*)NULL), NullPointerException)
+        << ("Should have thrown a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testAppendCharArrayIntInt) {
-
+TEST_F(StringBuilderTest, testAppendCharArrayIntInt)
+{
     StringBuilder sb;
     sb.append("ab", 0, 2);
     ASSERT_EQ(String("ab"), sb.toString());
@@ -135,18 +140,22 @@ TEST_F(StringBuilderTest, testAppendCharArrayIntInt) {
     sb.append("abcd", 2, 0);
     ASSERT_EQ(String(""), sb.toString());
 
-    ASSERT_THROW(sb.append((const char*) NULL, 0, 2), NullPointerException) << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(sb.append((const char*)NULL, 0, 2), NullPointerException)
+        << ("Should have thrown a NullPointerException");
 
-    ASSERT_THROW(sb.append("abcd", -1, 2), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.append("abcd", -1, 2), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.append("abcd", 0, -1), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.append("abcd", 0, -1), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.append("abcd", 2, 3), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.append("abcd", 2, 3), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testAppendCharSequence) {
-
+TEST_F(StringBuilderTest, testAppendCharSequence)
+{
     String ab("ab");
     String cd("cd");
 
@@ -157,13 +166,13 @@ TEST_F(StringBuilderTest, testAppendCharSequence) {
     sb.append(&cd);
     ASSERT_EQ(String("cd"), sb.toString());
     sb.setLength(0);
-    sb.append((CharSequence*) NULL);
+    sb.append((CharSequence*)NULL);
     ASSERT_EQ(String("null"), sb.toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testAppendCharSequenceIntInt) {
-
+TEST_F(StringBuilderTest, testAppendCharSequenceIntInt)
+{
     String ab("ab");
     String cd("cd");
     String abcd("abcd");
@@ -181,13 +190,13 @@ TEST_F(StringBuilderTest, testAppendCharSequenceIntInt) {
     sb.append(&abcd, 2, 4);
     ASSERT_EQ(String("cd"), sb.toString());
     sb.setLength(0);
-    sb.append((CharSequence*) NULL, 0, 2);
+    sb.append((CharSequence*)NULL, 0, 2);
     ASSERT_EQ(String("nu"), sb.toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testAppendShort) {
-
+TEST_F(StringBuilderTest, testAppendShort)
+{
     short a = 1;
     short b = 0;
     short c = -1;
@@ -210,8 +219,8 @@ TEST_F(StringBuilderTest, testAppendShort) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testAppendInt) {
-
+TEST_F(StringBuilderTest, testAppendInt)
+{
     int a = 1;
     int b = 0;
     int c = -1;
@@ -234,7 +243,8 @@ TEST_F(StringBuilderTest, testAppendInt) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testAppendLong) {
+TEST_F(StringBuilderTest, testAppendLong)
+{
     StringBuilder sb;
     sb.append(1LL);
     ASSERT_EQ(String::valueOf(1LL), sb.toString());
@@ -253,7 +263,8 @@ TEST_F(StringBuilderTest, testAppendLong) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testAppendDouble) {
+TEST_F(StringBuilderTest, testAppendDouble)
+{
     StringBuilder sb;
     sb.append(1.0);
     ASSERT_EQ(String::valueOf(1.0), sb.toString());
@@ -281,7 +292,8 @@ TEST_F(StringBuilderTest, testAppendDouble) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testAppendFloat) {
+TEST_F(StringBuilderTest, testAppendFloat)
+{
     StringBuilder sb;
     sb.append(1.0f);
     ASSERT_EQ(String::valueOf(1.0f), sb.toString());
@@ -309,7 +321,8 @@ TEST_F(StringBuilderTest, testAppendFloat) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testAppendString) {
+TEST_F(StringBuilderTest, testAppendString)
+{
     StringBuilder sb;
     sb.append(String("ab"));
     ASSERT_EQ(String("ab"), sb.toString());
@@ -319,8 +332,8 @@ TEST_F(StringBuilderTest, testAppendString) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testAppendStringBuffer) {
-
+TEST_F(StringBuilderTest, testAppendStringBuffer)
+{
     StringBuilder sb;
     sb.append(StringBuffer("ab"));
     ASSERT_EQ(String("ab"), sb.toString());
@@ -330,39 +343,41 @@ TEST_F(StringBuilderTest, testAppendStringBuffer) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class MyObject {
-    public:
+class MyObject
+{
+public:
+    String toString() const
+    {
+        return "MyObject";
+    }
+};
 
-        String toString() const {
-            return "MyObject";
-        }
-
-    };
-
-}
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testAppendRawPointer) {
-
-    MyObject obj;
+TEST_F(StringBuilderTest, testAppendRawPointer)
+{
+    MyObject      obj;
     StringBuilder sb;
     sb.append(&obj);
     ASSERT_EQ(String("MyObject"), sb.toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testAppendPointer) {
-
+TEST_F(StringBuilderTest, testAppendPointer)
+{
     Pointer<MyObject> obj(new MyObject);
-    StringBuilder sb;
+    StringBuilder     sb;
     sb.append(obj);
     ASSERT_EQ(String("MyObject"), sb.toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testCapacity) {
+TEST_F(StringBuilderTest, testCapacity)
+{
     StringBuilder sb;
     ASSERT_EQ(16, sb.capacity());
     sb.append("0123456789ABCDEF0123456789ABCDEF");
@@ -370,26 +385,30 @@ TEST_F(StringBuilderTest, testCapacity) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testCharAt) {
-
-    String fixture = "0123456789";
+TEST_F(StringBuilderTest, testCharAt)
+{
+    String        fixture = "0123456789";
     StringBuilder sb(fixture);
 
-    for (int i = 0; i < fixture.length(); i++) {
-        ASSERT_EQ((char) ('0' + i), sb.charAt(i));
+    for (int i = 0; i < fixture.length(); i++)
+    {
+        ASSERT_EQ((char)('0' + i), sb.charAt(i));
     }
 
-    ASSERT_THROW(sb.charAt(-1), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.charAt(-1), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.charAt(fixture.length()), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.charAt(fixture.length()), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.charAt(fixture.length() + 1), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.charAt(fixture.length() + 1), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testDeleteRange) {
-
-    String fixture = "0123456789";
+TEST_F(StringBuilderTest, testDeleteRange)
+{
+    String        fixture = "0123456789";
     StringBuilder sb(fixture);
 
     sb.deleteRange(0, 0);
@@ -410,11 +429,17 @@ TEST_F(StringBuilderTest, testDeleteRange) {
         ASSERT_EQ(0, sb.length());
     }
 
-    ASSERT_THROW(StringBuilder(fixture).deleteRange(-1, 2), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(StringBuilder(fixture).deleteRange(-1, 2),
+                 StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(StringBuilder(fixture).deleteRange(13, 12), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(StringBuilder(fixture).deleteRange(13, 12),
+                 StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(StringBuilder(fixture).deleteRange(11, 12), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(StringBuilder(fixture).deleteRange(11, 12),
+                 StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
     {
         StringBuilder sb;
@@ -428,9 +453,9 @@ TEST_F(StringBuilderTest, testDeleteRange) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testDeleteCharAt) {
-
-    String fixture = "0123456789";
+TEST_F(StringBuilderTest, testDeleteCharAt)
+{
+    String        fixture = "0123456789";
     StringBuilder sb(fixture);
 
     sb.deleteCharAt(0);
@@ -449,16 +474,22 @@ TEST_F(StringBuilderTest, testDeleteCharAt) {
         ASSERT_EQ(9, sb.length());
     }
 
-    ASSERT_THROW(StringBuilder(fixture).deleteCharAt(-1), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(StringBuilder(fixture).deleteCharAt(-1),
+                 StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(StringBuilder(fixture).deleteCharAt(fixture.length()), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(StringBuilder(fixture).deleteCharAt(fixture.length()),
+                 StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(StringBuilder(fixture).deleteCharAt(fixture.length() + 1), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(StringBuilder(fixture).deleteCharAt(fixture.length() + 1),
+                 StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testEnsureCapacity) {
-
+TEST_F(StringBuilderTest, testEnsureCapacity)
+{
     StringBuilder sb(5);
     ASSERT_EQ(5, sb.capacity());
     sb.ensureCapacity(10);
@@ -470,61 +501,72 @@ TEST_F(StringBuilderTest, testEnsureCapacity) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testGetChars) {
-
-    String fixture = "0123456789";
+TEST_F(StringBuilderTest, testGetChars)
+{
+    String        fixture = "0123456789";
     StringBuilder sb(fixture);
-    char* dst = new char[10];
+    char*         dst = new char[10];
     sb.getChars(0, 10, dst, 10, 0);
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 10; ++i)
+    {
         ASSERT_EQ(dst[i], fixture.charAt(i));
     }
 
     Arrays::fill(dst, 10, '\0');
     sb.getChars(0, 5, dst, 10, 0);
     char* fixtureChars = new char[10];
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 5; ++i)
+    {
         ASSERT_EQ(dst[i], fixture.charAt(i));
     }
 
     // TODO String needs getChars
-//    fixture.getChars(0, 5, fixtureChars, 0);
-//    assertTrue(Arrays.equals(fixtureChars, dst));
-//
-//    Arrays.fill(dst, '\0');
-//    Arrays.fill(fixtureChars, '\0');
-//    sb.getChars(0, 5, dst, 5);
-//    fixture.getChars(0, 5, fixtureChars, 5);
-//    assertTrue(Arrays.equals(fixtureChars, dst));
-//
-//    Arrays.fill(dst, '\0');
-//    Arrays.fill(fixtureChars, '\0');
-//    sb.getChars(5, 10, dst, 1);
-//    fixture.getChars(5, 10, fixtureChars, 1);
-//    assertTrue(Arrays.equals(fixtureChars, dst));
+    //    fixture.getChars(0, 5, fixtureChars, 0);
+    //    assertTrue(Arrays.equals(fixtureChars, dst));
+    //
+    //    Arrays.fill(dst, '\0');
+    //    Arrays.fill(fixtureChars, '\0');
+    //    sb.getChars(0, 5, dst, 5);
+    //    fixture.getChars(0, 5, fixtureChars, 5);
+    //    assertTrue(Arrays.equals(fixtureChars, dst));
+    //
+    //    Arrays.fill(dst, '\0');
+    //    Arrays.fill(fixtureChars, '\0');
+    //    sb.getChars(5, 10, dst, 1);
+    //    fixture.getChars(5, 10, fixtureChars, 1);
+    //    assertTrue(Arrays.equals(fixtureChars, dst));
 
-    ASSERT_THROW(sb.getChars(0, 10, dst, -1, 0), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.getChars(0, 10, dst, -1, 0), StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.getChars(0, 10, (char*) NULL, 10, 0), NullPointerException) << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(sb.getChars(0, 10, (char*)NULL, 10, 0), NullPointerException)
+        << ("Should have thrown a NullPointerException");
 
-    ASSERT_THROW(sb.getChars(-1, 10, dst, 10, 0), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.getChars(-1, 10, dst, 10, 0),
+                 StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.getChars(0, 10, dst, 10, -1), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.getChars(0, 10, dst, 10, -1),
+                 StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.getChars(5, 4, dst, 10, 0), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.getChars(5, 4, dst, 10, 0), StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.getChars(0, 11, dst, 10, 0), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.getChars(0, 11, dst, 10, 0), StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.getChars(0, 10, dst, 10, 5), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.getChars(0, 10, dst, 10, 5), StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    delete [] dst;
-    delete [] fixtureChars;
+    delete[] dst;
+    delete[] fixtureChars;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testIndexOfString) {
-
-    String fixture = "0123456789";
+TEST_F(StringBuilderTest, testIndexOfString)
+{
+    String        fixture = "0123456789";
     StringBuilder sb(fixture);
 
     ASSERT_EQ(0, sb.indexOf("0"));
@@ -534,9 +576,9 @@ TEST_F(StringBuilderTest, testIndexOfString) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testIndexOfStringInt) {
-
-    String fixture = "0123456789";
+TEST_F(StringBuilderTest, testIndexOfStringInt)
+{
+    String        fixture = "0123456789";
     StringBuilder sb(fixture);
     ASSERT_EQ(0, sb.indexOf("0"));
     ASSERT_EQ(0, sb.indexOf("012"));
@@ -555,9 +597,9 @@ TEST_F(StringBuilderTest, testIndexOfStringInt) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testLastIndexOfString) {
-
-    String fixture = "0123456789";
+TEST_F(StringBuilderTest, testLastIndexOfString)
+{
+    String        fixture = "0123456789";
     StringBuilder sb(fixture);
     ASSERT_EQ(0, sb.lastIndexOf("0"));
     ASSERT_EQ(0, sb.lastIndexOf("012"));
@@ -566,9 +608,9 @@ TEST_F(StringBuilderTest, testLastIndexOfString) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testLastIndexOfStringInt) {
-
-    String fixture = "0123456789";
+TEST_F(StringBuilderTest, testLastIndexOfStringInt)
+{
+    String        fixture = "0123456789";
     StringBuilder sb(fixture);
     ASSERT_EQ(0, sb.lastIndexOf("0"));
     ASSERT_EQ(0, sb.lastIndexOf("012"));
@@ -587,42 +629,43 @@ TEST_F(StringBuilderTest, testLastIndexOfStringInt) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    void reverseTest(const String& org, const String& rev, const String& back) {
+void reverseTest(const String& org, const String& rev, const String& back)
+{
+    // create non-shared StringBuilder
+    StringBuilder sb1(org);
+    sb1.reverse();
+    String reversed = sb1.toString();
+    ASSERT_EQ(rev, reversed);
 
-        // create non-shared StringBuilder
-        StringBuilder sb1(org);
-        sb1.reverse();
-        String reversed = sb1.toString();
-        ASSERT_EQ(rev, reversed);
+    // create non-shared StringBuilder
+    StringBuilder sb2(reversed);
+    sb2.reverse();
+    reversed = sb2.toString();
+    ASSERT_EQ(back, reversed);
 
-        // create non-shared StringBuilder
-        StringBuilder sb2(reversed);
-        sb2.reverse();
-        reversed = sb2.toString();
-        ASSERT_EQ(back, reversed);
-
-        // test algorithm when StringBuilder is shared
-        StringBuilder sb3(org);
-        String copy = sb3.toString();
-        ASSERT_EQ(org, copy);
-        sb3.reverse();
-        reversed = sb3.toString();
-        ASSERT_EQ(rev, reversed);
-        StringBuilder sb4(reversed);
-        copy = sb4.toString();
-        ASSERT_EQ(rev, copy);
-        sb4.reverse();
-        reversed = sb4.toString();
-        ASSERT_EQ(back, reversed);
-    }
+    // test algorithm when StringBuilder is shared
+    StringBuilder sb3(org);
+    String        copy = sb3.toString();
+    ASSERT_EQ(org, copy);
+    sb3.reverse();
+    reversed = sb3.toString();
+    ASSERT_EQ(rev, reversed);
+    StringBuilder sb4(reversed);
+    copy = sb4.toString();
+    ASSERT_EQ(rev, copy);
+    sb4.reverse();
+    reversed = sb4.toString();
+    ASSERT_EQ(back, reversed);
 }
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testReverse) {
-
-    String fixture = "0123456789";
+TEST_F(StringBuilderTest, testReverse)
+{
+    String        fixture = "0123456789";
     StringBuilder sb1(fixture);
     sb1.reverse();
     ASSERT_EQ(String("9876543210"), sb1.toString());
@@ -652,67 +695,81 @@ TEST_F(StringBuilderTest, testReverse) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testSubSequence) {
-
-    String fixture = "0123456789";
-    StringBuilder sb(fixture);
+TEST_F(StringBuilderTest, testSubSequence)
+{
+    String                fixture = "0123456789";
+    StringBuilder         sb(fixture);
     Pointer<CharSequence> ss(sb.subSequence(0, 5));
     ASSERT_EQ(std::string("01234"), ss->toString());
 
     ss.reset(sb.subSequence(0, 0));
     ASSERT_EQ(std::string(""), ss->toString());
 
-    ASSERT_THROW(sb.subSequence(-1, 1), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.subSequence(-1, 1), StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.subSequence(0, fixture.length() + 1), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.subSequence(0, fixture.length() + 1),
+                 StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.subSequence(0, -1), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.subSequence(0, -1), StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.subSequence(3, 2), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.subSequence(3, 2), StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testSubstringInt) {
-
-    String fixture = "0123456789";
+TEST_F(StringBuilderTest, testSubstringInt)
+{
+    String        fixture = "0123456789";
     StringBuilder sb(fixture);
-    String ss = sb.substring(0);
+    String        ss = sb.substring(0);
     ASSERT_EQ(fixture, ss);
 
     ss = sb.substring(10);
     ASSERT_EQ(String(""), ss);
 
-    ASSERT_THROW(sb.substring(-1), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.substring(-1), StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.substring(fixture.length() + 1), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.substring(fixture.length() + 1),
+                 StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.substring(0, -1), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.substring(0, -1), StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testSubstringIntInt) {
-
-    String fixture = "0123456789";
+TEST_F(StringBuilderTest, testSubstringIntInt)
+{
+    String        fixture = "0123456789";
     StringBuilder sb(fixture);
-    String ss = sb.substring(0, 5);
+    String        ss = sb.substring(0, 5);
     ASSERT_EQ(String("01234"), ss);
 
     ss = sb.substring(0, 0);
     ASSERT_EQ(String(), ss);
 
-    ASSERT_THROW(sb.substring(-1, 1), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.substring(-1, 1), StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.substring(0, fixture.length() + 1), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.substring(0, fixture.length() + 1),
+                 StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.substring(0, -1), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.substring(0, -1), StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.substring(3, 2), StringIndexOutOfBoundsException) << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.substring(3, 2), StringIndexOutOfBoundsException)
+        << ("Should have thrown a StringIndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testInsertChar) {
-
-    String fixture = "0000";
+TEST_F(StringBuilderTest, testInsertChar)
+{
+    String        fixture = "0000";
     StringBuilder sb(fixture);
     sb.insert(0, 'a');
     ASSERT_EQ(String("a0000"), sb.toString());
@@ -735,15 +792,17 @@ TEST_F(StringBuilderTest, testInsertChar) {
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, 'a'), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, 'a'), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, 'a'), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, 'a'), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testInsertBoolean) {
-
-    String fixture = "0000";
+TEST_F(StringBuilderTest, testInsertBoolean)
+{
+    String        fixture = "0000";
     StringBuilder sb(fixture);
     sb.insert(0, true);
     ASSERT_EQ(String("true0000"), sb.toString());
@@ -766,15 +825,17 @@ TEST_F(StringBuilderTest, testInsertBoolean) {
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, false), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, false), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, false), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, false), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testInsertCharArray) {
-
-    String fixture = "0000";
+TEST_F(StringBuilderTest, testInsertCharArray)
+{
+    String        fixture = "0000";
     StringBuilder sb(fixture);
     sb.insert(0, "ab");
     ASSERT_EQ(String("ab0000"), sb.toString());
@@ -792,17 +853,20 @@ TEST_F(StringBuilderTest, testInsertCharArray) {
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(0, (const char*) NULL), NullPointerException) << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(sb.insert(0, (const char*)NULL), NullPointerException)
+        << ("Should have thrown a NullPointerException");
 
-    ASSERT_THROW(sb.insert(-1, "Test"), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, "Test"), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, "Test"), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, "Test"), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testInsertCharArrayWithOffset) {
-
-    String fixture = "0000";
+TEST_F(StringBuilderTest, testInsertCharArrayWithOffset)
+{
+    String        fixture = "0000";
     StringBuilder sb(fixture);
     sb.insert(0, "ab", 0, 2);
     ASSERT_EQ(String("ab0000"), sb.toString());
@@ -835,23 +899,29 @@ TEST_F(StringBuilderTest, testInsertCharArrayWithOffset) {
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(0, (const char*) NULL, 0, 2), NullPointerException) << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(sb.insert(0, (const char*)NULL, 0, 2), NullPointerException)
+        << ("Should have thrown a NullPointerException");
 
-    ASSERT_THROW(sb.insert(-1, "ab", 0, 2), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, "ab", 0, 2), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, "ab", 0, 2), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, "ab", 0, 2), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(4, "ab", 0, -1), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(4, "ab", 0, -1), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(4, "ab", -1, 2), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(4, "ab", -1, 2), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(4, "ab", 0, 3), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(4, "ab", 0, 3), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testInsertString) {
-
-    String fixture = "0000";
+TEST_F(StringBuilderTest, testInsertString)
+{
+    String        fixture = "0000";
     StringBuilder sb(fixture);
     sb.insert(0, String("fixture"));
     ASSERT_EQ(String("fixture0000"), sb.toString());
@@ -869,15 +939,17 @@ TEST_F(StringBuilderTest, testInsertString) {
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, String("fixture")), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, String("fixture")), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, String("fixture")), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, String("fixture")), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testInsertStdString) {
-
-    std::string fixture = "0000";
+TEST_F(StringBuilderTest, testInsertStdString)
+{
+    std::string   fixture = "0000";
     StringBuilder sb(fixture);
     sb.insert(0, std::string("fixture"));
     ASSERT_EQ(String("fixture0000"), sb.toString());
@@ -895,16 +967,19 @@ TEST_F(StringBuilderTest, testInsertStdString) {
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, std::string("fixture")), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, std::string("fixture")),
+                 IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, std::string("fixture")), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, std::string("fixture")), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testInsertCharSequence) {
-
-    String fixture = "0000";
-    String ab("ab");
+TEST_F(StringBuilderTest, testInsertCharSequence)
+{
+    String        fixture = "0000";
+    String        ab("ab");
     StringBuilder sb(fixture);
     sb.insert(0, &ab);
     ASSERT_EQ(String("ab0000"), sb.toString());
@@ -921,22 +996,24 @@ TEST_F(StringBuilderTest, testInsertCharSequence) {
     ASSERT_EQ(6, sb.length());
     sb.setLength(0);
     sb.append(fixture);
-    sb.insert(4, (CharSequence*) NULL);
+    sb.insert(4, (CharSequence*)NULL);
     ASSERT_EQ(String("0000null"), sb.toString());
     ASSERT_EQ(8, sb.length());
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, &ab), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, &ab), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, &ab), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, &ab), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testInsertCharSequenceIntInt) {
-
-    String fixture = "0000";
-    String ab("ab");
+TEST_F(StringBuilderTest, testInsertCharSequenceIntInt)
+{
+    String        fixture = "0000";
+    String        ab("ab");
     StringBuilder sb(fixture);
     sb.insert(0, &ab, 0, 2);
     ASSERT_EQ(String("ab0000"), sb.toString());
@@ -968,27 +1045,32 @@ TEST_F(StringBuilderTest, testInsertCharSequenceIntInt) {
     ASSERT_EQ(5, sb.length());
     sb.setLength(0);
     sb.append(fixture);
-    sb.insert(4, (CharSequence*) NULL, 0, 2);
+    sb.insert(4, (CharSequence*)NULL, 0, 2);
     ASSERT_EQ(String("0000nu"), sb.toString());
     ASSERT_EQ(6, sb.length());
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, &ab, 0, 2), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, &ab, 0, 2), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, &ab, 0, 2), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, &ab, 0, 2), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, &ab, -1, 2), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, &ab, -1, 2), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, &ab, 0, -1), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, &ab, 0, -1), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, &ab, 0, 3), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, &ab, 0, 3), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testInsertDouble) {
-
-    String fixture = "0000";
+TEST_F(StringBuilderTest, testInsertDouble)
+{
+    String        fixture = "0000";
     StringBuilder sb(fixture);
     sb.insert(0, -1.1);
     ASSERT_EQ(String("-1.10000"), sb.toString());
@@ -1011,15 +1093,17 @@ TEST_F(StringBuilderTest, testInsertDouble) {
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, 1.0), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, 1.0), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, 1.0), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, 1.0), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testInsertFloat) {
-
-    String fixture = "0000";
+TEST_F(StringBuilderTest, testInsertFloat)
+{
+    String        fixture = "0000";
     StringBuilder sb(fixture);
     sb.insert(0, -1.1f);
     ASSERT_EQ(String("-1.10000"), sb.toString());
@@ -1042,46 +1126,50 @@ TEST_F(StringBuilderTest, testInsertFloat) {
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, 1.0f), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, 1.0f), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, 1.0f), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, 1.0f), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testInsertShort) {
-
-    String fixture = "0000";
+TEST_F(StringBuilderTest, testInsertShort)
+{
+    String        fixture = "0000";
     StringBuilder sb(fixture);
-    sb.insert(0, (short) -1);
+    sb.insert(0, (short)-1);
     ASSERT_EQ(String("-10000"), sb.toString());
     ASSERT_EQ(6, sb.length());
     sb.setLength(0);
     sb.append(fixture);
-    sb.insert(0, (short) 0);
+    sb.insert(0, (short)0);
     ASSERT_EQ(String("00000"), sb.toString());
     ASSERT_EQ(5, sb.length());
     sb.setLength(0);
     sb.append(fixture);
-    sb.insert(2, (short) 1);
+    sb.insert(2, (short)1);
     ASSERT_EQ(String("00100"), sb.toString());
     ASSERT_EQ(5, sb.length());
     sb.setLength(0);
     sb.append(fixture);
-    sb.insert(4, (short) 2);
+    sb.insert(4, (short)2);
     ASSERT_EQ(String("00002"), sb.toString());
     ASSERT_EQ(5, sb.length());
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, (short) 1), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, (short)1), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, (short) 1), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, (short)1), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testInsertInt) {
-
-    String fixture = "0000";
+TEST_F(StringBuilderTest, testInsertInt)
+{
+    String        fixture = "0000";
     StringBuilder sb(fixture);
     sb.insert(0, -1);
     ASSERT_EQ(String("-10000"), sb.toString());
@@ -1104,15 +1192,17 @@ TEST_F(StringBuilderTest, testInsertInt) {
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, 1), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, 1), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, 1), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, 1), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testInsertLong) {
-
-    String fixture = "0000";
+TEST_F(StringBuilderTest, testInsertLong)
+{
+    String        fixture = "0000";
     StringBuilder sb(fixture);
     sb.insert(0, -1LL);
     ASSERT_EQ(String("-10000"), sb.toString());
@@ -1135,47 +1225,53 @@ TEST_F(StringBuilderTest, testInsertLong) {
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, 1LL), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, 1LL), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, 1LL), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, 1LL), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testInsertRawPointer) {
-
-    String fixture = "0000";
-    MyObject obj;
+TEST_F(StringBuilderTest, testInsertRawPointer)
+{
+    String        fixture = "0000";
+    MyObject      obj;
     StringBuilder sb;
     sb.insert(0, &obj);
     ASSERT_EQ(String("MyObject"), sb.toString());
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, 1LL), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, 1LL), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, 1LL), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, 1LL), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testInsertPointer) {
-
-    String fixture = "0000";
+TEST_F(StringBuilderTest, testInsertPointer)
+{
+    String            fixture = "0000";
     Pointer<MyObject> obj(new MyObject);
-    StringBuilder sb;
+    StringBuilder     sb;
     sb.insert(0, obj);
     ASSERT_EQ(String("MyObject"), sb.toString());
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, obj), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, obj), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.insert(5, obj), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, obj), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StringBuilderTest, testReplace) {
-
-    String fixture = "0000";
+TEST_F(StringBuilderTest, testReplace)
+{
+    String        fixture = "0000";
     StringBuilder sb(fixture);
     sb.replace(1, 3, "11");
     ASSERT_EQ(String("0110"), sb.toString());
@@ -1198,13 +1294,17 @@ TEST_F(StringBuilderTest, testReplace) {
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.replace(1, 2, (const char*) NULL), NullPointerException) << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(sb.replace(1, 2, (const char*)NULL), NullPointerException)
+        << ("Should have thrown a NullPointerException");
 
-    ASSERT_THROW(sb.replace(-1, 2, "11"), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.replace(-1, 2, "11"), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.replace(5, 2, "11"), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.replace(5, 2, "11"), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
-    ASSERT_THROW(sb.replace(3, 2, "11"), IndexOutOfBoundsException) << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.replace(3, 2, "11"), IndexOutOfBoundsException)
+        << ("Should have thrown a IndexOutOfBoundsException");
 
     StringBuilder buffer("1234567");
     buffer.replace(2, 6, "XXX");

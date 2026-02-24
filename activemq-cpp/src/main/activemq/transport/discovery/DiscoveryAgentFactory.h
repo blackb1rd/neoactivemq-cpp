@@ -25,37 +25,45 @@
 
 #include <activemq/transport/discovery/DiscoveryAgent.h>
 
-namespace activemq {
-namespace transport {
-namespace discovery {
-
-    /**
-     * Factory class for creating discovery agents.  All agents are required to
-     * provide a factory class that can be registered in the DiscoveryAgentRegistry.
-     *
-     * @since 3.9.0
-     */
-    class AMQCPP_API DiscoveryAgentFactory {
-    public:
-
-        virtual ~DiscoveryAgentFactory();
+namespace activemq
+{
+namespace transport
+{
+    namespace discovery
+    {
 
         /**
-         * Creates and returns a new DiscoveryAgentFactory instance that can be used to
-         * create the agent referred to in the given URI.  The factory should apply all
-         * configuration options to the agent prior to returning it.
+         * Factory class for creating discovery agents.  All agents are required
+         * to provide a factory class that can be registered in the
+         * DiscoveryAgentRegistry.
          *
-         * @param agentURI
-         *      The URI that defines the agent to create along with it configuration options.
-         *
-         * @return a new DiscoveryAgent instance for the given URI.
-         *
-         * @throws IOException if an error occurs creating the given agent.
+         * @since 3.9.0
          */
-        virtual decaf::lang::Pointer<DiscoveryAgent> createAgent(const decaf::net::URI& agentURI) = 0;
+        class AMQCPP_API DiscoveryAgentFactory
+        {
+        public:
+            virtual ~DiscoveryAgentFactory();
 
-    };
+            /**
+             * Creates and returns a new DiscoveryAgentFactory instance that can
+             * be used to create the agent referred to in the given URI.  The
+             * factory should apply all configuration options to the agent prior
+             * to returning it.
+             *
+             * @param agentURI
+             *      The URI that defines the agent to create along with it
+             * configuration options.
+             *
+             * @return a new DiscoveryAgent instance for the given URI.
+             *
+             * @throws IOException if an error occurs creating the given agent.
+             */
+            virtual decaf::lang::Pointer<DiscoveryAgent> createAgent(
+                const decaf::net::URI& agentURI) = 0;
+        };
 
-}}}
+    }  // namespace discovery
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_DISCOVERY_DISCOVERYAGENTFACTORY_H_ */

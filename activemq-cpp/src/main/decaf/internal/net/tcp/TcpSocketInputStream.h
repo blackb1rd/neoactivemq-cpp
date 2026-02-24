@@ -20,76 +20,83 @@
 
 #include <decaf/util/Config.h>
 
-#include <decaf/io/InputStream.h>
 #include <decaf/io/IOException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/io/InputStream.h>
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
-namespace tcp {
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
+        namespace tcp
+        {
 
-    class TcpSocket;
+            class TcpSocket;
 
-    /**
-     * Input stream for performing reads on a socket.  This class will only
-     * work properly for blocking sockets.
-     *
-     * @since 1.0
-     */
-    class DECAF_API TcpSocketInputStream: public decaf::io::InputStream {
-    private:
+            /**
+             * Input stream for performing reads on a socket.  This class will
+             * only work properly for blocking sockets.
+             *
+             * @since 1.0
+             */
+            class DECAF_API TcpSocketInputStream : public decaf::io::InputStream
+            {
+            private:
+                TcpSocket* socket;
 
-        TcpSocket* socket;
+                volatile bool closed;
 
-        volatile bool closed;
+            private:
+                TcpSocketInputStream(const TcpSocketInputStream&);
+                TcpSocketInputStream& operator=(const TcpSocketInputStream&);
 
-    private:
+            public:
+                /**
+                 * Create a new InputStream to use for reading from the TCP/IP
+                 * socket.
+                 *
+                 * @param socket
+                 *      The parent SocketImpl for this stream.
+                 */
+                TcpSocketInputStream(TcpSocket* socket);
 
-        TcpSocketInputStream(const TcpSocketInputStream&);
-        TcpSocketInputStream& operator=(const TcpSocketInputStream&);
+                virtual ~TcpSocketInputStream();
 
-    public:
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual int available() const;
 
-        /**
-         * Create a new InputStream to use for reading from the TCP/IP socket.
-         *
-         * @param socket
-         *      The parent SocketImpl for this stream.
-         */
-        TcpSocketInputStream(TcpSocket* socket);
+                /**
+                 * Close - does nothing.  It is the responsibility of the owner
+                 * of the socket object to close it.
+                 *
+                 * {@inheritDoc}
+                 */
+                virtual void close();
 
-        virtual ~TcpSocketInputStream();
+                /**
+                 * Not supported.
+                 *
+                 * {@inheritDoc}
+                 */
+                virtual long long skip(long long num);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual int available() const;
+            protected:
+                virtual int doReadByte();
 
-        /**
-         * Close - does nothing.  It is the responsibility of the owner
-         * of the socket object to close it.
-         *
-         * {@inheritDoc}
-         */
-        virtual void close();
+                virtual int doReadArrayBounded(unsigned char* buffer,
+                                               int            size,
+                                               int            offset,
+                                               int            length);
+            };
 
-        /**
-         * Not supported.
-         *
-         * {@inheritDoc}
-         */
-        virtual long long skip(long long num);
-
-    protected:
-
-        virtual int doReadByte();
-
-        virtual int doReadArrayBounded(unsigned char* buffer, int size, int offset, int length);
-
-    };
-
-}}}}
+        }  // namespace tcp
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /*_DECAF_INTERNAL_NET_TCP_TCPSOCKETINPUTSTREAM_H_*/

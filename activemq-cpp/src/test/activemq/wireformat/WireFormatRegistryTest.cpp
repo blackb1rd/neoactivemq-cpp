@@ -28,23 +28,28 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-class WireFormatRegistryTest : public ::testing::Test {};
+class WireFormatRegistryTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(WireFormatRegistryTest, test) {
-
+TEST_F(WireFormatRegistryTest, test)
+{
     wireformat::openwire::OpenWireFormatFactory factory;
 
     WireFormatRegistry& registry = WireFormatRegistry::getInstance();
 
     ASSERT_TRUE(!registry.getWireFormatNames().empty());
 
-    ASSERT_NO_THROW(registry.findFactory( "openwire" ));
+    ASSERT_NO_THROW(registry.findFactory("openwire"));
 
-    ASSERT_THROW(registry.findFactory(""), NoSuchElementException) << ("Should have thrown an NoSuchElementException");
+    ASSERT_THROW(registry.findFactory(""), NoSuchElementException)
+        << ("Should have thrown an NoSuchElementException");
 
-    ASSERT_THROW(registry.registerFactory( "test", NULL ), NullPointerException) << ("Should have thrown an NullPointerException");
+    ASSERT_THROW(registry.registerFactory("test", NULL), NullPointerException)
+        << ("Should have thrown an NullPointerException");
 
-    ASSERT_THROW(registry.registerFactory( "", &factory ), IllegalArgumentException) << ("Should have thrown an IllegalArgumentException");
-
+    ASSERT_THROW(registry.registerFactory("", &factory),
+                 IllegalArgumentException)
+        << ("Should have thrown an IllegalArgumentException");
 }

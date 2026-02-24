@@ -24,30 +24,42 @@ using namespace activemq::transport;
 using namespace activemq::transport::failover;
 
 ////////////////////////////////////////////////////////////////////////////////
-BackupTransport::BackupTransport(BackupTransportPool* parent) :
-    parent(parent), transport(), uri(), closed(true), priority(false) {
+BackupTransport::BackupTransport(BackupTransportPool* parent)
+    : parent(parent),
+      transport(),
+      uri(),
+      closed(true),
+      priority(false)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BackupTransport::~BackupTransport() {
-    try {
-        if (this->transport != NULL) {
+BackupTransport::~BackupTransport()
+{
+    try
+    {
+        if (this->transport != NULL)
+        {
             // Detach the listener before closing to prevent the transport's IO
-            // thread from calling back into this object while it's being destroyed.
+            // thread from calling back into this object while it's being
+            // destroyed.
             this->transport->setTransportListener(NULL);
             this->transport->close();
         }
-    } catch (...) {
+    }
+    catch (...)
+    {
         // Suppress exceptions in destructor
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BackupTransport::onException(const decaf::lang::Exception& ex AMQCPP_UNUSED) {
-
+void BackupTransport::onException(const decaf::lang::Exception& ex AMQCPP_UNUSED)
+{
     this->closed = true;
 
-    if (this->parent != NULL) {
+    if (this->parent != NULL)
+    {
         this->parent->onBackupTransportFailure(this);
     }
 }

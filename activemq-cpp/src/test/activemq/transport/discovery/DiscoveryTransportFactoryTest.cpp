@@ -20,8 +20,8 @@
 #include <activemq/transport/discovery/DiscoveryAgent.h>
 #include <activemq/transport/discovery/DiscoveryAgentFactory.h>
 #include <activemq/transport/discovery/DiscoveryAgentRegistry.h>
-#include <activemq/transport/discovery/DiscoveryTransportFactory.h>
 #include <activemq/transport/discovery/DiscoveryTransport.h>
+#include <activemq/transport/discovery/DiscoveryTransportFactory.h>
 
 #include <decaf/net/URI.h>
 
@@ -34,91 +34,131 @@ using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class DiscoveryTransportFactoryTest : public ::testing::Test {
+class DiscoveryTransportFactoryTest : public ::testing::Test
+{
 public:
+    DiscoveryTransportFactoryTest();
+    virtual ~DiscoveryTransportFactoryTest();
 
-        DiscoveryTransportFactoryTest();
-        virtual ~DiscoveryTransportFactoryTest();
+    void test();
 
-        void test();
-
-        void SetUp() override;
-
-    };
-
+    void SetUp() override;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class MockDiscoveryAgent : public DiscoveryAgent {
-    public:
+class MockDiscoveryAgent : public DiscoveryAgent
+{
+public:
+    virtual ~MockDiscoveryAgent()
+    {
+    }
 
-        virtual ~MockDiscoveryAgent() {}
+    virtual void start()
+    {
+    }
 
-        virtual void start() {}
-        virtual void stop() {}
-        virtual void setDiscoveryListener(DiscoveryListener* listener) {}
-        virtual void registerService(const std::string& name) {}
-        virtual void serviceFailed(const activemq::commands::DiscoveryEvent& event) {}
-        virtual std::string toString() const { return "MockDiscoveryAgent"; }
-        virtual URI getDiscoveryURI() const { return URI(); }
-        virtual void setDiscoveryURI(const URI& discoveryURI) {}
-    };
+    virtual void stop()
+    {
+    }
 
-    class MockDiscoveryAgentFactory : public DiscoveryAgentFactory {
-    public:
+    virtual void setDiscoveryListener(DiscoveryListener* listener)
+    {
+    }
 
-        virtual ~MockDiscoveryAgentFactory() {}
+    virtual void registerService(const std::string& name)
+    {
+    }
 
-        virtual decaf::lang::Pointer<DiscoveryAgent> createAgent(const decaf::net::URI& agentURI) {
-            return Pointer<DiscoveryAgent>(new MockDiscoveryAgent);
-        }
+    virtual void serviceFailed(const activemq::commands::DiscoveryEvent& event)
+    {
+    }
 
-    };
+    virtual std::string toString() const
+    {
+        return "MockDiscoveryAgent";
+    }
 
-    class MyTransportListener : public TransportListener {
-    public:
+    virtual URI getDiscoveryURI() const
+    {
+        return URI();
+    }
 
-        MyTransportListener() {}
+    virtual void setDiscoveryURI(const URI& discoveryURI)
+    {
+    }
+};
 
-        virtual ~MyTransportListener() {}
+class MockDiscoveryAgentFactory : public DiscoveryAgentFactory
+{
+public:
+    virtual ~MockDiscoveryAgentFactory()
+    {
+    }
 
-        virtual void onCommand(const Pointer<Command> command) {
-        }
+    virtual decaf::lang::Pointer<DiscoveryAgent> createAgent(
+        const decaf::net::URI& agentURI)
+    {
+        return Pointer<DiscoveryAgent>(new MockDiscoveryAgent);
+    }
+};
 
-        virtual void onException(const decaf::lang::Exception& ex) {
-        }
+class MyTransportListener : public TransportListener
+{
+public:
+    MyTransportListener()
+    {
+    }
 
-        virtual void transportInterrupted() {
-        }
+    virtual ~MyTransportListener()
+    {
+    }
 
-        virtual void transportResumed() {
-        }
-    };
+    virtual void onCommand(const Pointer<Command> command)
+    {
+    }
 
+    virtual void onException(const decaf::lang::Exception& ex)
+    {
+    }
+
+    virtual void transportInterrupted()
+    {
+    }
+
+    virtual void transportResumed()
+    {
+    }
+};
+
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+DiscoveryTransportFactoryTest::DiscoveryTransportFactoryTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryTransportFactoryTest::DiscoveryTransportFactoryTest() {
+DiscoveryTransportFactoryTest::~DiscoveryTransportFactoryTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryTransportFactoryTest::~DiscoveryTransportFactoryTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void DiscoveryTransportFactoryTest::SetUp() {
-
+void DiscoveryTransportFactoryTest::SetUp()
+{
     DiscoveryAgentRegistry& registry = DiscoveryAgentRegistry::getInstance();
     registry.registerFactory("mock", new MockDiscoveryAgentFactory);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryTransportFactoryTest::test() {
-
+void DiscoveryTransportFactoryTest::test()
+{
     DiscoveryTransportFactory factory;
 
-    Pointer<Transport> transport = factory.create(URI("discovery:mock://default"));
+    Pointer<Transport> transport =
+        factory.create(URI("discovery:mock://default"));
     ASSERT_TRUE(transport != NULL);
 
     MyTransportListener listener;

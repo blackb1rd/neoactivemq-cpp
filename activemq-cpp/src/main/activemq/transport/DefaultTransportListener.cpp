@@ -21,6 +21,6 @@ using namespace activemq;
 using namespace activemq::transport;
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultTransportListener::~DefaultTransportListener() {
-
+DefaultTransportListener::~DefaultTransportListener()
+{
 }

@@ -16,84 +16,94 @@
  */
 
 #include <benchmark/PerformanceTimer.h>
-#include <decaf/util/LinkedList.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/util/Iterator.h>
+#include <decaf/util/LinkedList.h>
 
 #include <gtest/gtest.h>
-#include <string>
 #include <iostream>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 
-namespace decaf {
-namespace util {
+namespace decaf
+{
+namespace util
+{
 
-    class LinkedListBenchmark : public ::testing::Test {
+    class LinkedListBenchmark : public ::testing::Test
+    {
     protected:
-
-        LinkedList<int> intList;
+        LinkedList<int>         intList;
         LinkedList<std::string> stringList;
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedListBenchmark, runBenchmark) {
-
+TEST_F(LinkedListBenchmark, runBenchmark)
+{
     benchmark::PerformanceTimer timer;
-    int iterations = 100;
+    int                         iterations = 100;
 
-    for( int iter = 0; iter < iterations; ++iter ) {
+    for (int iter = 0; iter < iterations; ++iter)
+    {
         timer.start();
 
-        int numRuns = 500;
-        std::string test = "test";
-        std::string resultStr = "";
+        int                     numRuns   = 500;
+        std::string             test      = "test";
+        std::string             resultStr = "";
         LinkedList<std::string> stringCopy;
-        LinkedList<int> intCopy;
+        LinkedList<int>         intCopy;
 
-        for( int i = 0; i < numRuns; ++i ) {
-            stringList.add( test + Integer::toString(i) );
-            intList.add( 100 + i );
-            stringList.contains( test + Integer::toString(i) );
-            intList.contains( 100 + i );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            stringList.add(test + Integer::toString(i));
+            intList.add(100 + i);
+            stringList.contains(test + Integer::toString(i));
+            intList.contains(100 + i);
         }
 
-        for( int i = 0; i < numRuns; ++i ) {
-            stringList.remove( test + Integer::toString(i) );
-            intList.remove( 100 + i );
-            stringList.contains( test + Integer::toString(i) );
-            intList.contains( 100 + i );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            stringList.remove(test + Integer::toString(i));
+            intList.remove(100 + i);
+            stringList.contains(test + Integer::toString(i));
+            intList.contains(100 + i);
         }
 
-        for( int i = 0; i < numRuns; ++i ) {
-            stringList.add( test + Integer::toString(i) );
-            intList.add( 100 + i );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            stringList.add(test + Integer::toString(i));
+            intList.add(100 + i);
         }
 
         std::vector<std::string> stringVec;
-        std::vector<int> intVec;
+        std::vector<int>         intVec;
 
-        for( int i = 0; i < numRuns / 2; ++i ) {
+        for (int i = 0; i < numRuns / 2; ++i)
+        {
             stringVec = stringList.toArray();
-            intVec = intList.toArray();
+            intVec    = intList.toArray();
         }
 
         std::string tempStr = "";
 
-        for( int i = 0; i < numRuns / 2; ++i ) {
-
+        for (int i = 0; i < numRuns / 2; ++i)
+        {
             Iterator<std::string>* strIter = stringList.iterator();
-            Iterator<int>* intIter = intList.iterator();
+            Iterator<int>*         intIter = intList.iterator();
 
-            while( strIter->hasNext() ){
+            while (strIter->hasNext())
+            {
                 tempStr = strIter->next();
             }
 
-            while( intIter->hasNext() ){
+            while (intIter->hasNext())
+            {
                 intIter->next();
             }
 
@@ -101,10 +111,11 @@ TEST_F(LinkedListBenchmark, runBenchmark) {
             delete intIter;
         }
 
-        for( int i = 0; i < numRuns / 2; ++i ) {
-            stringCopy.copy( stringList );
+        for (int i = 0; i < numRuns / 2; ++i)
+        {
+            stringCopy.copy(stringList);
             stringCopy.clear();
-            intCopy.copy( intList );
+            intCopy.copy(intList);
             intCopy.clear();
         }
 
@@ -114,7 +125,7 @@ TEST_F(LinkedListBenchmark, runBenchmark) {
         timer.stop();
     }
 
-    std::cout << typeid( LinkedList<int> ).name() << " Benchmark Time = "
-              << timer.getAverageTime() << " Millisecs"
+    std::cout << typeid(LinkedList<int>).name()
+              << " Benchmark Time = " << timer.getAverageTime() << " Millisecs"
               << std::endl;
 }

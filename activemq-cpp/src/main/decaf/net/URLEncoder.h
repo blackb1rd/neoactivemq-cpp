@@ -21,42 +21,41 @@
 #include <decaf/util/Config.h>
 #include <string>
 
-namespace decaf{
-namespace net{
+namespace decaf
+{
+namespace net
+{
 
-    class DECAF_API URLEncoder {
+    class DECAF_API URLEncoder
+    {
     private:
-
         static const std::string digits;
 
     private:
-
         URLEncoder();
 
     public:
-
-        virtual ~URLEncoder() {}
+        virtual ~URLEncoder()
+        {
+        }
 
         /**
          * This class contains a utility method for converting a string to the
          * format required by the <code>application/x-www-form-urlencoded</code>
          * MIME content type.
          * <p>
-         * All characters except letters ('a'..'z', 'A'..'Z') and numbers ('0'..'9')
-         * and characters '.', '-', '*', '_' are converted into their hexidecimal
-         * value prepended by '%'.
-         * <p>
-         * For example: '#' -> %23
-         * <p>
+         * All characters except letters ('a'..'z', 'A'..'Z') and numbers
+         * ('0'..'9') and characters '.', '-', '*', '_' are converted into their
+         * hexidecimal value prepended by '%'. <p> For example: '#' -> %23 <p>
          * In addition, spaces are substituted by '+'
          *
          * @param value - the string to be converted
          * @return the converted string
          */
-        static std::string encode( const std::string& value );
-
+        static std::string encode(const std::string& value);
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /*_DECAF_NET_URLENCODER_H_*/

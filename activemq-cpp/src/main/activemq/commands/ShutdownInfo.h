@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseCommand.h>
@@ -29,8 +29,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -43,21 +45,17 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API ShutdownInfo : public BaseCommand {
+    class AMQCPP_API ShutdownInfo : public BaseCommand
+    {
     protected:
-
-
     public:
-
         const static unsigned char ID_SHUTDOWNINFO = 11;
 
     private:
-
         ShutdownInfo(const ShutdownInfo&);
-        ShutdownInfo& operator= (const ShutdownInfo&);
+        ShutdownInfo& operator=(const ShutdownInfo&);
 
     public:
-
         ShutdownInfo();
 
         virtual ~ShutdownInfo();
@@ -75,14 +73,15 @@ namespace commands {
         /**
          * @return an answer of true to the isShutdownInfo() query.
          */
-        virtual bool isShutdownInfo() const {
+        virtual bool isShutdownInfo() const
+        {
             return true;
         }
 
         virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_SHUTDOWNINFO_H_*/

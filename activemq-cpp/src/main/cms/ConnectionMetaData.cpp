@@ -20,7 +20,6 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionMetaData::~ConnectionMetaData() {
-
+ConnectionMetaData::~ConnectionMetaData()
+{
 }
-

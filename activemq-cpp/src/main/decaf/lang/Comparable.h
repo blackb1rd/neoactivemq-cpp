@@ -20,8 +20,10 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
 
     /**
      * This interface imposes a total ordering on the objects of each class that
@@ -29,11 +31,13 @@ namespace lang {
      * ordering, and the class's compareTo method is referred to as its natural
      * comparison method.
      */
-    template< typename T >
-    class Comparable {
+    template <typename T>
+    class Comparable
+    {
     public:
-
-        virtual ~Comparable() {}
+        virtual ~Comparable()
+        {
+        }
 
         /**
          * Compares this object with the specified object for order. Returns a
@@ -42,10 +46,11 @@ namespace lang {
          *
          * In the foregoing description, the notation sgn(expression) designates
          * the mathematical signum function, which is defined to return one of
-         * -1, 0, or 1 according to whether the value of expression  is negative,
-         * zero or positive. The implementor must ensure sgn(x.compareTo(y)) ==
-         * -sgn(y.compareTo(x)) for all x and y. (This implies that x.compareTo(y)
-         * must throw an exception iff y.compareTo(x) throws an exception.)
+         * -1, 0, or 1 according to whether the value of expression  is
+         * negative, zero or positive. The implementor must ensure
+         * sgn(x.compareTo(y)) == -sgn(y.compareTo(x)) for all x and y. (This
+         * implies that x.compareTo(y) must throw an exception iff
+         * y.compareTo(x) throws an exception.)
          *
          * The implementor must also ensure that the relation is transitive:
          * (x.compareTo(y)>0 && y.compareTo(z)>0) implies x.compareTo(z)>0.
@@ -84,9 +89,9 @@ namespace lang {
          * @return true if this object is equal to the one passed.
          */
         virtual bool operator<(const T& value) const = 0;
-
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 #endif /*_DECAF_LANG_COMPARABLE_H_*/

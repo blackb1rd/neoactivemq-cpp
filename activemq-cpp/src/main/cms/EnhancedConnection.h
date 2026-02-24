@@ -22,32 +22,34 @@
 #include <cms/Connection.h>
 #include <cms/DestinationSource.h>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * An enhanced CMS Connection instance that provides additional features above
+ * the default required features of a CMS Connection instance.
+ *
+ * @since 3.2
+ */
+class CMS_API EnhancedConnection : public virtual cms::Connection
+{
+public:
+    virtual ~EnhancedConnection();
 
     /**
-     * An enhanced CMS Connection instance that provides additional features above the
-     * default required features of a CMS Connection instance.
+     * Returns the DestinationSource} object which can be used to listen to
+     * destinations being created or destroyed or to enquire about the current
+     * destinations available on the message Provider.
      *
-     * @since 3.2
+     * @return a new instance of a DestinationSource that is owned by the
+     * caller.
+     *
+     * @throws CMSException if an error occurs while creating the destination
+     * source.
      */
-    class CMS_API EnhancedConnection : public virtual cms::Connection {
-    public:
+    virtual cms::DestinationSource* getDestinationSource() = 0;
+};
 
-        virtual ~EnhancedConnection();
-
-        /**
-         * Returns the DestinationSource} object which can be used to listen to destinations
-         * being created or destroyed or to enquire about the current destinations available
-         * on the message Provider.
-         *
-         * @return a new instance of a DestinationSource that is owned by the caller.
-         *
-         * @throws CMSException if an error occurs while creating the destination source.
-         */
-        virtual cms::DestinationSource* getDestinationSource() = 0;
-
-    };
-
-}
+}  // namespace cms
 
 #endif /* _CMS_ENHANCEDCONNECTION_H_ */

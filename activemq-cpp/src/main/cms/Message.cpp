@@ -19,16 +19,18 @@
 
 #include <cms/DeliveryMode.h>
 
-namespace cms {
+namespace cms
+{
 
 ////////////////////////////////////////////////////////////////////////////////
-CMS_API const int Message::DEFAULT_DELIVERY_MODE = cms::DeliveryMode::PERSISTENT;
-CMS_API const int Message::DEFAULT_MSG_PRIORITY = 4;
+CMS_API const int Message::DEFAULT_DELIVERY_MODE =
+    cms::DeliveryMode::PERSISTENT;
+CMS_API const int       Message::DEFAULT_MSG_PRIORITY = 4;
 CMS_API const long long Message::DEFAULT_TIME_TO_LIVE = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
-Message::~Message() {
-
+Message::~Message()
+{
 }
 
-}
+}  // namespace cms

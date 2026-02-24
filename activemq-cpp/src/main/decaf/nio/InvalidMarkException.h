@@ -18,15 +18,18 @@
 #ifndef _DECAF_NIO_INVALIDMARKEXCEPTION_H_
 #define _DECAF_NIO_INVALIDMARKEXCEPTION_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/lang/exceptions/IllegalStateException.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace nio {
+namespace decaf
+{
+namespace nio
+{
 
-    class DECAF_API InvalidMarkException : public lang::exceptions::IllegalStateException {
+    class DECAF_API InvalidMarkException
+        : public lang::exceptions::IllegalStateException
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -36,7 +39,8 @@ namespace nio {
          * Conversion Constructor from some other Exception
          *
          * @param ex
-         *      The Exception whose state data is to be copied into this Exception.
+         *      The Exception whose state data is to be copied into this
+         * Exception.
          */
         InvalidMarkException(const lang::Exception& ex);
 
@@ -44,7 +48,8 @@ namespace nio {
          * Copy Constructor
          *
          * @param ex
-         *      The Exception whose state data is to be copied into this Exception.
+         *      The Exception whose state data is to be copied into this
+         * Exception.
          */
         InvalidMarkException(const InvalidMarkException& ex);
 
@@ -55,11 +60,16 @@ namespace nio {
          *
          * @param file The file name where exception occurs
          * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
+         * @param cause The exception that was the cause for this one to be
+         * thrown.
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        InvalidMarkException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        InvalidMarkException(const char*           file,
+                             const int             lineNumber,
+                             const std::exception* cause,
+                             const char*           msg,
+                             ...);
 
         /**
          * Constructor
@@ -78,23 +88,27 @@ namespace nio {
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        InvalidMarkException(const char* file, const int lineNumber, const char* msg, ...);
+        InvalidMarkException(const char* file,
+                             const int   lineNumber,
+                             const char* msg,
+                             ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
          * @return A new Exception instance that is a copy of this Exception.
          */
-        virtual InvalidMarkException* clone() const {
+        virtual InvalidMarkException* clone() const
+        {
             return new InvalidMarkException(*this);
         }
 
         virtual ~InvalidMarkException() throw();
-
     };
 
-}}
+}  // namespace nio
+}  // namespace decaf
 
 #endif /*_DECAF_NIO_INVALIDMARKEXCEPTION_H_*/

@@ -20,5 +20,6 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-DestinationSource::~DestinationSource() {
+DestinationSource::~DestinationSource()
+{
 }

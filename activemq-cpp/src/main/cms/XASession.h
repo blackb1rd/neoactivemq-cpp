@@ -23,52 +23,55 @@
 #include <cms/Session.h>
 #include <cms/XAResource.h>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * The XASession interface extends the capability of Session by adding access to
+ * a CMS provider's support for the operating inside an XA Transaction
+ * (optional). This support takes the form of a cms::XAResource object. The
+ * functionality of this object closely resembles that defined by the standard
+ * X/Open XA Resource interface.
+ *
+ * An application controls the transactional assignment of an XASession by
+ * obtaining its XAResource. It uses the XAResource to assign the session to a
+ * transaction, prepare and commit work on the transaction, and so on.
+ *
+ * An XAResource provides some fairly sophisticated facilities for interleaving
+ * work on multiple transactions, recovering a list of transactions in progress,
+ * and so on. A XA aware CMS provider must fully implement this functionality.
+ *
+ * The XASession instance will behave much like a normal cms::Session however
+ * some methods will will not operate as normal, any call to Session::commit, or
+ * Session::rollback will result in a CMSException being thrown.  Also when not
+ * inside an XA transaction the MessageConsumer will operate as if it were in
+ * the AutoAcknowlege mode.
+ *
+ * The XASession interface is optional. CMS providers are not required to
+ * support this interface. This interface is for use by CMS providers to support
+ * transactional environments. Client programs are strongly encouraged to use
+ * the transactional support available in their environment, rather than use
+ * these XA interfaces directly.
+ *
+ * @since 2.3
+ */
+class CMS_API XASession : public virtual cms::Session
+{
+public:
+    virtual ~XASession();
 
     /**
-     * The XASession interface extends the capability of Session by adding access to a CMS provider's
-     * support for the operating inside an XA Transaction (optional). This support takes the form of
-     * a cms::XAResource object. The functionality of this object closely resembles that defined by
-     * the standard X/Open XA Resource interface.
+     * Returns the XA resource associated with this Session to the caller.
      *
-     * An application controls the transactional assignment of an XASession by obtaining its XAResource.
-     * It uses the XAResource to assign the session to a transaction, prepare and commit work on the
-     * transaction, and so on.
+     * The client can use the provided XA resource to interact with the XA
+     * Transaction Manager in use in the client application.
      *
-     * An XAResource provides some fairly sophisticated facilities for interleaving work on multiple
-     * transactions, recovering a list of transactions in progress, and so on. A XA aware CMS provider
-     * must fully implement this functionality.
-     *
-     * The XASession instance will behave much like a normal cms::Session however some methods will
-     * will not operate as normal, any call to Session::commit, or Session::rollback will result in
-     * a CMSException being thrown.  Also when not inside an XA transaction the MessageConsumer will
-     * operate as if it were in the AutoAcknowlege mode.
-     *
-     * The XASession interface is optional. CMS providers are not required to support this interface.
-     * This interface is for use by CMS providers to support transactional environments. Client programs
-     * are strongly encouraged to use the transactional support available in their environment, rather
-     * than use these XA interfaces directly.
-     *
-     * @since 2.3
+     * @return an XAResouce instance to the caller, the caller does not own this
+     *          pointer and should not delete it.
      */
-    class CMS_API XASession : public virtual cms::Session {
-    public:
+    virtual XAResource* getXAResource() const = 0;
+};
 
-        virtual ~XASession();
-
-        /**
-         * Returns the XA resource associated with this Session to the caller.
-         *
-         * The client can use the provided XA resource to interact with the XA Transaction
-         * Manager in use in the client application.
-         *
-         * @return an XAResouce instance to the caller, the caller does not own this
-         *          pointer and should not delete it.
-         */
-        virtual XAResource* getXAResource() const = 0;
-
-    };
-
-}
+}  // namespace cms
 
 #endif /* _CMS_XASESSION_H_ */

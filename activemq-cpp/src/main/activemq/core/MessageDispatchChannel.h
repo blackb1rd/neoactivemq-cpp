@@ -18,22 +18,25 @@
 #ifndef _ACTIVEMQ_CORE_MESSAGEDISPATCHCHANNEL_H_
 #define _ACTIVEMQ_CORE_MESSAGEDISPATCHCHANNEL_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/MessageDispatch.h>
+#include <activemq/util/Config.h>
 
+#include <decaf/lang/Pointer.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/Synchronizable.h>
-#include <decaf/lang/Pointer.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
-    using decaf::lang::Pointer;
     using activemq::commands::MessageDispatch;
+    using decaf::lang::Pointer;
 
-    class AMQCPP_API MessageDispatchChannel: public decaf::util::concurrent::Synchronizable {
+    class AMQCPP_API MessageDispatchChannel
+        : public decaf::util::concurrent::Synchronizable
+    {
     public:
-
         virtual ~MessageDispatchChannel();
 
         /**
@@ -61,17 +64,18 @@ namespace core {
         virtual bool isClosed() const = 0;
 
         /**
-         * @return true if the Channel currently running and will dequeue message.
+         * @return true if the Channel currently running and will dequeue
+         * message.
          */
         virtual bool isRunning() const = 0;
 
         /**
-         * Used to get an enqueued message. The amount of time this method blocks is
-         * based on the timeout value. - if timeout==-1 then it blocks until a
-         * message is received. - if timeout==0 then it it tries to not block at
-         * all, it returns a message if it is available - if timeout>0 then it
-         * blocks up to timeout amount of time. Expired messages will consumed by
-         * this method.
+         * Used to get an enqueued message. The amount of time this method
+         * blocks is based on the timeout value. - if timeout==-1 then it blocks
+         * until a message is received. - if timeout==0 then it it tries to not
+         * block at all, it returns a message if it is available - if timeout>0
+         * then it blocks up to timeout amount of time. Expired messages will
+         * consumed by this method.
          *
          * @return null if we timeout or if the consumer is closed.
          * @throws ActiveMQException
@@ -79,16 +83,16 @@ namespace core {
         virtual Pointer<MessageDispatch> dequeue(long long timeout) = 0;
 
         /**
-         * Used to get an enqueued message if there is one queued right now.  If there is
-         * no waiting message than this method returns Null.
+         * Used to get an enqueued message if there is one queued right now.  If
+         * there is no waiting message than this method returns Null.
          *
          * @return a message if there is one in the queue.
          */
         virtual Pointer<MessageDispatch> dequeueNoWait() = 0;
 
         /**
-         * Peek in the Queue and return the first message in the Channel without removing
-         * it from the channel.
+         * Peek in the Queue and return the first message in the Channel without
+         * removing it from the channel.
          *
          * @return a message if there is one in the queue.
          */
@@ -105,7 +109,8 @@ namespace core {
         virtual void stop() = 0;
 
         /**
-         * Close this channel no messages will be dispatched after this method is called.
+         * Close this channel no messages will be dispatched after this method
+         * is called.
          */
         virtual void close() = 0;
 
@@ -120,15 +125,15 @@ namespace core {
         virtual int size() const = 0;
 
         /**
-         * Remove all messages that are currently in the Channel and return them as
-         * a list of Messages.
+         * Remove all messages that are currently in the Channel and return them
+         * as a list of Messages.
          *
          * @return a list of Messages that was previously in the Channel.
          */
-        virtual std::vector<Pointer<MessageDispatch> > removeAll() = 0;
-
+        virtual std::vector<Pointer<MessageDispatch>> removeAll() = 0;
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_MESSAGEDISPATCHCHANNEL_H_ */

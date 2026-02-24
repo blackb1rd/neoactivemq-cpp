@@ -20,38 +20,41 @@
 
 #include <decaf/util/Config.h>
 
-#include <vector>
 #include <string>
+#include <vector>
 
-#include <decaf/io/IOException.h>
 #include <decaf/io/EOFException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/io/IOException.h>
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 
-namespace decaf {
-namespace io {
+namespace decaf
+{
+namespace io
+{
 
     /**
-     * The DataOutput interface provides for converting data from any of the C++ primitive types
-     * to a series of bytes and writing these bytes to a binary stream. There is also a facility
-     * for converting Strings into the Java standard modified UTF-8 format and writing the
-     * resulting series of bytes.
+     * The DataOutput interface provides for converting data from any of the C++
+     * primitive types to a series of bytes and writing these bytes to a binary
+     * stream. There is also a facility for converting Strings into the Java
+     * standard modified UTF-8 format and writing the resulting series of bytes.
      *
-     * If a method in this interface encounters an error while writing it will throw an IOException.
+     * If a method in this interface encounters an error while writing it will
+     * throw an IOException.
      *
      * @see DataInput
      * @see DataOutputStream
      *
      * @since 1.0
      */
-    class DECAF_API DataOutput {
+    class DECAF_API DataOutput
+    {
     public:
-
         virtual ~DataOutput();
 
         /**
-         * Writes a boolean to the underlying output stream as a 1-byte value. The
-         * value true is written out as the value (byte)1; the value false
+         * Writes a boolean to the underlying output stream as a 1-byte value.
+         * The value true is written out as the value (byte)1; the value false
          * is written out as the value (byte)0. If no exception is thrown,
          * the counter written is incremented by 1.
          *
@@ -191,22 +194,23 @@ namespace io {
         virtual void writeChars(const std::string& value) = 0;
 
         /**
-         * Writes out the string to the underlying output stream as a modeified UTF-8
-         * encoded sequence of bytes.  The first two bytes written are indicate its
-         * encoded length followed by the rest of the string's characters encoded as
-         * modified UTF-8.  The length represent the encoded length of the data not the
-         * actual length of the string.
+         * Writes out the string to the underlying output stream as a modeified
+         * UTF-8 encoded sequence of bytes.  The first two bytes written are
+         * indicate its encoded length followed by the rest of the string's
+         * characters encoded as modified UTF-8.  The length represent the
+         * encoded length of the data not the actual length of the string.
          *
          * @param value
          *        The string value value to write as modified UTF-8.
          *
          * @throws IOException if an I/O error is encountered.
-         * @throws UTFDataFormatException if the encoded size if greater than 65535
+         * @throws UTFDataFormatException if the encoded size if greater than
+         * 65535
          */
         virtual void writeUTF(const std::string& value) = 0;
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /* _DECAF_IO_DATAOUTPUT_H_ */

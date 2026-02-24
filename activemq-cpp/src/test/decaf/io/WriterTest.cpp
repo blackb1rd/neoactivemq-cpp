@@ -18,8 +18,8 @@
 #include <gtest/gtest.h>
 
 #include <decaf/io/Writer.h>
-#include <decaf/nio/CharBuffer.h>
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
+#include <decaf/nio/CharBuffer.h>
 
 using namespace std;
 using namespace decaf;
@@ -27,149 +27,164 @@ using namespace decaf::io;
 using namespace decaf::nio;
 using namespace decaf::lang::exceptions;
 
-    class WriterTest : public ::testing::Test {
+class WriterTest : public ::testing::Test
+{
 public:
-
-        WriterTest();
-        virtual ~WriterTest();
-
-    };
+    WriterTest();
+    virtual ~WriterTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class MockWriter : public Writer {
-    private:
+class MockWriter : public Writer
+{
+private:
+    char* contents;
+    int   length;
+    int   offset;
 
-        char* contents;
-        int length;
-        int offset;
+private:
+    MockWriter(const MockWriter&);
+    MockWriter& operator=(const MockWriter&);
 
-    private:
+public:
+    MockWriter(int capacity)
+        : contents(),
+          length(capacity),
+          offset(0)
+    {
+        contents = new char[capacity];
+    }
 
-        MockWriter(const MockWriter&);
-        MockWriter& operator= (const MockWriter&);
+    virtual ~MockWriter()
+    {
+        close();
+    }
 
-    public:
+    virtual void close()
+    {
+        flush();
+        delete[] contents;
+        contents = NULL;
+    }
 
-        MockWriter( int capacity ) : contents(), length(capacity), offset(0) {
-            contents = new char[capacity];
+    virtual void flush()
+    {
+    }
+
+    virtual void doWriteArrayBounded(const char* buffer,
+                                     int         size,
+                                     int         offset,
+                                     int         length)
+    {
+        if (NULL == contents)
+        {
+            throw IOException(__FILE__, __LINE__, "Writer was already closed.");
         }
 
-        virtual ~MockWriter() {
-            close();
+        if (offset + length > size)
+        {
+            throw IndexOutOfBoundsException(
+                __FILE__,
+                __LINE__,
+                "offset + length must be less than size.");
         }
 
-        virtual void close() {
-            flush();
-            delete [] contents;
-            contents = NULL;
+        for (int i = 0; i < length; i++)
+        {
+            contents[this->offset + i] = buffer[offset + i];
         }
 
-        virtual void flush() {
+        this->offset += length;
+    }
+
+    std::vector<char> getContents()
+    {
+        std::vector<char> result(offset);
+
+        for (int i = 0; i < offset; i++)
+        {
+            result[i] = contents[i];
         }
 
-        virtual void doWriteArrayBounded(
-            const char* buffer, int size, int offset, int length ) {
+        return result;
+    }
+};
 
-            if( NULL == contents ) {
-                throw IOException( __FILE__, __LINE__, "Writer was already closed." );
-            }
+}  // namespace
 
-            if( offset + length > size ) {
-                throw IndexOutOfBoundsException(
-                    __FILE__, __LINE__, "offset + length must be less than size." );
-            }
-
-            for( int i = 0; i < length; i++ ) {
-                contents[this->offset + i] = buffer[offset + i];
-            }
-
-            this->offset += length;
-
-        }
-
-        std::vector<char> getContents() {
-
-            std::vector<char> result( offset );
-
-            for( int i = 0; i < offset; i++ ) {
-                result[i] = contents[i];
-            }
-
-            return result;
-        }
-    };
-
+////////////////////////////////////////////////////////////////////////////////
+WriterTest::WriterTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-WriterTest::WriterTest() {
+WriterTest::~WriterTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-WriterTest::~WriterTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-TEST_F(WriterTest, testWriteChar) {
-
+TEST_F(WriterTest, testWriteChar)
+{
     std::string testString = "My Test String";
-    MockWriter writer( 20 );
+    MockWriter  writer(20);
 
     std::string::const_iterator iter = testString.begin();
-    for( ; iter != testString.end(); ++iter ) {
-        writer.write( *iter );
+    for (; iter != testString.end(); ++iter)
+    {
+        writer.write(*iter);
     }
 
     std::vector<char> result = writer.getContents();
-    ASSERT_EQ(testString, std::string( result.begin(), result.end() ));
+    ASSERT_EQ(testString, std::string(result.begin(), result.end()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(WriterTest, testWriteVector) {
-
+TEST_F(WriterTest, testWriteVector)
+{
     std::string testString = "My Test String";
-    MockWriter writer( 20 );
+    MockWriter  writer(20);
 
-    std::vector<char> buffer( testString.begin(), testString.end() );
-    writer.write( buffer );
+    std::vector<char> buffer(testString.begin(), testString.end());
+    writer.write(buffer);
 
     std::vector<char> result = writer.getContents();
-    ASSERT_EQ(testString, std::string( result.begin(), result.end() ));
+    ASSERT_EQ(testString, std::string(result.begin(), result.end()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(WriterTest, testWriteString) {
-
+TEST_F(WriterTest, testWriteString)
+{
     std::string testString = "My Test String";
-    MockWriter writer( 20 );
+    MockWriter  writer(20);
 
-    writer.write( testString );
+    writer.write(testString);
 
     std::vector<char> result = writer.getContents();
-    ASSERT_EQ(testString, std::string( result.begin(), result.end() ));
+    ASSERT_EQ(testString, std::string(result.begin(), result.end()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(WriterTest, testWriteStringOffsetCount) {
-
+TEST_F(WriterTest, testWriteStringOffsetCount)
+{
     std::string testString = "My Test String";
-    MockWriter writer( 20 );
+    MockWriter  writer(20);
 
-    writer.write( testString, 0, (int)testString.length() );
+    writer.write(testString, 0, (int)testString.length());
 
     std::vector<char> result = writer.getContents();
-    ASSERT_EQ(testString, std::string( result.begin(), result.end() ));
+    ASSERT_EQ(testString, std::string(result.begin(), result.end()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(WriterTest, testAppendChar) {
-
-    char testChar = ' ';
+TEST_F(WriterTest, testAppendChar)
+{
+    char       testChar = ' ';
     MockWriter writer(20);
 
-    writer.append( testChar );
+    writer.append(testChar);
 
     ASSERT_EQ(testChar, writer.getContents()[0]);
 
@@ -177,19 +192,19 @@ TEST_F(WriterTest, testAppendChar) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(WriterTest, testAppendCharSequence) {
-
+TEST_F(WriterTest, testAppendCharSequence)
+{
     std::string testString = "My Test String";
-    MockWriter writer( 20 );
+    MockWriter  writer(20);
 
-    CharBuffer* buffer = CharBuffer::allocate( (int)testString.size() );
-    buffer->put( testString );
+    CharBuffer* buffer = CharBuffer::allocate((int)testString.size());
+    buffer->put(testString);
     buffer->rewind();
 
-    writer.append( buffer );
+    writer.append(buffer);
 
     std::vector<char> result = writer.getContents();
-    ASSERT_EQ(testString, std::string( result.begin(), result.end() ));
+    ASSERT_EQ(testString, std::string(result.begin(), result.end()));
 
     writer.close();
 
@@ -197,19 +212,20 @@ TEST_F(WriterTest, testAppendCharSequence) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(WriterTest, testAppendCharSequenceIntInt) {
-
+TEST_F(WriterTest, testAppendCharSequenceIntInt)
+{
     std::string testString = "My Test String";
-    MockWriter writer(20);
+    MockWriter  writer(20);
 
-    CharBuffer* buffer = CharBuffer::allocate( (int)testString.size() );
-    buffer->put( testString );
+    CharBuffer* buffer = CharBuffer::allocate((int)testString.size());
+    buffer->put(testString);
     buffer->rewind();
 
-    writer.append( buffer, 1, 3 );
+    writer.append(buffer, 1, 3);
 
     std::vector<char> result = writer.getContents();
-    ASSERT_EQ(testString.substr( 1, 2 ), std::string( result.begin(), result.end() ));
+    ASSERT_EQ(testString.substr(1, 2),
+              std::string(result.begin(), result.end()));
 
     writer.close();
 

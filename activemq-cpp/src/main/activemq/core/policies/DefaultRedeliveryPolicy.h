@@ -22,99 +22,115 @@
 
 #include <activemq/core/RedeliveryPolicy.h>
 
-namespace activemq {
-namespace core {
-namespace policies {
+namespace activemq
+{
+namespace core
+{
+    namespace policies
+    {
 
-    class AMQCPP_API DefaultRedeliveryPolicy : public RedeliveryPolicy {
-    private:
+        class AMQCPP_API DefaultRedeliveryPolicy : public RedeliveryPolicy
+        {
+        private:
+            double    backOffMultiplier;
+            double    collisionAvoidanceFactor;
+            long long initialRedeliveryDelay;
+            int       maximumRedeliveries;
+            bool      useCollisionAvoidance;
+            bool      useExponentialBackOff;
+            long long redeliveryDelay;
+            long long maximumRedeliveryDelay;
 
-        double backOffMultiplier;
-        double collisionAvoidanceFactor;
-        long long initialRedeliveryDelay;
-        int maximumRedeliveries;
-        bool useCollisionAvoidance;
-        bool useExponentialBackOff;
-        long long redeliveryDelay;
-        long long maximumRedeliveryDelay;
+        private:
+            DefaultRedeliveryPolicy(const DefaultRedeliveryPolicy&);
+            DefaultRedeliveryPolicy& operator=(const DefaultRedeliveryPolicy&);
 
-    private:
+        public:
+            DefaultRedeliveryPolicy();
 
-        DefaultRedeliveryPolicy(const DefaultRedeliveryPolicy&);
-        DefaultRedeliveryPolicy& operator=(const DefaultRedeliveryPolicy&);
+            virtual ~DefaultRedeliveryPolicy();
 
-    public:
+            virtual double getBackOffMultiplier() const
+            {
+                return this->backOffMultiplier;
+            }
 
-        DefaultRedeliveryPolicy();
+            virtual void setBackOffMultiplier(double value)
+            {
+                this->backOffMultiplier = value;
+            }
 
-        virtual ~DefaultRedeliveryPolicy();
+            virtual short getCollisionAvoidancePercent() const;
 
-        virtual double getBackOffMultiplier() const {
-            return this->backOffMultiplier;
-        }
+            virtual void setCollisionAvoidancePercent(short value);
 
-        virtual void setBackOffMultiplier(double value) {
-            this->backOffMultiplier = value;
-        }
+            virtual long long getInitialRedeliveryDelay() const
+            {
+                return this->initialRedeliveryDelay;
+            }
 
-        virtual short getCollisionAvoidancePercent() const;
+            virtual void setInitialRedeliveryDelay(long long value)
+            {
+                this->initialRedeliveryDelay = value;
+            }
 
-        virtual void setCollisionAvoidancePercent(short value);
+            virtual long long getRedeliveryDelay() const
+            {
+                return this->redeliveryDelay;
+            }
 
-        virtual long long getInitialRedeliveryDelay() const {
-            return this->initialRedeliveryDelay;
-        }
+            virtual void setRedeliveryDelay(long long value)
+            {
+                this->redeliveryDelay = value;
+            }
 
-        virtual void setInitialRedeliveryDelay(long long value) {
-            this->initialRedeliveryDelay = value;
-        }
+            virtual int getMaximumRedeliveries() const
+            {
+                return this->maximumRedeliveries;
+            }
 
-        virtual long long getRedeliveryDelay() const {
-            return this->redeliveryDelay;
-        }
+            virtual void setMaximumRedeliveries(int value)
+            {
+                this->maximumRedeliveries = value;
+            }
 
-        virtual void setRedeliveryDelay(long long value) {
-            this->redeliveryDelay = value;
-        }
+            virtual bool isUseCollisionAvoidance() const
+            {
+                return this->useCollisionAvoidance;
+            }
 
-        virtual int getMaximumRedeliveries() const {
-            return this->maximumRedeliveries;
-        }
+            virtual void setUseCollisionAvoidance(bool value)
+            {
+                this->useCollisionAvoidance = value;
+            }
 
-        virtual void setMaximumRedeliveries(int value) {
-            this->maximumRedeliveries = value;
-        }
+            virtual bool isUseExponentialBackOff() const
+            {
+                return this->useExponentialBackOff;
+            }
 
-        virtual bool isUseCollisionAvoidance() const {
-            return this->useCollisionAvoidance;
-        }
+            virtual void setUseExponentialBackOff(bool value)
+            {
+                this->useExponentialBackOff = value;
+            }
 
-        virtual void setUseCollisionAvoidance(bool value) {
-            this->useCollisionAvoidance = value;
-        }
+            virtual long long getMaximumRedeliveryDelay() const
+            {
+                return this->maximumRedeliveryDelay;
+            }
 
-        virtual bool isUseExponentialBackOff() const {
-            return this->useExponentialBackOff;
-        }
+            virtual void setMaximumRedeliveryDelay(long long value)
+            {
+                this->maximumRedeliveryDelay = value;
+            }
 
-        virtual void setUseExponentialBackOff(bool value) {
-            this->useExponentialBackOff = value;
-        }
+            virtual long long getNextRedeliveryDelay(long long previousDelay);
 
-        virtual long long getMaximumRedeliveryDelay() const {
-            return this->maximumRedeliveryDelay;
-        }
+            virtual RedeliveryPolicy* clone() const;
+        };
 
-        virtual void setMaximumRedeliveryDelay(long long value) {
-            this->maximumRedeliveryDelay = value;
-        }
-
-        virtual long long getNextRedeliveryDelay(long long previousDelay);
-
-        virtual RedeliveryPolicy* clone() const;
-
-    };
-
-}}}
+    }  // namespace policies
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_POLICIES_DEFAULTREDELIVERYPOLICY_H_ */

@@ -19,12 +19,12 @@
 #include "ConnectionFactoryMgr.h"
 #include "TestSenderAndReceiver.h"
 
-#include <cms/Session.h>
-#include <cms/Message.h>
 #include <cms/ConnectionFactory.h>
+#include <cms/Message.h>
+#include <cms/Session.h>
 
-#include <activemq/cmsutil/MessageCreator.h>
 #include <activemq/cmsutil/CmsTemplate.h>
+#include <activemq/cmsutil/MessageCreator.h>
 #include <decaf/util/Iterator.h>
 
 #include <stdio.h>
@@ -40,22 +40,36 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-BrokerMonitor::BrokerMonitor(const std::string& url, int interval, CountDownLatch* quit) :
-    closing(false), brokerOk(false), url(url), interval(interval), brokerMonitorThread(), quit(quit) {
+BrokerMonitor::BrokerMonitor(const std::string& url,
+                             int                interval,
+                             CountDownLatch*    quit)
+    : closing(false),
+      brokerOk(false),
+      url(url),
+      interval(interval),
+      brokerMonitorThread(),
+      quit(quit)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BrokerMonitor::~BrokerMonitor() {
-    try {
+BrokerMonitor::~BrokerMonitor()
+{
+    try
+    {
         close();
-    } catch (...) {
+    }
+    catch (...)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerMonitor::close() {
+void BrokerMonitor::close()
+{
     closing = true;
-    if (brokerMonitorThread) {
+    if (brokerMonitorThread)
+    {
         brokerMonitorThread->join();
         delete brokerMonitorThread;
         brokerMonitorThread = NULL;
@@ -63,48 +77,66 @@ void BrokerMonitor::close() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerMonitor::start() {
-    if (!brokerMonitorThread) {
+void BrokerMonitor::start()
+{
+    if (!brokerMonitorThread)
+    {
         brokerMonitorThread = new Thread(this, "Message Broker Monitor Thread");
         brokerMonitorThread->start();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerMonitor::run() {
-    ConnectionFactory* connectionFactory = ConnectionFactoryMgr::getConnectionFactory(url);
+void BrokerMonitor::run()
+{
+    ConnectionFactory* connectionFactory =
+        ConnectionFactoryMgr::getConnectionFactory(url);
     CmsTemplate* cmsTemplate = createCmsTemplate(connectionFactory);
 
-    while (!closing) {
-        try {
+    while (!closing)
+    {
+        try
+        {
             cmsTemplate->send(this);
             Message* message = cmsTemplate->receive();
 
-            if (message) {
+            if (message)
+            {
                 delete message;
-                if (VERBOSE) {
+                if (VERBOSE)
+                {
                     printf("%c", SYM_MON_GOOD);
                 }
                 brokerOk = true;
-            } else {
-                if (VERBOSE) {
+            }
+            else
+            {
+                if (VERBOSE)
+                {
                     printf("%c", SYM_MON_BAD);
                 }
                 brokerOk = false;
             }
-        } catch (cms::CMSException& ex) {
-            if (VERBOSE) {
+        }
+        catch (cms::CMSException& ex)
+        {
+            if (VERBOSE)
+            {
                 printf("%c", SYM_MON_CMS);
             }
             brokerOk = false;
-        } catch (...) {
-            if (VERBOSE) {
+        }
+        catch (...)
+        {
+            if (VERBOSE)
+            {
                 printf("%c", SYM_MON_EXC);
             }
             brokerOk = false;
         }
 
-        if (quit->await(interval)) {
+        if (quit->await(interval))
+        {
             closing = true;
         }
     }
@@ -113,19 +145,23 @@ void BrokerMonitor::run() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Message* BrokerMonitor::createMessage(cms::Session* session) {
+Message* BrokerMonitor::createMessage(cms::Session* session)
+{
     Message* message = NULL;
-    if (session) {
+    if (session)
+    {
         message = session->createTextMessage("Heart Beat");
     }
     return message;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsTemplate* BrokerMonitor::createCmsTemplate(ConnectionFactory* connectionFactory) {
-
+CmsTemplate* BrokerMonitor::createCmsTemplate(
+    ConnectionFactory* connectionFactory)
+{
     CmsTemplate* cmsTemplate = new CmsTemplate(connectionFactory);
-    cmsTemplate->setDefaultDestinationName("cpp.CmsMessageHandler.BrokerMonitor.HeartBeatingChannel");
+    cmsTemplate->setDefaultDestinationName(
+        "cpp.CmsMessageHandler.BrokerMonitor.HeartBeatingChannel");
     cmsTemplate->setTimeToLive(1000);
     cmsTemplate->setReceiveTimeout(1000);
 
@@ -133,6 +169,7 @@ CmsTemplate* BrokerMonitor::createCmsTemplate(ConnectionFactory* connectionFacto
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool BrokerMonitor::isBrokerOk() {
+bool BrokerMonitor::isBrokerOk()
+{
     return brokerOk;
 }

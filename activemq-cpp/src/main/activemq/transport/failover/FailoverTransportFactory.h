@@ -26,33 +26,41 @@
 #include <decaf/net/URI.h>
 #include <decaf/util/Properties.h>
 
-namespace activemq {
-namespace transport {
-namespace failover {
+namespace activemq
+{
+namespace transport
+{
+    namespace failover
+    {
 
-    using decaf::lang::Pointer;
+        using decaf::lang::Pointer;
 
-    /**
-     * Creates an instance of a FailoverTransport.
-     *
-     * @since 3.0
-     */
-    class AMQCPP_API FailoverTransportFactory : public AbstractTransportFactory {
-    public:
+        /**
+         * Creates an instance of a FailoverTransport.
+         *
+         * @since 3.0
+         */
+        class AMQCPP_API FailoverTransportFactory
+            : public AbstractTransportFactory
+        {
+        public:
+            virtual ~FailoverTransportFactory()
+            {
+            }
 
-        virtual ~FailoverTransportFactory() {}
+            virtual Pointer<Transport> create(const decaf::net::URI& location);
 
-        virtual Pointer<Transport> create(const decaf::net::URI& location);
+            virtual Pointer<Transport> createComposite(
+                const decaf::net::URI& location);
 
-        virtual Pointer<Transport> createComposite(const decaf::net::URI& location);
+        protected:
+            virtual Pointer<Transport> doCreateComposite(
+                const decaf::net::URI&         location,
+                const decaf::util::Properties& properties);
+        };
 
-    protected:
-
-        virtual Pointer<Transport> doCreateComposite(const decaf::net::URI& location,
-                                                     const decaf::util::Properties& properties);
-
-    };
-
-}}}
+    }  // namespace failover
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVE_TRANSPORT_FAILOVER_FAILOVERTRANSPORTFACTORY_H_ */

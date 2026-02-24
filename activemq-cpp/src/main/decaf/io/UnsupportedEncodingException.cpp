@@ -21,26 +21,40 @@ using namespace decaf;
 using namespace decaf::io;
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedEncodingException::UnsupportedEncodingException() : io::IOException() {
+UnsupportedEncodingException::UnsupportedEncodingException()
+    : io::IOException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedEncodingException::~UnsupportedEncodingException() throw() {
+UnsupportedEncodingException::~UnsupportedEncodingException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedEncodingException::UnsupportedEncodingException(const Exception& ex) : io::IOException() {
-    *(Exception*) this = ex;
+UnsupportedEncodingException::UnsupportedEncodingException(const Exception& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedEncodingException::UnsupportedEncodingException(const UnsupportedEncodingException& ex) : io::IOException() {
-    *(Exception*) this = ex;
+UnsupportedEncodingException::UnsupportedEncodingException(
+    const UnsupportedEncodingException& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedEncodingException::UnsupportedEncodingException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : io::IOException(cause) {
-
+UnsupportedEncodingException::UnsupportedEncodingException(
+    const char*           file,
+    const int             lineNumber,
+    const std::exception* cause,
+    const char*           msg,
+    ...)
+    : io::IOException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -50,12 +64,19 @@ UnsupportedEncodingException::UnsupportedEncodingException(const char* file, con
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedEncodingException::UnsupportedEncodingException(const std::exception* cause) : io::IOException(cause) {
+UnsupportedEncodingException::UnsupportedEncodingException(
+    const std::exception* cause)
+    : io::IOException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedEncodingException::UnsupportedEncodingException(const char* file, const int lineNumber, const char* msg, ...) : io::IOException() {
-
+UnsupportedEncodingException::UnsupportedEncodingException(const char* file,
+                                                           const int lineNumber,
+                                                           const char* msg,
+                                                           ...)
+    : io::IOException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

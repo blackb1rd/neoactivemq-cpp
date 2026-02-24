@@ -17,8 +17,8 @@
 
 #include "Provider.h"
 
-#include <decaf/util/StlSet.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/util/StlSet.h>
 
 #include <decaf/security/ProviderService.h>
 
@@ -28,50 +28,66 @@ using namespace decaf::util;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf {
-namespace security {
+namespace decaf
+{
+namespace security
+{
 
-    class ProviderImpl {
+    class ProviderImpl
+    {
     public:
-
         StlSet<ProviderService*> services;
 
-        ~ProviderImpl() {
-            try {
-                Pointer< Iterator<ProviderService*> > iter(services.iterator());
-                while (iter->hasNext()) {
+        ~ProviderImpl()
+        {
+            try
+            {
+                Pointer<Iterator<ProviderService*>> iter(services.iterator());
+                while (iter->hasNext())
+                {
                     delete iter->next();
                 }
                 services.clear();
             }
             DECAF_CATCHALL_NOTHROW()
         }
-
     };
 
-}}
+}  // namespace security
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-Provider::Provider(const std::string& name, double version, const std::string& info) :
-    name(name), version(version), info(info), impl(new ProviderImpl) {
+Provider::Provider(const std::string& name,
+                   double             version,
+                   const std::string& info)
+    : name(name),
+      version(version),
+      info(info),
+      impl(new ProviderImpl)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Provider::~Provider() {
-    try {
+Provider::~Provider()
+{
+    try
+    {
         delete this->impl;
     }
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const Set<ProviderService*>& Provider::getServices() const {
+const Set<ProviderService*>& Provider::getServices() const
+{
     return this->impl->services;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Provider::addService(ProviderService* service) {
-    if (service != NULL) {
+void Provider::addService(ProviderService* service)
+{
+    if (service != NULL)
+    {
         this->impl->services.add(service);
     }
 }

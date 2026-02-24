@@ -27,23 +27,28 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-class TransportRegistryTest : public ::testing::Test {};
+class TransportRegistryTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TransportRegistryTest, test) {
-
+TEST_F(TransportRegistryTest, test)
+{
     transport::mock::MockTransportFactory factory;
 
     TransportRegistry& registry = TransportRegistry::getInstance();
 
     ASSERT_TRUE(!registry.getTransportNames().empty());
 
-    ASSERT_NO_THROW(registry.findFactory( "mock" ));
+    ASSERT_NO_THROW(registry.findFactory("mock"));
 
-    ASSERT_THROW(registry.findFactory(""), NoSuchElementException) << ("Should have thrown an NoSuchElementException");
+    ASSERT_THROW(registry.findFactory(""), NoSuchElementException)
+        << ("Should have thrown an NoSuchElementException");
 
-    ASSERT_THROW(registry.registerFactory( "test", NULL ), NullPointerException) << ("Should have thrown an NullPointerException");
+    ASSERT_THROW(registry.registerFactory("test", NULL), NullPointerException)
+        << ("Should have thrown an NullPointerException");
 
-    ASSERT_THROW(registry.registerFactory( "", &factory ), IllegalArgumentException) << ("Should have thrown an IllegalArgumentException");
-
+    ASSERT_THROW(registry.registerFactory("", &factory),
+                 IllegalArgumentException)
+        << ("Should have thrown an IllegalArgumentException");
 }

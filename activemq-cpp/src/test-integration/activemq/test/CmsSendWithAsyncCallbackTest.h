@@ -20,23 +20,24 @@
 
 #include <activemq/test/CMSTestFixture.h>
 
-#include <memory>
-#include <cms/ConnectionFactory.h>
 #include <cms/Connection.h>
+#include <cms/ConnectionFactory.h>
 #include <cms/Destination.h>
+#include <memory>
 
-namespace activemq {
-namespace test {
+namespace activemq
+{
+namespace test
+{
 
-    class CmsSendWithAsyncCallbackTest : public CMSTestFixture {
+    class CmsSendWithAsyncCallbackTest : public CMSTestFixture
+    {
     protected:
-
         std::unique_ptr<cms::ConnectionFactory> factory;
-        std::unique_ptr<cms::Connection> connection;
-        std::unique_ptr<cms::Destination> destination;
+        std::unique_ptr<cms::Connection>        connection;
+        std::unique_ptr<cms::Destination>       destination;
 
     public:
-
         CmsSendWithAsyncCallbackTest();
         virtual ~CmsSendWithAsyncCallbackTest();
 
@@ -44,9 +45,9 @@ namespace test {
 
         void SetUp() override;
         void TearDown() override;
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TEST_CMSSENDWITHASYNCCALLBACKTEST_H_ */

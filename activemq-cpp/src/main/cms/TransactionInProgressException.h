@@ -18,38 +18,42 @@
 #ifndef _CMS_TRANSACTIONINPROGRESSEXCEPTION_H_
 #define _CMS_TRANSACTIONINPROGRESSEXCEPTION_H_
 
-#include <cms/Config.h>
 #include <cms/CMSException.h>
+#include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
 
-    /**
-     * This exception is thrown when an operation is invalid because a transaction is in progress.
-     * For instance, an attempt to call Session::commit when a session is part of a distributed
-     * transaction should throw a TransactionInProgressException.
-     *
-     * @since 2.3
-     */
-    class CMS_API TransactionInProgressException : public cms::CMSException {
-    public:
+/**
+ * This exception is thrown when an operation is invalid because a transaction
+ * is in progress. For instance, an attempt to call Session::commit when a
+ * session is part of a distributed transaction should throw a
+ * TransactionInProgressException.
+ *
+ * @since 2.3
+ */
+class CMS_API TransactionInProgressException : public cms::CMSException
+{
+public:
+    TransactionInProgressException();
 
-        TransactionInProgressException();
+    TransactionInProgressException(const TransactionInProgressException& ex);
 
-        TransactionInProgressException(const TransactionInProgressException& ex);
+    TransactionInProgressException(const std::string& message);
 
-        TransactionInProgressException(const std::string& message);
+    TransactionInProgressException(const std::string&    message,
+                                   const std::exception* cause);
 
-        TransactionInProgressException(const std::string& message, const std::exception* cause);
+    TransactionInProgressException(
+        const std::string&                              message,
+        const std::exception*                           cause,
+        const std::vector<std::pair<std::string, int>>& stackTrace);
 
-        TransactionInProgressException(const std::string& message, const std::exception* cause,
-                                       const std::vector<std::pair<std::string, int> >& stackTrace);
+    virtual ~TransactionInProgressException() throw();
 
-        virtual ~TransactionInProgressException() throw();
+    virtual TransactionInProgressException* clone();
+};
 
-        virtual TransactionInProgressException* clone();
-
-    };
-
-}
+}  // namespace cms
 
 #endif /* _CMS_TRANSACTIONINPROGRESSEXCEPTION_H_ */

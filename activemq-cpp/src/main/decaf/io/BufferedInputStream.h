@@ -18,12 +18,14 @@
 #ifndef _DECAF_IO_BUFFEREDINPUTSTREAM_H_
 #define _DECAF_IO_BUFFEREDINPUTSTREAM_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/io/FilterInputStream.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/util/Config.h>
 
-namespace decaf{
-namespace io{
+namespace decaf
+{
+namespace io
+{
 
     /**
      * A wrapper around another input stream that performs
@@ -31,27 +33,25 @@ namespace io{
      * in order to reduce the number of io operations on the
      * input stream.
      */
-    class DECAF_API BufferedInputStream : public FilterInputStream {
+    class DECAF_API BufferedInputStream : public FilterInputStream
+    {
     private:
-
-        int pos;
-        int count;
-        int markLimit;
-        int markPos;
-        int bufferSize;
+        int            pos;
+        int            count;
+        int            markLimit;
+        int            markPos;
+        int            bufferSize;
         unsigned char* buff;
 
-        // Proxy to the actual buffer, when NULL it signals this stream is closed.
-        // the actual buffer is deleted in the destructor.
+        // Proxy to the actual buffer, when NULL it signals this stream is
+        // closed. the actual buffer is deleted in the destructor.
         unsigned char* proxyBuffer;
 
     private:
-
         BufferedInputStream(const BufferedInputStream&);
         BufferedInputStream& operator=(const BufferedInputStream&);
 
     public:
-
         /**
          * Constructor
          *
@@ -74,7 +74,9 @@ namespace io{
          *
          * @throws IllegalArgumentException is the size is zero or negative.
          */
-        BufferedInputStream(InputStream* stream, int bufferSize, bool own = false);
+        BufferedInputStream(InputStream* stream,
+                            int          bufferSize,
+                            bool         own = false);
 
         virtual ~BufferedInputStream();
 
@@ -106,22 +108,24 @@ namespace io{
         /**
          * {@inheritDoc}
          */
-        virtual bool markSupported() const {
+        virtual bool markSupported() const
+        {
             return true;
         }
 
     protected:
-
         virtual int doReadByte();
 
-        virtual int doReadArrayBounded(unsigned char* buffer, int size, int offset, int length);
+        virtual int doReadArrayBounded(unsigned char* buffer,
+                                       int            size,
+                                       int            offset,
+                                       int            length);
 
     private:
-
         int bufferData(InputStream* stream, unsigned char*& buffer);
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /*_DECAF_IO_BUFFEREDINPUTSTREAM_H_*/

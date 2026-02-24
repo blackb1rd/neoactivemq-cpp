@@ -22,41 +22,43 @@
 
 #include <decaf/util/TimerTask.h>
 
-namespace activemq {
-namespace transport {
-namespace inactivity {
+namespace activemq
+{
+namespace transport
+{
+    namespace inactivity
+    {
 
-    class InactivityMonitor;
+        class InactivityMonitor;
 
-    /**
-     * Runnable class that is used by the {@see InactivityMonitor} class the check for
-     * timeouts related to transport reads.
-     *
-     * @since 3.1
-     */
-    class AMQCPP_API ReadChecker : public decaf::util::TimerTask {
-    private:
+        /**
+         * Runnable class that is used by the {@see InactivityMonitor} class the
+         * check for timeouts related to transport reads.
+         *
+         * @since 3.1
+         */
+        class AMQCPP_API ReadChecker : public decaf::util::TimerTask
+        {
+        private:
+            ReadChecker(const ReadChecker&);
+            ReadChecker operator=(const ReadChecker&);
 
-        ReadChecker(const ReadChecker&);
-        ReadChecker operator=(const ReadChecker&);
+        private:
+            // The Inactivity Monitor that created this Read Checker.
+            InactivityMonitor* parent;
 
-    private:
+            // State value of last time this object was run
+            long long lastRunTime;
 
-        // The Inactivity Monitor that created this Read Checker.
-        InactivityMonitor* parent;
+        public:
+            ReadChecker(InactivityMonitor* parent);
+            virtual ~ReadChecker();
 
-        // State value of last time this object was run
-        long long lastRunTime;
+            virtual void run();
+        };
 
-    public:
-
-        ReadChecker(InactivityMonitor* parent);
-        virtual ~ReadChecker();
-
-        virtual void run();
-
-    };
-
-}}}
+    }  // namespace inactivity
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_INACTIVITY_READCHECKER_H_ */

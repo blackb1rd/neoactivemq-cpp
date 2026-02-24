@@ -20,37 +20,38 @@
 
 #include <activemq/util/Config.h>
 
-#include <activemq/transport/ResponseCallback.h>
 #include <activemq/commands/Response.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/transport/ResponseCallback.h>
 
-#include <decaf/lang/Thread.h>
-#include <decaf/lang/Pointer.h>
-#include <decaf/util/concurrent/Mutex.h>
-#include <decaf/util/concurrent/CountDownLatch.h>
-#include <decaf/lang/exceptions/InterruptedException.h>
 #include <decaf/io/InterruptedIOException.h>
+#include <decaf/lang/Pointer.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/lang/exceptions/InterruptedException.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
+#include <decaf/util/concurrent/Mutex.h>
 
-namespace activemq {
-namespace transport {
+namespace activemq
+{
+namespace transport
+{
 
-    using decaf::lang::Pointer;
     using activemq::commands::Response;
+    using decaf::lang::Pointer;
 
     /**
      * A container that holds a response object.  Callers of the getResponse
      * method will block until a response has been receive unless they call
      * the getRepsonse that takes a timeout.
      */
-    class AMQCPP_API FutureResponse {
+    class AMQCPP_API FutureResponse
+    {
     private:
-
         mutable decaf::util::concurrent::CountDownLatch responseLatch;
-        Pointer<Response> response;
-        Pointer<ResponseCallback> responseCallback;
+        Pointer<Response>                               response;
+        Pointer<ResponseCallback>                       responseCallback;
 
     public:
-
         FutureResponse();
 
         FutureResponse(const Pointer<ResponseCallback> responseCallback);
@@ -62,7 +63,8 @@ namespace transport {
          *
          * @return the response object for the request.
          *
-         * @throws InterruptedIOException if the wait for response is interrupted.
+         * @throws InterruptedIOException if the wait for response is
+         * interrupted.
          */
         Pointer<Response> getResponse() const;
         Pointer<Response> getResponse();
@@ -75,7 +77,8 @@ namespace transport {
          *
          * @return the response object for the request
          *
-         * @throws InterruptedIOException if the wait for response is interrupted.
+         * @throws InterruptedIOException if the wait for response is
+         * interrupted.
          */
         Pointer<Response> getResponse(unsigned int timeout) const;
         Pointer<Response> getResponse(unsigned int timeout);
@@ -85,9 +88,9 @@ namespace transport {
          * @param response the response object for the request.
          */
         void setResponse(Pointer<Response> response);
-
     };
 
-}}
+}  // namespace transport
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TRANSPORT_FUTURERESPONSE_H_*/

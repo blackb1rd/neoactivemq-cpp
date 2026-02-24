@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/DataStructure.h>
@@ -30,8 +30,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -44,22 +46,19 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API DataArrayResponse : public Response {
+    class AMQCPP_API DataArrayResponse : public Response
+    {
     protected:
-
-        std::vector< decaf::lang::Pointer<DataStructure> > data;
+        std::vector<decaf::lang::Pointer<DataStructure>> data;
 
     public:
-
         const static unsigned char ID_DATAARRAYRESPONSE = 33;
 
     private:
-
         DataArrayResponse(const DataArrayResponse&);
-        DataArrayResponse& operator= (const DataArrayResponse&);
+        DataArrayResponse& operator=(const DataArrayResponse&);
 
     public:
-
         DataArrayResponse();
 
         virtual ~DataArrayResponse();
@@ -74,12 +73,14 @@ namespace commands {
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const std::vector< decaf::lang::Pointer<DataStructure> >& getData() const;
-        virtual std::vector< decaf::lang::Pointer<DataStructure> >& getData();
-        virtual void setData(const std::vector< decaf::lang::Pointer<DataStructure> >& data);
-
+        virtual const std::vector<decaf::lang::Pointer<DataStructure>>&
+        getData() const;
+        virtual std::vector<decaf::lang::Pointer<DataStructure>>& getData();
+        virtual void                                              setData(
+                                                         const std::vector<decaf::lang::Pointer<DataStructure>>& data);
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_DATAARRAYRESPONSE_H_*/

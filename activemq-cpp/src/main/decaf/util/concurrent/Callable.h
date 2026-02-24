@@ -18,48 +18,60 @@
 #ifndef _DECAF_UTIL_CONCURRENT_CALLABLE_H_
 #define _DECAF_UTIL_CONCURRENT_CALLABLE_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/lang/Exception.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace util {
-namespace concurrent {
-
-    /**
-     * Base class of all Callable<T> objects, used to allow identification via type casting.
-     */
-    class CallableType {
-    public:
-
-        virtual ~CallableType() {}
-    };
-
-    /**
-     * A task that returns a result and may throw an exception. Implementors define a single method with no
-     * arguments called call.  This interface differs from the Runnable interface in that a Callable object
-     * can return a result and is allowed to throw an exceptions from its call method.
-     *
-     * The Executors class contains utility methods to convert from other common forms to Callable classes.
-     *
-     * @since 1.0
-     */
-    template<typename V>
-    class Callable : public CallableType {
-    public:
-
-        virtual ~Callable() {}
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
 
         /**
-         * Computes a result, or throws an exception if unable to do so.
-         * @return
-         *      Computed Result.
-         * @throws Exception
-         *      If unable to compute a result.
+         * Base class of all Callable<T> objects, used to allow identification
+         * via type casting.
          */
-        virtual V call() = 0;
+        class CallableType
+        {
+        public:
+            virtual ~CallableType()
+            {
+            }
+        };
 
-    };
+        /**
+         * A task that returns a result and may throw an exception. Implementors
+         * define a single method with no arguments called call.  This interface
+         * differs from the Runnable interface in that a Callable object can
+         * return a result and is allowed to throw an exceptions from its call
+         * method.
+         *
+         * The Executors class contains utility methods to convert from other
+         * common forms to Callable classes.
+         *
+         * @since 1.0
+         */
+        template <typename V>
+        class Callable : public CallableType
+        {
+        public:
+            virtual ~Callable()
+            {
+            }
 
-}}}
+            /**
+             * Computes a result, or throws an exception if unable to do so.
+             * @return
+             *      Computed Result.
+             * @throws Exception
+             *      If unable to compute a result.
+             */
+            virtual V call() = 0;
+        };
+
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_CONCURRENT_CALLABLE_H_*/

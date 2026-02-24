@@ -23,35 +23,41 @@
 #include <decaf/lang/Comparable.h>
 #include <decaf/util/concurrent/TimeUnit.h>
 
-namespace decaf {
-namespace util {
-namespace concurrent {
-
-    /**
-     * A mix-in style interface for marking objects that should be acted upon after a
-     * given delay.
-     * <p>
-     * An implementation of this interface must define a Comparable methods that provides an
-     * ordering consistent with its getDelay method.
-     */
-    class DECAF_API Delayed : public decaf::lang::Comparable<Delayed> {
-    public:
-
-        virtual ~Delayed() {}
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
 
         /**
-         * Returns the remaining delay associated with this object, in the given time unit.
-         *
-         * @param unit
-         *        The time unit
-         *
-         * @return the remaining delay; zero or negative values indicate that the delay
-         *          has already elapsed
+         * A mix-in style interface for marking objects that should be acted
+         * upon after a given delay. <p> An implementation of this interface
+         * must define a Comparable methods that provides an ordering consistent
+         * with its getDelay method.
          */
-        virtual long long getDelay( const TimeUnit& unit ) = 0;
+        class DECAF_API Delayed : public decaf::lang::Comparable<Delayed>
+        {
+        public:
+            virtual ~Delayed()
+            {
+            }
 
-    };
+            /**
+             * Returns the remaining delay associated with this object, in the
+             * given time unit.
+             *
+             * @param unit
+             *        The time unit
+             *
+             * @return the remaining delay; zero or negative values indicate
+             * that the delay has already elapsed
+             */
+            virtual long long getDelay(const TimeUnit& unit) = 0;
+        };
 
-}}}
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_CONCURRENT_DELAYED_H_ */

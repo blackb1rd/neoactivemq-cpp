@@ -20,8 +20,10 @@
 
 #include <activemq/util/Config.h>
 
-namespace activemq {
-namespace util {
+namespace activemq
+{
+namespace util
+{
 
     class Service;
 
@@ -30,9 +32,9 @@ namespace util {
      *
      * @since 3.3.0
      */
-    class AMQCPP_API ServiceListener {
+    class AMQCPP_API ServiceListener
+    {
     public:
-
         virtual ~ServiceListener();
 
         /**
@@ -50,9 +52,9 @@ namespace util {
          *      The service that triggered this notification.
          */
         virtual void stopped(const Service* target) = 0;
-
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_UTIL_SERVICELISTENER_H_ */

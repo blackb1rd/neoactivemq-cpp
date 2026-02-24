@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/ActiveMQDestination.h>
@@ -31,8 +31,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -45,23 +47,20 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API JournalQueueAck : public BaseDataStructure {
+    class AMQCPP_API JournalQueueAck : public BaseDataStructure
+    {
     protected:
-
         Pointer<ActiveMQDestination> destination;
-        Pointer<MessageAck> messageAck;
+        Pointer<MessageAck>          messageAck;
 
     public:
-
         const static unsigned char ID_JOURNALQUEUEACK = 52;
 
     private:
-
         JournalQueueAck(const JournalQueueAck&);
-        JournalQueueAck& operator= (const JournalQueueAck&);
+        JournalQueueAck& operator=(const JournalQueueAck&);
 
     public:
-
         JournalQueueAck();
 
         virtual ~JournalQueueAck();
@@ -77,15 +76,16 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>& getDestination();
-        virtual void setDestination(const Pointer<ActiveMQDestination>& destination);
+        virtual Pointer<ActiveMQDestination>&       getDestination();
+        virtual void                                setDestination(
+                                           const Pointer<ActiveMQDestination>& destination);
 
         virtual const Pointer<MessageAck>& getMessageAck() const;
-        virtual Pointer<MessageAck>& getMessageAck();
+        virtual Pointer<MessageAck>&       getMessageAck();
         virtual void setMessageAck(const Pointer<MessageAck>& messageAck);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_JOURNALQUEUEACK_H_*/

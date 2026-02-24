@@ -20,29 +20,40 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace util {
+namespace decaf
+{
+namespace util
+{
 
-    template<typename K, typename V>
-    class MapEntry {
+    template <typename K, typename V>
+    class MapEntry
+    {
     private:
-
         K key;
         V value;
 
     public:
-
-        MapEntry() : key(), value() {
+        MapEntry()
+            : key(),
+              value()
+        {
         }
 
-        MapEntry(const MapEntry& other) : key(other.getKey()), value(other.getValue()) {
+        MapEntry(const MapEntry& other)
+            : key(other.getKey()),
+              value(other.getValue())
+        {
         }
 
-        MapEntry(const K& key, const V& value) : key(key), value(value) {
+        MapEntry(const K& key, const V& value)
+            : key(key),
+              value(value)
+        {
         }
 
-        MapEntry& operator= (const MapEntry& other) {
-            this->key = other.getKey();
+        MapEntry& operator=(const MapEntry& other)
+        {
+            this->key   = other.getKey();
             this->value = other.getValue();
 
             return *this;
@@ -50,51 +61,63 @@ namespace util {
 
         virtual ~MapEntry() {};
 
-        virtual void setKey(K key) {
+        virtual void setKey(K key)
+        {
             this->key = key;
         }
 
-        virtual K& getKey() {
+        virtual K& getKey()
+        {
             return this->key;
         }
 
-        virtual const K& getKey() const {
+        virtual const K& getKey() const
+        {
             return this->key;
         }
 
-        virtual void setValue(const V& value) {
+        virtual void setValue(const V& value)
+        {
             this->value = value;
         }
 
-        virtual V& getValue() {
+        virtual V& getValue()
+        {
             return this->value;
         }
 
-        virtual const V& getValue() const {
+        virtual const V& getValue() const
+        {
             return this->value;
         }
 
-        virtual bool equals(const MapEntry<K, V>& entry) const {
-            if (this == &entry) {
+        virtual bool equals(const MapEntry<K, V>& entry) const
+        {
+            if (this == &entry)
+            {
                 return true;
             }
 
-            if (!(this->key == entry.getKey())) {
+            if (!(this->key == entry.getKey()))
+            {
                 return false;
             }
 
-            if (!(this->value == entry.getValue())) {
+            if (!(this->value == entry.getValue()))
+            {
                 return false;
             }
 
             return true;
         }
 
-        virtual bool operator==(const MapEntry<K, V>& other) const {
+        virtual bool operator==(const MapEntry<K, V>& other) const
+        {
             return this->equals(other);
         }
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_MAPENTRY_H_ */

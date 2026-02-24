@@ -17,11 +17,11 @@
 
 #include "AdvisoryProducer.h"
 
-#include <cms/Topic.h>
 #include <cms/Message.h>
 #include <cms/TextMessage.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <cms/Topic.h>
 #include <decaf/lang/Integer.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 
 using namespace std;
 using namespace activemqcpp;
@@ -32,51 +32,56 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-AdvisoryProducer::AdvisoryProducer( cms::Session* session ) : consumerOnline(false),
-                                                              shutdown(false),
-                                                              shutdownLatch(1),
-                                                              session(session),
-                                                              consumer(),
-                                                              producer() {
-
-    if( session == NULL ) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Session Object passed was Null." );
+AdvisoryProducer::AdvisoryProducer(cms::Session* session)
+    : consumerOnline(false),
+      shutdown(false),
+      shutdownLatch(1),
+      session(session),
+      consumer(),
+      producer()
+{
+    if (session == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Session Object passed was Null.");
     }
 
-    std::unique_ptr<cms::Topic> destination( session->createTopic(
-        "HEART-BEAT-CHANNEL" ) );
-    std::unique_ptr<cms::Topic> advisories( session->createTopic(
-        "ActiveMQ.Advisory.Consumer.Topic.HEART-BEAT-CHANNEL" ) );
+    std::unique_ptr<cms::Topic> destination(
+        session->createTopic("HEART-BEAT-CHANNEL"));
+    std::unique_ptr<cms::Topic> advisories(session->createTopic(
+        "ActiveMQ.Advisory.Consumer.Topic.HEART-BEAT-CHANNEL"));
 
-    this->producer.reset( session->createProducer( destination.get() ) );
-    this->consumer.reset( session->createConsumer( advisories.get() ) );
-    this->consumer->setMessageListener( this );
+    this->producer.reset(session->createProducer(destination.get()));
+    this->consumer.reset(session->createConsumer(advisories.get()));
+    this->consumer->setMessageListener(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AdvisoryProducer::~AdvisoryProducer() {
+AdvisoryProducer::~AdvisoryProducer()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisoryProducer::stop() {
+void AdvisoryProducer::stop()
+{
     this->shutdown = true;
-    this->shutdownLatch.await( 3000 );
+    this->shutdownLatch.await(3000);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisoryProducer::run() {
-
-    while( !this->shutdown ) {
-
-        if( this->consumerOnline ) {
-
+void AdvisoryProducer::run()
+{
+    while (!this->shutdown)
+    {
+        if (this->consumerOnline)
+        {
             std::unique_ptr<cms::TextMessage> message(
-                this->session->createTextMessage( "Alive" ) );
+                this->session->createTextMessage("Alive"));
 
-            this->producer->send( message.get() );
+            this->producer->send(message.get());
 
-            Thread::sleep( 1000 );
+            Thread::sleep(1000);
         }
     }
 
@@ -84,20 +89,23 @@ void AdvisoryProducer::run() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisoryProducer::onMessage( const cms::Message* message ) {
-
-    if( message->getCMSType() == "Advisory" ) {
-
+void AdvisoryProducer::onMessage(const cms::Message* message)
+{
+    if (message->getCMSType() == "Advisory")
+    {
         std::cout << "Received an Advisory Message!" << std::endl;
 
-        if( message->propertyExists( "consumerCount" ) ) {
-
-            std::string consumerCount = message->getStringProperty( "consumerCount" );
+        if (message->propertyExists("consumerCount"))
+        {
+            std::string consumerCount =
+                message->getStringProperty("consumerCount");
             std::cout << "Number of Consumers = " << consumerCount << std::endl;
-            this->consumerOnline = Integer::parseInt( consumerCount ) > 0 ? true : false;
+            this->consumerOnline = Integer::parseInt(consumerCount) > 0 ? true
+                                                                        : false;
         }
-
-    } else {
+    }
+    else
+    {
         std::cout << "Received a Non-Advisory Message!" << std::endl;
     }
 }

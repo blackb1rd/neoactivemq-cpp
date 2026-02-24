@@ -17,13 +17,13 @@
 
 #include <gtest/gtest.h>
 
-#include <string>
-#include <decaf/util/HashMap.h>
-#include <decaf/util/StlMap.h>
-#include <decaf/util/ArrayList.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/lang/exceptions/IllegalStateException.h>
+#include <decaf/util/ArrayList.h>
+#include <decaf/util/HashMap.h>
+#include <decaf/util/StlMap.h>
+#include <string>
 
 using namespace std;
 using namespace decaf;
@@ -31,71 +31,77 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class StlMapTest : public ::testing::Test {};
+class StlMapTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    const int MAP_SIZE = 1000;
+const int MAP_SIZE = 1000;
 
-    void populateMap(StlMap<int, std::string>& map) {
-        for (int i = 0; i < MAP_SIZE; ++i) {
-            map.put(i, Integer::toString(i));
-        }
+void populateMap(StlMap<int, std::string>& map)
+{
+    for (int i = 0; i < MAP_SIZE; ++i)
+    {
+        map.put(i, Integer::toString(i));
     }
 }
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testConstructor) {
-
+TEST_F(StlMapTest, testConstructor)
+{
     StlMap<string, int> map1;
     ASSERT_TRUE(map1.isEmpty());
     ASSERT_TRUE(map1.size() == 0);
 
-    ASSERT_THROW(map1.get( "TEST" ), decaf::util::NoSuchElementException) << ("Should Throw a NoSuchElementException");
+    ASSERT_THROW(map1.get("TEST"), decaf::util::NoSuchElementException)
+        << ("Should Throw a NoSuchElementException");
 
     HashMap<string, int> srcMap;
-    srcMap.put( "A", 1 );
-    srcMap.put( "B", 1 );
-    srcMap.put( "C", 1 );
+    srcMap.put("A", 1);
+    srcMap.put("B", 1);
+    srcMap.put("C", 1);
 
-    StlMap<string, int> destMap( srcMap );
+    StlMap<string, int> destMap(srcMap);
 
     ASSERT_TRUE(srcMap.size() == 3);
     ASSERT_TRUE(destMap.size() == 3);
-    ASSERT_TRUE(destMap.get( "B" ) == 1);
+    ASSERT_TRUE(destMap.get("B") == 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testContainsKey){
-
+TEST_F(StlMapTest, testContainsKey)
+{
     StlMap<string, bool> boolMap;
     ASSERT_TRUE(boolMap.containsKey("bob") == false);
 
-    boolMap.put( "bob", true );
+    boolMap.put("bob", true);
 
     ASSERT_TRUE(boolMap.containsKey("bob") == true);
     ASSERT_TRUE(boolMap.containsKey("fred") == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testContiansValue) {
-
+TEST_F(StlMapTest, testContiansValue)
+{
     StlMap<string, bool> boolMap;
 
-    boolMap.put( "fred", true );
-    boolMap.put( "fred1", false );
+    boolMap.put("fred", true);
+    boolMap.put("fred1", false);
     ASSERT_TRUE(boolMap.containsValue(true) == true);
-    boolMap.remove( "fred" );
+    boolMap.remove("fred");
     ASSERT_TRUE(boolMap.containsValue(true) == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testClear) {
-
+TEST_F(StlMapTest, testClear)
+{
     StlMap<string, bool> boolMap;
-    boolMap.put( "bob", true );
-    boolMap.put( "fred", true );
+    boolMap.put("bob", true);
+    boolMap.put("fred", true);
 
     ASSERT_TRUE(boolMap.size() == 2);
     boolMap.clear();
@@ -103,49 +109,49 @@ TEST_F(StlMapTest, testClear) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testCopy) {
-
-    StlMap<string, int> destMap;
+TEST_F(StlMapTest, testCopy)
+{
+    StlMap<string, int>  destMap;
     HashMap<string, int> srcMap;
-    StlMap<string, int> srcMap2;
+    StlMap<string, int>  srcMap2;
 
     ASSERT_TRUE(destMap.size() == 0);
 
-    srcMap.put( "A", 1 );
-    srcMap.put( "B", 2 );
-    srcMap.put( "C", 3 );
-    srcMap.put( "D", 4 );
-    srcMap.put( "E", 5 );
-    srcMap.put( "F", 6 );
+    srcMap.put("A", 1);
+    srcMap.put("B", 2);
+    srcMap.put("C", 3);
+    srcMap.put("D", 4);
+    srcMap.put("E", 5);
+    srcMap.put("F", 6);
 
-    destMap.copy( srcMap );
+    destMap.copy(srcMap);
     ASSERT_TRUE(destMap.size() == 6);
-    ASSERT_TRUE(destMap.get( "A" ) == 1);
-    ASSERT_TRUE(destMap.get( "B" ) == 2);
-    ASSERT_TRUE(destMap.get( "C" ) == 3);
-    ASSERT_TRUE(destMap.get( "D" ) == 4);
-    ASSERT_TRUE(destMap.get( "E" ) == 5);
-    ASSERT_TRUE(destMap.get( "F" ) == 6);
+    ASSERT_TRUE(destMap.get("A") == 1);
+    ASSERT_TRUE(destMap.get("B") == 2);
+    ASSERT_TRUE(destMap.get("C") == 3);
+    ASSERT_TRUE(destMap.get("D") == 4);
+    ASSERT_TRUE(destMap.get("E") == 5);
+    ASSERT_TRUE(destMap.get("F") == 6);
 
-    destMap.copy( srcMap2 );
+    destMap.copy(srcMap2);
     ASSERT_TRUE(destMap.size() == 0);
 
-    srcMap2.put( "A", 1 );
-    srcMap2.put( "B", 2 );
-    srcMap2.put( "C", 3 );
-    srcMap2.put( "D", 4 );
-    srcMap2.put( "E", 5 );
+    srcMap2.put("A", 1);
+    srcMap2.put("B", 2);
+    srcMap2.put("C", 3);
+    srcMap2.put("D", 4);
+    srcMap2.put("E", 5);
 
-    destMap.copy( srcMap2 );
+    destMap.copy(srcMap2);
     ASSERT_TRUE(destMap.size() == 5);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testIsEmpty) {
-
+TEST_F(StlMapTest, testIsEmpty)
+{
     StlMap<string, bool> boolMap;
-    boolMap.put( "bob", true );
-    boolMap.put( "fred", true );
+    boolMap.put("bob", true);
+    boolMap.put("fred", true);
 
     ASSERT_TRUE(boolMap.isEmpty() == false);
     boolMap.clear();
@@ -153,105 +159,114 @@ TEST_F(StlMapTest, testIsEmpty) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testSize) {
-
+TEST_F(StlMapTest, testSize)
+{
     StlMap<string, bool> boolMap;
 
     ASSERT_TRUE(boolMap.size() == 0);
-    boolMap.put( "bob", true );
+    boolMap.put("bob", true);
     ASSERT_TRUE(boolMap.size() == 1);
-    boolMap.put( "fred", true );
+    boolMap.put("fred", true);
     ASSERT_TRUE(boolMap.size() == 2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testGet) {
-
+TEST_F(StlMapTest, testGet)
+{
     StlMap<string, bool> boolMap;
 
-    boolMap.put( "fred", true );
+    boolMap.put("fred", true);
     ASSERT_TRUE(boolMap.get("fred") == true);
 
-    boolMap.put( "bob", false );
+    boolMap.put("bob", false);
     ASSERT_TRUE(boolMap.get("bob") == false);
     ASSERT_TRUE(boolMap.get("fred") == true);
 
-    try{
-        boolMap.get( "mike" );
+    try
+    {
+        boolMap.get("mike");
         ASSERT_TRUE(false);
-    } catch( decaf::util::NoSuchElementException& e ){
+    }
+    catch (decaf::util::NoSuchElementException& e)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testPut) {
-
+TEST_F(StlMapTest, testPut)
+{
     StlMap<string, bool> boolMap;
 
-    boolMap.put( "fred", true );
+    boolMap.put("fred", true);
     ASSERT_TRUE(boolMap.get("fred") == true);
 
-    boolMap.put( "bob", false );
+    boolMap.put("bob", false);
     ASSERT_TRUE(boolMap.get("bob") == false);
     ASSERT_TRUE(boolMap.get("fred") == true);
 
-    boolMap.put( "bob", true );
+    boolMap.put("bob", true);
     ASSERT_TRUE(boolMap.get("bob") == true);
     ASSERT_TRUE(boolMap.get("fred") == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testPutAll) {
-
-    StlMap<string, int> destMap;
+TEST_F(StlMapTest, testPutAll)
+{
+    StlMap<string, int>  destMap;
     HashMap<string, int> srcMap;
     HashMap<string, int> srcMap2;
 
-    srcMap.put( "A", 1 );
-    srcMap.put( "B", 1 );
-    srcMap.put( "C", 1 );
+    srcMap.put("A", 1);
+    srcMap.put("B", 1);
+    srcMap.put("C", 1);
 
     ASSERT_TRUE(srcMap.size() == 3);
     ASSERT_TRUE(destMap.size() == 0);
 
-    srcMap.put( "D", 1 );
-    srcMap.put( "E", 1 );
-    srcMap.put( "F", 1 );
+    srcMap.put("D", 1);
+    srcMap.put("E", 1);
+    srcMap.put("F", 1);
 
-    destMap.putAll( srcMap );
+    destMap.putAll(srcMap);
     ASSERT_TRUE(destMap.size() == 6);
-    destMap.putAll( srcMap2 );
+    destMap.putAll(srcMap2);
     ASSERT_TRUE(destMap.size() == 6);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testRemove) {
+TEST_F(StlMapTest, testRemove)
+{
     StlMap<string, bool> boolMap;
 
-    boolMap.put( "fred", true );
+    boolMap.put("fred", true);
     ASSERT_TRUE(boolMap.containsKey("fred") == true);
-    ASSERT_TRUE(boolMap.remove( "fred" ) == true);
+    ASSERT_TRUE(boolMap.remove("fred") == true);
     ASSERT_TRUE(boolMap.containsKey("fred") == false);
 
-    ASSERT_THROW(boolMap.remove( "fred" ), decaf::util::NoSuchElementException) << ("Should throw a NoSuchElementException");
+    ASSERT_THROW(boolMap.remove("fred"), decaf::util::NoSuchElementException)
+        << ("Should throw a NoSuchElementException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testEntrySet) {
-
+TEST_F(StlMapTest, testEntrySet)
+{
     StlMap<int, std::string> map;
 
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 50; i++)
+    {
         map.put(i, Integer::toString(i));
     }
 
-    Set<MapEntry<int, std::string> >& set = map.entrySet();
-    Pointer< Iterator<MapEntry<int, std::string> > > iterator(set.iterator());
+    Set<MapEntry<int, std::string>>&              set = map.entrySet();
+    Pointer<Iterator<MapEntry<int, std::string>>> iterator(set.iterator());
 
     ASSERT_TRUE(map.size() == set.size()) << ("Returned set of incorrect size");
-    while (iterator->hasNext()) {
+    while (iterator->hasNext())
+    {
         MapEntry<int, std::string> entry = iterator->next();
-        ASSERT_TRUE(map.containsKey(entry.getKey()) && map.containsValue(entry.getValue())) << ("Returned incorrect entry set");
+        ASSERT_TRUE(map.containsKey(entry.getKey()) &&
+                    map.containsValue(entry.getValue()))
+            << ("Returned incorrect entry set");
     }
 
     iterator.reset(set.iterator());
@@ -260,14 +275,17 @@ TEST_F(StlMapTest, testEntrySet) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testKeySet) {
-
+TEST_F(StlMapTest, testKeySet)
+{
     StlMap<int, std::string> map;
     populateMap(map);
     Set<int>& set = map.keySet();
-    ASSERT_TRUE(set.size() == map.size()) << ("Returned set of incorrect size()");
-    for (int i = 0; i < MAP_SIZE; i++) {
-        ASSERT_TRUE(set.contains(i)) << ("Returned set does not contain all keys");
+    ASSERT_TRUE(set.size() == map.size())
+        << ("Returned set of incorrect size()");
+    for (int i = 0; i < MAP_SIZE; i++)
+    {
+        ASSERT_TRUE(set.contains(i))
+            << ("Returned set does not contain all keys");
     }
 
     {
@@ -282,9 +300,9 @@ TEST_F(StlMapTest, testKeySet) {
         localMap.put(102, "102");
         localMap.put(203, "203");
 
-        Set<int>& intSet = localMap.keySet();
-        Pointer< Iterator<int> > it(intSet.iterator());
-        int remove1 = it->next();
+        Set<int>&              intSet = localMap.keySet();
+        Pointer<Iterator<int>> it(intSet.iterator());
+        int                    remove1 = it->next();
         it->hasNext();
         it->remove();
         int remove2 = it->next();
@@ -308,15 +326,18 @@ TEST_F(StlMapTest, testKeySet) {
         map2.put(1, "1");
         map2.put(4, "4");
 
-        Set<int>& intSet = map2.keySet();
-        Pointer< Iterator<int> > it2(intSet.iterator());
+        Set<int>&              intSet = map2.keySet();
+        Pointer<Iterator<int>> it2(intSet.iterator());
 
         int remove3 = it2->next();
         int next;
 
-        if (remove3 == 1) {
+        if (remove3 == 1)
+        {
             next = 4;
-        } else {
+        }
+        else
+        {
             next = 1;
         }
         it2->hasNext();
@@ -329,108 +350,131 @@ TEST_F(StlMapTest, testKeySet) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testValues) {
-
+TEST_F(StlMapTest, testValues)
+{
     StlMap<int, std::string> map;
     populateMap(map);
 
     Collection<std::string>& c = map.values();
-    ASSERT_TRUE(c.size() == map.size()) << ("Returned collection of incorrect size()");
-    for (int i = 0; i < MAP_SIZE; i++) {
-        ASSERT_TRUE(c.contains(Integer::toString(i))) << ("Returned collection does not contain all keys");
+    ASSERT_TRUE(c.size() == map.size())
+        << ("Returned collection of incorrect size()");
+    for (int i = 0; i < MAP_SIZE; i++)
+    {
+        ASSERT_TRUE(c.contains(Integer::toString(i)))
+            << ("Returned collection does not contain all keys");
     }
 
     c.remove("10");
-    ASSERT_TRUE(!map.containsKey(10)) << ("Removing from collection should alter Map");
+    ASSERT_TRUE(!map.containsKey(10))
+        << ("Removing from collection should alter Map");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testEntrySetIterator) {
-
+TEST_F(StlMapTest, testEntrySetIterator)
+{
     StlMap<int, std::string> map;
     populateMap(map);
 
-    int count = 0;
-    Pointer< Iterator<MapEntry<int, std::string> > > iterator(map.entrySet().iterator());
-    while (iterator->hasNext()) {
+    int                                           count = 0;
+    Pointer<Iterator<MapEntry<int, std::string>>> iterator(
+        map.entrySet().iterator());
+    while (iterator->hasNext())
+    {
         MapEntry<int, std::string> entry = iterator->next();
         ASSERT_EQ(count, entry.getKey());
         ASSERT_EQ(Integer::toString(count), entry.getValue());
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't cover the expected range");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.entrySet().iterator());
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 
     count = 0;
-    while (iterator->hasNext()) {
+    while (iterator->hasNext())
+    {
         iterator->next();
         iterator->remove();
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't remove the expected range");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testKeySetIterator) {
-
+TEST_F(StlMapTest, testKeySetIterator)
+{
     StlMap<int, std::string> map;
     populateMap(map);
 
-    int count = 0;
-    Pointer< Iterator<int> > iterator(map.keySet().iterator());
-    while (iterator->hasNext()) {
+    int                    count = 0;
+    Pointer<Iterator<int>> iterator(map.keySet().iterator());
+    while (iterator->hasNext())
+    {
         int key = iterator->next();
         ASSERT_EQ(count, key);
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't cover the expected range");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.keySet().iterator());
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 
     count = 0;
-    while (iterator->hasNext()) {
+    while (iterator->hasNext())
+    {
         iterator->next();
         iterator->remove();
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't remove the expected range");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapTest, testValuesIterator) {
-
+TEST_F(StlMapTest, testValuesIterator)
+{
     StlMap<int, std::string> map;
     populateMap(map);
 
-    int count = 0;
-    Pointer< Iterator<std::string> > iterator(map.values().iterator());
-    while (iterator->hasNext()) {
+    int                            count = 0;
+    Pointer<Iterator<std::string>> iterator(map.values().iterator());
+    while (iterator->hasNext())
+    {
         std::string value = iterator->next();
         ASSERT_EQ(Integer::toString(count), value);
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't cover the expected range");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.values().iterator());
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 
     count = 0;
-    while (iterator->hasNext()) {
+    while (iterator->hasNext())
+    {
         iterator->next();
         iterator->remove();
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't remove the expected range");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 }

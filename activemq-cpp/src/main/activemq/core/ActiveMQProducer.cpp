@@ -16,8 +16,8 @@
  */
 #include "ActiveMQProducer.h"
 
-#include <cms/Message.h>
 #include <activemq/util/CMSExceptionSupport.h>
+#include <cms/Message.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
 
 using namespace std;
@@ -30,101 +30,146 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQProducer::ActiveMQProducer(Pointer<ActiveMQProducerKernel> kernel) : kernel(kernel) {
-
-    if (kernel == NULL) {
-        throw ActiveMQException(__FILE__, __LINE__,
-            "ActiveMQProducer::ActiveMQProducer - Initialized with NULL Kernel");
+ActiveMQProducer::ActiveMQProducer(Pointer<ActiveMQProducerKernel> kernel)
+    : kernel(kernel)
+{
+    if (kernel == NULL)
+    {
+        throw ActiveMQException(__FILE__,
+                                __LINE__,
+                                "ActiveMQProducer::ActiveMQProducer - "
+                                "Initialized with NULL Kernel");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQProducer::~ActiveMQProducer() {
-    try {
+ActiveMQProducer::~ActiveMQProducer()
+{
+    try
+    {
         this->kernel->close();
     }
     AMQ_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducer::close() {
-
-    try {
+void ActiveMQProducer::close()
+{
+    try
+    {
         this->kernel->close();
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducer::send(cms::Message* message) {
-
-    try {
+void ActiveMQProducer::send(cms::Message* message)
+{
+    try
+    {
         this->kernel->send(message);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducer::send(cms::Message* message, cms::AsyncCallback* callback) {
-
-    try {
+void ActiveMQProducer::send(cms::Message* message, cms::AsyncCallback* callback)
+{
+    try
+    {
         this->kernel->send(message, callback);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducer::send(cms::Message* message, int deliveryMode, int priority, long long timeToLive) {
-
-    try {
+void ActiveMQProducer::send(cms::Message* message,
+                            int           deliveryMode,
+                            int           priority,
+                            long long     timeToLive)
+{
+    try
+    {
         this->kernel->send(message, deliveryMode, priority, timeToLive);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducer::send(cms::Message* message, int deliveryMode, int priority, long long timeToLive, cms::AsyncCallback* callback) {
-
-    try {
-        this->kernel->send(message, deliveryMode, priority, timeToLive, callback);
+void ActiveMQProducer::send(cms::Message*       message,
+                            int                 deliveryMode,
+                            int                 priority,
+                            long long           timeToLive,
+                            cms::AsyncCallback* callback)
+{
+    try
+    {
+        this->kernel->send(message,
+                           deliveryMode,
+                           priority,
+                           timeToLive,
+                           callback);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducer::send(const cms::Destination* destination, cms::Message* message) {
-
-    try {
+void ActiveMQProducer::send(const cms::Destination* destination,
+                            cms::Message*           message)
+{
+    try
+    {
         this->kernel->send(destination, message);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducer::send(const cms::Destination* destination, cms::Message* message, cms::AsyncCallback* callback) {
-
-    try {
+void ActiveMQProducer::send(const cms::Destination* destination,
+                            cms::Message*           message,
+                            cms::AsyncCallback*     callback)
+{
+    try
+    {
         this->kernel->send(destination, message, callback);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducer::send(const cms::Destination* destination, cms::Message* message,
-                            int deliveryMode, int priority, long long timeToLive) {
-
-    try {
-        this->kernel->send(destination, message, deliveryMode, priority, timeToLive);
+void ActiveMQProducer::send(const cms::Destination* destination,
+                            cms::Message*           message,
+                            int                     deliveryMode,
+                            int                     priority,
+                            long long               timeToLive)
+{
+    try
+    {
+        this->kernel->send(destination,
+                           message,
+                           deliveryMode,
+                           priority,
+                           timeToLive);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducer::send(const cms::Destination* destination, cms::Message* message,
-                            int deliveryMode, int priority, long long timeToLive, cms::AsyncCallback* callback) {
-
-    try {
-        this->kernel->send(destination, message, deliveryMode, priority, timeToLive, callback);
+void ActiveMQProducer::send(const cms::Destination* destination,
+                            cms::Message*           message,
+                            int                     deliveryMode,
+                            int                     priority,
+                            long long               timeToLive,
+                            cms::AsyncCallback*     callback)
+{
+    try
+    {
+        this->kernel->send(destination,
+                           message,
+                           deliveryMode,
+                           priority,
+                           timeToLive,
+                           callback);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }

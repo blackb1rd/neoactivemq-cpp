@@ -20,9 +20,9 @@
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 
-#include <decaf/internal/net/ssl/openssl/OpenSSLSocket.h>
-#include <decaf/internal/net/ssl/openssl/OpenSSLParameters.h>
 #include <decaf/internal/net/ssl/openssl/OpenSSLContextSpi.h>
+#include <decaf/internal/net/ssl/openssl/OpenSSLParameters.h>
+#include <decaf/internal/net/ssl/openssl/OpenSSLSocket.h>
 
 #include <memory>
 
@@ -40,119 +40,152 @@ using namespace decaf::internal::net::ssl;
 using namespace decaf::internal::net::ssl::openssl;
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketFactory::OpenSSLSocketFactory( OpenSSLContextSpi* parent ) : SSLSocketFactory(), parent( parent ) {
-
-    if( parent == NULL ) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Parent Pointer was NULL." );
+OpenSSLSocketFactory::OpenSSLSocketFactory(OpenSSLContextSpi* parent)
+    : SSLSocketFactory(),
+      parent(parent)
+{
+    if (parent == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Parent Pointer was NULL.");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketFactory::~OpenSSLSocketFactory() {
+OpenSSLSocketFactory::~OpenSSLSocketFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> OpenSSLSocketFactory::getDefaultCipherSuites() {
-
+std::vector<std::string> OpenSSLSocketFactory::getDefaultCipherSuites()
+{
     return std::vector<std::string>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> OpenSSLSocketFactory::getSupportedCipherSuites() {
-
+std::vector<std::string> OpenSSLSocketFactory::getSupportedCipherSuites()
+{
     return std::vector<std::string>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Socket* OpenSSLSocketFactory::createSocket() {
-
-    try{
-
-        // Create a new SSL object for the Socket then create a new unconnected Socket.
-        SSL_CTX* ctx = static_cast<SSL_CTX*>( this->parent->getOpenSSLCtx() );
-        std::unique_ptr<OpenSSLParameters> parameters( new OpenSSLParameters( ctx ) );
-        return new OpenSSLSocket( parameters.release() );
+Socket* OpenSSLSocketFactory::createSocket()
+{
+    try
+    {
+        // Create a new SSL object for the Socket then create a new unconnected
+        // Socket.
+        SSL_CTX* ctx = static_cast<SSL_CTX*>(this->parent->getOpenSSLCtx());
+        std::unique_ptr<OpenSSLParameters> parameters(
+            new OpenSSLParameters(ctx));
+        return new OpenSSLSocket(parameters.release());
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Socket* OpenSSLSocketFactory::createSocket( const decaf::net::InetAddress* host, int port ) {
-
-    try{
-
-        // Create a new SSL object for the Socket then create a new unconnected Socket.
-        SSL_CTX* ctx = static_cast<SSL_CTX*>( this->parent->getOpenSSLCtx() );
-        std::unique_ptr<OpenSSLParameters> parameters( new OpenSSLParameters( ctx ) );
-        std::unique_ptr<SSLSocket> socket( new OpenSSLSocket( parameters.release(), host, port ) );
-        return socket.release();
-    }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
-}
-
-////////////////////////////////////////////////////////////////////////////////
-Socket* OpenSSLSocketFactory::createSocket( const decaf::net::InetAddress* host, int port,
-                                            const decaf::net::InetAddress* ifAddress, int localPort ) {
-
-    try{
-
-        // Create a new SSL object for the Socket then create a new unconnected Socket.
-        SSL_CTX* ctx = static_cast<SSL_CTX*>( this->parent->getOpenSSLCtx() );
-        std::unique_ptr<OpenSSLParameters> parameters( new OpenSSLParameters( ctx ) );
+Socket* OpenSSLSocketFactory::createSocket(const decaf::net::InetAddress* host,
+                                           int                            port)
+{
+    try
+    {
+        // Create a new SSL object for the Socket then create a new unconnected
+        // Socket.
+        SSL_CTX* ctx = static_cast<SSL_CTX*>(this->parent->getOpenSSLCtx());
+        std::unique_ptr<OpenSSLParameters> parameters(
+            new OpenSSLParameters(ctx));
         std::unique_ptr<SSLSocket> socket(
-            new OpenSSLSocket( parameters.release(), host, port, ifAddress, localPort ) );
+            new OpenSSLSocket(parameters.release(), host, port));
         return socket.release();
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Socket* OpenSSLSocketFactory::createSocket( const std::string& hostname, int port ) {
-
-    try{
-
-        // Create a new SSL object for the Socket then create a new unconnected Socket.
-        SSL_CTX* ctx = static_cast<SSL_CTX*>( this->parent->getOpenSSLCtx() );
-        std::unique_ptr<OpenSSLParameters> parameters( new OpenSSLParameters( ctx ) );
-        std::unique_ptr<SSLSocket> socket( new OpenSSLSocket( parameters.release(), hostname, port ) );
-        return socket.release();
-    }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
-}
-
-////////////////////////////////////////////////////////////////////////////////
-Socket* OpenSSLSocketFactory::createSocket( const std::string& hostname, int port,
-                                            const InetAddress* ifAddress, int localPort ) {
-
-    try{
-
-        // Create a new SSL object for the Socket then create a new unconnected Socket.
-        SSL_CTX* ctx = static_cast<SSL_CTX*>( this->parent->getOpenSSLCtx() );
-        std::unique_ptr<OpenSSLParameters> parameters( new OpenSSLParameters( ctx ) );
+Socket* OpenSSLSocketFactory::createSocket(
+    const decaf::net::InetAddress* host,
+    int                            port,
+    const decaf::net::InetAddress* ifAddress,
+    int                            localPort)
+{
+    try
+    {
+        // Create a new SSL object for the Socket then create a new unconnected
+        // Socket.
+        SSL_CTX* ctx = static_cast<SSL_CTX*>(this->parent->getOpenSSLCtx());
+        std::unique_ptr<OpenSSLParameters> parameters(
+            new OpenSSLParameters(ctx));
         std::unique_ptr<SSLSocket> socket(
-            new OpenSSLSocket( parameters.release(), hostname, port, ifAddress, localPort ) );
+            new OpenSSLSocket(parameters.release(),
+                              host,
+                              port,
+                              ifAddress,
+                              localPort));
         return socket.release();
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Socket* OpenSSLSocketFactory::createSocket( Socket* socket DECAF_UNUSED,
-                                            std::string host DECAF_UNUSED,
-                                            int port DECAF_UNUSED,
-                                            bool autoClose DECAF_UNUSED ) {
+Socket* OpenSSLSocketFactory::createSocket(const std::string& hostname,
+                                           int                port)
+{
+    try
+    {
+        // Create a new SSL object for the Socket then create a new unconnected
+        // Socket.
+        SSL_CTX* ctx = static_cast<SSL_CTX*>(this->parent->getOpenSSLCtx());
+        std::unique_ptr<OpenSSLParameters> parameters(
+            new OpenSSLParameters(ctx));
+        std::unique_ptr<SSLSocket> socket(
+            new OpenSSLSocket(parameters.release(), hostname, port));
+        return socket.release();
+    }
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
+}
 
-    throw UnsupportedOperationException(
-        __FILE__, __LINE__, "Wrapped Sockets not yet Supported." );
+////////////////////////////////////////////////////////////////////////////////
+Socket* OpenSSLSocketFactory::createSocket(const std::string& hostname,
+                                           int                port,
+                                           const InetAddress* ifAddress,
+                                           int                localPort)
+{
+    try
+    {
+        // Create a new SSL object for the Socket then create a new unconnected
+        // Socket.
+        SSL_CTX* ctx = static_cast<SSL_CTX*>(this->parent->getOpenSSLCtx());
+        std::unique_ptr<OpenSSLParameters> parameters(
+            new OpenSSLParameters(ctx));
+        std::unique_ptr<SSLSocket> socket(
+            new OpenSSLSocket(parameters.release(),
+                              hostname,
+                              port,
+                              ifAddress,
+                              localPort));
+        return socket.release();
+    }
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+Socket* OpenSSLSocketFactory::createSocket(Socket* socket   DECAF_UNUSED,
+                                           std::string host DECAF_UNUSED,
+                                           int port         DECAF_UNUSED,
+                                           bool autoClose   DECAF_UNUSED)
+{
+    throw UnsupportedOperationException(__FILE__,
+                                        __LINE__,
+                                        "Wrapped Sockets not yet Supported.");
 }

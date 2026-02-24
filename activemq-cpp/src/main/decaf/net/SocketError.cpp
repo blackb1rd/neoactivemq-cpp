@@ -33,7 +33,8 @@ int SocketError::getErrorCode() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string SocketError::getErrorString() {
+std::string SocketError::getErrorString()
+{
     int errorCode = getErrorCode();
     return std::system_category().message(errorCode);
 }

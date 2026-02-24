@@ -18,16 +18,18 @@
 #ifndef _DECAF_UTIL_COLLECTION_H_
 #define _DECAF_UTIL_COLLECTION_H_
 
-#include <decaf/util/Config.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/lang/Iterable.h>
+#include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <decaf/util/Config.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/concurrent/Synchronizable.h>
 
-namespace decaf {
-namespace util {
+namespace decaf
+{
+namespace util
+{
 
     /**
      * The root interface in the collection hierarchy. A collection represents
@@ -39,22 +41,23 @@ namespace util {
      * All general-purpose Collection implementation classes (which typically
      * implement Collection indirectly through one of its subinterfaces) should
      * provide two "standard" constructors: a void (no arguments) constructor,
-     * which creates an empty collection, and a constructor with a single argument
-     * of type Collection, which creates a new collection with the same elements
-     * as its argument. In effect, the latter constructor allows the user to copy
-     * any collection, producing an equivalent collection of the desired
-     * implementation type. There is no way to enforce this convention
-     * (as interfaces cannot contain constructors) but all of the general-purpose
-     * Collection implementations in the Decaf platform libraries comply.
+     * which creates an empty collection, and a constructor with a single
+     * argument of type Collection, which creates a new collection with the same
+     * elements as its argument. In effect, the latter constructor allows the
+     * user to copy any collection, producing an equivalent collection of the
+     * desired implementation type. There is no way to enforce this convention
+     * (as interfaces cannot contain constructors) but all of the
+     * general-purpose Collection implementations in the Decaf platform
+     * libraries comply.
      *
-     * The "destructive" methods contained in this interface, that is, the methods
-     * that modify the collection on which they operate, are specified to throw
-     * UnsupportedOperationException if this collection does not support the
-     * operation. If this is the case, these methods may, but are not required
-     * to, throw an UnsupportedOperationException if the invocation would have
-     * no effect on the collection. For example, invoking the addAll(Collection)
-     * method on an unmodifiable collection may, but is not required to, throw
-     * the exception if the collection to be added is empty.
+     * The "destructive" methods contained in this interface, that is, the
+     * methods that modify the collection on which they operate, are specified
+     * to throw UnsupportedOperationException if this collection does not
+     * support the operation. If this is the case, these methods may, but are
+     * not required to, throw an UnsupportedOperationException if the invocation
+     * would have no effect on the collection. For example, invoking the
+     * addAll(Collection) method on an unmodifiable collection may, but is not
+     * required to, throw the exception if the collection to be added is empty.
      *
      * Many methods in Collections Framework interfaces are defined in terms of
      * the equals method. For example, the specification for the
@@ -64,12 +67,14 @@ namespace util {
      *
      * @since 1.0
      */
-    template< typename E >
+    template <typename E>
     class Collection : public virtual lang::Iterable<E>,
-                       public virtual util::concurrent::Synchronizable {
+                       public virtual util::concurrent::Synchronizable
+    {
     public:
-
-        virtual ~Collection() {}
+        virtual ~Collection()
+        {
+        }
 
         /**
          * Renders this Collection as a Copy of the given Collection
@@ -77,9 +82,10 @@ namespace util {
          * @param collection
          *      The collection to mirror.
          *
-         * @throws UnsupportedOperationExceptio if this is an unmodifiable collection.
-         * @throws IllegalStateException if the elements cannot be added at this time due
-         *         to insertion restrictions.
+         * @throws UnsupportedOperationExceptio if this is an unmodifiable
+         * collection.
+         * @throws IllegalStateException if the elements cannot be added at this
+         * time due to insertion restrictions.
          */
         virtual void copy(const Collection<E>& collection) = 0;
 
@@ -111,13 +117,14 @@ namespace util {
          *
          * @return true if the element was added to this Collection.
          *
-         * @throws UnsupportedOperationExceptio if this is an unmodifiable collection.
-         * @throws NullPointerException if the Collection is a container of pointers
-         *         and does not allow NULL values.
-         * @throws IllegalArgumentException if some property of the element prevents it
-         *         from being added to this collection
-         * @throws IllegalStateException if the element cannot be added at this time due
-         *         to insertion restrictions.
+         * @throws UnsupportedOperationExceptio if this is an unmodifiable
+         * collection.
+         * @throws NullPointerException if the Collection is a container of
+         * pointers and does not allow NULL values.
+         * @throws IllegalArgumentException if some property of the element
+         * prevents it from being added to this collection
+         * @throws IllegalStateException if the element cannot be added at this
+         * time due to insertion restrictions.
          */
         virtual bool add(const E& value) = 0;
 
@@ -134,37 +141,41 @@ namespace util {
          *
          * @return true if this collection changed as a result of the call
          *
-         * @throws UnsupportedOperationExceptio if this is an unmodifiable collection.
-         * @throws NullPointerException if the Collection is a container of pointers
-         *         and does not allow NULL values.
-         * @throws IllegalArgumentException if some property of an element prevents it
-         *         from being added to this collection
-         * @throws IllegalStateException if an element cannot be added at this time due
-         *         to insertion restrictions.
+         * @throws UnsupportedOperationExceptio if this is an unmodifiable
+         * collection.
+         * @throws NullPointerException if the Collection is a container of
+         * pointers and does not allow NULL values.
+         * @throws IllegalArgumentException if some property of an element
+         * prevents it from being added to this collection
+         * @throws IllegalStateException if an element cannot be added at this
+         * time due to insertion restrictions.
          */
         virtual bool addAll(const Collection<E>& collection) = 0;
 
         /**
-         * Removes all of the elements from this collection (optional operation).
-         * This collection will be empty after this method returns unless it throws
-         * an exception.
+         * Removes all of the elements from this collection (optional
+         * operation). This collection will be empty after this method returns
+         * unless it throws an exception.
          *
-         * @throws UnsupportedOperationExceptio if this is an unmodifiable collection.
+         * @throws UnsupportedOperationExceptio if this is an unmodifiable
+         * collection.
          */
         virtual void clear() = 0;
 
         /**
          * Returns true if this collection contains the specified element. More
          * formally, returns true if and only if this collection contains at
-         * least one element e such that (value == NULL ? e == NULL : value == e ).
+         * least one element e such that (value == NULL ? e == NULL : value == e
+         * ).
          *
          * @param value
          *      The value to check for presence in the collection.
          *
-         * @return true if there is at least one of the elements in the collection
+         * @return true if there is at least one of the elements in the
+         * collection
          *
-         * @throws NullPointerException if the Collection contains pointers and the
-         *         Collection does not allow for NULL elements (optional check).
+         * @throws NullPointerException if the Collection contains pointers and
+         * the Collection does not allow for NULL elements (optional check).
          */
         virtual bool contains(const E& value) const = 0;
 
@@ -175,8 +186,8 @@ namespace util {
          * @param collection
          *      The Collection to compare to this one.
          *
-         * @throws NullPointerException if the Collection contains pointers and the
-         *         Collection does not allow for NULL elements (optional check).
+         * @throws NullPointerException if the Collection contains pointers and
+         * the Collection does not allow for NULL elements (optional check).
          */
         virtual bool containsAll(const Collection<E>& collection) const = 0;
 
@@ -197,8 +208,8 @@ namespace util {
         /**
          * Removes a single instance of the specified element from the
          * collection.  More formally, removes an element e such that
-         * (value == NULL ? e == NULL : value == e), if this collection contains one
-         * or more such elements. Returns true if this collection contained
+         * (value == NULL ? e == NULL : value == e), if this collection contains
+         * one or more such elements. Returns true if this collection contained
          * the specified element (or equivalently, if this collection changed
          * as a result of the call).
          *
@@ -207,69 +218,74 @@ namespace util {
          *
          * @return true if the collection was changed, false otherwise.
          *
-         * @throws UnsupportedOperationExceptio if this is an unmodifiable collection.
-         * @throws NullPointerException if the Collection is a container of pointers
-         *         and does not allow NULL values.
+         * @throws UnsupportedOperationExceptio if this is an unmodifiable
+         * collection.
+         * @throws NullPointerException if the Collection is a container of
+         * pointers and does not allow NULL values.
          */
         virtual bool remove(const E& value) = 0;
 
         /**
          * Removes all this collection's elements that are also contained in
-         * the specified collection (optional operation). After this call returns,
-         * this collection will contain no elements in common with the specified
-         * collection.
+         * the specified collection (optional operation). After this call
+         * returns, this collection will contain no elements in common with the
+         * specified collection.
          *
          * @param collection
          *      The Collection whose elements are to be removed from this one.
          *
          * @return true if the collection changed as a result of this call.
          *
-         * @throws UnsupportedOperationExceptio if this is an unmodifiable collection.
-         * @throws NullPointerException if the Collection is a container of pointers
-         *         and does not allow NULL values.
+         * @throws UnsupportedOperationExceptio if this is an unmodifiable
+         * collection.
+         * @throws NullPointerException if the Collection is a container of
+         * pointers and does not allow NULL values.
          */
         virtual bool removeAll(const Collection<E>& collection) = 0;
 
         /**
-         * Retains only the elements in this collection that are contained in the
-         * specified collection (optional operation). In other words, removes from
-         * this collection all of its elements that are not contained in the
-         * specified collection.
+         * Retains only the elements in this collection that are contained in
+         * the specified collection (optional operation). In other words,
+         * removes from this collection all of its elements that are not
+         * contained in the specified collection.
          *
          * @param collection
          *      The Collection whose elements are to be retained.
          *
          * @return true if the collection changed as a result of this call.
          *
-         * @throws UnsupportedOperationExceptio if this is an unmodifiable collection.
-         * @throws NullPointerException if the Collection is a container of pointers
-         *         and does not allow NULL values.
+         * @throws UnsupportedOperationExceptio if this is an unmodifiable
+         * collection.
+         * @throws NullPointerException if the Collection is a container of
+         * pointers and does not allow NULL values.
          */
         virtual bool retainAll(const Collection<E>& collection) = 0;
 
         /**
          * Returns the number of elements in this collection. If this collection
-         * contains more than Integer::MAX_VALUE elements, returns Integer::MAX_VALUE.
+         * contains more than Integer::MAX_VALUE elements, returns
+         * Integer::MAX_VALUE.
          *
          * @return the number of elements in this collection
          */
         virtual int size() const = 0;
 
         /**
-         * Returns an array containing all of the elements in this collection. If
-         * the collection makes any guarantees as to what order its elements are
-         * returned by its iterator, this method must return the elements in the
-         * same order.
+         * Returns an array containing all of the elements in this collection.
+         * If the collection makes any guarantees as to what order its elements
+         * are returned by its iterator, this method must return the elements in
+         * the same order.
          *
-         * This method acts as bridge between array-based and collection-based APIs.
+         * This method acts as bridge between array-based and collection-based
+         * APIs.
          *
          * @return an array of the elements in this collection in the form of an
          *          STL vector.
          */
         virtual std::vector<E> toArray() const = 0;
-
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_COLLECTION_H_*/

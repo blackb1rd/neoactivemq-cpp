@@ -20,5 +20,6 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-EnhancedConnection::~EnhancedConnection() {
+EnhancedConnection::~EnhancedConnection()
+{
 }

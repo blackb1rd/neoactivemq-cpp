@@ -17,19 +17,22 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/UUID.h>
-#include <activemq/commands/ActiveMQTopic.h>
 #include <activemq/commands/ActiveMQDestination.h>
+#include <activemq/commands/ActiveMQTopic.h>
+#include <decaf/util/UUID.h>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
 
-class ActiveMQTopicTest : public ::testing::Test {};
+class ActiveMQTopicTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQTopicTest, test) {
+TEST_F(ActiveMQTopicTest, test)
+{
     ActiveMQTopic myQueue;
 
     ASSERT_TRUE(myQueue.getDestinationType() == cms::Destination::TOPIC);

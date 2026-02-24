@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/PartialCommand.h>
@@ -29,8 +29,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -43,21 +45,17 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API LastPartialCommand : public PartialCommand {
+    class AMQCPP_API LastPartialCommand : public PartialCommand
+    {
     protected:
-
-
     public:
-
         const static unsigned char ID_LASTPARTIALCOMMAND = 61;
 
     private:
-
         LastPartialCommand(const LastPartialCommand&);
-        LastPartialCommand& operator= (const LastPartialCommand&);
+        LastPartialCommand& operator=(const LastPartialCommand&);
 
     public:
-
         LastPartialCommand();
 
         virtual ~LastPartialCommand();
@@ -71,9 +69,9 @@ namespace commands {
         virtual std::string toString() const;
 
         virtual bool equals(const DataStructure* value) const;
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_LASTPARTIALCOMMAND_H_*/

@@ -21,19 +21,26 @@
 #include <activemq/test/CMSTestFixture.h>
 #include <activemq/util/IntegrationCommon.h>
 
-namespace activemq {
-namespace test {
+namespace activemq
+{
+namespace test
+{
 
-    class JmsMessageGroupsTest : public CMSTestFixture {
+    class JmsMessageGroupsTest : public CMSTestFixture
+    {
     public:
+        JmsMessageGroupsTest()
+        {
+        }
 
-        JmsMessageGroupsTest() {}
-        virtual ~JmsMessageGroupsTest() {}
+        virtual ~JmsMessageGroupsTest()
+        {
+        }
 
         void testMessageSend();
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TEST_JMSMESSAGEGROUPSTEST_H_ */

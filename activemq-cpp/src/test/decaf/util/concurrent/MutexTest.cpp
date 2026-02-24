@@ -17,11 +17,11 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/lang/Thread.h>
 #include <decaf/lang/Runnable.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/util/Random.h>
 #include <decaf/util/concurrent/Concurrent.h>
 #include <decaf/util/concurrent/Mutex.h>
-#include <decaf/util/Random.h>
 
 #include <decaf/internal/util/concurrent/SynchronizableImpl.h>
 
@@ -35,11 +35,13 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::internal::util::concurrent;
 
-    class MutexTest : public ::testing::Test {};
+class MutexTest : public ::testing::Test
+{
+};
 
 ///////////////////////////////////////////////////////////////////////////////
-TEST_F(MutexTest, testConstructor) {
-
+TEST_F(MutexTest, testConstructor)
+{
     Mutex mutex;
 
     mutex.lock();
@@ -49,42 +51,56 @@ TEST_F(MutexTest, testConstructor) {
 
     mutex.unlock();
 
-    try {
-        synchronized(&mutex) {
+    try
+    {
+        synchronized(&mutex)
+        {
             throw Exception();
         }
-    } catch (...) {}
+    }
+    catch (...)
+    {
+    }
 
     ASSERT_TRUE(!mutex.isLocked());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-class MyThread : public lang::Thread, public SynchronizableImpl{
+class MyThread : public lang::Thread, public SynchronizableImpl
+{
 public:
-
     volatile int value;
-    MyThread() : value(0) {}
-    virtual ~MyThread(){}
 
-    virtual void run(){
+    MyThread()
+        : value(0)
+    {
+    }
+
+    virtual ~MyThread()
+    {
+    }
+
+    virtual void run()
+    {
         {
-            Lock lock (this);
+            Lock lock(this);
 
             value = value * 25;
         }
     }
-
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-TEST_F(MutexTest, testSimpleThread) {
+TEST_F(MutexTest, testSimpleThread)
+{
     MyThread test;
 
-    synchronized(&test){
-
+    synchronized(&test)
+    {
         test.start();
 
-        for( int ix=0; ix<100; ix++ ){
+        for (int ix = 0; ix < 100; ix++)
+        {
             test.value += 1;
         }
     }
@@ -95,45 +111,57 @@ TEST_F(MutexTest, testSimpleThread) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-class MyWaitingThread : public lang::Thread, public SynchronizableImpl{
+class MyWaitingThread : public lang::Thread, public SynchronizableImpl
+{
 public:
-
-    volatile int value;
+    volatile int  value;
     volatile bool started;
-    MyWaitingThread() : value(0), started(false) {}
-    virtual ~MyWaitingThread(){}
 
-    virtual void run(){
+    MyWaitingThread()
+        : value(0),
+          started(false)
+    {
+    }
 
-        try {
+    virtual ~MyWaitingThread()
+    {
+    }
 
-            synchronized( this ) {
+    virtual void run()
+    {
+        try
+        {
+            synchronized(this)
+            {
                 this->started = true;
                 this->wait();
                 value = value * 25;
             }
-
-        } catch( lang::Exception& ex ) {
-            ex.setMark( __FILE__, __LINE__ );
+        }
+        catch (lang::Exception& ex)
+        {
+            ex.setMark(__FILE__, __LINE__);
         }
     }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-TEST_F(MutexTest, testWait){
-
+TEST_F(MutexTest, testWait)
+{
     try
     {
         MyWaitingThread test;
         test.start();
 
-        while( !test.started ) {
+        while (!test.started)
+        {
             Thread::sleep(1);
         }
 
-        synchronized( &test )
+        synchronized(&test)
         {
-            for( int ix=0; ix<100; ix++ ){
+            for (int ix = 0; ix < 100; ix++)
+            {
                 test.value += 1;
             }
 
@@ -143,48 +171,59 @@ TEST_F(MutexTest, testWait){
         test.join();
 
         ASSERT_TRUE(test.value == 2500);
-
-    } catch( lang::Exception& ex ) {
-        ex.setMark( __FILE__, __LINE__ );
+    }
+    catch (lang::Exception& ex)
+    {
+        ex.setMark(__FILE__, __LINE__);
         ASSERT_TRUE(false);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-class MyTimedWaitingThread : public lang::Thread, public SynchronizableImpl{
+class MyTimedWaitingThread : public lang::Thread, public SynchronizableImpl
+{
 public:
-
-    volatile int value;
+    volatile int  value;
     volatile bool started;
 
-    MyTimedWaitingThread() : value(0), started(false) {}
-    virtual ~MyTimedWaitingThread(){}
+    MyTimedWaitingThread()
+        : value(0),
+          started(false)
+    {
+    }
 
-    virtual void run(){
+    virtual ~MyTimedWaitingThread()
+    {
+    }
 
-        try {
-            synchronized( this ) {
-
+    virtual void run()
+    {
+        try
+        {
+            synchronized(this)
+            {
                 this->started = true;
                 this->wait(1100);
                 value = 666;
             }
-        } catch( lang::Exception& ex ) {
-            ex.setMark( __FILE__, __LINE__ );
+        }
+        catch (lang::Exception& ex)
+        {
+            ex.setMark(__FILE__, __LINE__);
         }
     }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-TEST_F(MutexTest, testTimedWait){
-
-    try {
-
+TEST_F(MutexTest, testTimedWait)
+{
+    try
+    {
         MyTimedWaitingThread test;
-        time_t startTime = time( NULL );
+        time_t               startTime = time(NULL);
         test.start();
         test.join();
-        time_t endTime = time( NULL );
+        time_t endTime = time(NULL);
 
         time_t delta = endTime - startTime;
 
@@ -194,137 +233,162 @@ TEST_F(MutexTest, testTimedWait){
             Mutex test;
             test.lock();
 
-            ASSERT_THROW(test.wait( -1, -1 ), IllegalArgumentException) << ("Should Throw an IllegalArgumentException");
+            ASSERT_THROW(test.wait(-1, -1), IllegalArgumentException)
+                << ("Should Throw an IllegalArgumentException");
 
-            ASSERT_THROW(test.wait( 1, 9999999 ), IllegalArgumentException) << ("Should Throw an IllegalArgumentException");
+            ASSERT_THROW(test.wait(1, 9999999), IllegalArgumentException)
+                << ("Should Throw an IllegalArgumentException");
 
-            ASSERT_THROW(test.wait( 0, -1 ), IllegalArgumentException) << ("Should Throw an IllegalArgumentException");
-
+            ASSERT_THROW(test.wait(0, -1), IllegalArgumentException)
+                << ("Should Throw an IllegalArgumentException");
         }
-
-    } catch(lang::Exception& ex) {
+    }
+    catch (lang::Exception& ex)
+    {
         std::cout << ex.getMessage() << std::endl;
         ASSERT_TRUE(false);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-class MyNotifiedThread : public lang::Thread, public Synchronizable{
+class MyNotifiedThread : public lang::Thread, public Synchronizable
+{
 public:
-
     volatile bool done;
-    Mutex* mutex;
-    Mutex* started;
-    Mutex* completed;
+    Mutex*        mutex;
+    Mutex*        started;
+    Mutex*        completed;
 
 private:
-
     MyNotifiedThread(const MyNotifiedThread&);
-    MyNotifiedThread& operator= (const MyNotifiedThread&);
+    MyNotifiedThread& operator=(const MyNotifiedThread&);
 
 public:
-
     int value;
-    MyNotifiedThread(Mutex* mutex, Mutex* started, Mutex* completed ) :
-        done(false), mutex(mutex), started(started), completed(completed), value() {
-    }
-    virtual ~MyNotifiedThread(){}
 
-    virtual void lock() {
+    MyNotifiedThread(Mutex* mutex, Mutex* started, Mutex* completed)
+        : done(false),
+          mutex(mutex),
+          started(started),
+          completed(completed),
+          value()
+    {
+    }
+
+    virtual ~MyNotifiedThread()
+    {
+    }
+
+    virtual void lock()
+    {
         mutex->lock();
     }
 
-    virtual bool tryLock() {
+    virtual bool tryLock()
+    {
         return mutex->tryLock();
     }
 
-    virtual void unlock() {
+    virtual void unlock()
+    {
         mutex->unlock();
     }
 
-    virtual void wait() {
-
+    virtual void wait()
+    {
         mutex->wait();
     }
 
-    virtual void wait( long long millisecs ) {
-
-        mutex->wait( millisecs );
+    virtual void wait(long long millisecs)
+    {
+        mutex->wait(millisecs);
     }
 
-    virtual void wait( long long millisecs, int nanos ) {
-
-        mutex->wait( millisecs, nanos );
+    virtual void wait(long long millisecs, int nanos)
+    {
+        mutex->wait(millisecs, nanos);
     }
 
-    virtual void notify() {
-
+    virtual void notify()
+    {
         mutex->notify();
     }
 
-    virtual void notifyAll() {
-
+    virtual void notifyAll()
+    {
         mutex->notifyAll();
     }
 
-    virtual void run(){
-
-        try {
+    virtual void run()
+    {
+        try
+        {
             done = false;
-            synchronized( this ) {
-                synchronized( started ) {
+            synchronized(this)
+            {
+                synchronized(started)
+                {
                     started->notify();
                 }
 
                 this->wait();
                 done = true;
 
-                synchronized( completed ) {
+                synchronized(completed)
+                {
                     completed->notify();
                 }
             }
-        } catch( lang::Exception& ex ) {
-            ex.setMark( __FILE__, __LINE__ );
+        }
+        catch (lang::Exception& ex)
+        {
+            ex.setMark(__FILE__, __LINE__);
         }
     }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-TEST_F(MutexTest, testNotify) {
-
-    try{
-
+TEST_F(MutexTest, testNotify)
+{
+    try
+    {
         Mutex mutex;
         Mutex started;
         Mutex completed;
 
-        const int numThreads = 30;
+        const int         numThreads = 30;
         MyNotifiedThread* threads[numThreads];
 
         // Create and start all the threads.
-        for( int ix=0; ix<numThreads; ++ix ){
-            threads[ix] = new MyNotifiedThread( &mutex, &started, &completed );
+        for (int ix = 0; ix < numThreads; ++ix)
+        {
+            threads[ix] = new MyNotifiedThread(&mutex, &started, &completed);
             threads[ix]->start();
         }
 
-        synchronized( &started ) {
+        synchronized(&started)
+        {
             int count = 0;
 
-            while( count < ( numThreads ) ) {
-                started.wait( 40 );
+            while (count < (numThreads))
+            {
+                started.wait(40);
                 count++;
             }
         }
 
-        synchronized(&mutex ) {
+        synchronized(&mutex)
+        {
             mutex.notify();
         }
 
-        Thread::sleep( 1200 );
+        Thread::sleep(1200);
 
         int counter = 0;
-        for( int ix=0; ix<numThreads; ++ix ){
-            if( threads[ix]->done ){
+        for (int ix = 0; ix < numThreads; ++ix)
+        {
+            if (threads[ix]->done)
+            {
                 counter++;
             }
         }
@@ -332,46 +396,56 @@ TEST_F(MutexTest, testNotify) {
         // Make sure only 1 thread was notified.
         ASSERT_TRUE(counter == 1);
 
-        synchronized( &mutex ) {
+        synchronized(&mutex)
+        {
             // Notify all threads.
-            for( int ix=0; ix<numThreads-1; ++ix ){
+            for (int ix = 0; ix < numThreads - 1; ++ix)
+            {
                 mutex.notify();
             }
         }
 
-        synchronized( &completed ){
+        synchronized(&completed)
+        {
             int count = 0;
 
-            while( count < ( numThreads ) ) {
-                completed.wait( 1000 );
+            while (count < (numThreads))
+            {
+                completed.wait(1000);
                 count++;
             }
         }
 
         int numComplete = 0;
-        for( int ix=0; ix<numThreads; ++ix ){
-            if( threads[ix]->done ){
+        for (int ix = 0; ix < numThreads; ++ix)
+        {
+            if (threads[ix]->done)
+            {
                 numComplete++;
             }
         }
         ASSERT_TRUE(numComplete == numThreads);
 
-        synchronized( &mutex ) {
-            mutex.wait( 5 );
+        synchronized(&mutex)
+        {
+            mutex.wait(5);
         }
 
-        synchronized( &mutex ) {
+        synchronized(&mutex)
+        {
             mutex.notifyAll();
         }
 
         // Delete all the threads.
-        for( int ix=0; ix<numThreads; ++ix ){
+        for (int ix = 0; ix < numThreads; ++ix)
+        {
             threads[ix]->join();
             delete threads[ix];
         }
-
-    }catch( lang::Exception& ex ){
-        ex.setMark( __FILE__, __LINE__ );
+    }
+    catch (lang::Exception& ex)
+    {
+        ex.setMark(__FILE__, __LINE__);
         ASSERT_TRUE(false);
     }
 }
@@ -379,252 +453,290 @@ TEST_F(MutexTest, testNotify) {
 ///////////////////////////////////////////////////////////////////////////////
 TEST_F(MutexTest, testNotifyAll)
 {
-    try{
+    try
+    {
         Mutex mutex;
         Mutex started;
         Mutex completed;
 
-        const int numThreads = 100;
+        const int         numThreads = 100;
         MyNotifiedThread* threads[numThreads];
 
         // Create and start all the threads.
-        for( int ix=0; ix<numThreads; ++ix ){
-            threads[ix] = new MyNotifiedThread( &mutex, &started, &completed );
+        for (int ix = 0; ix < numThreads; ++ix)
+        {
+            threads[ix] = new MyNotifiedThread(&mutex, &started, &completed);
             threads[ix]->start();
         }
 
-        synchronized( &started )
+        synchronized(&started)
         {
             int count = 0;
 
-            while( count < ( numThreads ) )
+            while (count < (numThreads))
             {
-                started.wait( 30 );
+                started.wait(30);
                 count++;
             }
         }
 
-        for( int ix=0; ix<numThreads; ++ix )
+        for (int ix = 0; ix < numThreads; ++ix)
         {
-            if( threads[ix]->done == true ){
-                printf("threads[%d] is done prematurely\n", ix );
+            if (threads[ix]->done == true)
+            {
+                printf("threads[%d] is done prematurely\n", ix);
             }
             ASSERT_TRUE(threads[ix]->done == false);
         }
 
         // Notify all threads.
-        synchronized( &mutex ){
-           mutex.notifyAll();
+        synchronized(&mutex)
+        {
+            mutex.notifyAll();
         }
 
-        synchronized( &completed )
+        synchronized(&completed)
         {
             int count = 0;
 
-            while( count < ( numThreads ) )
+            while (count < (numThreads))
             {
-                completed.wait( 30 );
+                completed.wait(30);
                 count++;
             }
         }
 
         int numComplete = 0;
-        for( int ix=0; ix<numThreads; ++ix ){
-            if( threads[ix]->done ){
+        for (int ix = 0; ix < numThreads; ++ix)
+        {
+            if (threads[ix]->done)
+            {
                 numComplete++;
             }
         }
-        //printf("numComplete: %d, numThreads: %d\n", numComplete, numThreads );
+        // printf("numComplete: %d, numThreads: %d\n", numComplete, numThreads
+        // );
         ASSERT_TRUE(numComplete == numThreads);
 
         // Delete all the threads.
-        for( int ix=0; ix<numThreads; ++ix ){
+        for (int ix = 0; ix < numThreads; ++ix)
+        {
             threads[ix]->join();
             delete threads[ix];
         }
-
-    }catch( lang::Exception& ex ){
-        ex.setMark( __FILE__, __LINE__ );
+    }
+    catch (lang::Exception& ex)
+    {
+        ex.setMark(__FILE__, __LINE__);
         ASSERT_TRUE(false);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-class MyRecursiveLockThread : public lang::Thread, public Synchronizable{
+class MyRecursiveLockThread : public lang::Thread, public Synchronizable
+{
 public:
-
     volatile bool done;
-    Mutex* mutex;
-    int index;
+    Mutex*        mutex;
+    int           index;
 
 private:
-
     MyRecursiveLockThread(const MyRecursiveLockThread&);
-    MyRecursiveLockThread& operator= (const MyRecursiveLockThread&);
+    MyRecursiveLockThread& operator=(const MyRecursiveLockThread&);
 
 public:
-
     volatile int value;
-    MyRecursiveLockThread(Mutex* mutex, int index) : done(false), mutex(mutex), index(index), value() {}
 
-    virtual ~MyRecursiveLockThread(){}
+    MyRecursiveLockThread(Mutex* mutex, int index)
+        : done(false),
+          mutex(mutex),
+          index(index),
+          value()
+    {
+    }
 
-    virtual void lock() {
+    virtual ~MyRecursiveLockThread()
+    {
+    }
+
+    virtual void lock()
+    {
         mutex->lock();
     }
 
-    virtual bool tryLock() {
+    virtual bool tryLock()
+    {
         return mutex->tryLock();
     }
 
-    virtual void unlock() {
+    virtual void unlock()
+    {
         mutex->unlock();
     }
 
-    virtual void wait()  {
-
+    virtual void wait()
+    {
         mutex->wait();
     }
 
-    virtual void wait( long long millisecs ) {
-
-        mutex->wait( millisecs );
+    virtual void wait(long long millisecs)
+    {
+        mutex->wait(millisecs);
     }
 
-    virtual void wait( long long millisecs, int nanos ) {
-
-        mutex->wait( millisecs, nanos );
+    virtual void wait(long long millisecs, int nanos)
+    {
+        mutex->wait(millisecs, nanos);
     }
 
-    virtual void notify() {
-
+    virtual void notify()
+    {
         mutex->notify();
     }
 
-    virtual void notifyAll() {
-
+    virtual void notifyAll()
+    {
         mutex->notifyAll();
     }
 
-    virtual void run(){
-
-        try {
-
+    virtual void run()
+    {
+        try
+        {
             done = false;
-            synchronized(this) {
-                synchronized(this) {
+            synchronized(this)
+            {
+                synchronized(this)
+                {
                     this->wait();
                     done = true;
                 }
             }
-
-        } catch(lang::Exception& ex) {
-            ex.setMark( __FILE__, __LINE__ );
+        }
+        catch (lang::Exception& ex)
+        {
+            ex.setMark(__FILE__, __LINE__);
         }
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(MutexTest, testRecursiveLock) {
-
-    try {
-
+TEST_F(MutexTest, testRecursiveLock)
+{
+    try
+    {
         Mutex mutex;
 
-        const int numThreads = 2;
+        const int              numThreads = 2;
         MyRecursiveLockThread* threads[numThreads];
 
         // Create and start all the threads.
-        for( int ix=0; ix<numThreads; ++ix ){
-            threads[ix] = new MyRecursiveLockThread( &mutex, ix );
+        for (int ix = 0; ix < numThreads; ++ix)
+        {
+            threads[ix] = new MyRecursiveLockThread(&mutex, ix);
             threads[ix]->start();
         }
 
         // Sleep so all the threads can get to the wait.
-        Thread::sleep( 2000 );
+        Thread::sleep(2000);
 
-        for( int ix=0; ix<numThreads; ++ix ){
-            if( threads[ix]->done == true ){
-                std::cout << "threads[" << ix
-                          << "] is done prematurely\n";
+        for (int ix = 0; ix < numThreads; ++ix)
+        {
+            if (threads[ix]->done == true)
+            {
+                std::cout << "threads[" << ix << "] is done prematurely\n";
             }
             ASSERT_TRUE(threads[ix]->done == false);
         }
 
         // Notify all threads.
-        synchronized( &mutex ) {
-            synchronized( &mutex ) {
+        synchronized(&mutex)
+        {
+            synchronized(&mutex)
+            {
                 mutex.notifyAll();
             }
         }
 
         // Sleep to give the threads time to wake up.
-        Thread::sleep( 2000 );
+        Thread::sleep(2000);
 
-        for( int ix=0; ix<numThreads; ++ix ){
-            if( threads[ix]->done != true ){
-                std::cout<< "threads[" << ix << "] is not done\n";
+        for (int ix = 0; ix < numThreads; ++ix)
+        {
+            if (threads[ix]->done != true)
+            {
+                std::cout << "threads[" << ix << "] is not done\n";
             }
             ASSERT_TRUE(threads[ix]->done == true);
         }
 
         // Delete all the threads.
-        for( int ix=0; ix<numThreads; ++ix ){
+        for (int ix = 0; ix < numThreads; ++ix)
+        {
             threads[ix]->join();
             delete threads[ix];
         }
-
-    }catch( lang::Exception& ex ){
-        ex.setMark( __FILE__, __LINE__ );
+    }
+    catch (lang::Exception& ex)
+    {
+        ex.setMark(__FILE__, __LINE__);
         ASSERT_TRUE(false);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-class MyDoubleLockThread : public lang::Thread {
+class MyDoubleLockThread : public lang::Thread
+{
 public:
-
     volatile bool done;
-    Mutex* mutex1;
-    Mutex* mutex2;
+    Mutex*        mutex1;
+    Mutex*        mutex2;
 
 private:
-
     MyDoubleLockThread(const MyDoubleLockThread&);
-    MyDoubleLockThread& operator= (const MyDoubleLockThread&);
+    MyDoubleLockThread& operator=(const MyDoubleLockThread&);
 
 public:
-
     volatile int value;
-    MyDoubleLockThread(Mutex* mutex1, Mutex* mutex2) :
-        done(false), mutex1(mutex1), mutex2(mutex2), value(0) {
+
+    MyDoubleLockThread(Mutex* mutex1, Mutex* mutex2)
+        : done(false),
+          mutex1(mutex1),
+          mutex2(mutex2),
+          value(0)
+    {
     }
 
-    virtual ~MyDoubleLockThread(){}
+    virtual ~MyDoubleLockThread()
+    {
+    }
 
-    virtual void run() {
-
-        try {
-
+    virtual void run()
+    {
+        try
+        {
             done = false;
-            synchronized(mutex1) {
-                synchronized(mutex2) {
+            synchronized(mutex1)
+            {
+                synchronized(mutex2)
+                {
                     mutex2->wait();
                     done = true;
                 }
             }
-
-        } catch(lang::Exception& ex) {
-            ex.setMark( __FILE__, __LINE__ );
+        }
+        catch (lang::Exception& ex)
+        {
+            ex.setMark(__FILE__, __LINE__);
         }
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(MutexTest, testDoubleLock) {
-
-    try {
-
+TEST_F(MutexTest, testDoubleLock)
+{
+    try
+    {
         Mutex mutex1;
         Mutex mutex2;
 
@@ -633,10 +745,11 @@ TEST_F(MutexTest, testDoubleLock) {
         thread.start();
 
         // Let the thread acquire both locks and start waiting
-        Thread::sleep( 500 );
+        Thread::sleep(500);
 
         // Lock mutex2 and notify the waiting thread
-        synchronized( &mutex2 ) {
+        synchronized(&mutex2)
+        {
             mutex2.notify();
         }
 
@@ -645,46 +758,58 @@ TEST_F(MutexTest, testDoubleLock) {
 
         // Verify thread completed successfully
         ASSERT_TRUE(thread.done);
-
-    }catch( lang::Exception& ex ){
-        ex.setMark( __FILE__, __LINE__ );
+    }
+    catch (lang::Exception& ex)
+    {
+        ex.setMark(__FILE__, __LINE__);
         ASSERT_TRUE(false);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-class MyStoppableThread : public lang::Runnable {
+class MyStoppableThread : public lang::Runnable
+{
 public:
-
     volatile bool started;
     volatile bool closed;
-    Mutex mutex;
+    Mutex         mutex;
     lang::Thread* thread;
-    util::Random rand;
+    util::Random  rand;
 
 private:
-
     MyStoppableThread(const MyStoppableThread&);
-    MyStoppableThread& operator= (const MyStoppableThread&);
+    MyStoppableThread& operator=(const MyStoppableThread&);
 
 public:
+    MyStoppableThread()
+        : started(false),
+          closed(false),
+          mutex(),
+          thread(),
+          rand()
+    {
+    }
 
-    MyStoppableThread() : started(false), closed(false), mutex(), thread(), rand() {}
+    virtual ~MyStoppableThread()
+    {
+        close();
+    }
 
-    virtual ~MyStoppableThread(){ close(); }
-
-    virtual void start(){
-        synchronized( &mutex ) {
-
-            if( closed || started ) {
+    virtual void start()
+    {
+        synchronized(&mutex)
+        {
+            if (closed || started)
+            {
                 return;
             }
 
             started = true;
 
             // Don't create the thread unless we need to.
-            if( thread == NULL ) {
-                thread = new lang::Thread( this );
+            if (thread == NULL)
+            {
+                thread = new lang::Thread(this);
                 thread->start();
             }
 
@@ -692,10 +817,12 @@ public:
         }
     }
 
-    virtual void stop() {
-        synchronized( &mutex ) {
-
-            if( closed || !started ) {
+    virtual void stop()
+    {
+        synchronized(&mutex)
+        {
+            if (closed || !started)
+            {
                 return;
             }
 
@@ -711,67 +838,77 @@ public:
         }
     }
 
-    virtual void close() {
-        synchronized( &mutex ) {
-
+    virtual void close()
+    {
+        synchronized(&mutex)
+        {
             closed = true;
             mutex.notifyAll();
         }
 
-        if( thread != NULL ) {
+        if (thread != NULL)
+        {
             thread->join();
             delete thread;
             thread = NULL;
         }
     }
 
-    virtual bool isStarted() const {
+    virtual bool isStarted() const
+    {
         return started;
     }
 
-    virtual void run(){
-        try {
+    virtual void run()
+    {
+        try
+        {
+            while (true)
+            {
+                lang::Thread::sleep(rand.nextInt(100));
 
-            while( true ) {
-
-                lang::Thread::sleep( rand.nextInt( 100 ) );
-
-                synchronized( &mutex ) {
-
+                synchronized(&mutex)
+                {
                     // If we're closing down, exit the thread.
-                    if( closed ) {
+                    if (closed)
+                    {
                         return;
                     }
 
                     // When told to stop, the calling thread will wait for a
-                    // responding notification, indicating that we have acknowledged
-                    // the stop command.
-                    if( !isStarted() ) {
+                    // responding notification, indicating that we have
+                    // acknowledged the stop command.
+                    if (!isStarted())
+                    {
                         mutex.notifyAll();
 
-                        if( !closed ) {
+                        if (!closed)
+                        {
                             // Wait for more data or to be woken up.
                             mutex.wait();
                         }
                     }
                 }
             }
-        } catch(...) {
+        }
+        catch (...)
+        {
             ASSERT_TRUE(false);
         }
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(MutexTest, testStressMutex){
-
+TEST_F(MutexTest, testStressMutex)
+{
     MyStoppableThread tester;
 
     tester.start();
 
     ASSERT_TRUE(tester.isStarted());
 
-    for( int i = 0; i < 100; ++i ) {
+    for (int i = 0; i < 100; ++i)
+    {
         tester.stop();
         tester.start();
     }

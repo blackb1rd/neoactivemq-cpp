@@ -20,36 +20,40 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
     class SocketImpl;
 
     /**
-     * Factory class interface for a Factory that creates ScoketImpl objects.  These
-     * factories can be used to create various types of Sockets, e.g. Streaming, Multicast,
-     * SSL, or platform specific variations of these types.
+     * Factory class interface for a Factory that creates ScoketImpl objects.
+     * These factories can be used to create various types of Sockets, e.g.
+     * Streaming, Multicast, SSL, or platform specific variations of these
+     * types.
      *
      * @see decaf::net::Socket
      * @see decaf::net::ServerSocket
      *
      * @since 1.0
      */
-    class DECAF_API SocketImplFactory {
+    class DECAF_API SocketImplFactory
+    {
     public:
-
         virtual ~SocketImplFactory();
 
         /**
-         * Creates a new SokcetImpl instance and returns it, the caller then owns the
-         * instance and must delete it when finished with the SocketImpl.
+         * Creates a new SokcetImpl instance and returns it, the caller then
+         * owns the instance and must delete it when finished with the
+         * SocketImpl.
          *
          * @return new SocketImpl instance that is owned by the caller.
          */
         virtual SocketImpl* createSocketImpl() = 0;
-
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /* _DECAF_NET_SOCKETIMPLFACTORY_H_ */

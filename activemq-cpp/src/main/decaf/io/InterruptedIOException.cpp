@@ -21,26 +21,38 @@ using namespace decaf;
 using namespace decaf::io;
 
 ////////////////////////////////////////////////////////////////////////////////
-InterruptedIOException::InterruptedIOException() : io::IOException() {
+InterruptedIOException::InterruptedIOException()
+    : io::IOException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InterruptedIOException::~InterruptedIOException() throw() {
+InterruptedIOException::~InterruptedIOException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InterruptedIOException::InterruptedIOException(const Exception& ex) : io::IOException() {
-    *(Exception*) this = ex;
+InterruptedIOException::InterruptedIOException(const Exception& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InterruptedIOException::InterruptedIOException(const InterruptedIOException& ex) : io::IOException() {
-    *(Exception*) this = ex;
+InterruptedIOException::InterruptedIOException(const InterruptedIOException& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InterruptedIOException::InterruptedIOException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : io::IOException(cause) {
-
+InterruptedIOException::InterruptedIOException(const char*           file,
+                                               const int             lineNumber,
+                                               const std::exception* cause,
+                                               const char*           msg,
+                                               ...)
+    : io::IOException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -50,12 +62,18 @@ InterruptedIOException::InterruptedIOException(const char* file, const int lineN
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InterruptedIOException::InterruptedIOException(const std::exception* cause) : io::IOException(cause) {
+InterruptedIOException::InterruptedIOException(const std::exception* cause)
+    : io::IOException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InterruptedIOException::InterruptedIOException(const char* file, const int lineNumber, const char* msg, ...) : io::IOException() {
-
+InterruptedIOException::InterruptedIOException(const char* file,
+                                               const int   lineNumber,
+                                               const char* msg,
+                                               ...)
+    : io::IOException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

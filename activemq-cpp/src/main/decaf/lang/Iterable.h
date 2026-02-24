@@ -21,27 +21,31 @@
 #include <decaf/util/Config.h>
 #include <decaf/util/Iterator.h>
 
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
 
     /**
      * Implementing this interface allows an object to be cast to an Iterable
      * type for generic collections API calls.
      */
-    template< typename E >
-    class Iterable {
+    template <typename E>
+    class Iterable
+    {
     public:
-
-        virtual ~Iterable() {}
+        virtual ~Iterable()
+        {
+        }
 
         /**
          * @return an iterator over a set of elements of type T.
          */
-        virtual decaf::util::Iterator<E>* iterator() = 0;
+        virtual decaf::util::Iterator<E>* iterator()       = 0;
         virtual decaf::util::Iterator<E>* iterator() const = 0;
-
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 #endif /*_DECAF_LANG_ITERABLE_H_*/

@@ -17,14 +17,14 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/LinkedHashSet.h>
-#include <decaf/util/Iterator.h>
-#include <decaf/util/HashMap.h>
-#include <decaf/util/StlMap.h>
-#include <decaf/util/ArrayList.h>
-#include <decaf/util/LinkedList.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/util/ArrayList.h>
+#include <decaf/util/HashMap.h>
+#include <decaf/util/Iterator.h>
+#include <decaf/util/LinkedHashSet.h>
+#include <decaf/util/LinkedList.h>
+#include <decaf/util/StlMap.h>
 
 using namespace std;
 using namespace decaf;
@@ -32,43 +32,49 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class LinkedHashSetTest : public ::testing::Test {
+class LinkedHashSetTest : public ::testing::Test
+{
 public:
-
-        LinkedHashSetTest();
-        virtual ~LinkedHashSetTest();
-
-    };
+    LinkedHashSetTest();
+    virtual ~LinkedHashSetTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    const int SET_SIZE = 1000;
+const int SET_SIZE = 1000;
 
-    void populateSet(LinkedHashSet<int>& hashSet) {
-        for (int i = 0; i < SET_SIZE; ++i) {
-            hashSet.add(i);
-        }
-    }
-
-    void populateSet(LinkedHashSet<int>& hashSet, int count) {
-        for (int i = 0; i < count; ++i) {
-            hashSet.add(i);
-        }
+void populateSet(LinkedHashSet<int>& hashSet)
+{
+    for (int i = 0; i < SET_SIZE; ++i)
+    {
+        hashSet.add(i);
     }
 }
 
+void populateSet(LinkedHashSet<int>& hashSet, int count)
+{
+    for (int i = 0; i < count; ++i)
+    {
+        hashSet.add(i);
+    }
+}
+}  // namespace
+
 ////////////////////////////////////////////////////////////////////////////////
-LinkedHashSetTest::LinkedHashSetTest() {
+LinkedHashSetTest::LinkedHashSetTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-LinkedHashSetTest::~LinkedHashSetTest() {
+LinkedHashSetTest::~LinkedHashSetTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testConstructor) {
-
+TEST_F(LinkedHashSetTest, testConstructor)
+{
     LinkedHashSet<int> set;
     ASSERT_TRUE(set.isEmpty());
     ASSERT_EQ(0, set.size());
@@ -76,14 +82,17 @@ TEST_F(LinkedHashSetTest, testConstructor) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testConstructorI) {
-
+TEST_F(LinkedHashSetTest, testConstructorI)
+{
     LinkedHashSet<int> set;
     ASSERT_EQ(0, set.size()) << ("Created incorrect LinkedHashSet");
 
-    try {
+    try
+    {
         LinkedHashSet<int> set(-1);
-    } catch (IllegalArgumentException& e) {
+    }
+    catch (IllegalArgumentException& e)
+    {
         return;
     }
 
@@ -91,23 +100,27 @@ TEST_F(LinkedHashSetTest, testConstructorI) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testConstructorIF) {
-
+TEST_F(LinkedHashSetTest, testConstructorIF)
+{
     LinkedHashSet<int> set(5, 0.5);
     ASSERT_EQ(0, set.size()) << ("Created incorrect LinkedHashSet");
 
-    try {
+    try
+    {
         LinkedHashSet<int> set(0, 0);
-    } catch (IllegalArgumentException& e) {
+    }
+    catch (IllegalArgumentException& e)
+    {
         return;
     }
 
-    FAIL() << ("Failed to throw IllegalArgumentException for initial load factor <= 0");
+    FAIL() << ("Failed to throw IllegalArgumentException for initial load "
+               "factor <= 0");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testConstructorCollection) {
-
+TEST_F(LinkedHashSetTest, testConstructorCollection)
+{
     ArrayList<int> intList;
     intList.add(1);
     intList.add(1);
@@ -116,16 +129,19 @@ TEST_F(LinkedHashSetTest, testConstructorCollection) {
     intList.add(4);
 
     LinkedHashSet<int> set(intList);
-    for (int counter = 0; counter < intList.size(); counter++) {
-        ASSERT_TRUE(set.contains(intList.get(counter))) << ("LinkedHashSet does not contain correct elements");
+    for (int counter = 0; counter < intList.size(); counter++)
+    {
+        ASSERT_TRUE(set.contains(intList.get(counter)))
+            << ("LinkedHashSet does not contain correct elements");
     }
 
-    ASSERT_TRUE(set.size() == intList.size() - 1) << ("LinkedHashSet created from collection incorrect size");
+    ASSERT_TRUE(set.size() == intList.size() - 1)
+        << ("LinkedHashSet created from collection incorrect size");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testEquals) {
-
+TEST_F(LinkedHashSetTest, testEquals)
+{
     LinkedHashSet<int> set1;
     populateSet(set1);
     LinkedHashSet<int> set2;
@@ -143,22 +159,24 @@ TEST_F(LinkedHashSetTest, testEquals) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testAdd) {
-
+TEST_F(LinkedHashSetTest, testAdd)
+{
     LinkedHashSet<int> set;
     populateSet(set);
     int size = set.size();
 
     set.add(8);
-    ASSERT_TRUE(set.size() == size) << ("Added element already contained by set");
+    ASSERT_TRUE(set.size() == size)
+        << ("Added element already contained by set");
     set.add(-9);
-    ASSERT_TRUE(set.size() == size + 1) << ("Failed to increment set size after add");
+    ASSERT_TRUE(set.size() == size + 1)
+        << ("Failed to increment set size after add");
     ASSERT_TRUE(set.contains(-9)) << ("Failed to add element to set");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testClear) {
-
+TEST_F(LinkedHashSetTest, testClear)
+{
     LinkedHashSet<int> set;
     populateSet(set);
 
@@ -169,33 +187,37 @@ TEST_F(LinkedHashSetTest, testClear) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testContains) {
-
+TEST_F(LinkedHashSetTest, testContains)
+{
     LinkedHashSet<int> set;
     populateSet(set);
 
     ASSERT_TRUE(set.contains(90)) << ("Returned false for valid object");
-    ASSERT_TRUE(!set.contains(SET_SIZE + 1)) << ("Returned true for invalid Object");
+    ASSERT_TRUE(!set.contains(SET_SIZE + 1))
+        << ("Returned true for invalid Object");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testIsEmpty) {
+TEST_F(LinkedHashSetTest, testIsEmpty)
+{
     LinkedHashSet<int> set;
     ASSERT_TRUE(set.isEmpty()) << ("Empty set returned true");
     set.add(1);
     ASSERT_TRUE(!set.isEmpty()) << ("Non-empty set returned true");
 
-    ASSERT_TRUE(LinkedHashSet<std::string>().isEmpty()) << ("Empty set returned false");
+    ASSERT_TRUE(LinkedHashSet<std::string>().isEmpty())
+        << ("Empty set returned false");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testIterator) {
-
+TEST_F(LinkedHashSetTest, testIterator)
+{
     LinkedHashSet<int> set;
     populateSet(set);
-    Pointer< Iterator<int> > iter(set.iterator());
+    Pointer<Iterator<int>> iter(set.iterator());
     // Tests that the LinkedHashSet iterates in order of insertion.
-    for (int j = 0; iter->hasNext(); j++) {
+    for (int j = 0; iter->hasNext(); j++)
+    {
         int value = iter->next();
         ASSERT_TRUE(value == j) << ("Incorrect element found");
     }
@@ -203,16 +225,17 @@ TEST_F(LinkedHashSetTest, testIterator) {
     {
         LinkedHashSet<string> set;
 
-        set.add( "fred1" );
-        set.add( "fred2" );
-        set.add( "fred3" );
+        set.add("fred1");
+        set.add("fred2");
+        set.add("fred3");
 
         Iterator<string>* iterator1 = set.iterator();
         ASSERT_TRUE(iterator1 != NULL);
         ASSERT_TRUE(iterator1->hasNext() == true);
 
         int count = 0;
-        while( iterator1->hasNext() ) {
+        while (iterator1->hasNext())
+        {
             iterator1->next();
             ++count;
         }
@@ -221,7 +244,8 @@ TEST_F(LinkedHashSetTest, testIterator) {
 
         Iterator<string>* iterator2 = set.iterator();
 
-        while( iterator2->hasNext() ) {
+        while (iterator2->hasNext())
+        {
             iterator2->next();
             iterator2->remove();
         }
@@ -234,8 +258,8 @@ TEST_F(LinkedHashSetTest, testIterator) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testRemove) {
-
+TEST_F(LinkedHashSetTest, testRemove)
+{
     LinkedHashSet<int> set;
     populateSet(set);
     int size = set.size();
@@ -245,8 +269,8 @@ TEST_F(LinkedHashSetTest, testRemove) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testSize) {
-
+TEST_F(LinkedHashSetTest, testSize)
+{
     LinkedHashSet<int> set;
     populateSet(set);
 
@@ -256,15 +280,17 @@ TEST_F(LinkedHashSetTest, testSize) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testToString) {
+TEST_F(LinkedHashSetTest, testToString)
+{
     LinkedHashSet<std::string> s;
-    std::string result = s.toString();
-    ASSERT_TRUE(result.find("LinkedHashSet") != std::string::npos) << ("toString returned bad value");
+    std::string                result = s.toString();
+    ASSERT_TRUE(result.find("LinkedHashSet") != std::string::npos)
+        << ("toString returned bad value");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testToArray) {
-
+TEST_F(LinkedHashSetTest, testToArray)
+{
     LinkedHashSet<int> set;
     populateSet(set);
 
@@ -273,11 +299,12 @@ TEST_F(LinkedHashSetTest, testToArray) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testCopy1) {
-
+TEST_F(LinkedHashSetTest, testCopy1)
+{
     LinkedHashSet<int> set1;
 
-    for (int i = 0; i < 50; ++i) {
+    for (int i = 0; i < 50; ++i)
+    {
         set1.add(i);
     }
 
@@ -287,7 +314,8 @@ TEST_F(LinkedHashSetTest, testCopy1) {
 
     ASSERT_TRUE(set1.size() == set2.size());
 
-    for (int i = 0; i < 50; ++i) {
+    for (int i = 0; i < 50; ++i)
+    {
         ASSERT_TRUE(set2.contains(i));
     }
 
@@ -295,11 +323,12 @@ TEST_F(LinkedHashSetTest, testCopy1) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testCopy2) {
-
+TEST_F(LinkedHashSetTest, testCopy2)
+{
     LinkedList<int> collection;
 
-    for (int i = 0; i < 50; ++i) {
+    for (int i = 0; i < 50; ++i)
+    {
         collection.add(i);
     }
 
@@ -309,7 +338,8 @@ TEST_F(LinkedHashSetTest, testCopy2) {
 
     ASSERT_TRUE(collection.size() == set.size());
 
-    for (int i = 0; i < 50; ++i) {
+    for (int i = 0; i < 50; ++i)
+    {
         ASSERT_TRUE(set.contains(i));
     }
 
@@ -317,8 +347,8 @@ TEST_F(LinkedHashSetTest, testCopy2) {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testRemoveAll) {
-
+TEST_F(LinkedHashSetTest, testRemoveAll)
+{
     LinkedHashSet<int> set;
     populateSet(set, 3);
 
@@ -343,8 +373,8 @@ TEST_F(LinkedHashSetTest, testRemoveAll) {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashSetTest, testRetainAll) {
-
+TEST_F(LinkedHashSetTest, testRetainAll)
+{
     LinkedHashSet<int> set;
     populateSet(set, 3);
 

@@ -21,8 +21,6 @@ using namespace decaf;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-Number::~Number() {
+Number::~Number()
+{
 }
-
-
-

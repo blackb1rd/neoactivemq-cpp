@@ -26,252 +26,317 @@ using namespace decaf::internal::util;
 using namespace decaf::nio;
 
 ///////////////////////////////////////////////////////////////////////////////
-DoubleArrayBuffer::DoubleArrayBuffer( int size, bool readOnly ) :
-    DoubleBuffer(size), _array(), offset(0), length(size), readOnly(readOnly) {
-
-    // Allocate using the ByteArray, not read-only initially.  Take a reference to it.
-    // The capacity is the given capacity times the size of the stored datatype
-    this->_array.reset( new ByteArrayAdapter( size * (int)sizeof(double) ) );
+DoubleArrayBuffer::DoubleArrayBuffer(int size, bool readOnly)
+    : DoubleBuffer(size),
+      _array(),
+      offset(0),
+      length(size),
+      readOnly(readOnly)
+{
+    // Allocate using the ByteArray, not read-only initially.  Take a reference
+    // to it. The capacity is the given capacity times the size of the stored
+    // datatype
+    this->_array.reset(new ByteArrayAdapter(size * (int)sizeof(double)));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-DoubleArrayBuffer::DoubleArrayBuffer( double* array, int size, int offset, int length, bool readOnly ) :
-    DoubleBuffer( length ), _array(), offset(offset), length(length), readOnly(readOnly) {
-
-    try{
-
-        if( offset < 0 || offset > size ) {
+DoubleArrayBuffer::DoubleArrayBuffer(double* array,
+                                     int     size,
+                                     int     offset,
+                                     int     length,
+                                     bool    readOnly)
+    : DoubleBuffer(length),
+      _array(),
+      offset(offset),
+      length(length),
+      readOnly(readOnly)
+{
+    try
+    {
+        if (offset < 0 || offset > size)
+        {
             throw IndexOutOfBoundsException(
-                __FILE__, __LINE__, "Offset parameter if out of bounds, %d", offset );
+                __FILE__,
+                __LINE__,
+                "Offset parameter if out of bounds, %d",
+                offset);
         }
 
-        if( length < 0 || offset + length > size ) {
+        if (length < 0 || offset + length > size)
+        {
             throw IndexOutOfBoundsException(
-                __FILE__, __LINE__, "length parameter if out of bounds, %d", length );
+                __FILE__,
+                __LINE__,
+                "length parameter if out of bounds, %d",
+                length);
         }
 
         // Allocate using the ByteArray, not read-only initially.
-        this->_array.reset( new ByteArrayAdapter( array, size, false ) );
+        this->_array.reset(new ByteArrayAdapter(array, size, false));
     }
-    DECAF_CATCH_RETHROW( NullPointerException )
-    DECAF_CATCH_RETHROW( IndexOutOfBoundsException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, NullPointerException )
-    DECAF_CATCHALL_THROW( NullPointerException )
+    DECAF_CATCH_RETHROW(NullPointerException)
+    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
+    DECAF_CATCHALL_THROW(NullPointerException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-DoubleArrayBuffer::DoubleArrayBuffer( const Pointer<ByteArrayAdapter>& array, int offset, int length, bool readOnly ) :
-    DoubleBuffer(length), _array(array), offset(offset), length(length), readOnly(readOnly) {
-
-    try{
-
-        if( offset < 0 || offset > array->getCapacity() ) {
+DoubleArrayBuffer::DoubleArrayBuffer(const Pointer<ByteArrayAdapter>& array,
+                                     int                              offset,
+                                     int                              length,
+                                     bool                             readOnly)
+    : DoubleBuffer(length),
+      _array(array),
+      offset(offset),
+      length(length),
+      readOnly(readOnly)
+{
+    try
+    {
+        if (offset < 0 || offset > array->getCapacity())
+        {
             throw IndexOutOfBoundsException(
-                __FILE__, __LINE__, "Offset parameter if out of bounds, %d", offset );
+                __FILE__,
+                __LINE__,
+                "Offset parameter if out of bounds, %d",
+                offset);
         }
 
-        if( length < 0 || offset + length > array->getCapacity() ) {
+        if (length < 0 || offset + length > array->getCapacity())
+        {
             throw IndexOutOfBoundsException(
-                __FILE__, __LINE__, "length parameter if out of bounds, %d", length );
+                __FILE__,
+                __LINE__,
+                "length parameter if out of bounds, %d",
+                length);
         }
     }
-    DECAF_CATCH_RETHROW( NullPointerException )
-    DECAF_CATCH_RETHROW( IndexOutOfBoundsException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, NullPointerException )
-    DECAF_CATCHALL_THROW( NullPointerException )
+    DECAF_CATCH_RETHROW(NullPointerException)
+    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
+    DECAF_CATCHALL_THROW(NullPointerException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-DoubleArrayBuffer::DoubleArrayBuffer( const DoubleArrayBuffer& other ) :
-    DoubleBuffer(other), _array(other._array), offset(other.offset), length(other.length), readOnly(other.readOnly) {
+DoubleArrayBuffer::DoubleArrayBuffer(const DoubleArrayBuffer& other)
+    : DoubleBuffer(other),
+      _array(other._array),
+      offset(other.offset),
+      length(other.length),
+      readOnly(other.readOnly)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DoubleArrayBuffer::~DoubleArrayBuffer() {
+DoubleArrayBuffer::~DoubleArrayBuffer()
+{
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-double* DoubleArrayBuffer::array() {
-
-    try{
-
-        if( !this->hasArray() ) {
+double* DoubleArrayBuffer::array()
+{
+    try
+    {
+        if (!this->hasArray())
+        {
             throw UnsupportedOperationException(
-                __FILE__, __LINE__,
-                "DoubleArrayBuffer::arrayOffset() - This Buffer has no backing array." );
+                __FILE__,
+                __LINE__,
+                "DoubleArrayBuffer::arrayOffset() - This Buffer has no backing "
+                "array.");
         }
 
-        if( this->isReadOnly() ) {
+        if (this->isReadOnly())
+        {
             throw ReadOnlyBufferException(
-                __FILE__, __LINE__,
-                "DoubleArrayBuffer::array - Buffer is Read-Only" );
+                __FILE__,
+                __LINE__,
+                "DoubleArrayBuffer::array - Buffer is Read-Only");
         }
 
         return this->_array->getDoubleArray();
     }
-    DECAF_CATCH_RETHROW( ReadOnlyBufferException )
-    DECAF_CATCH_RETHROW( UnsupportedOperationException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, UnsupportedOperationException )
-    DECAF_CATCHALL_THROW( UnsupportedOperationException )
+    DECAF_CATCH_RETHROW(ReadOnlyBufferException)
+    DECAF_CATCH_RETHROW(UnsupportedOperationException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, UnsupportedOperationException)
+    DECAF_CATCHALL_THROW(UnsupportedOperationException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int DoubleArrayBuffer::arrayOffset() {
-
-    try{
-
-        if( !this->hasArray() ) {
+int DoubleArrayBuffer::arrayOffset()
+{
+    try
+    {
+        if (!this->hasArray())
+        {
             throw UnsupportedOperationException(
-                __FILE__, __LINE__,
-                "DoubleArrayBuffer::arrayOffset() - This Buffer has no backing array." );
+                __FILE__,
+                __LINE__,
+                "DoubleArrayBuffer::arrayOffset() - This Buffer has no backing "
+                "array.");
         }
 
-        if( this->isReadOnly() ) {
+        if (this->isReadOnly())
+        {
             throw decaf::nio::ReadOnlyBufferException(
-                __FILE__, __LINE__,
-                "DoubleArrayBuffer::arrayOffset() - Buffer is Read Only." );
+                __FILE__,
+                __LINE__,
+                "DoubleArrayBuffer::arrayOffset() - Buffer is Read Only.");
         }
 
         return this->offset;
     }
-    DECAF_CATCH_RETHROW( ReadOnlyBufferException )
-    DECAF_CATCH_RETHROW( UnsupportedOperationException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, UnsupportedOperationException )
-    DECAF_CATCHALL_THROW( UnsupportedOperationException )
+    DECAF_CATCH_RETHROW(ReadOnlyBufferException)
+    DECAF_CATCH_RETHROW(UnsupportedOperationException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, UnsupportedOperationException)
+    DECAF_CATCHALL_THROW(UnsupportedOperationException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-DoubleBuffer* DoubleArrayBuffer::asReadOnlyBuffer() const {
-
-    try{
-
-        DoubleArrayBuffer* buffer = new DoubleArrayBuffer( *this );
-        buffer->setReadOnly( true );
+DoubleBuffer* DoubleArrayBuffer::asReadOnlyBuffer() const
+{
+    try
+    {
+        DoubleArrayBuffer* buffer = new DoubleArrayBuffer(*this);
+        buffer->setReadOnly(true);
 
         return buffer;
     }
-    DECAF_CATCH_RETHROW( Exception )
-    DECAF_CATCHALL_THROW( Exception )
+    DECAF_CATCH_RETHROW(Exception)
+    DECAF_CATCHALL_THROW(Exception)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-DoubleBuffer& DoubleArrayBuffer::compact() {
-
-    try{
-
-        if( this->isReadOnly() ) {
+DoubleBuffer& DoubleArrayBuffer::compact()
+{
+    try
+    {
+        if (this->isReadOnly())
+        {
             throw decaf::nio::ReadOnlyBufferException(
-                __FILE__, __LINE__,
-                "DoubleArrayBuffer::compact() - Buffer is Read Only." );
+                __FILE__,
+                __LINE__,
+                "DoubleArrayBuffer::compact() - Buffer is Read Only.");
         }
 
         // copy from the current pos to the beginning all the remaining bytes
         // the set pos to the
-        for( int ix = 0; ix < this->remaining(); ++ix ) {
-            this->put( ix, this->get( this->position() + ix ) );
+        for (int ix = 0; ix < this->remaining(); ++ix)
+        {
+            this->put(ix, this->get(this->position() + ix));
         }
 
-        this->position( this->limit() - this->position() );
-        this->limit( this->capacity() );
+        this->position(this->limit() - this->position());
+        this->limit(this->capacity());
         this->_markSet = false;
 
         return *this;
     }
-    DECAF_CATCH_RETHROW( decaf::nio::ReadOnlyBufferException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, decaf::nio::ReadOnlyBufferException )
-    DECAF_CATCHALL_THROW( decaf::nio::ReadOnlyBufferException )
+    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception,
+                                  decaf::nio::ReadOnlyBufferException)
+    DECAF_CATCHALL_THROW(decaf::nio::ReadOnlyBufferException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-DoubleBuffer* DoubleArrayBuffer::duplicate() {
-
-    try{
-        return new DoubleArrayBuffer( *this );
+DoubleBuffer* DoubleArrayBuffer::duplicate()
+{
+    try
+    {
+        return new DoubleArrayBuffer(*this);
     }
-    DECAF_CATCH_RETHROW( Exception )
-    DECAF_CATCHALL_THROW( Exception )
+    DECAF_CATCH_RETHROW(Exception)
+    DECAF_CATCHALL_THROW(Exception)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-double DoubleArrayBuffer::get() {
-
-    try{
-        return this->get( this->_position++ );
+double DoubleArrayBuffer::get()
+{
+    try
+    {
+        return this->get(this->_position++);
     }
-    DECAF_CATCH_RETHROW( BufferUnderflowException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, BufferUnderflowException )
-    DECAF_CATCHALL_THROW( BufferUnderflowException )
+    DECAF_CATCH_RETHROW(BufferUnderflowException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, BufferUnderflowException)
+    DECAF_CATCHALL_THROW(BufferUnderflowException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-double DoubleArrayBuffer::get( int index ) const {
-
-    try{
-
-        if( index >= this->limit() ) {
+double DoubleArrayBuffer::get(int index) const
+{
+    try
+    {
+        if (index >= this->limit())
+        {
             throw IndexOutOfBoundsException(
-                __FILE__, __LINE__,
-                "DoubleArrayBuffer::get - Not enough data to fill request." );
+                __FILE__,
+                __LINE__,
+                "DoubleArrayBuffer::get - Not enough data to fill request.");
         }
 
-        return this->_array->getDouble( offset + index );
+        return this->_array->getDouble(offset + index);
     }
-    DECAF_CATCH_RETHROW( IndexOutOfBoundsException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IndexOutOfBoundsException )
-    DECAF_CATCHALL_THROW( IndexOutOfBoundsException )
+    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
+    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DoubleBuffer& DoubleArrayBuffer::put( double value ) {
-
-    try{
-
-        this->put( this->_position++, value );
+DoubleBuffer& DoubleArrayBuffer::put(double value)
+{
+    try
+    {
+        this->put(this->_position++, value);
         return *this;
     }
-    DECAF_CATCH_RETHROW( decaf::nio::ReadOnlyBufferException )
-    DECAF_CATCH_RETHROW( decaf::nio::BufferOverflowException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, decaf::nio::BufferOverflowException )
-    DECAF_CATCHALL_THROW( decaf::nio::BufferOverflowException )
+    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
+    DECAF_CATCH_RETHROW(decaf::nio::BufferOverflowException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception,
+                                  decaf::nio::BufferOverflowException)
+    DECAF_CATCHALL_THROW(decaf::nio::BufferOverflowException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DoubleBuffer& DoubleArrayBuffer::put( int index, double value ) {
-
-    try{
-
-        if( this->isReadOnly() ) {
+DoubleBuffer& DoubleArrayBuffer::put(int index, double value)
+{
+    try
+    {
+        if (this->isReadOnly())
+        {
             throw decaf::nio::ReadOnlyBufferException(
-                __FILE__, __LINE__,
-                "DoubleArrayBuffer::put(i,i) - Buffer is Read Only." );
+                __FILE__,
+                __LINE__,
+                "DoubleArrayBuffer::put(i,i) - Buffer is Read Only.");
         }
 
-        if( index >= this->limit() ) {
-            throw IndexOutOfBoundsException(
-                __FILE__, __LINE__,
-                "DoubleArrayBuffer::put(i,i) - Not enough data to fill request." );
+        if (index >= this->limit())
+        {
+            throw IndexOutOfBoundsException(__FILE__,
+                                            __LINE__,
+                                            "DoubleArrayBuffer::put(i,i) - Not "
+                                            "enough data to fill request.");
         }
 
-        this->_array->putDouble( index + offset, value );
+        this->_array->putDouble(index + offset, value);
 
         return *this;
     }
-    DECAF_CATCH_RETHROW( decaf::nio::ReadOnlyBufferException )
-    DECAF_CATCH_RETHROW( IndexOutOfBoundsException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IndexOutOfBoundsException )
-    DECAF_CATCHALL_THROW( IndexOutOfBoundsException )
+    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
+    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
+    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DoubleBuffer* DoubleArrayBuffer::slice() const {
-
-    try{
-
-        return new DoubleArrayBuffer( this->_array,
-                                      this->offset + this->position(),
-                                      this->remaining(),
-                                      this->isReadOnly() );
+DoubleBuffer* DoubleArrayBuffer::slice() const
+{
+    try
+    {
+        return new DoubleArrayBuffer(this->_array,
+                                     this->offset + this->position(),
+                                     this->remaining(),
+                                     this->isReadOnly());
     }
-    DECAF_CATCH_RETHROW( Exception )
-    DECAF_CATCHALL_THROW( Exception )
+    DECAF_CATCH_RETHROW(Exception)
+    DECAF_CATCHALL_THROW(Exception)
 }

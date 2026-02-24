@@ -18,27 +18,27 @@
 #ifndef _ACTIVEMQ_CMSUTIL_CACHEDPRODUCER_H_
 #define _ACTIVEMQ_CMSUTIL_CACHEDPRODUCER_H_
 
-#include <cms/MessageProducer.h>
 #include <activemq/util/Config.h>
+#include <cms/MessageProducer.h>
 
-namespace activemq {
-namespace cmsutil {
+namespace activemq
+{
+namespace cmsutil
+{
 
     /**
      * A cached message producer contained within a pooled session.
      */
-    class AMQCPP_API CachedProducer: public cms::MessageProducer {
+    class AMQCPP_API CachedProducer : public cms::MessageProducer
+    {
     private:
-
         cms::MessageProducer* producer;
 
     private:
-
         CachedProducer(const CachedProducer&);
         CachedProducer& operator=(const CachedProducer&);
 
     public:
-
         CachedProducer(cms::MessageProducer* producer);
 
         virtual ~CachedProducer();
@@ -47,92 +47,145 @@ namespace cmsutil {
          * Does nothing - the real producer resource will be closed
          * by the lifecycle manager.
          */
-        virtual void close() {
+        virtual void close()
+        {
             // Do nothing.
         }
 
-        virtual void send(cms::Message* message) {
+        virtual void send(cms::Message* message)
+        {
             producer->send(message);
         }
 
-        virtual void send(cms::Message* message, cms::AsyncCallback* onComplete) {
+        virtual void send(cms::Message* message, cms::AsyncCallback* onComplete)
+        {
             producer->send(message, onComplete);
         }
 
-        virtual void send(cms::Message* message, int deliveryMode, int priority, long long timeToLive) {
+        virtual void send(cms::Message* message,
+                          int           deliveryMode,
+                          int           priority,
+                          long long     timeToLive)
+        {
             producer->send(message, deliveryMode, priority, timeToLive);
         }
 
-        virtual void send(cms::Message* message, int deliveryMode, int priority, long long timeToLive, cms::AsyncCallback* onComplete) {
-            producer->send(message, deliveryMode, priority, timeToLive, onComplete);
+        virtual void send(cms::Message*       message,
+                          int                 deliveryMode,
+                          int                 priority,
+                          long long           timeToLive,
+                          cms::AsyncCallback* onComplete)
+        {
+            producer->send(message,
+                           deliveryMode,
+                           priority,
+                           timeToLive,
+                           onComplete);
         }
 
-        virtual void send(const cms::Destination* destination, cms::Message* message) {
+        virtual void send(const cms::Destination* destination,
+                          cms::Message*           message)
+        {
             producer->send(destination, message);
         }
 
-        virtual void send(const cms::Destination* destination, cms::Message* message, cms::AsyncCallback* onComplete) {
+        virtual void send(const cms::Destination* destination,
+                          cms::Message*           message,
+                          cms::AsyncCallback*     onComplete)
+        {
             producer->send(destination, message, onComplete);
         }
 
-        virtual void send(const cms::Destination* destination, cms::Message* message, int deliveryMode, int priority, long long timeToLive) {
-            producer->send(destination, message, deliveryMode, priority, timeToLive);
+        virtual void send(const cms::Destination* destination,
+                          cms::Message*           message,
+                          int                     deliveryMode,
+                          int                     priority,
+                          long long               timeToLive)
+        {
+            producer->send(destination,
+                           message,
+                           deliveryMode,
+                           priority,
+                           timeToLive);
         }
 
-        virtual void send(const cms::Destination* destination, cms::Message* message, int deliveryMode, int priority, long long timeToLive, cms::AsyncCallback* onComplete) {
-            producer->send(destination, message, deliveryMode, priority, timeToLive, onComplete);
+        virtual void send(const cms::Destination* destination,
+                          cms::Message*           message,
+                          int                     deliveryMode,
+                          int                     priority,
+                          long long               timeToLive,
+                          cms::AsyncCallback*     onComplete)
+        {
+            producer->send(destination,
+                           message,
+                           deliveryMode,
+                           priority,
+                           timeToLive,
+                           onComplete);
         }
 
-        virtual void setDeliveryMode(int mode) {
+        virtual void setDeliveryMode(int mode)
+        {
             producer->setDeliveryMode(mode);
         }
 
-        virtual int getDeliveryMode() const {
+        virtual int getDeliveryMode() const
+        {
             return producer->getDeliveryMode();
         }
 
-        virtual void setDisableMessageID(bool value) {
+        virtual void setDisableMessageID(bool value)
+        {
             producer->setDisableMessageID(value);
         }
 
-        virtual bool getDisableMessageID() const {
+        virtual bool getDisableMessageID() const
+        {
             return producer->getDisableMessageID();
         }
 
-        virtual void setDisableMessageTimeStamp(bool value) {
+        virtual void setDisableMessageTimeStamp(bool value)
+        {
             producer->setDisableMessageTimeStamp(value);
         }
 
-        virtual bool getDisableMessageTimeStamp() const {
+        virtual bool getDisableMessageTimeStamp() const
+        {
             return producer->getDisableMessageTimeStamp();
         }
 
-        virtual void setPriority(int priority) {
+        virtual void setPriority(int priority)
+        {
             producer->setPriority(priority);
         }
 
-        virtual int getPriority() const {
+        virtual int getPriority() const
+        {
             return producer->getPriority();
         }
 
-        virtual void setTimeToLive(long long time) {
+        virtual void setTimeToLive(long long time)
+        {
             producer->setTimeToLive(time);
         }
 
-        virtual long long getTimeToLive() const {
+        virtual long long getTimeToLive() const
+        {
             return producer->getTimeToLive();
         }
 
-        virtual void setMessageTransformer(cms::MessageTransformer* transformer) {
+        virtual void setMessageTransformer(cms::MessageTransformer* transformer)
+        {
             producer->setMessageTransformer(transformer);
         }
 
-        virtual cms::MessageTransformer* getMessageTransformer() const {
+        virtual cms::MessageTransformer* getMessageTransformer() const
+        {
             return producer->getMessageTransformer();
         }
-
     };
 
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CMSUTIL_CACHEDPRODUCER_H_*/

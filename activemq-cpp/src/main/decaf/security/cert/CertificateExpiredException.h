@@ -18,99 +18,112 @@
 #ifndef _DECAF_SECURITY_CERT_CERTIFICATEEXPIREDEXCEPTION_H_
 #define _DECAF_SECURITY_CERT_CERTIFICATEEXPIREDEXCEPTION_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/security/cert/CertificateException.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace security {
-namespace cert {
+namespace decaf
+{
+namespace security
+{
+    namespace cert
+    {
 
-    /*
-     * Certificate Expired Exception. This is thrown whenever the current Date
-     * or the specified Date is after the notAfter date/time specified in the
-     * validity period of the certificate.
-     */
-    class DECAF_API CertificateExpiredException : public CertificateException {
-    public:
-
-        /**
-         * Default Constructor
+        /*
+         * Certificate Expired Exception. This is thrown whenever the current
+         * Date or the specified Date is after the notAfter date/time specified
+         * in the validity period of the certificate.
          */
-        CertificateExpiredException();
+        class DECAF_API CertificateExpiredException
+            : public CertificateException
+        {
+        public:
+            /**
+             * Default Constructor
+             */
+            CertificateExpiredException();
 
-        /**
-         * Conversion Constructor from some other Exception
-         * @param ex
-         *      An exception that should become this type of Exception
-         */
-        CertificateExpiredException(const Exception& ex);
+            /**
+             * Conversion Constructor from some other Exception
+             * @param ex
+             *      An exception that should become this type of Exception
+             */
+            CertificateExpiredException(const Exception& ex);
 
-        /**
-         * Copy Constructor
-         *
-         * @param ex
-         *      An exception that should become this type of Exception
-         */
-        CertificateExpiredException(const CertificateExpiredException& ex);
+            /**
+             * Copy Constructor
+             *
+             * @param ex
+             *      An exception that should become this type of Exception
+             */
+            CertificateExpiredException(const CertificateExpiredException& ex);
 
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using an
-         * optional list of arguments to parse into the message.
-         *
-         * @param file
-         *      The file name where exception occurs
-         * @param lineNumber
-         *      The line number where the exception occurred.
-         * @param cause
-         *      The exception that was the cause for this one to be thrown.
-         * @param msg
-         *      The message to report
-         * @param ...
-         *      list of primitives that are formatted into the message
-         */
-        CertificateExpiredException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+            /**
+             * Constructor - Initializes the file name and line number where
+             * this message occurred.  Sets the message to report, using an
+             * optional list of arguments to parse into the message.
+             *
+             * @param file
+             *      The file name where exception occurs
+             * @param lineNumber
+             *      The line number where the exception occurred.
+             * @param cause
+             *      The exception that was the cause for this one to be thrown.
+             * @param msg
+             *      The message to report
+             * @param ...
+             *      list of primitives that are formatted into the message
+             */
+            CertificateExpiredException(const char*           file,
+                                        const int             lineNumber,
+                                        const std::exception* cause,
+                                        const char*           msg,
+                                        ...);
 
-        /**
-         * Constructor
-         *
-         * @param cause
-         *      Pointer to the exception that caused this one to be
-         *      thrown, the object is cloned caller retains ownership.
-         */
-        CertificateExpiredException(const std::exception* cause);
+            /**
+             * Constructor
+             *
+             * @param cause
+             *      Pointer to the exception that caused this one to be
+             *      thrown, the object is cloned caller retains ownership.
+             */
+            CertificateExpiredException(const std::exception* cause);
 
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occured.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         *
-         * @param file
-         *      name where exception occurs
-         * @param lineNumber
-         *      line number where the exception occurred.
-         * @param msg
-         *      message to report
-         * @param ...
-         *      list of primitives that are formatted into the message
-         */
-        CertificateExpiredException(const char* file, const int lineNumber, const char* msg, ...);
+            /**
+             * Constructor - Initializes the file name and line number where
+             * this message occured.  Sets the message to report, using an
+             * optional list of arguments to parse into the message
+             *
+             * @param file
+             *      name where exception occurs
+             * @param lineNumber
+             *      line number where the exception occurred.
+             * @param msg
+             *      message to report
+             * @param ...
+             *      list of primitives that are formatted into the message
+             */
+            CertificateExpiredException(const char* file,
+                                        const int   lineNumber,
+                                        const char* msg,
+                                        ...);
 
-        /**
-         * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
-         *
-         * @return A deep copy of this exception.
-         */
-        virtual CertificateExpiredException* clone() const {
-            return new CertificateExpiredException(*this);
-        }
+            /**
+             * Clones this exception.  This is useful for cases where you need
+             * to preserve the type of the original exception as well as the
+             * message. All subclasses should override.
+             *
+             * @return A deep copy of this exception.
+             */
+            virtual CertificateExpiredException* clone() const
+            {
+                return new CertificateExpiredException(*this);
+            }
 
-        virtual ~CertificateExpiredException() throw();
+            virtual ~CertificateExpiredException() throw();
+        };
 
-    };
-
-}}}
+    }  // namespace cert
+}  // namespace security
+}  // namespace decaf
 
 #endif /*_DECAF_SECURITY_CERT_CERTIFICATEEXPIREDEXCEPTION_H_*/

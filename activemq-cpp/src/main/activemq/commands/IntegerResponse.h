@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/Response.h>
@@ -29,8 +29,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -43,22 +45,19 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API IntegerResponse : public Response {
+    class AMQCPP_API IntegerResponse : public Response
+    {
     protected:
-
         int result;
 
     public:
-
         const static unsigned char ID_INTEGERRESPONSE = 34;
 
     private:
-
         IntegerResponse(const IntegerResponse&);
-        IntegerResponse& operator= (const IntegerResponse&);
+        IntegerResponse& operator=(const IntegerResponse&);
 
     public:
-
         IntegerResponse();
 
         virtual ~IntegerResponse();
@@ -73,11 +72,11 @@ namespace commands {
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual int getResult() const;
+        virtual int  getResult() const;
         virtual void setResult(int result);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_INTEGERRESPONSE_H_*/

@@ -21,23 +21,31 @@ using namespace decaf;
 using namespace decaf::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-Inet6Address::Inet6Address() {
+Inet6Address::Inet6Address()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Inet6Address::Inet6Address(const unsigned char* ipAddress, int numBytes) : InetAddress(ipAddress, numBytes) {
+Inet6Address::Inet6Address(const unsigned char* ipAddress, int numBytes)
+    : InetAddress(ipAddress, numBytes)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Inet6Address::Inet6Address(const std::string& hostname, const unsigned char* ipAddress, int numBytes) :
-    InetAddress(hostname, ipAddress, numBytes) {
+Inet6Address::Inet6Address(const std::string&   hostname,
+                           const unsigned char* ipAddress,
+                           int                  numBytes)
+    : InetAddress(hostname, ipAddress, numBytes)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Inet6Address::~Inet6Address() {
+Inet6Address::~Inet6Address()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InetAddress* Inet6Address::clone() const {
+InetAddress* Inet6Address::clone() const
+{
     return NULL;
 }

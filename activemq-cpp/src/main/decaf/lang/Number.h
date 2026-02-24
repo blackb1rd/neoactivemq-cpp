@@ -20,8 +20,10 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf{
-namespace lang{
+namespace decaf
+{
+namespace lang
+{
 
     /**
      * The abstract class Number is the superclass of classes Byte, Double,
@@ -32,16 +34,17 @@ namespace lang{
      *
      * @since 1.0
      */
-    class DECAF_API Number {
+    class DECAF_API Number
+    {
     public:
-
         virtual ~Number();
 
         /**
          * Answers the byte value which the receiver represents
          * @return byte the value of the receiver.
          */
-        virtual unsigned char byteValue() const {
+        virtual unsigned char byteValue() const
+        {
             return (unsigned char)intValue();
         }
 
@@ -73,12 +76,13 @@ namespace lang{
          * Answers the short value which the receiver represents
          * @return short the value of the receiver.
          */
-        virtual short shortValue() const {
-            return (short) intValue();
+        virtual short shortValue() const
+        {
+            return (short)intValue();
         }
-
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 #endif /*_DECAF_LANG_NUMBER_H_*/

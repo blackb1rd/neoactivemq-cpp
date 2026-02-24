@@ -18,12 +18,14 @@
 #ifndef _DECAF_UTIL_LISTITERATOR_H_
 #define _DECAF_UTIL_LISTITERATOR_H_
 
-#include <decaf/util/Iterator.h>
-#include <decaf/util/Config.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/util/Config.h>
+#include <decaf/util/Iterator.h>
 
-namespace decaf{
-namespace util{
+namespace decaf
+{
+namespace util
+{
 
     /**
      * An iterator for lists that allows the programmer to traverse the list
@@ -34,11 +36,13 @@ namespace util{
      * of the cursor position; they are defined to operate on the last element
      * returned by a call to next() or previous().
      */
-    template< typename E>
-    class ListIterator : public decaf::util::Iterator<E> {
+    template <typename E>
+    class ListIterator : public decaf::util::Iterator<E>
+    {
     public:
-
-        virtual ~ListIterator() {}
+        virtual ~ListIterator()
+        {
+        }
 
         /**
          * Inserts the specified element into the list (optional operation). The
@@ -76,18 +80,18 @@ namespace util{
          * @throw IllegalArgumentException if some aspect of this element
          *        prevents it from being added to this list.
          * @throw IllegalStateException if neither next nor previous have been
-         *        called, or remove or add have been called after the last call to next
-         *        or previous.
+         *        called, or remove or add have been called after the last call
+         * to next or previous.
          */
         virtual void set(const E& e) = 0;
 
         /**
-         * Returns true if this list iterator has more elements when traversing the
-         * list in the reverse direction. (In other words, returns true if previous
-         * would return an element rather than throwing an exception.)
+         * Returns true if this list iterator has more elements when traversing
+         * the list in the reverse direction. (In other words, returns true if
+         * previous would return an element rather than throwing an exception.)
          *
-         * @return true if the list iterator has more elements when traversing the list
-         *         in the reverse direction.
+         * @return true if the list iterator has more elements when traversing
+         * the list in the reverse direction.
          */
         virtual bool hasPrevious() const = 0;
 
@@ -99,7 +103,8 @@ namespace util{
          *
          * @return the previous element in the list.
          *
-         * @throw NoSuchElementException if the iteration has no previous element.
+         * @throw NoSuchElementException if the iteration has no previous
+         * element.
          */
         virtual E previous() = 0;
 
@@ -124,9 +129,9 @@ namespace util{
          *         at beginning of list.
          */
         virtual int previousIndex() const = 0;
-
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_LISTITERATOR_H_*/

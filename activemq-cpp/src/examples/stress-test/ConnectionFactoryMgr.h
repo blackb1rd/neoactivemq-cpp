@@ -18,8 +18,8 @@
 #ifndef _CMS_STRESS_CONNECTIONFACTORYMGR_H_
 #define _CMS_STRESS_CONNECTIONFACTORYMGR_H_
 
-#include <decaf/util/Config.h>
 #include <cms/ConnectionFactory.h>
+#include <decaf/util/Config.h>
 
 #include <decaf/util/StlMap.h>
 
@@ -27,26 +27,29 @@ using namespace cms;
 using namespace decaf::util;
 using namespace std;
 
-namespace cms {
-namespace stress {
+namespace cms
+{
+namespace stress
+{
 
-    class ConnectionFactoryMgr {
+    class ConnectionFactoryMgr
+    {
     private:
-
-        static decaf::util::StlMap<std::string, cms::ConnectionFactory*>* connectionFactories;
+        static decaf::util::StlMap<std::string, cms::ConnectionFactory*>*
+            connectionFactories;
 
         ConnectionFactoryMgr();
         virtual ~ConnectionFactoryMgr();
 
     public:
-
         static void initialize();
         static void unInitialize();
 
-        static cms::ConnectionFactory* getConnectionFactory(const std::string& url);
-
+        static cms::ConnectionFactory* getConnectionFactory(
+            const std::string& url);
     };
 
-}}
+}  // namespace stress
+}  // namespace cms
 
 #endif /** _CMS_STRESS_CONNECTIONFACTORYMGR_H_ */

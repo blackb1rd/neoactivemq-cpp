@@ -21,48 +21,54 @@
 #include <decaf/lang/exceptions/InterruptedException.h>
 #include <decaf/util/concurrent/TimeoutException.h>
 
-namespace decaf {
-namespace internal {
-namespace util {
-namespace concurrent {
+namespace decaf
+{
+namespace internal
+{
+    namespace util
+    {
+        namespace concurrent
+        {
 
-    /**
-    * Shared internal API for dual stacks and queues.
-    */
-    template< typename E >
-    class Transferer {
+            /**
+             * Shared internal API for dual stacks and queues.
+             */
+            template <typename E>
+            class Transferer
+            {
+                /**
+                 * Performs a put
+                 *
+                 * @param e the item to be handed to a consumer;
+                 * @param timed if this operation should timeout
+                 * @param nanos the timeout, in nanoseconds
+                 *
+                 * @throws TimeoutException if the operation timed out waiting
+                 * for the consumer to accept the item offered.
+                 * @throws InterruptedException if the thread was interrupted
+                 * while waiting for the consumer to accept the item offered.
+                 */
+                virtual void transfer(E* e, bool timed, long long nanos) = 0;
 
-        /**
-         * Performs a put
-         *
-         * @param e the item to be handed to a consumer;
-         * @param timed if this operation should timeout
-         * @param nanos the timeout, in nanoseconds
-         *
-         * @throws TimeoutException if the operation timed out waiting for
-         *         the consumer to accept the item offered.
-         * @throws InterruptedException if the thread was interrupted while
-         *         waiting for the consumer to accept the item offered.
-         */
-        virtual void transfer( E* e, bool timed, long long nanos ) = 0;
+                /**
+                 * Performs a take.
+                 *
+                 * @param timed if this operation should timeout
+                 * @param nanos the timeout, in nanoseconds
+                 *
+                 * @return the item provided or received;
+                 *
+                 * @throws TimeoutException if the operation timed out waiting
+                 * for the producer to offer an item.
+                 * @throws InterruptedException if the thread was interrupted
+                 * while waiting for the producer to offer an item.
+                 */
+                virtual E* transfer(bool timed, long long nanos) = 0;
+            };
 
-        /**
-         * Performs a take.
-         *
-         * @param timed if this operation should timeout
-         * @param nanos the timeout, in nanoseconds
-         *
-         * @return the item provided or received;
-         *
-         * @throws TimeoutException if the operation timed out waiting for
-         *         the producer to offer an item.
-         * @throws InterruptedException if the thread was interrupted while
-         *         waiting for the producer to offer an item.
-         */
-        virtual E* transfer( bool timed, long long nanos ) = 0;
-
-    };
-
-}}}}
+        }  // namespace concurrent
+    }  // namespace util
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_UTIL_CONCURRENT_TRANSFERER_H_ */

@@ -18,15 +18,17 @@
 #ifndef _DECAF_NET_NOROUTETOHOSTEXCEPTION_H_
 #define _DECAF_NET_NOROUTETOHOSTEXCEPTION_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/net/SocketException.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
-    class DECAF_API NoRouteToHostException : public SocketException {
+    class DECAF_API NoRouteToHostException : public SocketException
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -53,11 +55,16 @@ namespace net {
          *
          * @param file The file name where exception occurs
          * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
+         * @param cause The exception that was the cause for this one to be
+         * thrown.
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        NoRouteToHostException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        NoRouteToHostException(const char*           file,
+                               const int             lineNumber,
+                               const std::exception* cause,
+                               const char*           msg,
+                               ...);
 
         /**
          * Constructor
@@ -77,23 +84,28 @@ namespace net {
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        NoRouteToHostException(const char* file, const int lineNumber, const char* msg, ...);
+        NoRouteToHostException(const char* file,
+                               const int   lineNumber,
+                               const char* msg,
+                               ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
-         * @return a new Exception instance that is a copy of this Exception object.
+         * @return a new Exception instance that is a copy of this Exception
+         * object.
          */
-        virtual NoRouteToHostException* clone() const {
+        virtual NoRouteToHostException* clone() const
+        {
             return new NoRouteToHostException(*this);
         }
 
         virtual ~NoRouteToHostException() throw();
-
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /*_DECAF_NET_NOROUTETOHOSTEXCEPTION_H_*/

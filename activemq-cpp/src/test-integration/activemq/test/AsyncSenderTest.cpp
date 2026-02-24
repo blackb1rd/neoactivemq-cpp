@@ -27,47 +27,53 @@ using namespace std;
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-AsyncSenderTest::AsyncSenderTest() {
+AsyncSenderTest::AsyncSenderTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AsyncSenderTest::~AsyncSenderTest() {
+AsyncSenderTest::~AsyncSenderTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AsyncSenderTest::testAsyncSends() {
-
-    try {
-
+void AsyncSenderTest::testAsyncSends()
+{
+    try
+    {
         // Create CMS Object for Comms
-        cms::Session* session( cmsProvider->getSession() );
+        cms::Session* session(cmsProvider->getSession());
 
-        CMSListener listener( session );
+        CMSListener listener(session);
 
         cms::MessageConsumer* consumer = cmsProvider->getConsumer();
-        consumer->setMessageListener( &listener );
+        consumer->setMessageListener(&listener);
         cms::MessageProducer* producer = cmsProvider->getProducer();
-        producer->setDeliveryMode( DeliveryMode::NON_PERSISTENT );
+        producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
-        std::unique_ptr<cms::TextMessage> txtMessage( session->createTextMessage( "TEST MESSAGE" ) );
-        std::unique_ptr<cms::BytesMessage> bytesMessage( session->createBytesMessage() );
+        std::unique_ptr<cms::TextMessage> txtMessage(
+            session->createTextMessage("TEST MESSAGE"));
+        std::unique_ptr<cms::BytesMessage> bytesMessage(
+            session->createBytesMessage());
 
-        for( unsigned int i = 0; i < IntegrationCommon::defaultMsgCount; ++i ) {
-            producer->send( txtMessage.get() );
+        for (unsigned int i = 0; i < IntegrationCommon::defaultMsgCount; ++i)
+        {
+            producer->send(txtMessage.get());
         }
 
-        for( unsigned int i = 0; i < IntegrationCommon::defaultMsgCount; ++i ) {
-            producer->send( bytesMessage.get() );
+        for (unsigned int i = 0; i < IntegrationCommon::defaultMsgCount; ++i)
+        {
+            producer->send(bytesMessage.get());
         }
 
         // Wait for the messages to get here
-        listener.asyncWaitForMessages( IntegrationCommon::defaultMsgCount * 2 );
+        listener.asyncWaitForMessages(IntegrationCommon::defaultMsgCount * 2);
 
         unsigned int numReceived = listener.getNumReceived();
         ASSERT_TRUE(numReceived == IntegrationCommon::defaultMsgCount * 2);
-
-    } catch(...) {
+    }
+    catch (...)
+    {
         ASSERT_TRUE(false);
     }
 }
-

@@ -41,92 +41,117 @@ using namespace decaf::io;
 using namespace decaf::lang;
 
 ///////////////////////////////////////////////////////////////////////////////
-DataStructure* BrokerIdMarshaller::createObject() const {
+DataStructure* BrokerIdMarshaller::createObject() const
+{
     return new BrokerId();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-unsigned char BrokerIdMarshaller::getDataStructureType() const {
+unsigned char BrokerIdMarshaller::getDataStructureType() const
+{
     return BrokerId::ID_BROKERID;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void BrokerIdMarshaller::tightUnmarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataInputStream* dataIn, BooleanStream* bs) {
+void BrokerIdMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
+                                        DataStructure*   dataStructure,
+                                        DataInputStream* dataIn,
+                                        BooleanStream*   bs)
+{
+    try
+    {
+        BaseDataStreamMarshaller::tightUnmarshal(wireFormat,
+                                                 dataStructure,
+                                                 dataIn,
+                                                 bs);
 
-    try {
-
-        BaseDataStreamMarshaller::tightUnmarshal(wireFormat, dataStructure, dataIn, bs);
-
-        BrokerId* info =
-            dynamic_cast<BrokerId*>(dataStructure);
+        BrokerId* info = dynamic_cast<BrokerId*>(dataStructure);
         info->setValue(tightUnmarshalString(dataIn, bs));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int BrokerIdMarshaller::tightMarshal1(OpenWireFormat* wireFormat, DataStructure* dataStructure, BooleanStream* bs) {
+int BrokerIdMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
+                                      DataStructure*  dataStructure,
+                                      BooleanStream*  bs)
+{
+    try
+    {
+        BrokerId* info = dynamic_cast<BrokerId*>(dataStructure);
 
-    try {
-
-        BrokerId* info =
-            dynamic_cast<BrokerId*>(dataStructure);
-
-        int rc = BaseDataStreamMarshaller::tightMarshal1(wireFormat, dataStructure, bs);
+        int rc = BaseDataStreamMarshaller::tightMarshal1(wireFormat,
+                                                         dataStructure,
+                                                         bs);
         rc += tightMarshalString1(info->getValue(), bs);
 
         return rc + 0;
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void BrokerIdMarshaller::tightMarshal2(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataOutputStream* dataOut, BooleanStream* bs) {
+void BrokerIdMarshaller::tightMarshal2(OpenWireFormat*   wireFormat,
+                                       DataStructure*    dataStructure,
+                                       DataOutputStream* dataOut,
+                                       BooleanStream*    bs)
+{
+    try
+    {
+        BaseDataStreamMarshaller::tightMarshal2(wireFormat,
+                                                dataStructure,
+                                                dataOut,
+                                                bs);
 
-    try {
-
-        BaseDataStreamMarshaller::tightMarshal2(wireFormat, dataStructure, dataOut, bs );
-
-        BrokerId* info =
-            dynamic_cast<BrokerId*>(dataStructure);
+        BrokerId* info = dynamic_cast<BrokerId*>(dataStructure);
         tightMarshalString2(info->getValue(), dataOut, bs);
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT( exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void BrokerIdMarshaller::looseUnmarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataInputStream* dataIn) {
-
-    try {
-
-        BaseDataStreamMarshaller::looseUnmarshal(wireFormat, dataStructure, dataIn);
-        BrokerId* info =
-            dynamic_cast<BrokerId*>(dataStructure);
+void BrokerIdMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
+                                        DataStructure*   dataStructure,
+                                        DataInputStream* dataIn)
+{
+    try
+    {
+        BaseDataStreamMarshaller::looseUnmarshal(wireFormat,
+                                                 dataStructure,
+                                                 dataIn);
+        BrokerId* info = dynamic_cast<BrokerId*>(dataStructure);
         info->setValue(looseUnmarshalString(dataIn));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void BrokerIdMarshaller::looseMarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataOutputStream* dataOut) {
-
-    try {
-
-        BrokerId* info =
-            dynamic_cast<BrokerId*>(dataStructure);
-        BaseDataStreamMarshaller::looseMarshal(wireFormat, dataStructure, dataOut);
+void BrokerIdMarshaller::looseMarshal(OpenWireFormat*   wireFormat,
+                                      DataStructure*    dataStructure,
+                                      DataOutputStream* dataOut)
+{
+    try
+    {
+        BrokerId* info = dynamic_cast<BrokerId*>(dataStructure);
+        BaseDataStreamMarshaller::looseMarshal(wireFormat,
+                                               dataStructure,
+                                               dataOut);
         looseMarshalString(info->getValue(), dataOut);
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
-

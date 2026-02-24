@@ -18,79 +18,89 @@
 #define _DECAF_INTERNAL_NET_TCP_IOCONTEXTMANAGER_H_
 
 #include <decaf/util/Config.h>
-#include <asio.hpp>
+#include <atomic>
+#include <memory>
+#include <mutex>
 #include <thread>
 #include <vector>
-#include <mutex>
-#include <memory>
-#include <atomic>
+#include <asio.hpp>
 
-namespace decaf {
-namespace internal {
-namespace net {
-namespace tcp {
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
+        namespace tcp
+        {
 
-    /**
-     * Singleton manager for ASIO io_context with thread pool.
-     *
-     * This provides a shared io_context for all TcpSocket instances,
-     * eliminating the thread-local state issues that occur when each
-     * socket has its own io_context.
-     *
-     * Thread-safe and automatically manages worker thread lifecycle.
-     */
-    class DECAF_API IoContextManager {
-    private:
+            /**
+             * Singleton manager for ASIO io_context with thread pool.
+             *
+             * This provides a shared io_context for all TcpSocket instances,
+             * eliminating the thread-local state issues that occur when each
+             * socket has its own io_context.
+             *
+             * Thread-safe and automatically manages worker thread lifecycle.
+             */
+            class DECAF_API IoContextManager
+            {
+            private:
+                asio::io_context ioContext;
+                std::unique_ptr<
+                    asio::executor_work_guard<asio::io_context::executor_type>>
+                                  workGuard;
+                std::mutex        mutex;
+                std::atomic<bool> started;
+                std::atomic<bool> shouldRun;
 
-        asio::io_context ioContext;
-        std::unique_ptr<asio::executor_work_guard<asio::io_context::executor_type>> workGuard;
-        std::mutex mutex;
-        std::atomic<bool> started;
-        std::atomic<bool> shouldRun;
+                IoContextManager();
+                ~IoContextManager();
 
-        IoContextManager();
-        ~IoContextManager();
+                // Non-copyable
+                IoContextManager(const IoContextManager&)            = delete;
+                IoContextManager& operator=(const IoContextManager&) = delete;
 
-        // Non-copyable
-        IoContextManager(const IoContextManager&) = delete;
-        IoContextManager& operator=(const IoContextManager&) = delete;
+            public:
+                /**
+                 * Get the singleton instance.
+                 *
+                 * @return reference to the singleton IoContextManager
+                 */
+                static IoContextManager& getInstance();
 
-    public:
+                /**
+                 * Get the shared io_context.
+                 *
+                 * @return reference to the shared io_context
+                 */
+                asio::io_context& getIoContext();
 
-        /**
-         * Get the singleton instance.
-         *
-         * @return reference to the singleton IoContextManager
-         */
-        static IoContextManager& getInstance();
+                /**
+                 * Start the worker thread pool if not already started.
+                 *
+                 * @param threadCount number of worker threads (default:
+                 * hardware concurrency)
+                 */
+                void start(size_t threadCount = 0);
 
-        /**
-         * Get the shared io_context.
-         *
-         * @return reference to the shared io_context
-         */
-        asio::io_context& getIoContext();
+                /**
+                 * Stop the worker thread pool and wait for all threads to
+                 * complete.
+                 */
+                void stop();
 
-        /**
-         * Start the worker thread pool if not already started.
-         *
-         * @param threadCount number of worker threads (default: hardware concurrency)
-         */
-        void start(size_t threadCount = 0);
+                /**
+                 * Check if the thread pool is running.
+                 *
+                 * @return true if worker threads are running
+                 */
+                bool isRunning() const;
+            };
 
-        /**
-         * Stop the worker thread pool and wait for all threads to complete.
-         */
-        void stop();
-
-        /**
-         * Check if the thread pool is running.
-         *
-         * @return true if worker threads are running
-         */
-        bool isRunning() const;
-    };
-
-}}}}
+        }  // namespace tcp
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_TCP_IOCONTEXTMANAGER_H_ */

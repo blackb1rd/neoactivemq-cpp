@@ -15,22 +15,32 @@
  * limitations under the License.
  */
 
-#include <activemq/util/IntegrationCommon.h>
 #include <activemq/test/CmsConnectionStartStopTest.h>
+#include <activemq/util/IntegrationCommon.h>
 
-namespace activemq {
-namespace test {
-namespace stomp {
-    class StompCmsConnectionStartStopTest : public CmsConnectionStartStopTest {
-    private:
-public:
-        StompCmsConnectionStartStopTest();
-        virtual ~StompCmsConnectionStartStopTest();
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getStompURL();
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace stomp
+    {
+        class StompCmsConnectionStartStopTest
+            : public CmsConnectionStartStopTest
+        {
+        private:
+        public:
+            StompCmsConnectionStartStopTest();
+            virtual ~StompCmsConnectionStartStopTest();
+
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getStompURL();
+            }
+        };
+    }  // namespace stomp
+}  // namespace test
+}  // namespace activemq
 
 #include <activemq/exceptions/ActiveMQException.h>
 
@@ -45,15 +55,30 @@ using namespace decaf;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-StompCmsConnectionStartStopTest::StompCmsConnectionStartStopTest() {
+StompCmsConnectionStartStopTest::StompCmsConnectionStartStopTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StompCmsConnectionStartStopTest::~StompCmsConnectionStartStopTest() {
+StompCmsConnectionStartStopTest::~StompCmsConnectionStartStopTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompCmsConnectionStartStopTest, DISABLED_testStoppedConsumerHoldsMessagesTillStarted) { testStoppedConsumerHoldsMessagesTillStarted(); }
-TEST_F(StompCmsConnectionStartStopTest, DISABLED_testMultipleConnectionStops) { testMultipleConnectionStops(); }
-TEST_F(StompCmsConnectionStartStopTest, DISABLED_testConcurrentSessionCreateWithStart) { testConcurrentSessionCreateWithStart(); }
+TEST_F(StompCmsConnectionStartStopTest,
+       DISABLED_testStoppedConsumerHoldsMessagesTillStarted)
+{
+    testStoppedConsumerHoldsMessagesTillStarted();
+}
+
+TEST_F(StompCmsConnectionStartStopTest, DISABLED_testMultipleConnectionStops)
+{
+    testMultipleConnectionStops();
+}
+
+TEST_F(StompCmsConnectionStartStopTest,
+       DISABLED_testConcurrentSessionCreateWithStart)
+{
+    testConcurrentSessionCreateWithStart();
+}

@@ -18,30 +18,30 @@
 #ifndef _ACTIVEMQ_CORE_FIFOMESSAGEDISPATCHCHANNEL_H_
 #define _ACTIVEMQ_CORE_FIFOMESSAGEDISPATCHCHANNEL_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/core/MessageDispatchChannel.h>
+#include <activemq/util/Config.h>
 
-#include <decaf/util/LinkedList.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/util/LinkedList.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
-    class AMQCPP_API FifoMessageDispatchChannel : public MessageDispatchChannel {
+    class AMQCPP_API FifoMessageDispatchChannel : public MessageDispatchChannel
+    {
     private:
-
         bool closed;
         bool running;
 
-        mutable decaf::util::LinkedList< Pointer<MessageDispatch> > channel;
+        mutable decaf::util::LinkedList<Pointer<MessageDispatch>> channel;
 
     private:
-
         FifoMessageDispatchChannel(const FifoMessageDispatchChannel&);
         FifoMessageDispatchChannel& operator=(const FifoMessageDispatchChannel&);
 
     public:
-
         FifoMessageDispatchChannel();
 
         virtual ~FifoMessageDispatchChannel();
@@ -52,11 +52,13 @@ namespace core {
 
         virtual bool isEmpty() const;
 
-        virtual bool isClosed() const {
+        virtual bool isClosed() const
+        {
             return this->closed;
         }
 
-        virtual bool isRunning() const {
+        virtual bool isRunning() const
+        {
             return this->running;
         }
 
@@ -76,44 +78,51 @@ namespace core {
 
         virtual int size() const;
 
-        virtual std::vector<Pointer<MessageDispatch> > removeAll();
+        virtual std::vector<Pointer<MessageDispatch>> removeAll();
 
     public:
-
-        virtual void lock() {
+        virtual void lock()
+        {
             channel.lock();
         }
 
-        virtual bool tryLock() {
+        virtual bool tryLock()
+        {
             return channel.tryLock();
         }
 
-        virtual void unlock() {
+        virtual void unlock()
+        {
             channel.unlock();
         }
 
-        virtual void wait() {
+        virtual void wait()
+        {
             channel.wait();
         }
 
-        virtual void wait(long long millisecs) {
+        virtual void wait(long long millisecs)
+        {
             channel.wait(millisecs);
         }
 
-        virtual void wait(long long millisecs, int nanos) {
+        virtual void wait(long long millisecs, int nanos)
+        {
             channel.wait(millisecs, nanos);
         }
 
-        virtual void notify() {
+        virtual void notify()
+        {
             channel.notify();
         }
 
-        virtual void notifyAll() {
+        virtual void notifyAll()
+        {
             channel.notifyAll();
         }
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_FIFOMESSAGEDISPATCHCHANNEL_H_ */

@@ -18,28 +18,29 @@
 #ifndef _ACTIVEMQ_UTIL_PRIMITIVELIST_H_
 #define _ACTIVEMQ_UTIL_PRIMITIVELIST_H_
 
+#include <activemq/util/PrimitiveValueConverter.h>
+#include <activemq/util/PrimitiveValueNode.h>
+#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
+#include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <decaf/util/LinkedList.h>
+#include <stdio.h>
 #include <string>
 #include <vector>
-#include <decaf/util/LinkedList.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <stdio.h>
-#include <activemq/util/PrimitiveValueNode.h>
-#include <activemq/util/PrimitiveValueConverter.h>
 
-namespace activemq{
-namespace util{
+namespace activemq
+{
+namespace util
+{
 
     /**
      * List of primitives.
      */
-    class PrimitiveList : public decaf::util::LinkedList<PrimitiveValueNode> {
+    class PrimitiveList : public decaf::util::LinkedList<PrimitiveValueNode>
+    {
     private:
-
         PrimitiveValueConverter converter;
 
     public:
-
         /**
          * Default Constructor, creates an Empty list.
          */
@@ -71,8 +72,8 @@ namespace util{
          * @param index - index to get value from
          * @return value contained at the given index
          * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of the
-         * type that this method is to return or can convert to.
+         * @throw UnsupportedOperationException if the type at index is not of
+         * the type that this method is to return or can convert to.
          */
         virtual bool getBool(int index) const;
 
@@ -92,8 +93,8 @@ namespace util{
          * @param index - index to get value from
          * @return value contained at the given index
          * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of the
-         * type that this method is to return or can convert to.
+         * @throw UnsupportedOperationException if the type at index is not of
+         * the type that this method is to return or can convert to.
          */
         virtual unsigned char getByte(int index) const;
 
@@ -113,8 +114,8 @@ namespace util{
          * @param index - index to get value from
          * @return value contained at the given index
          * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of the
-         * type that this method is to return or can convert to.
+         * @throw UnsupportedOperationException if the type at index is not of
+         * the type that this method is to return or can convert to.
          */
         virtual char getChar(int index) const;
 
@@ -134,8 +135,8 @@ namespace util{
          * @param index - index to get value from
          * @return value contained at the given index
          * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of the
-         * type that this method is to return or can convert to.
+         * @throw UnsupportedOperationException if the type at index is not of
+         * the type that this method is to return or can convert to.
          */
         virtual short getShort(int index) const;
 
@@ -155,8 +156,8 @@ namespace util{
          * @param index - index to get value from
          * @return value contained at the given index
          * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of the
-         * type that this method is to return or can convert to.
+         * @throw UnsupportedOperationException if the type at index is not of
+         * the type that this method is to return or can convert to.
          */
         virtual int getInt(int index) const;
 
@@ -176,8 +177,8 @@ namespace util{
          * @param index - index to get value from
          * @return value contained at the given index
          * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of the
-         * type that this method is to return or can convert to.
+         * @throw UnsupportedOperationException if the type at index is not of
+         * the type that this method is to return or can convert to.
          */
         virtual long long getLong(int index) const;
 
@@ -197,8 +198,8 @@ namespace util{
          * @param index - index to get value from
          * @return value contained at the given index
          * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of the
-         * type that this method is to return or can convert to.
+         * @throw UnsupportedOperationException if the type at index is not of
+         * the type that this method is to return or can convert to.
          */
         virtual float getFloat(int index) const;
 
@@ -218,8 +219,8 @@ namespace util{
          * @param index - index to get value from
          * @return value contained at the given index
          * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of the
-         * type that this method is to return or can convert to.
+         * @throw UnsupportedOperationException if the type at index is not of
+         * the type that this method is to return or can convert to.
          */
         virtual double getDouble(int index) const;
 
@@ -239,8 +240,8 @@ namespace util{
          * @param index - index to get value from
          * @return value contained at the given index
          * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of the
-         * type that this method is to return or can convert to.
+         * @throw UnsupportedOperationException if the type at index is not of
+         * the type that this method is to return or can convert to.
          */
         virtual std::string getString(int index) const;
 
@@ -260,8 +261,8 @@ namespace util{
          * @param index - index to get value from
          * @return value contained at the given index
          * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of the
-         * type that this method is to return or can convert to.
+         * @throw UnsupportedOperationException if the type at index is not of
+         * the type that this method is to return or can convert to.
          */
         virtual std::vector<unsigned char> getByteArray(int index) const;
 
@@ -274,10 +275,11 @@ namespace util{
          * @param value - the new value to assign to the element at index
          * @throw IndexOutOfBoundsException if index > size().
          */
-        virtual void setByteArray(int index, const std::vector<unsigned char>& value);
-
+        virtual void setByteArray(int                               index,
+                                  const std::vector<unsigned char>& value);
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_UTIL_PRIMITIVELIST_H_*/

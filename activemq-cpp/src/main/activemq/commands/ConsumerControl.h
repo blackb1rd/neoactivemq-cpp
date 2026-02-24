@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/ActiveMQDestination.h>
@@ -31,8 +31,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -45,28 +47,25 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API ConsumerControl : public BaseCommand {
+    class AMQCPP_API ConsumerControl : public BaseCommand
+    {
     protected:
-
         Pointer<ActiveMQDestination> destination;
-        bool close;
-        Pointer<ConsumerId> consumerId;
-        int prefetch;
-        bool flush;
-        bool start;
-        bool stop;
+        bool                         close;
+        Pointer<ConsumerId>          consumerId;
+        int                          prefetch;
+        bool                         flush;
+        bool                         start;
+        bool                         stop;
 
     public:
-
         const static unsigned char ID_CONSUMERCONTROL = 17;
 
     private:
-
         ConsumerControl(const ConsumerControl&);
-        ConsumerControl& operator= (const ConsumerControl&);
+        ConsumerControl& operator=(const ConsumerControl&);
 
     public:
-
         ConsumerControl();
 
         virtual ~ConsumerControl();
@@ -82,17 +81,18 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>& getDestination();
-        virtual void setDestination(const Pointer<ActiveMQDestination>& destination);
+        virtual Pointer<ActiveMQDestination>&       getDestination();
+        virtual void                                setDestination(
+                                           const Pointer<ActiveMQDestination>& destination);
 
         virtual bool isClose() const;
         virtual void setClose(bool close);
 
         virtual const Pointer<ConsumerId>& getConsumerId() const;
-        virtual Pointer<ConsumerId>& getConsumerId();
+        virtual Pointer<ConsumerId>&       getConsumerId();
         virtual void setConsumerId(const Pointer<ConsumerId>& consumerId);
 
-        virtual int getPrefetch() const;
+        virtual int  getPrefetch() const;
         virtual void setPrefetch(int prefetch);
 
         virtual bool isFlush() const;
@@ -107,14 +107,15 @@ namespace commands {
         /**
          * @return an answer of true to the isConsumerControl() query.
          */
-        virtual bool isConsumerControl() const {
+        virtual bool isConsumerControl() const
+        {
             return true;
         }
 
         virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_CONSUMERCONTROL_H_*/

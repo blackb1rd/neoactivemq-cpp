@@ -38,17 +38,21 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-RemoveInfo::RemoveInfo() :
-    BaseCommand(), objectId(NULL), lastDeliveredSequenceId(0) {
-
+RemoveInfo::RemoveInfo()
+    : BaseCommand(),
+      objectId(NULL),
+      lastDeliveredSequenceId(0)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-RemoveInfo::~RemoveInfo() {
+RemoveInfo::~RemoveInfo()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-RemoveInfo* RemoveInfo::cloneDataStructure() const {
+RemoveInfo* RemoveInfo::cloneDataStructure() const
+{
     std::unique_ptr<RemoveInfo> removeInfo(new RemoveInfo());
 
     // Copy the data from the base class or classes
@@ -58,18 +62,21 @@ RemoveInfo* RemoveInfo::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void RemoveInfo::copyDataStructure(const DataStructure* src) {
-
+void RemoveInfo::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const RemoveInfo* srcPtr = dynamic_cast<const RemoveInfo*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "RemoveInfo::copyDataStructure - src is NULL or invalid");
     }
 
@@ -81,13 +88,14 @@ void RemoveInfo::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char RemoveInfo::getDataStructureType() const {
+unsigned char RemoveInfo::getDataStructureType() const
+{
     return RemoveInfo::ID_REMOVEINFO;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string RemoveInfo::toString() const {
-
+std::string RemoveInfo::toString() const
+{
     ostringstream stream;
 
     stream << "RemoveInfo { "
@@ -95,73 +103,93 @@ std::string RemoveInfo::toString() const {
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "ObjectId = ";
-    if (this->getObjectId() != NULL) {
+    if (this->getObjectId() != NULL)
+    {
         stream << this->getObjectId()->toString();
-    } else {
+    }
+    else
+    {
         stream << "NULL";
     }
     stream << ", ";
-    stream << "LastDeliveredSequenceId = " << this->getLastDeliveredSequenceId();
+    stream << "LastDeliveredSequenceId = "
+           << this->getLastDeliveredSequenceId();
     stream << " }";
 
     return stream.str();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool RemoveInfo::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool RemoveInfo::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const RemoveInfo* valuePtr = dynamic_cast<const RemoveInfo*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getObjectId() != NULL) {
-        if (!this->getObjectId()->equals(valuePtr->getObjectId().get())) {
+    if (this->getObjectId() != NULL)
+    {
+        if (!this->getObjectId()->equals(valuePtr->getObjectId().get()))
+        {
             return false;
         }
-    } else if (valuePtr->getObjectId() != NULL) {
+    }
+    else if (valuePtr->getObjectId() != NULL)
+    {
         return false;
     }
-    if (this->getLastDeliveredSequenceId() != valuePtr->getLastDeliveredSequenceId()) {
+    if (this->getLastDeliveredSequenceId() !=
+        valuePtr->getLastDeliveredSequenceId())
+    {
         return false;
     }
-    if (!BaseCommand::equals(value)) {
+    if (!BaseCommand::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<DataStructure>& RemoveInfo::getObjectId() const {
+const decaf::lang::Pointer<DataStructure>& RemoveInfo::getObjectId() const
+{
     return objectId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<DataStructure>& RemoveInfo::getObjectId() {
+decaf::lang::Pointer<DataStructure>& RemoveInfo::getObjectId()
+{
     return objectId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void RemoveInfo::setObjectId(const decaf::lang::Pointer<DataStructure>& objectId) {
+void RemoveInfo::setObjectId(const decaf::lang::Pointer<DataStructure>& objectId)
+{
     this->objectId = objectId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long RemoveInfo::getLastDeliveredSequenceId() const {
+long long RemoveInfo::getLastDeliveredSequenceId() const
+{
     return lastDeliveredSequenceId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void RemoveInfo::setLastDeliveredSequenceId(long long lastDeliveredSequenceId) {
+void RemoveInfo::setLastDeliveredSequenceId(long long lastDeliveredSequenceId)
+{
     this->lastDeliveredSequenceId = lastDeliveredSequenceId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> RemoveInfo::visit(activemq::state::CommandVisitor* visitor) {
+decaf::lang::Pointer<commands::Command> RemoveInfo::visit(
+    activemq::state::CommandVisitor* visitor)
+{
     return visitor->processRemoveInfo(this);
 }

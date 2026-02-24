@@ -23,5 +23,6 @@ using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
 
 ////////////////////////////////////////////////////////////////////////////////
-Condition::~Condition() {
+Condition::~Condition()
+{
 }

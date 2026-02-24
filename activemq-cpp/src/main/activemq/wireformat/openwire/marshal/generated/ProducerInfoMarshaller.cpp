@@ -41,170 +41,228 @@ using namespace decaf::io;
 using namespace decaf::lang;
 
 ///////////////////////////////////////////////////////////////////////////////
-DataStructure* ProducerInfoMarshaller::createObject() const {
+DataStructure* ProducerInfoMarshaller::createObject() const
+{
     return new ProducerInfo();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-unsigned char ProducerInfoMarshaller::getDataStructureType() const {
+unsigned char ProducerInfoMarshaller::getDataStructureType() const
+{
     return ProducerInfo::ID_PRODUCERINFO;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ProducerInfoMarshaller::tightUnmarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataInputStream* dataIn, BooleanStream* bs) {
+void ProducerInfoMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
+                                            DataStructure*   dataStructure,
+                                            DataInputStream* dataIn,
+                                            BooleanStream*   bs)
+{
+    try
+    {
+        BaseCommandMarshaller::tightUnmarshal(wireFormat,
+                                              dataStructure,
+                                              dataIn,
+                                              bs);
 
-    try {
-
-        BaseCommandMarshaller::tightUnmarshal(wireFormat, dataStructure, dataIn, bs);
-
-        ProducerInfo* info =
-            dynamic_cast<ProducerInfo*>(dataStructure);
+        ProducerInfo* info = dynamic_cast<ProducerInfo*>(dataStructure);
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setProducerId(Pointer<ProducerId>(dynamic_cast<ProducerId* >(
+        info->setProducerId(Pointer<ProducerId>(dynamic_cast<ProducerId*>(
             tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
-        info->setDestination(Pointer<ActiveMQDestination>(dynamic_cast<ActiveMQDestination* >(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setDestination(
+            Pointer<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
 
-        if (bs->readBoolean()) {
+        if (bs->readBoolean())
+        {
             short size = dataIn->readShort();
             info->getBrokerPath().reserve(size);
-            for (int i = 0; i < size; i++) {
-                info->getBrokerPath().push_back(Pointer<BrokerId>(dynamic_cast<BrokerId*>(
-                    tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
+            for (int i = 0; i < size; i++)
+            {
+                info->getBrokerPath().push_back(
+                    Pointer<BrokerId>(dynamic_cast<BrokerId*>(
+                        tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
             }
-        } else {
+        }
+        else
+        {
             info->getBrokerPath().clear();
         }
-        if (wireVersion >= 2) {
+        if (wireVersion >= 2)
+        {
             info->setDispatchAsync(bs->readBoolean());
         }
-        if (wireVersion >= 3) {
+        if (wireVersion >= 3)
+        {
             info->setWindowSize(dataIn->readInt());
         }
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int ProducerInfoMarshaller::tightMarshal1(OpenWireFormat* wireFormat, DataStructure* dataStructure, BooleanStream* bs) {
+int ProducerInfoMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
+                                          DataStructure*  dataStructure,
+                                          BooleanStream*  bs)
+{
+    try
+    {
+        ProducerInfo* info = dynamic_cast<ProducerInfo*>(dataStructure);
 
-    try {
-
-        ProducerInfo* info =
-            dynamic_cast<ProducerInfo*>(dataStructure);
-
-        int rc = BaseCommandMarshaller::tightMarshal1(wireFormat, dataStructure, bs);
+        int rc =
+            BaseCommandMarshaller::tightMarshal1(wireFormat, dataStructure, bs);
 
         int wireVersion = wireFormat->getVersion();
 
-        rc += tightMarshalCachedObject1(wireFormat, info->getProducerId().get(), bs);
-        rc += tightMarshalCachedObject1(wireFormat, info->getDestination().get(), bs);
+        rc += tightMarshalCachedObject1(wireFormat,
+                                        info->getProducerId().get(),
+                                        bs);
+        rc += tightMarshalCachedObject1(wireFormat,
+                                        info->getDestination().get(),
+                                        bs);
         rc += tightMarshalObjectArray1(wireFormat, info->getBrokerPath(), bs);
-        if (wireVersion >= 2) {
+        if (wireVersion >= 2)
+        {
             bs->writeBoolean(info->isDispatchAsync());
         }
-        if (wireVersion >= 3) {
+        if (wireVersion >= 3)
+        {
         }
 
         return rc + 4;
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ProducerInfoMarshaller::tightMarshal2(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataOutputStream* dataOut, BooleanStream* bs) {
+void ProducerInfoMarshaller::tightMarshal2(OpenWireFormat*   wireFormat,
+                                           DataStructure*    dataStructure,
+                                           DataOutputStream* dataOut,
+                                           BooleanStream*    bs)
+{
+    try
+    {
+        BaseCommandMarshaller::tightMarshal2(wireFormat,
+                                             dataStructure,
+                                             dataOut,
+                                             bs);
 
-    try {
-
-        BaseCommandMarshaller::tightMarshal2(wireFormat, dataStructure, dataOut, bs );
-
-        ProducerInfo* info =
-            dynamic_cast<ProducerInfo*>(dataStructure);
+        ProducerInfo* info = dynamic_cast<ProducerInfo*>(dataStructure);
 
         int wireVersion = wireFormat->getVersion();
 
-        tightMarshalCachedObject2(wireFormat, info->getProducerId().get(), dataOut, bs);
-        tightMarshalCachedObject2(wireFormat, info->getDestination().get(), dataOut, bs);
+        tightMarshalCachedObject2(wireFormat,
+                                  info->getProducerId().get(),
+                                  dataOut,
+                                  bs);
+        tightMarshalCachedObject2(wireFormat,
+                                  info->getDestination().get(),
+                                  dataOut,
+                                  bs);
         tightMarshalObjectArray2(wireFormat, info->getBrokerPath(), dataOut, bs);
-        if (wireVersion >= 2) {
+        if (wireVersion >= 2)
+        {
             bs->readBoolean();
         }
-        if (wireVersion >= 3) {
+        if (wireVersion >= 3)
+        {
             dataOut->writeInt(info->getWindowSize());
         }
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT( exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ProducerInfoMarshaller::looseUnmarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataInputStream* dataIn) {
-
-    try {
-
-        BaseCommandMarshaller::looseUnmarshal(wireFormat, dataStructure, dataIn);
-        ProducerInfo* info =
-            dynamic_cast<ProducerInfo*>(dataStructure);
+void ProducerInfoMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
+                                            DataStructure*   dataStructure,
+                                            DataInputStream* dataIn)
+{
+    try
+    {
+        BaseCommandMarshaller::looseUnmarshal(wireFormat,
+                                              dataStructure,
+                                              dataIn);
+        ProducerInfo* info = dynamic_cast<ProducerInfo*>(dataStructure);
 
         int wireVersion = wireFormat->getVersion();
 
         info->setProducerId(Pointer<ProducerId>(dynamic_cast<ProducerId*>(
             looseUnmarshalCachedObject(wireFormat, dataIn))));
-        info->setDestination(Pointer<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setDestination(
+            Pointer<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
 
-        if (dataIn->readBoolean()) {
+        if (dataIn->readBoolean())
+        {
             short size = dataIn->readShort();
             info->getBrokerPath().reserve(size);
-            for (int i = 0; i < size; i++) {
-                info->getBrokerPath().push_back( Pointer<BrokerId>(dynamic_cast<BrokerId*>(
-                    looseUnmarshalNestedObject(wireFormat, dataIn))));
+            for (int i = 0; i < size; i++)
+            {
+                info->getBrokerPath().push_back(
+                    Pointer<BrokerId>(dynamic_cast<BrokerId*>(
+                        looseUnmarshalNestedObject(wireFormat, dataIn))));
             }
-        } else {
+        }
+        else
+        {
             info->getBrokerPath().clear();
         }
-        if (wireVersion >= 2) {
+        if (wireVersion >= 2)
+        {
             info->setDispatchAsync(dataIn->readBoolean());
         }
-        if (wireVersion >= 3) {
+        if (wireVersion >= 3)
+        {
             info->setWindowSize(dataIn->readInt());
         }
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ProducerInfoMarshaller::looseMarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataOutputStream* dataOut) {
-
-    try {
-
-        ProducerInfo* info =
-            dynamic_cast<ProducerInfo*>(dataStructure);
+void ProducerInfoMarshaller::looseMarshal(OpenWireFormat*   wireFormat,
+                                          DataStructure*    dataStructure,
+                                          DataOutputStream* dataOut)
+{
+    try
+    {
+        ProducerInfo* info = dynamic_cast<ProducerInfo*>(dataStructure);
         BaseCommandMarshaller::looseMarshal(wireFormat, dataStructure, dataOut);
 
         int wireVersion = wireFormat->getVersion();
 
-        looseMarshalCachedObject(wireFormat, info->getProducerId().get(), dataOut);
-        looseMarshalCachedObject(wireFormat, info->getDestination().get(), dataOut);
+        looseMarshalCachedObject(wireFormat,
+                                 info->getProducerId().get(),
+                                 dataOut);
+        looseMarshalCachedObject(wireFormat,
+                                 info->getDestination().get(),
+                                 dataOut);
         looseMarshalObjectArray(wireFormat, info->getBrokerPath(), dataOut);
-        if (wireVersion >= 2) {
+        if (wireVersion >= 2)
+        {
             dataOut->writeBoolean(info->isDispatchAsync());
         }
-        if (wireVersion >= 3) {
+        if (wireVersion >= 3)
+        {
             dataOut->writeInt(info->getWindowSize());
         }
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
-

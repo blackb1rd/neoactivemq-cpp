@@ -25,14 +25,16 @@
 #include <decaf/io/IOException.h>
 #include <decaf/lang/Pointer.h>
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/Command.h>
 #include <activemq/transport/Transport.h>
+#include <activemq/util/Config.h>
 
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 
-namespace activemq {
-namespace wireformat {
+namespace activemq
+{
+namespace wireformat
+{
 
     using decaf::lang::Pointer;
 
@@ -40,14 +42,14 @@ namespace wireformat {
      * Provides a mechanism to marshal commands into and out of packets
      * or into and out of streams, Channels and Datagrams.
      */
-    class AMQCPP_API WireFormat {
+    class AMQCPP_API WireFormat
+    {
     public:
-
         virtual ~WireFormat();
 
         /**
-         * Stream based marshaling of a Command, this method blocks until the entire
-         * Command has been written out to the output stream.
+         * Stream based marshaling of a Command, this method blocks until the
+         * entire Command has been written out to the output stream.
          *
          * @param command
          *      The Command to Marshal
@@ -58,14 +60,14 @@ namespace wireformat {
          *
          * @throws IOException if an I/O error occurs.
          */
-        virtual void marshal(const Pointer<commands::Command> command,
+        virtual void marshal(const Pointer<commands::Command>      command,
                              const activemq::transport::Transport* transport,
-                             decaf::io::DataOutputStream* out) = 0;
+                             decaf::io::DataOutputStream*          out) = 0;
 
         /**
-         * Stream based unmarshaling, blocks on reads on the input stream until a complete
-         * command has been read and unmarshaled into the correct form.  Returns a Pointer
-         * to the newly unmarshaled Command.
+         * Stream based unmarshaling, blocks on reads on the input stream until
+         * a complete command has been read and unmarshaled into the correct
+         * form.  Returns a Pointer to the newly unmarshaled Command.
          *
          * @param transport
          *      Pointer to the transport that is making this request.
@@ -76,8 +78,9 @@ namespace wireformat {
          *
          * @throws IOException if an I/O error occurs.
          */
-        virtual Pointer<commands::Command> unmarshal(const activemq::transport::Transport* transport,
-                                                     decaf::io::DataInputStream* in) = 0;
+        virtual Pointer<commands::Command> unmarshal(
+            const activemq::transport::Transport* transport,
+            decaf::io::DataInputStream*           in) = 0;
 
         /**
          * Set the Version
@@ -95,39 +98,42 @@ namespace wireformat {
         virtual int getVersion() const = 0;
 
         /**
-         * Returns true if this WireFormat has a Negotiator that needs to wrap the
-         * Transport that uses it.
+         * Returns true if this WireFormat has a Negotiator that needs to wrap
+         * the Transport that uses it.
          * @return true if the WireFormat provides a Negotiator.
          */
         virtual bool hasNegotiator() const = 0;
 
         /**
-         * Indicates if the WireFromat object is in the process of receiving a message.  This
-         * is useful for monitoring inactivity and the WireFormat is processing a large message
-         * which takes longer than some configured timeout to unmarshal, the inactivity monitor
-         * can query the WireFormat instance to determine if its busy or not and not mark the
-         * connection as inactive if so.
+         * Indicates if the WireFromat object is in the process of receiving a
+         * message.  This is useful for monitoring inactivity and the WireFormat
+         * is processing a large message which takes longer than some configured
+         * timeout to unmarshal, the inactivity monitor can query the WireFormat
+         * instance to determine if its busy or not and not mark the connection
+         * as inactive if so.
          *
          * @return true if the WireFormat object is unmarshaling a message.
          */
         virtual bool inReceive() const = 0;
 
         /**
-         * If the Transport Provides a Negotiator this method will create and return
-         * a new instance of the Negotiator.
+         * If the Transport Provides a Negotiator this method will create and
+         * return a new instance of the Negotiator.
          *
          * @param transport
          *      The Transport to Wrap the Negotiator around.
          *
-         * @return new instance of a WireFormatNegotiator as a Pointer<Transport>.
+         * @return new instance of a WireFormatNegotiator as a
+         * Pointer<Transport>.
          *
-         * @throws UnsupportedOperationException if the WireFormat doesn't have a Negotiator.
+         * @throws UnsupportedOperationException if the WireFormat doesn't have
+         * a Negotiator.
          */
         virtual Pointer<transport::Transport> createNegotiator(
             const Pointer<transport::Transport> transport) = 0;
-
     };
 
-}}
+}  // namespace wireformat
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_WIREFORMAT_WIREFORMAT_H_*/

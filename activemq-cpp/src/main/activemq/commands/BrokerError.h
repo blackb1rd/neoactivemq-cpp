@@ -18,45 +18,52 @@
 #ifndef _ACTIVEMQ_COMMANDS_BROKERERROR_H_
 #define _ACTIVEMQ_COMMANDS_BROKERERROR_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/BaseCommand.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/Config.h>
 #include <decaf/lang/Pointer.h>
 
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     /**
-     * This class represents an Exception sent from the Broker.  The Broker sends a java
-     * Throwable structure, so we must mimic its structure here.  We provide a means in this
-     * class to create a Decaf Exception that represents the error from the broker.
+     * This class represents an Exception sent from the Broker.  The Broker
+     * sends a java Throwable structure, so we must mimic its structure here. We
+     * provide a means in this class to create a Decaf Exception that represents
+     * the error from the broker.
      */
-    class AMQCPP_API BrokerError : public BaseCommand {
+    class AMQCPP_API BrokerError : public BaseCommand
+    {
     public:
-
         struct StackTraceElement
         {
             std::string ClassName;
             std::string FileName;
             std::string MethodName;
-            int LineNumber;
+            int         LineNumber;
 
-            StackTraceElement() : ClassName(), FileName(), MethodName(), LineNumber() {}
+            StackTraceElement()
+                : ClassName(),
+                  FileName(),
+                  MethodName(),
+                  LineNumber()
+            {
+            }
         };
 
     private:
-
-        std::string message;
-        std::string exceptionClass;
-        std::vector< decaf::lang::Pointer<StackTraceElement> > stackTraceElements;
-        decaf::lang::Pointer<BrokerError> cause;
-        decaf::lang::Pointer<decaf::lang::Exception> exCause;
+        std::string                                          message;
+        std::string                                          exceptionClass;
+        std::vector<decaf::lang::Pointer<StackTraceElement>> stackTraceElements;
+        decaf::lang::Pointer<BrokerError>                    cause;
+        decaf::lang::Pointer<decaf::lang::Exception>         exCause;
 
     public:
-
         BrokerError();
 
         BrokerError(decaf::lang::Pointer<decaf::lang::Exception> exCause);
@@ -67,7 +74,8 @@ namespace commands {
          * Get the DataStructure Type as defined in CommandTypes.h
          * @return The type of the data structure
          */
-        virtual unsigned char getDataStructureType() const {
+        virtual unsigned char getDataStructureType() const
+        {
             return 0;
         }
 
@@ -76,9 +84,10 @@ namespace commands {
          * caller now owns, this will be an exact copy of this one
          * @return new copy of this object.
          */
-        virtual BrokerError* cloneDataStructure() const {
+        virtual BrokerError* cloneDataStructure() const
+        {
             BrokerError* error = new BrokerError();
-            error->copyDataStructure( this );
+            error->copyDataStructure(this);
             return error;
         }
 
@@ -91,18 +100,21 @@ namespace commands {
 
         /**
          * Allows a Visitor to visit this command and return a response to the
-         * command based on the command type being visited.  The command will call
-         * the proper processXXX method in the visitor.
+         * command based on the command type being visited.  The command will
+         * call the proper processXXX method in the visitor.
          *
-         * @return a Response to the visitor being called or NULL if no response.
+         * @return a Response to the visitor being called or NULL if no
+         * response.
          */
-        virtual decaf::lang::Pointer<commands::Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual decaf::lang::Pointer<commands::Command> visit(
+            activemq::state::CommandVisitor* visitor);
 
         /**
          * Gets the string holding the error message
          * @return String Message
          */
-        virtual const std::string& getMessage() const {
+        virtual const std::string& getMessage() const
+        {
             return message;
         }
 
@@ -110,7 +122,8 @@ namespace commands {
          * Sets the string that contains the error Message
          * @param message - String Error Message
          */
-        virtual void setMessage(const std::string& message) {
+        virtual void setMessage(const std::string& message)
+        {
             this->message = message;
         }
 
@@ -118,7 +131,8 @@ namespace commands {
          * Gets the string holding the Exception Class name
          * @return Exception Class name
          */
-        virtual const std::string& getExceptionClass() const {
+        virtual const std::string& getExceptionClass() const
+        {
             return exceptionClass;
         }
 
@@ -126,7 +140,8 @@ namespace commands {
          * Sets the string that contains the Exception Class name
          * @param exceptionClass - String Exception Class name
          */
-        virtual void setExceptionClass(const std::string& exceptionClass) {
+        virtual void setExceptionClass(const std::string& exceptionClass)
+        {
             this->exceptionClass = exceptionClass;
         }
 
@@ -134,7 +149,8 @@ namespace commands {
          * Gets the Broker Error that caused this exception
          * @return Broker Error Pointer
          */
-        virtual const decaf::lang::Pointer<BrokerError>& getCause() const {
+        virtual const decaf::lang::Pointer<BrokerError>& getCause() const
+        {
             return cause;
         }
 
@@ -142,7 +158,8 @@ namespace commands {
          * Sets the Broker Error that caused this exception
          * @param cause - Broker Error
          */
-        virtual void setCause(const decaf::lang::Pointer<BrokerError>& cause) {
+        virtual void setCause(const decaf::lang::Pointer<BrokerError>& cause)
+        {
             this->cause = cause;
         }
 
@@ -150,7 +167,9 @@ namespace commands {
          * Gets the Stack Trace Elements for the Exception
          * @return Stack Trace Elements
          */
-        virtual const std::vector<decaf::lang::Pointer<StackTraceElement> >& getStackTraceElements() const {
+        virtual const std::vector<decaf::lang::Pointer<StackTraceElement>>&
+        getStackTraceElements() const
+        {
             return stackTraceElements;
         }
 
@@ -158,39 +177,49 @@ namespace commands {
          * Sets the Stack Trace Elements for this Exception
          * @param stackTraceElements - Stack Trace Elements
          */
-        virtual void setStackTraceElements(const std::vector<decaf::lang::Pointer<StackTraceElement> >& stackTraceElements) {
+        virtual void setStackTraceElements(
+            const std::vector<decaf::lang::Pointer<StackTraceElement>>&
+                stackTraceElements)
+        {
             this->stackTraceElements = stackTraceElements;
         }
 
         /**
-         * @return the local Exception that was the source of this BrokerError instance
+         * @return the local Exception that was the source of this BrokerError
+         * instance
          */
-        decaf::lang::Pointer<decaf::lang::Exception> getLocalException() const {
+        decaf::lang::Pointer<decaf::lang::Exception> getLocalException() const
+        {
             return this->exCause;
         }
 
         /**
-         * Sets the Pointer to the local exception that is the source of this Error
+         * Sets the Pointer to the local exception that is the source of this
+         * Error
          *
          * @param exCause
          *      The Exception that originated this BrokerError.
          */
-        void setLocalException(decaf::lang::Pointer<decaf::lang::Exception> exCause) {
+        void setLocalException(
+            decaf::lang::Pointer<decaf::lang::Exception> exCause)
+        {
             this->exCause = exCause;
         }
 
         /**
-         * Creates and returns a ActiveMQException object that contains the error data from the Broker.
+         * Creates and returns a ActiveMQException object that contains the
+         * error data from the Broker.
          *
-         * The returned exception will if possible contain a cms::CMSException pointer that represents
-         * the actual JMS exception that was forwarded from the broker.
+         * The returned exception will if possible contain a cms::CMSException
+         * pointer that represents the actual JMS exception that was forwarded
+         * from the broker.
          *
          * @return a new instance of an ActiveMQException
          */
         exceptions::ActiveMQException createExceptionObject();
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_BROKERERROR_H_*/

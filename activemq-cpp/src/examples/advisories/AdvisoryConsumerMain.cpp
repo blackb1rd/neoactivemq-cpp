@@ -18,8 +18,8 @@
 #include "AdvisoryConsumer.h"
 
 #include <activemq/library/ActiveMQCPP.h>
-#include <cms/ConnectionFactory.h>
 #include <cms/Connection.h>
+#include <cms/ConnectionFactory.h>
 #include <cms/Session.h>
 #include <stdlib.h>
 #include <iostream>
@@ -30,8 +30,8 @@ using namespace cms;
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
-int main( int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED ) {
-
+int main(int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED)
+{
     // We must always init the library first before using any methods in it.
     activemq::library::ActiveMQCPP::initializeLibrary();
 
@@ -50,30 +50,35 @@ int main( int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED ) {
 
     // Create the Connection
     std::unique_ptr<cms::ConnectionFactory> connectionFactory(
-        cms::ConnectionFactory::createCMSConnectionFactory( brokerURI ) );
+        cms::ConnectionFactory::createCMSConnectionFactory(brokerURI));
 
     std::unique_ptr<cms::Connection> connection;
 
     // Create a Connection
-    try{
-        connection.reset( connectionFactory->createConnection() );
-    } catch( CMSException& e ) {
+    try
+    {
+        connection.reset(connectionFactory->createConnection());
+    }
+    catch (CMSException& e)
+    {
         e.printStackTrace();
         return 1;
     }
 
     // Create the Session
-    std::unique_ptr<cms::Session> session( connection->createSession() );
+    std::unique_ptr<cms::Session> session(connection->createSession());
 
     // Create the producer and run it.
-    AdvisoryConsumer advisoryConsumer( session.get() );
+    AdvisoryConsumer advisoryConsumer(session.get());
 
     // Start the Connection now.
     connection->start();
 
     // Wait until we are told to quit.
     std::cout << "Press 'q' to quit" << std::endl;
-    while( std::cin.get() != 'q') {}
+    while (std::cin.get() != 'q')
+    {
+    }
 
     // Shutdown now
     advisoryConsumer.close();

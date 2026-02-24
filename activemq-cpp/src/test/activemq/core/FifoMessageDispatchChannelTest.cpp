@@ -17,8 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include <activemq/core/FifoMessageDispatchChannel.h>
 #include <activemq/commands/MessageDispatch.h>
+#include <activemq/core/FifoMessageDispatchChannel.h>
 #include <decaf/lang/Pointer.h>
 #include <decaf/lang/System.h>
 
@@ -28,12 +28,13 @@ using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
 
-class FifoMessageDispatchChannelTest : public ::testing::Test {
+class FifoMessageDispatchChannelTest : public ::testing::Test
+{
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FifoMessageDispatchChannelTest, testCtor) {
-
+TEST_F(FifoMessageDispatchChannelTest, testCtor)
+{
     FifoMessageDispatchChannel channel;
     ASSERT_TRUE(channel.isRunning() == false);
     ASSERT_TRUE(channel.isEmpty() == true);
@@ -42,16 +43,16 @@ TEST_F(FifoMessageDispatchChannelTest, testCtor) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FifoMessageDispatchChannelTest, testStart) {
-
+TEST_F(FifoMessageDispatchChannelTest, testStart)
+{
     FifoMessageDispatchChannel channel;
     channel.start();
     ASSERT_TRUE(channel.isRunning() == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FifoMessageDispatchChannelTest, testStop) {
-
+TEST_F(FifoMessageDispatchChannelTest, testStop)
+{
     FifoMessageDispatchChannel channel;
     channel.start();
     ASSERT_TRUE(channel.isRunning() == true);
@@ -60,8 +61,8 @@ TEST_F(FifoMessageDispatchChannelTest, testStop) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FifoMessageDispatchChannelTest, testClose) {
-
+TEST_F(FifoMessageDispatchChannelTest, testClose)
+{
     FifoMessageDispatchChannel channel;
     channel.start();
     ASSERT_TRUE(channel.isRunning() == true);
@@ -75,44 +76,44 @@ TEST_F(FifoMessageDispatchChannelTest, testClose) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FifoMessageDispatchChannelTest, testEnqueue) {
-
+TEST_F(FifoMessageDispatchChannelTest, testEnqueue)
+{
     FifoMessageDispatchChannel channel;
-    Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch2( new MessageDispatch() );
+    Pointer<MessageDispatch>   dispatch1(new MessageDispatch());
+    Pointer<MessageDispatch>   dispatch2(new MessageDispatch());
 
     ASSERT_TRUE(channel.isEmpty() == true);
     ASSERT_TRUE(channel.size() == 0);
 
-    channel.enqueue( dispatch1 );
+    channel.enqueue(dispatch1);
 
     ASSERT_TRUE(channel.isEmpty() == false);
     ASSERT_TRUE(channel.size() == 1);
 
-    channel.enqueue( dispatch2 );
+    channel.enqueue(dispatch2);
 
     ASSERT_TRUE(channel.isEmpty() == false);
     ASSERT_TRUE(channel.size() == 2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FifoMessageDispatchChannelTest, testEnqueueFront) {
-
+TEST_F(FifoMessageDispatchChannelTest, testEnqueueFront)
+{
     FifoMessageDispatchChannel channel;
-    Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch2( new MessageDispatch() );
+    Pointer<MessageDispatch>   dispatch1(new MessageDispatch());
+    Pointer<MessageDispatch>   dispatch2(new MessageDispatch());
 
     channel.start();
 
     ASSERT_TRUE(channel.isEmpty() == true);
     ASSERT_TRUE(channel.size() == 0);
 
-    channel.enqueueFirst( dispatch1 );
+    channel.enqueueFirst(dispatch1);
 
     ASSERT_TRUE(channel.isEmpty() == false);
     ASSERT_TRUE(channel.size() == 1);
 
-    channel.enqueueFirst( dispatch2 );
+    channel.enqueueFirst(dispatch2);
 
     ASSERT_TRUE(channel.isEmpty() == false);
     ASSERT_TRUE(channel.size() == 2);
@@ -122,21 +123,21 @@ TEST_F(FifoMessageDispatchChannelTest, testEnqueueFront) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FifoMessageDispatchChannelTest, testPeek) {
-
+TEST_F(FifoMessageDispatchChannelTest, testPeek)
+{
     FifoMessageDispatchChannel channel;
-    Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch2( new MessageDispatch() );
+    Pointer<MessageDispatch>   dispatch1(new MessageDispatch());
+    Pointer<MessageDispatch>   dispatch2(new MessageDispatch());
 
     ASSERT_TRUE(channel.isEmpty() == true);
     ASSERT_TRUE(channel.size() == 0);
 
-    channel.enqueueFirst( dispatch1 );
+    channel.enqueueFirst(dispatch1);
 
     ASSERT_TRUE(channel.isEmpty() == false);
     ASSERT_TRUE(channel.size() == 1);
 
-    channel.enqueueFirst( dispatch2 );
+    channel.enqueueFirst(dispatch2);
 
     ASSERT_TRUE(channel.isEmpty() == false);
     ASSERT_TRUE(channel.size() == 2);
@@ -152,20 +153,20 @@ TEST_F(FifoMessageDispatchChannelTest, testPeek) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FifoMessageDispatchChannelTest, testDequeueNoWait) {
-
+TEST_F(FifoMessageDispatchChannelTest, testDequeueNoWait)
+{
     FifoMessageDispatchChannel channel;
 
-    Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch2( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch3( new MessageDispatch() );
+    Pointer<MessageDispatch> dispatch1(new MessageDispatch());
+    Pointer<MessageDispatch> dispatch2(new MessageDispatch());
+    Pointer<MessageDispatch> dispatch3(new MessageDispatch());
 
     ASSERT_TRUE(channel.isRunning() == false);
     ASSERT_TRUE(channel.dequeueNoWait() == NULL);
 
-    channel.enqueue( dispatch1 );
-    channel.enqueue( dispatch2 );
-    channel.enqueue( dispatch3 );
+    channel.enqueue(dispatch1);
+    channel.enqueue(dispatch2);
+    channel.enqueue(dispatch3);
 
     ASSERT_TRUE(channel.dequeueNoWait() == NULL);
     channel.start();
@@ -182,48 +183,48 @@ TEST_F(FifoMessageDispatchChannelTest, testDequeueNoWait) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FifoMessageDispatchChannelTest, testDequeue) {
-
+TEST_F(FifoMessageDispatchChannelTest, testDequeue)
+{
     FifoMessageDispatchChannel channel;
 
-    Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch2( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch3( new MessageDispatch() );
+    Pointer<MessageDispatch> dispatch1(new MessageDispatch());
+    Pointer<MessageDispatch> dispatch2(new MessageDispatch());
+    Pointer<MessageDispatch> dispatch3(new MessageDispatch());
 
     channel.start();
     ASSERT_TRUE(channel.isRunning() == true);
 
     long long timeStarted = System::currentTimeMillis();
 
-    ASSERT_TRUE(channel.dequeue( 1000 ) == NULL);
+    ASSERT_TRUE(channel.dequeue(1000) == NULL);
 
     ASSERT_TRUE(System::currentTimeMillis() - timeStarted >= 999);
 
-    channel.enqueue( dispatch1 );
-    channel.enqueue( dispatch2 );
-    channel.enqueue( dispatch3 );
+    channel.enqueue(dispatch1);
+    channel.enqueue(dispatch2);
+    channel.enqueue(dispatch3);
     ASSERT_TRUE(channel.isEmpty() == false);
     ASSERT_TRUE(channel.size() == 3);
-    ASSERT_TRUE(channel.dequeue( -1 ) == dispatch1);
-    ASSERT_TRUE(channel.dequeue( 0 ) == dispatch2);
-    ASSERT_TRUE(channel.dequeue( 1000 ) == dispatch3);
+    ASSERT_TRUE(channel.dequeue(-1) == dispatch1);
+    ASSERT_TRUE(channel.dequeue(0) == dispatch2);
+    ASSERT_TRUE(channel.dequeue(1000) == dispatch3);
 
     ASSERT_TRUE(channel.size() == 0);
     ASSERT_TRUE(channel.isEmpty() == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FifoMessageDispatchChannelTest, testRemoveAll) {
-
+TEST_F(FifoMessageDispatchChannelTest, testRemoveAll)
+{
     FifoMessageDispatchChannel channel;
 
-    Pointer<MessageDispatch> dispatch1( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch2( new MessageDispatch() );
-    Pointer<MessageDispatch> dispatch3( new MessageDispatch() );
+    Pointer<MessageDispatch> dispatch1(new MessageDispatch());
+    Pointer<MessageDispatch> dispatch2(new MessageDispatch());
+    Pointer<MessageDispatch> dispatch3(new MessageDispatch());
 
-    channel.enqueue( dispatch1 );
-    channel.enqueue( dispatch2 );
-    channel.enqueue( dispatch3 );
+    channel.enqueue(dispatch1);
+    channel.enqueue(dispatch2);
+    channel.enqueue(dispatch3);
 
     channel.start();
     ASSERT_TRUE(channel.isRunning() == true);

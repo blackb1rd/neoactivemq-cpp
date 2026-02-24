@@ -23,62 +23,67 @@
 #include <decaf/util/logging/Formatter.h>
 #include <decaf/util/logging/LogRecord.h>
 
-namespace decaf {
-namespace util {
-namespace logging {
-
-    /**
-     * Format a LogRecord into a standard XML format.
-     *
-     * TODO - Currently only outputs UTF-8
-     * The XMLFormatter can be used with arbitrary character encodings, but it is
-     * recommended that it normally be used with UTF-8. The character encoding can
-     * be set on the output Handler.
-     *
-     * @since 1.0
-     */
-    class DECAF_API XMLFormatter : public Formatter {
-    public:
-
-        XMLFormatter();
-
-        virtual ~XMLFormatter();
+namespace decaf
+{
+namespace util
+{
+    namespace logging
+    {
 
         /**
-         * Converts a LogRecord into an XML string.
+         * Format a LogRecord into a standard XML format.
          *
-         * @param record
-         *       The log record to be formatted.
+         * TODO - Currently only outputs UTF-8
+         * The XMLFormatter can be used with arbitrary character encodings, but
+         * it is recommended that it normally be used with UTF-8. The character
+         * encoding can be set on the output Handler.
          *
-         * @return the log record formatted as an XML string.
+         * @since 1.0
          */
-        virtual std::string format( const LogRecord& record ) const;
+        class DECAF_API XMLFormatter : public Formatter
+        {
+        public:
+            XMLFormatter();
 
-        /**
-         * Returns the header string for a set of log records formatted as XML
-         * strings, using the output handler's encoding if it is defined, otherwise
-         * using the default platform encoding.
-         *
-         * @param handler
-         *       The output handler, may be NULL.
-         *
-         * @return the header string for log records formatted as XML strings.
-         */
-        virtual std::string getHead( const Handler* handler );
+            virtual ~XMLFormatter();
 
-        /**
-         * Returns the tail string for a set of log records formatted as XML
-         * strings.
-         *
-         * @param handler
-         *       The output handler, may be NULL.
-         *
-         * @return the tail string for log records formatted as XML strings.
-         */
-        virtual std::string getTail( const Handler* handler );
+            /**
+             * Converts a LogRecord into an XML string.
+             *
+             * @param record
+             *       The log record to be formatted.
+             *
+             * @return the log record formatted as an XML string.
+             */
+            virtual std::string format(const LogRecord& record) const;
 
-    };
+            /**
+             * Returns the header string for a set of log records formatted as
+             * XML strings, using the output handler's encoding if it is
+             * defined, otherwise using the default platform encoding.
+             *
+             * @param handler
+             *       The output handler, may be NULL.
+             *
+             * @return the header string for log records formatted as XML
+             * strings.
+             */
+            virtual std::string getHead(const Handler* handler);
 
-}}}
+            /**
+             * Returns the tail string for a set of log records formatted as XML
+             * strings.
+             *
+             * @param handler
+             *       The output handler, may be NULL.
+             *
+             * @return the tail string for log records formatted as XML strings.
+             */
+            virtual std::string getTail(const Handler* handler);
+        };
+
+    }  // namespace logging
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_LOGGING_XMLFORMATTER_H_ */

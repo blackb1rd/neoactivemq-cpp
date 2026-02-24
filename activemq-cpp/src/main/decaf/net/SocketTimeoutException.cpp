@@ -22,26 +22,38 @@ using namespace decaf::net;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketTimeoutException::SocketTimeoutException() : io::InterruptedIOException() {
+SocketTimeoutException::SocketTimeoutException()
+    : io::InterruptedIOException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketTimeoutException::~SocketTimeoutException() throw() {
+SocketTimeoutException::~SocketTimeoutException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketTimeoutException::SocketTimeoutException(const Exception& ex) : io::InterruptedIOException() {
-    *(Exception*) this = ex;
+SocketTimeoutException::SocketTimeoutException(const Exception& ex)
+    : io::InterruptedIOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketTimeoutException::SocketTimeoutException(const SocketTimeoutException& ex) : io::InterruptedIOException() {
-    *(Exception*) this = ex;
+SocketTimeoutException::SocketTimeoutException(const SocketTimeoutException& ex)
+    : io::InterruptedIOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketTimeoutException::SocketTimeoutException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : io::InterruptedIOException(cause) {
-
+SocketTimeoutException::SocketTimeoutException(const char*           file,
+                                               const int             lineNumber,
+                                               const std::exception* cause,
+                                               const char*           msg,
+                                               ...)
+    : io::InterruptedIOException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -51,12 +63,18 @@ SocketTimeoutException::SocketTimeoutException(const char* file, const int lineN
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketTimeoutException::SocketTimeoutException(const std::exception* cause) : io::InterruptedIOException(cause) {
+SocketTimeoutException::SocketTimeoutException(const std::exception* cause)
+    : io::InterruptedIOException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketTimeoutException::SocketTimeoutException(const char* file, const int lineNumber, const char* msg, ...) : io::InterruptedIOException() {
-
+SocketTimeoutException::SocketTimeoutException(const char* file,
+                                               const int   lineNumber,
+                                               const char* msg,
+                                               ...)
+    : io::InterruptedIOException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

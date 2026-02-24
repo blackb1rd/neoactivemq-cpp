@@ -23,22 +23,34 @@ using namespace decaf::lang;
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionFailedException::ConnectionFailedException() : ActiveMQException() {
+ConnectionFailedException::ConnectionFailedException()
+    : ActiveMQException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionFailedException::ConnectionFailedException(const exceptions::ActiveMQException& ex) : ActiveMQException() {
-    *(exceptions::ActiveMQException*) this = ex;
+ConnectionFailedException::ConnectionFailedException(
+    const exceptions::ActiveMQException& ex)
+    : ActiveMQException()
+{
+    *(exceptions::ActiveMQException*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionFailedException::ConnectionFailedException(const ConnectionFailedException& ex) : ActiveMQException() {
-    *(exceptions::ActiveMQException*) this = ex;
+ConnectionFailedException::ConnectionFailedException(
+    const ConnectionFailedException& ex)
+    : ActiveMQException()
+{
+    *(exceptions::ActiveMQException*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionFailedException::ConnectionFailedException(const char* file, const int lineNumber, const char* msg, ...) : ActiveMQException() {
-
+ConnectionFailedException::ConnectionFailedException(const char* file,
+                                                     const int   lineNumber,
+                                                     const char* msg,
+                                                     ...)
+    : ActiveMQException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -48,12 +60,12 @@ ConnectionFailedException::ConnectionFailedException(const char* file, const int
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionFailedException::~ConnectionFailedException() throw() {
-
+ConnectionFailedException::~ConnectionFailedException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionFailedException* ConnectionFailedException::clone() const {
+ConnectionFailedException* ConnectionFailedException::clone() const
+{
     return new ConnectionFailedException(*this);
 }
-

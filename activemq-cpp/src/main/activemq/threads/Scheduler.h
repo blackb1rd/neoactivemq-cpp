@@ -22,60 +22,65 @@
 #include <activemq/util/ServiceSupport.h>
 
 #include <decaf/lang/Runnable.h>
-#include <decaf/util/Timer.h>
 #include <decaf/util/StlMap.h>
+#include <decaf/util/Timer.h>
 #include <decaf/util/concurrent/Mutex.h>
 
 #include <string>
 
-namespace activemq {
-namespace threads {
+namespace activemq
+{
+namespace threads
+{
 
     /**
-     * Scheduler class for use in executing Runnable Tasks either periodically or
-     * one time only with optional delay.
+     * Scheduler class for use in executing Runnable Tasks either periodically
+     * or one time only with optional delay.
      *
      * @since 3.3.0
      */
-    class AMQCPP_API Scheduler : public activemq::util::ServiceSupport {
+    class AMQCPP_API Scheduler : public activemq::util::ServiceSupport
+    {
     private:
-
         decaf::util::concurrent::Mutex mutex;
-        std::string name;
-        decaf::util::Timer* timer;
-        decaf::util::StlMap<decaf::lang::Runnable*, decaf::util::TimerTask*> tasks;
+        std::string                    name;
+        decaf::util::Timer*            timer;
+        decaf::util::StlMap<decaf::lang::Runnable*, decaf::util::TimerTask*>
+            tasks;
 
     private:
-
         Scheduler(const Scheduler&);
-        Scheduler& operator= (const Scheduler&);
+        Scheduler& operator=(const Scheduler&);
 
     public:
-
         Scheduler(const std::string& name);
 
         virtual ~Scheduler();
 
     public:
+        void executePeriodically(decaf::lang::Runnable* task,
+                                 long long              period,
+                                 bool                   ownsTask = true);
 
-        void executePeriodically(decaf::lang::Runnable* task, long long period, bool ownsTask = true);
-
-        void schedualPeriodically(decaf::lang::Runnable* task, long long period, bool ownsTask = true);
+        void schedualPeriodically(decaf::lang::Runnable* task,
+                                  long long              period,
+                                  bool                   ownsTask = true);
 
         void cancel(decaf::lang::Runnable* task);
 
-        void executeAfterDelay(decaf::lang::Runnable* task, long long delay, bool ownsTask = true);
+        void executeAfterDelay(decaf::lang::Runnable* task,
+                               long long              delay,
+                               bool                   ownsTask = true);
 
         void shutdown();
 
     protected:
-
         virtual void doStart();
 
         virtual void doStop(activemq::util::ServiceStopper* stopper);
-
     };
 
-}}
+}  // namespace threads
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_THREADS_SCHEDULER_H_ */

@@ -18,13 +18,15 @@
 #ifndef _DECAF_IO_FILTERINPUTSTREAM_H_
 #define _DECAF_IO_FILTERINPUTSTREAM_H_
 
-#include <decaf/io/InputStream.h>
 #include <decaf/io/IOException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/io/InputStream.h>
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 
-namespace decaf{
-namespace io{
+namespace decaf
+{
+namespace io
+{
 
     /**
      * A FilterInputStream contains some other input stream, which it uses
@@ -35,9 +37,9 @@ namespace io{
      * FilterInputStream  may further override some of these methods and may
      * also provide additional methods and fields.
      */
-    class DECAF_API FilterInputStream: public InputStream {
+    class DECAF_API FilterInputStream : public InputStream
+    {
     protected:
-
         // The input stream to wrap
         InputStream* inputStream;
 
@@ -48,12 +50,10 @@ namespace io{
         volatile bool closed;
 
     private:
-
         FilterInputStream(const FilterInputStream&);
         FilterInputStream& operator=(const FilterInputStream&);
 
     public:
-
         /**
          * Constructor to create a wrapped InputStream
          *
@@ -97,20 +97,22 @@ namespace io{
         virtual bool markSupported() const;
 
     protected:
-
         virtual int doReadByte();
 
         virtual int doReadArray(unsigned char* buffer, int size);
 
-        virtual int doReadArrayBounded(unsigned char* buffer, int size, int offset, int length);
+        virtual int doReadArrayBounded(unsigned char* buffer,
+                                       int            size,
+                                       int            offset,
+                                       int            length);
 
         /**
          * @return true if this stream has been closed.
          */
         virtual bool isClosed() const;
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /*_DECAF_IO_FILTERINPUTSTREAM_H_*/

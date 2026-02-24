@@ -18,58 +18,83 @@
 #ifndef _ACTIVEMQ_COMMANDS_BASEDATASTRUCTURE_H_
 #define _ACTIVEMQ_COMMANDS_BASEDATASTRUCTURE_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/DataStructure.h>
+#include <activemq/util/Config.h>
 
-#include <string>
 #include <sstream>
+#include <string>
 
-namespace activemq{
-namespace wireformat{
+namespace activemq
+{
+namespace wireformat
+{
     class WireFormat;
-}
-namespace commands{
+}  // namespace wireformat
 
-    class AMQCPP_API BaseDataStructure : public DataStructure {
+namespace commands
+{
+
+    class AMQCPP_API BaseDataStructure : public DataStructure
+    {
     public:
+        virtual ~BaseDataStructure()
+        {
+        }
 
-        virtual ~BaseDataStructure() {}
-
-        virtual bool isMarshalAware() const {
+        virtual bool isMarshalAware() const
+        {
             return false;
         }
 
-        virtual void beforeMarshal( wireformat::WireFormat* wireFormat AMQCPP_UNUSED ) {}
+        virtual void beforeMarshal(
+            wireformat::WireFormat* wireFormat AMQCPP_UNUSED)
+        {
+        }
 
-        virtual void afterMarshal( wireformat::WireFormat* wireFormat AMQCPP_UNUSED ) {}
+        virtual void afterMarshal(
+            wireformat::WireFormat* wireFormat AMQCPP_UNUSED)
+        {
+        }
 
-        virtual void beforeUnmarshal( wireformat::WireFormat* wireFormat AMQCPP_UNUSED ) {}
+        virtual void beforeUnmarshal(
+            wireformat::WireFormat* wireFormat AMQCPP_UNUSED)
+        {
+        }
 
-        virtual void afterUnmarshal( wireformat::WireFormat* wireFormat AMQCPP_UNUSED ) {}
+        virtual void afterUnmarshal(
+            wireformat::WireFormat* wireFormat AMQCPP_UNUSED)
+        {
+        }
 
-        virtual void setMarshaledForm( wireformat::WireFormat* wireFormat AMQCPP_UNUSED,
-                                       const std::vector<char>& data AMQCPP_UNUSED ) {}
+        virtual void setMarshaledForm(
+            wireformat::WireFormat* wireFormat AMQCPP_UNUSED,
+            const std::vector<char>& data      AMQCPP_UNUSED)
+        {
+        }
 
         virtual std::vector<unsigned char> getMarshaledForm(
-            wireformat::WireFormat* wireFormat AMQCPP_UNUSED ) {
-
+            wireformat::WireFormat* wireFormat AMQCPP_UNUSED)
+        {
             return std::vector<unsigned char>();
         }
 
-        virtual void copyDataStructure( const DataStructure* src AMQCPP_UNUSED ) {
+        virtual void copyDataStructure(const DataStructure* src AMQCPP_UNUSED)
+        {
             // Nothing to do here
         }
 
-        virtual std::string toString() const {
-            return std::string( "No Data for Class BaseDataStructure\n" );
+        virtual std::string toString() const
+        {
+            return std::string("No Data for Class BaseDataStructure\n");
         }
 
-        virtual bool equals( const DataStructure* value AMQCPP_UNUSED ) const {
+        virtual bool equals(const DataStructure* value AMQCPP_UNUSED) const
+        {
             return true;
         }
+    };
 
-   };
-
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CONNECTOR_OPENWIRE_COMMANDS_BASEDATASTRUCTURE_H_*/

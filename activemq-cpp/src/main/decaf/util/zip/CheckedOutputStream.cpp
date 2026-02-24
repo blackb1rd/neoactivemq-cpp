@@ -25,27 +25,33 @@ using namespace decaf::util;
 using namespace decaf::util::zip;
 
 ////////////////////////////////////////////////////////////////////////////////
-CheckedOutputStream::CheckedOutputStream(OutputStream* outputStream, Checksum* sum, bool own) :
-    FilterOutputStream(outputStream, own), sum(sum) {
-
-    if (sum == NULL) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "The Checksum instance cannot be NULL.");
+CheckedOutputStream::CheckedOutputStream(OutputStream* outputStream,
+                                         Checksum*     sum,
+                                         bool          own)
+    : FilterOutputStream(outputStream, own),
+      sum(sum)
+{
+    if (sum == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "The Checksum instance cannot be NULL.");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CheckedOutputStream::~CheckedOutputStream() {
+CheckedOutputStream::~CheckedOutputStream()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedOutputStream::doWriteByte(unsigned char value) {
-
-    try {
-
-        if (isClosed()) {
-            throw IOException(
-                __FILE__, __LINE__, "Stream already closed");
+void CheckedOutputStream::doWriteByte(unsigned char value)
+{
+    try
+    {
+        if (isClosed())
+        {
+            throw IOException(__FILE__, __LINE__, "Stream already closed");
         }
 
         this->outputStream->write(value);
@@ -56,33 +62,49 @@ void CheckedOutputStream::doWriteByte(unsigned char value) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CheckedOutputStream::doWriteArrayBounded(const unsigned char* buffer, int size, int offset, int length) {
-
-    try {
-
-        if (buffer == NULL) {
-            throw NullPointerException(
-                __FILE__, __LINE__, "The buffer passed was NULL.");
+void CheckedOutputStream::doWriteArrayBounded(const unsigned char* buffer,
+                                              int                  size,
+                                              int                  offset,
+                                              int                  length)
+{
+    try
+    {
+        if (buffer == NULL)
+        {
+            throw NullPointerException(__FILE__,
+                                       __LINE__,
+                                       "The buffer passed was NULL.");
         }
 
-        if (size < 0) {
+        if (size < 0)
+        {
+            throw IndexOutOfBoundsException(__FILE__,
+                                            __LINE__,
+                                            "size parameter out of Bounds: %d.",
+                                            size);
+        }
+
+        if (offset > size || offset < 0)
+        {
             throw IndexOutOfBoundsException(
-                __FILE__, __LINE__, "size parameter out of Bounds: %d.", size);
+                __FILE__,
+                __LINE__,
+                "offset parameter out of Bounds: %d.",
+                offset);
         }
 
-        if (offset > size || offset < 0) {
+        if (length < 0 || length > size - offset)
+        {
             throw IndexOutOfBoundsException(
-                __FILE__, __LINE__, "offset parameter out of Bounds: %d.", offset);
+                __FILE__,
+                __LINE__,
+                "length parameter out of Bounds: %d.",
+                length);
         }
 
-        if (length < 0 || length > size - offset) {
-            throw IndexOutOfBoundsException(
-                __FILE__, __LINE__, "length parameter out of Bounds: %d.", length);
-        }
-
-        if (isClosed()) {
-            throw IOException(
-                __FILE__, __LINE__, "Stream already closed");
+        if (isClosed())
+        {
+            throw IOException(__FILE__, __LINE__, "Stream already closed");
         }
 
         this->outputStream->write(buffer, size, offset, length);

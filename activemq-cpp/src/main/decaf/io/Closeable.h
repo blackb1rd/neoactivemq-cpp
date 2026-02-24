@@ -18,18 +18,20 @@
 #ifndef _DECAF_IO_CLOSEABLE_H_
 #define _DECAF_IO_CLOSEABLE_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/io/IOException.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace io {
+namespace decaf
+{
+namespace io
+{
 
     /**
      * Interface for a class that implements the close method.
      */
-    class DECAF_API Closeable {
+    class DECAF_API Closeable
+    {
     public:
-
         virtual ~Closeable();
 
         /**
@@ -39,9 +41,9 @@ namespace io {
          * @throws IOException if an error occurs while closing.
          */
         virtual void close() = 0;
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /*_DECAF_IO_CLOSEABLE_H_*/

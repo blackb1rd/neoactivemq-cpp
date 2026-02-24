@@ -29,69 +29,84 @@ using namespace decaf::internal::net::ssl;
 using namespace decaf::internal::net::ssl::openssl;
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketOutputStream::OpenSSLSocketOutputStream( OpenSSLSocket* socket ) :
-    OutputStream(), socket( socket ), closed( false ) {
-
-    if( socket == NULL ) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "TcpSocket instance passed was NULL." );
+OpenSSLSocketOutputStream::OpenSSLSocketOutputStream(OpenSSLSocket* socket)
+    : OutputStream(),
+      socket(socket),
+      closed(false)
+{
+    if (socket == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "TcpSocket instance passed was NULL.");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketOutputStream::~OpenSSLSocketOutputStream() {
+OpenSSLSocketOutputStream::~OpenSSLSocketOutputStream()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenSSLSocketOutputStream::close() {
-
-    if( this->closed ) {
+void OpenSSLSocketOutputStream::close()
+{
+    if (this->closed)
+    {
         return;
     }
 
-    try{
+    try
+    {
         this->closed = true;
         this->socket->close();
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenSSLSocketOutputStream::doWriteByte( unsigned char c ) {
-
-    try{
-
+void OpenSSLSocketOutputStream::doWriteByte(unsigned char c)
+{
+    try
+    {
         // Treat the single byte case the same as an array.
-        this->doWriteArrayBounded( &c, 1, 0, 1 );
+        this->doWriteArrayBounded(&c, 1, 0, 1);
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenSSLSocketOutputStream::doWriteArrayBounded( const unsigned char* buffer, int size, int offset, int length ) {
-
-    try{
-
-        if( length == 0 ) {
+void OpenSSLSocketOutputStream::doWriteArrayBounded(const unsigned char* buffer,
+                                                    int                  size,
+                                                    int                  offset,
+                                                    int                  length)
+{
+    try
+    {
+        if (length == 0)
+        {
             return;
         }
 
-        if( buffer == NULL ) {
-            throw NullPointerException(
-                __FILE__, __LINE__, "passed buffer is null" );
+        if (buffer == NULL)
+        {
+            throw NullPointerException(__FILE__,
+                                       __LINE__,
+                                       "passed buffer is null");
         }
 
-        if( closed ) {
-            throw IOException(
-                __FILE__, __LINE__, "This Stream has been closed." );
+        if (closed)
+        {
+            throw IOException(__FILE__,
+                              __LINE__,
+                              "This Stream has been closed.");
         }
 
-        this->socket->write( buffer, size, offset, length );
+        this->socket->write(buffer, size, offset, length);
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_RETHROW( NullPointerException )
-    DECAF_CATCH_RETHROW( IndexOutOfBoundsException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_RETHROW(NullPointerException)
+    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
+    DECAF_CATCHALL_THROW(IOException)
 }

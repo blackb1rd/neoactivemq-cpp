@@ -22,36 +22,35 @@
 #include <decaf/io/IOException.h>
 #include <decaf/net/UnknownHostException.h>
 
-namespace decaf{
-namespace net{
+namespace decaf
+{
+namespace net
+{
 
     class Socket;
     class InetAddress;
 
     /**
-     * The SocketFactory is used to create Socket objects and can be sub-classed to
-     * provide other types of Sockets or Sockets with varying configurations.
+     * The SocketFactory is used to create Socket objects and can be sub-classed
+     * to provide other types of Sockets or Sockets with varying configurations.
      *
      * @see decaf.net.Socket
      *
      * @since 1.0
      */
-    class DECAF_API SocketFactory {
+    class DECAF_API SocketFactory
+    {
     private:
-
         static SocketFactory* defaultFactory;
 
     private:
-
-        SocketFactory( const SocketFactory& );
-        SocketFactory& operator= ( const SocketFactory& );
+        SocketFactory(const SocketFactory&);
+        SocketFactory& operator=(const SocketFactory&);
 
     protected:
-
         SocketFactory();
 
     public:
-
         virtual ~SocketFactory();
 
         /**
@@ -64,8 +63,8 @@ namespace net{
         virtual Socket* createSocket();
 
         /**
-         * Creates a new Socket object and connects it to the specified remote host and
-         * port using the configuration of this SocketFactory.
+         * Creates a new Socket object and connects it to the specified remote
+         * host and port using the configuration of this SocketFactory.
          *
          * @param host
          *      The host to connect the socket to.
@@ -74,15 +73,16 @@ namespace net{
          *
          * @return a new Socket object, caller must free this object when done.
          *
-         * @throws IOException if an I/O error occurs while creating the Socket object.
+         * @throws IOException if an I/O error occurs while creating the Socket
+         * object.
          * @throws UnknownHostException if the host name is not known.
          */
         virtual Socket* createSocket(const InetAddress* host, int port) = 0;
 
         /**
-         * Creates a new Socket object and connects it to the specified remote host and
-         * port using the configuration of this SocketFactory.  The Socket will be bound
-         * to the specified local address and port.
+         * Creates a new Socket object and connects it to the specified remote
+         * host and port using the configuration of this SocketFactory.  The
+         * Socket will be bound to the specified local address and port.
          *
          * @param host
          *      The host to connect the socket to.
@@ -95,14 +95,18 @@ namespace net{
          *
          * @return a new Socket object, caller must free this object when done.
          *
-         * @throws IOException if an I/O error occurs while creating the Socket object.
+         * @throws IOException if an I/O error occurs while creating the Socket
+         * object.
          * @throws UnknownHostException if the host name is not known.
          */
-        virtual Socket* createSocket(const InetAddress* host, int port, const InetAddress* ifAddress, int localPort) = 0;
+        virtual Socket* createSocket(const InetAddress* host,
+                                     int                port,
+                                     const InetAddress* ifAddress,
+                                     int                localPort) = 0;
 
         /**
-         * Creates a new Socket object and connects it to the specified remote host and
-         * port using the configuration of this SocketFactory.
+         * Creates a new Socket object and connects it to the specified remote
+         * host and port using the configuration of this SocketFactory.
          *
          * @param host
          *      The host name or IP address to connect the socket to.
@@ -111,14 +115,15 @@ namespace net{
          *
          * @return a new Socket object, caller must free this object when done.
          *
-         * @throws IOException if an I/O error occurs while creating the Socket object.
+         * @throws IOException if an I/O error occurs while creating the Socket
+         * object.
          * @throws UnknownHostException if the host name is not known.
          */
         virtual Socket* createSocket(const std::string& host, int port) = 0;
 
         /**
-         * Creates a new Socket object and connects it to the specified remote host and
-         * port using the configuration of this SocketFactory.
+         * Creates a new Socket object and connects it to the specified remote
+         * host and port using the configuration of this SocketFactory.
          *
          * @param host
          *      The host name or IP address to connect the socket to.
@@ -131,24 +136,30 @@ namespace net{
          *
          * @return a new Socket object, caller must free this object when done.
          *
-         * @throws IOException if an I/O error occurs while creating the Socket object.
+         * @throws IOException if an I/O error occurs while creating the Socket
+         * object.
          * @throws UnknownHostException if the host name is not known.
          */
-        virtual Socket* createSocket(const std::string& host, int port, const InetAddress* ifAddress, int localPort) = 0;
+        virtual Socket* createSocket(const std::string& host,
+                                     int                port,
+                                     const InetAddress* ifAddress,
+                                     int                localPort) = 0;
 
         /**
-         * Returns an pointer to the default SocketFactory for this Application, there is only one
-         * default SocketFactory per application, the pointer returned by this method is owned by
-         * the SocketFactory class and in not to be deleted by the caller.
+         * Returns an pointer to the default SocketFactory for this Application,
+         * there is only one default SocketFactory per application, the pointer
+         * returned by this method is owned by the SocketFactory class and in
+         * not to be deleted by the caller.
          *
          * @return pointer to the applications default SocketFactory.
          *
-         * @throws SocketException if an error occurs while getting the default instance.
+         * @throws SocketException if an error occurs while getting the default
+         * instance.
          */
         static SocketFactory* getDefault();
-
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /*_DECAF_NET_SOCKETFACTORY_H_*/

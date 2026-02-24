@@ -20,24 +20,27 @@
 
 #include <activemq/util/Config.h>
 
-#include <memory>
+#include <activemq/commands/ActiveMQDestination.h>
+#include <activemq/commands/ConsumerId.h>
+#include <activemq/core/kernels/ActiveMQSessionKernel.h>
+#include <cms/MessageEnumeration.h>
 #include <cms/Queue.h>
 #include <cms/QueueBrowser.h>
-#include <cms/MessageEnumeration.h>
-#include <activemq/commands/ConsumerId.h>
-#include <activemq/commands/ActiveMQDestination.h>
-#include <activemq/core/kernels/ActiveMQSessionKernel.h>
 #include <decaf/lang/Pointer.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/atomic/AtomicBoolean.h>
+#include <memory>
 
 #include <string>
 
-namespace activemq {
-namespace core {
-namespace kernels {
-    class ActiveMQConsumerKernel;
-}
+namespace activemq
+{
+namespace core
+{
+    namespace kernels
+    {
+        class ActiveMQConsumerKernel;
+    }  // namespace kernels
 
     class ActiveMQSession;
     class Browser;
@@ -45,49 +48,49 @@ namespace kernels {
     using decaf::lang::Pointer;
 
     class AMQCPP_API ActiveMQQueueBrowser : public cms::QueueBrowser,
-                                            public cms::MessageEnumeration {
+                                            public cms::MessageEnumeration
+    {
     private:
-
         friend class Browser;
 
         activemq::core::kernels::ActiveMQSessionKernel* session;
-        Pointer<commands::ConsumerId> consumerId;
-        Pointer<commands::ActiveMQDestination> destination;
-        std::string selector;
-        bool dispatchAsync;
-        cms::Queue* queue;
-        decaf::util::concurrent::atomic::AtomicBoolean closed;
+        Pointer<commands::ConsumerId>                   consumerId;
+        Pointer<commands::ActiveMQDestination>          destination;
+        std::string                                     selector;
+        bool                                            dispatchAsync;
+        cms::Queue*                                     queue;
+        decaf::util::concurrent::atomic::AtomicBoolean  closed;
 
-        mutable decaf::util::concurrent::Mutex mutex;
-        mutable decaf::util::concurrent::Mutex wait;
+        mutable decaf::util::concurrent::Mutex         mutex;
+        mutable decaf::util::concurrent::Mutex         wait;
         decaf::util::concurrent::atomic::AtomicBoolean browseDone;
-        // Shared validity flag - allows Browser to safely check validity even after
-        // this ActiveMQQueueBrowser instance is destroyed. The Browser holds its own
-        // copy of this shared_ptr, so it can check the flag without accessing parent.
-        std::shared_ptr<decaf::util::concurrent::atomic::AtomicBoolean> browserValid;
-        // Shared mutex for synchronizing dispatch with destroy. Browser holds its own
-        // copy to ensure safe locking even during parent destruction.
+        // Shared validity flag - allows Browser to safely check validity even
+        // after this ActiveMQQueueBrowser instance is destroyed. The Browser
+        // holds its own copy of this shared_ptr, so it can check the flag
+        // without accessing parent.
+        std::shared_ptr<decaf::util::concurrent::atomic::AtomicBoolean>
+            browserValid;
+        // Shared mutex for synchronizing dispatch with destroy. Browser holds
+        // its own copy to ensure safe locking even during parent destruction.
         std::shared_ptr<decaf::util::concurrent::Mutex> dispatchMutex;
 
         mutable Pointer<activemq::core::kernels::ActiveMQConsumerKernel> browser;
 
     private:
-
         ActiveMQQueueBrowser(const ActiveMQQueueBrowser&);
         ActiveMQQueueBrowser& operator=(const ActiveMQQueueBrowser&);
 
     public:
-
-        ActiveMQQueueBrowser(activemq::core::kernels::ActiveMQSessionKernel* session,
-                             const Pointer<commands::ConsumerId>& consumerId,
-                             const Pointer<commands::ActiveMQDestination>& destination,
-                             const std::string& selector,
-                             bool dispatchAsync);
+        ActiveMQQueueBrowser(
+            activemq::core::kernels::ActiveMQSessionKernel* session,
+            const Pointer<commands::ConsumerId>&            consumerId,
+            const Pointer<commands::ActiveMQDestination>&   destination,
+            const std::string&                              selector,
+            bool                                            dispatchAsync);
 
         virtual ~ActiveMQQueueBrowser();
 
     public:
-
         virtual const cms::Queue* getQueue() const;
 
         virtual std::string getMessageSelector() const;
@@ -101,16 +104,16 @@ namespace kernels {
         virtual cms::Message* nextMessage();
 
     private:
-
         void checkClosed();
         void notifyMessageAvailable();
         void waitForMessageAvailable();
 
-        Pointer<activemq::core::kernels::ActiveMQConsumerKernel> createConsumer();
+        Pointer<activemq::core::kernels::ActiveMQConsumerKernel>
+             createConsumer();
         void destroyConsumer();
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_ACTIVEMQQUEUEBROWSER_H_ */

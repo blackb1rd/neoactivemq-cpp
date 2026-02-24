@@ -20,58 +20,67 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
     class Thread;
-}
-namespace util {
-namespace concurrent {
-namespace locks {
+}  // namespace lang
 
-    /**
-     * Base class for locks that provide the notion of Ownership, the types of locks
-     * that are implemented using this base class would be owned by one specific Thread
-     * at any given time.
-     *
-     * @since 1.0
-     */
-    class DECAF_API AbstractOwnableSynchronizer {
-    private:
+namespace util
+{
+    namespace concurrent
+    {
+        namespace locks
+        {
 
-        decaf::lang::Thread* ownerThread;
+            /**
+             * Base class for locks that provide the notion of Ownership, the
+             * types of locks that are implemented using this base class would
+             * be owned by one specific Thread at any given time.
+             *
+             * @since 1.0
+             */
+            class DECAF_API AbstractOwnableSynchronizer
+            {
+            private:
+                decaf::lang::Thread* ownerThread;
 
-    private:
+            private:
+                AbstractOwnableSynchronizer(const AbstractOwnableSynchronizer&);
+                AbstractOwnableSynchronizer& operator=(
+                    const AbstractOwnableSynchronizer&);
 
-        AbstractOwnableSynchronizer(const AbstractOwnableSynchronizer&);
-        AbstractOwnableSynchronizer& operator= (const AbstractOwnableSynchronizer&);
+            public:
+                virtual ~AbstractOwnableSynchronizer();
 
-    public:
+            protected:
+                AbstractOwnableSynchronizer();
 
-        virtual ~AbstractOwnableSynchronizer();
+                /**
+                 * Gets the Thread that was last set using the
+                 * setExclusiveOwnerThread method, or NULL if no Thread has been
+                 * made the exclusive owner.
+                 *
+                 * @return pointer to the owner Thread or NULL if not set.
+                 */
+                decaf::lang::Thread* getExclusiveOwnerThread() const;
 
-    protected:
+                /**
+                 * Sets the Thread that has exclusive ownership of this
+                 * Synchronizer, can be NULL to indicate that no Thread now owns
+                 * this Synchronizer.
+                 *
+                 * @param thread
+                 *      The Thread that now has ownership, or NULL if ownership
+                 * is released.
+                 */
+                void setExclusiveOwnerThread(decaf::lang::Thread* thread);
+            };
 
-        AbstractOwnableSynchronizer();
-
-        /**
-         * Gets the Thread that was last set using the setExclusiveOwnerThread method, or NULL
-         * if no Thread has been made the exclusive owner.
-         *
-         * @return pointer to the owner Thread or NULL if not set.
-         */
-        decaf::lang::Thread* getExclusiveOwnerThread() const;
-
-        /**
-         * Sets the Thread that has exclusive ownership of this Synchronizer, can be NULL
-         * to indicate that no Thread now owns this Synchronizer.
-         *
-         * @param thread
-         *      The Thread that now has ownership, or NULL if ownership is released.
-         */
-        void setExclusiveOwnerThread(decaf::lang::Thread* thread);
-
-    };
-
-}}}}
+        }  // namespace locks
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_CONCURRENT_ABSTRACTOWNABLESYNCHRONIZER_H_ */

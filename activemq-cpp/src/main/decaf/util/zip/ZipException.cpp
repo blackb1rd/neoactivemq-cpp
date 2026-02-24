@@ -23,40 +23,38 @@ using namespace decaf::util;
 using namespace decaf::util::zip;
 
 ////////////////////////////////////////////////////////////////////////////////
-ZipException::ZipException() : IOException() {
+ZipException::ZipException()
+    : IOException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ZipException::~ZipException() throw () {
+ZipException::~ZipException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ZipException::ZipException(const lang::Exception& ex) : IOException() {
-    *(lang::Exception*) this = ex;
+ZipException::ZipException(const lang::Exception& ex)
+    : IOException()
+{
+    *(lang::Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ZipException::ZipException(const ZipException& ex) : IOException() {
-    *(lang::Exception*) this = ex;
+ZipException::ZipException(const ZipException& ex)
+    : IOException()
+{
+    *(lang::Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ZipException::ZipException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : IOException(cause) {
-    va_list vargs;
-    va_start( vargs, msg);
-    buildMessage(msg, vargs);
-
-    // Set the first mark for this exception.
-    setMark(file, lineNumber);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-ZipException::ZipException(const std::exception* cause) : IOException(cause) {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-ZipException::ZipException(const char* file, const int lineNumber, const char* msg, ...) : IOException() {
-
+ZipException::ZipException(const char*           file,
+                           const int             lineNumber,
+                           const std::exception* cause,
+                           const char*           msg,
+                           ...)
+    : IOException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -66,6 +64,28 @@ ZipException::ZipException(const char* file, const int lineNumber, const char* m
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ZipException* ZipException::clone() const {
+ZipException::ZipException(const std::exception* cause)
+    : IOException(cause)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+ZipException::ZipException(const char* file,
+                           const int   lineNumber,
+                           const char* msg,
+                           ...)
+    : IOException()
+{
+    va_list vargs;
+    va_start(vargs, msg);
+    buildMessage(msg, vargs);
+
+    // Set the first mark for this exception.
+    setMark(file, lineNumber);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+ZipException* ZipException::clone() const
+{
     return new ZipException(*this);
 }

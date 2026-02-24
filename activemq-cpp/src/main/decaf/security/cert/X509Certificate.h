@@ -23,58 +23,71 @@
 #include <decaf/util/Config.h>
 #include <decaf/util/Date.h>
 
-namespace decaf {
-namespace security {
-namespace auth {
-    class X500Principal;
-}
-namespace cert {
+namespace decaf
+{
+namespace security
+{
+    namespace auth
+    {
+        class X500Principal;
+    }  // namespace auth
 
-    /**
-     * Base interface for all identity certificates.
-     */
-    class DECAF_API X509Certificate : public Certificate {
-    public:
+    namespace cert
+    {
 
-        virtual ~X509Certificate() {
-        }
+        /**
+         * Base interface for all identity certificates.
+         */
+        class DECAF_API X509Certificate : public Certificate
+        {
+        public:
+            virtual ~X509Certificate()
+            {
+            }
 
-        virtual void checkValidity() const = 0;
+            virtual void checkValidity() const = 0;
 
-        virtual void checkValidity(const decaf::util::Date& date) const = 0;
+            virtual void checkValidity(const decaf::util::Date& date) const = 0;
 
-        virtual int getBasicConstraints() const = 0;
+            virtual int getBasicConstraints() const = 0;
 
-        virtual void getIssuerUniqueID(std::vector<bool>& output) const = 0;
+            virtual void getIssuerUniqueID(std::vector<bool>& output) const = 0;
 
-        virtual const auth::X500Principal* getIssuerX500Principal() const = 0;
+            virtual const auth::X500Principal* getIssuerX500Principal()
+                const = 0;
 
-        virtual void getKeyUsage(std::vector<unsigned char>& output) const = 0;
+            virtual void getKeyUsage(
+                std::vector<unsigned char>& output) const = 0;
 
-        virtual decaf::util::Date getNotAfter() const = 0;
+            virtual decaf::util::Date getNotAfter() const = 0;
 
-        virtual decaf::util::Date getNotBefore() const = 0;
+            virtual decaf::util::Date getNotBefore() const = 0;
 
-        //virtual BigInteger getSerialNumber() const = 0;
+            // virtual BigInteger getSerialNumber() const = 0;
 
-        virtual std::string getSigAlgName() const = 0;
+            virtual std::string getSigAlgName() const = 0;
 
-        virtual std::string getSigAlgOID() const = 0;
+            virtual std::string getSigAlgOID() const = 0;
 
-        virtual void getSigAlgParams(std::vector<unsigned char>& output) const = 0;
+            virtual void getSigAlgParams(
+                std::vector<unsigned char>& output) const = 0;
 
-        virtual void getSignature(std::vector<unsigned char>& output) const = 0;
+            virtual void getSignature(
+                std::vector<unsigned char>& output) const = 0;
 
-        virtual void getSubjectUniqueID(std::vector<bool>& output) const = 0;
+            virtual void getSubjectUniqueID(std::vector<bool>& output) const = 0;
 
-        virtual const auth::X500Principal* getSubjectX500Principal() const = 0;
+            virtual const auth::X500Principal* getSubjectX500Principal()
+                const = 0;
 
-        virtual void getTBSCertificate(std::vector<unsigned char>& output) const = 0;
+            virtual void getTBSCertificate(
+                std::vector<unsigned char>& output) const = 0;
 
-        virtual int getVersion() const = 0;
+            virtual int getVersion() const = 0;
+        };
 
-    };
-
-}}}
+    }  // namespace cert
+}  // namespace security
+}  // namespace decaf
 
 #endif /*_DECAF_SECURITY_CERT_X509CERTIFICATE_H_*/

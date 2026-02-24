@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseCommand.h>
@@ -32,8 +32,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -46,32 +48,29 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API ConnectionInfo : public BaseCommand {
+    class AMQCPP_API ConnectionInfo : public BaseCommand
+    {
     protected:
-
-        Pointer<ConnectionId> connectionId;
-        std::string clientId;
-        std::string password;
-        std::string userName;
-        std::vector< decaf::lang::Pointer<BrokerId> > brokerPath;
-        bool brokerMasterConnector;
-        bool manageable;
-        bool clientMaster;
-        bool faultTolerant;
-        bool failoverReconnect;
-        std::string clientIp;
+        Pointer<ConnectionId>                       connectionId;
+        std::string                                 clientId;
+        std::string                                 password;
+        std::string                                 userName;
+        std::vector<decaf::lang::Pointer<BrokerId>> brokerPath;
+        bool                                        brokerMasterConnector;
+        bool                                        manageable;
+        bool                                        clientMaster;
+        bool                                        faultTolerant;
+        bool                                        failoverReconnect;
+        std::string                                 clientIp;
 
     public:
-
         const static unsigned char ID_CONNECTIONINFO = 3;
 
     private:
-
         ConnectionInfo(const ConnectionInfo&);
-        ConnectionInfo& operator= (const ConnectionInfo&);
+        ConnectionInfo& operator=(const ConnectionInfo&);
 
     public:
-
         ConnectionInfo();
 
         virtual ~ConnectionInfo();
@@ -89,24 +88,26 @@ namespace commands {
         Pointer<RemoveInfo> createRemoveCommand() const;
 
         virtual const Pointer<ConnectionId>& getConnectionId() const;
-        virtual Pointer<ConnectionId>& getConnectionId();
+        virtual Pointer<ConnectionId>&       getConnectionId();
         virtual void setConnectionId(const Pointer<ConnectionId>& connectionId);
 
         virtual const std::string& getClientId() const;
-        virtual std::string& getClientId();
-        virtual void setClientId(const std::string& clientId);
+        virtual std::string&       getClientId();
+        virtual void               setClientId(const std::string& clientId);
 
         virtual const std::string& getPassword() const;
-        virtual std::string& getPassword();
-        virtual void setPassword(const std::string& password);
+        virtual std::string&       getPassword();
+        virtual void               setPassword(const std::string& password);
 
         virtual const std::string& getUserName() const;
-        virtual std::string& getUserName();
-        virtual void setUserName(const std::string& userName);
+        virtual std::string&       getUserName();
+        virtual void               setUserName(const std::string& userName);
 
-        virtual const std::vector< decaf::lang::Pointer<BrokerId> >& getBrokerPath() const;
-        virtual std::vector< decaf::lang::Pointer<BrokerId> >& getBrokerPath();
-        virtual void setBrokerPath(const std::vector< decaf::lang::Pointer<BrokerId> >& brokerPath);
+        virtual const std::vector<decaf::lang::Pointer<BrokerId>>&
+        getBrokerPath() const;
+        virtual std::vector<decaf::lang::Pointer<BrokerId>>& getBrokerPath();
+        virtual void                                         setBrokerPath(
+                                                    const std::vector<decaf::lang::Pointer<BrokerId>>& brokerPath);
 
         virtual bool isBrokerMasterConnector() const;
         virtual void setBrokerMasterConnector(bool brokerMasterConnector);
@@ -124,20 +125,21 @@ namespace commands {
         virtual void setFailoverReconnect(bool failoverReconnect);
 
         virtual const std::string& getClientIp() const;
-        virtual std::string& getClientIp();
-        virtual void setClientIp(const std::string& clientIp);
+        virtual std::string&       getClientIp();
+        virtual void               setClientIp(const std::string& clientIp);
 
         /**
          * @return an answer of true to the isConnectionInfo() query.
          */
-        virtual bool isConnectionInfo() const {
+        virtual bool isConnectionInfo() const
+        {
             return true;
         }
 
         virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_CONNECTIONINFO_H_*/

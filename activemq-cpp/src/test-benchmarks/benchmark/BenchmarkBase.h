@@ -18,45 +18,51 @@
 #ifndef _BENCHMARK_BENCHMARKBASE_H_
 #define _BENCHMARK_BENCHMARKBASE_H_
 
-#include <gtest/gtest.h>
-#include <decaf/lang/Runnable.h>
 #include <benchmark/PerformanceTimer.h>
-#include <string>
+#include <decaf/lang/Runnable.h>
+#include <gtest/gtest.h>
 #include <iostream>
+#include <string>
 
-namespace benchmark{
+namespace benchmark
+{
 
-    template < class NAME, class TARGET, int ITERATIONS = 100 >
-    class BenchmarkBase : public decaf::lang::Runnable, public ::testing::Test
-    {
+template <class NAME, class TARGET, int ITERATIONS = 100>
+class BenchmarkBase : public decaf::lang::Runnable, public ::testing::Test
+{
 private:
+    PerformanceTimer timer;
 
-        PerformanceTimer timer;
+public:
+    BenchmarkBase()
+        : timer()
+    {
+    }
 
-    public:
+    virtual ~BenchmarkBase()
+    {
+    }
 
-        BenchmarkBase() : timer() {}
-        virtual ~BenchmarkBase() {}
+    int getIterations() const
+    {
+        return ITERATIONS;
+    }
 
-        int getIterations() const {
-            return ITERATIONS;
+    void runBenchmark()
+    {
+        for (int i = 0; i < ITERATIONS; ++i)
+        {
+            timer.start();
+            this->run();
+            timer.stop();
         }
 
-        void runBenchmark(){
+        std::cout << typeid(TARGET).name()
+                  << " Benchmark Time = " << timer.getAverageTime()
+                  << " Millisecs" << std::endl;
+    }
+};
 
-            for( int i = 0; i < ITERATIONS; ++i ){
-                timer.start();
-                this->run();
-                timer.stop();
-            }
-
-            std::cout << typeid( TARGET ).name() << " Benchmark Time = "
-                      << timer.getAverageTime() << " Millisecs"
-                      << std::endl;
-        }
-
-    };
-
-}
+}  // namespace benchmark
 
 #endif /*_BENCHMARK_BENCHMARKBASE_H_*/

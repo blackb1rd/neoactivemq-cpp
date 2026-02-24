@@ -27,202 +27,247 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class AbstractSequentialListTest : public ::testing::Test {
+class AbstractSequentialListTest : public ::testing::Test
+{
 public:
+    AbstractSequentialListTest();
 
-        AbstractSequentialListTest();
-
-        virtual ~AbstractSequentialListTest();
-
-    };
+    virtual ~AbstractSequentialListTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    template< typename E >
-    class SimpleList : public AbstractSequentialList<E> {
-    private:
+template <typename E>
+class SimpleList : public AbstractSequentialList<E>
+{
+private:
+    LinkedList<E> list;
 
-        LinkedList<E> list;
+public:
+    SimpleList()
+        : AbstractSequentialList<E>(),
+          list()
+    {
+    }
 
-    public:
+    virtual ~SimpleList()
+    {
+    }
 
-        SimpleList() : AbstractSequentialList<E>(), list() {}
+    using AbstractSequentialList<E>::listIterator;
 
-        virtual ~SimpleList() {}
+    virtual ListIterator<E>* listIterator(int index)
+    {
+        return list.listIterator(index);
+    }
 
-        using AbstractSequentialList<E>::listIterator;
+    virtual ListIterator<E>* listIterator(int index) const
+    {
+        return list.listIterator(index);
+    }
 
-        virtual ListIterator<E>* listIterator(int index) {
-            return list.listIterator(index);
-        }
-        virtual ListIterator<E>* listIterator(int index) const {
-            return list.listIterator(index);
-        }
+    virtual int size() const
+    {
+        return list.size();
+    }
+};
 
-        virtual int size() const {
-            return list.size();
-        }
+template <typename E>
+class MockListIterator : public ListIterator<E>
+{
+public:
+    virtual ~MockListIterator()
+    {
+    }
 
-    };
+    virtual E next()
+    {
+        throw UnsupportedOperationException();
+    }
 
-    template< typename E >
-    class MockListIterator : public ListIterator<E> {
-    public:
+    virtual bool hasNext() const
+    {
+        throw UnsupportedOperationException();
+    }
 
-        virtual ~MockListIterator() {}
+    virtual void remove()
+    {
+        throw UnsupportedOperationException();
+    }
 
-        virtual E next() {
-            throw UnsupportedOperationException();
-        }
+    virtual void add(const E& e)
+    {
+        throw UnsupportedOperationException();
+    }
 
-        virtual bool hasNext() const {
-            throw UnsupportedOperationException();
-        }
+    virtual void set(const E& e)
+    {
+        throw UnsupportedOperationException();
+    }
 
-        virtual void remove() {
-            throw UnsupportedOperationException();
-        }
+    virtual bool hasPrevious() const
+    {
+        throw UnsupportedOperationException();
+    }
 
-        virtual void add(const E& e) {
-            throw UnsupportedOperationException();
-        }
+    virtual E previous()
+    {
+        throw UnsupportedOperationException();
+    }
 
-        virtual void set(const E& e) {
-            throw UnsupportedOperationException();
-        }
+    virtual int nextIndex() const
+    {
+        throw UnsupportedOperationException();
+    }
 
-        virtual bool hasPrevious() const {
-            throw UnsupportedOperationException();
-        }
+    virtual int previousIndex() const
+    {
+        throw UnsupportedOperationException();
+    }
+};
 
-        virtual E previous() {
-            throw UnsupportedOperationException();
-        }
+template <typename E>
+class MockAbstractSequentialList : public AbstractSequentialList<E>
+{
+public:
+    virtual ~MockAbstractSequentialList()
+    {
+    }
 
-        virtual int nextIndex() const {
-            throw UnsupportedOperationException();
-        }
+    using AbstractSequentialList<E>::listIterator;
 
-        virtual int previousIndex() const {
-            throw UnsupportedOperationException();
-        }
+    virtual ListIterator<E>* listIterator(int index)
+    {
+        return new MockListIterator<E>();
+    }
 
-    };
+    virtual ListIterator<E>* listIterator(int index) const
+    {
+        return new MockListIterator<E>();
+    }
 
-    template< typename E >
-    class MockAbstractSequentialList : public AbstractSequentialList<E> {
-    public:
+    virtual int size() const
+    {
+        return 0;
+    }
+};
+}  // namespace
 
-        virtual ~MockAbstractSequentialList() {}
-
-        using AbstractSequentialList<E>::listIterator;
-
-        virtual ListIterator<E>* listIterator(int index) {
-            return new MockListIterator<E>();
-        }
-        virtual ListIterator<E>* listIterator(int index) const {
-            return new MockListIterator<E>();
-        }
-
-        virtual int size() const {
-            return 0;
-        }
-    };
+////////////////////////////////////////////////////////////////////////////////
+AbstractSequentialListTest::AbstractSequentialListTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractSequentialListTest::AbstractSequentialListTest() {
+AbstractSequentialListTest::~AbstractSequentialListTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractSequentialListTest::~AbstractSequentialListTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractSequentialListTest, testAddAll) {
-
+TEST_F(AbstractSequentialListTest, testAddAll)
+{
     LinkedList<int> collection;
-    for( int i = 0; i < 50; ++i ) {
-        collection.add( i );
+    for (int i = 0; i < 50; ++i)
+    {
+        collection.add(i);
     }
 
     SimpleList<int> list;
-    list.addAll( collection );
-    ASSERT_TRUE(list.addAll( 2, collection )) << ("Should return true");
+    list.addAll(collection);
+    ASSERT_TRUE(list.addAll(2, collection)) << ("Should return true");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractSequentialListTest, testGet) {
-
+TEST_F(AbstractSequentialListTest, testGet)
+{
     SimpleList<int> list;
 
-    list.add( 1 );
-    list.add( 2 );
+    list.add(1);
+    list.add(2);
 
-    ASSERT_EQ(1, list.get( 0 ));
-    ASSERT_EQ(2, list.get( 1 ));
+    ASSERT_EQ(1, list.get(0));
+    ASSERT_EQ(2, list.get(1));
 
     // get value by index which is out of bounds
-    try {
-        list.get( list.size() );
+    try
+    {
+        list.get(list.size());
         FAIL() << ("Should throw IndexOutOfBoundsException.");
-    } catch( IndexOutOfBoundsException& e ) {
+    }
+    catch (IndexOutOfBoundsException& e)
+    {
         // expected
     }
 
-    try {
-        list.get( -1 );
+    try
+    {
+        list.get(-1);
         FAIL() << ("Should throw IndexOutOfBoundsException.");
-    } catch( IndexOutOfBoundsException& e ) {
+    }
+    catch (IndexOutOfBoundsException& e)
+    {
         // expected
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractSequentialListTest, testRemove) {
-
+TEST_F(AbstractSequentialListTest, testRemove)
+{
     SimpleList<int> list;
     list.add(1);
 
-    ASSERT_EQ(1, list.removeAt( 0 ));
+    ASSERT_EQ(1, list.removeAt(0));
 
-    list.add( 2 );
-    ASSERT_EQ(2, list.removeAt( 0 ));
+    list.add(2);
+    ASSERT_EQ(2, list.removeAt(0));
 
     // remove index is out of bounds
-    try {
-        list.removeAt( list.size() );
+    try
+    {
+        list.removeAt(list.size());
         FAIL() << ("Should throw IndexOutOfBoundsException.");
-    } catch( IndexOutOfBoundsException& e ) {
+    }
+    catch (IndexOutOfBoundsException& e)
+    {
         // expected
     }
-    try {
-        list.removeAt( -1 );
+    try
+    {
+        list.removeAt(-1);
         FAIL() << ("Should throw IndexOutOfBoundsException.");
-    } catch( IndexOutOfBoundsException& e ) {
+    }
+    catch (IndexOutOfBoundsException& e)
+    {
         // expected
     }
 
     // list dont't support remove operation
-    try {
+    try
+    {
         MockAbstractSequentialList<int> mylist;
-        mylist.removeAt( 0 );
+        mylist.removeAt(0);
         FAIL() << ("Should throw UnsupportedOperationException.");
-    } catch( UnsupportedOperationException& e ) {
+    }
+    catch (UnsupportedOperationException& e)
+    {
         // expected
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractSequentialListTest, testSet) {
-
+TEST_F(AbstractSequentialListTest, testSet)
+{
     SimpleList<int> list;
 
-    try {
-        list.set( 0, 12 );
+    try
+    {
+        list.set(0, 12);
         FAIL() << ("should throw IndexOutOfBoundsException");
-    } catch( IndexOutOfBoundsException& e ) {
+    }
+    catch (IndexOutOfBoundsException& e)
+    {
         // expected
     }
 }

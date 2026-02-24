@@ -17,10 +17,10 @@
 
 #include <activemq/test/MapMessageTest.h>
 
-#include <activemq/util/CMSListener.h>
-#include <activemq/exceptions/ActiveMQException.h>
-#include <activemq/core/ActiveMQConnection.h>
 #include <activemq/commands/ActiveMQMapMessage.h>
+#include <activemq/core/ActiveMQConnection.h>
+#include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/CMSListener.h>
 
 using namespace std;
 using namespace cms;
@@ -34,26 +34,34 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::util;
 
-namespace activemq {
-namespace test {
-namespace openwire_ssl {
+namespace activemq
+{
+namespace test
+{
+    namespace openwire_ssl
+    {
 
-    class OpenwireSslMapMessageTest : public MapMessageTest {
-    public:
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL();
-        }
-    };
+        class OpenwireSslMapMessageTest : public MapMessageTest
+        {
+        public:
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getSslOpenwireURL();
+            }
+        };
 
-}}}
+    }  // namespace openwire_ssl
+}  // namespace test
+}  // namespace activemq
 
 using activemq::test::openwire_ssl::OpenwireSslMapMessageTest;
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslMapMessageTest, testEmptyMapSendReceive) {
-
+TEST_F(OpenwireSslMapMessageTest, testEmptyMapSendReceive)
+{
     // Create CMS Object for Comms
-    cms::Session* session(cmsProvider->getSession());
+    cms::Session*         session(cmsProvider->getSession());
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
@@ -72,10 +80,10 @@ TEST_F(OpenwireSslMapMessageTest, testEmptyMapSendReceive) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslMapMessageTest, testMapWithEmptyStringValue) {
-
+TEST_F(OpenwireSslMapMessageTest, testMapWithEmptyStringValue)
+{
     // Create CMS Object for Comms
-    cms::Session* session(cmsProvider->getSession());
+    cms::Session*         session(cmsProvider->getSession());
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
@@ -101,10 +109,10 @@ TEST_F(OpenwireSslMapMessageTest, testMapWithEmptyStringValue) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslMapMessageTest, testMapSetEmptyBytesVector) {
-
+TEST_F(OpenwireSslMapMessageTest, testMapSetEmptyBytesVector)
+{
     // Create CMS Object for Comms
-    cms::Session* session(cmsProvider->getSession());
+    cms::Session*         session(cmsProvider->getSession());
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
@@ -128,10 +136,10 @@ TEST_F(OpenwireSslMapMessageTest, testMapSetEmptyBytesVector) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslMapMessageTest, testMapWithSingleCharEntry) {
-
+TEST_F(OpenwireSslMapMessageTest, testMapWithSingleCharEntry)
+{
     // Create CMS Object for Comms
-    cms::Session* session(cmsProvider->getSession());
+    cms::Session*         session(cmsProvider->getSession());
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
@@ -154,10 +162,10 @@ TEST_F(OpenwireSslMapMessageTest, testMapWithSingleCharEntry) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslMapMessageTest, testMapWithCharAndStringEntry) {
-
+TEST_F(OpenwireSslMapMessageTest, testMapWithCharAndStringEntry)
+{
     // Create CMS Object for Comms
-    cms::Session* session(cmsProvider->getSession());
+    cms::Session*         session(cmsProvider->getSession());
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);

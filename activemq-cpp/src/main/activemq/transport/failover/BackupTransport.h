@@ -20,133 +20,146 @@
 
 #include <activemq/util/Config.h>
 
-#include <activemq/transport/Transport.h>
 #include <activemq/transport/DefaultTransportListener.h>
-#include <decaf/net/URI.h>
+#include <activemq/transport/Transport.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/net/URI.h>
 #include <memory>
 
-namespace activemq {
-namespace transport {
-namespace failover {
+namespace activemq
+{
+namespace transport
+{
+    namespace failover
+    {
 
-    using decaf::lang::Pointer;
+        using decaf::lang::Pointer;
 
-    class BackupTransportPool;
+        class BackupTransportPool;
 
-    class AMQCPP_API BackupTransport : public DefaultTransportListener {
-    private:
+        class AMQCPP_API BackupTransport : public DefaultTransportListener
+        {
+        private:
+            // The parent of this Backup
+            BackupTransportPool* parent;
 
-        // The parent of this Backup
-        BackupTransportPool* parent;
+            // The Transport this one is managing.
+            Pointer<Transport> transport;
 
-        // The Transport this one is managing.
-        Pointer<Transport> transport;
+            // The URI of this Backup
+            decaf::net::URI uri;
 
-        // The URI of this Backup
-        decaf::net::URI uri;
+            // Indicates that the contained transport is not valid any longer.
+            bool closed;
 
-        // Indicates that the contained transport is not valid any longer.
-        bool closed;
+            // Is this Transport one of the priority backups.
+            bool priority;
 
-        // Is this Transport one of the priority backups.
-        bool priority;
+        private:
+            BackupTransport(const BackupTransport&);
+            BackupTransport& operator=(const BackupTransport&);
 
-    private:
+        public:
+            BackupTransport(BackupTransportPool* failover);
 
-        BackupTransport(const BackupTransport&);
-        BackupTransport& operator=(const BackupTransport&);
+            virtual ~BackupTransport();
 
-    public:
-
-        BackupTransport(BackupTransportPool* failover);
-
-        virtual ~BackupTransport();
-
-        /**
-         * Gets the URI assigned to this Backup
-         * @return the assigned URI
-         */
-        decaf::net::URI getUri() const {
-            return this->uri;
-        }
-
-        /**
-         * Sets the URI assigned to this Transport.
-         */
-        void setUri(const decaf::net::URI& uri) {
-            this->uri = uri;
-        }
-
-        /**
-         * Gets the currently held transport
-         * @return pointer to the held transport or NULL if not set.
-         */
-        const Pointer<Transport>& getTransport() {
-            return transport;
-        }
-
-        /**
-         * Sets the held transport, if not NULL then start to listen for exceptions
-         * from the held transport.
-         *
-         * @param transport
-         *        The transport to hold.
-         */
-        void setTransport(const Pointer<Transport> transport) {
-            this->transport = transport;
-
-            if (this->transport != NULL) {
-                this->transport->setTransportListener(this);
+            /**
+             * Gets the URI assigned to this Backup
+             * @return the assigned URI
+             */
+            decaf::net::URI getUri() const
+            {
+                return this->uri;
             }
-        }
 
-        /**
-         * Event handler for an exception from a command transport.
-         * <p>
-         * The BackupTransport closes its internal Transport when an exception is
-         * received and returns the URI to the pool of URIs to attempt connections to.
-         *
-         * @param ex
-         *      The exception that was passed to this listener to handle.
-         */
-        virtual void onException(const decaf::lang::Exception& ex);
+            /**
+             * Sets the URI assigned to this Transport.
+             */
+            void setUri(const decaf::net::URI& uri)
+            {
+                this->uri = uri;
+            }
 
-        /**
-         * Has the Transport been shutdown and no longer usable.
-         *
-         * @return true if the Transport
-         */
-        bool isClosed() const {
-            return this->closed;
-        }
+            /**
+             * Gets the currently held transport
+             * @return pointer to the held transport or NULL if not set.
+             */
+            const Pointer<Transport>& getTransport()
+            {
+                return transport;
+            }
 
-        /**
-         * Sets the closed flag on this Transport.
-         * @param value - true for closed.
-         */
-        void setClosed(bool value) {
-            this->closed = value;
-        }
+            /**
+             * Sets the held transport, if not NULL then start to listen for
+             * exceptions from the held transport.
+             *
+             * @param transport
+             *        The transport to hold.
+             */
+            void setTransport(const Pointer<Transport> transport)
+            {
+                this->transport = transport;
 
-        /**
-         * @return true if this transport was in the priority backup list.
-         */
-        bool isPriority() const {
-            return this->priority;
-        }
+                if (this->transport != NULL)
+                {
+                    this->transport->setTransportListener(this);
+                }
+            }
 
-        /**
-         * Set if this transport is a Priority backup or not.
-         *
-         * @param value
-         *      True if this is a priority backup.
-         */
-        void setPriority(bool value) {
-            this->priority = value;
-        }
-    };
+            /**
+             * Event handler for an exception from a command transport.
+             * <p>
+             * The BackupTransport closes its internal Transport when an
+             * exception is received and returns the URI to the pool of URIs to
+             * attempt connections to.
+             *
+             * @param ex
+             *      The exception that was passed to this listener to handle.
+             */
+            virtual void onException(const decaf::lang::Exception& ex);
 
-}}}
+            /**
+             * Has the Transport been shutdown and no longer usable.
+             *
+             * @return true if the Transport
+             */
+            bool isClosed() const
+            {
+                return this->closed;
+            }
+
+            /**
+             * Sets the closed flag on this Transport.
+             * @param value - true for closed.
+             */
+            void setClosed(bool value)
+            {
+                this->closed = value;
+            }
+
+            /**
+             * @return true if this transport was in the priority backup list.
+             */
+            bool isPriority() const
+            {
+                return this->priority;
+            }
+
+            /**
+             * Set if this transport is a Priority backup or not.
+             *
+             * @param value
+             *      True if this is a priority backup.
+             */
+            void setPriority(bool value)
+            {
+                this->priority = value;
+            }
+        };
+
+    }  // namespace failover
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVE_TRANSPORT_FAILOVER_BACKUPTRANSPORT_H_ */

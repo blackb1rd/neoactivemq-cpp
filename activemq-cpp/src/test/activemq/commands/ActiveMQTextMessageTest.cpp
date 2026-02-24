@@ -25,19 +25,21 @@ using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
 
-    class ActiveMQTextMessageTest : public ::testing::Test {
-    };
-
+class ActiveMQTextMessageTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQTextMessageTest, test) {
+TEST_F(ActiveMQTextMessageTest, test)
+{
     ActiveMQTextMessage myMessage;
 
-    ASSERT_TRUE(myMessage.getDataStructureType() == ActiveMQTextMessage::ID_ACTIVEMQTEXTMESSAGE);
+    ASSERT_TRUE(myMessage.getDataStructureType() ==
+                ActiveMQTextMessage::ID_ACTIVEMQTEXTMESSAGE);
 
     const char* testText = "This is some test Text";
 
-    myMessage.setText( testText );
+    myMessage.setText(testText);
 
     ASSERT_TRUE(myMessage.getText() == testText);
 
@@ -48,85 +50,105 @@ TEST_F(ActiveMQTextMessageTest, test) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQTextMessageTest, testShallowCopy) {
-
+TEST_F(ActiveMQTextMessageTest, testShallowCopy)
+{
     ActiveMQTextMessage msg;
-    std::string string1 = "str";
-    msg.setText( string1 );
+    std::string         string1 = "str";
+    msg.setText(string1);
 
     ActiveMQTextMessage msg2;
 
-    msg2.copyDataStructure( &msg );
+    msg2.copyDataStructure(&msg);
     ASSERT_TRUE(msg.getText() == msg2.getText());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQTextMessageTest, testGetBytes) {
-
+TEST_F(ActiveMQTextMessageTest, testGetBytes)
+{
     ActiveMQTextMessage msg;
-    std::string str = "testText";
-    msg.setText( str );
-    msg.beforeMarshal( NULL );
+    std::string         str = "testText";
+    msg.setText(str);
+    msg.beforeMarshal(NULL);
 
     ActiveMQTextMessage msg2;
-    msg2.setContent( msg.getContent() );
+    msg2.setContent(msg.getContent());
 
     ASSERT_TRUE(msg2.getText() == str);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQTextMessageTest, testClearBody) {
-
+TEST_F(ActiveMQTextMessageTest, testClearBody)
+{
     ActiveMQTextMessage textMessage;
-    textMessage.setText( "string" );
+    textMessage.setText("string");
     textMessage.clearBody();
     ASSERT_TRUE(!textMessage.isReadOnlyBody());
     ASSERT_TRUE(textMessage.getText() == "");
-    try {
-        textMessage.setText( "String" );
+    try
+    {
+        textMessage.setText("String");
         textMessage.getText();
-    } catch( MessageNotWriteableException& mnwe ) {
+    }
+    catch (MessageNotWriteableException& mnwe)
+    {
         FAIL() << ("should be writeable");
-    } catch( MessageNotReadableException& mnre ) {
+    }
+    catch (MessageNotReadableException& mnre)
+    {
         FAIL() << ("should be readable");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQTextMessageTest, testReadOnlyBody) {
+TEST_F(ActiveMQTextMessageTest, testReadOnlyBody)
+{
     ActiveMQTextMessage textMessage;
-    textMessage.setText( "test" );
-    textMessage.setReadOnlyBody( true );
-    try {
+    textMessage.setText("test");
+    textMessage.setReadOnlyBody(true);
+    try
+    {
         textMessage.getText();
-    } catch( MessageNotReadableException& e ) {
+    }
+    catch (MessageNotReadableException& e)
+    {
         FAIL() << ("should be readable");
     }
-    try {
-        textMessage.setText( "test" );
+    try
+    {
+        textMessage.setText("test");
         FAIL() << ("should throw exception");
-    } catch( MessageNotWriteableException& mnwe ) {
+    }
+    catch (MessageNotWriteableException& mnwe)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQTextMessageTest, testWriteOnlyBody) {
-
+TEST_F(ActiveMQTextMessageTest, testWriteOnlyBody)
+{
     ActiveMQTextMessage textMessage;
-    textMessage.setReadOnlyBody( false );
-    try {
-        textMessage.setText( "test" );
+    textMessage.setReadOnlyBody(false);
+    try
+    {
+        textMessage.setText("test");
         textMessage.getText();
-    } catch( MessageNotReadableException& e ) {
+    }
+    catch (MessageNotReadableException& e)
+    {
         FAIL() << ("should be readable");
     }
-    textMessage.setReadOnlyBody( true );
-    try {
+    textMessage.setReadOnlyBody(true);
+    try
+    {
         textMessage.getText();
-        textMessage.setText( "test" );
+        textMessage.setText("test");
         FAIL() << ("should throw exception");
-    } catch( MessageNotReadableException& e ) {
+    }
+    catch (MessageNotReadableException& e)
+    {
         FAIL() << ("should be readable");
-    } catch( MessageNotWriteableException& mnwe ) {
+    }
+    catch (MessageNotWriteableException& mnwe)
+    {
     }
 }

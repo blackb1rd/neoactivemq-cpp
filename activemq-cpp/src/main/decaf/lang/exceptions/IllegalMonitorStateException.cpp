@@ -22,30 +22,45 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalMonitorStateException::IllegalMonitorStateException() : Exception() {
+IllegalMonitorStateException::IllegalMonitorStateException()
+    : Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalMonitorStateException::~IllegalMonitorStateException() throw () {
+IllegalMonitorStateException::~IllegalMonitorStateException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalMonitorStateException::IllegalMonitorStateException(const Exception& ex) : Exception() {
-    *(Exception*) this = ex;
+IllegalMonitorStateException::IllegalMonitorStateException(const Exception& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalMonitorStateException::IllegalMonitorStateException(const IllegalMonitorStateException& ex) : Exception() {
-    *(Exception*) this = ex;
+IllegalMonitorStateException::IllegalMonitorStateException(
+    const IllegalMonitorStateException& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalMonitorStateException::IllegalMonitorStateException(const std::exception* cause) : Exception(cause) {
+IllegalMonitorStateException::IllegalMonitorStateException(
+    const std::exception* cause)
+    : Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalMonitorStateException::IllegalMonitorStateException(const char* file, const int lineNumber, const char* msg, ...) : Exception() {
-
+IllegalMonitorStateException::IllegalMonitorStateException(const char* file,
+                                                           const int lineNumber,
+                                                           const char* msg,
+                                                           ...)
+    : Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +70,14 @@ IllegalMonitorStateException::IllegalMonitorStateException(const char* file, con
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalMonitorStateException::IllegalMonitorStateException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : Exception(cause) {
-
+IllegalMonitorStateException::IllegalMonitorStateException(
+    const char*           file,
+    const int             lineNumber,
+    const std::exception* cause,
+    const char*           msg,
+    ...)
+    : Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

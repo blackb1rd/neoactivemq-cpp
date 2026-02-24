@@ -26,44 +26,49 @@ using namespace activemq::core;
 string ActiveMQConstants::StaticInitializer::destOptions[NUM_OPTIONS];
 string ActiveMQConstants::StaticInitializer::uriParams[NUM_PARAMS];
 
-map< std::string, ActiveMQConstants::DestinationOption >
+map<std::string, ActiveMQConstants::DestinationOption>
     ActiveMQConstants::StaticInitializer::destOptionMap;
-map< std::string, ActiveMQConstants::URIParam >
+map<std::string, ActiveMQConstants::URIParam>
     ActiveMQConstants::StaticInitializer::uriParamsMap;
 
 ActiveMQConstants::StaticInitializer ActiveMQConstants::staticInits;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQConstants::StaticInitializer::StaticInitializer() {
-
+ActiveMQConstants::StaticInitializer::StaticInitializer()
+{
     destOptions[CONSUMER_PREFECTCHSIZE] = "consumer.prefetchSize";
-    destOptions[CUNSUMER_MAXPENDINGMSGLIMIT] = "consumer.maximumPendingMessageLimit";
-    destOptions[CONSUMER_NOLOCAL] = "consumer.noLocal";
+    destOptions[CUNSUMER_MAXPENDINGMSGLIMIT] =
+        "consumer.maximumPendingMessageLimit";
+    destOptions[CONSUMER_NOLOCAL]       = "consumer.noLocal";
     destOptions[CONSUMER_DISPATCHASYNC] = "consumer.dispatchAsync";
-    destOptions[CONSUMER_RETROACTIVE] = "consumer.retroactive";
-    destOptions[CONSUMER_SELECTOR] = "consumer.selector";
-    destOptions[CONSUMER_EXCLUSIVE] = "consumer.exclusive";
-    destOptions[CONSUMER_PRIORITY] = "consumer.priority";
+    destOptions[CONSUMER_RETROACTIVE]   = "consumer.retroactive";
+    destOptions[CONSUMER_SELECTOR]      = "consumer.selector";
+    destOptions[CONSUMER_EXCLUSIVE]     = "consumer.exclusive";
+    destOptions[CONSUMER_PRIORITY]      = "consumer.priority";
 
-    uriParams[CONNECTION_CLOSETIMEOUT] = "connection.closeTimeout";
-    uriParams[CONNECTION_SENDTIMEOUT] = "connection.sendTimeout";
+    uriParams[CONNECTION_CLOSETIMEOUT]       = "connection.closeTimeout";
+    uriParams[CONNECTION_SENDTIMEOUT]        = "connection.sendTimeout";
     uriParams[CONNECTION_PRODUCERWINDOWSIZE] = "connection.producerWindowSize";
-    uriParams[CONNECTION_ALWAYSSYNCSEND] = "connection.alwaysSyncSend";
-    uriParams[CONNECTION_USEASYNCSEND] = "connection.useAsyncSend";
-    uriParams[CONNECTION_USECOMPRESSION] = "connection.useCompression";
-    uriParams[CONNECTION_DISPATCHASYNC] = "connection.dispatchAsync";
-    uriParams[CONNECTION_MANAGEABLE] = "connection.manageable";
-    uriParams[CONNECTION_ADVISORYCONSUMERDISPATCHASYNC] = "connection.advisoryConsumerDispatchAsync";
+    uriParams[CONNECTION_ALWAYSSYNCSEND]     = "connection.alwaysSyncSend";
+    uriParams[CONNECTION_USEASYNCSEND]       = "connection.useAsyncSend";
+    uriParams[CONNECTION_USECOMPRESSION]     = "connection.useCompression";
+    uriParams[CONNECTION_DISPATCHASYNC]      = "connection.dispatchAsync";
+    uriParams[CONNECTION_MANAGEABLE]         = "connection.manageable";
+    uriParams[CONNECTION_ADVISORYCONSUMERDISPATCHASYNC] =
+        "connection.advisoryConsumerDispatchAsync";
     uriParams[PARAM_USERNAME] = "username";
     uriParams[PARAM_PASSWORD] = "password";
     uriParams[PARAM_CLIENTID] = "client-id";
-    uriParams[CONNECTION_CONNECTRESPONSETIMEOUT] = "connection.connectResponseTimeout";
+    uriParams[CONNECTION_CONNECTRESPONSETIMEOUT] =
+        "connection.connectResponseTimeout";
     uriParams[CONNECTION_REQUESTTIMEOUT] = "connection.requestTimeout";
 
-    for (int ix = 0; ix < NUM_OPTIONS; ++ix) {
-        destOptionMap[destOptions[ix]] = (DestinationOption) ix;
+    for (int ix = 0; ix < NUM_OPTIONS; ++ix)
+    {
+        destOptionMap[destOptions[ix]] = (DestinationOption)ix;
     }
-    for (int ix = 0; ix < NUM_PARAMS; ++ix) {
-        uriParamsMap[uriParams[ix]] = (URIParam) ix;
+    for (int ix = 0; ix < NUM_PARAMS; ++ix)
+    {
+        uriParamsMap[uriParams[ix]] = (URIParam)ix;
     }
 }

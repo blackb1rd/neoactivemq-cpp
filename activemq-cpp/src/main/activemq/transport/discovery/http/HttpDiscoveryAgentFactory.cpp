@@ -17,8 +17,8 @@
 
 #include <activemq/transport/discovery/http/HttpDiscoveryAgentFactory.h>
 
-#include <activemq/transport/discovery/http/HttpDiscoveryAgent.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/transport/discovery/http/HttpDiscoveryAgent.h>
 
 using namespace activemq;
 using namespace activemq::exceptions;
@@ -31,19 +31,23 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-HttpDiscoveryAgentFactory::~HttpDiscoveryAgentFactory() {
+HttpDiscoveryAgentFactory::~HttpDiscoveryAgentFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<AbstractDiscoveryAgent> HttpDiscoveryAgentFactory::doCreateAgent() {
+Pointer<AbstractDiscoveryAgent> HttpDiscoveryAgentFactory::doCreateAgent()
+{
     return Pointer<AbstractDiscoveryAgent>(new HttpDiscoveryAgent);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HttpDiscoveryAgentFactory::doConfigureAgent(Pointer<AbstractDiscoveryAgent> agent AMQCPP_UNUSED, const Properties& options AMQCPP_UNUSED) {
-
-    try {
-
+void HttpDiscoveryAgentFactory::doConfigureAgent(
+    Pointer<AbstractDiscoveryAgent> agent AMQCPP_UNUSED,
+    const Properties& options             AMQCPP_UNUSED)
+{
+    try
+    {
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)

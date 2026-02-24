@@ -22,8 +22,10 @@
 
 #include <cms/ConnectionMetaData.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     /**
      * This class houses all the various settings and information that is used
@@ -31,19 +33,17 @@ namespace core {
      *
      * @since 3.0
      */
-    class AMQCPP_API ActiveMQConnectionMetaData : public cms::ConnectionMetaData {
+    class AMQCPP_API ActiveMQConnectionMetaData : public cms::ConnectionMetaData
+    {
     private:
-
         ActiveMQConnectionMetaData(const ActiveMQConnectionMetaData&);
         ActiveMQConnectionMetaData& operator=(const ActiveMQConnectionMetaData&);
 
     public:
-
         ActiveMQConnectionMetaData();
         virtual ~ActiveMQConnectionMetaData();
 
     public:  // cms::ConnectionMetaData
-
         virtual std::string getCMSVersion() const;
 
         virtual int getCMSMajorVersion() const;
@@ -61,9 +61,9 @@ namespace core {
         virtual int getProviderPatchVersion() const;
 
         virtual std::vector<std::string> getCMSXPropertyNames() const;
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_ACTIVEMQCONNECTIONMETADATA_H_ */

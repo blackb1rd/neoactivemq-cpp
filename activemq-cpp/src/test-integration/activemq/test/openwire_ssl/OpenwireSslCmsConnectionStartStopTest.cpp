@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-#include <activemq/test/CmsConnectionStartStopTest.h>
-#include <activemq/util/IntegrationCommon.h>
 #include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/test/CmsConnectionStartStopTest.h>
+#include <activemq/util/IntegrationCommon.h>
 
-#include <decaf/lang/Runnable.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/Integer.h>
+#include <decaf/lang/Pointer.h>
+#include <decaf/lang/Runnable.h>
 #include <decaf/util/Random.h>
 #include <decaf/util/concurrent/CopyOnWriteArrayList.h>
-#include <decaf/util/concurrent/TimeUnit.h>
-#include <decaf/util/concurrent/ThreadPoolExecutor.h>
 #include <decaf/util/concurrent/LinkedBlockingQueue.h>
+#include <decaf/util/concurrent/ThreadPoolExecutor.h>
+#include <decaf/util/concurrent/TimeUnit.h>
 
 using namespace std;
 using namespace cms;
@@ -41,100 +41,131 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 
-namespace {
+namespace
+{
 
-    class CreateSessionRunnable : public Runnable {
-    private:
+class CreateSessionRunnable : public Runnable
+{
+private:
+    Connection*                        connection;
+    Random                             rand;
+    CopyOnWriteArrayList<std::string>* exceptions;
 
-        Connection* connection;
-        Random rand;
-        CopyOnWriteArrayList<std::string>* exceptions;
+private:
+    CreateSessionRunnable(const CreateSessionRunnable&);
+    CreateSessionRunnable& operator=(const CreateSessionRunnable&);
 
-    private:
+public:
+    CreateSessionRunnable(Connection*                        connection,
+                          CopyOnWriteArrayList<std::string>* exceptions)
+        : Runnable(),
+          connection(connection),
+          rand(),
+          exceptions(exceptions)
+    {
+    }
 
-        CreateSessionRunnable(const CreateSessionRunnable&);
-        CreateSessionRunnable& operator= (const CreateSessionRunnable&);
+    virtual ~CreateSessionRunnable()
+    {
+    }
 
-    public:
-
-        CreateSessionRunnable(Connection* connection, CopyOnWriteArrayList<std::string>* exceptions) :
-            Runnable(), connection(connection), rand(), exceptions(exceptions) {
+    virtual void run()
+    {
+        try
+        {
+            TimeUnit::MILLISECONDS.sleep(rand.nextInt(10));
+            Pointer<Session>(connection->createSession());
         }
+        catch (CMSException& e)
+        {
+            exceptions->add(e.getMessage());
+        }
+    }
+};
 
-        virtual ~CreateSessionRunnable() {}
+class StartStopRunnable : public Runnable
+{
+private:
+    Connection*                        connection;
+    Random                             rand;
+    CopyOnWriteArrayList<std::string>* exceptions;
 
-        virtual void run() {
-            try {
-                TimeUnit::MILLISECONDS.sleep(rand.nextInt(10));
-                Pointer<Session>(connection->createSession());
-            } catch (CMSException& e) {
-                exceptions->add(e.getMessage());
+private:
+    StartStopRunnable(const StartStopRunnable&);
+    StartStopRunnable& operator=(const StartStopRunnable&);
+
+public:
+    StartStopRunnable(Connection*                        connection,
+                      CopyOnWriteArrayList<std::string>* exceptions)
+        : Runnable(),
+          connection(connection),
+          rand(),
+          exceptions(exceptions)
+    {
+    }
+
+    virtual ~StartStopRunnable()
+    {
+    }
+
+    virtual void run()
+    {
+        try
+        {
+            TimeUnit::MILLISECONDS.sleep(rand.nextInt(10));
+            connection->start();
+            connection->stop();
+        }
+        catch (CMSException& e)
+        {
+            exceptions->add(e.getMessage());
+        }
+    }
+};
+
+}  // namespace
+
+namespace activemq
+{
+namespace test
+{
+    namespace openwire_ssl
+    {
+
+        class OpenwireSslCmsConnectionStartStopTest
+            : public CmsConnectionStartStopTest
+        {
+        public:
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getSslOpenwireURL();
             }
-        }
-    };
+        };
 
-    class StartStopRunnable : public Runnable {
-    private:
-
-        Connection* connection;
-        Random rand;
-        CopyOnWriteArrayList<std::string>* exceptions;
-
-    private:
-
-        StartStopRunnable(const StartStopRunnable&);
-        StartStopRunnable& operator= (const StartStopRunnable&);
-
-    public:
-
-        StartStopRunnable(Connection* connection, CopyOnWriteArrayList<std::string>* exceptions) :
-            Runnable(), connection(connection), rand(), exceptions(exceptions) {
-        }
-
-        virtual ~StartStopRunnable() {}
-
-        virtual void run() {
-            try {
-                TimeUnit::MILLISECONDS.sleep(rand.nextInt(10));
-                connection->start();
-                connection->stop();
-            } catch (CMSException& e) {
-                exceptions->add(e.getMessage());
-            }
-
-        }
-    };
-
-}
-
-namespace activemq {
-namespace test {
-namespace openwire_ssl {
-
-    class OpenwireSslCmsConnectionStartStopTest : public CmsConnectionStartStopTest {
-    public:
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL();
-        }
-    };
-
-}}}
+    }  // namespace openwire_ssl
+}  // namespace test
+}  // namespace activemq
 
 using activemq::test::openwire_ssl::OpenwireSslCmsConnectionStartStopTest;
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslCmsConnectionStartStopTest, testStoppedConsumerHoldsMessagesTillStarted) {
-
+TEST_F(OpenwireSslCmsConnectionStartStopTest,
+       testStoppedConsumerHoldsMessagesTillStarted)
+{
     Pointer<Session> startedSession(startedConnection->createSession());
     Pointer<Session> stoppedSession(stoppedConnection->createSession());
 
     // Setup the consumers.
-    Pointer<Topic> topic(startedSession->createTopic("test"));
-    Pointer<MessageConsumer> startedConsumer(startedSession->createConsumer(topic.get()));
-    Pointer<MessageConsumer> stoppedConsumer(stoppedSession->createConsumer(topic.get()));
+    Pointer<Topic>           topic(startedSession->createTopic("test"));
+    Pointer<MessageConsumer> startedConsumer(
+        startedSession->createConsumer(topic.get()));
+    Pointer<MessageConsumer> stoppedConsumer(
+        stoppedSession->createConsumer(topic.get()));
 
     // Send the message.
-    Pointer<MessageProducer> producer(startedSession->createProducer(topic.get()));
+    Pointer<MessageProducer> producer(
+        startedSession->createProducer(topic.get()));
     Pointer<TextMessage> message(startedSession->createTextMessage("Hello"));
     producer->send(message.get());
 
@@ -154,8 +185,8 @@ TEST_F(OpenwireSslCmsConnectionStartStopTest, testStoppedConsumerHoldsMessagesTi
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslCmsConnectionStartStopTest, testMultipleConnectionStops) {
-
+TEST_F(OpenwireSslCmsConnectionStartStopTest, testMultipleConnectionStops)
+{
     testStoppedConsumerHoldsMessagesTillStarted();
     stoppedConnection->stop();
     testStoppedConsumerHoldsMessagesTillStarted();
@@ -164,19 +195,29 @@ TEST_F(OpenwireSslCmsConnectionStartStopTest, testMultipleConnectionStops) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslCmsConnectionStartStopTest, testConcurrentSessionCreateWithStart) {
-
-    ThreadPoolExecutor executor(50, Integer::MAX_VALUE, 60LL, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>());
+TEST_F(OpenwireSslCmsConnectionStartStopTest,
+       testConcurrentSessionCreateWithStart)
+{
+    ThreadPoolExecutor executor(50,
+                                Integer::MAX_VALUE,
+                                60LL,
+                                TimeUnit::SECONDS,
+                                new LinkedBlockingQueue<Runnable*>());
 
     CopyOnWriteArrayList<std::string> exceptions;
-    Random rand;
+    Random                            rand;
 
-    for (int i=0; i<2000; i++) {
-        executor.execute(new CreateSessionRunnable(stoppedConnection.get(), &exceptions));
-        executor.execute(new StartStopRunnable(stoppedConnection.get(), &exceptions));
+    for (int i = 0; i < 2000; i++)
+    {
+        executor.execute(
+            new CreateSessionRunnable(stoppedConnection.get(), &exceptions));
+        executor.execute(
+            new StartStopRunnable(stoppedConnection.get(), &exceptions));
     }
 
     executor.shutdown();
-    ASSERT_TRUE(executor.awaitTermination(45, TimeUnit::SECONDS)) << ("executor terminated");
-    ASSERT_TRUE(exceptions.isEmpty()) << ("no exceptions: " + exceptions.toString());
+    ASSERT_TRUE(executor.awaitTermination(45, TimeUnit::SECONDS))
+        << ("executor terminated");
+    ASSERT_TRUE(exceptions.isEmpty())
+        << ("no exceptions: " + exceptions.toString());
 }

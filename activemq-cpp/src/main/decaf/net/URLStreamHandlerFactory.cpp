@@ -21,6 +21,6 @@ using namespace decaf;
 using namespace decaf::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-URLStreamHandlerFactory::~URLStreamHandlerFactory() {
+URLStreamHandlerFactory::~URLStreamHandlerFactory()
+{
 }
-

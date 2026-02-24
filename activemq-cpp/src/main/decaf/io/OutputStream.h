@@ -21,34 +21,37 @@
 #include <decaf/io/Closeable.h>
 #include <decaf/io/Flushable.h>
 #include <decaf/io/IOException.h>
-#include <decaf/util/concurrent/Synchronizable.h>
-#include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/Config.h>
+#include <decaf/util/concurrent/Mutex.h>
+#include <decaf/util/concurrent/Synchronizable.h>
 
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 
-namespace decaf{
-namespace io{
+namespace decaf
+{
+namespace io
+{
 
     /**
-     * Base interface for any class that wants to represent an output stream of bytes.
+     * Base interface for any class that wants to represent an output stream of
+     * bytes.
      *
      * @since 1.0
      */
-    class DECAF_API OutputStream: public Closeable, public Flushable, public util::concurrent::Synchronizable {
+    class DECAF_API OutputStream : public Closeable,
+                                   public Flushable,
+                                   public util::concurrent::Synchronizable
+    {
     private:
-
         // Synchronization object.
         util::concurrent::Mutex mutex;
 
     private:
-
         OutputStream(const OutputStream&);
         OutputStream& operator=(const OutputStream&);
 
     public:
-
         OutputStream();
 
         virtual ~OutputStream();
@@ -70,8 +73,9 @@ namespace io{
         /**
          * Writes a single byte to the output stream.
          *
-         * The default implementation of this method calls the pure virtual method
-         * doWriteByte which must be implemented by any subclass of the OutputStream.
+         * The default implementation of this method calls the pure virtual
+         * method doWriteByte which must be implemented by any subclass of the
+         * OutputStream.
          *
          * @param c
          *      The byte to write to the sink.
@@ -81,13 +85,14 @@ namespace io{
         virtual void write(unsigned char c);
 
         /**
-         * Writes an array of bytes to the output stream.  The entire contents of
-         * the given vector are written to the output stream.
+         * Writes an array of bytes to the output stream.  The entire contents
+         * of the given vector are written to the output stream.
          *
-         * The default implementation of this method simply calls the doWriteArray which
-         * writes the contents of the array using the doWriteByte method repeatedly.  It is
-         * recommended that a subclass override doWriteArray to provide more performant
-         * means of writing the array.
+         * The default implementation of this method simply calls the
+         * doWriteArray which writes the contents of the array using the
+         * doWriteByte method repeatedly.  It is recommended that a subclass
+         * override doWriteArray to provide more performant means of writing the
+         * array.
          *
          * @param buffer
          *      The vector of bytes to write.
@@ -101,14 +106,15 @@ namespace io{
         virtual void write(const unsigned char* buffer, int size);
 
         /**
-         * Writes an array of bytes to the output stream in order starting at buffer[offset]
-         * and proceeding until the number of bytes specified by the length argument are
-         * written or an error occurs.
+         * Writes an array of bytes to the output stream in order starting at
+         * buffer[offset] and proceeding until the number of bytes specified by
+         * the length argument are written or an error occurs.
          *
-         * The default implementation of this method simply calls the doWriteArrayBounded method
-         * which writes the contents of the array using the doWriteByte method repeatedly.  It is
-         * recommended that a subclass override doWriteArrayBounded to provide more performant
-         * means of writing the array.
+         * The default implementation of this method simply calls the
+         * doWriteArrayBounded method which writes the contents of the array
+         * using the doWriteByte method repeatedly.  It is recommended that a
+         * subclass override doWriteArrayBounded to provide more performant means
+         * of writing the array.
          *
          * @param buffer
          *      The array of bytes to write.
@@ -121,10 +127,13 @@ namespace io{
          *
          * @throws IOException if an I/O error occurs.
          * @throws NullPointerException thrown if buffer is Null.
-         * @throws IndexOutOfBoundsException if the offset + length > size. or one of the
-         *         parameters is negative.
+         * @throws IndexOutOfBoundsException if the offset + length > size. or
+         * one of the parameters is negative.
          */
-        virtual void write(const unsigned char* buffer, int size, int offset, int length);
+        virtual void write(const unsigned char* buffer,
+                           int                  size,
+                           int                  offset,
+                           int                  length);
 
         /**
          * Output a String representation of this object.
@@ -136,49 +145,58 @@ namespace io{
         virtual std::string toString() const;
 
     protected:
-
         virtual void doWriteByte(unsigned char value) = 0;
 
         virtual void doWriteArray(const unsigned char* buffer, int size);
 
-        virtual void doWriteArrayBounded(const unsigned char* buffer, int size, int offset, int length);
+        virtual void doWriteArrayBounded(const unsigned char* buffer,
+                                         int                  size,
+                                         int                  offset,
+                                         int                  length);
 
     public:
-
-        virtual void lock() {
+        virtual void lock()
+        {
             mutex.lock();
         }
 
-        virtual bool tryLock() {
+        virtual bool tryLock()
+        {
             return mutex.tryLock();
         }
 
-        virtual void unlock() {
+        virtual void unlock()
+        {
             mutex.unlock();
         }
 
-        virtual void wait() {
+        virtual void wait()
+        {
             mutex.wait();
         }
 
-        virtual void wait(long long millisecs) {
+        virtual void wait(long long millisecs)
+        {
             mutex.wait(millisecs);
         }
 
-        virtual void wait(long long millisecs, int nanos) {
+        virtual void wait(long long millisecs, int nanos)
+        {
             mutex.wait(millisecs, nanos);
         }
 
-        virtual void notify() {
+        virtual void notify()
+        {
             mutex.notify();
         }
 
-        virtual void notifyAll() {
+        virtual void notifyAll()
+        {
             mutex.notifyAll();
         }
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /*_DECAF_IO_OUTPUTSTREAM_H*/

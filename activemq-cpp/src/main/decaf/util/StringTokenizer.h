@@ -22,17 +22,19 @@
 #include <string>
 #include <vector>
 
-namespace decaf{
-namespace util{
+namespace decaf
+{
+namespace util
+{
 
     /**
      * Class that allows for parsing of string based on Tokens.
      *
      * @since 1.0
      */
-    class DECAF_API StringTokenizer {
+    class DECAF_API StringTokenizer
+    {
     private:
-
         // String to tokenize
         std::string str;
 
@@ -46,7 +48,6 @@ namespace util{
         bool returnDelims;
 
     public:
-
         /**
          * Constructs a string tokenizer for the specified string. All
          * characters in the delim argument are the delimiters for separating
@@ -62,9 +63,12 @@ namespace util{
          * StringTokenizer may result in an Exception.
          * @param str - The string to tokenize
          * @param delim - String containing the delimiters
-         * @param returnDelims - boolean indicating if the delimiters are returned as tokens
+         * @param returnDelims - boolean indicating if the delimiters are
+         * returned as tokens
          */
-        StringTokenizer(const std::string& str, const std::string& delim = " \t\n\r\f", bool returnDelims = false);
+        StringTokenizer(const std::string& str,
+                        const std::string& delim        = " \t\n\r\f",
+                        bool               returnDelims = false);
 
         virtual ~StringTokenizer();
 
@@ -88,7 +92,8 @@ namespace util{
          *
          * @return string value of next token
          *
-         * @throws NoSuchElementException if there are no more tokens in this string.
+         * @throws NoSuchElementException if there are no more tokens in this
+         * string.
          */
         virtual std::string nextToken();
 
@@ -106,7 +111,8 @@ namespace util{
          *
          * @return next string in the token list
          *
-         * @throws NoSuchElementException if there are no more tokens in this string.
+         * @throws NoSuchElementException if there are no more tokens in this
+         * string.
          */
         virtual std::string nextToken(const std::string& delim);
 
@@ -127,7 +133,8 @@ namespace util{
          *   * If set the string param will reset the string that this Tokenizer
          *     is working on.  If set to "" no change is made.
          *   * If set the delim param will reset the string that this Tokenizer
-         *     is using to tokenizer the string.  If set to "", no change is made
+         *     is using to tokenizer the string.  If set to "", no change is
+         * made
          *   * If set the return Delims will set if this Tokenizer will return
          *     delimiters as tokens. Defaults to false.
          *
@@ -138,10 +145,12 @@ namespace util{
          * @param returnDelims
          *      Should the Tokenizer return delimiters as Tokens, default false
          */
-        virtual void reset(const std::string& str = "", const std::string& delim = "", bool returnDelims = false);
-
+        virtual void reset(const std::string& str          = "",
+                           const std::string& delim        = "",
+                           bool               returnDelims = false);
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_STRINGTOKENIZER_H_*/

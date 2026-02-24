@@ -15,23 +15,31 @@
  * limitations under the License.
  */
 
-#include <activemq/util/IntegrationCommon.h>
+#include <activemq/core/ActiveMQConnection.h>
+#include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/test/AsyncSenderTest.h>
 #include <activemq/util/CMSListener.h>
-#include <activemq/core/ActiveMQConnectionFactory.h>
-#include <activemq/core/ActiveMQConnection.h>
+#include <activemq/util/IntegrationCommon.h>
 
-namespace activemq {
-namespace test {
-namespace openwire_ssl {
-    class OpenwireSslAsyncSenderTest : public AsyncSenderTest {
-public:
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL() +
-                   "&connection.useAsyncSend=true";
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace openwire_ssl
+    {
+        class OpenwireSslAsyncSenderTest : public AsyncSenderTest
+        {
+        public:
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                           .getSslOpenwireURL() +
+                       "&connection.useAsyncSend=true";
+            }
+        };
+    }  // namespace openwire_ssl
+}  // namespace test
+}  // namespace activemq
 
 using namespace std;
 using namespace cms;
@@ -42,53 +50,59 @@ using namespace activemq::core;
 using namespace activemq::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslAsyncSenderTest, testAsyncSends) {
-
-    try {
-
+TEST_F(OpenwireSslAsyncSenderTest, testAsyncSends)
+{
+    try
+    {
         // Create CMS Object for Comms
-        cms::Session* session( cmsProvider->getSession() );
+        cms::Session* session(cmsProvider->getSession());
 
-        CMSListener listener( session );
+        CMSListener listener(session);
 
         cms::MessageConsumer* consumer = cmsProvider->getConsumer();
-        consumer->setMessageListener( &listener );
+        consumer->setMessageListener(&listener);
         cms::MessageProducer* producer = cmsProvider->getProducer();
-        producer->setDeliveryMode( DeliveryMode::NON_PERSISTENT );
+        producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
-        std::unique_ptr<cms::TextMessage> txtMessage( session->createTextMessage( "TEST MESSAGE" ) );
-        std::unique_ptr<cms::BytesMessage> bytesMessage( session->createBytesMessage() );
+        std::unique_ptr<cms::TextMessage> txtMessage(
+            session->createTextMessage("TEST MESSAGE"));
+        std::unique_ptr<cms::BytesMessage> bytesMessage(
+            session->createBytesMessage());
 
-        for( unsigned int i = 0; i < IntegrationCommon::defaultMsgCount; ++i ) {
-            producer->send( txtMessage.get() );
+        for (unsigned int i = 0; i < IntegrationCommon::defaultMsgCount; ++i)
+        {
+            producer->send(txtMessage.get());
         }
 
-        for( unsigned int i = 0; i < IntegrationCommon::defaultMsgCount; ++i ) {
-            producer->send( bytesMessage.get() );
+        for (unsigned int i = 0; i < IntegrationCommon::defaultMsgCount; ++i)
+        {
+            producer->send(bytesMessage.get());
         }
 
         // Wait for the messages to get here
-        listener.asyncWaitForMessages( IntegrationCommon::defaultMsgCount * 2 );
+        listener.asyncWaitForMessages(IntegrationCommon::defaultMsgCount * 2);
 
         unsigned int numReceived = listener.getNumReceived();
         ASSERT_TRUE(numReceived == IntegrationCommon::defaultMsgCount * 2);
-
-    } catch(...) {
+    }
+    catch (...)
+    {
         ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslAsyncSenderTest, testOpenwireSslConnector) {
-
-    try{
-
+TEST_F(OpenwireSslAsyncSenderTest, testOpenwireSslConnector)
+{
+    try
+    {
         std::unique_ptr<ActiveMQConnectionFactory> connectionFactory(
-            new ActiveMQConnectionFactory( this->getBrokerURL() ) );
-        std::unique_ptr<cms::Connection> connection( connectionFactory->createConnection() );
+            new ActiveMQConnectionFactory(this->getBrokerURL()));
+        std::unique_ptr<cms::Connection> connection(
+            connectionFactory->createConnection());
 
         ActiveMQConnection* amqConnection =
-            dynamic_cast<ActiveMQConnection*>( connection.get() );
+            dynamic_cast<ActiveMQConnection*>(connection.get());
         ASSERT_TRUE(amqConnection != NULL);
 
         ASSERT_TRUE(amqConnection->isUseAsyncSend());
@@ -98,7 +112,9 @@ TEST_F(OpenwireSslAsyncSenderTest, testOpenwireSslConnector) {
         connection->stop();
 
         ASSERT_TRUE(true);
-    } catch(...) {
+    }
+    catch (...)
+    {
         ASSERT_TRUE(false);
     }
 }

@@ -22,64 +22,75 @@
 
 #include <decaf/io/InputStream.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
-namespace ssl {
-namespace openssl {
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
+        namespace ssl
+        {
+            namespace openssl
+            {
 
-    class OpenSSLSocket;
+                class OpenSSLSocket;
 
-    /**
-     * An output stream for reading data from an OpenSSL Socket instance.
-     *
-     * @since 1.0
-     */
-    class DECAF_API OpenSSLSocketInputStream : public decaf::io::InputStream {
-    private:
+                /**
+                 * An output stream for reading data from an OpenSSL Socket
+                 * instance.
+                 *
+                 * @since 1.0
+                 */
+                class DECAF_API OpenSSLSocketInputStream
+                    : public decaf::io::InputStream
+                {
+                private:
+                    OpenSSLSocket* socket;
+                    volatile bool  closed;
 
-        OpenSSLSocket* socket;
-        volatile bool closed;
+                private:
+                    OpenSSLSocketInputStream(const OpenSSLSocketInputStream&);
+                    OpenSSLSocketInputStream& operator=(
+                        const OpenSSLSocketInputStream&);
 
-    private:
+                public:
+                    OpenSSLSocketInputStream(OpenSSLSocket* socket);
 
-        OpenSSLSocketInputStream( const OpenSSLSocketInputStream& );
-        OpenSSLSocketInputStream& operator= ( const OpenSSLSocketInputStream& );
+                    virtual ~OpenSSLSocketInputStream();
 
-    public:
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual int available() const;
 
-        OpenSSLSocketInputStream( OpenSSLSocket* socket );
+                    /**
+                     * Close - does nothing.  It is the responsibility of the
+                     * owner of the socket object to close it.
+                     *
+                     * {@inheritDoc}
+                     */
+                    virtual void close();
 
-        virtual ~OpenSSLSocketInputStream();
+                    /**
+                     * Not supported.
+                     *
+                     * {@inheritDoc}
+                     */
+                    virtual long long skip(long long num);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual int available() const;
+                protected:
+                    virtual int doReadByte();
 
-        /**
-         * Close - does nothing.  It is the responsibility of the owner
-         * of the socket object to close it.
-         *
-         * {@inheritDoc}
-         */
-        virtual void close();
+                    virtual int doReadArrayBounded(unsigned char* buffer,
+                                                   int            size,
+                                                   int            offset,
+                                                   int            length);
+                };
 
-        /**
-         * Not supported.
-         *
-         * {@inheritDoc}
-         */
-        virtual long long skip( long long num );
-
-    protected:
-
-        virtual int doReadByte();
-
-        virtual int doReadArrayBounded( unsigned char* buffer, int size, int offset, int length );
-
-    };
-
-}}}}}
+            }  // namespace openssl
+        }  // namespace ssl
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_SSL_OPENSSL_OPENSSLSOCKETINPUTSTREAM_H_ */

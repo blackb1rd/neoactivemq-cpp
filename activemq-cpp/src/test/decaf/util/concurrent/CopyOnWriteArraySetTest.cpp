@@ -17,8 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/concurrent/CopyOnWriteArraySet.h>
 #include <decaf/util/StlList.h>
+#include <decaf/util/concurrent/CopyOnWriteArraySet.h>
 
 using namespace decaf;
 using namespace decaf::util;
@@ -26,48 +26,50 @@ using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class CopyOnWriteArraySetTest : public ::testing::Test {
+class CopyOnWriteArraySetTest : public ::testing::Test
+{
 protected:
+    static const int SIZE;
 
-        static const int SIZE;
-
-    public:
-
-        CopyOnWriteArraySetTest();
-        virtual ~CopyOnWriteArraySetTest();
-
-    };
+public:
+    CopyOnWriteArraySetTest();
+    virtual ~CopyOnWriteArraySetTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    void populate( CopyOnWriteArraySet<int>& set, int n ) {
+void populate(CopyOnWriteArraySet<int>& set, int n)
+{
+    ASSERT_TRUE(set.isEmpty());
 
-        ASSERT_TRUE(set.isEmpty());
-
-        for( int i = 0; i < n; ++i ) {
-            set.add( i );
-        }
-
-        ASSERT_TRUE(!set.isEmpty());
-        ASSERT_EQ(n, set.size());
+    for (int i = 0; i < n; ++i)
+    {
+        set.add(i);
     }
+
+    ASSERT_TRUE(!set.isEmpty());
+    ASSERT_EQ(n, set.size());
 }
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 const int CopyOnWriteArraySetTest::SIZE = 50;
 
 ////////////////////////////////////////////////////////////////////////////////
-CopyOnWriteArraySetTest::CopyOnWriteArraySetTest() {
+CopyOnWriteArraySetTest::CopyOnWriteArraySetTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CopyOnWriteArraySetTest::~CopyOnWriteArraySetTest() {
+CopyOnWriteArraySetTest::~CopyOnWriteArraySetTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testConstructor1) {
-
+TEST_F(CopyOnWriteArraySetTest, testConstructor1)
+{
     CopyOnWriteArraySet<int> set;
     ASSERT_TRUE(set.isEmpty());
     ASSERT_TRUE(set.size() == 0);
@@ -78,168 +80,173 @@ TEST_F(CopyOnWriteArraySetTest, testConstructor1) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testConstructor2) {
-
+TEST_F(CopyOnWriteArraySetTest, testConstructor2)
+{
     StlList<int> intsList;
 
-    for( int i = 0; i < SIZE; ++i ) {
-        intsList.add( i );
+    for (int i = 0; i < SIZE; ++i)
+    {
+        intsList.add(i);
     }
 
-    CopyOnWriteArraySet<int> array( intsList );
+    CopyOnWriteArraySet<int> array(intsList);
     ASSERT_TRUE(!array.isEmpty());
     ASSERT_TRUE(array.size() == SIZE);
 
-    for( int i = 0; i < SIZE; ++i ) {
-        ASSERT_TRUE(array.contains( i ));
+    for (int i = 0; i < SIZE; ++i)
+    {
+        ASSERT_TRUE(array.contains(i));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testConstructor3) {
-
+TEST_F(CopyOnWriteArraySetTest, testConstructor3)
+{
     int ints[SIZE];
 
-    for( int i = 0; i < SIZE; ++i ) {
+    for (int i = 0; i < SIZE; ++i)
+    {
         ints[i] = i;
     }
 
-    CopyOnWriteArraySet<int> array( ints, SIZE );
+    CopyOnWriteArraySet<int> array(ints, SIZE);
     ASSERT_TRUE(!array.isEmpty());
     ASSERT_TRUE(array.size() == SIZE);
 
-    for( int i = 0; i < SIZE; ++i ) {
-        ASSERT_TRUE(array.contains( i ));
+    for (int i = 0; i < SIZE; ++i)
+    {
+        ASSERT_TRUE(array.contains(i));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testAddAll1) {
-
+TEST_F(CopyOnWriteArraySetTest, testAddAll1)
+{
     CopyOnWriteArraySet<int> full;
-    populate( full, 3 );
+    populate(full, 3);
 
     StlList<int> intsList;
-    intsList.add( 3 );
-    intsList.add( 4 );
-    intsList.add( 5 );
+    intsList.add(3);
+    intsList.add(4);
+    intsList.add(5);
 
-    full.addAll( intsList );
+    full.addAll(intsList);
     ASSERT_EQ(6, full.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testAddAll2) {
-
+TEST_F(CopyOnWriteArraySetTest, testAddAll2)
+{
     CopyOnWriteArraySet<int> full;
-    populate( full, 3 );
+    populate(full, 3);
 
     StlList<int> intsList;
-    intsList.add( 3 );
-    intsList.add( 4 );
-    intsList.add( 1 );
+    intsList.add(3);
+    intsList.add(4);
+    intsList.add(1);
 
-    full.addAll( intsList );
+    full.addAll(intsList);
     ASSERT_EQ(5, full.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testAdd1) {
-
+TEST_F(CopyOnWriteArraySetTest, testAdd1)
+{
     CopyOnWriteArraySet<int> full;
-    populate( full, 3 );
+    populate(full, 3);
 
-    full.add( 1 );
+    full.add(1);
     ASSERT_EQ(3, full.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testAdd2) {
-
+TEST_F(CopyOnWriteArraySetTest, testAdd2)
+{
     CopyOnWriteArraySet<int> full;
-    populate( full, 3 );
+    populate(full, 3);
 
-    full.add( 3 );
+    full.add(3);
     ASSERT_EQ(4, full.size());
-    ASSERT_TRUE(full.contains( 3 ));
+    ASSERT_TRUE(full.contains(3));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testClear) {
-
+TEST_F(CopyOnWriteArraySetTest, testClear)
+{
     CopyOnWriteArraySet<int> full;
-    populate( full, 3 );
+    populate(full, 3);
 
     full.clear();
     ASSERT_EQ(0, full.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testContains) {
-
+TEST_F(CopyOnWriteArraySetTest, testContains)
+{
     CopyOnWriteArraySet<int> full;
-    populate( full, 3 );
+    populate(full, 3);
 
-    ASSERT_TRUE(full.contains( 1 ));
-    ASSERT_TRUE(!full.contains( 5 ));
+    ASSERT_TRUE(full.contains(1));
+    ASSERT_TRUE(!full.contains(5));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testEquals) {
-
+TEST_F(CopyOnWriteArraySetTest, testEquals)
+{
     CopyOnWriteArraySet<int> a;
-    populate( a, 3 );
+    populate(a, 3);
     CopyOnWriteArraySet<int> b;
-    populate( b, 3 );
+    populate(b, 3);
 
-    ASSERT_TRUE(a.equals( b ));
-    ASSERT_TRUE(b.equals( a ));
-    a.add( 42 );
+    ASSERT_TRUE(a.equals(b));
+    ASSERT_TRUE(b.equals(a));
+    a.add(42);
 
-    ASSERT_TRUE(!a.equals( b ));
-    ASSERT_TRUE(!b.equals( a ));
-    b.add( 42 );
+    ASSERT_TRUE(!a.equals(b));
+    ASSERT_TRUE(!b.equals(a));
+    b.add(42);
 
-    ASSERT_TRUE(a.equals( b ));
-    ASSERT_TRUE(b.equals( a ));
+    ASSERT_TRUE(a.equals(b));
+    ASSERT_TRUE(b.equals(a));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testContainsAll) {
-
+TEST_F(CopyOnWriteArraySetTest, testContainsAll)
+{
     CopyOnWriteArraySet<int> full;
-    populate( full, 3 );
+    populate(full, 3);
 
     StlList<int> intsList;
-    intsList.add( 1 );
-    intsList.add( 2 );
+    intsList.add(1);
+    intsList.add(2);
 
-    ASSERT_TRUE(full.containsAll( intsList ));
+    ASSERT_TRUE(full.containsAll(intsList));
 
-    intsList.add( 6 );
-    ASSERT_TRUE(!full.containsAll( intsList ));
+    intsList.add(6);
+    ASSERT_TRUE(!full.containsAll(intsList));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testIsEmpty) {
-
+TEST_F(CopyOnWriteArraySetTest, testIsEmpty)
+{
     CopyOnWriteArraySet<int> empty;
     CopyOnWriteArraySet<int> full;
-    populate( full, 3 );
+    populate(full, 3);
 
     ASSERT_TRUE(empty.isEmpty());
     ASSERT_TRUE(!full.isEmpty());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testIterator) {
-
+TEST_F(CopyOnWriteArraySetTest, testIterator)
+{
     CopyOnWriteArraySet<int> full;
-    populate( full, 3 );
+    populate(full, 3);
 
-    std::unique_ptr< Iterator<int> > iter( full.iterator() );
-    int j;
-    for( j = 0; iter->hasNext(); j++ ) {
+    std::unique_ptr<Iterator<int>> iter(full.iterator());
+    int                            j;
+    for (j = 0; iter->hasNext(); j++)
+    {
         ASSERT_EQ(j, iter->next());
     }
 
@@ -247,59 +254,60 @@ TEST_F(CopyOnWriteArraySetTest, testIterator) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testIteratorRemove) {
-
+TEST_F(CopyOnWriteArraySetTest, testIteratorRemove)
+{
     CopyOnWriteArraySet<int> full;
-    populate( full, 3 );
+    populate(full, 3);
 
-    std::unique_ptr< Iterator<int> > iter( full.iterator() );
+    std::unique_ptr<Iterator<int>> iter(full.iterator());
     iter->next();
 
-    ASSERT_THROW(iter->remove(), UnsupportedOperationException) << ("Should throw a UnsupportedOperationException");
+    ASSERT_THROW(iter->remove(), UnsupportedOperationException)
+        << ("Should throw a UnsupportedOperationException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testRemoveAll) {
-
+TEST_F(CopyOnWriteArraySetTest, testRemoveAll)
+{
     CopyOnWriteArraySet<int> full;
-    populate( full, 3 );
+    populate(full, 3);
 
     StlList<int> intsList;
-    intsList.add( 1 );
-    intsList.add( 2 );
+    intsList.add(1);
+    intsList.add(2);
 
-    full.removeAll( intsList );
+    full.removeAll(intsList);
     ASSERT_EQ(1, full.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testRemove) {
-
+TEST_F(CopyOnWriteArraySetTest, testRemove)
+{
     CopyOnWriteArraySet<int> full;
-    populate( full, 3 );
+    populate(full, 3);
 
-    full.remove( 1 );
+    full.remove(1);
 
-    ASSERT_TRUE(!full.contains( 1 ));
+    ASSERT_TRUE(!full.contains(1));
     ASSERT_EQ(2, full.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testSize) {
-
+TEST_F(CopyOnWriteArraySetTest, testSize)
+{
     CopyOnWriteArraySet<int> empty;
     CopyOnWriteArraySet<int> full;
-    populate( full, 3 );
+    populate(full, 3);
 
     ASSERT_EQ(3, full.size());
     ASSERT_EQ(0, empty.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CopyOnWriteArraySetTest, testToArray) {
-
+TEST_F(CopyOnWriteArraySetTest, testToArray)
+{
     CopyOnWriteArraySet<int> full;
-    populate( full, 3 );
+    populate(full, 3);
 
     std::vector<int> array = full.toArray();
 

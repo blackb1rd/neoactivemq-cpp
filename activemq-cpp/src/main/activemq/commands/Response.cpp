@@ -38,17 +38,20 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-Response::Response() :
-    BaseCommand(), correlationId(0) {
-
+Response::Response()
+    : BaseCommand(),
+      correlationId(0)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Response::~Response() {
+Response::~Response()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Response* Response::cloneDataStructure() const {
+Response* Response::cloneDataStructure() const
+{
     std::unique_ptr<Response> response(new Response());
 
     // Copy the data from the base class or classes
@@ -58,18 +61,21 @@ Response* Response::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Response::copyDataStructure(const DataStructure* src) {
-
+void Response::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const Response* srcPtr = dynamic_cast<const Response*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "Response::copyDataStructure - src is NULL or invalid");
     }
 
@@ -80,13 +86,14 @@ void Response::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char Response::getDataStructureType() const {
+unsigned char Response::getDataStructureType() const
+{
     return Response::ID_RESPONSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Response::toString() const {
-
+std::string Response::toString() const
+{
     ostringstream stream;
 
     stream << "Response { "
@@ -100,38 +107,46 @@ std::string Response::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Response::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool Response::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const Response* valuePtr = dynamic_cast<const Response*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getCorrelationId() != valuePtr->getCorrelationId()) {
+    if (this->getCorrelationId() != valuePtr->getCorrelationId())
+    {
         return false;
     }
-    if (!BaseCommand::equals(value)) {
+    if (!BaseCommand::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Response::getCorrelationId() const {
+int Response::getCorrelationId() const
+{
     return correlationId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Response::setCorrelationId(int correlationId) {
+void Response::setCorrelationId(int correlationId)
+{
     this->correlationId = correlationId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> Response::visit(activemq::state::CommandVisitor* visitor) {
+decaf::lang::Pointer<commands::Command> Response::visit(
+    activemq::state::CommandVisitor* visitor)
+{
     return visitor->processResponse(this);
 }

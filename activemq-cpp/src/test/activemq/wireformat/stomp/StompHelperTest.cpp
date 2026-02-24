@@ -28,24 +28,26 @@ using namespace activemq::commands;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::stomp;
 
-    class StompHelperTest : public ::testing::Test {};
-
+class StompHelperTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StompHelperTest, testConvertDestinationFromString) {
-
+TEST_F(StompHelperTest, testConvertDestinationFromString)
+{
     StompWireFormat wireformat;
     wireformat.setTopicPrefix("mytopics://");
     StompHelper helper(&wireformat);
 
-    Pointer<ActiveMQDestination> destination = helper.convertDestination("mytopics://SomeTopic");
+    Pointer<ActiveMQDestination> destination =
+        helper.convertDestination("mytopics://SomeTopic");
 
     ASSERT_EQ(std::string("SomeTopic"), destination->getPhysicalName());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StompHelperTest, testConvertDestinationFromCommand) {
-
+TEST_F(StompHelperTest, testConvertDestinationFromCommand)
+{
     StompWireFormat wireformat;
     wireformat.setTopicPrefix("mytopics://");
     StompHelper helper(&wireformat);

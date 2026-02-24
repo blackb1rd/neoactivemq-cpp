@@ -18,23 +18,24 @@
 #ifndef _DECAF_LANG_BOOLEAN_H_
 #define _DECAF_LANG_BOOLEAN_H_
 
-#include <string>
-#include <decaf/lang/String.h>
 #include <decaf/lang/Comparable.h>
+#include <decaf/lang/String.h>
 #include <decaf/util/Config.h>
+#include <string>
 
-namespace decaf{
-namespace lang{
+namespace decaf
+{
+namespace lang
+{
 
     class DECAF_API Boolean : public Comparable<Boolean>,
-                              public Comparable<bool> {
+                              public Comparable<bool>
+    {
     private:
-
         // This objects boolean value
         bool value;
 
     public:
-
         /**
          * The Class object representing the primitive false boolean.
          */
@@ -46,7 +47,6 @@ namespace lang{
         static const Boolean _TRUE;
 
     public:
-
         /**
          * @param value - primitive boolean to wrap.
          */
@@ -57,12 +57,15 @@ namespace lang{
          */
         Boolean(const String& value);
 
-        virtual ~Boolean() {}
+        virtual ~Boolean()
+        {
+        }
 
         /**
          * @return the primitive boolean value of this object
          */
-        bool booleanValue() const {
+        bool booleanValue() const
+        {
             return value;
         }
 
@@ -99,7 +102,8 @@ namespace lang{
         /**
          * @return true if the two Boolean Objects have the same value.
          */
-        bool equals(const Boolean& b) const {
+        bool equals(const Boolean& b) const
+        {
             return this->value == b.value;
         }
 
@@ -131,12 +135,12 @@ namespace lang{
         /**
          * @return true if the two Boolean Objects have the same value.
          */
-        bool equals(const bool& b) const {
+        bool equals(const bool& b) const
+        {
             return this->value == b;
         }
 
     public:
-
         /**
          * @param value
          *      The bool value to convert to a <code>Boolean</code> instance.
@@ -147,7 +151,8 @@ namespace lang{
 
         /**
          * @param value
-         *      The std::string value to convert to a <code>Boolean</code> instance.
+         *      The std::string value to convert to a <code>Boolean</code>
+         * instance.
          *
          * @return a Boolean instance of the string value
          */
@@ -170,9 +175,9 @@ namespace lang{
          * @return std::string representation of the bool value passed.
          */
         static std::string toString(bool value);
-
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 #endif /*_DECAF_LANG_BOOLEAN_H_*/

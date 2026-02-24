@@ -20,45 +20,50 @@
 
 #include <decaf/util/Config.h>
 
-namespace cms {
-namespace stress {
+namespace cms
+{
+namespace stress
+{
 
-    #define SYM_GOOD_SEND 32
-    #define SYM_BAD_SEND 33
-    #define SYM_BIG_DIFF 63
-    #define SYM_GOOD_SEQ 2
-    #define SYM_BAD_MSG 105
-    #define SYM_MON_GOOD 71
-    #define SYM_MON_BAD 66
-    #define SYM_MON_CMS 67
-    #define SYM_MON_EXC 69
+#define SYM_GOOD_SEND 32
+#define SYM_BAD_SEND  33
+#define SYM_BIG_DIFF  63
+#define SYM_GOOD_SEQ  2
+#define SYM_BAD_MSG   105
+#define SYM_MON_GOOD  71
+#define SYM_MON_BAD   66
+#define SYM_MON_CMS   67
+#define SYM_MON_EXC   69
 
-    enum ErrorCode {         // NOTE: When added an entry to ErrorCode you must add the corresponding error string to ErrorDescription
-       CMS_SUCCESS = 0,
-       CMS_ERROR_UNABLE_TO_PARSE_XML,
-       CMS_ERROR_MESSAGE_HAS_BEEN_DEFINED_ALREADY,
-       CMS_ERROR_HEADER_HAS_BEEN_DEFINED_ALREADY,
-       CMS_ERROR_CLIENT_HAS_BEEN_DEFINED_ALREADY,
-       CMS_ERROR_DESTINATION_HAS_BEEN_DEFINED_ALREADY,
-       CMS_ERROR_INVALID_CLIENT,
-       CMS_ERROR_INVALID_DESTINATION,
-       CMS_ERROR_INVALID_MESSAGE,
-       CMS_ERROR_INVALID_HEADERS,
-       CMS_ERROR_INVALID_MESSAGELISTENER,
-       CMS_ERROR_A_MESSAGELISTENER_HAS_BEEN_REGISTERED_ALREADY,
-       CMS_ERROR_RECEIVER_TIMEDOUT,
-       CMS_ERROR_DESTINATION_NOT_CONFIGURED_FOR_SENDING_MESSAGES,
-       CMS_ERROR_DESTINATION_NOT_CONFIGURED_FOR_RECEIVING_MESSAGES,
-       CMS_ERROR_CAUGHT_CMS_EXCEPTION,
-       CMS_ERROR_CAUGHT_TBGENOBJ_ERROR,
-       CMS_ERROR_MESSAGE_BROKER_ERROR,
-       CMS_ERROR_BROKER_MONITOR_NOT_FOUND,
-       CMS_ERROR_BROKER_MONITORING_NOT_TURNED_ON,
-       CMS_ERROR_INVALID_BROKERSTATUSLISTENER,
-       CMS_ERROR_A_BROKERSTATUSLISTENER_HAS_BEEN_REGISTERED_ALREADY,
-       CMS_ERROR_CAUGHT_EXCEPTION_IN_INIT,
-       CMS_ERROR_CAUGHT_EXCEPTION_IN_UNINIT,
-       CMS_LAST                             // Put all error enums BEFORE this one. This one must be listed last.
+    enum ErrorCode
+    {  // NOTE: When added an entry to ErrorCode you must add the corresponding
+       // error string to ErrorDescription
+        CMS_SUCCESS = 0,
+        CMS_ERROR_UNABLE_TO_PARSE_XML,
+        CMS_ERROR_MESSAGE_HAS_BEEN_DEFINED_ALREADY,
+        CMS_ERROR_HEADER_HAS_BEEN_DEFINED_ALREADY,
+        CMS_ERROR_CLIENT_HAS_BEEN_DEFINED_ALREADY,
+        CMS_ERROR_DESTINATION_HAS_BEEN_DEFINED_ALREADY,
+        CMS_ERROR_INVALID_CLIENT,
+        CMS_ERROR_INVALID_DESTINATION,
+        CMS_ERROR_INVALID_MESSAGE,
+        CMS_ERROR_INVALID_HEADERS,
+        CMS_ERROR_INVALID_MESSAGELISTENER,
+        CMS_ERROR_A_MESSAGELISTENER_HAS_BEEN_REGISTERED_ALREADY,
+        CMS_ERROR_RECEIVER_TIMEDOUT,
+        CMS_ERROR_DESTINATION_NOT_CONFIGURED_FOR_SENDING_MESSAGES,
+        CMS_ERROR_DESTINATION_NOT_CONFIGURED_FOR_RECEIVING_MESSAGES,
+        CMS_ERROR_CAUGHT_CMS_EXCEPTION,
+        CMS_ERROR_CAUGHT_TBGENOBJ_ERROR,
+        CMS_ERROR_MESSAGE_BROKER_ERROR,
+        CMS_ERROR_BROKER_MONITOR_NOT_FOUND,
+        CMS_ERROR_BROKER_MONITORING_NOT_TURNED_ON,
+        CMS_ERROR_INVALID_BROKERSTATUSLISTENER,
+        CMS_ERROR_A_BROKERSTATUSLISTENER_HAS_BEEN_REGISTERED_ALREADY,
+        CMS_ERROR_CAUGHT_EXCEPTION_IN_INIT,
+        CMS_ERROR_CAUGHT_EXCEPTION_IN_UNINIT,
+        CMS_LAST  // Put all error enums BEFORE this one. This one must be
+                  // listed last.
     };
 
     const char ErrorDescription[][100] = {
@@ -89,9 +94,12 @@ namespace stress {
         "CMS_LAST - ErrorCodeToString macro index out of range",
     };
 
-    #define ErrorCodeToString(i) (((i >= CMS_SUCCESS) && (i <= CMS_LAST)) ? ErrorDescription[i] : ErrorDescription[CMS_LAST])
-    #define IsError(i) (i != CMS_SUCCESS)
+#define ErrorCodeToString(i)                                       \
+    (((i >= CMS_SUCCESS) && (i <= CMS_LAST)) ? ErrorDescription[i] \
+                                             : ErrorDescription[CMS_LAST])
+#define IsError(i) (i != CMS_SUCCESS)
 
-}}
+}  // namespace stress
+}  // namespace cms
 
 #endif /** _CMS_STRESS_CMSMESSAGEHANDLERDEFINITIONS_H_ */

@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/ActiveMQDestination.h>
@@ -33,8 +33,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -47,29 +49,25 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API MessageDispatch : public BaseCommand {
+    class AMQCPP_API MessageDispatch : public BaseCommand
+    {
     protected:
-
-        Pointer<ConsumerId> consumerId;
+        Pointer<ConsumerId>          consumerId;
         Pointer<ActiveMQDestination> destination;
-        Pointer<Message> message;
-        int redeliveryCounter;
+        Pointer<Message>             message;
+        int                          redeliveryCounter;
 
     public:
-
         const static unsigned char ID_MESSAGEDISPATCH = 21;
 
     private:
-
         decaf::lang::Exception rollbackCause;
 
     private:
-
         MessageDispatch(const MessageDispatch&);
-        MessageDispatch& operator= (const MessageDispatch&);
+        MessageDispatch& operator=(const MessageDispatch&);
 
     public:
-
         MessageDispatch();
 
         virtual ~MessageDispatch();
@@ -89,31 +87,33 @@ namespace commands {
         decaf::lang::Exception getRollbackCause() const;
 
         virtual const Pointer<ConsumerId>& getConsumerId() const;
-        virtual Pointer<ConsumerId>& getConsumerId();
+        virtual Pointer<ConsumerId>&       getConsumerId();
         virtual void setConsumerId(const Pointer<ConsumerId>& consumerId);
 
         virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>& getDestination();
-        virtual void setDestination(const Pointer<ActiveMQDestination>& destination);
+        virtual Pointer<ActiveMQDestination>&       getDestination();
+        virtual void                                setDestination(
+                                           const Pointer<ActiveMQDestination>& destination);
 
         virtual const Pointer<Message>& getMessage() const;
-        virtual Pointer<Message>& getMessage();
+        virtual Pointer<Message>&       getMessage();
         virtual void setMessage(const Pointer<Message>& message);
 
-        virtual int getRedeliveryCounter() const;
+        virtual int  getRedeliveryCounter() const;
         virtual void setRedeliveryCounter(int redeliveryCounter);
 
         /**
          * @return an answer of true to the isMessageDispatch() query.
          */
-        virtual bool isMessageDispatch() const {
+        virtual bool isMessageDispatch() const
+        {
             return true;
         }
 
         virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_MESSAGEDISPATCH_H_*/

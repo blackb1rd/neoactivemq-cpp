@@ -16,11 +16,11 @@
  */
 #include "ActiveMQConsumer.h"
 
-#include <activemq/util/Config.h>
-#include <activemq/util/CMSExceptionSupport.h>
-#include <activemq/exceptions/ActiveMQException.h>
-#include <activemq/core/kernels/ActiveMQConsumerKernel.h>
 #include <activemq/core/RedeliveryPolicy.h>
+#include <activemq/core/kernels/ActiveMQConsumerKernel.h>
+#include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/CMSExceptionSupport.h>
+#include <activemq/util/Config.h>
 #include <cms/ExceptionListener.h>
 #include <memory>
 
@@ -36,43 +36,56 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
-    class ActiveMQConsumerData {
+    class ActiveMQConsumerData
+    {
     private:
-
         ActiveMQConsumerData(const ActiveMQConsumerData&);
         ActiveMQConsumerData& operator=(const ActiveMQConsumerData&);
 
     public:
-
         Pointer<ActiveMQConsumerKernel> kernel;
 
-        ActiveMQConsumerData(const Pointer<ActiveMQConsumerKernel>& kernel) : kernel(kernel) {}
+        ActiveMQConsumerData(const Pointer<ActiveMQConsumerKernel>& kernel)
+            : kernel(kernel)
+        {
+        }
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQConsumer::ActiveMQConsumer(const Pointer<ActiveMQConsumerKernel>& kernel) : MessageConsumer(), config(NULL) {
-
-    if (kernel == NULL) {
-        throw ActiveMQException(__FILE__, __LINE__,
-            "ActiveMQConsumer::ActiveMQConsumer - Constructor called with NULL Kernel");
+ActiveMQConsumer::ActiveMQConsumer(const Pointer<ActiveMQConsumerKernel>& kernel)
+    : MessageConsumer(),
+      config(NULL)
+{
+    if (kernel == NULL)
+    {
+        throw ActiveMQException(__FILE__,
+                                __LINE__,
+                                "ActiveMQConsumer::ActiveMQConsumer - "
+                                "Constructor called with NULL Kernel");
     }
 
     this->config = new ActiveMQConsumerData(kernel);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQConsumer::~ActiveMQConsumer() {
-
-    try {
-
-        try {
+ActiveMQConsumer::~ActiveMQConsumer()
+{
+    try
+    {
+        try
+        {
             this->config->kernel->close();
-        } catch (...) {
+        }
+        catch (...)
+        {
         }
 
         delete this->config;
@@ -81,11 +94,12 @@ ActiveMQConsumer::~ActiveMQConsumer() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConsumer::start() {
-
-    try {
-
-        if (this->config->kernel->isClosed()) {
+void ActiveMQConsumer::start()
+{
+    try
+    {
+        if (this->config->kernel->isClosed())
+        {
             return;
         }
 
@@ -95,135 +109,160 @@ void ActiveMQConsumer::start() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConsumer::stop() {
+void ActiveMQConsumer::stop()
+{
     this->config->kernel->stop();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQConsumer::isClosed() const {
+bool ActiveMQConsumer::isClosed() const
+{
     return this->config->kernel->isClosed();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConsumer::close() {
-
-    try {
+void ActiveMQConsumer::close()
+{
+    try
+    {
         this->config->kernel->close();
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQConsumer::getMessageSelector() const {
-
-    try {
+std::string ActiveMQConsumer::getMessageSelector() const
+{
+    try
+    {
         return this->config->kernel->getMessageSelector();
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Message* ActiveMQConsumer::receive() {
-
-    try {
+cms::Message* ActiveMQConsumer::receive()
+{
+    try
+    {
         return this->config->kernel->receive();
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Message* ActiveMQConsumer::receive(int millisecs) {
-
-    try {
+cms::Message* ActiveMQConsumer::receive(int millisecs)
+{
+    try
+    {
         return this->config->kernel->receive(millisecs);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Message* ActiveMQConsumer::receiveNoWait() {
-
-    try {
+cms::Message* ActiveMQConsumer::receiveNoWait()
+{
+    try
+    {
         return this->config->kernel->receiveNoWait();
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConsumer::setMessageListener(cms::MessageListener* listener) {
-
-    try {
+void ActiveMQConsumer::setMessageListener(cms::MessageListener* listener)
+{
+    try
+    {
         this->config->kernel->setMessageListener(listener);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ActiveMQConsumer::getMessageAvailableCount() const {
+int ActiveMQConsumer::getMessageAvailableCount() const
+{
     return this->config->kernel->getMessageAvailableCount();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-RedeliveryPolicy* ActiveMQConsumer::getRedeliveryPolicy() const {
+RedeliveryPolicy* ActiveMQConsumer::getRedeliveryPolicy() const
+{
     return this->config->kernel->getRedeliveryPolicy();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::MessageListener* ActiveMQConsumer::getMessageListener() const {
+cms::MessageListener* ActiveMQConsumer::getMessageListener() const
+{
     return this->config->kernel->getMessageListener();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const Pointer<commands::ConsumerInfo>& ActiveMQConsumer::getConsumerInfo() const {
+const Pointer<commands::ConsumerInfo>& ActiveMQConsumer::getConsumerInfo() const
+{
     return this->config->kernel->getConsumerInfo();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const Pointer<commands::ConsumerId>& ActiveMQConsumer::getConsumerId() const {
+const Pointer<commands::ConsumerId>& ActiveMQConsumer::getConsumerId() const
+{
     return this->config->kernel->getConsumerId();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Exception* ActiveMQConsumer::getFailureError() const {
+decaf::lang::Exception* ActiveMQConsumer::getFailureError() const
+{
     return this->config->kernel->getFailureError();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConsumer::setMessageTransformer(cms::MessageTransformer* transformer) {
+void ActiveMQConsumer::setMessageTransformer(
+    cms::MessageTransformer* transformer)
+{
     this->config->kernel->setMessageTransformer(transformer);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::MessageTransformer* ActiveMQConsumer::getMessageTransformer() const {
+cms::MessageTransformer* ActiveMQConsumer::getMessageTransformer() const
+{
     return this->config->kernel->getMessageTransformer();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConsumer::setMessageAvailableListener(cms::MessageAvailableListener* listener) {
+void ActiveMQConsumer::setMessageAvailableListener(
+    cms::MessageAvailableListener* listener)
+{
     this->config->kernel->setMessageAvailableListener(listener);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::MessageAvailableListener* ActiveMQConsumer::getMessageAvailableListener() const {
+cms::MessageAvailableListener* ActiveMQConsumer::getMessageAvailableListener()
+    const
+{
     return this->config->kernel->getMessageAvailableListener();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long ActiveMQConsumer::getOptimizedAckScheduledAckInterval() const {
+long long ActiveMQConsumer::getOptimizedAckScheduledAckInterval() const
+{
     return this->config->kernel->getOptimizedAckScheduledAckInterval();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConsumer::setOptimizedAckScheduledAckInterval(long long value) {
+void ActiveMQConsumer::setOptimizedAckScheduledAckInterval(long long value)
+{
     this->config->kernel->setOptimizedAckScheduledAckInterval(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQConsumer::isOptimizeAcknowledge() const {
+bool ActiveMQConsumer::isOptimizeAcknowledge() const
+{
     return this->config->kernel->isOptimizeAcknowledge();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConsumer::setOptimizeAcknowledge(bool value) {
+void ActiveMQConsumer::setOptimizeAcknowledge(bool value)
+{
     this->config->kernel->setOptimizeAcknowledge(value);
 }

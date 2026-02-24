@@ -29,18 +29,25 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-InternalCommandListener::InternalCommandListener() :
-    transport(NULL), responseBuilder(), done(false), startedLatch(1), inboundQueue() {
-
+InternalCommandListener::InternalCommandListener()
+    : transport(NULL),
+      responseBuilder(),
+      done(false),
+      startedLatch(1),
+      inboundQueue()
+{
     this->start();
     startedLatch.await();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InternalCommandListener::~InternalCommandListener() {
-    try {
+InternalCommandListener::~InternalCommandListener()
+{
+    try
+    {
         done = true;
-        synchronized(&inboundQueue) {
+        synchronized(&inboundQueue)
+        {
             inboundQueue.notifyAll();
         }
         this->join();
@@ -51,8 +58,10 @@ InternalCommandListener::~InternalCommandListener() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InternalCommandListener::onCommand(const Pointer<Command> command) {
-    synchronized(&inboundQueue) {
+void InternalCommandListener::onCommand(const Pointer<Command> command)
+{
+    synchronized(&inboundQueue)
+    {
         // Create a response now before the caller has a
         // chance to destroy the command.
         responseBuilder->buildIncomingCommands(command, inboundQueue);
@@ -63,33 +72,45 @@ void InternalCommandListener::onCommand(const Pointer<Command> command) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InternalCommandListener::run() {
-
-    try {
-
-        synchronized(&inboundQueue) {
-
-            while (!done) {
+void InternalCommandListener::run()
+{
+    try
+    {
+        synchronized(&inboundQueue)
+        {
+            while (!done)
+            {
                 startedLatch.countDown();
 
-                while (inboundQueue.isEmpty() && !done) {
-                    inboundQueue.wait(100);  // Wait with 100ms timeout to periodically check done flag
+                while (inboundQueue.isEmpty() && !done)
+                {
+                    inboundQueue.wait(100);  // Wait with 100ms timeout to
+                                             // periodically check done flag
                 }
 
-                if (done || transport == NULL) {
+                if (done || transport == NULL)
+                {
                     continue;
                 }
 
                 // If we created a response then send it.
-                while (!inboundQueue.isEmpty()) {
-
+                while (!inboundQueue.isEmpty())
+                {
                     Pointer<Command> command = inboundQueue.pop();
 
-                    if (command->isMessage() && transport->isFailOnReceiveMessage()) {
-                        transport->setNumReceivedMessages(transport->getNumReceivedMessages() + 1);
+                    if (command->isMessage() &&
+                        transport->isFailOnReceiveMessage())
+                    {
+                        transport->setNumReceivedMessages(
+                            transport->getNumReceivedMessages() + 1);
 
-                        if (transport->getNumReceivedMessages() > transport->getNumReceivedMessageBeforeFail()) {
-                            transport->fireException(IOException(__FILE__, __LINE__, "Failed to Send Message."));
+                        if (transport->getNumReceivedMessages() >
+                            transport->getNumReceivedMessageBeforeFail())
+                        {
+                            transport->fireException(
+                                IOException(__FILE__,
+                                            __LINE__,
+                                            "Failed to Send Message."));
                             ;
                         }
                     }

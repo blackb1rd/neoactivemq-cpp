@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseDataStructure.h>
@@ -30,8 +30,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     class SessionId;
     class ProducerId;
@@ -48,19 +50,18 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API ConnectionId : public BaseDataStructure, public decaf::lang::Comparable<ConnectionId> {
+    class AMQCPP_API ConnectionId : public BaseDataStructure,
+                                    public decaf::lang::Comparable<ConnectionId>
+    {
     protected:
-
         std::string value;
 
     public:
-
         const static unsigned char ID_CONNECTIONID = 120;
 
         typedef decaf::lang::PointerComparator<ConnectionId> COMPARATOR;
 
     public:
-
         ConnectionId();
 
         ConnectionId(const ConnectionId& other);
@@ -84,8 +85,8 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const std::string& getValue() const;
-        virtual std::string& getValue();
-        virtual void setValue(const std::string& value);
+        virtual std::string&       getValue();
+        virtual void               setValue(const std::string& value);
 
         virtual int compareTo(const ConnectionId& value) const;
 
@@ -95,12 +96,12 @@ namespace commands {
 
         virtual bool operator<(const ConnectionId& value) const;
 
-        ConnectionId& operator= (const ConnectionId& other);
+        ConnectionId& operator=(const ConnectionId& other);
 
         int getHashCode() const;
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_CONNECTIONID_H_*/

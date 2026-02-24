@@ -23,29 +23,41 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-ReadOnlyBufferException::ReadOnlyBufferException() : lang::exceptions::UnsupportedOperationException() {
+ReadOnlyBufferException::ReadOnlyBufferException()
+    : lang::exceptions::UnsupportedOperationException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ReadOnlyBufferException::~ReadOnlyBufferException() throw () {
+ReadOnlyBufferException::~ReadOnlyBufferException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ReadOnlyBufferException::ReadOnlyBufferException(const lang::Exception& ex) : lang::exceptions::UnsupportedOperationException() {
-    *(lang::Exception*) this = ex;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-ReadOnlyBufferException::ReadOnlyBufferException(const ReadOnlyBufferException& ex) : lang::exceptions::UnsupportedOperationException() {
-    *(lang::Exception*) this = ex;
+ReadOnlyBufferException::ReadOnlyBufferException(const lang::Exception& ex)
+    : lang::exceptions::UnsupportedOperationException()
+{
+    *(lang::Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ReadOnlyBufferException::ReadOnlyBufferException(
-    const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : lang::exceptions::UnsupportedOperationException(cause) {
+    const ReadOnlyBufferException& ex)
+    : lang::exceptions::UnsupportedOperationException()
+{
+    *(lang::Exception*)this = ex;
+}
 
+////////////////////////////////////////////////////////////////////////////////
+ReadOnlyBufferException::ReadOnlyBufferException(const char* file,
+                                                 const int   lineNumber,
+                                                 const std::exception* cause,
+                                                 const char*           msg,
+                                                 ...)
+    : lang::exceptions::UnsupportedOperationException(cause)
+{
     va_list vargs;
-    va_start( vargs, msg);
+    va_start(vargs, msg);
     buildMessage(msg, vargs);
 
     // Set the first mark for this exception.
@@ -53,13 +65,18 @@ ReadOnlyBufferException::ReadOnlyBufferException(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ReadOnlyBufferException::ReadOnlyBufferException(const std::exception* cause) : lang::exceptions::UnsupportedOperationException(cause) {
+ReadOnlyBufferException::ReadOnlyBufferException(const std::exception* cause)
+    : lang::exceptions::UnsupportedOperationException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ReadOnlyBufferException::ReadOnlyBufferException(
-    const char* file, const int lineNumber, const char* msg, ...) : lang::exceptions::UnsupportedOperationException() {
-
+ReadOnlyBufferException::ReadOnlyBufferException(const char* file,
+                                                 const int   lineNumber,
+                                                 const char* msg,
+                                                 ...)
+    : lang::exceptions::UnsupportedOperationException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

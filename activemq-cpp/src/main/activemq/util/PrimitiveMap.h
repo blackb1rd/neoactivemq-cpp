@@ -18,28 +18,30 @@
 #ifndef _ACTIVEMQ_UTIL_PRIMITIVEMAP_H_
 #define _ACTIVEMQ_UTIL_PRIMITIVEMAP_H_
 
+#include <activemq/util/Config.h>
+#include <activemq/util/PrimitiveValueConverter.h>
+#include <activemq/util/PrimitiveValueNode.h>
+#include <decaf/util/Config.h>
+#include <decaf/util/NoSuchElementException.h>
+#include <decaf/util/StlMap.h>
 #include <string>
 #include <vector>
-#include <activemq/util/Config.h>
-#include <decaf/util/Config.h>
-#include <decaf/util/StlMap.h>
-#include <decaf/util/NoSuchElementException.h>
-#include <activemq/util/PrimitiveValueNode.h>
-#include <activemq/util/PrimitiveValueConverter.h>
 
-namespace activemq {
-namespace util {
+namespace activemq
+{
+namespace util
+{
 
     /**
      * Map of named primitives.
      */
-    class AMQCPP_API PrimitiveMap : public decaf::util::StlMap<std::string, PrimitiveValueNode> {
+    class AMQCPP_API PrimitiveMap
+        : public decaf::util::StlMap<std::string, PrimitiveValueNode>
+    {
     private:
-
         PrimitiveValueConverter converter;
 
     public:
-
         /**
          * Default Constructor, creates an empty map.
          */
@@ -51,9 +53,11 @@ namespace util {
          * Copy Constructor
          *
          * @param source
-         *      The Decaf Library Map instance whose elements will be copied into this Map.
+         *      The Decaf Library Map instance whose elements will be copied
+         * into this Map.
          */
-        PrimitiveMap(const decaf::util::Map<std::string, PrimitiveValueNode>& source);
+        PrimitiveMap(
+            const decaf::util::Map<std::string, PrimitiveValueNode>& source);
 
         /**
          * Copy Constructor
@@ -75,7 +79,8 @@ namespace util {
          * @return the numeric type value for the given key if it exists.
          * @throws NoSuchElementException if the key is not present in the map.
          */
-        virtual PrimitiveValueNode::PrimitiveType getValueType(const std::string& key) const;
+        virtual PrimitiveValueNode::PrimitiveType getValueType(
+            const std::string& key) const;
 
         /**
          * Gets the Boolean value at the given key, if the key is not
@@ -264,7 +269,8 @@ namespace util {
          * @param key - the map key to set or insert.
          * @param value - the new value to set at the key location.
          */
-        virtual void setString(const std::string& key, const std::string& value);
+        virtual void setString(const std::string& key,
+                               const std::string& value);
 
         /**
          * Gets the Byte Array value at the given key, if the key is not
@@ -277,7 +283,8 @@ namespace util {
          * @throw UnSupportedOperationException if the value cannot be converted
          *                                      to the type this method returns
          */
-        virtual std::vector<unsigned char> getByteArray(const std::string& key) const;
+        virtual std::vector<unsigned char> getByteArray(
+            const std::string& key) const;
 
         /**
          * Sets the value at key to the specified type. Overwrites any data
@@ -285,10 +292,11 @@ namespace util {
          * @param key - the map key to set or insert.
          * @param value - the new value to set at the key location.
          */
-        virtual void setByteArray(const std::string& key, const std::vector<unsigned char>& value);
-
+        virtual void setByteArray(const std::string&                key,
+                                  const std::vector<unsigned char>& value);
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_UTIL_PRIMITIVEMAP_H_*/

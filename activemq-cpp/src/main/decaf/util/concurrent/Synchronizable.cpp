@@ -22,8 +22,6 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-Synchronizable::~Synchronizable() {
-
+Synchronizable::~Synchronizable()
+{
 }
-
-

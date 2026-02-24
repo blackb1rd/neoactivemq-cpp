@@ -17,31 +17,45 @@
 
 #include <activemq/test/JmsMessageGroupsTest.h>
 
-namespace activemq {
-namespace test {
-namespace stomp {
-    class StompJmsMessageGroupsTest : public JmsMessageGroupsTest {
-public:
-        StompJmsMessageGroupsTest();
-        virtual ~StompJmsMessageGroupsTest();
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getStompURL();
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace stomp
+    {
+        class StompJmsMessageGroupsTest : public JmsMessageGroupsTest
+        {
+        public:
+            StompJmsMessageGroupsTest();
+            virtual ~StompJmsMessageGroupsTest();
+
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getStompURL();
+            }
+        };
+    }  // namespace stomp
+}  // namespace test
+}  // namespace activemq
 
 using namespace activemq;
 using namespace activemq::test;
 using namespace activemq::test::stomp;
 
 ////////////////////////////////////////////////////////////////////////////////
-StompJmsMessageGroupsTest::StompJmsMessageGroupsTest() {
+StompJmsMessageGroupsTest::StompJmsMessageGroupsTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StompJmsMessageGroupsTest::~StompJmsMessageGroupsTest() {
+StompJmsMessageGroupsTest::~StompJmsMessageGroupsTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompJmsMessageGroupsTest, DISABLED_testMessageSend) { testMessageSend(); }
+TEST_F(StompJmsMessageGroupsTest, DISABLED_testMessageSend)
+{
+    testMessageSend();
+}

@@ -27,27 +27,31 @@ using namespace decaf;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-CMSExceptionSupport::CMSExceptionSupport() {
+CMSExceptionSupport::CMSExceptionSupport()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CMSExceptionSupport::~CMSExceptionSupport() {
+CMSExceptionSupport::~CMSExceptionSupport()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CMSException CMSExceptionSupport::create(const std::string& msg, const Exception& cause) {
-
+CMSException CMSExceptionSupport::create(const std::string& msg,
+                                         const Exception&   cause)
+{
     CMSException exception(msg, cause.clone());
     return exception;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CMSException CMSExceptionSupport::create(const Exception& cause) {
-
+CMSException CMSExceptionSupport::create(const Exception& cause)
+{
     std::string msg = cause.getMessage();
 
-    if (msg.length() == 0) {
-        msg = typeid( &cause ).name();
+    if (msg.length() == 0)
+    {
+        msg = typeid(&cause).name();
     }
 
     CMSException exception(msg, cause.clone());
@@ -56,12 +60,14 @@ CMSException CMSExceptionSupport::create(const Exception& cause) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageEOFException CMSExceptionSupport::createMessageEOFException(const Exception& cause) {
-
+MessageEOFException CMSExceptionSupport::createMessageEOFException(
+    const Exception& cause)
+{
     std::string msg = cause.getMessage();
 
-    if (msg.length() == 0) {
-        msg = typeid( &cause ).name();
+    if (msg.length() == 0)
+    {
+        msg = typeid(&cause).name();
     }
 
     MessageEOFException exception(msg, cause.clone());
@@ -70,12 +76,14 @@ MessageEOFException CMSExceptionSupport::createMessageEOFException(const Excepti
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageFormatException CMSExceptionSupport::createMessageFormatException(const Exception& cause) {
-
+MessageFormatException CMSExceptionSupport::createMessageFormatException(
+    const Exception& cause)
+{
     std::string msg = cause.getMessage();
 
-    if (msg.length() == 0) {
-        msg = typeid( &cause ).name();
+    if (msg.length() == 0)
+    {
+        msg = typeid(&cause).name();
     }
 
     MessageFormatException exception(msg, cause.clone());

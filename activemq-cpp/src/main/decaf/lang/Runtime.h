@@ -20,21 +20,21 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
 
-    class DECAF_API Runtime {
+    class DECAF_API Runtime
+    {
     private:
-
         Runtime(const Runtime&);
-        Runtime& operator= (const Runtime&);
+        Runtime& operator=(const Runtime&);
 
     protected:
-
         Runtime();
 
     public:
-
         virtual ~Runtime();
 
         /**
@@ -55,7 +55,7 @@ namespace lang {
          * @throws runtime_error if the library is already initialized or an
          *         error occurs during initialization.
          */
-        static void initializeRuntime(int argc, char **argv);
+        static void initializeRuntime(int argc, char** argv);
 
         /**
          * Initialize the Decaf Library
@@ -67,15 +67,16 @@ namespace lang {
 
         /**
          * Shutdown the Decaf Library, this call should take places after all
-         * objects that were created from the Decaf library have been deallocated.
+         * objects that were created from the Decaf library have been
+         * deallocated.
          *
-         * @throws runtime_error if the library has not already been initialized or an
-         *         error occurs during shutdown.
+         * @throws runtime_error if the library has not already been initialized
+         * or an error occurs during shutdown.
          */
         static void shutdownRuntime();
-
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 #endif /*_DECAF_LANG_RUNTIME_H_*/

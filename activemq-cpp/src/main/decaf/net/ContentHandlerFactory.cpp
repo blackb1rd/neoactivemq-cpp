@@ -21,6 +21,6 @@ using namespace decaf;
 using namespace decaf::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-ContentHandlerFactory::~ContentHandlerFactory() {
+ContentHandlerFactory::~ContentHandlerFactory()
+{
 }
-

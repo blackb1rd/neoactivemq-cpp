@@ -21,22 +21,33 @@ using namespace decaf;
 using namespace decaf::security;
 
 ////////////////////////////////////////////////////////////////////////////////
-DigestException::DigestException() : GeneralSecurityException() {
+DigestException::DigestException()
+    : GeneralSecurityException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DigestException::DigestException(const Exception& ex) : GeneralSecurityException() {
-    *(Exception*) this = ex;
+DigestException::DigestException(const Exception& ex)
+    : GeneralSecurityException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DigestException::DigestException(const DigestException& ex) : GeneralSecurityException() {
-    *(Exception*) this = ex;
+DigestException::DigestException(const DigestException& ex)
+    : GeneralSecurityException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DigestException::DigestException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : GeneralSecurityException(cause) {
-
+DigestException::DigestException(const char*           file,
+                                 const int             lineNumber,
+                                 const std::exception* cause,
+                                 const char*           msg,
+                                 ...)
+    : GeneralSecurityException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -46,12 +57,18 @@ DigestException::DigestException(const char* file, const int lineNumber, const s
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DigestException::DigestException(const std::exception* cause) : GeneralSecurityException(cause) {
+DigestException::DigestException(const std::exception* cause)
+    : GeneralSecurityException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DigestException::DigestException(const char* file, const int lineNumber, const char* msg, ...) : GeneralSecurityException() {
-
+DigestException::DigestException(const char* file,
+                                 const int   lineNumber,
+                                 const char* msg,
+                                 ...)
+    : GeneralSecurityException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -61,5 +78,6 @@ DigestException::DigestException(const char* file, const int lineNumber, const c
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DigestException::~DigestException() throw () {
+DigestException::~DigestException() throw()
+{
 }

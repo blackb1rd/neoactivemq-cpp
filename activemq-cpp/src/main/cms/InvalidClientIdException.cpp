@@ -20,33 +20,47 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidClientIdException::InvalidClientIdException() : CMSException() {
+InvalidClientIdException::InvalidClientIdException()
+    : CMSException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidClientIdException::InvalidClientIdException(const InvalidClientIdException& ex) : CMSException(ex) {
+InvalidClientIdException::InvalidClientIdException(
+    const InvalidClientIdException& ex)
+    : CMSException(ex)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidClientIdException::InvalidClientIdException(const std::string& message) : CMSException(message, NULL) {
+InvalidClientIdException::InvalidClientIdException(const std::string& message)
+    : CMSException(message, NULL)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidClientIdException::InvalidClientIdException(const std::string& message, const std::exception* cause) :
-    CMSException(message, cause) {
+InvalidClientIdException::InvalidClientIdException(const std::string& message,
+                                                   const std::exception* cause)
+    : CMSException(message, cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidClientIdException::InvalidClientIdException(const std::string& message, const std::exception* cause,
-                                                   const std::vector<std::pair<std::string, int> >& stackTrace) :
-    CMSException(message, cause, stackTrace) {
+InvalidClientIdException::InvalidClientIdException(
+    const std::string&                              message,
+    const std::exception*                           cause,
+    const std::vector<std::pair<std::string, int>>& stackTrace)
+    : CMSException(message, cause, stackTrace)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidClientIdException::~InvalidClientIdException() throw() {
+InvalidClientIdException::~InvalidClientIdException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidClientIdException* InvalidClientIdException::clone() {
+InvalidClientIdException* InvalidClientIdException::clone()
+{
     return new InvalidClientIdException(*this);
 }

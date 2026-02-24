@@ -43,35 +43,52 @@ using namespace decaf::internal::util;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-ProducerId::ProducerId() :
-    BaseDataStructure(), connectionId(""), value(0), sessionId(0), parentId() {
-
+ProducerId::ProducerId()
+    : BaseDataStructure(),
+      connectionId(""),
+      value(0),
+      sessionId(0),
+      parentId()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProducerId::ProducerId(const ProducerId& other) :
-    BaseDataStructure(), connectionId(""), value(0), sessionId(0), parentId() {
-
+ProducerId::ProducerId(const ProducerId& other)
+    : BaseDataStructure(),
+      connectionId(""),
+      value(0),
+      sessionId(0),
+      parentId()
+{
     this->copyDataStructure(&other);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProducerId::ProducerId( const SessionId& sessionId, long long consumerId ) : 
-    BaseDataStructure(), connectionId(""), value(0), sessionId(0), parentId() {
-
+ProducerId::ProducerId(const SessionId& sessionId, long long consumerId)
+    : BaseDataStructure(),
+      connectionId(""),
+      value(0),
+      sessionId(0),
+      parentId()
+{
     this->connectionId = sessionId.getConnectionId();
-    this->sessionId = sessionId.getValue();
-    this->value = consumerId;
+    this->sessionId    = sessionId.getValue();
+    this->value        = consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProducerId::ProducerId(std::string producerKey) :
-    BaseDataStructure(), connectionId(""), value(0), sessionId(0), parentId() {
-
+ProducerId::ProducerId(std::string producerKey)
+    : BaseDataStructure(),
+      connectionId(""),
+      value(0),
+      sessionId(0),
+      parentId()
+{
     // Parse off the producerId
-    std::size_t p = producerKey.rfind( ':' );
+    std::size_t p = producerKey.rfind(':');
 
-    if (p != std::string::npos) {
+    if (p != std::string::npos)
+    {
         value = Long::parseLong(producerKey.substr(p + 1, std::string::npos));
         producerKey = producerKey.substr(0, p);
     }
@@ -80,11 +97,13 @@ ProducerId::ProducerId(std::string producerKey) :
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProducerId::~ProducerId() {
+ProducerId::~ProducerId()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProducerId* ProducerId::cloneDataStructure() const {
+ProducerId* ProducerId::cloneDataStructure() const
+{
     std::unique_ptr<ProducerId> producerId(new ProducerId());
 
     // Copy the data from the base class or classes
@@ -94,18 +113,21 @@ ProducerId* ProducerId::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ProducerId::copyDataStructure(const DataStructure* src) {
-
+void ProducerId::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const ProducerId* srcPtr = dynamic_cast<const ProducerId*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "ProducerId::copyDataStructure - src is NULL or invalid");
     }
 
@@ -118,106 +140,129 @@ void ProducerId::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ProducerId::getDataStructureType() const {
+unsigned char ProducerId::getDataStructureType() const
+{
     return ProducerId::ID_PRODUCERID;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ProducerId::toString() const {
-
+std::string ProducerId::toString() const
+{
     ostringstream stream;
 
-    stream << this->connectionId << ":"
-           << this->sessionId << ":"
+    stream << this->connectionId << ":" << this->sessionId << ":"
            << this->value;
 
     return stream.str();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ProducerId::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool ProducerId::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const ProducerId* valuePtr = dynamic_cast<const ProducerId*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getConnectionId() != valuePtr->getConnectionId()) {
+    if (this->getConnectionId() != valuePtr->getConnectionId())
+    {
         return false;
     }
-    if (this->getValue() != valuePtr->getValue()) {
+    if (this->getValue() != valuePtr->getValue())
+    {
         return false;
     }
-    if (this->getSessionId() != valuePtr->getSessionId()) {
+    if (this->getSessionId() != valuePtr->getSessionId())
+    {
         return false;
     }
-    if (!BaseDataStructure::equals(value)) {
+    if (!BaseDataStructure::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::string& ProducerId::getConnectionId() const {
+const std::string& ProducerId::getConnectionId() const
+{
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string& ProducerId::getConnectionId() {
+std::string& ProducerId::getConnectionId()
+{
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ProducerId::setConnectionId(const std::string& connectionId) {
+void ProducerId::setConnectionId(const std::string& connectionId)
+{
     this->connectionId = connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long ProducerId::getValue() const {
+long long ProducerId::getValue() const
+{
     return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ProducerId::setValue(long long value) {
+void ProducerId::setValue(long long value)
+{
     this->value = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long ProducerId::getSessionId() const {
+long long ProducerId::getSessionId() const
+{
     return sessionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ProducerId::setSessionId(long long sessionId) {
+void ProducerId::setSessionId(long long sessionId)
+{
     this->sessionId = sessionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ProducerId::compareTo(const ProducerId& value) const {
-
-    if (this == &value) {
+int ProducerId::compareTo(const ProducerId& value) const
+{
+    if (this == &value)
+    {
         return 0;
     }
 
-    int connectionIdComp = StringUtils::compareIgnoreCase(this->connectionId.c_str(), value.connectionId.c_str());
-    if (connectionIdComp != 0) {
+    int connectionIdComp =
+        StringUtils::compareIgnoreCase(this->connectionId.c_str(),
+                                       value.connectionId.c_str());
+    if (connectionIdComp != 0)
+    {
         return connectionIdComp;
     }
 
-    if (this->value > value.value) {
+    if (this->value > value.value)
+    {
         return 1;
-    } else if(this->value < value.value) {
+    }
+    else if (this->value < value.value)
+    {
         return -1;
     }
 
-    if (this->sessionId > value.sessionId) {
+    if (this->sessionId > value.sessionId)
+    {
         return 1;
-    } else if(this->sessionId < value.sessionId) {
+    }
+    else if (this->sessionId < value.sessionId)
+    {
         return -1;
     }
 
@@ -225,47 +270,56 @@ int ProducerId::compareTo(const ProducerId& value) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ProducerId::equals(const ProducerId& value) const {
+bool ProducerId::equals(const ProducerId& value) const
+{
     return this->equals((const DataStructure*)&value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ProducerId::operator==(const ProducerId& value) const {
+bool ProducerId::operator==(const ProducerId& value) const
+{
     return this->compareTo(value) == 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ProducerId::operator<(const ProducerId& value) const {
+bool ProducerId::operator<(const ProducerId& value) const
+{
     return this->compareTo(value) < 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProducerId& ProducerId::operator= (const ProducerId& other) {
+ProducerId& ProducerId::operator=(const ProducerId& other)
+{
     this->copyDataStructure(&other);
     return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ProducerId::getHashCode() const {
+int ProducerId::getHashCode() const
+{
     return decaf::util::HashCode<std::string>()(this->toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const Pointer<SessionId>& ProducerId::getParentId() const {
-    if (this->parentId == NULL) {
+const Pointer<SessionId>& ProducerId::getParentId() const
+{
+    if (this->parentId == NULL)
+    {
         this->parentId.reset(new SessionId(this));
     }
     return this->parentId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ProducerId::setProducerSessionKey( std::string sessionKey ) {
-
+void ProducerId::setProducerSessionKey(std::string sessionKey)
+{
     // Parse off the value
-    std::size_t p = sessionKey.rfind( ':' );
+    std::size_t p = sessionKey.rfind(':');
 
-    if (p != std::string::npos) {
-        this->sessionId = Long::parseLong(sessionKey.substr(p + 1, std::string::npos));
+    if (p != std::string::npos)
+    {
+        this->sessionId =
+            Long::parseLong(sessionKey.substr(p + 1, std::string::npos));
         sessionKey = sessionKey.substr(0, p);
     }
 

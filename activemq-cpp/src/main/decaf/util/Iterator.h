@@ -18,23 +18,27 @@
 #ifndef _DECAF_UTIL_ITERATOR_H_
 #define _DECAF_UTIL_ITERATOR_H_
 
-#include <decaf/util/NoSuchElementException.h>
 #include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <decaf/util/NoSuchElementException.h>
 
-namespace decaf{
-namespace util{
+namespace decaf
+{
+namespace util
+{
 
     /**
      * Defines an object that can be used to iterate over the elements of a
      * collection.  The iterator provides a way to access and remove elements
      * with well defined semantics.
      */
-    template< typename E>
-    class Iterator {
+    template <typename E>
+    class Iterator
+    {
     public:
-
-        virtual ~Iterator() {}
+        virtual ~Iterator()
+        {
+        }
 
         /**
          * Returns the next element in the iteration. Calling this method
@@ -71,9 +75,9 @@ namespace util{
          *         the last call to the next method.
          */
         virtual void remove() = 0;
-
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_ITERATOR_H_*/

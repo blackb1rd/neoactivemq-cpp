@@ -18,38 +18,48 @@
 #ifndef _DECAF_INTERNAL_SECURITY_PROVIDER_DEFAULTSECURERANDOMPROVIDERSERVICE_H_
 #define _DECAF_INTERNAL_SECURITY_PROVIDER_DEFAULTSECURERANDOMPROVIDERSERVICE_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/security/ProviderService.h>
+#include <decaf/util/Config.h>
 #include <string>
 
-namespace decaf {
-namespace internal {
-namespace security {
-namespace provider {
+namespace decaf
+{
+namespace internal
+{
+    namespace security
+    {
+        namespace provider
+        {
 
-    /**
-     * Decaf's Default Secure Random Security provider used to create instances of the
-     * built-in Secure Random algorithm SPI classes.
-     *
-     * @since 1.0
-     */
-    class DECAF_API DefaultSecureRandomProviderService : public decaf::security::ProviderService {
-    private:
+            /**
+             * Decaf's Default Secure Random Security provider used to create
+             * instances of the built-in Secure Random algorithm SPI classes.
+             *
+             * @since 1.0
+             */
+            class DECAF_API DefaultSecureRandomProviderService
+                : public decaf::security::ProviderService
+            {
+            private:
+                DefaultSecureRandomProviderService(
+                    const DefaultSecureRandomProviderService&);
+                DefaultSecureRandomProviderService& operator=(
+                    const DefaultSecureRandomProviderService&);
 
-        DefaultSecureRandomProviderService(const DefaultSecureRandomProviderService&);
-        DefaultSecureRandomProviderService& operator= (const DefaultSecureRandomProviderService&);
+            public:
+                DefaultSecureRandomProviderService(
+                    const decaf::security::Provider* provider,
+                    const std::string&               algorithmName);
 
-    public:
+                virtual ~DefaultSecureRandomProviderService();
 
-        DefaultSecureRandomProviderService(const decaf::security::Provider* provider,
-                                            const std::string& algorithmName);
+                virtual decaf::security::SecuritySpi* newInstance();
+            };
 
-        virtual ~DefaultSecureRandomProviderService();
+        }  // namespace provider
+    }  // namespace security
+}  // namespace internal
+}  // namespace decaf
 
-        virtual decaf::security::SecuritySpi* newInstance();
-
-    };
-
-}}}}
-
-#endif /* _DECAF_INTERNAL_SECURITY_PROVIDER_DEFAULTSECURERANDOMPROVIDERSERVICE_H_ */
+#endif /* _DECAF_INTERNAL_SECURITY_PROVIDER_DEFAULTSECURERANDOMPROVIDERSERVICE_H_ \
+        */

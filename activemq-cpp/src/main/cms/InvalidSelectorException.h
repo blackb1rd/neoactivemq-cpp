@@ -18,37 +18,40 @@
 #ifndef _CMS_INVALIDSELECTOREXCEPTION_H_
 #define _CMS_INVALIDSELECTOREXCEPTION_H_
 
-#include <cms/Config.h>
 #include <cms/CMSException.h>
+#include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
 
-    /**
-     * This exception must be thrown when a CMS client attempts to give a provider a
-     * message selector with invalid syntax.
-     *
-     * @since 1.3
-     */
-    class CMS_API InvalidSelectorException : public CMSException {
-    public:
+/**
+ * This exception must be thrown when a CMS client attempts to give a provider a
+ * message selector with invalid syntax.
+ *
+ * @since 1.3
+ */
+class CMS_API InvalidSelectorException : public CMSException
+{
+public:
+    InvalidSelectorException();
 
-        InvalidSelectorException();
+    InvalidSelectorException(const InvalidSelectorException& ex);
 
-        InvalidSelectorException(const InvalidSelectorException& ex);
+    InvalidSelectorException(const std::string& message);
 
-        InvalidSelectorException(const std::string& message);
+    InvalidSelectorException(const std::string&    message,
+                             const std::exception* cause);
 
-        InvalidSelectorException(const std::string& message, const std::exception* cause);
+    InvalidSelectorException(
+        const std::string&                              message,
+        const std::exception*                           cause,
+        const std::vector<std::pair<std::string, int>>& stackTrace);
 
-        InvalidSelectorException(const std::string& message, const std::exception* cause,
-                                 const std::vector<std::pair<std::string, int> >& stackTrace);
+    virtual ~InvalidSelectorException() throw();
 
-        virtual ~InvalidSelectorException() throw();
+    virtual InvalidSelectorException* clone();
+};
 
-        virtual InvalidSelectorException* clone();
-
-    };
-
-}
+}  // namespace cms
 
 #endif /*_CMS_INVALIDSELECTOREXCEPTION_H_*/

@@ -18,75 +18,80 @@
 #ifndef _DECAF_UTIL_CONCURRENT_LOCK_H_
 #define _DECAF_UTIL_CONCURRENT_LOCK_H_
 
-#include <decaf/util/concurrent/Synchronizable.h>
 #include <decaf/util/Config.h>
+#include <decaf/util/concurrent/Synchronizable.h>
 
-namespace decaf{
-namespace util{
-namespace concurrent{
-
-    /**
-     * A wrapper class around a given synchronization mechanism that
-     * provides automatic release upon destruction.
-     *
-     * @since 1.0
-     */
-    class DECAF_API Lock {
-    private:
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
 
         /**
-         * Flag to indicate whether or not this object has locked the
-         * sync object.
-         */
-        volatile bool locked;
-
-        /**
-         * The synchronizable object to lock/unlock.
-         */
-        Synchronizable* syncObject;
-
-    private:
-
-        Lock( const Lock& src );
-        Lock& operator= ( const Lock& src );
-
-    public:
-
-        /**
-         * Constructor - initializes the object member and locks
-         * the object if desired.
+         * A wrapper class around a given synchronization mechanism that
+         * provides automatic release upon destruction.
          *
-         * @param object
-         *      The sync object to control
-         * @param intiallyLocked
-         *      If true, the object will automatically be locked.
+         * @since 1.0
          */
-        Lock( Synchronizable* object, const bool intiallyLocked = true );
+        class DECAF_API Lock
+        {
+        private:
+            /**
+             * Flag to indicate whether or not this object has locked the
+             * sync object.
+             */
+            volatile bool locked;
 
-        /**
-         * Destructor - Unlocks the object if it is locked.
-         */
-        virtual ~Lock();
+            /**
+             * The synchronizable object to lock/unlock.
+             */
+            Synchronizable* syncObject;
 
-        /**
-         * Locks the object.
-         */
-        void lock();
+        private:
+            Lock(const Lock& src);
+            Lock& operator=(const Lock& src);
 
-        /**
-         * Unlocks the object if it is already locked, otherwise a call to this method has
-         * no effect.
-         */
-        void unlock();
+        public:
+            /**
+             * Constructor - initializes the object member and locks
+             * the object if desired.
+             *
+             * @param object
+             *      The sync object to control
+             * @param intiallyLocked
+             *      If true, the object will automatically be locked.
+             */
+            Lock(Synchronizable* object, const bool intiallyLocked = true);
 
-        /**
-         * Indicates whether or not the object is locked.
-         * @return  true if the object is locked, otherwise false.
-         */
-        bool isLocked() const{ return locked; }
+            /**
+             * Destructor - Unlocks the object if it is locked.
+             */
+            virtual ~Lock();
 
-    };
+            /**
+             * Locks the object.
+             */
+            void lock();
 
-}}}
+            /**
+             * Unlocks the object if it is already locked, otherwise a call to
+             * this method has no effect.
+             */
+            void unlock();
 
-#endif // _DECAF_UTIL_CONCURRENT_LOCK_H_
+            /**
+             * Indicates whether or not the object is locked.
+             * @return  true if the object is locked, otherwise false.
+             */
+            bool isLocked() const
+            {
+                return locked;
+            }
+        };
+
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
+
+#endif  // _DECAF_UTIL_CONCURRENT_LOCK_H_

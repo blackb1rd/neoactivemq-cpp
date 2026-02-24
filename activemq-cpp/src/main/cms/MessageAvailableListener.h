@@ -20,32 +20,32 @@
 
 #include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
 
-    class MessageConsumer;
+class MessageConsumer;
+
+/**
+ * A listener interface similar to the MessageListener interface.  This listener
+ * is notified by its associated MessageConsumer that a new Message is available
+ * for processing when the consumer is in sync consumption mode.  A consumer
+ * with a registered MessageListener will not use this listener.
+ */
+class CMS_API MessageAvailableListener
+{
+public:
+    virtual ~MessageAvailableListener();
 
     /**
-     * A listener interface similar to the MessageListener interface.  This listener
-     * is notified by its associated MessageConsumer that a new Message is available
-     * for processing when the consumer is in sync consumption mode.  A consumer with
-     * a registered MessageListener will not use this listener.
+     * Indicates that a new Message has become available for consumption
+     * from the provided consumer, a call to receiveNoWait should return
+     * the message immediately.
+     *
+     * @param consumer
+     *      The consumer that now has a message queued for consumption.
      */
-    class CMS_API MessageAvailableListener {
-    public:
+    virtual void onMessageAvailable(cms::MessageConsumer* consumer) = 0;
+};
 
-        virtual ~MessageAvailableListener();
-
-        /**
-         * Indicates that a new Message has become available for consumption
-         * from the provided consumer, a call to receiveNoWait should return
-         * the message immediately.
-         *
-         * @param consumer
-         *      The consumer that now has a message queued for consumption.
-         */
-        virtual void onMessageAvailable(cms::MessageConsumer* consumer) = 0;
-
-    };
-
-}
+}  // namespace cms
 #endif /* _CMS_MESSAGEAVAILABLELISTENER_H_ */

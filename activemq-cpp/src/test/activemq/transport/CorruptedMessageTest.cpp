@@ -15,20 +15,20 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <activemq/util/Config.h>
+#include <gtest/gtest.h>
 
+#include <activemq/commands/ActiveMQTextMessage.h>
+#include <activemq/commands/ActiveMQTopic.h>
+#include <activemq/commands/ConsumerId.h>
+#include <activemq/commands/Message.h>
+#include <activemq/commands/MessageAck.h>
+#include <activemq/commands/MessageDispatch.h>
+#include <activemq/commands/MessageId.h>
+#include <activemq/commands/ProducerId.h>
 #include <activemq/transport/IOTransport.h>
 #include <activemq/transport/Transport.h>
 #include <activemq/wireformat/openwire/OpenWireFormat.h>
-#include <activemq/commands/MessageDispatch.h>
-#include <activemq/commands/Message.h>
-#include <activemq/commands/MessageAck.h>
-#include <activemq/commands/MessageId.h>
-#include <activemq/commands/ProducerId.h>
-#include <activemq/commands/ConsumerId.h>
-#include <activemq/commands/ActiveMQTextMessage.h>
-#include <activemq/commands/ActiveMQTopic.h>
 #include <decaf/io/ByteArrayInputStream.h>
 #include <decaf/io/ByteArrayOutputStream.h>
 #include <decaf/io/DataInputStream.h>
@@ -49,346 +49,462 @@ using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::util::concurrent;
 
-class CorruptedMessageTest : public ::testing::Test {};
+class CorruptedMessageTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * Minimal Mock Transport for marshalling tests.
  * OpenWireFormat::marshal() requires a non-null Transport pointer.
  */
-class MockTransport : public Transport {
+class MockTransport : public Transport
+{
 public:
-    MockTransport() {}
-    virtual ~MockTransport() {}
+    MockTransport()
+    {
+    }
 
-    virtual void start() {}
-    virtual void stop() {}
-    virtual void close() {}
-    virtual void oneway(const Pointer<Command> command) {}
-    virtual Pointer<FutureResponse> asyncRequest(const Pointer<Command> command,
-                                                  const Pointer<ResponseCallback> responseCallback) {
+    virtual ~MockTransport()
+    {
+    }
+
+    virtual void start()
+    {
+    }
+
+    virtual void stop()
+    {
+    }
+
+    virtual void close()
+    {
+    }
+
+    virtual void oneway(const Pointer<Command> command)
+    {
+    }
+
+    virtual Pointer<FutureResponse> asyncRequest(
+        const Pointer<Command>          command,
+        const Pointer<ResponseCallback> responseCallback)
+    {
         return Pointer<FutureResponse>();
     }
-    virtual Pointer<Response> request(const Pointer<Command> command) {
+
+    virtual Pointer<Response> request(const Pointer<Command> command)
+    {
         return Pointer<Response>();
     }
-    virtual Pointer<Response> request(const Pointer<Command> command, unsigned int timeout) {
+
+    virtual Pointer<Response> request(const Pointer<Command> command,
+                                      unsigned int           timeout)
+    {
         return Pointer<Response>();
     }
-    virtual Pointer<wireformat::WireFormat> getWireFormat() const {
+
+    virtual Pointer<wireformat::WireFormat> getWireFormat() const
+    {
         return Pointer<wireformat::WireFormat>();
     }
-    virtual void setWireFormat(const Pointer<wireformat::WireFormat> wireFormat) {}
-    virtual void setTransportListener(TransportListener* listener) {}
-    virtual TransportListener* getTransportListener() const { return nullptr; }
-    virtual Transport* narrow(const std::type_info& typeId) { return nullptr; }
-    virtual bool isFaultTolerant() const { return false; }
-    virtual bool isConnected() const { return true; }
-    virtual bool isClosed() const { return false; }
-    virtual std::string getRemoteAddress() const { return "mock://localhost"; }
-    virtual bool isReconnectSupported() const { return false; }
-    virtual bool isUpdateURIsSupported() const { return false; }
-    virtual void updateURIs(bool rebalance, const decaf::util::List<decaf::net::URI>& uris) {}
-    virtual void reconnect(const decaf::net::URI& uri) {}
+
+    virtual void setWireFormat(const Pointer<wireformat::WireFormat> wireFormat)
+    {
+    }
+
+    virtual void setTransportListener(TransportListener* listener)
+    {
+    }
+
+    virtual TransportListener* getTransportListener() const
+    {
+        return nullptr;
+    }
+
+    virtual Transport* narrow(const std::type_info& typeId)
+    {
+        return nullptr;
+    }
+
+    virtual bool isFaultTolerant() const
+    {
+        return false;
+    }
+
+    virtual bool isConnected() const
+    {
+        return true;
+    }
+
+    virtual bool isClosed() const
+    {
+        return false;
+    }
+
+    virtual std::string getRemoteAddress() const
+    {
+        return "mock://localhost";
+    }
+
+    virtual bool isReconnectSupported() const
+    {
+        return false;
+    }
+
+    virtual bool isUpdateURIsSupported() const
+    {
+        return false;
+    }
+
+    virtual void updateURIs(bool                                      rebalance,
+                            const decaf::util::List<decaf::net::URI>& uris)
+    {
+    }
+
+    virtual void reconnect(const decaf::net::URI& uri)
+    {
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
+
+/**
+ * Helper class to create corrupted message streams for testing
+ */
+class CorruptedStreamBuilder
+{
+public:
+    /**
+     * Create a valid MessageDispatch marshaled to bytes
+     *
+     * @param consumerId - connection ID for the consumer (e.g., "ID:conn-1")
+     * @param producerId - producer ID in format
+     * "connectionId:sessionId:producerValue" (e.g., "ID:producer-1:1:1")
+     * @param messageText - the text content of the message
+     */
+    static std::vector<unsigned char> createValidMessageDispatch(
+        const std::string& consumerId,
+        const std::string& producerId,
+        const std::string& messageText)
+    {
+        ByteArrayOutputStream   baos;
+        DataOutputStream        dos(&baos);
+        decaf::util::Properties props;
+        OpenWireFormat          wireFormat(props);
+        MockTransport mockTransport;  // Use mock transport for marshalling
+
+        // Create MessageDispatch with Message
+        Pointer<MessageDispatch> dispatch(new MessageDispatch());
+
+        // Set ConsumerId
+        Pointer<ConsumerId> cid(new ConsumerId());
+        cid->setConnectionId(consumerId);
+        cid->setSessionId(1);
+        cid->setValue(1);
+        dispatch->setConsumerId(cid);
+
+        // Set Destination
+        Pointer<ActiveMQDestination> dest(new ActiveMQTopic("test.topic"));
+        dispatch->setDestination(dest);
+
+        // Create Message with MessageId
+        // ProducerId format: connectionId:sessionId:producerValue
+        // MessageId is created from ProducerId + sequence number
+        Pointer<ActiveMQTextMessage> message(new ActiveMQTextMessage());
+        Pointer<ProducerId>          pid(new ProducerId());
+        pid->setConnectionId(consumerId);  // Use same connection for simplicity
+        pid->setSessionId(1);
+        pid->setValue(1);
+        Pointer<MessageId> mid(new MessageId(pid, 1));
+        message->setMessageId(mid);
+        message->setText(messageText);
+
+        dispatch->setMessage(message);
+        dispatch->setRedeliveryCounter(0);
+
+        // Marshal to stream using mock transport
+        wireFormat.marshal(Pointer<commands::Command>(dispatch),
+                           &mockTransport,
+                           &dos);
+        dos.flush();
+
+        std::pair<unsigned char*, int> data = baos.toByteArray();
+        std::vector<unsigned char> result(data.first, data.first + data.second);
+        delete[] data.first;
+        return result;
+    }
 
     /**
-     * Helper class to create corrupted message streams for testing
+     * Create a corrupted MessageDispatch where corruption occurs after
+     * MessageId This simulates corruption during properties or body
+     * unmarshaling
      */
-    class CorruptedStreamBuilder {
-    public:
+    static std::vector<unsigned char> createCorruptedMessageAfterMessageId(
+        const std::string& consumerId,
+        const std::string& messageId)
+    {
+        // First create a valid message
+        std::vector<unsigned char> validBytes =
+            createValidMessageDispatch(consumerId, messageId, "Test message");
 
-        /**
-         * Create a valid MessageDispatch marshaled to bytes
-         *
-         * @param consumerId - connection ID for the consumer (e.g., "ID:conn-1")
-         * @param producerId - producer ID in format "connectionId:sessionId:producerValue" (e.g., "ID:producer-1:1:1")
-         * @param messageText - the text content of the message
-         */
-        static std::vector<unsigned char> createValidMessageDispatch(
-            const std::string& consumerId,
-            const std::string& producerId,
-            const std::string& messageText) {
-
-            ByteArrayOutputStream baos;
-            DataOutputStream dos(&baos);
-            decaf::util::Properties props;
-            OpenWireFormat wireFormat(props);
-            MockTransport mockTransport;  // Use mock transport for marshalling
-
-            // Create MessageDispatch with Message
-            Pointer<MessageDispatch> dispatch(new MessageDispatch());
-
-            // Set ConsumerId
-            Pointer<ConsumerId> cid(new ConsumerId());
-            cid->setConnectionId(consumerId);
-            cid->setSessionId(1);
-            cid->setValue(1);
-            dispatch->setConsumerId(cid);
-
-            // Set Destination
-            Pointer<ActiveMQDestination> dest(new ActiveMQTopic("test.topic"));
-            dispatch->setDestination(dest);
-
-            // Create Message with MessageId
-            // ProducerId format: connectionId:sessionId:producerValue
-            // MessageId is created from ProducerId + sequence number
-            Pointer<ActiveMQTextMessage> message(new ActiveMQTextMessage());
-            Pointer<ProducerId> pid(new ProducerId());
-            pid->setConnectionId(consumerId);  // Use same connection for simplicity
-            pid->setSessionId(1);
-            pid->setValue(1);
-            Pointer<MessageId> mid(new MessageId(pid, 1));
-            message->setMessageId(mid);
-            message->setText(messageText);
-
-            dispatch->setMessage(message);
-            dispatch->setRedeliveryCounter(0);
-
-            // Marshal to stream using mock transport
-            wireFormat.marshal(Pointer<commands::Command>(dispatch), &mockTransport, &dos);
-            dos.flush();
-
-            std::pair<unsigned char*, int> data = baos.toByteArray();
-            std::vector<unsigned char> result(data.first, data.first + data.second);
-            delete[] data.first;
-            return result;
+        // Corrupt bytes after MessageId is marshaled
+        // MessageId is typically at byte position 40-60 depending on ID lengths
+        // Properties/body start after that, so corrupt around byte 70+
+        if (validBytes.size() > 70)
+        {
+            // Insert invalid size field for properties (0xFFFFFFFF = -1)
+            validBytes[70] = 0xFF;
+            validBytes[71] = 0xFF;
+            validBytes[72] = 0xFF;
+            validBytes[73] = 0xFF;
         }
 
-        /**
-         * Create a corrupted MessageDispatch where corruption occurs after MessageId
-         * This simulates corruption during properties or body unmarshaling
-         */
-        static std::vector<unsigned char> createCorruptedMessageAfterMessageId(
-            const std::string& consumerId,
-            const std::string& messageId) {
-
-            // First create a valid message
-            std::vector<unsigned char> validBytes = createValidMessageDispatch(
-                consumerId, messageId, "Test message");
-
-            // Corrupt bytes after MessageId is marshaled
-            // MessageId is typically at byte position 40-60 depending on ID lengths
-            // Properties/body start after that, so corrupt around byte 70+
-            if (validBytes.size() > 70) {
-                // Insert invalid size field for properties (0xFFFFFFFF = -1)
-                validBytes[70] = 0xFF;
-                validBytes[71] = 0xFF;
-                validBytes[72] = 0xFF;
-                validBytes[73] = 0xFF;
-            }
-
-            return validBytes;
-        }
-
-        /**
-         * Create a corrupted MessageDispatch where corruption occurs during ConsumerId
-         * This means MessageId is never reached
-         */
-        static std::vector<unsigned char> createCorruptedMessageBeforeMessageId() {
-            std::vector<unsigned char> bytes;
-
-            // MessageDispatch type (21)
-            bytes.push_back(21);
-
-            // Command ID
-            bytes.push_back(0);
-            bytes.push_back(0);
-            bytes.push_back(0);
-            bytes.push_back(1);
-
-            // Response required
-            bytes.push_back(0);
-
-            // Corrupt ConsumerId - invalid type
-            bytes.push_back(255);  // Invalid data type
-
-            return bytes;
-        }
-
-        /**
-         * Truncate a valid message stream to simulate EOF
-         */
-        static std::vector<unsigned char> createTruncatedMessage(
-            const std::string& consumerId,
-            const std::string& messageId,
-            size_t truncateAtByte) {
-
-            std::vector<unsigned char> validBytes = createValidMessageDispatch(
-                consumerId, messageId, "Test");
-
-            if (truncateAtByte < validBytes.size()) {
-                validBytes.resize(truncateAtByte);
-            }
-
-            return validBytes;
-        }
-
-        /**
-         * Create a valid MessageDispatch for a durable topic subscriber
-         * Durable subscribers have a subscription name in the ConsumerId
-         */
-        static std::vector<unsigned char> createValidDurableSubscriberMessageDispatch(
-            const std::string& connectionId,
-            const std::string& subscriptionName,
-            const std::string& producerId,
-            const std::string& messageText) {
-
-            ByteArrayOutputStream baos;
-            DataOutputStream dos(&baos);
-            decaf::util::Properties props;
-            OpenWireFormat wireFormat(props);
-            MockTransport mockTransport;  // Use mock transport for marshalling
-
-            // Create MessageDispatch with Message
-            Pointer<MessageDispatch> dispatch(new MessageDispatch());
-
-            // Set ConsumerId for durable subscriber
-            Pointer<ConsumerId> cid(new ConsumerId());
-            cid->setConnectionId(connectionId);
-            cid->setSessionId(1);
-            cid->setValue(1);
-            // Note: In real implementation, subscription name would be part of the ConsumerId string
-            // Format: "connectionId:sessionId:consumerId:subscriptionName"
-            dispatch->setConsumerId(cid);
-
-            // Set Destination - durable subscriptions are for topics
-            Pointer<ActiveMQDestination> dest(new ActiveMQTopic("durable.topic"));
-            dispatch->setDestination(dest);
-
-            // Create Message with MessageId using ProducerId
-            Pointer<ActiveMQTextMessage> message(new ActiveMQTextMessage());
-            Pointer<ProducerId> pid(new ProducerId());
-            pid->setConnectionId(connectionId);
-            pid->setSessionId(1);
-            pid->setValue(1);
-            Pointer<MessageId> mid(new MessageId(pid, 1));
-            message->setMessageId(mid);
-            message->setText(messageText);
-
-            // Set properties to indicate durable subscription
-            message->setStringProperty("subscriptionName", subscriptionName);
-
-            dispatch->setMessage(message);
-            dispatch->setRedeliveryCounter(0);
-
-            // Marshal to stream using mock transport
-            wireFormat.marshal(Pointer<commands::Command>(dispatch), &mockTransport, &dos);
-            dos.flush();
-
-            std::pair<unsigned char*, int> data = baos.toByteArray();
-            std::vector<unsigned char> result(data.first, data.first + data.second);
-            delete[] data.first;
-            return result;
-        }
-
-        /**
-         * Create a corrupted MessageDispatch for durable subscriber (corruption after MessageId)
-         */
-        static std::vector<unsigned char> createCorruptedDurableSubscriberMessage(
-            const std::string& connectionId,
-            const std::string& subscriptionName,
-            const std::string& messageId) {
-
-            // First create a valid durable subscriber message
-            std::vector<unsigned char> validBytes = createValidDurableSubscriberMessageDispatch(
-                connectionId, subscriptionName, messageId, "Test message");
-
-            // Corrupt bytes after MessageId is marshaled
-            if (validBytes.size() > 70) {
-                // Insert invalid size field for properties (0xFFFFFFFF = -1)
-                validBytes[70] = 0xFF;
-                validBytes[71] = 0xFF;
-                validBytes[72] = 0xFF;
-                validBytes[73] = 0xFF;
-            }
-
-            return validBytes;
-        }
-    };
+        return validBytes;
+    }
 
     /**
-     * Mock TransportListener to capture delivered commands and errors
+     * Create a corrupted MessageDispatch where corruption occurs during
+     * ConsumerId This means MessageId is never reached
      */
-    class MockTransportListener : public TransportListener {
-    private:
-        std::vector<Pointer<Command>> receivedCommands;
-        std::vector<std::string> receivedErrors;
-        CountDownLatch* expectedCommandLatch;
-        CountDownLatch* errorLatch;
+    static std::vector<unsigned char> createCorruptedMessageBeforeMessageId()
+    {
+        std::vector<unsigned char> bytes;
 
-    public:
+        // MessageDispatch type (21)
+        bytes.push_back(21);
 
-        MockTransportListener()
-            : expectedCommandLatch(nullptr), errorLatch(nullptr) {}
+        // Command ID
+        bytes.push_back(0);
+        bytes.push_back(0);
+        bytes.push_back(0);
+        bytes.push_back(1);
 
-        virtual ~MockTransportListener() {}
+        // Response required
+        bytes.push_back(0);
 
-        void setExpectedCommands(int count) {
-            expectedCommandLatch = new CountDownLatch(count);
+        // Corrupt ConsumerId - invalid type
+        bytes.push_back(255);  // Invalid data type
+
+        return bytes;
+    }
+
+    /**
+     * Truncate a valid message stream to simulate EOF
+     */
+    static std::vector<unsigned char> createTruncatedMessage(
+        const std::string& consumerId,
+        const std::string& messageId,
+        size_t             truncateAtByte)
+    {
+        std::vector<unsigned char> validBytes =
+            createValidMessageDispatch(consumerId, messageId, "Test");
+
+        if (truncateAtByte < validBytes.size())
+        {
+            validBytes.resize(truncateAtByte);
         }
 
-        void setExpectError() {
-            errorLatch = new CountDownLatch(1);
+        return validBytes;
+    }
+
+    /**
+     * Create a valid MessageDispatch for a durable topic subscriber
+     * Durable subscribers have a subscription name in the ConsumerId
+     */
+    static std::vector<unsigned char>
+    createValidDurableSubscriberMessageDispatch(
+        const std::string& connectionId,
+        const std::string& subscriptionName,
+        const std::string& producerId,
+        const std::string& messageText)
+    {
+        ByteArrayOutputStream   baos;
+        DataOutputStream        dos(&baos);
+        decaf::util::Properties props;
+        OpenWireFormat          wireFormat(props);
+        MockTransport mockTransport;  // Use mock transport for marshalling
+
+        // Create MessageDispatch with Message
+        Pointer<MessageDispatch> dispatch(new MessageDispatch());
+
+        // Set ConsumerId for durable subscriber
+        Pointer<ConsumerId> cid(new ConsumerId());
+        cid->setConnectionId(connectionId);
+        cid->setSessionId(1);
+        cid->setValue(1);
+        // Note: In real implementation, subscription name would be part of the
+        // ConsumerId string Format:
+        // "connectionId:sessionId:consumerId:subscriptionName"
+        dispatch->setConsumerId(cid);
+
+        // Set Destination - durable subscriptions are for topics
+        Pointer<ActiveMQDestination> dest(new ActiveMQTopic("durable.topic"));
+        dispatch->setDestination(dest);
+
+        // Create Message with MessageId using ProducerId
+        Pointer<ActiveMQTextMessage> message(new ActiveMQTextMessage());
+        Pointer<ProducerId>          pid(new ProducerId());
+        pid->setConnectionId(connectionId);
+        pid->setSessionId(1);
+        pid->setValue(1);
+        Pointer<MessageId> mid(new MessageId(pid, 1));
+        message->setMessageId(mid);
+        message->setText(messageText);
+
+        // Set properties to indicate durable subscription
+        message->setStringProperty("subscriptionName", subscriptionName);
+
+        dispatch->setMessage(message);
+        dispatch->setRedeliveryCounter(0);
+
+        // Marshal to stream using mock transport
+        wireFormat.marshal(Pointer<commands::Command>(dispatch),
+                           &mockTransport,
+                           &dos);
+        dos.flush();
+
+        std::pair<unsigned char*, int> data = baos.toByteArray();
+        std::vector<unsigned char> result(data.first, data.first + data.second);
+        delete[] data.first;
+        return result;
+    }
+
+    /**
+     * Create a corrupted MessageDispatch for durable subscriber (corruption
+     * after MessageId)
+     */
+    static std::vector<unsigned char> createCorruptedDurableSubscriberMessage(
+        const std::string& connectionId,
+        const std::string& subscriptionName,
+        const std::string& messageId)
+    {
+        // First create a valid durable subscriber message
+        std::vector<unsigned char> validBytes =
+            createValidDurableSubscriberMessageDispatch(connectionId,
+                                                        subscriptionName,
+                                                        messageId,
+                                                        "Test message");
+
+        // Corrupt bytes after MessageId is marshaled
+        if (validBytes.size() > 70)
+        {
+            // Insert invalid size field for properties (0xFFFFFFFF = -1)
+            validBytes[70] = 0xFF;
+            validBytes[71] = 0xFF;
+            validBytes[72] = 0xFF;
+            validBytes[73] = 0xFF;
         }
 
-        bool waitForCommands(int timeoutMs) {
-            if (expectedCommandLatch) {
-                return expectedCommandLatch->await(timeoutMs);
-            }
-            return true;
+        return validBytes;
+    }
+};
+
+/**
+ * Mock TransportListener to capture delivered commands and errors
+ */
+class MockTransportListener : public TransportListener
+{
+private:
+    std::vector<Pointer<Command>> receivedCommands;
+    std::vector<std::string>      receivedErrors;
+    CountDownLatch*               expectedCommandLatch;
+    CountDownLatch*               errorLatch;
+
+public:
+    MockTransportListener()
+        : expectedCommandLatch(nullptr),
+          errorLatch(nullptr)
+    {
+    }
+
+    virtual ~MockTransportListener()
+    {
+    }
+
+    void setExpectedCommands(int count)
+    {
+        expectedCommandLatch = new CountDownLatch(count);
+    }
+
+    void setExpectError()
+    {
+        errorLatch = new CountDownLatch(1);
+    }
+
+    bool waitForCommands(int timeoutMs)
+    {
+        if (expectedCommandLatch)
+        {
+            return expectedCommandLatch->await(timeoutMs);
         }
+        return true;
+    }
 
-        bool waitForError(int timeoutMs) {
-            if (errorLatch) {
-                return errorLatch->await(timeoutMs);
-            }
-            return true;
+    bool waitForError(int timeoutMs)
+    {
+        if (errorLatch)
+        {
+            return errorLatch->await(timeoutMs);
         }
+        return true;
+    }
 
-        virtual void onCommand(const Pointer<Command> command) {
-            receivedCommands.push_back(command);
-            if (expectedCommandLatch) {
-                expectedCommandLatch->countDown();
-            }
+    virtual void onCommand(const Pointer<Command> command)
+    {
+        receivedCommands.push_back(command);
+        if (expectedCommandLatch)
+        {
+            expectedCommandLatch->countDown();
         }
+    }
 
-        virtual void onException(const decaf::lang::Exception& ex) {
-            receivedErrors.push_back(ex.getMessage());
-            if (errorLatch) {
-                errorLatch->countDown();
-            }
+    virtual void onException(const decaf::lang::Exception& ex)
+    {
+        receivedErrors.push_back(ex.getMessage());
+        if (errorLatch)
+        {
+            errorLatch->countDown();
         }
+    }
 
-        virtual void transportInterrupted() {}
-        virtual void transportResumed() {}
+    virtual void transportInterrupted()
+    {
+    }
 
-        const std::vector<Pointer<Command>>& getReceivedCommands() const {
-            return receivedCommands;
+    virtual void transportResumed()
+    {
+    }
+
+    const std::vector<Pointer<Command>>& getReceivedCommands() const
+    {
+        return receivedCommands;
+    }
+
+    const std::vector<std::string>& getReceivedErrors() const
+    {
+        return receivedErrors;
+    }
+
+    void reset()
+    {
+        receivedCommands.clear();
+        receivedErrors.clear();
+        if (expectedCommandLatch)
+        {
+            delete expectedCommandLatch;
+            expectedCommandLatch = nullptr;
         }
-
-        const std::vector<std::string>& getReceivedErrors() const {
-            return receivedErrors;
+        if (errorLatch)
+        {
+            delete errorLatch;
+            errorLatch = nullptr;
         }
+    }
+};
 
-        void reset() {
-            receivedCommands.clear();
-            receivedErrors.clear();
-            if (expectedCommandLatch) {
-                delete expectedCommandLatch;
-                expectedCommandLatch = nullptr;
-            }
-            if (errorLatch) {
-                delete errorLatch;
-                errorLatch = nullptr;
-            }
-        }
-    };
-
-}
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 /**
@@ -400,11 +516,13 @@ namespace {
  * - consecutiveErrors increments to 1
  * - Connection remains open
  */
-TEST_F(CorruptedMessageTest, testCorruptedFirstMessage) {
+TEST_F(CorruptedMessageTest, testCorruptedFirstMessage)
+{
     // Create corrupted message bytes
     std::vector<unsigned char> corruptedBytes =
         CorruptedStreamBuilder::createCorruptedMessageAfterMessageId(
-            "ID:test-connection-1", "ID:test-producer-1:1:1:1");
+            "ID:test-connection-1",
+            "ID:test-producer-1:1:1:1");
 
     // Create input stream with corrupted message
     Pointer<ByteArrayInputStream> inputStream(
@@ -422,29 +540,36 @@ TEST_F(CorruptedMessageTest, testCorruptedFirstMessage) {
     listener.setExpectError();
 
     // Create IOTransport (this would normally be done by TcpTransport)
-    // Since IOTransport constructor is protected, we need to test through its public interface
-    // For now, we verify the helper functions work correctly
+    // Since IOTransport constructor is protected, we need to test through its
+    // public interface For now, we verify the helper functions work correctly
 
     // Test 1: Verify corrupted stream builder creates invalid data
     Pointer<DataInputStream> dis(new DataInputStream(inputStream.get()));
-    bool caughtException = false;
-    try {
+    bool                     caughtException = false;
+    try
+    {
         Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
-    } catch (IOException& e) {
+    }
+    catch (IOException& e)
+    {
         caughtException = true;
         // This is expected - corrupted data should throw
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         caughtException = true;
     }
 
-    ASSERT_TRUE(caughtException) << ("Corrupted message should throw exception during unmarshal");
+    ASSERT_TRUE(caughtException)
+        << ("Corrupted message should throw exception during unmarshal");
 
     // Test 2: Verify that if MessageId was unmarshaled before corruption,
     // it should be available in thread-local storage
     // This is tested indirectly through the production code path
 
     std::cout << "[CorruptedMessageTest] testCorruptedFirstMessage: "
-              << "Verified corrupted message throws exception during unmarshal" << std::endl;
+              << "Verified corrupted message throws exception during unmarshal"
+              << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -458,27 +583,35 @@ TEST_F(CorruptedMessageTest, testCorruptedFirstMessage) {
  * - Valid messages after corruption are processed normally
  * - consecutiveErrors resets to 0 on next valid message
  */
-TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages) {
+TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages)
+{
     // Create stream with 3 messages: valid, corrupted, valid
     std::vector<unsigned char> stream;
 
     // Message 1: Valid
-    std::vector<unsigned char> msg1 = CorruptedStreamBuilder::createValidMessageDispatch(
-        "ID:conn:1", "ID:msg:1", "Message One");
+    std::vector<unsigned char> msg1 =
+        CorruptedStreamBuilder::createValidMessageDispatch("ID:conn:1",
+                                                           "ID:msg:1",
+                                                           "Message One");
     stream.insert(stream.end(), msg1.begin(), msg1.end());
 
     // Message 2: Corrupted (after MessageId)
-    std::vector<unsigned char> msg2 = CorruptedStreamBuilder::createCorruptedMessageAfterMessageId(
-        "ID:conn:1", "ID:msg:2");
+    std::vector<unsigned char> msg2 =
+        CorruptedStreamBuilder::createCorruptedMessageAfterMessageId(
+            "ID:conn:1",
+            "ID:msg:2");
     stream.insert(stream.end(), msg2.begin(), msg2.end());
 
     // Message 3: Valid
-    std::vector<unsigned char> msg3 = CorruptedStreamBuilder::createValidMessageDispatch(
-        "ID:conn:1", "ID:msg:3", "Message Three");
+    std::vector<unsigned char> msg3 =
+        CorruptedStreamBuilder::createValidMessageDispatch("ID:conn:1",
+                                                           "ID:msg:3",
+                                                           "Message Three");
     stream.insert(stream.end(), msg3.begin(), msg3.end());
 
     // Create input stream
-    Pointer<ByteArrayInputStream> bais(new ByteArrayInputStream(&stream[0], stream.size()));
+    Pointer<ByteArrayInputStream> bais(
+        new ByteArrayInputStream(&stream[0], stream.size()));
     Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
 
     // Create wireformat for unmarshal testing
@@ -486,28 +619,36 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages) {
     Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
 
     // Unmarshal messages one by one
-    int validCount = 0;
+    int validCount     = 0;
     int corruptedCount = 0;
 
     // Message 1 - should succeed
-    try {
+    try
+    {
         Pointer<Command> cmd1 = wireFormat->unmarshal(nullptr, dis.get());
         ASSERT_TRUE(cmd1 != nullptr);
         Pointer<MessageDispatch> dispatch = cmd1.dynamicCast<MessageDispatch>();
         ASSERT_TRUE(dispatch != nullptr);
         validCount++;
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         FAIL() << ("First message should unmarshal successfully");
     }
 
     // Message 2 - should throw (corrupted)
-    try {
+    try
+    {
         Pointer<Command> cmd2 = wireFormat->unmarshal(nullptr, dis.get());
         FAIL() << ("Corrupted message should throw exception");
-    } catch (IOException& e) {
+    }
+    catch (IOException& e)
+    {
         corruptedCount++;
         // Expected - corrupted message
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         corruptedCount++;
         // Also acceptable
     }
@@ -516,11 +657,14 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages) {
     // This demonstrates why we need MAX_CONSECUTIVE_ERRORS and reconnection
     // We cannot reliably read message 3 after corruption in message 2
 
-    ASSERT_EQ(1, validCount) << ("Should have successfully unmarshaled 1 valid message");
+    ASSERT_EQ(1, validCount)
+        << ("Should have successfully unmarshaled 1 valid message");
     ASSERT_EQ(1, corruptedCount) << ("Should have caught 1 corrupted message");
 
-    std::cout << "[CorruptedMessageTest] testCorruptedMessageBetweenValidMessages: "
-              << "Verified valid message before corruption, then corruption detected" << std::endl;
+    std::cout
+        << "[CorruptedMessageTest] testCorruptedMessageBetweenValidMessages: "
+        << "Verified valid message before corruption, then corruption detected"
+        << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -533,14 +677,16 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages) {
  * - Next valid message is read and processed successfully
  * - consecutiveErrors resets to 0
  */
-TEST_F(CorruptedMessageTest, testContinueAfterCorruptedMessage) {
+TEST_F(CorruptedMessageTest, testContinueAfterCorruptedMessage)
+{
     // This test verifies that after a corrupted message, the error handling
     // allows the system to continue (not crash or hang)
 
     // Create corrupted message
     std::vector<unsigned char> corruptedBytes =
         CorruptedStreamBuilder::createCorruptedMessageAfterMessageId(
-            "ID:test-connection", "ID:test-message-corrupted");
+            "ID:test-connection",
+            "ID:test-message-corrupted");
 
     Pointer<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
@@ -552,13 +698,17 @@ TEST_F(CorruptedMessageTest, testContinueAfterCorruptedMessage) {
 
     // Try to unmarshal corrupted message
     bool caughtException = false;
-    try {
+    try
+    {
         Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         caughtException = true;
     }
 
-    ASSERT_TRUE(caughtException) << ("Corrupted message should throw exception");
+    ASSERT_TRUE(caughtException)
+        << ("Corrupted message should throw exception");
 
     // The key point: We didn't crash, we caught the exception
     // In production, IOTransport would:
@@ -583,27 +733,34 @@ TEST_F(CorruptedMessageTest, testContinueAfterCorruptedMessage) {
  * - consecutiveErrors increments with each corruption
  * - Connection remains open (< MAX_CONSECUTIVE_ERRORS)
  */
-TEST_F(CorruptedMessageTest, testMultipleCorruptedMessages) {
+TEST_F(CorruptedMessageTest, testMultipleCorruptedMessages)
+{
     // Create 5 corrupted messages
     decaf::util::Properties props;
     Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
     int corruptedCount = 0;
-    for (int i = 1; i <= 5; i++) {
+    for (int i = 1; i <= 5; i++)
+    {
         std::string msgId = "ID:msg:" + decaf::lang::Integer::toString(i);
         std::vector<unsigned char> corruptedBytes =
             CorruptedStreamBuilder::createCorruptedMessageAfterMessageId(
-                "ID:conn:1", msgId);
+                "ID:conn:1",
+                msgId);
 
         Pointer<ByteArrayInputStream> bais(
-            new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
+            new ByteArrayInputStream(&corruptedBytes[0],
+                                     corruptedBytes.size()));
         Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
 
-        try {
+        try
+        {
             Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
             FAIL() << ("Corrupted message should throw exception");
-        } catch (Exception& e) {
+        }
+        catch (Exception& e)
+        {
             corruptedCount++;
         }
     }
@@ -625,7 +782,8 @@ TEST_F(CorruptedMessageTest, testMultipleCorruptedMessages) {
  * - consecutiveErrors increments
  * - Connection remains open
  */
-TEST_F(CorruptedMessageTest, testCorruptedMessageWithoutMessageId) {
+TEST_F(CorruptedMessageTest, testCorruptedMessageWithoutMessageId)
+{
     // Create corrupted message where corruption occurs before MessageId
     std::vector<unsigned char> corruptedBytes =
         CorruptedStreamBuilder::createCorruptedMessageBeforeMessageId();
@@ -639,9 +797,12 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageWithoutMessageId) {
     // Wire-level corruption test - unmarshal will throw exception
 
     bool caughtException = false;
-    try {
+    try
+    {
         Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         caughtException = true;
     }
 
@@ -652,7 +813,8 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageWithoutMessageId) {
     // This test verifies early corruption is caught
 
     std::cout << "[CorruptedMessageTest] testCorruptedMessageWithoutMessageId: "
-              << "Verified early corruption (before MessageId) throws exception" << std::endl;
+              << "Verified early corruption (before MessageId) throws exception"
+              << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -665,7 +827,8 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageWithoutMessageId) {
  * - 10th corruption: Connection closes and thread exits
  * - Failover transport should trigger reconnection
  */
-TEST_F(CorruptedMessageTest, testMaxConsecutiveErrors) {
+TEST_F(CorruptedMessageTest, testMaxConsecutiveErrors)
+{
     // Verify that MAX_CONSECUTIVE_ERRORS (10) is defined correctly
     // This test simulates 10 consecutive errors
 
@@ -673,28 +836,35 @@ TEST_F(CorruptedMessageTest, testMaxConsecutiveErrors) {
     Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
-    int corruptedCount = 0;
-    const int MAX_ERRORS = 10;
+    int       corruptedCount = 0;
+    const int MAX_ERRORS     = 10;
 
-    for (int i = 1; i <= MAX_ERRORS; i++) {
+    for (int i = 1; i <= MAX_ERRORS; i++)
+    {
         std::string msgId = "ID:error:" + decaf::lang::Integer::toString(i);
         std::vector<unsigned char> corruptedBytes =
             CorruptedStreamBuilder::createCorruptedMessageAfterMessageId(
-                "ID:conn:1", msgId);
+                "ID:conn:1",
+                msgId);
 
         Pointer<ByteArrayInputStream> bais(
-            new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
+            new ByteArrayInputStream(&corruptedBytes[0],
+                                     corruptedBytes.size()));
         Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
 
-        try {
+        try
+        {
             Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
             FAIL() << ("Corrupted message should throw exception");
-        } catch (Exception& e) {
+        }
+        catch (Exception& e)
+        {
             corruptedCount++;
         }
     }
 
-    ASSERT_EQ(MAX_ERRORS, corruptedCount) << ("Should have caught 10 consecutive errors");
+    ASSERT_EQ(MAX_ERRORS, corruptedCount)
+        << ("Should have caught 10 consecutive errors");
 
     // In production, IOTransport would:
     // - Handle first 9 errors with POISON_ACK
@@ -715,7 +885,8 @@ TEST_F(CorruptedMessageTest, testMaxConsecutiveErrors) {
  * - MessageId matches from Message
  * - Command marshaled and written to stream
  */
-TEST_F(CorruptedMessageTest, testPoisonAckSent) {
+TEST_F(CorruptedMessageTest, testPoisonAckSent)
+{
     // This test verifies the POISON_ACK format
     // In production, IOTransport::sendPoisonAck() creates MessageAck with:
     // - ackType = ACK_TYPE_POISON (1)
@@ -746,25 +917,33 @@ TEST_F(CorruptedMessageTest, testPoisonAckSent) {
 
     // Marshal to verify it doesn't throw
     Pointer<ByteArrayOutputStream> baos(new ByteArrayOutputStream());
-    Pointer<DataOutputStream> dos(new DataOutputStream(baos.get()));
+    Pointer<DataOutputStream>      dos(new DataOutputStream(baos.get()));
 
     decaf::util::Properties props;
     Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
     MockTransport mockTransport;  // Use mock transport for marshalling
 
-    try {
-        wireFormat->marshal(Pointer<commands::Command>(ack), &mockTransport, dos.get());
+    try
+    {
+        wireFormat->marshal(Pointer<commands::Command>(ack),
+                            &mockTransport,
+                            dos.get());
         dos->flush();
-    } catch (Exception& e) {
-        FAIL() << (std::string("POISON_ACK marshal should succeed: ") + e.getMessage());
+    }
+    catch (Exception& e)
+    {
+        FAIL() << (std::string("POISON_ACK marshal should succeed: ") +
+                   e.getMessage());
     }
 
     // Verify we wrote some bytes
     std::pair<unsigned char*, int> ackData = baos->toByteArray();
-    std::vector<unsigned char> ackBytes(ackData.first, ackData.first + ackData.second);
+    std::vector<unsigned char>     ackBytes(ackData.first,
+                                        ackData.first + ackData.second);
     delete[] ackData.first;
-    ASSERT_TRUE(ackBytes.size() > 0) << ("POISON_ACK should marshal to non-empty bytes");
+    ASSERT_TRUE(ackBytes.size() > 0)
+        << ("POISON_ACK should marshal to non-empty bytes");
 
     std::cout << "[CorruptedMessageTest] testPoisonAckSent: "
               << "Verified POISON_ACK (ackType=1) marshals successfully, size="
@@ -781,7 +960,8 @@ TEST_F(CorruptedMessageTest, testPoisonAckSent) {
  * - Corrupted message: POISON_ACK sent
  * - Valid message after: processed successfully (stream in sync)
  */
-TEST_F(CorruptedMessageTest, testStreamResyncAfterSingleCorruption) {
+TEST_F(CorruptedMessageTest, testStreamResyncAfterSingleCorruption)
+{
     // NOTE: Stream resync is NOT guaranteed after corruption!
     // This is why we have MAX_CONSECUTIVE_ERRORS
     // After corruption, stream is likely desynchronized
@@ -789,8 +969,9 @@ TEST_F(CorruptedMessageTest, testStreamResyncAfterSingleCorruption) {
 
     // Create valid message
     std::vector<unsigned char> validBytes =
-        CorruptedStreamBuilder::createValidMessageDispatch(
-            "ID:conn:1", "ID:msg:valid", "Valid message");
+        CorruptedStreamBuilder::createValidMessageDispatch("ID:conn:1",
+                                                           "ID:msg:valid",
+                                                           "Valid message");
 
     Pointer<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&validBytes[0], validBytes.size()));
@@ -801,10 +982,13 @@ TEST_F(CorruptedMessageTest, testStreamResyncAfterSingleCorruption) {
     // Wire-level corruption test - unmarshal will throw exception
 
     // Should unmarshal successfully
-    try {
+    try
+    {
         Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
         ASSERT_TRUE(cmd != nullptr);
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         FAIL() << ("Valid message should unmarshal successfully");
     }
 
@@ -814,9 +998,11 @@ TEST_F(CorruptedMessageTest, testStreamResyncAfterSingleCorruption) {
     // 2. consecutiveErrors counter
     // 3. Reconnection after MAX_CONSECUTIVE_ERRORS
 
-    std::cout << "[CorruptedMessageTest] testStreamResyncAfterSingleCorruption: "
-              << "Verified valid message unmarshals successfully. "
-              << "Stream resync after corruption NOT guaranteed - use reconnection." << std::endl;
+    std::cout
+        << "[CorruptedMessageTest] testStreamResyncAfterSingleCorruption: "
+        << "Verified valid message unmarshals successfully. "
+        << "Stream resync after corruption NOT guaranteed - use reconnection."
+        << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -830,9 +1016,10 @@ TEST_F(CorruptedMessageTest, testStreamResyncAfterSingleCorruption) {
  * - Failover transport triggers reconnection to backup
  * - After reconnect, consecutiveErrors resets to 0
  */
-TEST_F(CorruptedMessageTest, testCorruptedMessageDuringFailover) {
-    // Failover testing requires more complex setup with actual network connections
-    // This test documents the expected behavior:
+TEST_F(CorruptedMessageTest, testCorruptedMessageDuringFailover)
+{
+    // Failover testing requires more complex setup with actual network
+    // connections This test documents the expected behavior:
     //
     // 1. Client connected to primary broker
     // 2. Receives corrupted messages
@@ -852,18 +1039,24 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDuringFailover) {
 
     // Simulate MAX_CONSECUTIVE_ERRORS scenario
     int errorCount = 0;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++)
+    {
         std::vector<unsigned char> corruptedBytes =
             CorruptedStreamBuilder::createCorruptedMessageAfterMessageId(
-                "ID:conn:1", "ID:msg:" + decaf::lang::Integer::toString(i));
+                "ID:conn:1",
+                "ID:msg:" + decaf::lang::Integer::toString(i));
 
         Pointer<ByteArrayInputStream> bais(
-            new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
+            new ByteArrayInputStream(&corruptedBytes[0],
+                                     corruptedBytes.size()));
         Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
 
-        try {
+        try
+        {
             wireFormat->unmarshal(nullptr, dis.get());
-        } catch (Exception& e) {
+        }
+        catch (Exception& e)
+        {
             errorCount++;
         }
     }
@@ -871,7 +1064,8 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDuringFailover) {
     ASSERT_EQ(10, errorCount);
 
     std::cout << "[CorruptedMessageTest] testCorruptedMessageDuringFailover: "
-              << "Verified error counter reaches MAX. Failover integration test "
+              << "Verified error counter reaches MAX. Failover integration "
+                 "test "
               << "requires real brokers." << std::endl;
 }
 
@@ -889,7 +1083,8 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDuringFailover) {
  * - POISON_ACK only sent when MessageId successfully unmarshaled
  * - Appropriate error handling for each corruption point
  */
-TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts) {
+TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts)
+{
     // Test corruption at different unmarshal points
     decaf::util::Properties props;
     Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
@@ -904,9 +1099,12 @@ TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts) {
         Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
 
         bool caught = false;
-        try {
+        try
+        {
             wireFormat->unmarshal(nullptr, dis.get());
-        } catch (Exception& e) {
+        }
+        catch (Exception& e)
+        {
             caught = true;
         }
         ASSERT_TRUE(caught) << ("Early corruption should throw");
@@ -916,15 +1114,19 @@ TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts) {
     {
         std::vector<unsigned char> bytes =
             CorruptedStreamBuilder::createCorruptedMessageAfterMessageId(
-                "ID:conn:1", "ID:msg:1");
+                "ID:conn:1",
+                "ID:msg:1");
         Pointer<ByteArrayInputStream> bais(
             new ByteArrayInputStream(&bytes[0], bytes.size()));
         Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
 
         bool caught = false;
-        try {
+        try
+        {
             wireFormat->unmarshal(nullptr, dis.get());
-        } catch (Exception& e) {
+        }
+        catch (Exception& e)
+        {
             caught = true;
         }
         ASSERT_TRUE(caught) << ("Properties corruption should throw");
@@ -934,15 +1136,20 @@ TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts) {
     {
         std::vector<unsigned char> bytes =
             CorruptedStreamBuilder::createTruncatedMessage(
-                "ID:conn:1", "ID:msg:1", 50);  // Truncate at 50 bytes
+                "ID:conn:1",
+                "ID:msg:1",
+                50);  // Truncate at 50 bytes
         Pointer<ByteArrayInputStream> bais(
             new ByteArrayInputStream(&bytes[0], bytes.size()));
         Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
 
         bool caught = false;
-        try {
+        try
+        {
             wireFormat->unmarshal(nullptr, dis.get());
-        } catch (Exception& e) {
+        }
+        catch (Exception& e)
+        {
             caught = true;
         }
         ASSERT_TRUE(caught) << ("Truncated message should throw");
@@ -950,11 +1157,15 @@ TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts) {
 
     // Summary of behavior:
     // - Corruption before MessageId: Exception thrown, no POISON_ACK
-    // - Corruption after MessageId: Exception thrown, POISON_ACK sent (MessageId available)
-    // - Truncation: Exception thrown, POISON_ACK sent if MessageId already unmarshaled
+    // - Corruption after MessageId: Exception thrown, POISON_ACK sent
+    // (MessageId available)
+    // - Truncation: Exception thrown, POISON_ACK sent if MessageId already
+    // unmarshaled
 
-    std::cout << "[CorruptedMessageTest] testCorruptionInDifferentMessageParts: "
-              << "Verified corruption handling at different unmarshal points" << std::endl;
+    std::cout << "[CorruptedMessageTest] "
+                 "testCorruptionInDifferentMessageParts: "
+              << "Verified corruption handling at different unmarshal points"
+              << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -968,9 +1179,11 @@ TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts) {
  * - Message moved to DLQ
  * - Subscription does NOT persist after disconnect
  */
-TEST_F(CorruptedMessageTest, testCorruptedMessageNonDurableConsumer) {
+TEST_F(CorruptedMessageTest, testCorruptedMessageNonDurableConsumer)
+{
     // Test corrupted message handling for non-durable consumer
-    // Non-durable consumers are typical queue/topic consumers without persistence
+    // Non-durable consumers are typical queue/topic consumers without
+    // persistence
 
     decaf::util::Properties props;
     Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
@@ -978,11 +1191,12 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageNonDurableConsumer) {
 
     // Create corrupted message for non-durable consumer
     std::string connectionId = "ID:non-durable-connection:1";
-    std::string messageId = "ID:producer:1:1:1:100";
+    std::string messageId    = "ID:producer:1:1:1:100";
 
     std::vector<unsigned char> corruptedBytes =
         CorruptedStreamBuilder::createCorruptedMessageAfterMessageId(
-            connectionId, messageId);
+            connectionId,
+            messageId);
 
     Pointer<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
@@ -990,13 +1204,17 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageNonDurableConsumer) {
 
     // Verify corruption detected
     bool caughtException = false;
-    try {
+    try
+    {
         Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         caughtException = true;
     }
 
-    ASSERT_TRUE(caughtException) << ("Non-durable consumer corrupted message should throw exception");
+    ASSERT_TRUE(caughtException)
+        << ("Non-durable consumer corrupted message should throw exception");
 
     // In production, IOTransport would:
     // 1. Extract ConsumerId from partial MessageDispatch (non-durable format)
@@ -1005,8 +1223,10 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageNonDurableConsumer) {
     // 4. Broker moves message to DLQ
     // 5. If consumer disconnects, subscription does NOT persist
 
-    std::cout << "[CorruptedMessageTest] testCorruptedMessageNonDurableConsumer: "
-              << "Verified corrupted message handling for non-durable consumer" << std::endl;
+    std::cout << "[CorruptedMessageTest] "
+                 "testCorruptedMessageNonDurableConsumer: "
+              << "Verified corrupted message handling for non-durable consumer"
+              << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1021,7 +1241,8 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageNonDurableConsumer) {
  * - Subscription persists even after handling corrupted message
  * - Client can reconnect and continue from where it left off
  */
-TEST_F(CorruptedMessageTest, testCorruptedMessageDurableTopicSubscriber) {
+TEST_F(CorruptedMessageTest, testCorruptedMessageDurableTopicSubscriber)
+{
     // Test corrupted message handling for durable topic subscriber
     // Durable subscribers maintain their subscription even when disconnected
 
@@ -1030,13 +1251,15 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDurableTopicSubscriber) {
     // Wire-level corruption test - unmarshal will throw exception
 
     // Create corrupted message for durable subscriber
-    std::string connectionId = "ID:durable-connection:1";
+    std::string connectionId     = "ID:durable-connection:1";
     std::string subscriptionName = "MyDurableSubscription";
-    std::string messageId = "ID:producer:1:1:1:200";
+    std::string messageId        = "ID:producer:1:1:1:200";
 
     std::vector<unsigned char> corruptedBytes =
         CorruptedStreamBuilder::createCorruptedDurableSubscriberMessage(
-            connectionId, subscriptionName, messageId);
+            connectionId,
+            subscriptionName,
+            messageId);
 
     Pointer<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
@@ -1044,24 +1267,31 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDurableTopicSubscriber) {
 
     // Verify corruption detected
     bool caughtException = false;
-    try {
+    try
+    {
         Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         caughtException = true;
     }
 
-    ASSERT_TRUE(caughtException) << ("Durable subscriber corrupted message should throw exception");
+    ASSERT_TRUE(caughtException)
+        << ("Durable subscriber corrupted message should throw exception");
 
     // In production, IOTransport would:
-    // 1. Extract ConsumerId from partial MessageDispatch (includes subscription name)
+    // 1. Extract ConsumerId from partial MessageDispatch (includes subscription
+    // name)
     // 2. Extract MessageId from partial Message
     // 3. Send POISON_ACK with durable subscriber info
     // 4. Broker moves message to DLQ
     // 5. Durable subscription PERSISTS after handling corrupted message
     // 6. Client can disconnect and reconnect, subscription continues
 
-    std::cout << "[CorruptedMessageTest] testCorruptedMessageDurableTopicSubscriber: "
-              << "Verified corrupted message handling for durable topic subscriber" << std::endl;
+    std::cout
+        << "[CorruptedMessageTest] testCorruptedMessageDurableTopicSubscriber: "
+        << "Verified corrupted message handling for durable topic subscriber"
+        << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1075,9 +1305,11 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDurableTopicSubscriber) {
  * - Broker can properly route to DLQ for durable subscription
  * - Subscription state remains intact
  */
-TEST_F(CorruptedMessageTest, testPoisonAckForDurableSubscriber) {
+TEST_F(CorruptedMessageTest, testPoisonAckForDurableSubscriber)
+{
     // Verify POISON_ACK format for durable topic subscriber
-    // This ensures the broker properly handles DLQ routing for durable subscriptions
+    // This ensures the broker properly handles DLQ routing for durable
+    // subscriptions
 
     // Create a MessageAck for durable subscriber
     Pointer<MessageAck> ack(new MessageAck());
@@ -1087,8 +1319,9 @@ TEST_F(CorruptedMessageTest, testPoisonAckForDurableSubscriber) {
     cid->setConnectionId("ID:durable-conn-123");
     cid->setSessionId(1);
     cid->setValue(1);
-    // Note: In production, the full ConsumerId string would include subscription name
-    // Format: "ID:connection:session:consumer:subscriptionName"
+    // Note: In production, the full ConsumerId string would include
+    // subscription name Format:
+    // "ID:connection:session:consumer:subscriptionName"
     ack->setConsumerId(cid);
 
     // Set up MessageId using ProducerId (proper format)
@@ -1106,30 +1339,39 @@ TEST_F(CorruptedMessageTest, testPoisonAckForDurableSubscriber) {
 
     // Marshal to verify structure
     Pointer<ByteArrayOutputStream> baos(new ByteArrayOutputStream());
-    Pointer<DataOutputStream> dos(new DataOutputStream(baos.get()));
+    Pointer<DataOutputStream>      dos(new DataOutputStream(baos.get()));
 
     decaf::util::Properties props;
     Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     MockTransport mockTransport;  // Use mock transport for marshalling
 
-    try {
-        wireFormat->marshal(Pointer<commands::Command>(ack), &mockTransport, dos.get());
+    try
+    {
+        wireFormat->marshal(Pointer<commands::Command>(ack),
+                            &mockTransport,
+                            dos.get());
         dos->flush();
-    } catch (Exception& e) {
-        FAIL() << (std::string("POISON_ACK marshal for durable subscriber should succeed: ")
-                     + e.getMessage());
+    }
+    catch (Exception& e)
+    {
+        FAIL() << (std::string("POISON_ACK marshal for durable subscriber "
+                               "should succeed: ") +
+                   e.getMessage());
     }
 
     std::pair<unsigned char*, int> ackData = baos->toByteArray();
-    std::vector<unsigned char> ackBytes(ackData.first, ackData.first + ackData.second);
+    std::vector<unsigned char>     ackBytes(ackData.first,
+                                        ackData.first + ackData.second);
     delete[] ackData.first;
-    ASSERT_TRUE(ackBytes.size() > 0) << ("POISON_ACK for durable subscriber should marshal to non-empty bytes");
+    ASSERT_TRUE(ackBytes.size() > 0) << ("POISON_ACK for durable subscriber "
+                                         "should marshal to non-empty bytes");
 
     // The key difference for durable subscribers:
     // - Broker uses subscription name to track DLQ messages
     // - Client can reconnect with same subscription name
     // - Subscription state persists across connections
-    // - POISON_ACK format is the same, but ConsumerId includes subscription info
+    // - POISON_ACK format is the same, but ConsumerId includes subscription
+    // info
 
     std::cout << "[CorruptedMessageTest] testPoisonAckForDurableSubscriber: "
               << "Verified POISON_ACK (ackType=1) for durable subscriber, size="
@@ -1148,7 +1390,8 @@ TEST_F(CorruptedMessageTest, testPoisonAckForDurableSubscriber) {
  * - consecutiveErrors increments
  * - Connection remains open
  */
-TEST_F(CorruptedMessageTest, testEOFDuringMessageIdRead) {
+TEST_F(CorruptedMessageTest, testEOFDuringMessageIdRead)
+{
     // Simulate EOF while reading MessageId field
     // This is the "DataInputStream::readLong - Reached EOF" error
     // that occurs when MessageId unmarshaling is interrupted
@@ -1160,31 +1403,40 @@ TEST_F(CorruptedMessageTest, testEOFDuringMessageIdRead) {
     // Create a truncated message that ends during MessageId read
     // MessageId typically starts around byte 30-40, so truncate at 35
     std::vector<unsigned char> truncatedBytes =
-        CorruptedStreamBuilder::createTruncatedMessage(
-            "ID:conn:1", "ID:msg:1", 35);
+        CorruptedStreamBuilder::createTruncatedMessage("ID:conn:1",
+                                                       "ID:msg:1",
+                                                       35);
 
     Pointer<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&truncatedBytes[0], truncatedBytes.size()));
     Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
 
     // Verify EOF exception thrown
-    bool caughtException = false;
+    bool        caughtException = false;
     std::string exceptionType;
-    try {
+    try
+    {
         Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
         FAIL() << ("Truncated message during MessageId should throw exception");
-    } catch (EOFException& e) {
+    }
+    catch (EOFException& e)
+    {
         caughtException = true;
-        exceptionType = "EOFException";
-    } catch (IOException& e) {
+        exceptionType   = "EOFException";
+    }
+    catch (IOException& e)
+    {
         caughtException = true;
-        exceptionType = "IOException";
-    } catch (Exception& e) {
+        exceptionType   = "IOException";
+    }
+    catch (Exception& e)
+    {
         caughtException = true;
-        exceptionType = "Exception";
+        exceptionType   = "Exception";
     }
 
-    ASSERT_TRUE(caughtException) << ("EOF during MessageId read should throw exception");
+    ASSERT_TRUE(caughtException)
+        << ("EOF during MessageId read should throw exception");
 
     // In production, IOTransport would:
     // 1. Catch EOFException
@@ -1210,7 +1462,8 @@ TEST_F(CorruptedMessageTest, testEOFDuringMessageIdRead) {
  * - POISON_ACK sent with valid MessageId
  * - consecutiveErrors increments
  */
-TEST_F(CorruptedMessageTest, testEOFDuringPropertiesRead) {
+TEST_F(CorruptedMessageTest, testEOFDuringPropertiesRead)
+{
     // Simulate EOF while reading message properties
     // This is the MOST COMMON case: MessageId successfully read,
     // but EOF occurs during properties unmarshaling
@@ -1224,8 +1477,9 @@ TEST_F(CorruptedMessageTest, testEOFDuringPropertiesRead) {
     // MessageId completes around byte 60-70, properties start after that
     // Truncate at byte 75 to simulate EOF during properties
     std::vector<unsigned char> truncatedBytes =
-        CorruptedStreamBuilder::createTruncatedMessage(
-            "ID:conn:1", "ID:producer:1:1:1:100", 75);
+        CorruptedStreamBuilder::createTruncatedMessage("ID:conn:1",
+                                                       "ID:producer:1:1:1:100",
+                                                       75);
 
     Pointer<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&truncatedBytes[0], truncatedBytes.size()));
@@ -1233,18 +1487,27 @@ TEST_F(CorruptedMessageTest, testEOFDuringPropertiesRead) {
 
     // Verify EOF exception thrown
     bool caughtException = false;
-    try {
+    try
+    {
         Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
-        FAIL() << ("Truncated message during properties should throw exception");
-    } catch (EOFException& e) {
+        FAIL() << ("Truncated message during properties should throw "
+                   "exception");
+    }
+    catch (EOFException& e)
+    {
         caughtException = true;
-    } catch (IOException& e) {
+    }
+    catch (IOException& e)
+    {
         caughtException = true;
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         caughtException = true;
     }
 
-    ASSERT_TRUE(caughtException) << ("EOF during properties read should throw exception");
+    ASSERT_TRUE(caughtException)
+        << ("EOF during properties read should throw exception");
 
     // In production, IOTransport would:
     // 1. Catch EOFException
@@ -1252,13 +1515,15 @@ TEST_F(CorruptedMessageTest, testEOFDuringPropertiesRead) {
     // 3. MessageId IS complete (unmarshaled before properties)
     // 4. Extract ConsumerId and MessageId
     // 5. Send POISON_ACK successfully
-    // 6. Log: "[IOTransport] Sending POISON_ACK for corrupted message: messageId=..."
+    // 6. Log: "[IOTransport] Sending POISON_ACK for corrupted message:
+    // messageId=..."
     // 7. Increment consecutiveErrors
 
     // This is the production scenario from your logs:
-    // [MessageMarshaller] Successfully unmarshaled MessageId: ID:stm58-20029-1769673005375-1:1:1:1:492
-    // [MessageDispatchMarshaller] Failed to unmarshal Message (..., MessageId: ...) - EOF
-    // [IOTransport] Sending POISON_ACK for corrupted message: messageId=...
+    // [MessageMarshaller] Successfully unmarshaled MessageId:
+    // ID:stm58-20029-1769673005375-1:1:1:1:492 [MessageDispatchMarshaller]
+    // Failed to unmarshal Message (..., MessageId: ...) - EOF [IOTransport]
+    // Sending POISON_ACK for corrupted message: messageId=...
 
     std::cout << "[CorruptedMessageTest] testEOFDuringPropertiesRead: "
               << "Verified EOF during properties read (MOST COMMON case). "
@@ -1276,7 +1541,8 @@ TEST_F(CorruptedMessageTest, testEOFDuringPropertiesRead) {
  * - POISON_ACK sent with valid MessageId
  * - consecutiveErrors increments
  */
-TEST_F(CorruptedMessageTest, testEOFDuringBodyRead) {
+TEST_F(CorruptedMessageTest, testEOFDuringBodyRead)
+{
     // Simulate EOF while reading message body
     // MessageId and properties complete, but body truncated
 
@@ -1288,8 +1554,9 @@ TEST_F(CorruptedMessageTest, testEOFDuringBodyRead) {
     // Properties typically complete around byte 80-90
     // Truncate at byte 95 to simulate EOF during body
     std::vector<unsigned char> truncatedBytes =
-        CorruptedStreamBuilder::createTruncatedMessage(
-            "ID:conn:1", "ID:producer:1:1:1:200", 95);
+        CorruptedStreamBuilder::createTruncatedMessage("ID:conn:1",
+                                                       "ID:producer:1:1:1:200",
+                                                       95);
 
     Pointer<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&truncatedBytes[0], truncatedBytes.size()));
@@ -1297,18 +1564,26 @@ TEST_F(CorruptedMessageTest, testEOFDuringBodyRead) {
 
     // Verify EOF exception thrown
     bool caughtException = false;
-    try {
+    try
+    {
         Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
         FAIL() << ("Truncated message during body should throw exception");
-    } catch (EOFException& e) {
+    }
+    catch (EOFException& e)
+    {
         caughtException = true;
-    } catch (IOException& e) {
+    }
+    catch (IOException& e)
+    {
         caughtException = true;
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         caughtException = true;
     }
 
-    ASSERT_TRUE(caughtException) << ("EOF during body read should throw exception");
+    ASSERT_TRUE(caughtException)
+        << ("EOF during body read should throw exception");
 
     // In production, IOTransport would:
     // 1. Catch EOFException

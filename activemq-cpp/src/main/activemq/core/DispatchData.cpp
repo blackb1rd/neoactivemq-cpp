@@ -21,10 +21,17 @@ using namespace activemq;
 using namespace activemq::core;
 
 ////////////////////////////////////////////////////////////////////////////////
-DispatchData::DispatchData() : consumerId(), message() {}
+DispatchData::DispatchData()
+    : consumerId(),
+      message()
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-DispatchData::DispatchData(const decaf::lang::Pointer<commands::ConsumerId>& consumer,
-                           const decaf::lang::Pointer<commands::Message>& message) :
-    consumerId(consumer), message(message) {
+DispatchData::DispatchData(
+    const decaf::lang::Pointer<commands::ConsumerId>& consumer,
+    const decaf::lang::Pointer<commands::Message>&    message)
+    : consumerId(consumer),
+      message(message)
+{
 }

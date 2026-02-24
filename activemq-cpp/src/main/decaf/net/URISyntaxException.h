@@ -18,21 +18,22 @@
 #ifndef _DECAF_NET_URISYNTAXEXCEPTION_H_
 #define _DECAF_NET_URISYNTAXEXCEPTION_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/lang/Exception.h>
+#include <decaf/util/Config.h>
 
-namespace decaf{
-namespace net{
+namespace decaf
+{
+namespace net
+{
 
-    class DECAF_API URISyntaxException : public lang::Exception {
+    class DECAF_API URISyntaxException : public lang::Exception
+    {
     private:
-
         std::string reason;
         std::string input;
-        int index;
+        int         index;
 
     public:
-
         /**
          * Default Constructor
          */
@@ -59,11 +60,16 @@ namespace net{
          *
          * @param file The file name where exception occurs
          * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
+         * @param cause The exception that was the cause for this one to be
+         * thrown.
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        URISyntaxException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        URISyntaxException(const char*           file,
+                           const int             lineNumber,
+                           const std::exception* cause,
+                           const char*           msg,
+                           ...);
 
         /**
          * Constructor
@@ -83,7 +89,9 @@ namespace net{
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        URISyntaxException(const char* file, const int lineNumber, const char* msg);
+        URISyntaxException(const char* file,
+                           const int   lineNumber,
+                           const char* msg);
 
         /**
          * Constructor - Initializes the file name and line number where
@@ -95,7 +103,10 @@ namespace net{
          * @param input The URL that caused the exception.
          * @param reason The reason for the failure.
          */
-        URISyntaxException(const char* file, const int lineNumber, const std::string& input, const std::string& reason);
+        URISyntaxException(const char*        file,
+                           const int          lineNumber,
+                           const std::string& input,
+                           const std::string& reason);
 
         /**
          * Constructor - Initializes the file name and line number where
@@ -108,16 +119,22 @@ namespace net{
          * @param reason The reason for the failure.
          * @param index The index in the URI string where the error occurred.
          */
-        URISyntaxException(const char* file, const int lineNumber, const std::string& input, const std::string& reason, int index);
+        URISyntaxException(const char*        file,
+                           const int          lineNumber,
+                           const std::string& input,
+                           const std::string& reason,
+                           int                index);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
-         * @return a new Exception instance that is a copy of this Exception object.
+         * @return a new Exception instance that is a copy of this Exception
+         * object.
          */
-        virtual URISyntaxException* clone() const {
+        virtual URISyntaxException* clone() const
+        {
             return new URISyntaxException(*this);
         }
 
@@ -126,26 +143,29 @@ namespace net{
         /**
          * @return the Input string that cause this exception or ""
          */
-        std::string getInput() const {
+        std::string getInput() const
+        {
             return input;
         }
 
         /**
          * @return the Reason given for this failure, or ""
          */
-        std::string getReason() const {
+        std::string getReason() const
+        {
             return reason;
         }
 
         /**
          * @return the index in the input string where the error occured or -1
          */
-        int getIndex() const {
+        int getIndex() const
+        {
             return index;
         }
-
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /*_DECAF_NET_URISYNTAXEXCEPTION_H_*/

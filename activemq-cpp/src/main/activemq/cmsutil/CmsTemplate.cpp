@@ -16,12 +16,12 @@
  */
 
 #include "CmsTemplate.h"
-#include "ProducerCallback.h"
 #include "MessageCreator.h"
+#include "ProducerCallback.h"
 #include <iostream>
 
-#include <cms/IllegalStateException.h>
 #include <cms/CMSException.h>
+#include <cms/IllegalStateException.h>
 
 using namespace cms;
 using namespace activemq::cmsutil;
@@ -36,12 +36,17 @@ using namespace std;
  *      The instance of CmsTemplate
  * (e.g. ActiveMQException ).
  */
-#define CMSTEMPLATE_CATCH( type, t ) \
-    catch( type& ex ){ \
-        ex.setMark(__FILE__, __LINE__); \
-        try { \
-            t->destroy(); \
-        } catch(...) {} \
+#define CMSTEMPLATE_CATCH(type, t)           \
+    catch (type & ex)                        \
+    {                                        \
+        ex.setMark(__FILE__, __LINE__);      \
+        try                                  \
+        {                                    \
+            t->destroy();                    \
+        }                                    \
+        catch (...)                          \
+        {                                    \
+        }                                    \
         throw CMSException(ex.what(), NULL); \
     }
 
@@ -50,121 +55,146 @@ using namespace std;
  * @param t
  *      The instance of CmsTemplate
  */
-#define CMSTEMPLATE_CATCHALL(t) \
-    catch( cms::CMSException& ex ){ \
-        try { \
-            t->destroy(); \
-        } catch( ... ) {} \
-        throw; \
-    } catch(...){ \
-        try { \
-            t->destroy(); \
-        } catch( ... ) {} \
+#define CMSTEMPLATE_CATCHALL(t)                               \
+    catch (cms::CMSException & ex)                            \
+    {                                                         \
+        try                                                   \
+        {                                                     \
+            t->destroy();                                     \
+        }                                                     \
+        catch (...)                                           \
+        {                                                     \
+        }                                                     \
+        throw;                                                \
+    }                                                         \
+    catch (...)                                               \
+    {                                                         \
+        try                                                   \
+        {                                                     \
+            t->destroy();                                     \
+        }                                                     \
+        catch (...)                                           \
+        {                                                     \
+        }                                                     \
         throw CMSException("caught unknown exception", NULL); \
     }
 
-#define CMSTEMPLATE_CATCHALL_NOTHROW( ) \
-    catch(...){ \
+#define CMSTEMPLATE_CATCHALL_NOTHROW() \
+    catch (...)                        \
+    {                                  \
     }
 
 ////////////////////////////////////////////////////////////////////////////////
-const long long CmsTemplate::RECEIVE_TIMEOUT_NO_WAIT = -1;
+const long long CmsTemplate::RECEIVE_TIMEOUT_NO_WAIT         = -1;
 const long long CmsTemplate::RECEIVE_TIMEOUT_INDEFINITE_WAIT = 0;
-const int CmsTemplate::DEFAULT_PRIORITY = 4;
-const long long CmsTemplate::DEFAULT_TIME_TO_LIVE = 0;
+const int       CmsTemplate::DEFAULT_PRIORITY                = 4;
+const long long CmsTemplate::DEFAULT_TIME_TO_LIVE            = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsTemplate::CmsTemplate() : CmsDestinationAccessor(),
-                             connection(NULL),
-                             sessionPools(),
-                             defaultDestination(NULL),
-                             defaultDestinationName(""),
-                             messageIdEnabled(false),
-                             messageTimestampEnabled(false),
-                             noLocal(false),
-                             receiveTimeout(0),
-                             explicitQosEnabled(false),
-                             deliveryMode(0),
-                             priority(0),
-                             timeToLive(0),
-                             initialized(false) {
-
+CmsTemplate::CmsTemplate()
+    : CmsDestinationAccessor(),
+      connection(NULL),
+      sessionPools(),
+      defaultDestination(NULL),
+      defaultDestinationName(""),
+      messageIdEnabled(false),
+      messageTimestampEnabled(false),
+      noLocal(false),
+      receiveTimeout(0),
+      explicitQosEnabled(false),
+      deliveryMode(0),
+      priority(0),
+      timeToLive(0),
+      initialized(false)
+{
     initDefaults();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsTemplate::CmsTemplate( cms::ConnectionFactory* connectionFactory ) : CmsDestinationAccessor(),
-                                                                        connection(NULL),
-                                                                        sessionPools(),
-                                                                        defaultDestination(NULL),
-                                                                        defaultDestinationName(""),
-                                                                        messageIdEnabled(false),
-                                                                        messageTimestampEnabled(false),
-                                                                        noLocal(false),
-                                                                        receiveTimeout(0),
-                                                                        explicitQosEnabled(false),
-                                                                        deliveryMode(0),
-                                                                        priority(0),
-                                                                        timeToLive(0),
-                                                                        initialized(false) {
-
+CmsTemplate::CmsTemplate(cms::ConnectionFactory* connectionFactory)
+    : CmsDestinationAccessor(),
+      connection(NULL),
+      sessionPools(),
+      defaultDestination(NULL),
+      defaultDestinationName(""),
+      messageIdEnabled(false),
+      messageTimestampEnabled(false),
+      noLocal(false),
+      receiveTimeout(0),
+      explicitQosEnabled(false),
+      deliveryMode(0),
+      priority(0),
+      timeToLive(0),
+      initialized(false)
+{
     initDefaults();
     setConnectionFactory(connectionFactory);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsTemplate::~CmsTemplate() {
-
-    try {
+CmsTemplate::~CmsTemplate()
+{
+    try
+    {
         destroy();
-    } catch( ... ) { /* Absorb */ }
+    }
+    catch (...)
+    { /* Absorb */
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::initDefaults() {
-    initialized = false;
-    defaultDestination = NULL;
-    defaultDestinationName = "";
-    messageIdEnabled = true;
+void CmsTemplate::initDefaults()
+{
+    initialized             = false;
+    defaultDestination      = NULL;
+    defaultDestinationName  = "";
+    messageIdEnabled        = true;
     messageTimestampEnabled = true;
-    noLocal = false;
-    receiveTimeout = RECEIVE_TIMEOUT_INDEFINITE_WAIT;
-    explicitQosEnabled = false;
-    deliveryMode = cms::DeliveryMode::PERSISTENT;
-    priority = DEFAULT_PRIORITY;
-    timeToLive = DEFAULT_TIME_TO_LIVE;
+    noLocal                 = false;
+    receiveTimeout          = RECEIVE_TIMEOUT_INDEFINITE_WAIT;
+    explicitQosEnabled      = false;
+    deliveryMode            = cms::DeliveryMode::PERSISTENT;
+    priority                = DEFAULT_PRIORITY;
+    timeToLive              = DEFAULT_TIME_TO_LIVE;
 
     // Initialize the connection object.
     connection = NULL;
 
     // Initialize the session pools.
-    for( int ix=0; ix<NUM_SESSION_POOLS; ++ix ) {
+    for (int ix = 0; ix < NUM_SESSION_POOLS; ++ix)
+    {
         sessionPools[ix] = NULL;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::createSessionPools() {
-
+void CmsTemplate::createSessionPools()
+{
     // Make sure they're destroyed first.
     destroySessionPools();
 
     /**
      * Create the session pools.
      */
-    for (int ix = 0; ix < NUM_SESSION_POOLS; ++ix) {
-        sessionPools[ix] = new SessionPool(connection, (cms::Session::AcknowledgeMode) ix, getResourceLifecycleManager());
+    for (int ix = 0; ix < NUM_SESSION_POOLS; ++ix)
+    {
+        sessionPools[ix] = new SessionPool(connection,
+                                           (cms::Session::AcknowledgeMode)ix,
+                                           getResourceLifecycleManager());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::destroySessionPools() {
-
+void CmsTemplate::destroySessionPools()
+{
     /**
      * Destroy the session pools.
      */
-    for (int ix = 0; ix < NUM_SESSION_POOLS; ++ix) {
-        if (sessionPools[ix] != NULL) {
+    for (int ix = 0; ix < NUM_SESSION_POOLS; ++ix)
+    {
+        if (sessionPools[ix] != NULL)
+        {
             delete sessionPools[ix];
             sessionPools[ix] = NULL;
         }
@@ -172,12 +202,12 @@ void CmsTemplate::destroySessionPools() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::init() {
-
-    try {
-
-        if (!initialized) {
-
+void CmsTemplate::init()
+{
+    try
+    {
+        if (!initialized)
+        {
             // Invoke the base class.
             CmsDestinationAccessor::init();
 
@@ -189,10 +219,10 @@ void CmsTemplate::init() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::destroy() {
-
-    try {
-
+void CmsTemplate::destroy()
+{
+    try
+    {
         // Mark as not initialized.
         initialized = false;
 
@@ -213,18 +243,23 @@ void CmsTemplate::destroy() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::checkDefaultDestination() {
-    if (this->defaultDestination == NULL && this->defaultDestinationName.size() == 0) {
-        throw IllegalStateException("No defaultDestination or defaultDestinationName specified."
-                "Check configuration of CmsTemplate.", NULL);
+void CmsTemplate::checkDefaultDestination()
+{
+    if (this->defaultDestination == NULL &&
+        this->defaultDestinationName.size() == 0)
+    {
+        throw IllegalStateException(
+            "No defaultDestination or defaultDestinationName specified."
+            "Check configuration of CmsTemplate.",
+            NULL);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Destination* CmsTemplate::resolveDefaultDestination(cms::Session* session) {
-
-    try {
-
+cms::Destination* CmsTemplate::resolveDefaultDestination(cms::Session* session)
+{
+    try
+    {
         // Make sure we have a default - otherwise throw.
         checkDefaultDestination();
 
@@ -234,7 +269,8 @@ cms::Destination* CmsTemplate::resolveDefaultDestination(cms::Session* session) 
         // If no default object was provided, the name was provided.  Resolve
         // the name and then set the destination object so we don't have to
         // do this next time.
-        if (dest == NULL) {
+        if (dest == NULL)
+        {
             dest = resolveDestinationName(session, getDefaultDestinationName());
             setDefaultDestination(dest);
         }
@@ -246,13 +282,13 @@ cms::Destination* CmsTemplate::resolveDefaultDestination(cms::Session* session) 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Connection* CmsTemplate::getConnection() {
-
-    try {
-
+cms::Connection* CmsTemplate::getConnection()
+{
+    try
+    {
         // If we don't have a connection, create one.
-        if (connection == NULL) {
-
+        if (connection == NULL)
+        {
             // Invoke the base class to create the connection and add it
             // to the resource lifecycle manager.
             connection = createConnection();
@@ -271,10 +307,10 @@ cms::Connection* CmsTemplate::getConnection() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-PooledSession* CmsTemplate::takeSession() {
-
-    try {
-
+PooledSession* CmsTemplate::takeSession()
+{
+    try
+    {
         // Get the connection resource to verify that the connection and session
         // pools have been allocated.
         getConnection();
@@ -286,11 +322,12 @@ PooledSession* CmsTemplate::takeSession() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::returnSession(PooledSession*& session) {
-
-    try {
-
-        if (session == NULL) {
+void CmsTemplate::returnSession(PooledSession*& session)
+{
+    try
+    {
+        if (session == NULL)
+        {
             return;
         }
 
@@ -302,12 +339,14 @@ void CmsTemplate::returnSession(PooledSession*& session) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::MessageProducer* CmsTemplate::createProducer(cms::Session* session, cms::Destination* dest) {
-
-    try {
-
+cms::MessageProducer* CmsTemplate::createProducer(cms::Session*     session,
+                                                  cms::Destination* dest)
+{
+    try
+    {
         // If no destination was provided, resolve the default.
-        if (dest == NULL) {
+        if (dest == NULL)
+        {
             dest = resolveDefaultDestination(session);
         }
 
@@ -316,9 +355,12 @@ cms::MessageProducer* CmsTemplate::createProducer(cms::Session* session, cms::De
         // Try to use a cached producer - requires that we're using a
         // PooledSession
         PooledSession* pooledSession = dynamic_cast<PooledSession*>(session);
-        if (pooledSession != NULL) {
+        if (pooledSession != NULL)
+        {
             producer = pooledSession->createCachedProducer(dest);
-        } else {
+        }
+        else
+        {
             producer = session->createProducer(dest);
         }
 
@@ -333,12 +375,16 @@ cms::MessageProducer* CmsTemplate::createProducer(cms::Session* session, cms::De
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::MessageConsumer* CmsTemplate::createConsumer(cms::Session* session, cms::Destination* dest, const std::string& selector, bool noLocal) {
-
-    try {
-
+cms::MessageConsumer* CmsTemplate::createConsumer(cms::Session*      session,
+                                                  cms::Destination*  dest,
+                                                  const std::string& selector,
+                                                  bool               noLocal)
+{
+    try
+    {
         // If no destination was provided, resolve the default.
-        if (dest == NULL) {
+        if (dest == NULL)
+        {
             dest = resolveDefaultDestination(session);
         }
 
@@ -347,9 +393,13 @@ cms::MessageConsumer* CmsTemplate::createConsumer(cms::Session* session, cms::De
         // Try to use a cached consumer - requires that we're using a
         // PooledSession
         PooledSession* pooledSession = dynamic_cast<PooledSession*>(session);
-        if (pooledSession != NULL) {
-            consumer = pooledSession->createCachedConsumer(dest, selector, noLocal);
-        } else {
+        if (pooledSession != NULL)
+        {
+            consumer =
+                pooledSession->createCachedConsumer(dest, selector, noLocal);
+        }
+        else
+        {
             consumer = session->createConsumer(dest, selector, noLocal);
         }
 
@@ -360,13 +410,15 @@ cms::MessageConsumer* CmsTemplate::createConsumer(cms::Session* session, cms::De
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::destroyProducer(cms::MessageProducer*& producer) {
-
-    if (producer == NULL) {
+void CmsTemplate::destroyProducer(cms::MessageProducer*& producer)
+{
+    if (producer == NULL)
+    {
         return;
     }
 
-    try {
+    try
+    {
         // Close the producer, then destroy it.
         producer->close();
     }
@@ -374,7 +426,8 @@ void CmsTemplate::destroyProducer(cms::MessageProducer*& producer) {
 
     // Destroy if it's not a cached producer.
     CachedProducer* cachedProducer = dynamic_cast<CachedProducer*>(producer);
-    if (cachedProducer == NULL) {
+    if (cachedProducer == NULL)
+    {
         delete producer;
     }
 
@@ -382,13 +435,15 @@ void CmsTemplate::destroyProducer(cms::MessageProducer*& producer) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::destroyConsumer(cms::MessageConsumer*& consumer) {
-
-    if (consumer == NULL) {
+void CmsTemplate::destroyConsumer(cms::MessageConsumer*& consumer)
+{
+    if (consumer == NULL)
+    {
         return;
     }
 
-    try {
+    try
+    {
         // Close the producer, then destroy it.
         consumer->close();
     }
@@ -396,7 +451,8 @@ void CmsTemplate::destroyConsumer(cms::MessageConsumer*& consumer) {
 
     // Destroy if it's not a cached consumer.
     CachedConsumer* cachedConsumer = dynamic_cast<CachedConsumer*>(consumer);
-    if (cachedConsumer == NULL) {
+    if (cachedConsumer == NULL)
+    {
         delete consumer;
     }
 
@@ -404,9 +460,10 @@ void CmsTemplate::destroyConsumer(cms::MessageConsumer*& consumer) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::destroyMessage(cms::Message*& message) {
-
-    if (message == NULL) {
+void CmsTemplate::destroyMessage(cms::Message*& message)
+{
+    if (message == NULL)
+    {
         return;
     }
 
@@ -416,13 +473,14 @@ void CmsTemplate::destroyMessage(cms::Message*& message) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::execute(SessionCallback* action) {
-
+void CmsTemplate::execute(SessionCallback* action)
+{
     PooledSession* pooledSession = NULL;
 
-    try {
-
-        if (action == NULL) {
+    try
+    {
+        if (action == NULL)
+        {
             return;
         }
 
@@ -443,10 +501,10 @@ void CmsTemplate::execute(SessionCallback* action) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::execute(ProducerCallback* action) {
-
-    try {
-
+void CmsTemplate::execute(ProducerCallback* action)
+{
+    try
+    {
         // Verify that we are initialized
         init();
 
@@ -461,10 +519,10 @@ void CmsTemplate::execute(ProducerCallback* action) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::execute(cms::Destination* dest, ProducerCallback* action) {
-
-    try {
-
+void CmsTemplate::execute(cms::Destination* dest, ProducerCallback* action)
+{
+    try
+    {
         // Verify that we are initialized
         init();
 
@@ -479,10 +537,11 @@ void CmsTemplate::execute(cms::Destination* dest, ProducerCallback* action) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::execute(const std::string& destinationName, ProducerCallback* action) {
-
-    try {
-
+void CmsTemplate::execute(const std::string& destinationName,
+                          ProducerCallback*  action)
+{
+    try
+    {
         // Verify that we are initialized
         init();
 
@@ -497,13 +556,14 @@ void CmsTemplate::execute(const std::string& destinationName, ProducerCallback* 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::ProducerExecutor::doInCms(cms::Session* session) {
-
+void CmsTemplate::ProducerExecutor::doInCms(cms::Session* session)
+{
     cms::MessageProducer* producer = NULL;
 
-    try {
-
-        if (session == NULL) {
+    try
+    {
+        if (session == NULL)
+        {
             return;
         }
 
@@ -515,15 +575,16 @@ void CmsTemplate::ProducerExecutor::doInCms(cms::Session* session) {
 
         // Destroy the producer.
         parent->destroyProducer(producer);
-
     }
     CMSTEMPLATE_CATCHALL(parent)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Destination* CmsTemplate::ResolveProducerExecutor::getDestination(cms::Session* session) {
-
-    try {
+cms::Destination* CmsTemplate::ResolveProducerExecutor::getDestination(
+    cms::Session* session)
+{
+    try
+    {
         return parent->resolveDestinationName(session, destinationName);
     }
     CMSTEMPLATE_CATCH(IllegalStateException, parent)
@@ -531,9 +592,10 @@ cms::Destination* CmsTemplate::ResolveProducerExecutor::getDestination(cms::Sess
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::send(MessageCreator* messageCreator) {
-
-    try {
+void CmsTemplate::send(MessageCreator* messageCreator)
+{
+    try
+    {
         SendExecutor senderExecutor(messageCreator, this);
         execute(&senderExecutor);
     }
@@ -541,9 +603,10 @@ void CmsTemplate::send(MessageCreator* messageCreator) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::send(cms::Destination* dest, MessageCreator* messageCreator) {
-
-    try {
+void CmsTemplate::send(cms::Destination* dest, MessageCreator* messageCreator)
+{
+    try
+    {
         SendExecutor senderExecutor(messageCreator, this);
         execute(dest, &senderExecutor);
     }
@@ -551,9 +614,11 @@ void CmsTemplate::send(cms::Destination* dest, MessageCreator* messageCreator) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::send(const std::string& destinationName, MessageCreator* messageCreator) {
-
-    try {
+void CmsTemplate::send(const std::string& destinationName,
+                       MessageCreator*    messageCreator)
+{
+    try
+    {
         SendExecutor senderExecutor(messageCreator, this);
         execute(destinationName, &senderExecutor);
     }
@@ -561,13 +626,16 @@ void CmsTemplate::send(const std::string& destinationName, MessageCreator* messa
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::doSend(cms::Session* session, cms::MessageProducer* producer, MessageCreator* messageCreator) {
-
+void CmsTemplate::doSend(cms::Session*         session,
+                         cms::MessageProducer* producer,
+                         MessageCreator*       messageCreator)
+{
     cms::Message* message = NULL;
 
-    try {
-
-        if (producer == NULL) {
+    try
+    {
+        if (producer == NULL)
+        {
             return;
         }
 
@@ -575,17 +643,23 @@ void CmsTemplate::doSend(cms::Session* session, cms::MessageProducer* producer, 
         message = messageCreator->createMessage(session);
 
         // Send the message.
-        if (isExplicitQosEnabled()) {
-            producer->send(message, getDeliveryMode(), getPriority(), getTimeToLive());
-        } else {
+        if (isExplicitQosEnabled())
+        {
+            producer->send(message,
+                           getDeliveryMode(),
+                           getPriority(),
+                           getTimeToLive());
+        }
+        else
+        {
             producer->send(message);
         }
 
         // Destroy the resources.
         destroyMessage(message);
-
-    } catch (CMSException& e) {
-
+    }
+    catch (CMSException& e)
+    {
         e.setMark(__FILE__, __LINE__);
 
         // Destroy the resources.
@@ -596,55 +670,63 @@ void CmsTemplate::doSend(cms::Session* session, cms::MessageProducer* producer, 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Message* CmsTemplate::doReceive(cms::MessageConsumer* consumer) {
-
-    try {
-
-        if (consumer == NULL) {
+cms::Message* CmsTemplate::doReceive(cms::MessageConsumer* consumer)
+{
+    try
+    {
+        if (consumer == NULL)
+        {
             throw CMSException("consumer is NULL", NULL);
         }
 
         long long receiveTime = getReceiveTimeout();
 
-        switch (receiveTime) {
-            case RECEIVE_TIMEOUT_NO_WAIT: {
+        switch (receiveTime)
+        {
+            case RECEIVE_TIMEOUT_NO_WAIT:
+            {
                 return consumer->receiveNoWait();
             }
-            case RECEIVE_TIMEOUT_INDEFINITE_WAIT: {
+            case RECEIVE_TIMEOUT_INDEFINITE_WAIT:
+            {
                 return consumer->receive();
             }
-            default: {
-                return consumer->receive((int) receiveTime);
+            default:
+            {
+                return consumer->receive((int)receiveTime);
             }
         }
-
     }
     CMSTEMPLATE_CATCHALL(this)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplate::ReceiveExecutor::doInCms(cms::Session* session) {
-
+void CmsTemplate::ReceiveExecutor::doInCms(cms::Session* session)
+{
     cms::MessageConsumer* consumer = NULL;
-    message = NULL;
+    message                        = NULL;
 
-    try {
-
-        if (session == NULL) {
+    try
+    {
+        if (session == NULL)
+        {
             return;
         }
 
         // Create the consumer resource.
-        consumer = parent->createConsumer(session, getDestination(session), selector, noLocal);
+        consumer = parent->createConsumer(session,
+                                          getDestination(session),
+                                          selector,
+                                          noLocal);
 
         // Receive the message.
         message = parent->doReceive(consumer);
 
         // Destroy the consumer resource.
         parent->destroyConsumer(consumer);
-
-    } catch (CMSException& e) {
-
+    }
+    catch (CMSException& e)
+    {
         e.setMark(__FILE__, __LINE__);
 
         // Destroy the message resource.
@@ -655,9 +737,11 @@ void CmsTemplate::ReceiveExecutor::doInCms(cms::Session* session) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Destination* CmsTemplate::ResolveReceiveExecutor::getDestination(cms::Session* session) {
-
-    try {
+cms::Destination* CmsTemplate::ResolveReceiveExecutor::getDestination(
+    cms::Session* session)
+{
+    try
+    {
         return parent->resolveDestinationName(session, destinationName);
     }
     CMSTEMPLATE_CATCH(IllegalStateException, parent)
@@ -665,10 +749,10 @@ cms::Destination* CmsTemplate::ResolveReceiveExecutor::getDestination(cms::Sessi
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Message* CmsTemplate::receive() {
-
-    try {
-
+cms::Message* CmsTemplate::receive()
+{
+    try
+    {
         ReceiveExecutor receiveExecutor(this, NULL, "", isNoLocal());
         execute(&receiveExecutor);
 
@@ -678,10 +762,10 @@ cms::Message* CmsTemplate::receive() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Message* CmsTemplate::receive(cms::Destination* destination) {
-
-    try {
-
+cms::Message* CmsTemplate::receive(cms::Destination* destination)
+{
+    try
+    {
         ReceiveExecutor receiveExecutor(this, destination, "", isNoLocal());
         execute(&receiveExecutor);
 
@@ -691,11 +775,14 @@ cms::Message* CmsTemplate::receive(cms::Destination* destination) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Message* CmsTemplate::receive(const std::string& destinationName) {
-
-    try {
-
-        ResolveReceiveExecutor receiveExecutor(this, "", isNoLocal(), destinationName);
+cms::Message* CmsTemplate::receive(const std::string& destinationName)
+{
+    try
+    {
+        ResolveReceiveExecutor receiveExecutor(this,
+                                               "",
+                                               isNoLocal(),
+                                               destinationName);
         execute(&receiveExecutor);
 
         return receiveExecutor.getMessage();
@@ -704,10 +791,10 @@ cms::Message* CmsTemplate::receive(const std::string& destinationName) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Message* CmsTemplate::receiveSelected(const std::string& selector) {
-
-    try {
-
+cms::Message* CmsTemplate::receiveSelected(const std::string& selector)
+{
+    try
+    {
         ReceiveExecutor receiveExecutor(this, NULL, selector, isNoLocal());
         execute(&receiveExecutor);
 
@@ -717,11 +804,15 @@ cms::Message* CmsTemplate::receiveSelected(const std::string& selector) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Message* CmsTemplate::receiveSelected(cms::Destination* destination, const std::string& selector) {
-
-    try {
-
-        ReceiveExecutor receiveExecutor(this, destination, selector, isNoLocal());
+cms::Message* CmsTemplate::receiveSelected(cms::Destination*  destination,
+                                           const std::string& selector)
+{
+    try
+    {
+        ReceiveExecutor receiveExecutor(this,
+                                        destination,
+                                        selector,
+                                        isNoLocal());
         execute(&receiveExecutor);
 
         return receiveExecutor.getMessage();
@@ -730,11 +821,15 @@ cms::Message* CmsTemplate::receiveSelected(cms::Destination* destination, const 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Message* CmsTemplate::receiveSelected(const std::string& destinationName, const std::string& selector) {
-
-    try {
-
-        ResolveReceiveExecutor receiveExecutor(this, selector, isNoLocal(), destinationName);
+cms::Message* CmsTemplate::receiveSelected(const std::string& destinationName,
+                                           const std::string& selector)
+{
+    try
+    {
+        ResolveReceiveExecutor receiveExecutor(this,
+                                               selector,
+                                               isNoLocal(),
+                                               destinationName);
         execute(&receiveExecutor);
 
         return receiveExecutor.getMessage();

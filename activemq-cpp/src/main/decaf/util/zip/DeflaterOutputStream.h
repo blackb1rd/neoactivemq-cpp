@@ -26,126 +26,148 @@
 
 #include <vector>
 
-namespace decaf {
-namespace util {
-namespace zip {
-
-    /**
-     * Provides a FilterOutputStream instance that compresses the data before writing it
-     * to the wrapped OutputStream.
-     *
-     * @since 1.0
-     */
-    class DECAF_API DeflaterOutputStream : public decaf::io::FilterOutputStream {
-    protected:
+namespace decaf
+{
+namespace util
+{
+    namespace zip
+    {
 
         /**
-         * The Deflater for this stream.
-         */
-        Deflater* deflater;
-
-        /**
-         * The Buffer to use for
-         */
-        std::vector<unsigned char> buf;
-
-        bool ownDeflater;
-        bool isDone;
-
-        static const std::size_t DEFAULT_BUFFER_SIZE;
-
-    private:
-
-        DeflaterOutputStream(const DeflaterOutputStream&);
-        DeflaterOutputStream& operator=(const DeflaterOutputStream&);
-
-    public:
-
-        /**
-         * Creates a new DeflateOutputStream with a Default Deflater and buffer size.
+         * Provides a FilterOutputStream instance that compresses the data
+         * before writing it to the wrapped OutputStream.
          *
-         * @param outputStream
-         *      The OutputStream instance to wrap.
-         * @param own
-         *      Should this filter take ownership of the OutputStream pointer (default is false).
+         * @since 1.0
          */
-        DeflaterOutputStream(decaf::io::OutputStream* outputStream, bool own = false);
+        class DECAF_API DeflaterOutputStream
+            : public decaf::io::FilterOutputStream
+        {
+        protected:
+            /**
+             * The Deflater for this stream.
+             */
+            Deflater* deflater;
 
-        /**
-         * Creates a new DeflateOutputStream with a user supplied Deflater and a default buffer size.
-         * When the user supplied a Deflater instance the DeflaterOutpotStream does not take ownership
-         * of the Deflater pointer unless the ownDeflater parameter is set to true, the caller is still
-         * responsible for deleting the Deflater when ownDeflater is false.
-         *
-         * @param outputStream
-         *      The OutputStream instance to wrap.
-         * @param deflater
-         *      The user supplied Deflater to use for compression. (
-         * @param own
-         *      Should this filter take ownership of the OutputStream pointer (default is false).
-         * @param ownDeflater
-         *      Should the filter take ownership of the passed Deflater object (default is false).
-         *
-         * @throws NullPointerException if the Deflater given is NULL.
-         */
-        DeflaterOutputStream(decaf::io::OutputStream* outputStream, Deflater* deflater,
-                             bool own = false, bool ownDeflater = false);
+            /**
+             * The Buffer to use for
+             */
+            std::vector<unsigned char> buf;
 
-        /**
-         * Creates a new DeflateOutputStream with a user supplied Deflater and specified buffer size.
-         * When the user supplied a Deflater instance the DeflaterOutpotStream does not take ownership
-         * of the Deflater pointer unless the ownDeflater parameter is set to true, otherwise the caller
-         * is still responsible for deleting the Deflater.
-         *
-         * @param outputStream
-         *      The OutputStream instance to wrap.
-         * @param deflater
-         *      The user supplied Deflater to use for compression.
-         * @param bufferSize
-         *      The size of the input buffer.
-         * @param own
-         *      Should this filter take ownership of the OutputStream pointer (default is false).
-         * @param ownDeflater
-         *      Should the filter take ownership of the passed Deflater object (default is false).
-         *
-         * @throws NullPointerException if the Deflater given is NULL.
-         * @throws IllegalArgumentException if bufferSize is 0.
-         */
-        DeflaterOutputStream(decaf::io::OutputStream* outputStream, Deflater* deflater,
-                             int bufferSize, bool own = false, bool ownDeflater = false);
+            bool ownDeflater;
+            bool isDone;
 
-        virtual ~DeflaterOutputStream();
+            static const std::size_t DEFAULT_BUFFER_SIZE;
 
-        /**
-         * Finishes writing any remaining data to the wrapped OutputStream but does not close
-         * it upon completion.
-         *
-         * @throws IOException if an I/O error occurs.
-         */
-        virtual void finish();
+        private:
+            DeflaterOutputStream(const DeflaterOutputStream&);
+            DeflaterOutputStream& operator=(const DeflaterOutputStream&);
 
-        /**
-         * {@inheritDoc}
-         *
-         * Finishes writing any remaining data to the OutputStream then closes the stream.
-         */
-        virtual void close();
+        public:
+            /**
+             * Creates a new DeflateOutputStream with a Default Deflater and
+             * buffer size.
+             *
+             * @param outputStream
+             *      The OutputStream instance to wrap.
+             * @param own
+             *      Should this filter take ownership of the OutputStream
+             * pointer (default is false).
+             */
+            DeflaterOutputStream(decaf::io::OutputStream* outputStream,
+                                 bool                     own = false);
 
-    protected:
+            /**
+             * Creates a new DeflateOutputStream with a user supplied Deflater
+             * and a default buffer size. When the user supplied a Deflater
+             * instance the DeflaterOutpotStream does not take ownership of the
+             * Deflater pointer unless the ownDeflater parameter is set to true,
+             * the caller is still responsible for deleting the Deflater when
+             * ownDeflater is false.
+             *
+             * @param outputStream
+             *      The OutputStream instance to wrap.
+             * @param deflater
+             *      The user supplied Deflater to use for compression. (
+             * @param own
+             *      Should this filter take ownership of the OutputStream
+             * pointer (default is false).
+             * @param ownDeflater
+             *      Should the filter take ownership of the passed Deflater
+             * object (default is false).
+             *
+             * @throws NullPointerException if the Deflater given is NULL.
+             */
+            DeflaterOutputStream(decaf::io::OutputStream* outputStream,
+                                 Deflater*                deflater,
+                                 bool                     own         = false,
+                                 bool                     ownDeflater = false);
 
-        virtual void doWriteByte(unsigned char value);
+            /**
+             * Creates a new DeflateOutputStream with a user supplied Deflater
+             * and specified buffer size. When the user supplied a Deflater
+             * instance the DeflaterOutpotStream does not take ownership of the
+             * Deflater pointer unless the ownDeflater parameter is set to true,
+             * otherwise the caller is still responsible for deleting the
+             * Deflater.
+             *
+             * @param outputStream
+             *      The OutputStream instance to wrap.
+             * @param deflater
+             *      The user supplied Deflater to use for compression.
+             * @param bufferSize
+             *      The size of the input buffer.
+             * @param own
+             *      Should this filter take ownership of the OutputStream
+             * pointer (default is false).
+             * @param ownDeflater
+             *      Should the filter take ownership of the passed Deflater
+             * object (default is false).
+             *
+             * @throws NullPointerException if the Deflater given is NULL.
+             * @throws IllegalArgumentException if bufferSize is 0.
+             */
+            DeflaterOutputStream(decaf::io::OutputStream* outputStream,
+                                 Deflater*                deflater,
+                                 int                      bufferSize,
+                                 bool                     own         = false,
+                                 bool                     ownDeflater = false);
 
-        virtual void doWriteArrayBounded(const unsigned char* buffer, int size, int offset, int length);
+            virtual ~DeflaterOutputStream();
 
-    protected:
+            /**
+             * Finishes writing any remaining data to the wrapped OutputStream
+             * but does not close it upon completion.
+             *
+             * @throws IOException if an I/O error occurs.
+             */
+            virtual void finish();
 
-        /**
-         * Writes a buffers worth of compressed data to the wrapped OutputStream.
-         */
-        virtual void deflate();
+            /**
+             * {@inheritDoc}
+             *
+             * Finishes writing any remaining data to the OutputStream then
+             * closes the stream.
+             */
+            virtual void close();
 
-    };
+        protected:
+            virtual void doWriteByte(unsigned char value);
 
-}}}
+            virtual void doWriteArrayBounded(const unsigned char* buffer,
+                                             int                  size,
+                                             int                  offset,
+                                             int                  length);
+
+        protected:
+            /**
+             * Writes a buffers worth of compressed data to the wrapped
+             * OutputStream.
+             */
+            virtual void deflate();
+        };
+
+    }  // namespace zip
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_ZIP_DEFLATEROUTPUTSTREAM_H_ */

@@ -17,72 +17,91 @@
 #ifndef _ACTIVEMQ_CORE_ACTIVEMQPRODUCER_H_
 #define _ACTIVEMQ_CORE_ACTIVEMQPRODUCER_H_
 
-#include <cms/MessageProducer.h>
-#include <cms/Message.h>
-#include <cms/Destination.h>
 #include <cms/DeliveryMode.h>
+#include <cms/Destination.h>
+#include <cms/Message.h>
+#include <cms/MessageProducer.h>
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/ProducerInfo.h>
 #include <activemq/core/kernels/ActiveMQProducerKernel.h>
+#include <activemq/util/Config.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     using decaf::lang::Pointer;
 
     class ActiveMQSession;
 
-    class AMQCPP_API ActiveMQProducer : public cms::MessageProducer {
+    class AMQCPP_API ActiveMQProducer : public cms::MessageProducer
+    {
     private:
-
         Pointer<activemq::core::kernels::ActiveMQProducerKernel> kernel;
 
     private:
-
         ActiveMQProducer(const ActiveMQProducer&);
         ActiveMQProducer& operator=(const ActiveMQProducer&);
 
     public:
-
         /**
          * Constructor, creates an instance of an ActiveMQProducer to wrap the
          * provided ActiveMQProducerKernel.
          *
          * @param kernel
-         *        The Producer kernel pointer that implements the producers functionality.
+         *        The Producer kernel pointer that implements the producers
+         * functionality.
          */
-        ActiveMQProducer(Pointer<activemq::core::kernels::ActiveMQProducerKernel> kernel);
+        ActiveMQProducer(
+            Pointer<activemq::core::kernels::ActiveMQProducerKernel> kernel);
 
         virtual ~ActiveMQProducer();
 
     public:  // cms::MessageProducer methods.
-
         virtual void close();
 
         virtual void send(cms::Message* message);
 
         virtual void send(cms::Message* message, cms::AsyncCallback* callback);
 
-        virtual void send(cms::Message* message, int deliveryMode, int priority, long long timeToLive);
+        virtual void send(cms::Message* message,
+                          int           deliveryMode,
+                          int           priority,
+                          long long     timeToLive);
 
-        virtual void send(cms::Message* message, int deliveryMode, int priority, long long timeToLive, cms::AsyncCallback* callback);
+        virtual void send(cms::Message*       message,
+                          int                 deliveryMode,
+                          int                 priority,
+                          long long           timeToLive,
+                          cms::AsyncCallback* callback);
 
-        virtual void send(const cms::Destination* destination, cms::Message* message);
+        virtual void send(const cms::Destination* destination,
+                          cms::Message*           message);
 
-        virtual void send(const cms::Destination* destination, cms::Message* message, cms::AsyncCallback* callback);
+        virtual void send(const cms::Destination* destination,
+                          cms::Message*           message,
+                          cms::AsyncCallback*     callback);
 
-        virtual void send(const cms::Destination* destination, cms::Message* message,
-                          int deliveryMode, int priority, long long timeToLive);
+        virtual void send(const cms::Destination* destination,
+                          cms::Message*           message,
+                          int                     deliveryMode,
+                          int                     priority,
+                          long long               timeToLive);
 
-        virtual void send(const cms::Destination* destination, cms::Message* message,
-                          int deliveryMode, int priority, long long timeToLive, cms::AsyncCallback* callback);
+        virtual void send(const cms::Destination* destination,
+                          cms::Message*           message,
+                          int                     deliveryMode,
+                          int                     priority,
+                          long long               timeToLive,
+                          cms::AsyncCallback*     callback);
 
         /**
          * Sets the delivery mode for this Producer
          * @param mode - The DeliveryMode to use for Message sends.
          */
-        virtual void setDeliveryMode(int mode) {
+        virtual void setDeliveryMode(int mode)
+        {
             this->kernel->setDeliveryMode(mode);
         }
 
@@ -90,7 +109,8 @@ namespace core {
          * Gets the delivery mode for this Producer
          * @return The DeliveryMode
          */
-        virtual int getDeliveryMode() const {
+        virtual int getDeliveryMode() const
+        {
             return this->kernel->getDeliveryMode();
         }
 
@@ -98,15 +118,18 @@ namespace core {
          * Sets if Message Ids are disabled for this Producer
          * @param value - boolean indicating enable / disable (true / false)
          */
-        virtual void setDisableMessageID(bool value) {
+        virtual void setDisableMessageID(bool value)
+        {
             this->kernel->setDisableMessageID(value);
         }
 
         /**
          * Gets if Message Ids are disabled for this Producer
-         * @return a boolean indicating state enable / disable (true / false) for MessageIds.
+         * @return a boolean indicating state enable / disable (true / false)
+         * for MessageIds.
          */
-        virtual bool getDisableMessageID() const {
+        virtual bool getDisableMessageID() const
+        {
             return this->kernel->getDisableMessageID();
         }
 
@@ -114,7 +137,8 @@ namespace core {
          * Sets if Message Time Stamps are disabled for this Producer
          * @param value - boolean indicating enable / disable (true / false)
          */
-        virtual void setDisableMessageTimeStamp(bool value) {
+        virtual void setDisableMessageTimeStamp(bool value)
+        {
             this->kernel->setDisableMessageTimeStamp(value);
         }
 
@@ -122,7 +146,8 @@ namespace core {
          * Gets if Message Time Stamps are disabled for this Producer
          * @return boolean indicating state of enable / disable (true / false)
          */
-        virtual bool getDisableMessageTimeStamp() const {
+        virtual bool getDisableMessageTimeStamp() const
+        {
             return this->kernel->getDisableMessageTimeStamp();
         }
 
@@ -130,7 +155,8 @@ namespace core {
          * Sets the Priority that this Producers sends messages at
          * @param priority int value for Priority level
          */
-        virtual void setPriority(int priority) {
+        virtual void setPriority(int priority)
+        {
             this->kernel->setPriority(priority);
         }
 
@@ -138,7 +164,8 @@ namespace core {
          * Gets the Priority level that this producer sends messages at
          * @return int based priority level
          */
-        virtual int getPriority() const {
+        virtual int getPriority() const
+        {
             return this->kernel->getPriority();
         }
 
@@ -146,7 +173,8 @@ namespace core {
          * Sets the Time to Live that this Producers sends messages with
          * @param time The new default time to live value in milliseconds.
          */
-        virtual void setTimeToLive(long long time) {
+        virtual void setTimeToLive(long long time)
+        {
             this->kernel->setTimeToLive(time);
         }
 
@@ -154,7 +182,8 @@ namespace core {
          * Gets the Time to Live that this producer sends messages with
          * @return The default time to live value in milliseconds.
          */
-        virtual long long getTimeToLive() const {
+        virtual long long getTimeToLive() const
+        {
             return this->kernel->getTimeToLive();
         }
 
@@ -162,7 +191,8 @@ namespace core {
          * Sets the Send Timeout that this Producers sends messages with
          * @param time The new default send timeout value in milliseconds.
          */
-        virtual void setSendTimeout(long long time) {
+        virtual void setSendTimeout(long long time)
+        {
             this->kernel->setSendTimeout(time);
         }
 
@@ -170,24 +200,27 @@ namespace core {
          * Gets the Send Timeout that this producer sends messages with
          * @return The default send timeout value in milliseconds.
          */
-        virtual long long getSendTimeout() const {
+        virtual long long getSendTimeout() const
+        {
             return this->kernel->getSendTimeout();
         }
 
-        virtual void setMessageTransformer(cms::MessageTransformer* transformer) {
+        virtual void setMessageTransformer(cms::MessageTransformer* transformer)
+        {
             this->kernel->setMessageTransformer(transformer);
         }
 
-        virtual cms::MessageTransformer* getMessageTransformer() const {
+        virtual cms::MessageTransformer* getMessageTransformer() const
+        {
             return this->kernel->getMessageTransformer();
         }
 
     public:
-
         /**
          * @return true if this Producer has been closed.
          */
-        bool isClosed() const {
+        bool isClosed() const
+        {
             return this->kernel->isClosed();
         }
 
@@ -195,7 +228,8 @@ namespace core {
          * Retries this object ProducerInfo pointer
          * @return ProducerInfo Reference
          */
-        const Pointer<commands::ProducerInfo>& getProducerInfo() const {
+        const Pointer<commands::ProducerInfo>& getProducerInfo() const
+        {
             return this->kernel->getProducerInfo();
         }
 
@@ -203,11 +237,13 @@ namespace core {
          * Retries this object ProducerId or NULL if closed.
          * @return ProducerId Reference
          */
-        const Pointer<commands::ProducerId>& getProducerId() const {
+        const Pointer<commands::ProducerId>& getProducerId() const
+        {
             return this->kernel->getProducerId();
         }
-   };
+    };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CORE_ACTIVEMQPRODUCER_H_*/

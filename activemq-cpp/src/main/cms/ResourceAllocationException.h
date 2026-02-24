@@ -18,38 +18,42 @@
 #ifndef _CMS_RESOURCEALLOCATIONEXCEPTION_H_
 #define _CMS_RESOURCEALLOCATIONEXCEPTION_H_
 
-#include <cms/Config.h>
 #include <cms/CMSException.h>
+#include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
 
-    /**
-     * This exception is thrown when an operation is invalid because a transaction is in progress.
-     * For instance, an attempt to call Session::commit when a session is part of a distributed
-     * transaction should throw a  ResourceAllocationException.
-     *
-     * @since 2.3
-     */
-    class CMS_API ResourceAllocationException : public cms::CMSException {
-    public:
+/**
+ * This exception is thrown when an operation is invalid because a transaction
+ * is in progress. For instance, an attempt to call Session::commit when a
+ * session is part of a distributed transaction should throw a
+ * ResourceAllocationException.
+ *
+ * @since 2.3
+ */
+class CMS_API ResourceAllocationException : public cms::CMSException
+{
+public:
+    ResourceAllocationException();
 
-        ResourceAllocationException();
+    ResourceAllocationException(const ResourceAllocationException& ex);
 
-        ResourceAllocationException(const ResourceAllocationException& ex);
+    ResourceAllocationException(const std::string& message);
 
-        ResourceAllocationException(const std::string& message);
+    ResourceAllocationException(const std::string&    message,
+                                const std::exception* cause);
 
-        ResourceAllocationException(const std::string& message, const std::exception* cause);
+    ResourceAllocationException(
+        const std::string&                              message,
+        const std::exception*                           cause,
+        const std::vector<std::pair<std::string, int>>& stackTrace);
 
-        ResourceAllocationException(const std::string& message, const std::exception* cause,
-                                    const std::vector<std::pair<std::string, int> >& stackTrace);
+    virtual ~ResourceAllocationException() throw();
 
-        virtual ~ResourceAllocationException() throw();
+    virtual ResourceAllocationException* clone();
+};
 
-        virtual ResourceAllocationException* clone();
-
-    };
-
-}
+}  // namespace cms
 
 #endif /* _CMS_RESOURCEALLOCATIONEXCEPTION_H_ */

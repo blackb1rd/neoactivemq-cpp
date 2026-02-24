@@ -22,29 +22,41 @@ using namespace decaf::nio;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-BufferOverflowException::BufferOverflowException() : lang::Exception() {
+BufferOverflowException::BufferOverflowException()
+    : lang::Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BufferOverflowException::~BufferOverflowException() throw () {
+BufferOverflowException::~BufferOverflowException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BufferOverflowException::BufferOverflowException(const lang::Exception& ex) : lang::Exception() {
-    *(lang::Exception*) this = ex;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-BufferOverflowException::BufferOverflowException(const BufferOverflowException& ex) : lang::Exception() {
-    *(lang::Exception*) this = ex;
+BufferOverflowException::BufferOverflowException(const lang::Exception& ex)
+    : lang::Exception()
+{
+    *(lang::Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 BufferOverflowException::BufferOverflowException(
-    const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : lang::Exception(cause) {
+    const BufferOverflowException& ex)
+    : lang::Exception()
+{
+    *(lang::Exception*)this = ex;
+}
 
+////////////////////////////////////////////////////////////////////////////////
+BufferOverflowException::BufferOverflowException(const char* file,
+                                                 const int   lineNumber,
+                                                 const std::exception* cause,
+                                                 const char*           msg,
+                                                 ...)
+    : lang::Exception(cause)
+{
     va_list vargs;
-    va_start( vargs, msg);
+    va_start(vargs, msg);
     buildMessage(msg, vargs);
 
     // Set the first mark for this exception.
@@ -52,13 +64,18 @@ BufferOverflowException::BufferOverflowException(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BufferOverflowException::BufferOverflowException(const std::exception* cause) : lang::Exception(cause) {
+BufferOverflowException::BufferOverflowException(const std::exception* cause)
+    : lang::Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BufferOverflowException::BufferOverflowException(
-    const char* file, const int lineNumber, const char* msg, ...) : lang::Exception() {
-
+BufferOverflowException::BufferOverflowException(const char* file,
+                                                 const int   lineNumber,
+                                                 const char* msg,
+                                                 ...)
+    : lang::Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

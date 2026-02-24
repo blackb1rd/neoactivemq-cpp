@@ -22,26 +22,38 @@ using namespace decaf::net;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketException::SocketException() : io::IOException() {
+SocketException::SocketException()
+    : io::IOException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketException::~SocketException() throw() {
+SocketException::~SocketException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketException::SocketException(const Exception& ex) : io::IOException() {
-    *(Exception*) this = ex;
+SocketException::SocketException(const Exception& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketException::SocketException(const SocketException& ex) : io::IOException() {
-    *(Exception*) this = ex;
+SocketException::SocketException(const SocketException& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketException::SocketException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : io::IOException(cause) {
-
+SocketException::SocketException(const char*           file,
+                                 const int             lineNumber,
+                                 const std::exception* cause,
+                                 const char*           msg,
+                                 ...)
+    : io::IOException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -51,12 +63,18 @@ SocketException::SocketException(const char* file, const int lineNumber, const s
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketException::SocketException(const std::exception* cause) : io::IOException(cause) {
+SocketException::SocketException(const std::exception* cause)
+    : io::IOException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketException::SocketException(const char* file, const int lineNumber, const char* msg, ...) : io::IOException() {
-
+SocketException::SocketException(const char* file,
+                                 const int   lineNumber,
+                                 const char* msg,
+                                 ...)
+    : io::IOException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

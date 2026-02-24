@@ -20,18 +20,27 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace util {
-namespace concurrent {
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
 
-    class ConcurrentHashMap {
-    public:
+        class ConcurrentHashMap
+        {
+        public:
+            ConcurrentHashMap()
+            {
+            }
 
-        ConcurrentHashMap() {}
-        virtual ~ConcurrentHashMap() {}
+            virtual ~ConcurrentHashMap()
+            {
+            }
+        };
 
-    };
-
-}}}
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_CONCURRENT_CONCURRENTHASHMAP_H_ */

@@ -25,17 +25,22 @@ using namespace activemq::commands;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-ProducerState::ProducerState(Pointer<ProducerInfo> info) : info(info), transactionState() {
+ProducerState::ProducerState(Pointer<ProducerInfo> info)
+    : info(info),
+      transactionState()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProducerState::~ProducerState() {
+ProducerState::~ProducerState()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ProducerState::toString() const {
-
-    if (this->info != NULL) {
+std::string ProducerState::toString() const
+{
+    if (this->info != NULL)
+    {
         return this->info->toString();
     }
 
@@ -43,11 +48,14 @@ std::string ProducerState::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ProducerState::setTransactionState(Pointer<TransactionState> transactionState) {
+void ProducerState::setTransactionState(
+    Pointer<TransactionState> transactionState)
+{
     this->transactionState = transactionState;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<TransactionState> ProducerState::getTransactionState() const {
+Pointer<TransactionState> ProducerState::getTransactionState() const
+{
     return this->transactionState;
 }

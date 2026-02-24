@@ -18,314 +18,375 @@
 #ifndef _ACTIVEMQ_TANSPORT_MOCK_MOCKTRANSPORT_H_
 #define _ACTIVEMQ_TANSPORT_MOCK_MOCKTRANSPORT_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/transport/DefaultTransportListener.h>
 #include <activemq/transport/Transport.h>
 #include <activemq/transport/TransportListener.h>
-#include <activemq/transport/DefaultTransportListener.h>
-#include <activemq/transport/mock/ResponseBuilder.h>
 #include <activemq/transport/mock/InternalCommandListener.h>
+#include <activemq/transport/mock/ResponseBuilder.h>
+#include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
 
-#include <decaf/lang/Thread.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/lang/Thread.h>
 #include <decaf/util/concurrent/Concurrent.h>
-#include <decaf/util/concurrent/atomic/AtomicInteger.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
+#include <decaf/util/concurrent/atomic/AtomicInteger.h>
 
 #include <cms/Message.h>
 
 #include <map>
 #include <set>
 
-namespace activemq{
-namespace transport{
-namespace mock{
+namespace activemq
+{
+namespace transport
+{
+    namespace mock
+    {
 
-    using decaf::lang::Pointer;
-    using activemq::commands::Command;
-    using activemq::commands::Response;
-
-    /**
-     * The MockTransport defines a base level Transport class that is intended to
-     * be used in place of an a regular protocol Transport suck as TCP.  This
-     * Transport assumes that it is the base Transport in the Transports stack, and
-     * destroys any Transports that are passed to it in its constructor.
-     *
-     * This Transport defines an Interface ResponseBuilder which must be implemented
-     * by any protocol for which the Transport is used to Emulate.  The Transport
-     * hands off all outbound commands to the ResponseBuilder for processing, it is
-     * up to the builder to create appropriate responses and schedule any asynchronous
-     * messages that might result from a message sent to the Broker.
-     */
-    class AMQCPP_API MockTransport: public Transport {
-    private:
-
-        Pointer<ResponseBuilder> responseBuilder;
-        Pointer<wireformat::WireFormat> wireFormat;
-        TransportListener* outgoingListener;
-        TransportListener* listener;
-        decaf::util::concurrent::atomic::AtomicInteger nextCommandId;
-        InternalCommandListener internalListener;
-        static MockTransport* instance;
-
-        std::string name;
-
-        bool failOnSendMessage;
-        int numSentMessageBeforeFail;
-        int numSentMessages;
-        bool failOnReceiveMessage;
-        int numReceivedMessageBeforeFail;
-        int numReceivedMessages;
-        bool failOnKeepAliveSends;
-        int numSentKeepAlivesBeforeFail;
-        int numSentKeepAlives;
-
-        bool failOnStart;
-        bool failOnStop;
-        bool failOnClose;
-
-    private:
-
-        MockTransport(const MockTransport&);
-        MockTransport operator=(const MockTransport&);
-
-    public:
-
-        MockTransport(const Pointer<wireformat::WireFormat> wireFormat, const Pointer<ResponseBuilder> responseBuilder);
-
-        virtual ~MockTransport() {}
-
-        static MockTransport* getInstance() {
-            return instance;
-        }
+        using activemq::commands::Command;
+        using activemq::commands::Response;
+        using decaf::lang::Pointer;
 
         /**
-         * Fires a Command back through this transport to its registered
-         * CommandListener if there is one.
-         * @param command - Command to send to the Listener.
-         */
-        virtual void fireCommand(const Pointer<Command> command) {
-            if (listener != NULL) {
-                listener->onCommand(command);
-            }
-        }
-
-        /**
-         * Fires a Exception back through this transport to its registered
-         * ExceptionListener if there is one.
+         * The MockTransport defines a base level Transport class that is
+         * intended to be used in place of an a regular protocol Transport suck
+         * as TCP.  This Transport assumes that it is the base Transport in the
+         * Transports stack, and destroys any Transports that are passed to it
+         * in its constructor.
          *
-         * @param ex
-         *      The Exception that will be passed on the the Transport listener.
+         * This Transport defines an Interface ResponseBuilder which must be
+         * implemented by any protocol for which the Transport is used to
+         * Emulate.  The Transport hands off all outbound commands to the
+         * ResponseBuilder for processing, it is up to the builder to create
+         * appropriate responses and schedule any asynchronous messages that
+         * might result from a message sent to the Broker.
          */
-        virtual void fireException(const exceptions::ActiveMQException& ex) {
-            if (listener != NULL) {
-                listener->onException(ex);
-            }
-        }
+        class AMQCPP_API MockTransport : public Transport
+        {
+        private:
+            Pointer<ResponseBuilder>                       responseBuilder;
+            Pointer<wireformat::WireFormat>                wireFormat;
+            TransportListener*                             outgoingListener;
+            TransportListener*                             listener;
+            decaf::util::concurrent::atomic::AtomicInteger nextCommandId;
+            InternalCommandListener                        internalListener;
+            static MockTransport*                          instance;
 
-        /**
-         * Sets the ResponseBuilder that this class uses to create Responses to
-         * Commands sent.  These are either real Response Objects, or Commands that
-         * would have been sent Asynchronously be the Broker.
-         * @param responseBuilder - The ResponseBuilder to use from now on.
-         */
-        void setResponseBuilder(const Pointer<ResponseBuilder> responseBuilder) {
-            this->responseBuilder = responseBuilder;
-        }
+            std::string name;
 
-        /**
-         * Sets a Listener that gets notified for every command that would
-         * have been sent by this transport to the Broker, this allows a client
-         * to verify that its messages are making it to the wire.
-         * @param listener - The CommandListener to notify for each message
-         */
-        virtual void setOutgoingListener(TransportListener* listener) {
-            outgoingListener = listener;
-        }
+            bool failOnSendMessage;
+            int  numSentMessageBeforeFail;
+            int  numSentMessages;
+            bool failOnReceiveMessage;
+            int  numReceivedMessageBeforeFail;
+            int  numReceivedMessages;
+            bool failOnKeepAliveSends;
+            int  numSentKeepAlivesBeforeFail;
+            int  numSentKeepAlives;
 
-        /**
-         * Gets the currently set WireFormat
-         *
-         * @return the current WireFormat object.
-         */
-        Pointer<wireformat::WireFormat> getWireFormat() const {
-            return this->wireFormat;
-        }
+            bool failOnStart;
+            bool failOnStop;
+            bool failOnClose;
 
-    public: // Transport Methods
+        private:
+            MockTransport(const MockTransport&);
+            MockTransport operator=(const MockTransport&);
 
-        virtual void oneway(const Pointer<Command> command);
+        public:
+            MockTransport(const Pointer<wireformat::WireFormat> wireFormat,
+                          const Pointer<ResponseBuilder> responseBuilder);
 
-        virtual Pointer<FutureResponse> asyncRequest(const Pointer<Command> command,
-                                                     const Pointer<ResponseCallback> responseCallback);
-
-        virtual Pointer<Response> request(const Pointer<Command> command);
-
-        virtual Pointer<Response> request(const Pointer<Command> command, unsigned int timeout);
-
-        virtual void setWireFormat(const Pointer<wireformat::WireFormat> wireFormat AMQCPP_UNUSED) {}
-
-        virtual void setTransportListener(TransportListener* listener) {
-            this->listener = listener;
-        }
-
-        virtual TransportListener* getTransportListener() const {
-            return this->listener;
-        }
-
-        virtual void start();
-
-        virtual void stop();
-
-        virtual void close();
-
-        virtual Transport* narrow(const std::type_info& typeId) {
-            if (typeid( *this ) == typeId) {
-                return this;
+            virtual ~MockTransport()
+            {
             }
 
-            return NULL;
-        }
+            static MockTransport* getInstance()
+            {
+                return instance;
+            }
 
-        virtual bool isFaultTolerant() const {
-            return false;
-        }
+            /**
+             * Fires a Command back through this transport to its registered
+             * CommandListener if there is one.
+             * @param command - Command to send to the Listener.
+             */
+            virtual void fireCommand(const Pointer<Command> command)
+            {
+                if (listener != NULL)
+                {
+                    listener->onCommand(command);
+                }
+            }
 
-        virtual bool isConnected() const {
-            return true;
-        }
+            /**
+             * Fires a Exception back through this transport to its registered
+             * ExceptionListener if there is one.
+             *
+             * @param ex
+             *      The Exception that will be passed on the the Transport
+             * listener.
+             */
+            virtual void fireException(const exceptions::ActiveMQException& ex)
+            {
+                if (listener != NULL)
+                {
+                    listener->onException(ex);
+                }
+            }
 
-        virtual bool isClosed() const {
-            return false;
-        }
+            /**
+             * Sets the ResponseBuilder that this class uses to create Responses
+             * to Commands sent.  These are either real Response Objects, or
+             * Commands that would have been sent Asynchronously be the Broker.
+             * @param responseBuilder - The ResponseBuilder to use from now on.
+             */
+            void setResponseBuilder(
+                const Pointer<ResponseBuilder> responseBuilder)
+            {
+                this->responseBuilder = responseBuilder;
+            }
 
-        virtual std::string getRemoteAddress() const {
-            return "";
-        }
+            /**
+             * Sets a Listener that gets notified for every command that would
+             * have been sent by this transport to the Broker, this allows a
+             * client to verify that its messages are making it to the wire.
+             * @param listener - The CommandListener to notify for each message
+             */
+            virtual void setOutgoingListener(TransportListener* listener)
+            {
+                outgoingListener = listener;
+            }
 
-        virtual void reconnect(const decaf::net::URI& uri AMQCPP_UNUSED) {}
+            /**
+             * Gets the currently set WireFormat
+             *
+             * @return the current WireFormat object.
+             */
+            Pointer<wireformat::WireFormat> getWireFormat() const
+            {
+                return this->wireFormat;
+            }
 
-    public: // Property Getters and Setters
+        public:  // Transport Methods
+            virtual void oneway(const Pointer<Command> command);
 
-        std::string getName() const {
-            return this->name;
-        }
+            virtual Pointer<FutureResponse> asyncRequest(
+                const Pointer<Command>          command,
+                const Pointer<ResponseCallback> responseCallback);
 
-        void setName(const std::string& name) {
-            this->name = name;
-        }
+            virtual Pointer<Response> request(const Pointer<Command> command);
 
-        bool isFailOnSendMessage() const {
-            return this->failOnSendMessage;
-        }
+            virtual Pointer<Response> request(const Pointer<Command> command,
+                                              unsigned int           timeout);
 
-        void setFailOnSendMessage(bool value) {
-            this->failOnSendMessage = value;
-        }
+            virtual void setWireFormat(
+                const Pointer<wireformat::WireFormat> wireFormat AMQCPP_UNUSED)
+            {
+            }
 
-        int getNumSentMessageBeforeFail() const {
-            return this->numSentMessageBeforeFail;
-        }
+            virtual void setTransportListener(TransportListener* listener)
+            {
+                this->listener = listener;
+            }
 
-        void setNumSentMessageBeforeFail(int value) {
-            this->numSentMessageBeforeFail = value;
-        }
+            virtual TransportListener* getTransportListener() const
+            {
+                return this->listener;
+            }
 
-        int getNumSentMessages() const {
-            return this->numSentMessages;
-        }
+            virtual void start();
 
-        void setNumSentMessages(int value) {
-            this->numSentMessages = value;
-        }
+            virtual void stop();
 
-        bool isFailOnReceiveMessage() const {
-            return this->failOnReceiveMessage;
-        }
+            virtual void close();
 
-        void setFailOnReceiveMessage(bool value) {
-            this->failOnReceiveMessage = value;
-        }
+            virtual Transport* narrow(const std::type_info& typeId)
+            {
+                if (typeid(*this) == typeId)
+                {
+                    return this;
+                }
 
-        int getNumReceivedMessageBeforeFail() const {
-            return this->numReceivedMessageBeforeFail;
-        }
+                return NULL;
+            }
 
-        void setNumReceivedMessageBeforeFail(int value) {
-            this->numReceivedMessageBeforeFail = value;
-        }
+            virtual bool isFaultTolerant() const
+            {
+                return false;
+            }
 
-        int getNumReceivedMessages() const {
-            return this->numReceivedMessages;
-        }
+            virtual bool isConnected() const
+            {
+                return true;
+            }
 
-        void setNumReceivedMessages(int value) {
-            this->numReceivedMessages = value;
-        }
+            virtual bool isClosed() const
+            {
+                return false;
+            }
 
-        bool isFailOnKeepAliveSends() const {
-            return this->failOnKeepAliveSends;
-        }
+            virtual std::string getRemoteAddress() const
+            {
+                return "";
+            }
 
-        void setFailOnKeepAliveSends(bool value) {
-            this->failOnKeepAliveSends = value;
-        }
+            virtual void reconnect(const decaf::net::URI& uri AMQCPP_UNUSED)
+            {
+            }
 
-        int getNumSentKeepAlivesBeforeFail() const {
-            return this->numSentKeepAlivesBeforeFail;
-        }
+        public:  // Property Getters and Setters
+            std::string getName() const
+            {
+                return this->name;
+            }
 
-        void setNumSentKeepAlivesBeforeFail(int value) {
-            this->numSentKeepAlivesBeforeFail = value;
-        }
+            void setName(const std::string& name)
+            {
+                this->name = name;
+            }
 
-        int getNumSentKeepAlives() const {
-            return this->numSentKeepAlives;
-        }
+            bool isFailOnSendMessage() const
+            {
+                return this->failOnSendMessage;
+            }
 
-        void setNumSentKeepAlives(int value) {
-            this->numSentKeepAlives = value;
-        }
+            void setFailOnSendMessage(bool value)
+            {
+                this->failOnSendMessage = value;
+            }
 
-        bool isFailOnStart() const {
-            return this->failOnReceiveMessage;
-        }
+            int getNumSentMessageBeforeFail() const
+            {
+                return this->numSentMessageBeforeFail;
+            }
 
-        void setFailOnStart(bool value) {
-            this->failOnReceiveMessage = value;
-        }
+            void setNumSentMessageBeforeFail(int value)
+            {
+                this->numSentMessageBeforeFail = value;
+            }
 
-        bool isFailOnStop() const {
-            return this->failOnStop;
-        }
+            int getNumSentMessages() const
+            {
+                return this->numSentMessages;
+            }
 
-        void setFailOnStop(bool value) {
-            this->failOnStop = value;
-        }
+            void setNumSentMessages(int value)
+            {
+                this->numSentMessages = value;
+            }
 
-        bool isFailOnClose() const {
-            return this->failOnClose;
-        }
+            bool isFailOnReceiveMessage() const
+            {
+                return this->failOnReceiveMessage;
+            }
 
-        void setFailOnClose(bool value) {
-            this->failOnClose = value;
-        }
+            void setFailOnReceiveMessage(bool value)
+            {
+                this->failOnReceiveMessage = value;
+            }
 
-        virtual bool isReconnectSupported() const {
-            return false;
-        }
+            int getNumReceivedMessageBeforeFail() const
+            {
+                return this->numReceivedMessageBeforeFail;
+            }
 
-        virtual bool isUpdateURIsSupported() const {
-            return false;
-        }
+            void setNumReceivedMessageBeforeFail(int value)
+            {
+                this->numReceivedMessageBeforeFail = value;
+            }
 
-        virtual void updateURIs(bool rebalance AMQCPP_UNUSED, const decaf::util::List<decaf::net::URI>& uris AMQCPP_UNUSED) {
-            throw decaf::io::IOException();
-        }
+            int getNumReceivedMessages() const
+            {
+                return this->numReceivedMessages;
+            }
 
-    };
+            void setNumReceivedMessages(int value)
+            {
+                this->numReceivedMessages = value;
+            }
 
-}}}
+            bool isFailOnKeepAliveSends() const
+            {
+                return this->failOnKeepAliveSends;
+            }
+
+            void setFailOnKeepAliveSends(bool value)
+            {
+                this->failOnKeepAliveSends = value;
+            }
+
+            int getNumSentKeepAlivesBeforeFail() const
+            {
+                return this->numSentKeepAlivesBeforeFail;
+            }
+
+            void setNumSentKeepAlivesBeforeFail(int value)
+            {
+                this->numSentKeepAlivesBeforeFail = value;
+            }
+
+            int getNumSentKeepAlives() const
+            {
+                return this->numSentKeepAlives;
+            }
+
+            void setNumSentKeepAlives(int value)
+            {
+                this->numSentKeepAlives = value;
+            }
+
+            bool isFailOnStart() const
+            {
+                return this->failOnReceiveMessage;
+            }
+
+            void setFailOnStart(bool value)
+            {
+                this->failOnReceiveMessage = value;
+            }
+
+            bool isFailOnStop() const
+            {
+                return this->failOnStop;
+            }
+
+            void setFailOnStop(bool value)
+            {
+                this->failOnStop = value;
+            }
+
+            bool isFailOnClose() const
+            {
+                return this->failOnClose;
+            }
+
+            void setFailOnClose(bool value)
+            {
+                this->failOnClose = value;
+            }
+
+            virtual bool isReconnectSupported() const
+            {
+                return false;
+            }
+
+            virtual bool isUpdateURIsSupported() const
+            {
+                return false;
+            }
+
+            virtual void updateURIs(
+                bool rebalance                                 AMQCPP_UNUSED,
+                const decaf::util::List<decaf::net::URI>& uris AMQCPP_UNUSED)
+            {
+                throw decaf::io::IOException();
+            }
+        };
+
+    }  // namespace mock
+}  // namespace transport
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TANSPORT_MOCK_MOCKTRANSPORT_H_*/

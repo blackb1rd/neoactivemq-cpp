@@ -20,14 +20,17 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf{
-namespace util{
+namespace decaf
+{
+namespace util
+{
 
     /**
      * A comparison function, which imposes a total ordering on some collection
      * of objects. Comparators can be passed to a sort method (such as
-     * Collections.sort) to allow precise control over the sort order. Comparators
-     * can also be used to control the order of certain data structures.
+     * Collections.sort) to allow precise control over the sort order.
+     * Comparators can also be used to control the order of certain data
+     * structures.
      *
      * The ordering imposed by a Comparator c on a set of elements S is said to
      * be consistent with equals if and only if
@@ -36,15 +39,18 @@ namespace util{
      *
      * @since 1.0
      */
-    template<typename T>
-    class Comparator {
+    template <typename T>
+    class Comparator
+    {
     public:
-
-        virtual ~Comparator() {}
+        virtual ~Comparator()
+        {
+        }
 
         /**
-         * Implementation of the Binary function interface as a means of allowing
-         * a Comparator to be passed to an STL Map for use as the sorting criteria.
+         * Implementation of the Binary function interface as a means of
+         * allowing a Comparator to be passed to an STL Map for use as the
+         * sorting criteria.
          *
          * @param left
          *      The Left hand side operand.
@@ -53,12 +59,12 @@ namespace util{
          *
          * @return true if the vale of left is less than the value of right.
          */
-        virtual bool operator() (const T& left, const T& right) const = 0;
+        virtual bool operator()(const T& left, const T& right) const = 0;
 
         /**
-         * Compares its two arguments for order. Returns a negative integer, zero,
-         * or a positive integer as the first argument is less than, equal to, or
-         * greater than the second.
+         * Compares its two arguments for order. Returns a negative integer,
+         * zero, or a positive integer as the first argument is less than, equal
+         * to, or greater than the second.
          *
          * The implementor must ensure that
          * sgn( compare(x, y)) == -sgn(compare(y, x) ) for all x and y.
@@ -86,9 +92,9 @@ namespace util{
          *          argument is less than, equal to, or greater than the second.
          */
         virtual int compare(const T& o1, const T& o2) const = 0;
-
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_COMPARATOR_H_*/

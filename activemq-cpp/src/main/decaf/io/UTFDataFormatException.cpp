@@ -21,26 +21,38 @@ using namespace decaf;
 using namespace decaf::io;
 
 ////////////////////////////////////////////////////////////////////////////////
-UTFDataFormatException::UTFDataFormatException() : io::IOException() {
+UTFDataFormatException::UTFDataFormatException()
+    : io::IOException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UTFDataFormatException::~UTFDataFormatException() throw() {
+UTFDataFormatException::~UTFDataFormatException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UTFDataFormatException::UTFDataFormatException(const Exception& ex) : io::IOException() {
-    *(Exception*) this = ex;
+UTFDataFormatException::UTFDataFormatException(const Exception& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UTFDataFormatException::UTFDataFormatException(const UTFDataFormatException& ex) : io::IOException() {
-    *(Exception*) this = ex;
+UTFDataFormatException::UTFDataFormatException(const UTFDataFormatException& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UTFDataFormatException::UTFDataFormatException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : io::IOException(cause) {
-
+UTFDataFormatException::UTFDataFormatException(const char*           file,
+                                               const int             lineNumber,
+                                               const std::exception* cause,
+                                               const char*           msg,
+                                               ...)
+    : io::IOException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -50,12 +62,18 @@ UTFDataFormatException::UTFDataFormatException(const char* file, const int lineN
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UTFDataFormatException::UTFDataFormatException(const std::exception* cause) : io::IOException(cause) {
+UTFDataFormatException::UTFDataFormatException(const std::exception* cause)
+    : io::IOException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UTFDataFormatException::UTFDataFormatException(const char* file, const int lineNumber, const char* msg, ...) : io::IOException() {
-
+UTFDataFormatException::UTFDataFormatException(const char* file,
+                                               const int   lineNumber,
+                                               const char* msg,
+                                               ...)
+    : io::IOException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

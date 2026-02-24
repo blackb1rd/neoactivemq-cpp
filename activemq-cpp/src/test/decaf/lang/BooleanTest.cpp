@@ -15,14 +15,16 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <decaf/lang/Boolean.h>
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
 
-    class BooleanTest : public ::testing::Test {};
+class BooleanTest : public ::testing::Test
+{
+};
 
 TEST_F(BooleanTest, test)
 {
@@ -34,15 +36,14 @@ TEST_F(BooleanTest, test)
     ASSERT_TRUE(y == true);
     ASSERT_TRUE(z == false);
 
-    std::string x1 = Boolean::toString( x );
-    std::string y1 = Boolean::toString( y );
-    std::string z1 = Boolean::toString( z );
+    std::string x1 = Boolean::toString(x);
+    std::string y1 = Boolean::toString(y);
+    std::string z1 = Boolean::toString(z);
 
     ASSERT_TRUE(x1 == "false");
     ASSERT_TRUE(y1 == "true");
     ASSERT_TRUE(z1 == "false");
 
-    Boolean b( true );
+    Boolean b(true);
     ASSERT_TRUE(b.booleanValue() == true);
-
 }

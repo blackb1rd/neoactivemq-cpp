@@ -18,39 +18,40 @@
 #ifndef _CMS_EXCEPTIONLISTENER_H_
 #define _CMS_EXCEPTIONLISTENER_H_
 
-#include <cms/Config.h>
 #include <cms/CMSException.h>
+#include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * If a CMS provider detects a serious problem, it notifies the client
+ * application through an <code>ExceptionListener</code> that is registered
+ * with the <code>Connection</code>.
+ * <p>
+ * An exception listener allows a client to be notified of a problem
+ * asynchronously. Some connections only consume messages via the asynchronous
+ * event mechanism so they would have no other way to learn that their
+ * connection has failed.
+ *
+ * @since 1.0
+ */
+class CMS_API ExceptionListener
+{
+public:
+    virtual ~ExceptionListener();
 
     /**
-     * If a CMS provider detects a serious problem, it notifies the client
-     * application through an <code>ExceptionListener</code> that is registered
-     * with the <code>Connection</code>.
-     * <p>
-     * An exception listener allows a client to be notified of a problem asynchronously.
-     * Some connections only consume messages via the asynchronous event mechanism so
-     * they would have no other way to learn that their connection has failed.
+     * Called when an exception occurs.  Once notified of an exception
+     * the caller should no longer use the resource that generated the
+     * exception.
      *
-     * @since 1.0
+     * @param ex
+     *      Exception Object that occurred.
      */
-    class CMS_API ExceptionListener {
-    public:
+    virtual void onException(const cms::CMSException& ex) = 0;
+};
 
-        virtual ~ExceptionListener();
-
-        /**
-         * Called when an exception occurs.  Once notified of an exception
-         * the caller should no longer use the resource that generated the
-         * exception.
-         *
-         * @param ex
-         *      Exception Object that occurred.
-         */
-        virtual void onException(const cms::CMSException& ex) = 0;
-
-    };
-
-}
+}  // namespace cms
 
 #endif /*_CMS_EXCEPTIONLISTENER_H_*/

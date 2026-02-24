@@ -19,8 +19,8 @@
 
 #include <decaf/lang/System.h>
 
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 
 using namespace decaf;
 using namespace decaf::util;
@@ -30,34 +30,45 @@ using namespace decaf::lang::exceptions;
 unsigned long long Random::multiplier = 0x5deece66dLL;
 
 ////////////////////////////////////////////////////////////////////////////////
-Random::Random() : haveNextNextGaussian(false), seed(0), nextNextGaussian(0) {
-    setSeed( System::currentTimeMillis() );
+Random::Random()
+    : haveNextNextGaussian(false),
+      seed(0),
+      nextNextGaussian(0)
+{
+    setSeed(System::currentTimeMillis());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Random::Random(unsigned long long seed) : haveNextNextGaussian(false), seed(0), nextNextGaussian(0) {
+Random::Random(unsigned long long seed)
+    : haveNextNextGaussian(false),
+      seed(0),
+      nextNextGaussian(0)
+{
     setSeed(seed);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Random::~Random() {
+Random::~Random()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Random::nextBoolean() {
+bool Random::nextBoolean()
+{
     return next(1) != 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Random::nextBytes(std::vector<unsigned char>& buf) {
-
-    try {
-
-        if (buf.empty()) {
+void Random::nextBytes(std::vector<unsigned char>& buf)
+{
+    try
+    {
+        if (buf.empty())
+        {
             return;
         }
 
-        this->nextBytes(&buf[0], (int) buf.size());
+        this->nextBytes(&buf[0], (int)buf.size());
     }
     DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCH_RETHROW(IllegalArgumentException)
@@ -65,123 +76,145 @@ void Random::nextBytes(std::vector<unsigned char>& buf) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Random::nextBytes(unsigned char* buf, int size) {
-
-    if (buf == NULL) {
-        throw NullPointerException(__FILE__, __LINE__, "Buffer passed cannot be NULL.");
+void Random::nextBytes(unsigned char* buf, int size)
+{
+    if (buf == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Buffer passed cannot be NULL.");
     }
 
-    if (size < 0) {
-        throw IllegalArgumentException(__FILE__, __LINE__, "Specified buffer size was negative.");
+    if (size < 0)
+    {
+        throw IllegalArgumentException(__FILE__,
+                                       __LINE__,
+                                       "Specified buffer size was negative.");
     }
 
-    int rand = 0;
+    int rand  = 0;
     int count = 0, loop = 0;
-    while (count < size) {
-        if (loop == 0) {
+    while (count < size)
+    {
+        if (loop == 0)
+        {
             rand = nextInt();
             loop = 3;
-        } else {
+        }
+        else
+        {
             loop--;
         }
-        buf[count++] = (unsigned char) rand;
+        buf[count++] = (unsigned char)rand;
         rand >>= 8;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-double Random::nextDouble() {
+double Random::nextDouble()
+{
     // Ensure proper evaluation order by storing values
-    int upper = next(26);
-    int lower = next(27);
+    int       upper   = next(26);
+    int       lower   = next(27);
     long long divisor = 1LL;
     divisor <<= 31;
     divisor <<= 22;
-    return ((double) (((long long) upper << 27) + lower) / (double) divisor);
+    return ((double)(((long long)upper << 27) + lower) / (double)divisor);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-float Random::nextFloat() {
-    return ((float) next(24) / 16777216.0f);
+float Random::nextFloat()
+{
+    return ((float)next(24) / 16777216.0f);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-double Random::nextGaussian() {
-
-    if (haveNextNextGaussian) {
+double Random::nextGaussian()
+{
+    if (haveNextNextGaussian)
+    {
         // if X1 has been returned, return the second Gaussian
         haveNextNextGaussian = false;
         return nextNextGaussian;
     }
 
     double v1, v2, s;
-    do {
+    do
+    {
         // Generates two independent random variables U1, U2
         v1 = 2 * nextDouble() - 1;
         v2 = 2 * nextDouble() - 1;
-        s = v1 * v1 + v2 * v2;
+        s  = v1 * v1 + v2 * v2;
     } while (s >= 1);
     double norm = std::sqrt(-2 * std::log(s) / s);
     // should that not be norm instead of multiplier ?
-    nextNextGaussian = v2 * norm;
+    nextNextGaussian     = v2 * norm;
     haveNextNextGaussian = true;
     // should that not be norm instead of multiplier ?
     return v1 * norm;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Random::nextInt() {
+int Random::nextInt()
+{
     return next(32);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Random::nextInt(int n) {
-
-    if (n > 0) {
-
-        if ((n & -n) == n) {
-            return (int) ((n * (long long) next(31)) >> 31);
+int Random::nextInt(int n)
+{
+    if (n > 0)
+    {
+        if ((n & -n) == n)
+        {
+            return (int)((n * (long long)next(31)) >> 31);
         }
 
         int bits, val;
 
-        do {
+        do
+        {
             bits = next(31);
-            val = bits % n;
+            val  = bits % n;
         } while (bits - val + (n - 1) < 0);
 
         return val;
     }
 
     throw exceptions::IllegalArgumentException(
-        __FILE__, __LINE__, "Value passed cannot be less than or equal to zero.");
+        __FILE__,
+        __LINE__,
+        "Value passed cannot be less than or equal to zero.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long Random::nextLong() {
+long long Random::nextLong()
+{
     // Java uses: return ((long)(next(32)) << 32) + next(32);
     // In C++, we must prevent sign extension of the lower 32 bits
     // Store both values first to ensure proper evaluation order
     int upper = next(32);
     int lower = next(32);
-    return (((long long) upper) << 32) + ((unsigned int) lower);
+    return (((long long)upper) << 32) + ((unsigned int)lower);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Random::setSeed(unsigned long long seed) {
+void Random::setSeed(unsigned long long seed)
+{
     unsigned long long mask = 1ULL;
     mask <<= 31;
     mask <<= 17;
-    this->seed = (seed ^ multiplier) & (mask - 1);
+    this->seed           = (seed ^ multiplier) & (mask - 1);
     haveNextNextGaussian = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Random::next(int bits) {
+int Random::next(int bits)
+{
     long long mask = 1L;
     mask <<= 31;
     mask <<= 17;
     seed = (seed * multiplier + 0xbL) & (mask - 1);
     // was: return (int) (seed >>> (48 - bits));
-    return (int) (seed >> (48 - bits));
+    return (int)(seed >> (48 - bits));
 }

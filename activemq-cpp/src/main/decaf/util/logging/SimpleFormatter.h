@@ -22,33 +22,37 @@
 
 #include <string>
 
-namespace decaf{
-namespace util{
-namespace logging{
-
-    /**
-     * Print a brief summary of the LogRecord in a human readable format.
-     * The summary will typically be 1 or 2 lines.
-     *
-     * @since 1.0
-     */
-    class DECAF_API SimpleFormatter : public Formatter {
-    public:
-
-        SimpleFormatter();
-
-        virtual ~SimpleFormatter();
+namespace decaf
+{
+namespace util
+{
+    namespace logging
+    {
 
         /**
-         * Format the given log record and return the formatted string.
+         * Print a brief summary of the LogRecord in a human readable format.
+         * The summary will typically be 1 or 2 lines.
          *
-         * @param record
-         *      The Log Record to Format.
+         * @since 1.0
          */
-        virtual std::string format( const LogRecord& record ) const;
+        class DECAF_API SimpleFormatter : public Formatter
+        {
+        public:
+            SimpleFormatter();
 
-    };
+            virtual ~SimpleFormatter();
 
-}}}
+            /**
+             * Format the given log record and return the formatted string.
+             *
+             * @param record
+             *      The Log Record to Format.
+             */
+            virtual std::string format(const LogRecord& record) const;
+        };
+
+    }  // namespace logging
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_LOGGING_SIMPLEFORMATTER_H_*/

@@ -19,17 +19,17 @@
 #define _CMS_CONFIG_H_
 
 #ifdef CMS_DLL
- #ifdef CMS_EXPORTS
- #define CMS_API __declspec(dllexport)
- #else
- #define CMS_API __declspec(dllimport)
- #endif
+#ifdef CMS_EXPORTS
+#define CMS_API __declspec(dllexport)
 #else
- #if defined(__GNUC__) && __GNUC__ >= 4
- #define CMS_API __attribute__ ((visibility("default")))
- #else
- #define CMS_API
- #endif
+#define CMS_API __declspec(dllimport)
+#endif
+#else
+#if defined(__GNUC__) && __GNUC__ >= 4
+#define CMS_API __attribute__((visibility("default")))
+#else
+#define CMS_API
+#endif
 #endif
 
 #endif /*_CMS_CONFIG_H_*/

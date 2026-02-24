@@ -18,38 +18,39 @@
 #ifndef _CMS_QUEUE_H_
 #define _CMS_QUEUE_H_
 
+#include <cms/CMSException.h>
 #include <cms/Config.h>
 #include <cms/Destination.h>
-#include <cms/CMSException.h>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * An interface encapsulating a provider-specific queue name.
+ *
+ * Messages sent to a Queue are sent to a Single Subscriber on that Queue
+ * Destination. This allows for Queues to be used as load balances implementing
+ * a SEDA based architecture. The length of time that a Provider will store a
+ * Message in a Queue is not defined by the CMS API, consult your Provider
+ * documentation for this information.
+ *
+ * @since 1.0
+ */
+class CMS_API Queue : public Destination
+{
+public:
+    virtual ~Queue();
 
     /**
-     * An interface encapsulating a provider-specific queue name.
+     * Gets the name of this queue.
      *
-     * Messages sent to a Queue are sent to a Single Subscriber on that Queue Destination.
-     * This allows for Queues to be used as load balances implementing a SEDA based architecture.
-     * The length of time that a Provider will store a Message in a Queue is not defined by
-     * the CMS API, consult your Provider documentation for this information.
+     * @return The queue name.
      *
-     * @since 1.0
+     * @throws CMSException - If an internal error occurs.
      */
-    class CMS_API Queue : public Destination {
-    public:
+    virtual std::string getQueueName() const = 0;
+};
 
-        virtual ~Queue();
-
-        /**
-         * Gets the name of this queue.
-         *
-         * @return The queue name.
-         *
-         * @throws CMSException - If an internal error occurs.
-         */
-        virtual std::string getQueueName() const = 0;
-
-    };
-
-}
+}  // namespace cms
 
 #endif /*_CMS_QUEUE_H_*/

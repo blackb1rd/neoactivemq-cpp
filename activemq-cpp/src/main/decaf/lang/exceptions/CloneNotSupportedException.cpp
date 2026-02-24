@@ -22,30 +22,45 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-CloneNotSupportedException::CloneNotSupportedException() : Exception() {
+CloneNotSupportedException::CloneNotSupportedException()
+    : Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CloneNotSupportedException::~CloneNotSupportedException() throw () {
+CloneNotSupportedException::~CloneNotSupportedException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CloneNotSupportedException::CloneNotSupportedException(const Exception& ex) : Exception() {
-    *(Exception*) this = ex;
+CloneNotSupportedException::CloneNotSupportedException(const Exception& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CloneNotSupportedException::CloneNotSupportedException(const CloneNotSupportedException& ex) : Exception() {
-    *(Exception*) this = ex;
+CloneNotSupportedException::CloneNotSupportedException(
+    const CloneNotSupportedException& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CloneNotSupportedException::CloneNotSupportedException(const std::exception* cause) : Exception(cause) {
+CloneNotSupportedException::CloneNotSupportedException(
+    const std::exception* cause)
+    : Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CloneNotSupportedException::CloneNotSupportedException(const char* file, const int lineNumber, const char* msg, ...) : Exception() {
-
+CloneNotSupportedException::CloneNotSupportedException(const char* file,
+                                                       const int   lineNumber,
+                                                       const char* msg,
+                                                       ...)
+    : Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +70,14 @@ CloneNotSupportedException::CloneNotSupportedException(const char* file, const i
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CloneNotSupportedException::CloneNotSupportedException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : Exception(cause) {
-
+CloneNotSupportedException::CloneNotSupportedException(
+    const char*           file,
+    const int             lineNumber,
+    const std::exception* cause,
+    const char*           msg,
+    ...)
+    : Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

@@ -17,13 +17,13 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/Set.h>
-#include <decaf/util/Iterator.h>
-#include <decaf/util/LinkedHashMap.h>
-#include <decaf/util/StlMap.h>
-#include <decaf/util/ArrayList.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/util/ArrayList.h>
+#include <decaf/util/Iterator.h>
+#include <decaf/util/LinkedHashMap.h>
+#include <decaf/util/Set.h>
+#include <decaf/util/StlMap.h>
 
 using namespace std;
 using namespace decaf;
@@ -31,103 +31,122 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class LinkedHashMapTest : public ::testing::Test {
+class LinkedHashMapTest : public ::testing::Test
+{
 public:
-
-        LinkedHashMapTest();
-        virtual ~LinkedHashMapTest();
-
-    };
+    LinkedHashMapTest();
+    virtual ~LinkedHashMapTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    const int MAP_SIZE = 1000;
+const int MAP_SIZE = 1000;
 
-    void populateMap(LinkedHashMap<int, std::string>& map) {
-        for (int i = 0; i < MAP_SIZE; ++i) {
-            map.put(i, Integer::toString(i));
-        }
-    }
-
-    void populateMap(LinkedHashMap<int, std::string>& map, int num) {
-        for (int i = 0; i < num; ++i) {
-            map.put(i, Integer::toString(i));
-        }
+void populateMap(LinkedHashMap<int, std::string>& map)
+{
+    for (int i = 0; i < MAP_SIZE; ++i)
+    {
+        map.put(i, Integer::toString(i));
     }
 }
 
+void populateMap(LinkedHashMap<int, std::string>& map, int num)
+{
+    for (int i = 0; i < num; ++i)
+    {
+        map.put(i, Integer::toString(i));
+    }
+}
+}  // namespace
+
 ////////////////////////////////////////////////////////////////////////////////
-LinkedHashMapTest::LinkedHashMapTest() {
+LinkedHashMapTest::LinkedHashMapTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-LinkedHashMapTest::~LinkedHashMapTest() {
+LinkedHashMapTest::~LinkedHashMapTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testConstructor) {
-
+TEST_F(LinkedHashMapTest, testConstructor)
+{
     LinkedHashMap<int, std::string> map;
     ASSERT_TRUE(map.isEmpty());
     ASSERT_TRUE(map.size() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testConstructorI) {
-
+TEST_F(LinkedHashMapTest, testConstructorI)
+{
     LinkedHashMap<int, std::string> map(5);
 
     ASSERT_EQ(0, map.size()) << ("Created incorrect LinkedHashMap");
 
-    try {
+    try
+    {
         LinkedHashMap<int, std::string> map(-1);
-        FAIL() << ("Should have thrown IllegalArgumentException for negative arg.");
-    } catch (IllegalArgumentException& e) {
+        FAIL() << ("Should have thrown IllegalArgumentException for negative "
+                   "arg.");
+    }
+    catch (IllegalArgumentException& e)
+    {
     }
 
     LinkedHashMap<int, std::string> empty(0);
-    ASSERT_THROW(empty.get(1), NoSuchElementException) << ("Should have thrown NoSuchElementException");
+    ASSERT_THROW(empty.get(1), NoSuchElementException)
+        << ("Should have thrown NoSuchElementException");
     empty.put(1, "here");
     ASSERT_TRUE(empty.get(1) == std::string("here")) << ("cannot get element");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testConstructorIF) {
-
+TEST_F(LinkedHashMapTest, testConstructorIF)
+{
     LinkedHashMap<int, std::string> map(5, 0.5f);
 
     ASSERT_EQ(0, map.size()) << ("Created incorrect LinkedHashMap");
 
-    try {
+    try
+    {
         LinkedHashMap<int, std::string> map(0, 0);
-        FAIL() << ("Should have thrown IllegalArgumentException for negative arg.");
-    } catch (IllegalArgumentException& e) {
+        FAIL() << ("Should have thrown IllegalArgumentException for negative "
+                   "arg.");
+    }
+    catch (IllegalArgumentException& e)
+    {
     }
 
     LinkedHashMap<int, std::string> empty(0, 0.25f);
-    ASSERT_THROW(empty.get(1), NoSuchElementException) << ("Should have thrown NoSuchElementException");
+    ASSERT_THROW(empty.get(1), NoSuchElementException)
+        << ("Should have thrown NoSuchElementException");
     empty.put(1, "here");
     ASSERT_TRUE(empty.get(1) == std::string("here")) << ("cannot get element");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testConstructorMap) {
-
+TEST_F(LinkedHashMapTest, testConstructorMap)
+{
     LinkedHashMap<int, int> myMap;
-    for (int counter = 0; counter < 125; counter++) {
+    for (int counter = 0; counter < 125; counter++)
+    {
         myMap.put(counter, counter);
     }
 
     LinkedHashMap<int, int> hashMap(myMap);
-    for (int counter = 0; counter < 125; counter++) {
-        ASSERT_TRUE(myMap.get(counter) == hashMap.get(counter)) << ("Failed to construct correct LinkedHashMap");
+    for (int counter = 0; counter < 125; counter++)
+    {
+        ASSERT_TRUE(myMap.get(counter) == hashMap.get(counter))
+            << ("Failed to construct correct LinkedHashMap");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testClear) {
-
+TEST_F(LinkedHashMapTest, testClear)
+{
     LinkedHashMap<int, std::string> hashMap;
     hashMap.put(1, "one");
     hashMap.put(3, "three");
@@ -135,25 +154,30 @@ TEST_F(LinkedHashMapTest, testClear) {
 
     hashMap.clear();
     ASSERT_EQ(0, hashMap.size()) << ("Clear failed to reset size");
-    for (int i = 0; i < 125; i++) {
-        ASSERT_THROW(hashMap.get(i), NoSuchElementException) << ("Failed to clear all elements");
+    for (int i = 0; i < 125; i++)
+    {
+        ASSERT_THROW(hashMap.get(i), NoSuchElementException)
+            << ("Failed to clear all elements");
     }
 
     // Check clear on a large loaded map of Integer keys
     LinkedHashMap<int, std::string> map;
-    for (int i = -32767; i < 32768; i++) {
+    for (int i = -32767; i < 32768; i++)
+    {
         map.put(i, "foobar");
     }
     map.clear();
     ASSERT_EQ(0, map.size()) << ("Failed to reset size on large integer map");
-    for (int i = -32767; i < 32768; i++) {
-        ASSERT_THROW(map.get(i), NoSuchElementException) << ("Failed to clear all elements");
+    for (int i = -32767; i < 32768; i++)
+    {
+        ASSERT_THROW(map.get(i), NoSuchElementException)
+            << ("Failed to clear all elements");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testContainsKey) {
-
+TEST_F(LinkedHashMapTest, testContainsKey)
+{
     LinkedHashMap<int, std::string> hashMap;
 
     hashMap.put(876, "test");
@@ -164,36 +188,44 @@ TEST_F(LinkedHashMapTest, testContainsKey) {
     LinkedHashMap<int, std::string> hashMap2;
     hashMap2.put(0, "test");
     ASSERT_TRUE(hashMap2.containsKey(0)) << ("Failed with key");
-    ASSERT_TRUE(!hashMap2.containsKey(1)) << ("Failed with missing key matching hash");
+    ASSERT_TRUE(!hashMap2.containsKey(1))
+        << ("Failed with missing key matching hash");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testContainsValue) {
-
+TEST_F(LinkedHashMapTest, testContainsValue)
+{
     LinkedHashMap<int, std::string> hashMap;
 
     hashMap.put(876, "test");
 
-    ASSERT_TRUE(hashMap.containsValue("test")) << ("Returned false for valid value");
-    ASSERT_TRUE(!hashMap.containsValue("")) << ("Returned true for invalid valie");
+    ASSERT_TRUE(hashMap.containsValue("test"))
+        << ("Returned false for valid value");
+    ASSERT_TRUE(!hashMap.containsValue(""))
+        << ("Returned true for invalid valie");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testEntrySet) {
-
+TEST_F(LinkedHashMapTest, testEntrySet)
+{
     LinkedHashMap<int, std::string> hashMap;
 
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 50; i++)
+    {
         hashMap.put(i, Integer::toString(i));
     }
 
-    Set<MapEntry<int, std::string> >& set = hashMap.entrySet();
-    Pointer< Iterator<MapEntry<int, std::string> > > iterator(set.iterator());
+    Set<MapEntry<int, std::string>>&              set = hashMap.entrySet();
+    Pointer<Iterator<MapEntry<int, std::string>>> iterator(set.iterator());
 
-    ASSERT_TRUE(hashMap.size() == set.size()) << ("Returned set of incorrect size");
-    while (iterator->hasNext()) {
+    ASSERT_TRUE(hashMap.size() == set.size())
+        << ("Returned set of incorrect size");
+    while (iterator->hasNext())
+    {
         MapEntry<int, std::string> entry = iterator->next();
-        ASSERT_TRUE(hashMap.containsKey(entry.getKey()) && hashMap.containsValue(entry.getValue())) << ("Returned incorrect entry set");
+        ASSERT_TRUE(hashMap.containsKey(entry.getKey()) &&
+                    hashMap.containsValue(entry.getValue()))
+            << ("Returned incorrect entry set");
     }
 
     iterator.reset(set.iterator());
@@ -202,18 +234,20 @@ TEST_F(LinkedHashMapTest, testEntrySet) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testGet) {
-
+TEST_F(LinkedHashMapTest, testGet)
+{
     LinkedHashMap<int, std::string> hashMap;
 
-    ASSERT_THROW(hashMap.get(1), NoSuchElementException) << ("Should have thrown NoSuchElementException");
+    ASSERT_THROW(hashMap.get(1), NoSuchElementException)
+        << ("Should have thrown NoSuchElementException");
     hashMap.put(22, "HELLO");
-    ASSERT_EQ(std::string("HELLO"), hashMap.get(22)) << ("Get returned incorrect value for existing key");
+    ASSERT_EQ(std::string("HELLO"), hashMap.get(22))
+        << ("Get returned incorrect value for existing key");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testIsEmpty) {
-
+TEST_F(LinkedHashMapTest, testIsEmpty)
+{
     LinkedHashMap<int, std::string> hashMap;
 
     ASSERT_TRUE(hashMap.isEmpty()) << ("Returned false for new map");
@@ -224,14 +258,17 @@ TEST_F(LinkedHashMapTest, testIsEmpty) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testKeySet) {
-
+TEST_F(LinkedHashMapTest, testKeySet)
+{
     LinkedHashMap<int, std::string> hashMap;
     populateMap(hashMap);
     Set<int>& set = hashMap.keySet();
-    ASSERT_TRUE(set.size() == hashMap.size()) << ("Returned set of incorrect size()");
-    for (int i = 0; i < MAP_SIZE; i++) {
-        ASSERT_TRUE(set.contains(i)) << ("Returned set does not contain all keys");
+    ASSERT_TRUE(set.size() == hashMap.size())
+        << ("Returned set of incorrect size()");
+    for (int i = 0; i < MAP_SIZE; i++)
+    {
+        ASSERT_TRUE(set.contains(i))
+            << ("Returned set does not contain all keys");
     }
 
     {
@@ -246,9 +283,9 @@ TEST_F(LinkedHashMapTest, testKeySet) {
         localMap.put(102, "102");
         localMap.put(203, "203");
 
-        Set<int>& intSet = localMap.keySet();
-        Pointer< Iterator<int> > it(intSet.iterator());
-        int remove1 = it->next();
+        Set<int>&              intSet = localMap.keySet();
+        Pointer<Iterator<int>> it(intSet.iterator());
+        int                    remove1 = it->next();
         it->hasNext();
         it->remove();
         int remove2 = it->next();
@@ -272,15 +309,18 @@ TEST_F(LinkedHashMapTest, testKeySet) {
         map2.put(1, "1");
         map2.put(4, "4");
 
-        Set<int>& intSet = map2.keySet();
-        Pointer< Iterator<int> > it2(intSet.iterator());
+        Set<int>&              intSet = map2.keySet();
+        Pointer<Iterator<int>> it2(intSet.iterator());
 
         int remove3 = it2->next();
         int next;
 
-        if (remove3 == 1) {
+        if (remove3 == 1)
+        {
             next = 4;
-        } else {
+        }
+        else
+        {
             next = 1;
         }
         it2->hasNext();
@@ -293,68 +333,78 @@ TEST_F(LinkedHashMapTest, testKeySet) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class MyKey {
-    private:
+class MyKey
+{
+private:
+    static int COUNTER;
 
-        static int COUNTER;
+    int id;
 
-        int id;
-
-    public:
-
-        MyKey() : id(++COUNTER) {
-        }
-
-        int hashCode() const {
-            return 0;
-        }
-
-        bool operator==(const MyKey& key) const {
-            return this->id == key.id;
-        }
-
-        friend std::ostream& operator<<(std::ostream& stream, const MyKey& key);
-    };
-
-    std::ostream& operator<<(std::ostream& stream, const MyKey& key) {
-        stream << "MyKey: " << key.id;
-        return stream;
+public:
+    MyKey()
+        : id(++COUNTER)
+    {
     }
 
-    int MyKey::COUNTER = 0;
+    int hashCode() const
+    {
+        return 0;
+    }
+
+    bool operator==(const MyKey& key) const
+    {
+        return this->id == key.id;
+    }
+
+    friend std::ostream& operator<<(std::ostream& stream, const MyKey& key);
+};
+
+std::ostream& operator<<(std::ostream& stream, const MyKey& key)
+{
+    stream << "MyKey: " << key.id;
+    return stream;
 }
+
+int MyKey::COUNTER = 0;
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace decaf {
-namespace util {
-    template<>
-    struct HashCode<MyKey> {
-
+namespace decaf
+{
+namespace util
+{
+    template <>
+    struct HashCode<MyKey>
+    {
         typedef MyKey argument_type;
-        typedef int result_type;
+        typedef int   result_type;
 
-        int operator()(const MyKey& arg) const {
+        int operator()(const MyKey& arg) const
+        {
             return arg.hashCode();
         }
     };
-}
-}
+}  // namespace util
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testPut) {
-
+TEST_F(LinkedHashMapTest, testPut)
+{
     {
         LinkedHashMap<std::string, std::string> hashMap(101);
         hashMap.put("KEY", "VALUE");
-        ASSERT_EQ(std::string("VALUE"), hashMap.get("KEY")) << ("Failed to install key/value pair");
+        ASSERT_EQ(std::string("VALUE"), hashMap.get("KEY"))
+            << ("Failed to install key/value pair");
     }
     {
         // Check my actual key instance is returned
         LinkedHashMap<int, std::string> map;
-        for (int i = -32767; i < 32768; i++) {
+        for (int i = -32767; i < 32768; i++)
+        {
             map.put(i, "foobar");
         }
         int myKey = 0;
@@ -362,13 +412,15 @@ TEST_F(LinkedHashMapTest, testPut) {
         map.put(myKey, "myValue");
         ASSERT_TRUE(map.containsKey(myKey));
         ASSERT_EQ(std::string("myValue"), map.get(myKey));
-        bool found = false;
-        Set<int>& intSet = map.keySet();
-        Pointer< Iterator<int> > itr(intSet.iterator());
-        while (itr->hasNext()) {
+        bool                   found  = false;
+        Set<int>&              intSet = map.keySet();
+        Pointer<Iterator<int>> itr(intSet.iterator());
+        while (itr->hasNext())
+        {
             int key = itr->next();
-            found = (key == myKey);
-            if (found) {
+            found   = (key == myKey);
+            if (found)
+            {
                 break;
             }
         }
@@ -380,10 +432,12 @@ TEST_F(LinkedHashMapTest, testPut) {
         ASSERT_TRUE(map.containsKey(myKey));
         ASSERT_EQ(std::string("myValue"), map.get(myKey));
         itr.reset(intSet.iterator());
-        while (itr->hasNext()) {
+        while (itr->hasNext())
+        {
             int key = itr->next();
-            found = (key == myKey);
-            if (found) {
+            found   = (key == myKey);
+            if (found)
+            {
                 break;
             }
         }
@@ -398,7 +452,8 @@ TEST_F(LinkedHashMapTest, testPut) {
         ASSERT_TRUE(!map.containsKey(aKey));
         map.put(aKey, "value");
         MyKey aKey2;
-        ASSERT_THROW(map.remove(aKey2), NoSuchElementException) << ("Should have thrown NoSuchElementException");
+        ASSERT_THROW(map.remove(aKey2), NoSuchElementException)
+            << ("Should have thrown NoSuchElementException");
         MyKey aKey3;
         map.put(aKey3, "foobar");
         ASSERT_EQ(std::string("foobar"), map.get(aKey3));
@@ -407,50 +462,64 @@ TEST_F(LinkedHashMapTest, testPut) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testPutAll) {
-
+TEST_F(LinkedHashMapTest, testPutAll)
+{
     LinkedHashMap<int, std::string> hashMap;
     populateMap(hashMap);
 
     LinkedHashMap<int, std::string> hashMap2;
     hashMap2.putAll(hashMap);
-    for (int i = 0; i < 1000; i++) {
-        ASSERT_TRUE(hashMap2.get(i) == Integer::toString(i)) << ("Failed to put all elements into new Map");
+    for (int i = 0; i < 1000; i++)
+    {
+        ASSERT_TRUE(hashMap2.get(i) == Integer::toString(i))
+            << ("Failed to put all elements into new Map");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testRemove) {
-
+TEST_F(LinkedHashMapTest, testRemove)
+{
     {
         LinkedHashMap<int, std::string> hashMap;
         populateMap(hashMap);
 
         int size = hashMap.size();
-        ASSERT_NO_THROW(hashMap.remove(9)) << ("Remove returned incorrect value");
-        ASSERT_THROW(hashMap.get(9), NoSuchElementException) << ("Should have thrown a NoSuchElementException on get of non-existent key.");
+        ASSERT_NO_THROW(hashMap.remove(9))
+            << ("Remove returned incorrect value");
+        ASSERT_THROW(hashMap.get(9), NoSuchElementException)
+            << ("Should have thrown a NoSuchElementException on get of "
+                "non-existent key.");
 
-        ASSERT_TRUE(hashMap.size() == (size - 1)) << ("Failed to decrement size");
-        ASSERT_THROW(hashMap.remove(9), NoSuchElementException) << ("Should have thrown a NoSuchElementException on remove of non-existent key.");
+        ASSERT_TRUE(hashMap.size() == (size - 1))
+            << ("Failed to decrement size");
+        ASSERT_THROW(hashMap.remove(9), NoSuchElementException)
+            << ("Should have thrown a NoSuchElementException on remove of "
+                "non-existent key.");
     }
     {
         LinkedHashMap<int, std::string> hashMap;
-        for (int i = 0; i < 8192; i++) {
+        for (int i = 0; i < 8192; i++)
+        {
             hashMap.put(i, "const");
         }
-        for (int i = 0; i < 8192; i++) {
+        for (int i = 0; i < 8192; i++)
+        {
             hashMap.put(i, Integer::toString(i));
         }
-        for (int i = 8191; i >= 0; i--) {
+        for (int i = 8191; i >= 0; i--)
+        {
             std::string iValue = Integer::toString(i);
-            ASSERT_TRUE(hashMap.containsValue(iValue)) << (std::string("Failed to replace value: ") + iValue);
+            ASSERT_TRUE(hashMap.containsValue(iValue))
+                << (std::string("Failed to replace value: ") + iValue);
             hashMap.remove(i);
-            ASSERT_TRUE(!hashMap.containsValue(iValue)) << (std::string("Failed to remove same value: ") + iValue);
+            ASSERT_TRUE(!hashMap.containsValue(iValue))
+                << (std::string("Failed to remove same value: ") + iValue);
         }
     }
 
     {
-        // Ensure keys with identical hashcode are stored separately and removed correctly.
+        // Ensure keys with identical hashcode are stored separately and removed
+        // correctly.
         LinkedHashMap<MyKey, std::string> map;
 
         // Put non-equal object with same hashcode
@@ -458,7 +527,8 @@ TEST_F(LinkedHashMapTest, testRemove) {
         ASSERT_TRUE(!map.containsKey(aKey));
         map.put(aKey, "value");
         MyKey aKey2;
-        ASSERT_THROW(map.remove(aKey2), NoSuchElementException) << ("Should have thrown NoSuchElementException");
+        ASSERT_THROW(map.remove(aKey2), NoSuchElementException)
+            << ("Should have thrown NoSuchElementException");
         MyKey aKey3;
         map.put(aKey3, "foobar");
         ASSERT_EQ(std::string("foobar"), map.get(aKey3));
@@ -471,7 +541,8 @@ TEST_F(LinkedHashMapTest, testRemove) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testRehash) {
+TEST_F(LinkedHashMapTest, testRehash)
+{
     // This map should rehash on adding the ninth element.
     LinkedHashMap<MyKey, int> hashMap(10, 0.5f);
 
@@ -479,14 +550,16 @@ TEST_F(LinkedHashMapTest, testRehash) {
     MyKey keyOrder[9];
 
     // Store eight elements
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++)
+    {
         hashMap.put(keyOrder[i], i);
     }
 
     // Check expected ordering
-    Set<MyKey>& keySet = hashMap.keySet();
+    Set<MyKey>&        keySet       = hashMap.keySet();
     std::vector<MyKey> returnedKeys = keySet.toArray();
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++)
+    {
         ASSERT_EQ(keyOrder[i], returnedKeys[i]);
     }
 
@@ -494,13 +567,15 @@ TEST_F(LinkedHashMapTest, testRehash) {
     hashMap.put(keyOrder[8], 8);
     // Check expected insertion ordering
     returnedKeys = keySet.toArray();
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < 9; i++)
+    {
         ASSERT_EQ(keyOrder[i], returnedKeys[i]);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testSize) {
+TEST_F(LinkedHashMapTest, testSize)
+{
     LinkedHashMap<int, std::string> hashMap;
     populateMap(hashMap);
 
@@ -508,24 +583,28 @@ TEST_F(LinkedHashMapTest, testSize) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testValues) {
-
+TEST_F(LinkedHashMapTest, testValues)
+{
     LinkedHashMap<int, std::string> hashMap;
     populateMap(hashMap);
 
     Collection<std::string>& c = hashMap.values();
-    ASSERT_TRUE(c.size() == hashMap.size()) << ("Returned collection of incorrect size()");
-    for (int i = 0; i < MAP_SIZE; i++) {
-        ASSERT_TRUE(c.contains(Integer::toString(i))) << ("Returned collection does not contain all keys");
+    ASSERT_TRUE(c.size() == hashMap.size())
+        << ("Returned collection of incorrect size()");
+    for (int i = 0; i < MAP_SIZE; i++)
+    {
+        ASSERT_TRUE(c.contains(Integer::toString(i)))
+            << ("Returned collection does not contain all keys");
     }
 
     c.remove("10");
-    ASSERT_TRUE(!hashMap.containsKey(10)) << ("Removing from collection should alter Map");
+    ASSERT_TRUE(!hashMap.containsKey(10))
+        << ("Removing from collection should alter Map");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testToString) {
-
+TEST_F(LinkedHashMapTest, testToString)
+{
     LinkedHashMap<int, std::string> hashMap;
     populateMap(hashMap);
     std::string result = hashMap.toString();
@@ -533,99 +612,118 @@ TEST_F(LinkedHashMapTest, testToString) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testEntrySetIterator) {
-
+TEST_F(LinkedHashMapTest, testEntrySetIterator)
+{
     LinkedHashMap<int, std::string> map;
     populateMap(map);
 
-    int count = 0;
-    Pointer< Iterator<MapEntry<int, std::string> > > iterator(map.entrySet().iterator());
-    while (iterator->hasNext()) {
+    int                                           count = 0;
+    Pointer<Iterator<MapEntry<int, std::string>>> iterator(
+        map.entrySet().iterator());
+    while (iterator->hasNext())
+    {
         MapEntry<int, std::string> entry = iterator->next();
         ASSERT_EQ(count, entry.getKey());
         ASSERT_EQ(Integer::toString(count), entry.getValue());
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't cover the expected range");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.entrySet().iterator());
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 
     count = 0;
-    while (iterator->hasNext()) {
+    while (iterator->hasNext())
+    {
         iterator->next();
         iterator->remove();
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't remove the expected range");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testKeySetIterator) {
-
+TEST_F(LinkedHashMapTest, testKeySetIterator)
+{
     LinkedHashMap<int, std::string> map;
     populateMap(map);
 
-    int count = 0;
-    Pointer< Iterator<int> > iterator(map.keySet().iterator());
-    while (iterator->hasNext()) {
+    int                    count = 0;
+    Pointer<Iterator<int>> iterator(map.keySet().iterator());
+    while (iterator->hasNext())
+    {
         int key = iterator->next();
         ASSERT_EQ(count, key);
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't cover the expected range");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.keySet().iterator());
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 
     count = 0;
-    while (iterator->hasNext()) {
+    while (iterator->hasNext())
+    {
         iterator->next();
         iterator->remove();
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't remove the expected range");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testValuesIterator) {
-
+TEST_F(LinkedHashMapTest, testValuesIterator)
+{
     LinkedHashMap<int, std::string> map;
     populateMap(map);
 
-    int count = 0;
-    Pointer< Iterator<std::string> > iterator(map.values().iterator());
-    while (iterator->hasNext()) {
+    int                            count = 0;
+    Pointer<Iterator<std::string>> iterator(map.values().iterator());
+    while (iterator->hasNext())
+    {
         std::string value = iterator->next();
         ASSERT_EQ(Integer::toString(count), value);
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't cover the expected range");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.values().iterator());
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 
     count = 0;
-    while (iterator->hasNext()) {
+    while (iterator->hasNext())
+    {
         iterator->next();
         iterator->remove();
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't remove the expected range");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testOrderedEntrySet) {
-
+TEST_F(LinkedHashMapTest, testOrderedEntrySet)
+{
     int i;
     int size = 100;
 
@@ -633,12 +731,14 @@ TEST_F(LinkedHashMapTest, testOrderedEntrySet) {
         LinkedHashMap<int, std::string> map;
         populateMap(map, size);
 
-        Set<MapEntry<int, std::string> >& set = map.entrySet();
-        Pointer< Iterator<MapEntry<int, std::string> > > iter(set.iterator());
-        ASSERT_TRUE(map.size() == set.size()) << ("Returned set of incorrect size 1");
-        for (i = 0; iter->hasNext(); i++) {
+        Set<MapEntry<int, std::string>>&              set = map.entrySet();
+        Pointer<Iterator<MapEntry<int, std::string>>> iter(set.iterator());
+        ASSERT_TRUE(map.size() == set.size())
+            << ("Returned set of incorrect size 1");
+        for (i = 0; iter->hasNext(); i++)
+        {
             MapEntry<int, std::string> entry = iter->next();
-            int key = entry.getKey();
+            int                        key   = entry.getKey();
             ASSERT_TRUE(key == i) << ("Returned incorrect entry set 1");
         }
     }
@@ -646,42 +746,48 @@ TEST_F(LinkedHashMapTest, testOrderedEntrySet) {
     LinkedHashMap<int, std::string> map2(200, .75f, true);
     populateMap(map2, size);
 
-    Set<MapEntry<int, std::string> >& set = map2.entrySet();
-    Pointer< Iterator<MapEntry<int, std::string> > > iter(set.iterator());
-    ASSERT_TRUE(map2.size() == set.size()) << ("Returned set of incorrect size 2");
-    for (i = 0; i < size && iter->hasNext(); i++) {
+    Set<MapEntry<int, std::string>>&              set = map2.entrySet();
+    Pointer<Iterator<MapEntry<int, std::string>>> iter(set.iterator());
+    ASSERT_TRUE(map2.size() == set.size())
+        << ("Returned set of incorrect size 2");
+    for (i = 0; i < size && iter->hasNext(); i++)
+    {
         MapEntry<int, std::string> entry = iter->next();
-        int key = entry.getKey();
+        int                        key   = entry.getKey();
         ASSERT_TRUE(key == i) << ("Returned incorrect entry set 2");
     }
 
     /* fetch the even numbered entries to affect traversal order */
     int p = 0;
-    for (i = 0; i < size; i += 2) {
+    for (i = 0; i < size; i += 2)
+    {
         std::string ii = map2.get(i);
-        p = p + Integer::parseInt(ii);
+        p              = p + Integer::parseInt(ii);
     }
     ASSERT_EQ(2450, p) << ("invalid sum of even numbers");
 
     set = map2.entrySet();
     iter.reset(set.iterator());
-    ASSERT_TRUE(map2.size() == set.size()) << ("Returned set of incorrect size 3");
-    for (i = 1; i < size && iter->hasNext(); i += 2) {
+    ASSERT_TRUE(map2.size() == set.size())
+        << ("Returned set of incorrect size 3");
+    for (i = 1; i < size && iter->hasNext(); i += 2)
+    {
         MapEntry<int, std::string> entry = iter->next();
-        int key = entry.getKey();
+        int                        key   = entry.getKey();
         ASSERT_EQ(key, i) << ("Returned incorrect entry set 3");
     }
-    for (i = 0; i < size && iter->hasNext(); i += 2) {
+    for (i = 0; i < size && iter->hasNext(); i += 2)
+    {
         MapEntry<int, std::string> entry = iter->next();
-        int key = entry.getKey();
+        int                        key   = entry.getKey();
         ASSERT_EQ(key, i) << ("Returned incorrect entry set 4");
     }
     ASSERT_TRUE(!iter->hasNext()) << ("Entries left to iterate on");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testOrderedKeySet) {
-
+TEST_F(LinkedHashMapTest, testOrderedKeySet)
+{
     int i;
     int size = 100;
 
@@ -689,10 +795,12 @@ TEST_F(LinkedHashMapTest, testOrderedKeySet) {
         LinkedHashMap<int, std::string> map;
         populateMap(map, size);
 
-        Set<int>& set = map.keySet();
-        Pointer< Iterator<int> > iter(set.iterator());
-        ASSERT_TRUE(map.size() == set.size()) << ("Returned set of incorrect size 1");
-        for (i = 0; iter->hasNext(); i++) {
+        Set<int>&              set = map.keySet();
+        Pointer<Iterator<int>> iter(set.iterator());
+        ASSERT_TRUE(map.size() == set.size())
+            << ("Returned set of incorrect size 1");
+        for (i = 0; iter->hasNext(); i++)
+        {
             int key = iter->next();
             ASSERT_TRUE(key == i) << ("Returned incorrect key set 1");
         }
@@ -701,30 +809,36 @@ TEST_F(LinkedHashMapTest, testOrderedKeySet) {
     LinkedHashMap<int, std::string> map2(200, .75f, true);
     populateMap(map2, size);
 
-    Set<int>& set = map2.keySet();
-    Pointer< Iterator<int> > iter(set.iterator());
-    ASSERT_TRUE(map2.size() == set.size()) << ("Returned set of incorrect size 2");
-    for (i = 0; i < size && iter->hasNext(); i++) {
+    Set<int>&              set = map2.keySet();
+    Pointer<Iterator<int>> iter(set.iterator());
+    ASSERT_TRUE(map2.size() == set.size())
+        << ("Returned set of incorrect size 2");
+    for (i = 0; i < size && iter->hasNext(); i++)
+    {
         int key = iter->next();
         ASSERT_TRUE(key == i) << ("Returned incorrect key set 2");
     }
 
     /* fetch the even numbered entries to affect traversal order */
     int p = 0;
-    for (i = 0; i < size; i += 2) {
+    for (i = 0; i < size; i += 2)
+    {
         std::string ii = map2.get(i);
-        p = p + Integer::parseInt(ii);
+        p              = p + Integer::parseInt(ii);
     }
     ASSERT_EQ(2450, p) << ("invalid sum of even numbers");
 
     set = map2.keySet();
     iter.reset(set.iterator());
-    ASSERT_TRUE(map2.size() == set.size()) << ("Returned set of incorrect size 3");
-    for (i = 1; i < size && iter->hasNext(); i += 2) {
+    ASSERT_TRUE(map2.size() == set.size())
+        << ("Returned set of incorrect size 3");
+    for (i = 1; i < size && iter->hasNext(); i += 2)
+    {
         int key = iter->next();
         ASSERT_EQ(key, i) << ("Returned incorrect key set 3");
     }
-    for (i = 0; i < size && iter->hasNext(); i += 2) {
+    for (i = 0; i < size && iter->hasNext(); i += 2)
+    {
         int key = iter->next();
         ASSERT_EQ(key, i) << ("Returned incorrect key set 4");
     }
@@ -732,54 +846,64 @@ TEST_F(LinkedHashMapTest, testOrderedKeySet) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testOrderedValues) {
-
+TEST_F(LinkedHashMapTest, testOrderedValues)
+{
     int i;
     int size = 100;
 
     {
         LinkedHashMap<int, int> map;
-        for (i = 0; i < size; i++) {
+        for (i = 0; i < size; i++)
+        {
             map.put(i, i * 2);
         }
 
-        Collection<int>& set = map.values();
-        Pointer< Iterator<int> > iter(set.iterator());
-        ASSERT_TRUE(map.size() == set.size()) << ("Returned set of incorrect size 1");
-        for (i = 0; iter->hasNext(); i++) {
+        Collection<int>&       set = map.values();
+        Pointer<Iterator<int>> iter(set.iterator());
+        ASSERT_TRUE(map.size() == set.size())
+            << ("Returned set of incorrect size 1");
+        for (i = 0; iter->hasNext(); i++)
+        {
             int value = iter->next();
             ASSERT_EQ(value, i * 2) << ("Returned incorrect values set 1");
         }
     }
 
     LinkedHashMap<int, int> map2(200, .75f, true);
-    for (i = 0; i < size; i++) {
+    for (i = 0; i < size; i++)
+    {
         map2.put(i, i * 2);
     }
 
-    Collection<int>& set = map2.values();
-    Pointer< Iterator<int> > iter(set.iterator());
-    ASSERT_TRUE(map2.size() == set.size()) << ("Returned set of incorrect size 2");
-    for (i = 0; i < size && iter->hasNext(); i++) {
+    Collection<int>&       set = map2.values();
+    Pointer<Iterator<int>> iter(set.iterator());
+    ASSERT_TRUE(map2.size() == set.size())
+        << ("Returned set of incorrect size 2");
+    for (i = 0; i < size && iter->hasNext(); i++)
+    {
         int value = iter->next();
         ASSERT_EQ(value, i * 2) << ("Returned incorrect values set 2");
     }
 
     /* fetch the even numbered entries to affect traversal order */
     int p = 0;
-    for (i = 0; i < size; i += 2) {
+    for (i = 0; i < size; i += 2)
+    {
         p = p + map2.get(i);
     }
     ASSERT_EQ(2450 * 2, p) << ("invalid sum of even numbers");
 
     set = map2.values();
     iter.reset(set.iterator());
-    ASSERT_TRUE(map2.size() == set.size()) << ("Returned set of incorrect size 3");
-    for (i = 1; i < size && iter->hasNext(); i += 2) {
+    ASSERT_TRUE(map2.size() == set.size())
+        << ("Returned set of incorrect size 3");
+    for (i = 1; i < size && iter->hasNext(); i += 2)
+    {
         int value = iter->next();
         ASSERT_EQ(value, i * 2) << ("Returned incorrect values set 3");
     }
-    for (i = 0; i < size && iter->hasNext(); i += 2) {
+    for (i = 0; i < size && iter->hasNext(); i += 2)
+    {
         int value = iter->next();
         ASSERT_EQ(value, i * 2) << ("Returned incorrect values set 4");
     }
@@ -787,46 +911,55 @@ TEST_F(LinkedHashMapTest, testOrderedValues) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class CacheMap : public LinkedHashMap<int, int> {
-    public:
+class CacheMap : public LinkedHashMap<int, int>
+{
+public:
+    int removals;
 
-        int removals;
+    CacheMap()
+        : LinkedHashMap<int, int>(),
+          removals(0)
+    {
+    }
 
-        CacheMap() : LinkedHashMap<int, int>(), removals(0) {
-        }
+    virtual ~CacheMap()
+    {
+    }
 
-        virtual ~CacheMap() {}
+protected:
+    virtual bool removeEldestEntry(const MapEntry<int, int>& eldest)
+    {
+        return size() > 5;
+    }
 
-    protected:
-
-        virtual bool removeEldestEntry(const MapEntry<int, int>& eldest) {
-            return size() > 5;
-        }
-
-        virtual void onEviction(const MapEntry<int, int>& eldest) {
-            removals++;
-        }
-
-    };
-}
+    virtual void onEviction(const MapEntry<int, int>& eldest)
+    {
+        removals++;
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LinkedHashMapTest, testRemoveEldest) {
-
-    int i;
-    int size = 10;
+TEST_F(LinkedHashMapTest, testRemoveEldest)
+{
+    int      i;
+    int      size = 10;
     CacheMap map;
-    for (i = 0; i < size; i++) {
+    for (i = 0; i < size; i++)
+    {
         map.put(i, i * 2);
     }
 
-    Collection<int>& values = map.values();
-    Pointer< Iterator<int> > iter(values.iterator());
+    Collection<int>&       values = map.values();
+    Pointer<Iterator<int>> iter(values.iterator());
 
-    ASSERT_TRUE(map.size() == values.size()) << ("Returned set of incorrect size 1");
-    for (i = 5; iter->hasNext(); i++) {
+    ASSERT_TRUE(map.size() == values.size())
+        << ("Returned set of incorrect size 1");
+    for (i = 5; iter->hasNext(); i++)
+    {
         int current = iter->next();
         ASSERT_TRUE(current == i * 2) << ("Returned incorrect entry set 1");
     }

@@ -15,39 +15,53 @@
  * limitations under the License.
  */
 
-#include <activemq/util/IntegrationCommon.h>
 #include <activemq/test/CMSTestFixture.h>
+#include <activemq/util/IntegrationCommon.h>
 
-namespace activemq {
-namespace test {
-namespace openwire {
-    class OpenwireNonBlockingRedeliveryTest : public CMSTestFixture {
-    public:
-        void SetUp() override {}
-        void TearDown() override {}
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL() +
-                "?connection.nonBlockingRedelivery=true";
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace openwire
+    {
+        class OpenwireNonBlockingRedeliveryTest : public CMSTestFixture
+        {
+        public:
+            void SetUp() override
+            {
+            }
 
-#include <cms/MessageListener.h>
+            void TearDown() override
+            {
+            }
+
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                           .getOpenwireURL() +
+                       "?connection.nonBlockingRedelivery=true";
+            }
+        };
+    }  // namespace openwire
+}  // namespace test
+}  // namespace activemq
+
 #include <cms/ExceptionListener.h>
+#include <cms/MessageListener.h>
 
 #include <activemq/commands/Message.h>
-#include <activemq/commands/ProducerId.h>
 #include <activemq/commands/MessageId.h>
-#include <activemq/core/ActiveMQConnectionFactory.h>
+#include <activemq/commands/ProducerId.h>
 #include <activemq/core/ActiveMQConnection.h>
+#include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/core/ActiveMQConsumer.h>
 #include <activemq/core/PrefetchPolicy.h>
 #include <activemq/exceptions/ActiveMQException.h>
 
-#include <decaf/lang/Thread.h>
 #include <decaf/lang/Pointer.h>
-#include <decaf/util/LinkedList.h>
+#include <decaf/lang/Thread.h>
 #include <decaf/util/LinkedHashSet.h>
+#include <decaf/util/LinkedList.h>
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
 
 using namespace std;
@@ -66,290 +80,359 @@ using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    void sendMessages(const std::string& uri, const std::string destinationName, int count) {
-        Pointer<ActiveMQConnectionFactory> connectionFactory(new ActiveMQConnectionFactory(uri));
-        Pointer<Connection> connection(connectionFactory->createConnection());
-        Pointer<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
-        Pointer<Destination> destination(session->createQueue(destinationName));
-        Pointer<MessageProducer> producer(session->createProducer(destination.get()));
-        for(int i = 0; i < count; ++i) {
-            Pointer<TextMessage> message(session->createTextMessage());
-            producer->send(message.get());
+void sendMessages(const std::string& uri,
+                  const std::string  destinationName,
+                  int                count)
+{
+    Pointer<ActiveMQConnectionFactory> connectionFactory(
+        new ActiveMQConnectionFactory(uri));
+    Pointer<Connection> connection(connectionFactory->createConnection());
+    Pointer<Session>    session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    Pointer<Destination>     destination(session->createQueue(destinationName));
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
+    for (int i = 0; i < count; ++i)
+    {
+        Pointer<TextMessage> message(session->createTextMessage());
+        producer->send(message.get());
+    }
+    connection->close();
+}
+
+void destroyDestination(const std::string& uri,
+                        const std::string  destinationName)
+{
+    Pointer<ActiveMQConnectionFactory> connectionFactory(
+        new ActiveMQConnectionFactory(uri));
+    Pointer<Connection> connection(connectionFactory->createConnection());
+    Pointer<Session>    session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    Pointer<Destination> destination(session->createQueue(destinationName));
+    Pointer<ActiveMQConnection> amqCon =
+        connection.dynamicCast<ActiveMQConnection>();
+    amqCon->destroyDestination(destination.get());
+    connection->close();
+}
+
+bool assertTrue(LinkedHashSet<Pointer<MessageId>>& set, int expected)
+{
+    for (int i = 0; i <= 60; ++i)
+    {
+        if (set.size() == expected)
+        {
+            return true;
         }
-        connection->close();
+
+        Thread::sleep(1000);
     }
 
-    void destroyDestination(const std::string& uri, const std::string destinationName) {
-        Pointer<ActiveMQConnectionFactory> connectionFactory(new ActiveMQConnectionFactory(uri));
-        Pointer<Connection> connection(connectionFactory->createConnection());
-        Pointer<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
-        Pointer<Destination> destination(session->createQueue(destinationName));
-        Pointer<ActiveMQConnection> amqCon = connection.dynamicCast<ActiveMQConnection>();
-        amqCon->destroyDestination(destination.get());
-        connection->close();
+    return false;
+}
+
+class TestProducer : public Thread
+{
+private:
+    std::string destinationName;
+    std::string brokerUri;
+    int         produceMessages;
+
+public:
+    TestProducer(const std::string& brokerUri,
+                 const std::string& destinationName,
+                 int                produceMessages)
+        : Thread(),
+          destinationName(destinationName),
+          brokerUri(brokerUri),
+          produceMessages(produceMessages)
+    {
     }
 
-    bool assertTrue(LinkedHashSet< Pointer<MessageId> >& set, int expected) {
-        for (int i = 0; i <= 60; ++i) {
-            if (set.size() == expected) {
-                return true;
-            }
-
-            Thread::sleep(1000);
-        }
-
-        return false;
-    }
-
-    class TestProducer : public Thread {
-    private:
-
-        std::string destinationName;
-        std::string brokerUri;
-        int produceMessages;
-
-    public:
-
-        TestProducer(const std::string& brokerUri,
-                     const std::string& destinationName,
-                     int produceMessages) : Thread(),
-                                            destinationName(destinationName),
-                                            brokerUri(brokerUri),
-                                            produceMessages(produceMessages) {
-        }
-
-        void run() {
-
-            Pointer<ActiveMQConnectionFactory> connectionFactory;
-            Pointer<Connection> connection;
-            Pointer<Session> session;
-            Pointer<Destination> destination;
-
-            try {
-
-                connectionFactory.reset(new ActiveMQConnectionFactory(brokerUri));
-                connection.reset(connectionFactory->createConnection());
-                connection->start();
-                session.reset(connection->createSession(Session::AUTO_ACKNOWLEDGE));
-
-                destination.reset(session->createQueue(destinationName));
-
-                // Create a MessageProducer from the Session to the Topic or Queue
-                Pointer<MessageProducer> producer(session->createProducer(destination.get()));
-                producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
-
-                for (int i = 0; i < produceMessages; i++) {
-                    Pointer<TextMessage> message(session->createTextMessage());
-                    message->setLongProperty("TestTime", System::currentTimeMillis());
-                    try {
-                        producer->send(message.get());
-                    } catch (Exception& deeperException) {
-                    }
-
-                    Thread::sleep(50);
-                }
-            } catch (Exception& e) {
-            }
-
-            try {
-                if (connection != NULL) {
-                    connection->close();
-                }
-            } catch (Exception& e) {
-            }
-        }
-    };
-
-    class TestConsumer : public Thread, public MessageListener {
-    private:
-
-        std::string brokerUri;
-        std::string destinationName;
-        CountDownLatch totalMessages;
-        int expected;
-        int receivedCount;
-        bool rolledBack;
-        bool failed;
-        LinkedList<int>* messages;
+    void run()
+    {
         Pointer<ActiveMQConnectionFactory> connectionFactory;
-        Pointer<Connection> connection;
-        Pointer<Session> session;
-        Pointer<MessageConsumer> consumer;
+        Pointer<Connection>                connection;
+        Pointer<Session>                   session;
+        Pointer<Destination>               destination;
 
-    public:
+        try
+        {
+            connectionFactory.reset(new ActiveMQConnectionFactory(brokerUri));
+            connection.reset(connectionFactory->createConnection());
+            connection->start();
+            session.reset(connection->createSession(Session::AUTO_ACKNOWLEDGE));
 
-        TestConsumer(const std::string& brokerUri,
-                     const std::string& destinationName,
-                     LinkedList<int>* messages,
-                     int totalMessages) : Thread(),
-                                          brokerUri(brokerUri),
-                                          destinationName(destinationName),
-                                          totalMessages(totalMessages),
-                                          expected(totalMessages),
-                                          receivedCount(0),
-                                          rolledBack(false),
-                                          failed(false),
-                                          messages(messages),
-                                          connectionFactory(),
-                                          connection(),
-                                          session(),
-                                          consumer() {
-        }
+            destination.reset(session->createQueue(destinationName));
 
-        bool isFailed() const {
-            return this->failed;
-        }
+            // Create a MessageProducer from the Session to the Topic or Queue
+            Pointer<MessageProducer> producer(
+                session->createProducer(destination.get()));
+            producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 
-        virtual void run() {
-            try {
-
-                connectionFactory.reset(new ActiveMQConnectionFactory(brokerUri));
-                connection.reset(connectionFactory->createConnection());
-                session.reset(connection->createSession(Session::SESSION_TRANSACTED));
-
-                Pointer<ActiveMQConnection> amqCon = connection.dynamicCast<ActiveMQConnection>();
-
-                RedeliveryPolicy* policy = amqCon->getRedeliveryPolicy();
-                policy->setInitialRedeliveryDelay(1000);
-                policy->setBackOffMultiplier(-1);
-                policy->setRedeliveryDelay(1000);
-                policy->setUseExponentialBackOff(false);
-                policy->setMaximumRedeliveries(10);
-
-                Pointer<Destination> destination(session->createQueue(destinationName));
-                consumer.reset(session->createConsumer(destination.get()));
-                consumer->setMessageListener(this);
-
-                connection->start();
-
-                if (!totalMessages.await(10, TimeUnit::MINUTES)) {
-                    this->failed = true;
+            for (int i = 0; i < produceMessages; i++)
+            {
+                Pointer<TextMessage> message(session->createTextMessage());
+                message->setLongProperty("TestTime",
+                                         System::currentTimeMillis());
+                try
+                {
+                    producer->send(message.get());
+                }
+                catch (Exception& deeperException)
+                {
                 }
 
-            } catch (Exception& e) {
-            }
-            try {
-                if (connection != NULL) {
-                    connection->close();
-                }
-            } catch (Exception& e) {
+                Thread::sleep(50);
             }
         }
+        catch (Exception& e)
+        {
+        }
 
-        virtual void onMessage(const cms::Message* message) {
-            receivedCount++;
+        try
+        {
+            if (connection != NULL)
+            {
+                connection->close();
+            }
+        }
+        catch (Exception& e)
+        {
+        }
+    }
+};
 
-            try {
+class TestConsumer : public Thread, public MessageListener
+{
+private:
+    std::string                        brokerUri;
+    std::string                        destinationName;
+    CountDownLatch                     totalMessages;
+    int                                expected;
+    int                                receivedCount;
+    bool                               rolledBack;
+    bool                               failed;
+    LinkedList<int>*                   messages;
+    Pointer<ActiveMQConnectionFactory> connectionFactory;
+    Pointer<Connection>                connection;
+    Pointer<Session>                   session;
+    Pointer<MessageConsumer>           consumer;
 
-                const commands::Message* amqMessage =
-                    dynamic_cast<const commands::Message*>(message);
+public:
+    TestConsumer(const std::string& brokerUri,
+                 const std::string& destinationName,
+                 LinkedList<int>*   messages,
+                 int                totalMessages)
+        : Thread(),
+          brokerUri(brokerUri),
+          destinationName(destinationName),
+          totalMessages(totalMessages),
+          expected(totalMessages),
+          receivedCount(0),
+          rolledBack(false),
+          failed(false),
+          messages(messages),
+          connectionFactory(),
+          connection(),
+          session(),
+          consumer()
+    {
+    }
 
-                if (!rolledBack) {
-                    if (++receivedCount == expected / 2) {
-                        rolledBack = true;
-                        session->rollback();
-                    }
-                } else {
-                    Pointer<MessageId> msgId = amqMessage->getMessageId();
-                    messages->add((int)msgId->getProducerSequenceId());
-                    session->commit();
-                    totalMessages.countDown();
-                }
+    bool isFailed() const
+    {
+        return this->failed;
+    }
 
-            } catch (Exception& ex) {
+    virtual void run()
+    {
+        try
+        {
+            connectionFactory.reset(new ActiveMQConnectionFactory(brokerUri));
+            connection.reset(connectionFactory->createConnection());
+            session.reset(
+                connection->createSession(Session::SESSION_TRANSACTED));
+
+            Pointer<ActiveMQConnection> amqCon =
+                connection.dynamicCast<ActiveMQConnection>();
+
+            RedeliveryPolicy* policy = amqCon->getRedeliveryPolicy();
+            policy->setInitialRedeliveryDelay(1000);
+            policy->setBackOffMultiplier(-1);
+            policy->setRedeliveryDelay(1000);
+            policy->setUseExponentialBackOff(false);
+            policy->setMaximumRedeliveries(10);
+
+            Pointer<Destination> destination(
+                session->createQueue(destinationName));
+            consumer.reset(session->createConsumer(destination.get()));
+            consumer->setMessageListener(this);
+
+            connection->start();
+
+            if (!totalMessages.await(10, TimeUnit::MINUTES))
+            {
                 this->failed = true;
             }
         }
-    };
-
-    class ReceivedListener : public cms::MessageListener {
-    private:
-
-        LinkedHashSet< Pointer<MessageId> >* received;
-
-    public:
-
-        ReceivedListener(LinkedHashSet< Pointer<MessageId> >* received) :
-            cms::MessageListener(), received(received) {
+        catch (Exception& e)
+        {
         }
-
-        virtual ~ReceivedListener() {
+        try
+        {
+            if (connection != NULL)
+            {
+                connection->close();
+            }
         }
+        catch (Exception& e)
+        {
+        }
+    }
 
-        virtual void onMessage(const cms::Message* message) {
+    virtual void onMessage(const cms::Message* message)
+    {
+        receivedCount++;
+
+        try
+        {
             const commands::Message* amqMessage =
                 dynamic_cast<const commands::Message*>(message);
 
-            received->add(amqMessage->getMessageId());
-        }
-
-    };
-
-    class SomeRollbacksListener : public cms::MessageListener {
-    private:
-
-        int count;
-        Pointer<Session> session;
-        LinkedHashSet< Pointer<MessageId> >* received;
-
-    public:
-
-        SomeRollbacksListener(Pointer<Session> session, LinkedHashSet< Pointer<MessageId> >* received) :
-            cms::MessageListener(), count(0), session(session), received(received) {
-        }
-
-        virtual ~SomeRollbacksListener() {}
-
-        virtual void onMessage(const cms::Message* message) {
-            const commands::Message* amqMessage =
-                dynamic_cast<const commands::Message*>(message);
-
-            if (++count > 10) {
-                try {
+            if (!rolledBack)
+            {
+                if (++receivedCount == expected / 2)
+                {
+                    rolledBack = true;
                     session->rollback();
-                    count = 0;
-                } catch (CMSException& e) {
-                }
-            } else {
-                received->add(amqMessage->getMessageId());
-                try {
-                    session->commit();
-                } catch (CMSException& e) {
                 }
             }
+            else
+            {
+                Pointer<MessageId> msgId = amqMessage->getMessageId();
+                messages->add((int)msgId->getProducerSequenceId());
+                session->commit();
+                totalMessages.countDown();
+            }
         }
-
-    };
-
-    class RollbacksListener : public cms::MessageListener {
-    private:
-
-        Pointer<Session> session;
-
-    public:
-
-        RollbacksListener(Pointer<Session> session) :
-            cms::MessageListener(), session(session) {
+        catch (Exception& ex)
+        {
+            this->failed = true;
         }
+    }
+};
 
-        virtual ~RollbacksListener() {
-        }
+class ReceivedListener : public cms::MessageListener
+{
+private:
+    LinkedHashSet<Pointer<MessageId>>* received;
 
-        virtual void onMessage(const cms::Message* message) {
-            try {
+public:
+    ReceivedListener(LinkedHashSet<Pointer<MessageId>>* received)
+        : cms::MessageListener(),
+          received(received)
+    {
+    }
+
+    virtual ~ReceivedListener()
+    {
+    }
+
+    virtual void onMessage(const cms::Message* message)
+    {
+        const commands::Message* amqMessage =
+            dynamic_cast<const commands::Message*>(message);
+
+        received->add(amqMessage->getMessageId());
+    }
+};
+
+class SomeRollbacksListener : public cms::MessageListener
+{
+private:
+    int                                count;
+    Pointer<Session>                   session;
+    LinkedHashSet<Pointer<MessageId>>* received;
+
+public:
+    SomeRollbacksListener(Pointer<Session>                   session,
+                          LinkedHashSet<Pointer<MessageId>>* received)
+        : cms::MessageListener(),
+          count(0),
+          session(session),
+          received(received)
+    {
+    }
+
+    virtual ~SomeRollbacksListener()
+    {
+    }
+
+    virtual void onMessage(const cms::Message* message)
+    {
+        const commands::Message* amqMessage =
+            dynamic_cast<const commands::Message*>(message);
+
+        if (++count > 10)
+        {
+            try
+            {
                 session->rollback();
-            } catch (CMSException& e) {
+                count = 0;
+            }
+            catch (CMSException& e)
+            {
             }
         }
+        else
+        {
+            received->add(amqMessage->getMessageId());
+            try
+            {
+                session->commit();
+            }
+            catch (CMSException& e)
+            {
+            }
+        }
+    }
+};
 
-    };
-}
+class RollbacksListener : public cms::MessageListener
+{
+private:
+    Pointer<Session> session;
+
+public:
+    RollbacksListener(Pointer<Session> session)
+        : cms::MessageListener(),
+          session(session)
+    {
+    }
+
+    virtual ~RollbacksListener()
+    {
+    }
+
+    virtual void onMessage(const cms::Message* message)
+    {
+        try
+        {
+            session->rollback();
+        }
+        catch (CMSException& e)
+        {
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireNonBlockingRedeliveryTest, testConsumerMessagesAreNotOrdered) {
-
+TEST_F(OpenwireNonBlockingRedeliveryTest, testConsumerMessagesAreNotOrdered)
+{
     LinkedList<int> messages;
 
     const std::string DEST_NAME = "QUEUE.FOO";
@@ -367,12 +450,14 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testConsumerMessagesAreNotOrdered) {
 
     ASSERT_TRUE(!consumer.isFailed());
 
-    bool ordered = true;
-    int lastId = 0;
-    Pointer<Iterator<int> > sequenceIds(messages.iterator());
-    while (sequenceIds->hasNext()) {
+    bool                   ordered = true;
+    int                    lastId  = 0;
+    Pointer<Iterator<int>> sequenceIds(messages.iterator());
+    while (sequenceIds->hasNext())
+    {
         int id = sequenceIds->next();
-        if (id != (lastId + 1)) {
+        if (id != (lastId + 1))
+        {
             ordered = false;
         }
 
@@ -384,22 +469,27 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testConsumerMessagesAreNotOrdered) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageDeleiveredWhenNonBlockingEnabled) {
+TEST_F(OpenwireNonBlockingRedeliveryTest,
+       testMessageDeleiveredWhenNonBlockingEnabled)
+{
+    LinkedHashSet<Pointer<MessageId>> received;
+    LinkedHashSet<Pointer<MessageId>> beforeRollback;
+    LinkedHashSet<Pointer<MessageId>> afterRollback;
 
-    LinkedHashSet< Pointer<MessageId> > received;
-    LinkedHashSet< Pointer<MessageId> > beforeRollback;
-    LinkedHashSet< Pointer<MessageId> > afterRollback;
-
-    const int MSG_COUNT = 100;
-    const std::string destinationName = "testMessageDeleiveredWhenNonBlockingEnabled";
+    const int         MSG_COUNT = 100;
+    const std::string destinationName =
+        "testMessageDeleiveredWhenNonBlockingEnabled";
 
     destroyDestination(getBrokerURL(), destinationName);
 
-    Pointer<ActiveMQConnectionFactory> connectionFactory(new ActiveMQConnectionFactory(getBrokerURL()));
+    Pointer<ActiveMQConnectionFactory> connectionFactory(
+        new ActiveMQConnectionFactory(getBrokerURL()));
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<Session> session(connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Destination> destination(session->createQueue(destinationName));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session>    session(
+        connection->createSession(Session::SESSION_TRANSACTED));
+    Pointer<Destination>     destination(session->createQueue(destinationName));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
     ReceivedListener receivedListener(&received);
     consumer->setMessageListener(&receivedListener);
@@ -407,13 +497,15 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageDeleiveredWhenNonBlockingEn
 
     connection->start();
 
-    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Pre-Rollack received size incorrect");
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT))
+        << ("Pre-Rollack received size incorrect");
 
     beforeRollback.addAll(received);
     received.clear();
     session->rollback();
 
-    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Post-Rollack received size incorrect");
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT))
+        << ("Post-Rollack received size incorrect");
 
     afterRollback.addAll(received);
     received.clear();
@@ -426,22 +518,26 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageDeleiveredWhenNonBlockingEn
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageRedeliveriesAreInOrder) {
+TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageRedeliveriesAreInOrder)
+{
+    LinkedHashSet<Pointer<MessageId>> received;
+    LinkedHashSet<Pointer<MessageId>> beforeRollback;
+    LinkedHashSet<Pointer<MessageId>> afterRollback;
 
-    LinkedHashSet< Pointer<MessageId> > received;
-    LinkedHashSet< Pointer<MessageId> > beforeRollback;
-    LinkedHashSet< Pointer<MessageId> > afterRollback;
-
-    const int MSG_COUNT = 100;
-    const std::string destinationName = "testMessageDeleiveredWhenNonBlockingEnabled";
+    const int         MSG_COUNT = 100;
+    const std::string destinationName =
+        "testMessageDeleiveredWhenNonBlockingEnabled";
 
     destroyDestination(getBrokerURL(), destinationName);
 
-    Pointer<ActiveMQConnectionFactory> connectionFactory(new ActiveMQConnectionFactory(getBrokerURL()));
+    Pointer<ActiveMQConnectionFactory> connectionFactory(
+        new ActiveMQConnectionFactory(getBrokerURL()));
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<Session> session(connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Destination> destination(session->createQueue(destinationName));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session>    session(
+        connection->createSession(Session::SESSION_TRANSACTED));
+    Pointer<Destination>     destination(session->createQueue(destinationName));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
     ReceivedListener receivedListener(&received);
     consumer->setMessageListener(&receivedListener);
@@ -449,13 +545,15 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageRedeliveriesAreInOrder) {
 
     connection->start();
 
-    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Pre-Rollack received size incorrect");
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT))
+        << ("Pre-Rollack received size incorrect");
 
     beforeRollback.addAll(received);
     received.clear();
     session->rollback();
 
-    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Post-Rollack received size incorrect");
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT))
+        << ("Post-Rollack received size incorrect");
 
     afterRollback.addAll(received);
     received.clear();
@@ -463,14 +561,15 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageRedeliveriesAreInOrder) {
     ASSERT_EQ(beforeRollback.size(), afterRollback.size());
     ASSERT_TRUE(beforeRollback.equals(afterRollback));
 
-    Pointer< Iterator<Pointer<MessageId> > > after(afterRollback.iterator());
-    Pointer< Iterator<Pointer<MessageId> > > before(beforeRollback.iterator());
+    Pointer<Iterator<Pointer<MessageId>>> after(afterRollback.iterator());
+    Pointer<Iterator<Pointer<MessageId>>> before(beforeRollback.iterator());
 
-    while (before->hasNext() && after->hasNext()) {
-        Pointer<MessageId> original = before->next();
+    while (before->hasNext() && after->hasNext())
+    {
+        Pointer<MessageId> original   = before->next();
         Pointer<MessageId> rolledBack = after->next();
 
-        long long originalSeq = original->getProducerSequenceId();
+        long long originalSeq   = original->getProducerSequenceId();
         long long rolledbackSeq = rolledBack->getProducerSequenceId();
 
         ASSERT_EQ(originalSeq, rolledbackSeq);
@@ -482,22 +581,25 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageRedeliveriesAreInOrder) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageDeleiveryDoesntStop) {
+TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageDeleiveryDoesntStop)
+{
+    LinkedHashSet<Pointer<MessageId>> received;
+    LinkedHashSet<Pointer<MessageId>> beforeRollback;
+    LinkedHashSet<Pointer<MessageId>> afterRollback;
 
-    LinkedHashSet< Pointer<MessageId> > received;
-    LinkedHashSet< Pointer<MessageId> > beforeRollback;
-    LinkedHashSet< Pointer<MessageId> > afterRollback;
-
-    const int MSG_COUNT = 100;
+    const int         MSG_COUNT       = 100;
     const std::string destinationName = "testMessageDeleiveryDoesntStop";
 
     destroyDestination(getBrokerURL(), destinationName);
 
-    Pointer<ActiveMQConnectionFactory> connectionFactory(new ActiveMQConnectionFactory(getBrokerURL()));
+    Pointer<ActiveMQConnectionFactory> connectionFactory(
+        new ActiveMQConnectionFactory(getBrokerURL()));
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<Session> session(connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Destination> destination(session->createQueue(destinationName));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session>    session(
+        connection->createSession(Session::SESSION_TRANSACTED));
+    Pointer<Destination>     destination(session->createQueue(destinationName));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
     ReceivedListener receivedListener(&received);
     consumer->setMessageListener(&receivedListener);
@@ -505,7 +607,8 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageDeleiveryDoesntStop) {
 
     connection->start();
 
-    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Pre-Rollack received size incorrect");
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT))
+        << ("Pre-Rollack received size incorrect");
 
     beforeRollback.addAll(received);
     received.clear();
@@ -513,7 +616,8 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageDeleiveryDoesntStop) {
 
     sendMessages(getBrokerURL(), destinationName, MSG_COUNT);
 
-    ASSERT_TRUE(assertTrue(received, MSG_COUNT * 2)) << ("Post-Rollack received size incorrect");
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT * 2))
+        << ("Post-Rollack received size incorrect");
 
     afterRollback.addAll(received);
     received.clear();
@@ -526,22 +630,28 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageDeleiveryDoesntStop) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryIsDelayed) {
+TEST_F(OpenwireNonBlockingRedeliveryTest,
+       testNonBlockingMessageDeleiveryIsDelayed)
+{
+    LinkedHashSet<Pointer<MessageId>> received;
 
-    LinkedHashSet< Pointer<MessageId> > received;
-
-    const int MSG_COUNT = 100;
-    const std::string destinationName = "testNonBlockingMessageDeleiveryIsDelayed";
+    const int         MSG_COUNT = 100;
+    const std::string destinationName =
+        "testNonBlockingMessageDeleiveryIsDelayed";
 
     destroyDestination(getBrokerURL(), destinationName);
 
-    Pointer<ActiveMQConnectionFactory> connectionFactory(new ActiveMQConnectionFactory(getBrokerURL()));
-    connectionFactory->getRedeliveryPolicy()->setInitialRedeliveryDelay(TimeUnit::SECONDS.toMillis(10));
+    Pointer<ActiveMQConnectionFactory> connectionFactory(
+        new ActiveMQConnectionFactory(getBrokerURL()));
+    connectionFactory->getRedeliveryPolicy()->setInitialRedeliveryDelay(
+        TimeUnit::SECONDS.toMillis(10));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<Session> session(connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Destination> destination(session->createQueue(destinationName));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session>    session(
+        connection->createSession(Session::SESSION_TRANSACTED));
+    Pointer<Destination>     destination(session->createQueue(destinationName));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
     ReceivedListener receivedListener(&received);
     consumer->setMessageListener(&receivedListener);
@@ -549,7 +659,8 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryIsDelay
 
     connection->start();
 
-    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Pre-Rollack received size incorrect");
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT))
+        << ("Pre-Rollack received size incorrect");
 
     received.clear();
     session->rollback();
@@ -557,7 +668,8 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryIsDelay
     TimeUnit::SECONDS.sleep(6);
     ASSERT_TRUE(received.isEmpty()) << ("Rollback redelivery was not delayed.");
 
-    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Post-Rollack received size incorrect");
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT))
+        << ("Post-Rollack received size incorrect");
 
     session->commit();
     connection->close();
@@ -566,22 +678,28 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryIsDelay
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryWithRollbacks) {
+TEST_F(OpenwireNonBlockingRedeliveryTest,
+       testNonBlockingMessageDeleiveryWithRollbacks)
+{
+    LinkedHashSet<Pointer<MessageId>> received;
 
-    LinkedHashSet< Pointer<MessageId> > received;
-
-    const int MSG_COUNT = 100;
-    const std::string destinationName = "testNonBlockingMessageDeleiveryWithRollbacks";
+    const int         MSG_COUNT = 100;
+    const std::string destinationName =
+        "testNonBlockingMessageDeleiveryWithRollbacks";
 
     destroyDestination(getBrokerURL(), destinationName);
 
-    Pointer<ActiveMQConnectionFactory> connectionFactory(new ActiveMQConnectionFactory(getBrokerURL()));
-    connectionFactory->getRedeliveryPolicy()->setInitialRedeliveryDelay(TimeUnit::SECONDS.toMillis(10));
+    Pointer<ActiveMQConnectionFactory> connectionFactory(
+        new ActiveMQConnectionFactory(getBrokerURL()));
+    connectionFactory->getRedeliveryPolicy()->setInitialRedeliveryDelay(
+        TimeUnit::SECONDS.toMillis(10));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<Session> session(connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Destination> destination(session->createQueue(destinationName));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session>    session(
+        connection->createSession(Session::SESSION_TRANSACTED));
+    Pointer<Destination>     destination(session->createQueue(destinationName));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
     ReceivedListener receivedListener(&received);
     consumer->setMessageListener(&receivedListener);
@@ -589,7 +707,8 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryWithRol
 
     connection->start();
 
-    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Pre-Rollack received size incorrect");
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT))
+        << ("Pre-Rollack received size incorrect");
 
     received.clear();
 
@@ -598,7 +717,8 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryWithRol
 
     session->rollback();
 
-    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Post-Rollack received size incorrect");
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT))
+        << ("Post-Rollack received size incorrect");
 
     session->commit();
     connection->close();
@@ -607,26 +727,32 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryWithRol
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryWithAllRolledBack) {
+TEST_F(OpenwireNonBlockingRedeliveryTest,
+       testNonBlockingMessageDeleiveryWithAllRolledBack)
+{
+    LinkedHashSet<Pointer<MessageId>> received;
+    LinkedHashSet<Pointer<MessageId>> dlqed;
 
-    LinkedHashSet< Pointer<MessageId> > received;
-    LinkedHashSet< Pointer<MessageId> > dlqed;
-
-    const int MSG_COUNT = 100;
-    const std::string destinationName = "testNonBlockingMessageDeleiveryWithAllRolledBack";
+    const int         MSG_COUNT = 100;
+    const std::string destinationName =
+        "testNonBlockingMessageDeleiveryWithAllRolledBack";
 
     destroyDestination(getBrokerURL(), destinationName);
     destroyDestination(getBrokerURL(), "ActiveMQ.DLQ");
 
-    Pointer<ActiveMQConnectionFactory> connectionFactory(new ActiveMQConnectionFactory(getBrokerURL()));
+    Pointer<ActiveMQConnectionFactory> connectionFactory(
+        new ActiveMQConnectionFactory(getBrokerURL()));
     connectionFactory->getRedeliveryPolicy()->setMaximumRedeliveries(5);
-    connectionFactory->getRedeliveryPolicy()->setInitialRedeliveryDelay(TimeUnit::SECONDS.toMillis(5));
+    connectionFactory->getRedeliveryPolicy()->setInitialRedeliveryDelay(
+        TimeUnit::SECONDS.toMillis(5));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<Session> session(connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Destination> destination(session->createQueue(destinationName));
-    Pointer<Destination> dlq(session->createQueue("ActiveMQ.DLQ"));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session>    session(
+        connection->createSession(Session::SESSION_TRANSACTED));
+    Pointer<Destination>     destination(session->createQueue(destinationName));
+    Pointer<Destination>     dlq(session->createQueue("ActiveMQ.DLQ"));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
     Pointer<MessageConsumer> dlqConsumer(session->createConsumer(dlq.get()));
 
     ReceivedListener dlqReceivedListener(&dlqed);
@@ -638,14 +764,16 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testNonBlockingMessageDeleiveryWithAll
     sendMessages(getBrokerURL(), destinationName, MSG_COUNT);
     connection->start();
 
-    ASSERT_TRUE(assertTrue(received, MSG_COUNT)) << ("Pre-Rollack received size incorrect");
+    ASSERT_TRUE(assertTrue(received, MSG_COUNT))
+        << ("Pre-Rollack received size incorrect");
 
     session->rollback();
 
     RollbacksListener rollbackListener(session);
     consumer->setMessageListener(&rollbackListener);
 
-    ASSERT_TRUE(assertTrue(dlqed, MSG_COUNT)) << ("Post-Rollack DQL size incorrect");
+    ASSERT_TRUE(assertTrue(dlqed, MSG_COUNT))
+        << ("Post-Rollack DQL size incorrect");
 
     session->commit();
     connection->close();

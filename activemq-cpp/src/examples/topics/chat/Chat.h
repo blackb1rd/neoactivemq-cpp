@@ -18,118 +18,126 @@
 #ifndef _EXAMPLE_TOPICS_CHAT_CHAT_H_
 #define _EXAMPLE_TOPICS_CHAT_CHAT_H_
 
-#include <memory>
+#include <cms/CMSException.h>
 #include <cms/Connection.h>
-#include <cms/Session.h>
-#include <cms/MessageConsumer.h>
-#include <cms/MessageListener.h>
 #include <cms/Destination.h>
 #include <cms/ExceptionListener.h>
-#include <cms/CMSException.h>
+#include <cms/MessageConsumer.h>
+#include <cms/MessageListener.h>
+#include <cms/Session.h>
+#include <memory>
 
-namespace example{
-namespace topics{
-namespace chat{
-
-    /**
-     * Simple Chat Client that uses a Topic
-     */
-    class Chat : public cms::MessageListener,
-                 public cms::ExceptionListener {
-    private:
-
-        std::unique_ptr<cms::Connection> connection;
-        std::unique_ptr<cms::Session> session;
-        std::unique_ptr<cms::MessageConsumer> consumer;
-        std::unique_ptr<cms::MessageProducer> producer;
-        std::unique_ptr<cms::Destination> topic;
-
-        std::string brokerURI;
-        std::string username;
-        std::string password;
-        std::string topicName;
-
-    private:
-
-        Chat( const Chat& );
-        Chat& operator= ( const Chat& );
-
-    public:
-
-        static const char* DEFAULT_BROKER_URI;
-        static const char* DEFAULT_TOPIC_NAME;
-
-    public:
-
-        Chat();
-        virtual ~Chat();
-
-        virtual void onMessage( const cms::Message* message );
-        virtual void onException( const cms::CMSException& ex );
+namespace example
+{
+namespace topics
+{
+    namespace chat
+    {
 
         /**
-         * Sets the BrokerURI
+         * Simple Chat Client that uses a Topic
          */
-        void setBrokerURI( const std::string& uri ) {
-            this->brokerURI = uri;
-        }
+        class Chat : public cms::MessageListener, public cms::ExceptionListener
+        {
+        private:
+            std::unique_ptr<cms::Connection>      connection;
+            std::unique_ptr<cms::Session>         session;
+            std::unique_ptr<cms::MessageConsumer> consumer;
+            std::unique_ptr<cms::MessageProducer> producer;
+            std::unique_ptr<cms::Destination>     topic;
 
-        /**
-         * Gets the BrokerURI
-         */
-        std::string getBrokerURI() const {
-            return this->brokerURI;
-        }
+            std::string brokerURI;
+            std::string username;
+            std::string password;
+            std::string topicName;
 
-        /**
-         * Sets the Topic Name
-         */
-        void setTopicName( const std::string& topicName ) {
-            this->topicName = topicName;
-        }
+        private:
+            Chat(const Chat&);
+            Chat& operator=(const Chat&);
 
-        /**
-         * Gets the Topic Name
-         */
-        std::string getTopicName() const {
-            return this->topicName;
-        }
+        public:
+            static const char* DEFAULT_BROKER_URI;
+            static const char* DEFAULT_TOPIC_NAME;
 
-        /**
-         * Sets the User Name
-         */
-        void setUsername( const std::string& username ) {
-            this->username = username;
-        }
+        public:
+            Chat();
+            virtual ~Chat();
 
-        /**
-         * Gets the User Name
-         */
-        std::string getUsername() const {
-            return this->username;
-        }
+            virtual void onMessage(const cms::Message* message);
+            virtual void onException(const cms::CMSException& ex);
 
-        /**
-         * Sets the Password
-         */
-        void setPassword( const std::string& password ) {
-            this->password = password;
-        }
+            /**
+             * Sets the BrokerURI
+             */
+            void setBrokerURI(const std::string& uri)
+            {
+                this->brokerURI = uri;
+            }
 
-        /**
-         * Gets the Password
-         */
-        std::string getPassword() const {
-            return this->password;
-        }
+            /**
+             * Gets the BrokerURI
+             */
+            std::string getBrokerURI() const
+            {
+                return this->brokerURI;
+            }
 
-        /**
-         * Run the Chat Application.
-         */
-        void run();
+            /**
+             * Sets the Topic Name
+             */
+            void setTopicName(const std::string& topicName)
+            {
+                this->topicName = topicName;
+            }
 
-    };
+            /**
+             * Gets the Topic Name
+             */
+            std::string getTopicName() const
+            {
+                return this->topicName;
+            }
 
-}}}
+            /**
+             * Sets the User Name
+             */
+            void setUsername(const std::string& username)
+            {
+                this->username = username;
+            }
 
-#endif // _EXAMPLE_TOPICS_CHAT_CHAT_H_
+            /**
+             * Gets the User Name
+             */
+            std::string getUsername() const
+            {
+                return this->username;
+            }
+
+            /**
+             * Sets the Password
+             */
+            void setPassword(const std::string& password)
+            {
+                this->password = password;
+            }
+
+            /**
+             * Gets the Password
+             */
+            std::string getPassword() const
+            {
+                return this->password;
+            }
+
+            /**
+             * Run the Chat Application.
+             */
+            void run();
+        };
+
+    }  // namespace chat
+}  // namespace topics
+}  // namespace example
+
+#endif  // _EXAMPLE_TOPICS_CHAT_CHAT_H_

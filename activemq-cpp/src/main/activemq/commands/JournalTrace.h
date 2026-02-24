@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseDataStructure.h>
@@ -29,8 +29,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -43,22 +45,19 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API JournalTrace : public BaseDataStructure {
+    class AMQCPP_API JournalTrace : public BaseDataStructure
+    {
     protected:
-
         std::string message;
 
     public:
-
         const static unsigned char ID_JOURNALTRACE = 53;
 
     private:
-
         JournalTrace(const JournalTrace&);
-        JournalTrace& operator= (const JournalTrace&);
+        JournalTrace& operator=(const JournalTrace&);
 
     public:
-
         JournalTrace();
 
         virtual ~JournalTrace();
@@ -74,11 +73,11 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const std::string& getMessage() const;
-        virtual std::string& getMessage();
-        virtual void setMessage(const std::string& message);
-
+        virtual std::string&       getMessage();
+        virtual void               setMessage(const std::string& message);
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_JOURNALTRACE_H_*/

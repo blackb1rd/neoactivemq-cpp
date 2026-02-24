@@ -17,9 +17,9 @@
 
 #include "SimpleRollbackTest.h"
 
+#include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/CMSListener.h>
 #include <activemq/util/IntegrationCommon.h>
-#include <activemq/exceptions/ActiveMQException.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/UUID.h>
 
@@ -35,18 +35,20 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-SimpleRollbackTest::SimpleRollbackTest() {
+SimpleRollbackTest::SimpleRollbackTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SimpleRollbackTest::~SimpleRollbackTest() {
+SimpleRollbackTest::~SimpleRollbackTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimpleRollbackTest::testRollbacks() {
-
-    try {
-
+void SimpleRollbackTest::testRollbacks()
+{
+    try
+    {
         // Create CMS Object for Comms
         cms::Session* session(cmsProvider->getSession());
 
@@ -57,9 +59,11 @@ void SimpleRollbackTest::testRollbacks() {
         cms::MessageProducer* producer = cmsProvider->getProducer();
         producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
-        std::unique_ptr<cms::TextMessage> txtMessage(session->createTextMessage());
+        std::unique_ptr<cms::TextMessage> txtMessage(
+            session->createTextMessage());
 
-        for (unsigned int i = 0; i < IntegrationCommon::defaultMsgCount; ++i) {
+        for (unsigned int i = 0; i < IntegrationCommon::defaultMsgCount; ++i)
+        {
             ostringstream lcStream;
             lcStream << "SimpleTest - Message #" << i << ends;
             txtMessage->setText(lcStream.str());
@@ -77,7 +81,8 @@ void SimpleRollbackTest::testRollbacks() {
         session->commit();
         Thread::sleep(50);
 
-        for (unsigned int i = 0; i < 5; ++i) {
+        for (unsigned int i = 0; i < 5; ++i)
+        {
             ostringstream lcStream;
             lcStream << "SimpleTest - Message #" << i << ends;
             txtMessage->setText(lcStream.str());
@@ -106,10 +111,10 @@ void SimpleRollbackTest::testRollbacks() {
         listener.asyncWaitForMessages(1);
         ASSERT_TRUE(listener.getNumReceived() == 1);
         session->commit();
-
-    } catch (std::exception& ex) {
+    }
+    catch (std::exception& ex)
+    {
         std::cout << ex.what() << std::endl;
         throw ex;
     }
 }
-

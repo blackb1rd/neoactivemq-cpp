@@ -17,24 +17,27 @@
 #ifndef _ACTIVEMQ_CMSUTIL_CMSDESTINATIONACCESSOR_H_
 #define _ACTIVEMQ_CMSUTIL_CMSDESTINATIONACCESSOR_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/cmsutil/CmsAccessor.h>
 #include <activemq/cmsutil/DynamicDestinationResolver.h>
+#include <activemq/util/Config.h>
 
-namespace activemq {
-namespace cmsutil {
+namespace activemq
+{
+namespace cmsutil
+{
 
     /**
-     * Extends the <code>CmsAccessor</code> to add support for resolving destination names.
+     * Extends the <code>CmsAccessor</code> to add support for resolving
+     * destination names.
      *
      * <p>Not intended to be used directly.
      *
      * @see CmsTemplate
      * @see CmsAccessor
      */
-    class AMQCPP_API CmsDestinationAccessor : public CmsAccessor {
+    class AMQCPP_API CmsDestinationAccessor : public CmsAccessor
+    {
     private:
-
         /**
          * The default destination resolver.
          */
@@ -51,48 +54,52 @@ namespace cmsutil {
         bool pubSubDomain;
 
     private:
-
         CmsDestinationAccessor(const CmsDestinationAccessor&);
         CmsDestinationAccessor& operator=(const CmsDestinationAccessor&);
 
     public:
-
         CmsDestinationAccessor();
 
         virtual ~CmsDestinationAccessor();
 
-        virtual bool isPubSubDomain() const {
+        virtual bool isPubSubDomain() const
+        {
             return this->pubSubDomain;
         }
 
-        virtual void setPubSubDomain( bool pubSubDomain ) {
+        virtual void setPubSubDomain(bool pubSubDomain)
+        {
             this->pubSubDomain = pubSubDomain;
         }
 
-        virtual DestinationResolver* getDestinationResolver() {
+        virtual DestinationResolver* getDestinationResolver()
+        {
             return destinationResolver;
         }
 
-        virtual const DestinationResolver* getDestinationResolver() const {
+        virtual const DestinationResolver* getDestinationResolver() const
+        {
             return destinationResolver;
         }
 
-        virtual void setDestinationResolver(DestinationResolver* destRes) {
+        virtual void setDestinationResolver(DestinationResolver* destRes)
+        {
             this->destinationResolver = destRes;
         }
 
     protected:
-
         virtual void init();
 
         virtual void destroy();
 
-        virtual cms::Destination* resolveDestinationName(cms::Session* session, const std::string& destName);
+        virtual cms::Destination* resolveDestinationName(
+            cms::Session*      session,
+            const std::string& destName);
 
         virtual void checkDestinationResolver();
-
     };
 
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CMSUTIL_CMSDESTINATIONACCESSOR_H_ */

@@ -21,14 +21,21 @@
 #include <activemq/test/CMSTestFixture.h>
 #include <activemq/util/IntegrationCommon.h>
 
-namespace activemq{
-namespace test{
+namespace activemq
+{
+namespace test
+{
 
-    class SimpleTest : public CMSTestFixture {
+    class SimpleTest : public CMSTestFixture
+    {
     public:
+        SimpleTest()
+        {
+        }
 
-        SimpleTest() {}
-        virtual ~SimpleTest() {}
+        virtual ~SimpleTest()
+        {
+        }
 
         virtual void testAutoAck();
         virtual void testClientAck();
@@ -44,9 +51,9 @@ namespace test{
         virtual void testBytesMessageSendRecv();
         virtual void testBytesMessageSendRecvAsync();
         virtual void testLibraryInitShutdownInit();
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TEST_SIMPLETESTER_H_*/

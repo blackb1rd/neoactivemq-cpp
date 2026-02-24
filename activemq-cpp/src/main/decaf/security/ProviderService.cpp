@@ -23,11 +23,16 @@ using namespace decaf;
 using namespace decaf::security;
 
 ////////////////////////////////////////////////////////////////////////////////
-ProviderService::ProviderService(const Provider* provider, const std::string& type, const std::string& algorithm) :
-    provider(provider), type(type), algorithm(algorithm) {
+ProviderService::ProviderService(const Provider*    provider,
+                                 const std::string& type,
+                                 const std::string& algorithm)
+    : provider(provider),
+      type(type),
+      algorithm(algorithm)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProviderService::~ProviderService() {
+ProviderService::~ProviderService()
+{
 }
-

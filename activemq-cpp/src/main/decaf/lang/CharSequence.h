@@ -21,21 +21,24 @@
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
 
     /**
-     * A CharSequence is a readable sequence of char values. This interface provides
-     * uniform, read-only access to many different kinds of char sequences.
+     * A CharSequence is a readable sequence of char values. This interface
+     * provides uniform, read-only access to many different kinds of char
+     * sequences.
      *
-     * This interface does not define that a CharSequence should implement comparable,
-     * it is therefore up to the dervied classes that implement this interface to define
-     * equality, which implies that comparison of two CharSequences does not have a
-     * contract on equality.
+     * This interface does not define that a CharSequence should implement
+     * comparable, it is therefore up to the dervied classes that implement this
+     * interface to define equality, which implies that comparison of two
+     * CharSequences does not have a contract on equality.
      */
-    class DECAF_API CharSequence {
+    class DECAF_API CharSequence
+    {
     public:
-
         virtual ~CharSequence();
 
         /**
@@ -52,15 +55,17 @@ namespace lang {
          *
          * @return the char at the given position.
          *
-         * @throws IndexOutOfBoundsException if index is > than length() or negative
+         * @throws IndexOutOfBoundsException if index is > than length() or
+         * negative
          */
         virtual char charAt(int index) const = 0;
 
         /**
-         * Returns a new CharSequence that is a subsequence of this sequence. The
-         * subsequence starts with the char value at the specified index and ends with
-         * the char value at index end - 1. The length (in chars) of the returned
-         * sequence is end - start, so if start == end then an empty sequence is returned.
+         * Returns a new CharSequence that is a subsequence of this sequence.
+         * The subsequence starts with the char value at the specified index and
+         * ends with the char value at index end - 1. The length (in chars) of
+         * the returned sequence is end - start, so if start == end then an
+         * empty sequence is returned.
          *
          * @param start
          *      The start index, inclusive.
@@ -69,7 +74,8 @@ namespace lang {
          *
          * @return a new CharSequence
          *
-         * @throws IndexOutOfBoundsException if start or end > length() or start or end are negative.
+         * @throws IndexOutOfBoundsException if start or end > length() or start
+         * or end are negative.
          */
         virtual CharSequence* subSequence(int start, int end) const = 0;
 
@@ -77,9 +83,9 @@ namespace lang {
          * @return the String representation of this CharSequence
          */
         virtual std::string toString() const = 0;
-
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 #endif /*_DECAF_LANG_CHARSEQUENCE_H_*/

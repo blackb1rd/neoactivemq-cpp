@@ -18,23 +18,25 @@
 #define _ACTIVEMQ_EXCEPTIONS_ACTIVEMQEXCEPTION_H_
 
 #ifdef _MSC_VER
-#pragma warning( disable : 4250 )
+#pragma warning(disable : 4250)
 #endif
 
+#include <activemq/exceptions/ExceptionDefines.h>
 #include <activemq/util/Config.h>
 #include <cms/CMSException.h>
 #include <decaf/lang/Exception.h>
-#include <activemq/exceptions/ExceptionDefines.h>
 
-namespace activemq {
-namespace exceptions {
+namespace activemq
+{
+namespace exceptions
+{
 
     /*
      * Base class for all exceptions.
      */
-    class AMQCPP_API ActiveMQException : public decaf::lang::Exception {
+    class AMQCPP_API ActiveMQException : public decaf::lang::Exception
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -70,7 +72,10 @@ namespace exceptions {
          * @param ...
          *      The list of primitives that are formatted into the message.
          */
-        ActiveMQException(const char* file, const int lineNumber, const char* msg, ...);
+        ActiveMQException(const char* file,
+                          const int   lineNumber,
+                          const char* msg,
+                          ...);
 
         /**
          * Constructor - Initializes the file name and line number where
@@ -88,14 +93,18 @@ namespace exceptions {
          * @param ...
          *      list of primitives that are formatted into the message
          */
-        ActiveMQException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        ActiveMQException(const char*           file,
+                          const int             lineNumber,
+                          const std::exception* cause,
+                          const char*           msg,
+                          ...);
 
         virtual ~ActiveMQException() throw();
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
          * @return Copy of this Exception object
          */
@@ -107,9 +116,9 @@ namespace exceptions {
          * @return a CMSException with the data from this exception
          */
         virtual cms::CMSException convertToCMSException() const;
+    };
 
-   };
-
-}}
+}  // namespace exceptions
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_EXCEPTIONS_ACTIVEMQEXCEPTION_H_*/

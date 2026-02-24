@@ -24,42 +24,47 @@ using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang::exceptions;
 
-    class InputStreamTest : public ::testing::Test {
+class InputStreamTest : public ::testing::Test
+{
 public:
-
-        InputStreamTest();
-        virtual ~InputStreamTest();
-
-    };
+    InputStreamTest();
+    virtual ~InputStreamTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace{
+namespace
+{
 
-    class MockInputStream : public InputStream {
-    public:
+class MockInputStream : public InputStream
+{
+public:
+    virtual ~MockInputStream()
+    {
+    }
 
-        virtual ~MockInputStream() {}
+    virtual int doReadByte()
+    {
+        return 0;
+    }
+};
 
-        virtual int doReadByte() {
-            return 0;
-        }
+}  // namespace
 
-    };
-
+////////////////////////////////////////////////////////////////////////////////
+InputStreamTest::InputStreamTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InputStreamTest::InputStreamTest() {
+InputStreamTest::~InputStreamTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InputStreamTest::~InputStreamTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-TEST_F(InputStreamTest, test) {
-
+TEST_F(InputStreamTest, test)
+{
     MockInputStream stream;
 
-    ASSERT_THROW(stream.read( NULL, 0, 0, 1 ), NullPointerException) << ("Should throw a NullPointerException");
+    ASSERT_THROW(stream.read(NULL, 0, 0, 1), NullPointerException)
+        << ("Should throw a NullPointerException");
 }

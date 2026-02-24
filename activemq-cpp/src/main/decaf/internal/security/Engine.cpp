@@ -17,10 +17,10 @@
 
 #include "Engine.h"
 
-#include <decaf/security/SecuritySpi.h>
+#include <decaf/security/NoSuchAlgorithmException.h>
 #include <decaf/security/Provider.h>
 #include <decaf/security/ProviderService.h>
-#include <decaf/security/NoSuchAlgorithmException.h>
+#include <decaf/security/SecuritySpi.h>
 
 #include <decaf/internal/security/SecurityRuntime.h>
 #include <decaf/internal/security/ServiceRegistry.h>
@@ -31,32 +31,43 @@ using namespace decaf::internal;
 using namespace decaf::internal::security;
 
 ////////////////////////////////////////////////////////////////////////////////
-Engine::Engine(const std::string& serviceName) : serviceName(serviceName), provider(NULL) {
+Engine::Engine(const std::string& serviceName)
+    : serviceName(serviceName),
+      provider(NULL)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Engine::~Engine() {
+Engine::~Engine()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SecuritySpi* Engine::newInstance(const std::string& algorithmName) {
-
-    if (algorithmName.empty()) {
-        throw NoSuchAlgorithmException(__FILE__, __LINE__, "Null algorithm name");
+SecuritySpi* Engine::newInstance(const std::string& algorithmName)
+{
+    if (algorithmName.empty())
+    {
+        throw NoSuchAlgorithmException(__FILE__,
+                                       __LINE__,
+                                       "Null algorithm name");
     }
 
     SecurityRuntime* runtime = SecurityRuntime::getSecurityRuntime();
-    SecuritySpi* spi = NULL;
+    SecuritySpi*     spi     = NULL;
 
-    synchronized(runtime->getRuntimeLock()) {
+    synchronized(runtime->getRuntimeLock())
+    {
         std::string providerServiceName = serviceName + "." + algorithmName;
 
         ServiceRegistry* registry = runtime->getServiceRegistry();
-        ProviderService* service = registry->getService(providerServiceName);
+        ProviderService* service  = registry->getService(providerServiceName);
 
-        if (service == NULL) {
-            throw NoSuchAlgorithmException(__FILE__, __LINE__,
-                "%s Implementation not found", providerServiceName.c_str());
+        if (service == NULL)
+        {
+            throw NoSuchAlgorithmException(__FILE__,
+                                           __LINE__,
+                                           "%s Implementation not found",
+                                           providerServiceName.c_str());
         }
 
         this->provider = service->getProvider();

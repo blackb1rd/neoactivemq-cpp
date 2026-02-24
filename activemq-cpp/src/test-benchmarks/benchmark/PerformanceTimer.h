@@ -21,61 +21,61 @@
 #include <activemq/util/Config.h>
 #include <vector>
 
-namespace benchmark{
+namespace benchmark
+{
+
+/**
+ * This class is used to aid in testing the performace of code.  This class
+ * maintains a running list of performance numbers for successive calls to
+ * the method start and stop.  Once the desired number of tests has been run,
+ * the user can call getAverageTime to find out the average time it took for
+ * all start / stop cycles.
+ */
+class PerformanceTimer
+{
+private:
+    long long              numberOfRuns;
+    std::vector<long long> times;
+    long long              startTime;
+    long long              endTime;
+
+public:
+    PerformanceTimer();
+    virtual ~PerformanceTimer();
 
     /**
-     * This class is used to aid in testing the performace of code.  This class
-     * maintains a running list of performance numbers for successive calls to
-     * the method start and stop.  Once the desired number of tests has been run,
-     * the user can call getAverageTime to find out the average time it took for
-     * all start / stop cycles.
+     * Starts the timer, time is from the call to start until a call
+     * to stop is made.
      */
-    class PerformanceTimer {
-    private:
+    void start();
 
-        long long numberOfRuns;
-        std::vector<long long> times;
-        long long startTime;
-        long long endTime;
+    /**
+     * Stops the timer and records the latest time.
+     */
+    void stop();
 
-    public:
+    /**
+     * Resets the Timer to an unused state all data is thrown out.
+     */
+    void reset();
 
-        PerformanceTimer();
-        virtual ~PerformanceTimer();
+    /**
+     * Gets the number of runs made so far
+     * @return unsigned int that counts the number of runs
+     */
+    long long getNumberOfRuns() const
+    {
+        return numberOfRuns;
+    }
 
-        /**
-         * Starts the timer, time is from the call to start until a call
-         * to stop is made.
-         */
-        void start();
+    /**
+     * Gets the overall average time that the count has recoreded
+     * for all start / stop cycles.
+     * @return the average time for all the runs times / numberOfRuns
+     */
+    long long getAverageTime() const;
+};
 
-        /**
-         * Stops the timer and records the latest time.
-         */
-        void stop();
-
-        /**
-         * Resets the Timer to an unused state all data is thrown out.
-         */
-        void reset();
-
-        /**
-         * Gets the number of runs made so far
-         * @return unsigned int that counts the number of runs
-         */
-        long long getNumberOfRuns() const {
-            return numberOfRuns;
-        }
-
-        /**
-         * Gets the overall average time that the count has recoreded
-         * for all start / stop cycles.
-         * @return the average time for all the runs times / numberOfRuns
-         */
-        long long getAverageTime() const;
-
-    };
-
-}
+}  // namespace benchmark
 
 #endif /*_PERFORMANCETIMER_H_*/

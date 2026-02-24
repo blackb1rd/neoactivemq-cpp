@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 #include <activemq/commands/ActiveMQMapMessage.h>
-#include <activemq/wireformat/openwire/marshal/PrimitiveTypesMarshaller.h>
 #include <activemq/util/CMSExceptionSupport.h>
+#include <activemq/wireformat/openwire/marshal/PrimitiveTypesMarshaller.h>
 
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 
+#include <decaf/io/BufferedInputStream.h>
 #include <decaf/io/ByteArrayInputStream.h>
 #include <decaf/io/ByteArrayOutputStream.h>
-#include <decaf/io/BufferedInputStream.h>
 #include <decaf/io/DataInputStream.h>
 #include <decaf/io/DataOutputStream.h>
 #include <decaf/util/zip/DeflaterOutputStream.h>
@@ -47,27 +47,34 @@ using namespace activemq::wireformat::openwire::marshal;
 const unsigned char ActiveMQMapMessage::ID_ACTIVEMQMAPMESSAGE = 25;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQMapMessage::ActiveMQMapMessage() : ActiveMQMessageTemplate<cms::MapMessage>(), map() {
+ActiveMQMapMessage::ActiveMQMapMessage()
+    : ActiveMQMessageTemplate<cms::MapMessage>(),
+      map()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQMapMessage::~ActiveMQMapMessage() throw() {
+ActiveMQMapMessage::~ActiveMQMapMessage() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ActiveMQMapMessage::getDataStructureType() const {
+unsigned char ActiveMQMapMessage::getDataStructureType() const
+{
     return ActiveMQMapMessage::ID_ACTIVEMQMAPMESSAGE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQMapMessage* ActiveMQMapMessage::cloneDataStructure() const {
+ActiveMQMapMessage* ActiveMQMapMessage::cloneDataStructure() const
+{
     ActiveMQMapMessage* message = new ActiveMQMapMessage();
-    message->copyDataStructure( this );
+    message->copyDataStructure(this);
     return message;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::MapMessage* ActiveMQMapMessage::clone() const {
+cms::MapMessage* ActiveMQMapMessage::clone() const
+{
     ActiveMQMapMessage* clone = this->cloneDataStructure();
     clone->setReadOnlyBody(false);
     clone->setReadOnlyProperties(false);
@@ -75,50 +82,59 @@ cms::MapMessage* ActiveMQMapMessage::clone() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessage::copyDataStructure(const DataStructure* src) {
+void ActiveMQMapMessage::copyDataStructure(const DataStructure* src)
+{
     ActiveMQMessageTemplate<cms::MapMessage>::copyDataStructure(src);
 
-    const ActiveMQMapMessage* srcMap = dynamic_cast<const ActiveMQMapMessage*>(src);
+    const ActiveMQMapMessage* srcMap =
+        dynamic_cast<const ActiveMQMapMessage*>(src);
 
-    if (srcMap != NULL && srcMap->map.get() != NULL) {
+    if (srcMap != NULL && srcMap->map.get() != NULL)
+    {
         this->map.reset(new util::PrimitiveMap(*srcMap->map));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQMapMessage::toString() const {
+std::string ActiveMQMapMessage::toString() const
+{
     return ActiveMQMessageTemplate<cms::MapMessage>::toString();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQMapMessage::equals(const DataStructure* value) const {
+bool ActiveMQMapMessage::equals(const DataStructure* value) const
+{
     return ActiveMQMessageTemplate<cms::MapMessage>::equals(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessage::clearBody() {
+void ActiveMQMapMessage::clearBody()
+{
     ActiveMQMessageTemplate<cms::MapMessage>::clearBody();
     this->getMap().clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessage::beforeMarshal(WireFormat* wireFormat) {
-
-    try {
-
+void ActiveMQMapMessage::beforeMarshal(WireFormat* wireFormat)
+{
+    try
+    {
         // Let the base class do its thing.
         ActiveMQMessageTemplate<cms::MapMessage>::beforeMarshal(wireFormat);
 
-        if (map.get() != NULL && !map->isEmpty()) {
-
+        if (map.get() != NULL && !map->isEmpty())
+        {
             ByteArrayOutputStream* bytesOut = new ByteArrayOutputStream();
 
             OutputStream* os = bytesOut;
 
-            if (this->connection != NULL && this->connection->isUseCompression()) {
+            if (this->connection != NULL &&
+                this->connection->isUseCompression())
+            {
                 this->compressed = true;
 
-                Deflater* deflator = new Deflater(this->connection->getCompressionLevel());
+                Deflater* deflator =
+                    new Deflater(this->connection->getCompressionLevel());
 
                 os = new DeflaterOutputStream(os, deflator, true, true);
             }
@@ -128,9 +144,13 @@ void ActiveMQMapMessage::beforeMarshal(WireFormat* wireFormat) {
             dataOut.close();
 
             std::pair<unsigned char*, int> array = bytesOut->toByteArray();
-            this->setContent(std::vector<unsigned char>(array.first, array.first + array.second));
+            this->setContent(
+                std::vector<unsigned char>(array.first,
+                                           array.first + array.second));
             delete[] array.first;
-        } else {
+        }
+        else
+        {
             clearBody();
         }
     }
@@ -140,9 +160,10 @@ void ActiveMQMapMessage::beforeMarshal(WireFormat* wireFormat) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-PrimitiveMap& ActiveMQMapMessage::getMap() {
-
-    try {
+PrimitiveMap& ActiveMQMapMessage::getMap()
+{
+    try
+    {
         this->checkMapIsUnmarshalled();
         return *map;
     }
@@ -152,9 +173,10 @@ PrimitiveMap& ActiveMQMapMessage::getMap() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const PrimitiveMap& ActiveMQMapMessage::getMap() const {
-
-    try {
+const PrimitiveMap& ActiveMQMapMessage::getMap() const
+{
+    try
+    {
         this->checkMapIsUnmarshalled();
         return *map;
     }
@@ -164,15 +186,16 @@ const PrimitiveMap& ActiveMQMapMessage::getMap() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessage::checkMapIsUnmarshalled() const {
-
-    try {
-
-        if (map.get() == NULL && !getContent().empty()) {
-
+void ActiveMQMapMessage::checkMapIsUnmarshalled() const
+{
+    try
+    {
+        if (map.get() == NULL && !getContent().empty())
+        {
             InputStream* is = new ByteArrayInputStream(getContent());
 
-            if (isCompressed()) {
+            if (isCompressed())
+            {
                 is = new InflaterInputStream(is, true);
                 is = new BufferedInputStream(is, true);
             }
@@ -181,12 +204,17 @@ void ActiveMQMapMessage::checkMapIsUnmarshalled() const {
 
             map.reset(PrimitiveTypesMarshaller::unmarshalMap(dataIn));
 
-            if (map.get() == NULL) {
+            if (map.get() == NULL)
+            {
                 throw NullPointerException(
-                    __FILE__, __LINE__,
-                    "ActiveMQMapMessage::getMap() - All attempts to create a map have failed.");
+                    __FILE__,
+                    __LINE__,
+                    "ActiveMQMapMessage::getMap() - All attempts to create a "
+                    "map have failed.");
             }
-        } else if (map.get() == NULL) {
+        }
+        else if (map.get() == NULL)
+        {
             map.reset(new PrimitiveMap());
         }
     }
@@ -196,39 +224,46 @@ void ActiveMQMapMessage::checkMapIsUnmarshalled() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQMapMessage::isEmpty() const {
-
-    try {
+bool ActiveMQMapMessage::isEmpty() const
+{
+    try
+    {
         return getMap().isEmpty();
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> ActiveMQMapMessage::getMapNames() const {
-
-    try {
+std::vector<std::string> ActiveMQMapMessage::getMapNames() const
+{
+    try
+    {
         return getMap().keySet().toArray();
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQMapMessage::itemExists(const std::string& name) const {
-
-    try {
+bool ActiveMQMapMessage::itemExists(const std::string& name) const
+{
+    try
+    {
         return getMap().containsKey(name);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Message::ValueType ActiveMQMapMessage::getValueType(const std::string& key) const {
+cms::Message::ValueType ActiveMQMapMessage::getValueType(
+    const std::string& key) const
+{
+    try
+    {
+        util::PrimitiveValueNode::PrimitiveType type =
+            this->getMap().getValueType(key);
 
-    try {
-        util::PrimitiveValueNode::PrimitiveType type = this->getMap().getValueType(key);
-
-        switch (type) {
+        switch (type)
+        {
             case util::PrimitiveValueNode::NULL_TYPE:
                 return cms::Message::NULL_TYPE;
             case util::PrimitiveValueNode::BOOLEAN_TYPE:
@@ -262,210 +297,253 @@ cms::Message::ValueType ActiveMQMapMessage::getValueType(const std::string& key)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQMapMessage::getBoolean(const std::string& name) const {
-
-    try {
+bool ActiveMQMapMessage::getBoolean(const std::string& name) const
+{
+    try
+    {
         return getMap().getBool(name);
-    } catch (UnsupportedOperationException& ex) {
+    }
+    catch (UnsupportedOperationException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessage::setBoolean(const std::string& name, bool value) {
-
+void ActiveMQMapMessage::setBoolean(const std::string& name, bool value)
+{
     failIfReadOnlyBody();
-    try {
+    try
+    {
         getMap().setBool(name, value);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ActiveMQMapMessage::getByte(const std::string& name) const {
-
-    try {
+unsigned char ActiveMQMapMessage::getByte(const std::string& name) const
+{
+    try
+    {
         return getMap().getByte(name);
-    } catch (UnsupportedOperationException& ex) {
+    }
+    catch (UnsupportedOperationException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessage::setByte(const std::string& name, unsigned char value) {
-
+void ActiveMQMapMessage::setByte(const std::string& name, unsigned char value)
+{
     failIfReadOnlyBody();
-    try {
+    try
+    {
         getMap().setByte(name, value);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<unsigned char> ActiveMQMapMessage::getBytes(const std::string& name) const {
-
-    try {
+std::vector<unsigned char> ActiveMQMapMessage::getBytes(
+    const std::string& name) const
+{
+    try
+    {
         return getMap().getByteArray(name);
-    } catch (UnsupportedOperationException& ex) {
+    }
+    catch (UnsupportedOperationException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessage::setBytes(const std::string& name, const std::vector<unsigned char>& value) {
-
+void ActiveMQMapMessage::setBytes(const std::string&                name,
+                                  const std::vector<unsigned char>& value)
+{
     failIfReadOnlyBody();
-    try {
+    try
+    {
         getMap().setByteArray(name, value);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-char ActiveMQMapMessage::getChar(const std::string& name) const {
-
-    try {
+char ActiveMQMapMessage::getChar(const std::string& name) const
+{
+    try
+    {
         return getMap().getChar(name);
-    } catch (UnsupportedOperationException& ex) {
+    }
+    catch (UnsupportedOperationException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessage::setChar(const std::string& name, char value) {
-
+void ActiveMQMapMessage::setChar(const std::string& name, char value)
+{
     failIfReadOnlyBody();
-    try {
+    try
+    {
         getMap().setChar(name, value);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-double ActiveMQMapMessage::getDouble(const std::string& name) const {
-
-    try {
+double ActiveMQMapMessage::getDouble(const std::string& name) const
+{
+    try
+    {
         return getMap().getDouble(name);
-    } catch (UnsupportedOperationException& ex) {
+    }
+    catch (UnsupportedOperationException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessage::setDouble(const std::string& name, double value) {
-
+void ActiveMQMapMessage::setDouble(const std::string& name, double value)
+{
     failIfReadOnlyBody();
-    try {
+    try
+    {
         getMap().setDouble(name, value);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-float ActiveMQMapMessage::getFloat(const std::string& name) const {
-
-    try {
+float ActiveMQMapMessage::getFloat(const std::string& name) const
+{
+    try
+    {
         return getMap().getFloat(name);
-    } catch (UnsupportedOperationException& ex) {
+    }
+    catch (UnsupportedOperationException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessage::setFloat(const std::string& name, float value) {
-
+void ActiveMQMapMessage::setFloat(const std::string& name, float value)
+{
     failIfReadOnlyBody();
-    try {
+    try
+    {
         getMap().setFloat(name, value);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ActiveMQMapMessage::getInt(const std::string& name) const {
-
-    try {
+int ActiveMQMapMessage::getInt(const std::string& name) const
+{
+    try
+    {
         return getMap().getInt(name);
-    } catch (UnsupportedOperationException& ex) {
+    }
+    catch (UnsupportedOperationException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessage::setInt(const std::string& name, int value) {
-
+void ActiveMQMapMessage::setInt(const std::string& name, int value)
+{
     failIfReadOnlyBody();
-    try {
+    try
+    {
         getMap().setInt(name, value);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long ActiveMQMapMessage::getLong(const std::string& name) const {
-
-    try {
+long long ActiveMQMapMessage::getLong(const std::string& name) const
+{
+    try
+    {
         return getMap().getLong(name);
-    } catch (UnsupportedOperationException& ex) {
+    }
+    catch (UnsupportedOperationException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessage::setLong(const std::string& name, long long value) {
-
+void ActiveMQMapMessage::setLong(const std::string& name, long long value)
+{
     failIfReadOnlyBody();
-    try {
+    try
+    {
         getMap().setLong(name, value);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-short ActiveMQMapMessage::getShort(const std::string& name) const {
-
-    try {
+short ActiveMQMapMessage::getShort(const std::string& name) const
+{
+    try
+    {
         return getMap().getShort(name);
-    } catch (UnsupportedOperationException& ex) {
+    }
+    catch (UnsupportedOperationException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessage::setShort(const std::string& name, short value) {
-
+void ActiveMQMapMessage::setShort(const std::string& name, short value)
+{
     failIfReadOnlyBody();
-    try {
+    try
+    {
         getMap().setShort(name, value);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQMapMessage::getString(const std::string& name) const {
-
-    try {
+std::string ActiveMQMapMessage::getString(const std::string& name) const
+{
+    try
+    {
         return getMap().getString(name);
-    } catch (UnsupportedOperationException& ex) {
+    }
+    catch (UnsupportedOperationException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMapMessage::setString(const std::string& name, const std::string& value) {
-
+void ActiveMQMapMessage::setString(const std::string& name,
+                                   const std::string& value)
+{
     failIfReadOnlyBody();
-    try {
+    try
+    {
         getMap().setString(name, value);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()

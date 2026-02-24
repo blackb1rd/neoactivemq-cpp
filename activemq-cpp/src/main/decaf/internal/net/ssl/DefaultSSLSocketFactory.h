@@ -25,73 +25,93 @@
 #include <string>
 #include <vector>
 
-namespace decaf {
-namespace internal {
-namespace net {
-namespace ssl {
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
+        namespace ssl
+        {
 
-    /**
-     * Default implementation of the SSLSocketFactory, this factory throws an Exception
-     * from all its create methods to indicate that SSL is not supported, this factory
-     * is used when OpenSSL is not enabled in the builds.
-     *
-     * @since 1.0
-     */
-    class DECAF_API DefaultSSLSocketFactory : public decaf::net::ssl::SSLSocketFactory {
-    private:
+            /**
+             * Default implementation of the SSLSocketFactory, this factory
+             * throws an Exception from all its create methods to indicate that
+             * SSL is not supported, this factory is used when OpenSSL is not
+             * enabled in the builds.
+             *
+             * @since 1.0
+             */
+            class DECAF_API DefaultSSLSocketFactory
+                : public decaf::net::ssl::SSLSocketFactory
+            {
+            private:
+                std::string errorMessage;
 
-        std::string errorMessage;
+            public:
+                DefaultSSLSocketFactory(const std::string& errorMessage);
 
-    public:
+                virtual ~DefaultSSLSocketFactory();
 
-        DefaultSSLSocketFactory( const std::string& errorMessage );
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual decaf::net::Socket* createSocket();
 
-        virtual ~DefaultSSLSocketFactory();
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual decaf::net::Socket* createSocket(
+                    const decaf::net::InetAddress* host,
+                    int                            port);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::Socket* createSocket();
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual decaf::net::Socket* createSocket(
+                    const decaf::net::InetAddress* host,
+                    int                            port,
+                    const decaf::net::InetAddress* ifAddress,
+                    int                            localPort);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::Socket* createSocket( const decaf::net::InetAddress* host, int port );
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual decaf::net::Socket* createSocket(const std::string& name,
+                                                         int port);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::Socket* createSocket( const decaf::net::InetAddress* host, int port,
-                                                  const decaf::net::InetAddress* ifAddress, int localPort );
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual decaf::net::Socket* createSocket(
+                    const std::string&             name,
+                    int                            port,
+                    const decaf::net::InetAddress* ifAddress,
+                    int                            localPort);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::Socket* createSocket( const std::string& name, int port );
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual std::vector<std::string> getDefaultCipherSuites();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::Socket* createSocket( const std::string& name, int port,
-                                                  const decaf::net::InetAddress* ifAddress, int localPort );
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual std::vector<std::string> getSupportedCipherSuites();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual std::vector<std::string> getDefaultCipherSuites();
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual decaf::net::Socket* createSocket(
+                    decaf::net::Socket* socket,
+                    std::string         host,
+                    int                 port,
+                    bool                autoClose);
+            };
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual std::vector<std::string> getSupportedCipherSuites();
-
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::Socket* createSocket( decaf::net::Socket* socket, std::string host, int port, bool autoClose );
-
-    };
-
-}}}}
+        }  // namespace ssl
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_SSL_DEFAULTSSLSOCKETFACTORY_H_ */

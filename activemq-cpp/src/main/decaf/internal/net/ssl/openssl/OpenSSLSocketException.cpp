@@ -30,79 +30,92 @@ using namespace decaf::internal::net::ssl;
 using namespace decaf::internal::net::ssl::openssl;
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketException::OpenSSLSocketException() {
+OpenSSLSocketException::OpenSSLSocketException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketException::OpenSSLSocketException( const Exception& ex )
-: SocketException() {
+OpenSSLSocketException::OpenSSLSocketException(const Exception& ex)
+    : SocketException()
+{
     *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketException::OpenSSLSocketException( const OpenSSLSocketException& ex )
-: SocketException() {
+OpenSSLSocketException::OpenSSLSocketException(const OpenSSLSocketException& ex)
+    : SocketException()
+{
     *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketException::OpenSSLSocketException( const char* file, const int lineNumber,
-                                                const std::exception* cause,
-                                                const char* msg, ... )
-: SocketException( cause ) {
-
+OpenSSLSocketException::OpenSSLSocketException(const char*           file,
+                                               const int             lineNumber,
+                                               const std::exception* cause,
+                                               const char*           msg,
+                                               ...)
+    : SocketException(cause)
+{
     va_list vargs;
-    va_start( vargs, msg );
-    buildMessage( msg, vargs );
+    va_start(vargs, msg);
+    buildMessage(msg, vargs);
 
     // Set the first mark for this exception.
-    setMark( file, lineNumber );
+    setMark(file, lineNumber);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketException::OpenSSLSocketException( const std::exception* cause )
-: SocketException( cause ) {
-
+OpenSSLSocketException::OpenSSLSocketException(const std::exception* cause)
+    : SocketException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketException::OpenSSLSocketException( const char* file, const int lineNumber,
-                                                const char* msg, ... )
-: SocketException() {
-
-    va_list vargs ;
-    va_start( vargs, msg );
-    buildMessage( msg, vargs );
+OpenSSLSocketException::OpenSSLSocketException(const char* file,
+                                               const int   lineNumber,
+                                               const char* msg,
+                                               ...)
+    : SocketException()
+{
+    va_list vargs;
+    va_start(vargs, msg);
+    buildMessage(msg, vargs);
 
     // Set the first mark for this exception.
-    setMark( file, lineNumber );
+    setMark(file, lineNumber);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketException::OpenSSLSocketException( const char* file, const int lineNumber )
-: SocketException() {
-
+OpenSSLSocketException::OpenSSLSocketException(const char* file,
+                                               const int   lineNumber)
+    : SocketException()
+{
     // Get from the OpenSSL error Stack.
     std::string errorMsg = this->getErrorString();
-    this->setMessage( errorMsg.c_str() );
+    this->setMessage(errorMsg.c_str());
 
     // Log the full OpenSSL error details
-    AMQ_LOG_ERROR("OpenSSLSocketException", "OpenSSL error at " << file << ":" << lineNumber << " - " << errorMsg);
+    AMQ_LOG_ERROR("OpenSSLSocketException",
+                  "OpenSSL error at " << file << ":" << lineNumber << " - "
+                                      << errorMsg);
 
     // Set the first mark for this exception.
-    setMark( file, lineNumber );
+    setMark(file, lineNumber);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketException::~OpenSSLSocketException() throw() {
+OpenSSLSocketException::~OpenSSLSocketException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string OpenSSLSocketException::getErrorString() const {
+std::string OpenSSLSocketException::getErrorString() const
+{
+    std::string returnValue =
+        "Error occurred while accessing an OpenSSL library method:";
 
-    std::string returnValue = "Error occurred while accessing an OpenSSL library method:";
-
-    for( unsigned long e = ERR_get_error(); e; e = ERR_get_error() ) {
+    for (unsigned long e = ERR_get_error(); e; e = ERR_get_error())
+    {
         char msg[256];
         ERR_error_string_n(e, msg, sizeof msg);
         returnValue += "\n";

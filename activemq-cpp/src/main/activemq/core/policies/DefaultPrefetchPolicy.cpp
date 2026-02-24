@@ -28,25 +28,27 @@ using namespace decaf::lang;
 ////////////////////////////////////////////////////////////////////////////////
 int DefaultPrefetchPolicy::MAX_PREFETCH_SIZE = Short::MAX_VALUE - 1;
 int DefaultPrefetchPolicy::DEFAULT_DURABLE_TOPIC_PREFETCH = 100;
-int DefaultPrefetchPolicy::DEFAULT_QUEUE_PREFETCH = 1000;
+int DefaultPrefetchPolicy::DEFAULT_QUEUE_PREFETCH         = 1000;
 int DefaultPrefetchPolicy::DEFAULT_QUEUE_BROWSER_PREFETCH = 500;
-int DefaultPrefetchPolicy::DEFAULT_TOPIC_PREFETCH = MAX_PREFETCH_SIZE;
+int DefaultPrefetchPolicy::DEFAULT_TOPIC_PREFETCH         = MAX_PREFETCH_SIZE;
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultPrefetchPolicy::DefaultPrefetchPolicy() :
-    durableTopicPrefetch( DEFAULT_DURABLE_TOPIC_PREFETCH ),
-    queuePrefetch( DEFAULT_QUEUE_PREFETCH ),
-    queueBrowserPrefetch( DEFAULT_QUEUE_BROWSER_PREFETCH ),
-    topicPrefetch( DEFAULT_TOPIC_PREFETCH ) {
+DefaultPrefetchPolicy::DefaultPrefetchPolicy()
+    : durableTopicPrefetch(DEFAULT_DURABLE_TOPIC_PREFETCH),
+      queuePrefetch(DEFAULT_QUEUE_PREFETCH),
+      queueBrowserPrefetch(DEFAULT_QUEUE_BROWSER_PREFETCH),
+      topicPrefetch(DEFAULT_TOPIC_PREFETCH)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultPrefetchPolicy::~DefaultPrefetchPolicy() {
+DefaultPrefetchPolicy::~DefaultPrefetchPolicy()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-PrefetchPolicy* DefaultPrefetchPolicy::clone() const {
-
+PrefetchPolicy* DefaultPrefetchPolicy::clone() const
+{
     DefaultPrefetchPolicy* copy = new DefaultPrefetchPolicy;
 
     copy->setDurableTopicPrefetch(this->getDurableTopicPrefetch());

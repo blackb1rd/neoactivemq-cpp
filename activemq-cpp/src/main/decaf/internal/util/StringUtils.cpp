@@ -20,8 +20,8 @@
 #include <decaf/lang/Character.h>
 #include <decaf/lang/Integer.h>
 
-#include <decaf/lang/exceptions/RuntimeException.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/lang/exceptions/RuntimeException.h>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -30,127 +30,180 @@ using namespace decaf::internal;
 using namespace decaf::internal::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    int compareRight(char const* left, char const* right) {
+int compareRight(char const* left, char const* right)
+{
+    int bias = 0;
 
-        int bias = 0;
-
-        // The longest run of digits wins.  That aside, the greatest
-        // value wins, but we don't know that it will until we've scanned
-        // both numbers to know that they have the same magnitude, so we
-        // remember it in BIAS.
-        for (;; left++, ++right) {
-            if (!Character::isDigit(*left) && !Character::isDigit(*right)) {
-                break;
-            } else if (!Character::isDigit(*left)) {
-                return -1;
-            } else if (!Character::isDigit(*right)) {
-                return +1;
-            } else if (*left < *right) {
-                if (!bias) bias = -1;
-            } else if (*left > *right) {
-                if (!bias) bias = +1;
-            } else if (!*left && !*right) {
-                break;
+    // The longest run of digits wins.  That aside, the greatest
+    // value wins, but we don't know that it will until we've scanned
+    // both numbers to know that they have the same magnitude, so we
+    // remember it in BIAS.
+    for (;; left++, ++right)
+    {
+        if (!Character::isDigit(*left) && !Character::isDigit(*right))
+        {
+            break;
+        }
+        else if (!Character::isDigit(*left))
+        {
+            return -1;
+        }
+        else if (!Character::isDigit(*right))
+        {
+            return +1;
+        }
+        else if (*left < *right)
+        {
+            if (!bias)
+            {
+                bias = -1;
             }
         }
-
-        return bias;
-    }
-
-    int compareLeft(char const* left, char const* right) {
-        // Compare two left-aligned numbers: the first to have a
-        // different value wins.
-        for (;; left++, right++) {
-            if (!Character::isDigit(*left) && !Character::isDigit(*right)) {
-                break;
-            } else if (!Character::isDigit(*left)) {
-                return -1;
-            } else if (!Character::isDigit(*right)) {
-                return +1;
-            } else if (*left < *right) {
-                return -1;
-            } else if (*left > *right) {
-                return +1;
+        else if (*left > *right)
+        {
+            if (!bias)
+            {
+                bias = +1;
             }
         }
-
-        return 0;
-    }
-
-    int doCompare(char const* left, char const* right, bool ignoreCase) {
-        int lIndex = 0;
-        int rIndex = 0;
-        char curLeft = 0;
-        char curRight = 0;
-
-        bool fractional = false;
-        int result = 0;
-
-        while (true) {
-            curLeft = left[lIndex];
-            curRight = right[rIndex];
-
-            while (Character::isWhitespace(curLeft)) {
-                curLeft = left[++lIndex];
-            }
-
-            while (Character::isWhitespace(curRight)) {
-                curRight = left[++rIndex];
-            }
-
-            if (Character::isDigit(curLeft) && Character::isDigit(curRight)) {
-                fractional = (curLeft == '0' || curRight == '0');
-
-                if (fractional) {
-                    if ((result = compareLeft(left + lIndex, right + rIndex)) != 0) {
-                        return result;
-                    }
-                } else {
-                    if ((result = compareRight(left + lIndex, right + rIndex)) != 0) {
-                        return result;
-                    }
-                }
-            }
-
-            if (!curLeft && !curRight) {
-                return 0;
-            }
-
-            if (ignoreCase) {
-                curLeft = Character::toUpperCase(curLeft);
-                curRight = Character::toUpperCase(curRight);
-            }
-
-            if (curLeft < curRight) {
-                return -1;
-            } else if (curLeft > curRight) {
-                return +1;
-            }
-
-            ++lIndex;
-            ++rIndex;
+        else if (!*left && !*right)
+        {
+            break;
         }
-
-        return 0;
     }
 
+    return bias;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-int StringUtils::stringLength(const char* string) {
+int compareLeft(char const* left, char const* right)
+{
+    // Compare two left-aligned numbers: the first to have a
+    // different value wins.
+    for (;; left++, right++)
+    {
+        if (!Character::isDigit(*left) && !Character::isDigit(*right))
+        {
+            break;
+        }
+        else if (!Character::isDigit(*left))
+        {
+            return -1;
+        }
+        else if (!Character::isDigit(*right))
+        {
+            return +1;
+        }
+        else if (*left < *right)
+        {
+            return -1;
+        }
+        else if (*left > *right)
+        {
+            return +1;
+        }
+    }
 
-    if (string == NULL) {
-        throw NullPointerException(__FILE__, __LINE__, "Cannot check length of NULL string.");
+    return 0;
+}
+
+int doCompare(char const* left, char const* right, bool ignoreCase)
+{
+    int  lIndex   = 0;
+    int  rIndex   = 0;
+    char curLeft  = 0;
+    char curRight = 0;
+
+    bool fractional = false;
+    int  result     = 0;
+
+    while (true)
+    {
+        curLeft  = left[lIndex];
+        curRight = right[rIndex];
+
+        while (Character::isWhitespace(curLeft))
+        {
+            curLeft = left[++lIndex];
+        }
+
+        while (Character::isWhitespace(curRight))
+        {
+            curRight = left[++rIndex];
+        }
+
+        if (Character::isDigit(curLeft) && Character::isDigit(curRight))
+        {
+            fractional = (curLeft == '0' || curRight == '0');
+
+            if (fractional)
+            {
+                if ((result = compareLeft(left + lIndex, right + rIndex)) != 0)
+                {
+                    return result;
+                }
+            }
+            else
+            {
+                if ((result = compareRight(left + lIndex, right + rIndex)) != 0)
+                {
+                    return result;
+                }
+            }
+        }
+
+        if (!curLeft && !curRight)
+        {
+            return 0;
+        }
+
+        if (ignoreCase)
+        {
+            curLeft  = Character::toUpperCase(curLeft);
+            curRight = Character::toUpperCase(curRight);
+        }
+
+        if (curLeft < curRight)
+        {
+            return -1;
+        }
+        else if (curLeft > curRight)
+        {
+            return +1;
+        }
+
+        ++lIndex;
+        ++rIndex;
+    }
+
+    return 0;
+}
+
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+int StringUtils::stringLength(const char* string)
+{
+    if (string == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Cannot check length of NULL string.");
     }
 
     int length = 0;
-    while (*string != '\0') {
+    while (*string != '\0')
+    {
         string++;
 
-        if (length == Integer::MAX_VALUE) {
-            throw RuntimeException(__FILE__, __LINE__, "String length is longer than Integer::MAX_VALUE");
+        if (length == Integer::MAX_VALUE)
+        {
+            throw RuntimeException(
+                __FILE__,
+                __LINE__,
+                "String length is longer than Integer::MAX_VALUE");
         }
 
         length++;
@@ -160,11 +213,13 @@ int StringUtils::stringLength(const char* string) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int StringUtils::compareIgnoreCase(const char* left, const char* right) {
+int StringUtils::compareIgnoreCase(const char* left, const char* right)
+{
     return doCompare(left, right, true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int StringUtils::compare(const char* left, const char* right) {
+int StringUtils::compare(const char* left, const char* right)
+{
     return doCompare(left, right, false);
 }

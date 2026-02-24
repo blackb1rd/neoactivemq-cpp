@@ -38,17 +38,22 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-TransactionInfo::TransactionInfo() :
-    BaseCommand(), connectionId(NULL), transactionId(NULL), type(0) {
-
+TransactionInfo::TransactionInfo()
+    : BaseCommand(),
+      connectionId(NULL),
+      transactionId(NULL),
+      type(0)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TransactionInfo::~TransactionInfo() {
+TransactionInfo::~TransactionInfo()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TransactionInfo* TransactionInfo::cloneDataStructure() const {
+TransactionInfo* TransactionInfo::cloneDataStructure() const
+{
     std::unique_ptr<TransactionInfo> transactionInfo(new TransactionInfo());
 
     // Copy the data from the base class or classes
@@ -58,18 +63,21 @@ TransactionInfo* TransactionInfo::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransactionInfo::copyDataStructure(const DataStructure* src) {
-
+void TransactionInfo::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const TransactionInfo* srcPtr = dynamic_cast<const TransactionInfo*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "TransactionInfo::copyDataStructure - src is NULL or invalid");
     }
 
@@ -82,13 +90,14 @@ void TransactionInfo::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char TransactionInfo::getDataStructureType() const {
+unsigned char TransactionInfo::getDataStructureType() const
+{
     return TransactionInfo::ID_TRANSACTIONINFO;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string TransactionInfo::toString() const {
-
+std::string TransactionInfo::toString() const
+{
     ostringstream stream;
 
     stream << "TransactionInfo { "
@@ -96,16 +105,22 @@ std::string TransactionInfo::toString() const {
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "ConnectionId = ";
-    if (this->getConnectionId() != NULL) {
+    if (this->getConnectionId() != NULL)
+    {
         stream << this->getConnectionId()->toString();
-    } else {
+    }
+    else
+    {
         stream << "NULL";
     }
     stream << ", ";
     stream << "TransactionId = ";
-    if (this->getTransactionId() != NULL) {
+    if (this->getTransactionId() != NULL)
+    {
         stream << this->getTransactionId()->toString();
-    } else {
+    }
+    else
+    {
         stream << "NULL";
     }
     stream << ", ";
@@ -116,82 +131,110 @@ std::string TransactionInfo::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool TransactionInfo::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool TransactionInfo::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
-    const TransactionInfo* valuePtr = dynamic_cast<const TransactionInfo*>(value);
+    const TransactionInfo* valuePtr =
+        dynamic_cast<const TransactionInfo*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getConnectionId() != NULL) {
-        if (!this->getConnectionId()->equals(valuePtr->getConnectionId().get())) {
+    if (this->getConnectionId() != NULL)
+    {
+        if (!this->getConnectionId()->equals(valuePtr->getConnectionId().get()))
+        {
             return false;
         }
-    } else if (valuePtr->getConnectionId() != NULL) {
+    }
+    else if (valuePtr->getConnectionId() != NULL)
+    {
         return false;
     }
-    if (this->getTransactionId() != NULL) {
-        if (!this->getTransactionId()->equals(valuePtr->getTransactionId().get())) {
+    if (this->getTransactionId() != NULL)
+    {
+        if (!this->getTransactionId()->equals(
+                valuePtr->getTransactionId().get()))
+        {
             return false;
         }
-    } else if (valuePtr->getTransactionId() != NULL) {
+    }
+    else if (valuePtr->getTransactionId() != NULL)
+    {
         return false;
     }
-    if (this->getType() != valuePtr->getType()) {
+    if (this->getType() != valuePtr->getType())
+    {
         return false;
     }
-    if (!BaseCommand::equals(value)) {
+    if (!BaseCommand::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ConnectionId>& TransactionInfo::getConnectionId() const {
+const decaf::lang::Pointer<ConnectionId>& TransactionInfo::getConnectionId()
+    const
+{
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ConnectionId>& TransactionInfo::getConnectionId() {
+decaf::lang::Pointer<ConnectionId>& TransactionInfo::getConnectionId()
+{
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransactionInfo::setConnectionId(const decaf::lang::Pointer<ConnectionId>& connectionId) {
+void TransactionInfo::setConnectionId(
+    const decaf::lang::Pointer<ConnectionId>& connectionId)
+{
     this->connectionId = connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<TransactionId>& TransactionInfo::getTransactionId() const {
+const decaf::lang::Pointer<TransactionId>& TransactionInfo::getTransactionId()
+    const
+{
     return transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<TransactionId>& TransactionInfo::getTransactionId() {
+decaf::lang::Pointer<TransactionId>& TransactionInfo::getTransactionId()
+{
     return transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransactionInfo::setTransactionId(const decaf::lang::Pointer<TransactionId>& transactionId) {
+void TransactionInfo::setTransactionId(
+    const decaf::lang::Pointer<TransactionId>& transactionId)
+{
     this->transactionId = transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char TransactionInfo::getType() const {
+unsigned char TransactionInfo::getType() const
+{
     return type;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransactionInfo::setType(unsigned char type) {
+void TransactionInfo::setType(unsigned char type)
+{
     this->type = type;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> TransactionInfo::visit(activemq::state::CommandVisitor* visitor) {
+decaf::lang::Pointer<commands::Command> TransactionInfo::visit(
+    activemq::state::CommandVisitor* visitor)
+{
     return visitor->processTransactionInfo(this);
 }

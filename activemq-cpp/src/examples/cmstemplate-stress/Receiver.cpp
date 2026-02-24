@@ -16,9 +16,9 @@
  */
 
 #include "Receiver.h"
+#include "ConnectionFactoryMgr.h"
 #include "MessagingTask.h"
 #include "decaf/lang/System.h"
-#include "ConnectionFactoryMgr.h"
 
 #include <cms/Message.h>
 #include <decaf/lang/Exception.h>
@@ -37,22 +37,26 @@ using namespace cmstemplate;
 ThreadPoolExecutor* Receiver::threadPoolExecutor = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
-Receiver::Receiver(const string & url, const string & queueOrTopicName,
-                   bool isTopic, long long receiveTimeout, bool useThreadPool) :
-        url(url),
-        mutexForCmsTemplate(),
-        mutexGeneral(),
-        closing(false),
-        ready(1),
-        messageListener(NULL),
-        cmsTemplate(NULL),
-        asyncReceiverThread(NULL),
-        receiveTimeout(receiveTimeout),
-        bUseThreadPool(useThreadPool),
-        cmsTemplateCreateTime(0),
-        numOfMessagingTasks(0) {
-
-    ConnectionFactory* connectionFactory = ConnectionFactoryMgr::getConnectionFactory(url);
+Receiver::Receiver(const string& url,
+                   const string& queueOrTopicName,
+                   bool          isTopic,
+                   long long     receiveTimeout,
+                   bool          useThreadPool)
+    : url(url),
+      mutexForCmsTemplate(),
+      mutexGeneral(),
+      closing(false),
+      ready(1),
+      messageListener(NULL),
+      cmsTemplate(NULL),
+      asyncReceiverThread(NULL),
+      receiveTimeout(receiveTimeout),
+      bUseThreadPool(useThreadPool),
+      cmsTemplateCreateTime(0),
+      numOfMessagingTasks(0)
+{
+    ConnectionFactory* connectionFactory =
+        ConnectionFactoryMgr::getConnectionFactory(url);
     cmsTemplate.reset(new CmsTemplate(connectionFactory));
     cmsTemplate->setDefaultDestinationName(queueOrTopicName);
     cmsTemplate->setPubSubDomain(isTopic);
@@ -60,41 +64,57 @@ Receiver::Receiver(const string & url, const string & queueOrTopicName,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Receiver::~Receiver() {
-
-    try {
+Receiver::~Receiver()
+{
+    try
+    {
         closing = true;
 
         // wait until all outstanding messaging tasks are done
-        while (true) {
+        while (true)
+        {
             long numOfMessagingTasks = getNumOfMessagingTasks();
-            if (numOfMessagingTasks <= 0) {
+            if (numOfMessagingTasks <= 0)
+            {
                 break;
             }
             Thread::sleep(1000);
         }
 
-        if (asyncReceiverThread.get() != NULL) {
+        if (asyncReceiverThread.get() != NULL)
+        {
             asyncReceiverThread->join();
         }
-
-    } catch (...) {
+    }
+    catch (...)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::initialize(int reservedThreads, int maxThreads) {
-    threadPoolExecutor = new ThreadPoolExecutor(reservedThreads, maxThreads, 5, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>());
+void Receiver::initialize(int reservedThreads, int maxThreads)
+{
+    threadPoolExecutor =
+        new ThreadPoolExecutor(reservedThreads,
+                               maxThreads,
+                               5,
+                               TimeUnit::SECONDS,
+                               new LinkedBlockingQueue<Runnable*>());
     threadPoolExecutor->prestartCoreThread();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::unInitialize() {
-    if (threadPoolExecutor != NULL) {
-        try {
+void Receiver::unInitialize()
+{
+    if (threadPoolExecutor != NULL)
+    {
+        try
+        {
             threadPoolExecutor->shutdown();
             threadPoolExecutor->awaitTermination(10000, TimeUnit::MILLISECONDS);
-        } catch (Exception& ie) {
+        }
+        catch (Exception& ie)
+        {
         }
         delete threadPoolExecutor;
         threadPoolExecutor = NULL;
@@ -102,82 +122,109 @@ void Receiver::unInitialize() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::receiveMessage(std::string& message, ErrorCode& errorCode, bool retryOnError) {
+void Receiver::receiveMessage(std::string& message,
+                              ErrorCode&   errorCode,
+                              bool         retryOnError)
+{
     long long stopRetryTime = System::currentTimeMillis() + receiveTimeout;
-    errorCode = CMS_SUCCESS;
+    errorCode               = CMS_SUCCESS;
 
-    if (receiveTimeout == 0/*CmsTemplate::RECEIVE_TIMEOUT_NO_WAIT*/) {
+    if (receiveTimeout == 0 /*CmsTemplate::RECEIVE_TIMEOUT_NO_WAIT*/)
+    {
         retryOnError = false;
-    } else if (receiveTimeout == -1/*CmsTemplate::RECEIVE_TIMEOUT_INDEFINITE_WAIT*/) {
+    }
+    else if (receiveTimeout ==
+             -1 /*CmsTemplate::RECEIVE_TIMEOUT_INDEFINITE_WAIT*/)
+    {
         retryOnError = true;
     }
 
-    do {
+    do
+    {
         long long timeoutForThisLoop;
-        if (receiveTimeout <= 0) {
+        if (receiveTimeout <= 0)
+        {
             timeoutForThisLoop = receiveTimeout;
-        } else {
+        }
+        else
+        {
             timeoutForThisLoop = stopRetryTime - System::currentTimeMillis();
-            if (timeoutForThisLoop <= 0) {
+            if (timeoutForThisLoop <= 0)
+            {
                 errorCode = CMS_ERROR_RECEIVER_TIMEDOUT;
                 break;
             }
         }
 
         mutexForCmsTemplate.lock();
-        if (cmsTemplate.get() != NULL) {
+        if (cmsTemplate.get() != NULL)
+        {
             cmsTemplate->setReceiveTimeout(timeoutForThisLoop);
 
             cms::Message* cmsMessage = NULL;
-            try {
+            try
+            {
                 cmsMessage = cmsTemplate->receive();
-            } catch (cms::CMSException& ex) {
+            }
+            catch (cms::CMSException& ex)
+            {
                 mutexForCmsTemplate.unlock();
                 errorCode = CMS_ERROR_CAUGHT_CMS_EXCEPTION;
                 break;
             }
 
             mutexForCmsTemplate.unlock();
-            if (cmsMessage == NULL) {
+            if (cmsMessage == NULL)
+            {
                 break;
             }
 
-            if (isMessageExpired(cmsMessage)) {
+            if (isMessageExpired(cmsMessage))
+            {
                 errorCode = CMS_ERROR_INVALID_MESSAGE;
                 delete cmsMessage;
                 continue;
             }
 
-            wstring text;
-            cms::TextMessage* txtMessage = dynamic_cast<cms::TextMessage*>(cmsMessage);
-            if (txtMessage) {
-
+            wstring           text;
+            cms::TextMessage* txtMessage =
+                dynamic_cast<cms::TextMessage*>(cmsMessage);
+            if (txtMessage)
+            {
                 message = txtMessage->getText();
             }
             delete cmsMessage;
-        } else {
+        }
+        else
+        {
             mutexForCmsTemplate.unlock();
         }
-    } while (errorCode != CMS_SUCCESS && retryOnError && System::currentTimeMillis() < stopRetryTime);
+    } while (errorCode != CMS_SUCCESS && retryOnError &&
+             System::currentTimeMillis() < stopRetryTime);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::waitUntilReady() {
+void Receiver::waitUntilReady()
+{
     ready.await();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::registerMessageListener(ReceiverListener* messageListener, ErrorCode& errorCode) {
+void Receiver::registerMessageListener(ReceiverListener* messageListener,
+                                       ErrorCode&        errorCode)
+{
     errorCode = CMS_SUCCESS;
 
     mutexGeneral.lock();
-    if (messageListener == NULL) {
+    if (messageListener == NULL)
+    {
         errorCode = CMS_ERROR_INVALID_MESSAGELISTENER;
         mutexGeneral.unlock();
         return;
     }
 
-    if (this->messageListener != NULL) {
+    if (this->messageListener != NULL)
+    {
         errorCode = CMS_ERROR_A_MESSAGELISTENER_HAS_BEEN_REGISTERED_ALREADY;
         mutexGeneral.unlock();
         return;
@@ -193,25 +240,38 @@ void Receiver::registerMessageListener(ReceiverListener* messageListener, ErrorC
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::run() {
+void Receiver::run()
+{
     ready.countDown();
-    while (!closing) {
+    while (!closing)
+    {
         string message = "";
 
         ErrorCode errorCode = CMS_SUCCESS;
 
         receiveMessage(message, errorCode, false);
-        if (message != "") {
-            if (bUseThreadPool) {
+        if (message != "")
+        {
+            if (bUseThreadPool)
+            {
                 queueMessagingTask(message);
-            } else {
-                try {
+            }
+            else
+            {
+                try
+                {
                     executeMessagingTask(message, false);
-                } catch (...) {
+                }
+                catch (...)
+                {
                 }
             }
-        } else {
-            if (errorCode == CMS_ERROR_CAUGHT_CMS_EXCEPTION || errorCode == CMS_ERROR_MESSAGE_BROKER_ERROR) {
+        }
+        else
+        {
+            if (errorCode == CMS_ERROR_CAUGHT_CMS_EXCEPTION ||
+                errorCode == CMS_ERROR_MESSAGE_BROKER_ERROR)
+            {
                 long long sleepTime = 0;
                 mutexForCmsTemplate.lock();
                 sleepTime = cmsTemplate->getReceiveTimeout();
@@ -223,8 +283,10 @@ void Receiver::run() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::queueMessagingTask(const string& message) {
-    if (message != "" && (!closing)) {
+void Receiver::queueMessagingTask(const string& message)
+{
+    if (message != "" && (!closing))
+    {
         MessagingTask* task = new MessagingTask(this, message);
         increaseNumOfMessagingTasks();
         threadPoolExecutor->execute(task);
@@ -232,47 +294,57 @@ void Receiver::queueMessagingTask(const string& message) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::executeMessagingTask(const string& message, bool bDecreaseNumOfMessagingTasks/*=true*/) {
-    if ((!closing)) {
+void Receiver::executeMessagingTask(const string& message,
+                                    bool bDecreaseNumOfMessagingTasks /*=true*/)
+{
+    if ((!closing))
+    {
         mutexGeneral.lock();
         ReceiverListener* copy = this->messageListener;
         mutexGeneral.unlock();
-        if (copy) {
+        if (copy)
+        {
             copy->onMessage(message);
         }
     }
 
-    if (bDecreaseNumOfMessagingTasks) {
+    if (bDecreaseNumOfMessagingTasks)
+    {
         decreaseNumOfMessagingTasks();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Receiver::isMessageExpired(cms::Message* message) {
-    long long expireTime = message->getCMSExpiration();
+bool Receiver::isMessageExpired(cms::Message* message)
+{
+    long long expireTime  = message->getCMSExpiration();
     long long currentTime = System::currentTimeMillis();
-    if (expireTime > 0 && currentTime > expireTime) {
+    if (expireTime > 0 && currentTime > expireTime)
+    {
         return true;
     }
     return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::increaseNumOfMessagingTasks() {
+void Receiver::increaseNumOfMessagingTasks()
+{
     mutexGeneral.lock();
     numOfMessagingTasks++;
     mutexGeneral.unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::decreaseNumOfMessagingTasks() {
+void Receiver::decreaseNumOfMessagingTasks()
+{
     mutexGeneral.lock();
     numOfMessagingTasks--;
     mutexGeneral.unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long Receiver::getNumOfMessagingTasks() {
+long Receiver::getNumOfMessagingTasks()
+{
     long numOfMessagingTasks = 0;
     mutexGeneral.lock();
     this->numOfMessagingTasks = numOfMessagingTasks;
@@ -281,6 +353,7 @@ long Receiver::getNumOfMessagingTasks() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::close() {
+void Receiver::close()
+{
     closing = true;
 }

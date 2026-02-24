@@ -17,14 +17,14 @@
 
 #include "MessagePriorityTest.h"
 
-#include <activemq/util/CMSListener.h>
-#include <activemq/exceptions/ActiveMQException.h>
-#include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/core/ActiveMQConnection.h>
+#include <activemq/core/ActiveMQConnectionFactory.h>
+#include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/CMSListener.h>
 
+#include <decaf/lang/Pointer.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/UUID.h>
-#include <decaf/lang/Pointer.h>
 
 using namespace std;
 using namespace cms;
@@ -38,54 +38,66 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class ProducerThread : public Thread {
-    private:
+class ProducerThread : public Thread
+{
+private:
+    Session*     session;
+    Destination* destination;
+    int          num;
+    int          priority;
 
-        Session* session;
-        Destination* destination;
-        int num;
-        int priority;
+private:
+    ProducerThread(const ProducerThread&);
+    ProducerThread& operator=(const ProducerThread&);
 
-    private:
+public:
+    ProducerThread(Session*     session,
+                   Destination* destination,
+                   int          num,
+                   int          priority)
+        : session(session),
+          destination(destination),
+          num(num),
+          priority(priority)
+    {
+    }
 
-        ProducerThread(const ProducerThread&);
-        ProducerThread& operator= (const ProducerThread&);
+    virtual ~ProducerThread()
+    {
+    }
 
-    public:
+    virtual void run()
+    {
+        Pointer<MessageProducer> producer(session->createProducer(destination));
+        producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
+        producer->setPriority(priority);
 
-        ProducerThread(Session* session, Destination* destination, int num, int priority) :
-            session(session), destination(destination), num(num), priority(priority) {
+        for (int i = 0; i < num; ++i)
+        {
+            Pointer<TextMessage> message(
+                session->createTextMessage("Test Message"));
+            producer->send(message.get());
         }
+    }
+};
+}  // namespace
 
-        virtual ~ProducerThread() {}
-
-        virtual void run() {
-
-            Pointer<MessageProducer> producer(session->createProducer(destination));
-            producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
-            producer->setPriority(priority);
-
-            for (int i = 0; i < num; ++i) {
-                Pointer<TextMessage> message(session->createTextMessage("Test Message"));
-                producer->send(message.get());
-            }
-        }
-    };
+////////////////////////////////////////////////////////////////////////////////
+MessagePriorityTest::MessagePriorityTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessagePriorityTest::MessagePriorityTest() {
+MessagePriorityTest::~MessagePriorityTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessagePriorityTest::~MessagePriorityTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void MessagePriorityTest::testMessagePrioritySendReceive() {
-
+void MessagePriorityTest::testMessagePrioritySendReceive()
+{
     static const int MSG_COUNT = 25;
 
     Pointer<ActiveMQConnectionFactory> connectionFactory(
@@ -94,10 +106,13 @@ void MessagePriorityTest::testMessagePrioritySendReceive() {
     connectionFactory->setMessagePrioritySupported(true);
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
-    Pointer<Queue> destination(session->createTemporaryQueue());
-    Pointer<MessageProducer> producer(session->createProducer(destination.get()));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session>    session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    Pointer<Queue>           destination(session->createTemporaryQueue());
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
     connection->start();
 
@@ -112,7 +127,8 @@ void MessagePriorityTest::testMessagePrioritySendReceive() {
 
     Thread::sleep(3000);
 
-    for (int i = 0; i < MSG_COUNT * 2; ++i) {
+    for (int i = 0; i < MSG_COUNT * 2; ++i)
+    {
         Pointer<cms::Message> message(consumer->receive(2000));
         ASSERT_TRUE(message != NULL);
         ASSERT_TRUE(message->getCMSPriority() == (i < MSG_COUNT ? 9 : 1));

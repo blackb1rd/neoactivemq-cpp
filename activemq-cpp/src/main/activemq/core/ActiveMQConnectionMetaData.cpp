@@ -22,63 +22,73 @@ using namespace activemq;
 using namespace activemq::core;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQConnectionMetaData::ActiveMQConnectionMetaData() {
+ActiveMQConnectionMetaData::ActiveMQConnectionMetaData()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQConnectionMetaData::~ActiveMQConnectionMetaData() {
+ActiveMQConnectionMetaData::~ActiveMQConnectionMetaData()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQConnectionMetaData::getCMSVersion() const {
+std::string ActiveMQConnectionMetaData::getCMSVersion() const
+{
     return "3.2";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ActiveMQConnectionMetaData::getCMSMajorVersion() const {
+int ActiveMQConnectionMetaData::getCMSMajorVersion() const
+{
     return 3;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ActiveMQConnectionMetaData::getCMSMinorVersion() const {
+int ActiveMQConnectionMetaData::getCMSMinorVersion() const
+{
     return 2;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQConnectionMetaData::getCMSProviderName() const {
+std::string ActiveMQConnectionMetaData::getCMSProviderName() const
+{
     return "activemq-cpp";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQConnectionMetaData::getProviderVersion() const {
+std::string ActiveMQConnectionMetaData::getProviderVersion() const
+{
     return "3.10.0";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ActiveMQConnectionMetaData::getProviderMajorVersion() const {
+int ActiveMQConnectionMetaData::getProviderMajorVersion() const
+{
     return 3;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ActiveMQConnectionMetaData::getProviderMinorVersion() const {
+int ActiveMQConnectionMetaData::getProviderMinorVersion() const
+{
     return 10;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ActiveMQConnectionMetaData::getProviderPatchVersion() const {
+int ActiveMQConnectionMetaData::getProviderPatchVersion() const
+{
     return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> ActiveMQConnectionMetaData::getCMSXPropertyNames() const {
-
+std::vector<std::string> ActiveMQConnectionMetaData::getCMSXPropertyNames() const
+{
     std::vector<std::string> jmxProperties;
 
-    jmxProperties.push_back( "JMSXUserID" );
-    jmxProperties.push_back( "JMSXGroupID" );
-    jmxProperties.push_back( "JMSXGroupSeq" );
-    jmxProperties.push_back( "JMSXDeliveryCount" );
-    jmxProperties.push_back( "JMSXProducerTXID" );
+    jmxProperties.push_back("JMSXUserID");
+    jmxProperties.push_back("JMSXGroupID");
+    jmxProperties.push_back("JMSXGroupSeq");
+    jmxProperties.push_back("JMSXDeliveryCount");
+    jmxProperties.push_back("JMSXProducerTXID");
 
     return jmxProperties;
 }

@@ -28,30 +28,37 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-OutputStream::OutputStream() : mutex() {
+OutputStream::OutputStream()
+    : mutex()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OutputStream::~OutputStream() {
+OutputStream::~OutputStream()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStream::close() {
+void OutputStream::close()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStream::flush() {
+void OutputStream::flush()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string OutputStream::toString() const {
+std::string OutputStream::toString() const
+{
     return typeid(this).name();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStream::write(unsigned char c) {
-
-    try {
+void OutputStream::write(unsigned char c)
+{
+    try
+    {
         this->doWriteByte(c);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -59,9 +66,10 @@ void OutputStream::write(unsigned char c) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStream::write(const unsigned char* buffer, int size) {
-
-    try {
+void OutputStream::write(const unsigned char* buffer, int size)
+{
+    try
+    {
         this->doWriteArray(buffer, size);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -71,9 +79,13 @@ void OutputStream::write(const unsigned char* buffer, int size) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStream::write(const unsigned char* buffer, int size, int offset, int length) {
-
-    try {
+void OutputStream::write(const unsigned char* buffer,
+                         int                  size,
+                         int                  offset,
+                         int                  length)
+{
+    try
+    {
         this->doWriteArrayBounded(buffer, size, offset, length);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -83,9 +95,10 @@ void OutputStream::write(const unsigned char* buffer, int size, int offset, int 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStream::doWriteArray(const unsigned char* buffer, int size) {
-
-    try {
+void OutputStream::doWriteArray(const unsigned char* buffer, int size)
+{
+    try
+    {
         this->doWriteArrayBounded(buffer, size, 0, size);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -93,26 +106,46 @@ void OutputStream::doWriteArray(const unsigned char* buffer, int size) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OutputStream::doWriteArrayBounded(const unsigned char* buffer, int size, int offset, int length) {
-
-    if (buffer == NULL) {
-        throw IndexOutOfBoundsException(__FILE__, __LINE__, "Buffer pointer passed was NULL.");
+void OutputStream::doWriteArrayBounded(const unsigned char* buffer,
+                                       int                  size,
+                                       int                  offset,
+                                       int                  length)
+{
+    if (buffer == NULL)
+    {
+        throw IndexOutOfBoundsException(__FILE__,
+                                        __LINE__,
+                                        "Buffer pointer passed was NULL.");
     }
 
-    if (size < 0) {
-        throw IndexOutOfBoundsException(__FILE__, __LINE__, "size parameter out of Bounds: %d.", size);
+    if (size < 0)
+    {
+        throw IndexOutOfBoundsException(__FILE__,
+                                        __LINE__,
+                                        "size parameter out of Bounds: %d.",
+                                        size);
     }
 
-    if (offset > size || offset < 0) {
-        throw IndexOutOfBoundsException(__FILE__, __LINE__, "offset parameter out of Bounds: %d.", offset);
+    if (offset > size || offset < 0)
+    {
+        throw IndexOutOfBoundsException(__FILE__,
+                                        __LINE__,
+                                        "offset parameter out of Bounds: %d.",
+                                        offset);
     }
 
-    if (length < 0 || length > size - offset) {
-        throw IndexOutOfBoundsException(__FILE__, __LINE__, "length parameter out of Bounds: %d.", length);
+    if (length < 0 || length > size - offset)
+    {
+        throw IndexOutOfBoundsException(__FILE__,
+                                        __LINE__,
+                                        "length parameter out of Bounds: %d.",
+                                        length);
     }
 
-    try {
-        for (int i = offset; i < offset + length; i++) {
+    try
+    {
+        for (int i = offset; i < offset + length; i++)
+        {
             this->doWriteByte(buffer[i]);
         }
     }

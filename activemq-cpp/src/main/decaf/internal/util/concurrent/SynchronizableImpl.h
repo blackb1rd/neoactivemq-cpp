@@ -19,48 +19,55 @@
 #define _DECAF_INTERNAL_UTIL_CONCURRENT_SYNCHRONIZABLEIMPL_H_
 
 #include <decaf/util/Config.h>
-#include <decaf/util/concurrent/Synchronizable.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <decaf/util/concurrent/Synchronizable.h>
 
-namespace decaf {
-namespace internal {
-namespace util {
-namespace concurrent {
+namespace decaf
+{
+namespace internal
+{
+    namespace util
+    {
+        namespace concurrent
+        {
 
-    /**
-     * A convenience class used by some Decaf classes to implement the Synchronizable interface
-     * when there is no issues related to multiple inheritance.
-     *
-     * @since 1.0
-     */
-    class DECAF_API SynchronizableImpl : public decaf::util::concurrent::Synchronizable {
-    protected:
+            /**
+             * A convenience class used by some Decaf classes to implement the
+             * Synchronizable interface when there is no issues related to
+             * multiple inheritance.
+             *
+             * @since 1.0
+             */
+            class DECAF_API SynchronizableImpl
+                : public decaf::util::concurrent::Synchronizable
+            {
+            protected:
+                mutable decaf::util::concurrent::Mutex mutex;
 
-        mutable decaf::util::concurrent::Mutex mutex;
+            public:
+                SynchronizableImpl();
+                virtual ~SynchronizableImpl();
 
-    public:
+                virtual void lock();
 
-        SynchronizableImpl();
-        virtual ~SynchronizableImpl();
+                virtual bool tryLock();
 
-        virtual void lock();
+                virtual void unlock();
 
-        virtual bool tryLock();
+                virtual void wait();
 
-        virtual void unlock();
+                virtual void wait(long long millisecs);
 
-        virtual void wait();
+                virtual void wait(long long millisecs, int nanos);
 
-        virtual void wait( long long millisecs );
+                virtual void notify();
 
-        virtual void wait( long long millisecs, int nanos );
+                virtual void notifyAll();
+            };
 
-        virtual void notify();
-
-        virtual void notifyAll();
-
-    };
-
-}}}}
+        }  // namespace concurrent
+    }  // namespace util
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_UTIL_CONCURRENT_SYNCHRONIZABLEIMPL_H_ */

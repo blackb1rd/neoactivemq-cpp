@@ -23,168 +23,193 @@
 #include <string>
 #include <vector>
 
-namespace decaf {
-namespace net {
-namespace ssl {
+namespace decaf
+{
+namespace net
+{
+    namespace ssl
+    {
 
-    class DECAF_API SSLParameters {
-    private:
+        class DECAF_API SSLParameters
+        {
+        private:
+            std::vector<std::string> cipherSuites;
+            std::vector<std::string> protocols;
+            std::vector<std::string> serverNames;
+            bool                     needClientAuth;
+            bool                     wantClientAuth;
+            bool                     peerVerificationEnabled;
 
-        std::vector<std::string> cipherSuites;
-        std::vector<std::string> protocols;
-        std::vector<std::string> serverNames;
-        bool needClientAuth;
-        bool wantClientAuth;
-        bool peerVerificationEnabled;
+        public:
+            /**
+             * Creates a new SSLParameters instance with empty vectors for the
+             * protocols and the cipherSuites, the wantClientAuth and
+             * needClientAuth flags are set to false.
+             */
+            SSLParameters();
 
-    public:
+            /**
+             * Creates a new SSLParameters instance with the given cipherSuites
+             * value, the protocols vector is empty and the wantClientAuth and
+             * needClientAuth flags are set to false.
+             *
+             * @param cipherSuites
+             *      The vector of cipherSuites for this SSLParameters instance
+             * (can be empty).
+             */
+            SSLParameters(const std::vector<std::string>& cipherSuites);
 
-        /**
-         * Creates a new SSLParameters instance with empty vectors for the protocols and the
-         * cipherSuites, the wantClientAuth and needClientAuth flags are set to false.
-         */
-        SSLParameters();
+            /**
+             * Creates a new SSLParameters instance with the given cipherSuites
+             * value and protocols value, the wantClientAuth and needClientAuth
+             * flags are set to false.
+             *
+             * @param cipherSuites
+             *      The vector of cipherSuites for this SSLParameters instance
+             * (can be empty).
+             * @param protocols
+             *      The vector of protocols for this SSLParameters instance (can
+             * be empty).
+             */
+            SSLParameters(const std::vector<std::string>& cipherSuites,
+                          const std::vector<std::string>& protocols);
 
-        /**
-         * Creates a new SSLParameters instance with the given cipherSuites value, the protocols
-         * vector is empty and the wantClientAuth and needClientAuth flags are set to false.
-         *
-         * @param cipherSuites
-         *      The vector of cipherSuites for this SSLParameters instance (can be empty).
-         */
-        SSLParameters(const std::vector<std::string>& cipherSuites);
+            virtual ~SSLParameters();
 
-        /**
-         * Creates a new SSLParameters instance with the given cipherSuites value and protocols
-         * value, the wantClientAuth and needClientAuth flags are set to false.
-         *
-         * @param cipherSuites
-         *      The vector of cipherSuites for this SSLParameters instance (can be empty).
-         * @param protocols
-         *      The vector of protocols for this SSLParameters instance (can be empty).
-         */
-        SSLParameters(const std::vector<std::string>& cipherSuites, const std::vector<std::string>& protocols);
+            /**
+             * @return a copy of the vector of ciphersuites or an empty vector
+             * if none have been set.
+             */
+            std::vector<std::string> getCipherSuites() const
+            {
+                return this->cipherSuites;
+            }
 
-        virtual ~SSLParameters();
+            /**
+             * Sets the vector of ciphersuites.
+             *
+             * @param cipherSuites
+             *      The vector of cipherSuites (can be an empty vector).
+             */
+            void setCipherSuites(const std::vector<std::string>& cipherSuites)
+            {
+                this->cipherSuites = cipherSuites;
+            }
 
-        /**
-         * @return a copy of the vector of ciphersuites or an empty vector if none have been set.
-         */
-        std::vector<std::string> getCipherSuites() const {
-            return this->cipherSuites;
-        }
+            /**
+             * @return a copy of the vector of protocols or an empty vector if
+             * none have been set.
+             */
+            std::vector<std::string> getProtocols() const
+            {
+                return this->protocols;
+            }
 
-        /**
-         * Sets the vector of ciphersuites.
-         *
-         * @param cipherSuites
-         *      The vector of cipherSuites (can be an empty vector).
-         */
-        void setCipherSuites(const std::vector<std::string>& cipherSuites) {
-            this->cipherSuites = cipherSuites;
-        }
+            /**
+             * Sets the vector of protocols.
+             *
+             * @param protocols
+             *      the vector of protocols (or an empty vector)
+             */
+            void setProtocols(const std::vector<std::string>& protocols)
+            {
+                this->protocols = protocols;
+            }
 
-        /**
-         * @return a copy of the vector of protocols or an empty vector if none have been set.
-         */
-        std::vector<std::string> getProtocols() const {
-            return this->protocols;
-        }
+            /**
+             * @return whether client authentication should be requested.
+             */
+            bool getWantClientAuth() const
+            {
+                return this->wantClientAuth;
+            }
 
-        /**
-         * Sets the vector of protocols.
-         *
-         * @param protocols
-         *      the vector of protocols (or an empty vector)
-         */
-        void setProtocols(const std::vector<std::string>& protocols) {
-            this->protocols = protocols;
-        }
+            /**
+             * Sets whether client authentication should be requested. Calling
+             * this method clears the needClientAuth flag.
+             *
+             * @param wantClientAuth
+             *      whether client authentication should be requested.
+             */
+            void setWantClientAuth(bool wantClientAuth)
+            {
+                this->wantClientAuth = wantClientAuth;
+                this->needClientAuth = false;
+            }
 
-        /**
-         * @return whether client authentication should be requested.
-         */
-        bool getWantClientAuth() const {
-            return this->wantClientAuth;
-        }
+            /**
+             * @return whether client authentication should be required.
+             */
+            bool getNeedClientAuth() const
+            {
+                return this->needClientAuth;
+            }
 
-        /**
-         * Sets whether client authentication should be requested. Calling this method clears the
-         * needClientAuth flag.
-         *
-         * @param wantClientAuth
-         *      whether client authentication should be requested.
-         */
-        void setWantClientAuth(bool wantClientAuth) {
-            this->wantClientAuth = wantClientAuth;
-            this->needClientAuth = false;
-        }
+            /**
+             * Sets whether client authentication should be required. Calling
+             * this method clears the wantClientAuth flag.
+             *
+             * @param needClientAuth
+             *      whether client authentication should be required.
+             */
+            void setNeedClientAuth(bool needClientAuth)
+            {
+                this->needClientAuth = needClientAuth;
+                this->wantClientAuth = false;
+            }
 
-        /**
-         * @return whether client authentication should be required.
-         */
-        bool getNeedClientAuth() const {
-            return this->needClientAuth;
-        }
+            /**
+             * Sets the Server Names that this client wants to encode for use
+             * during the SSL Handshaking phase.  The list is copied so the
+             * values cannot be changed later.
+             *
+             * @param serverNames
+             *      The server name to encode into the SSL handshake.
+             */
+            void setServerNames(const std::vector<std::string>& serverNames)
+            {
+                this->serverNames = serverNames;
+            }
 
-        /**
-         * Sets whether client authentication should be required. Calling this method clears the
-         * wantClientAuth flag.
-         *
-         * @param needClientAuth
-         *      whether client authentication should be required.
-         */
-        void setNeedClientAuth(bool needClientAuth) {
-            this->needClientAuth = needClientAuth;
-            this->wantClientAuth = false;
-        }
+            /**
+             * Gets the currently set list of server names used.  This method
+             * returns a copy of the list so that it cannot be modified.  If
+             * updates are needed a new list must be set via {#setServerNames}.
+             *
+             * @return a list of server names if any were previously configured.
+             */
+            std::vector<std::string> getServerNames() const
+            {
+                return this->serverNames;
+            }
 
-        /**
-         * Sets the Server Names that this client wants to encode for use during the
-         * SSL Handshaking phase.  The list is copied so the values cannot be changed
-         * later.
-         *
-         * @param serverNames
-         *      The server name to encode into the SSL handshake.
-         */
-        void setServerNames(const std::vector<std::string>& serverNames) {
-            this->serverNames = serverNames;
-        }
+            /**
+             * Sets whether peer certificate verification should be enabled.
+             * When disabled, the SSL connection will not verify the server's
+             * certificate. This should only be disabled for testing purposes.
+             *
+             * @param enabled
+             *      true to enable peer verification (default), false to
+             * disable.
+             */
+            void setPeerVerificationEnabled(bool enabled)
+            {
+                this->peerVerificationEnabled = enabled;
+            }
 
-        /**
-         * Gets the currently set list of server names used.  This method returns a copy
-         * of the list so that it cannot be modified.  If updates are needed a new list
-         * must be set via {#setServerNames}.
-         *
-         * @return a list of server names if any were previously configured.
-         */
-        std::vector<std::string> getServerNames() const {
-            return this->serverNames;
-        }
+            /**
+             * Gets whether peer certificate verification is enabled.
+             *
+             * @return true if peer verification is enabled, false otherwise.
+             */
+            bool getPeerVerificationEnabled() const
+            {
+                return this->peerVerificationEnabled;
+            }
+        };
 
-        /**
-         * Sets whether peer certificate verification should be enabled.
-         * When disabled, the SSL connection will not verify the server's certificate.
-         * This should only be disabled for testing purposes.
-         *
-         * @param enabled
-         *      true to enable peer verification (default), false to disable.
-         */
-        void setPeerVerificationEnabled(bool enabled) {
-            this->peerVerificationEnabled = enabled;
-        }
-
-        /**
-         * Gets whether peer certificate verification is enabled.
-         *
-         * @return true if peer verification is enabled, false otherwise.
-         */
-        bool getPeerVerificationEnabled() const {
-            return this->peerVerificationEnabled;
-        }
-
-    };
-
-}}}
+    }  // namespace ssl
+}  // namespace net
+}  // namespace decaf
 
 #endif /* _DECAF_NET_SSL_SSLPARAMETERS_H_ */

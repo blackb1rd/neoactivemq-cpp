@@ -38,17 +38,20 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-ControlCommand::ControlCommand() :
-    BaseCommand(), command("") {
-
+ControlCommand::ControlCommand()
+    : BaseCommand(),
+      command("")
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ControlCommand::~ControlCommand() {
+ControlCommand::~ControlCommand()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ControlCommand* ControlCommand::cloneDataStructure() const {
+ControlCommand* ControlCommand::cloneDataStructure() const
+{
     std::unique_ptr<ControlCommand> controlCommand(new ControlCommand());
 
     // Copy the data from the base class or classes
@@ -58,18 +61,21 @@ ControlCommand* ControlCommand::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ControlCommand::copyDataStructure(const DataStructure* src) {
-
+void ControlCommand::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const ControlCommand* srcPtr = dynamic_cast<const ControlCommand*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "ControlCommand::copyDataStructure - src is NULL or invalid");
     }
 
@@ -80,13 +86,14 @@ void ControlCommand::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ControlCommand::getDataStructureType() const {
+unsigned char ControlCommand::getDataStructureType() const
+{
     return ControlCommand::ID_CONTROLCOMMAND;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ControlCommand::toString() const {
-
+std::string ControlCommand::toString() const
+{
     ostringstream stream;
 
     stream << "ControlCommand { "
@@ -100,43 +107,52 @@ std::string ControlCommand::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ControlCommand::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool ControlCommand::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const ControlCommand* valuePtr = dynamic_cast<const ControlCommand*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getCommand() != valuePtr->getCommand()) {
+    if (this->getCommand() != valuePtr->getCommand())
+    {
         return false;
     }
-    if (!BaseCommand::equals(value)) {
+    if (!BaseCommand::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::string& ControlCommand::getCommand() const {
+const std::string& ControlCommand::getCommand() const
+{
     return command;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string& ControlCommand::getCommand() {
+std::string& ControlCommand::getCommand()
+{
     return command;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ControlCommand::setCommand(const std::string& command) {
+void ControlCommand::setCommand(const std::string& command)
+{
     this->command = command;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> ControlCommand::visit(activemq::state::CommandVisitor* visitor) {
+decaf::lang::Pointer<commands::Command> ControlCommand::visit(
+    activemq::state::CommandVisitor* visitor)
+{
     return visitor->processControlCommand(this);
 }

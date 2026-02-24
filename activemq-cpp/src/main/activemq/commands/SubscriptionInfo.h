@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/ActiveMQDestination.h>
@@ -30,8 +30,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -44,27 +46,24 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API SubscriptionInfo : public BaseDataStructure {
+    class AMQCPP_API SubscriptionInfo : public BaseDataStructure
+    {
     protected:
-
-        std::string clientId;
+        std::string                  clientId;
         Pointer<ActiveMQDestination> destination;
-        std::string selector;
-        std::string subcriptionName;
+        std::string                  selector;
+        std::string                  subcriptionName;
         Pointer<ActiveMQDestination> subscribedDestination;
-        bool noLocal;
+        bool                         noLocal;
 
     public:
-
         const static unsigned char ID_SUBSCRIPTIONINFO = 55;
 
     private:
-
         SubscriptionInfo(const SubscriptionInfo&);
-        SubscriptionInfo& operator= (const SubscriptionInfo&);
+        SubscriptionInfo& operator=(const SubscriptionInfo&);
 
     public:
-
         SubscriptionInfo();
 
         virtual ~SubscriptionInfo();
@@ -80,30 +79,33 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const std::string& getClientId() const;
-        virtual std::string& getClientId();
-        virtual void setClientId(const std::string& clientId);
+        virtual std::string&       getClientId();
+        virtual void               setClientId(const std::string& clientId);
 
         virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>& getDestination();
-        virtual void setDestination(const Pointer<ActiveMQDestination>& destination);
+        virtual Pointer<ActiveMQDestination>&       getDestination();
+        virtual void                                setDestination(
+                                           const Pointer<ActiveMQDestination>& destination);
 
         virtual const std::string& getSelector() const;
-        virtual std::string& getSelector();
-        virtual void setSelector(const std::string& selector);
+        virtual std::string&       getSelector();
+        virtual void               setSelector(const std::string& selector);
 
         virtual const std::string& getSubcriptionName() const;
-        virtual std::string& getSubcriptionName();
+        virtual std::string&       getSubcriptionName();
         virtual void setSubcriptionName(const std::string& subcriptionName);
 
-        virtual const Pointer<ActiveMQDestination>& getSubscribedDestination() const;
+        virtual const Pointer<ActiveMQDestination>& getSubscribedDestination()
+            const;
         virtual Pointer<ActiveMQDestination>& getSubscribedDestination();
-        virtual void setSubscribedDestination(const Pointer<ActiveMQDestination>& subscribedDestination);
+        virtual void                          setSubscribedDestination(
+                                     const Pointer<ActiveMQDestination>& subscribedDestination);
 
         virtual bool isNoLocal() const;
         virtual void setNoLocal(bool noLocal);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_SUBSCRIPTIONINFO_H_*/

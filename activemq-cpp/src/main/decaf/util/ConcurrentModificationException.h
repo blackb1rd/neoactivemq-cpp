@@ -18,16 +18,18 @@
 #ifndef _DECAF_UTIL_CONCURRENTMODIFICATIONEXCEPTION_H_
 #define _DECAF_UTIL_CONCURRENTMODIFICATIONEXCEPTION_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/lang/exceptions/RuntimeException.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace util {
+namespace decaf
+{
+namespace util
+{
 
-    class DECAF_API ConcurrentModificationException :
-        public lang::exceptions::RuntimeException {
+    class DECAF_API ConcurrentModificationException
+        : public lang::exceptions::RuntimeException
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -45,7 +47,8 @@ namespace util {
          *
          * @param ex the exception to copy, which is an instance of this type
          */
-        ConcurrentModificationException(const ConcurrentModificationException& ex);
+        ConcurrentModificationException(
+            const ConcurrentModificationException& ex);
 
         /**
          * Constructor - Initializes the file name and line number where
@@ -54,12 +57,16 @@ namespace util {
          *
          * @param file The file name where exception occurs
          * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
+         * @param cause The exception that was the cause for this one to be
+         * thrown.
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        ConcurrentModificationException(const char* file, const int lineNumber,
-                                        const std::exception* cause, const char* msg, ...);
+        ConcurrentModificationException(const char*           file,
+                                        const int             lineNumber,
+                                        const std::exception* cause,
+                                        const char*           msg,
+                                        ...);
 
         /**
          * Constructor
@@ -77,21 +84,25 @@ namespace util {
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        ConcurrentModificationException(const char* file, const int lineNumber, const char* msg, ...);
+        ConcurrentModificationException(const char* file,
+                                        const int   lineNumber,
+                                        const char* msg,
+                                        ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          */
-        virtual ConcurrentModificationException* clone() const {
+        virtual ConcurrentModificationException* clone() const
+        {
             return new ConcurrentModificationException(*this);
         }
 
         virtual ~ConcurrentModificationException() throw();
-
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_CONCURRENTMODIFICATIONEXCEPTION_H_*/

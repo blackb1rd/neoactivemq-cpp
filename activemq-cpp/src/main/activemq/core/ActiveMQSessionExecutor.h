@@ -18,22 +18,25 @@
 #ifndef ACTIVEMQ_CORE_ACTIVEMQSESSIONEXECUTOR_
 #define ACTIVEMQ_CORE_ACTIVEMQSESSIONEXECUTOR_
 
-#include <activemq/util/Config.h>
-#include <activemq/core/MessageDispatchChannel.h>
 #include <activemq/commands/ConsumerId.h>
 #include <activemq/commands/MessageDispatch.h>
+#include <activemq/core/MessageDispatchChannel.h>
 #include <activemq/threads/Task.h>
 #include <activemq/threads/TaskRunner.h>
+#include <activemq/util/Config.h>
 #include <decaf/lang/Pointer.h>
 
-namespace activemq {
-namespace core {
-namespace kernels {
-    class ActiveMQSessionKernel;
-}
+namespace activemq
+{
+namespace core
+{
+    namespace kernels
+    {
+        class ActiveMQSessionKernel;
+    }  // namespace kernels
 
-    using decaf::lang::Pointer;
     using activemq::commands::MessageDispatch;
+    using decaf::lang::Pointer;
 
     class ActiveMQConsumer;
 
@@ -41,9 +44,9 @@ namespace kernels {
      * Delegate dispatcher for a single session.  Contains a thread
      * to provide for asynchronous dispatching.
      */
-    class AMQCPP_API ActiveMQSessionExecutor : activemq::threads::Task {
+    class AMQCPP_API ActiveMQSessionExecutor : activemq::threads::Task
+    {
     private:
-
         /** Session that is this executors parent. */
         activemq::core::kernels::ActiveMQSessionKernel* session;
 
@@ -54,16 +57,15 @@ namespace kernels {
         Pointer<activemq::threads::TaskRunner> taskRunner;
 
     private:
-
         ActiveMQSessionExecutor(const ActiveMQSessionExecutor&);
         ActiveMQSessionExecutor& operator=(const ActiveMQSessionExecutor&);
 
     public:
-
         /**
          * Creates an un-started executor for the given session.
          */
-        ActiveMQSessionExecutor(activemq::core::kernels::ActiveMQSessionKernel* session);
+        ActiveMQSessionExecutor(
+            activemq::core::kernels::ActiveMQSessionKernel* session);
 
         /**
          * Calls stop() then clear().
@@ -85,17 +87,22 @@ namespace kernels {
         virtual void executeFirst(const Pointer<MessageDispatch>& data);
 
         /**
-         * Removes all messages in the Dispatch Channel so that non are delivered.
+         * Removes all messages in the Dispatch Channel so that non are
+         * delivered.
          */
-        virtual void clearMessagesInProgress() {
+        virtual void clearMessagesInProgress()
+        {
             this->messageQueue->clear();
         }
 
         /**
-         * @return true if there are any pending messages in the dispatch channel.
+         * @return true if there are any pending messages in the dispatch
+         * channel.
          */
-        virtual bool hasUncomsumedMessages() const {
-            return !messageQueue->isClosed() && messageQueue->isRunning() && !messageQueue->isEmpty();
+        virtual bool hasUncomsumedMessages() const
+        {
+            return !messageQueue->isClosed() && messageQueue->isRunning() &&
+                   !messageQueue->isEmpty();
         }
 
         /**
@@ -114,31 +121,35 @@ namespace kernels {
         virtual void stop();
 
         /**
-         * Terminates the dispatching thread.  Once this is called, the executor is no longer
-         * usable.
+         * Terminates the dispatching thread.  Once this is called, the executor
+         * is no longer usable.
          */
-        virtual void close() {
+        virtual void close()
+        {
             this->messageQueue->close();
         }
 
         /**
          * @return true indicates if the executor is started
          */
-        virtual bool isRunning() const {
+        virtual bool isRunning() const
+        {
             return this->messageQueue->isRunning();
         }
 
         /**
          * @return true if there are no messages in the Dispatch Channel.
          */
-        virtual bool isEmpty() {
+        virtual bool isEmpty()
+        {
             return messageQueue->isEmpty();
         }
 
         /**
          * Removes all queued messages and destroys them.
          */
-        virtual void clear() {
+        virtual void clear()
+        {
             this->messageQueue->clear();
         }
 
@@ -151,23 +162,23 @@ namespace kernels {
         virtual bool iterate();
 
         /**
-         * @return a vector containing all the unconsumed messages, this clears the
-         *          Message Dispatch Channel when called.
+         * @return a vector containing all the unconsumed messages, this clears
+         * the Message Dispatch Channel when called.
          */
-        std::vector< Pointer<MessageDispatch> > getUnconsumedMessages() {
+        std::vector<Pointer<MessageDispatch>> getUnconsumedMessages()
+        {
             return messageQueue->removeAll();
         }
 
     private:
-
         /**
          * Dispatches a message to a particular consumer.
          * @param data - The message to be dispatched.
          */
         virtual void dispatch(const Pointer<MessageDispatch>& data);
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /*ACTIVEMQ_CORE_ACTIVEMQSESSIONEXECUTOR_*/

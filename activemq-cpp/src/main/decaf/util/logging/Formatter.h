@@ -20,73 +20,81 @@
 #include <decaf/util/Config.h>
 #include <decaf/util/logging/Handler.h>
 
-namespace decaf {
-namespace util {
-namespace logging {
-
-    /**
-     * A Formatter provides support for formatting LogRecords.
-     *
-     * Typically each logging Handler will have a Formatter associated with
-     * it. The Formatter takes a LogRecord and converts it to a string.
-     *
-     * Some formatters (such as the XMLFormatter) need to wrap head and
-     * tail strings around a set of formatted records. The getHeader and
-     * getTail methods can be used to obtain these strings.
-     */
-    class DECAF_API Formatter {
-    public:
-
-        virtual ~Formatter() {}
+namespace decaf
+{
+namespace util
+{
+    namespace logging
+    {
 
         /**
-         * Format the given log record and return the formatted string.
+         * A Formatter provides support for formatting LogRecords.
          *
-         * @param record
-         *      The Log Record to Format
+         * Typically each logging Handler will have a Formatter associated with
+         * it. The Formatter takes a LogRecord and converts it to a string.
          *
-         * @return the formatted record.
+         * Some formatters (such as the XMLFormatter) need to wrap head and
+         * tail strings around a set of formatted records. The getHeader and
+         * getTail methods can be used to obtain these strings.
          */
-        virtual std::string format(const LogRecord& record) const = 0;
+        class DECAF_API Formatter
+        {
+        public:
+            virtual ~Formatter()
+            {
+            }
 
-        /**
-         * Format the message string from a log record.
-         *
-         * @param record
-         *      The Log Record to Format
-         *
-         * @return the formatted message
-         */
-        virtual std::string formatMessage(const LogRecord& record) const;
+            /**
+             * Format the given log record and return the formatted string.
+             *
+             * @param record
+             *      The Log Record to Format
+             *
+             * @return the formatted record.
+             */
+            virtual std::string format(const LogRecord& record) const = 0;
 
-        /**
-         * Return the header string for a set of formatted records.  In the
-         * default implementation this method should return empty string.
-         *
-         * @param handler
-         *      The target handler, can be NULL.
-         *
-         * @return the head string.
-         */
-        virtual std::string getHead(const Handler* handler DECAF_UNUSED) {
-            return "";
-        }
+            /**
+             * Format the message string from a log record.
+             *
+             * @param record
+             *      The Log Record to Format
+             *
+             * @return the formatted message
+             */
+            virtual std::string formatMessage(const LogRecord& record) const;
 
-        /**
-         * Return the tail string for a set of formatted records.  In the
-         * default implementation this method should return empty string
-         *
-         * @param handler
-         *      the target handler, can be null
-         *
-         * @return the tail string
-         */
-        virtual std::string getTail(const Handler* handler DECAF_UNUSED) {
-            return "";
-        }
+            /**
+             * Return the header string for a set of formatted records.  In the
+             * default implementation this method should return empty string.
+             *
+             * @param handler
+             *      The target handler, can be NULL.
+             *
+             * @return the head string.
+             */
+            virtual std::string getHead(const Handler* handler DECAF_UNUSED)
+            {
+                return "";
+            }
 
-    };
+            /**
+             * Return the tail string for a set of formatted records.  In the
+             * default implementation this method should return empty string
+             *
+             * @param handler
+             *      the target handler, can be null
+             *
+             * @return the tail string
+             */
+            virtual std::string getTail(const Handler* handler DECAF_UNUSED)
+            {
+                return "";
+            }
+        };
 
-}}}
+    }  // namespace logging
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_LOGGING_FORMATTER_H_*/

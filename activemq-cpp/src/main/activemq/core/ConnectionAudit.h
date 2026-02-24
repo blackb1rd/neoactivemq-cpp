@@ -23,8 +23,10 @@
 #include <activemq/commands/Message.h>
 #include <decaf/lang/Pointer.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     class ConnectionAuditImpl;
     class Dispatcher;
@@ -35,22 +37,20 @@ namespace core {
      *
      * @since 3.7.0
      */
-    class AMQCPP_API ConnectionAudit {
+    class AMQCPP_API ConnectionAudit
+    {
     private:
-
         ConnectionAudit(const ConnectionAudit&);
-        ConnectionAudit& operator= (const ConnectionAudit&);
+        ConnectionAudit& operator=(const ConnectionAudit&);
 
     private:
-
         ConnectionAuditImpl* impl;
 
         bool checkForDuplicates;
-        int auditDepth;
-        int auditMaximumProducerNumber;
+        int  auditDepth;
+        int  auditMaximumProducerNumber;
 
     public:
-
         ConnectionAudit();
 
         ConnectionAudit(int auditDepth, int maxProducers);
@@ -58,41 +58,47 @@ namespace core {
         ~ConnectionAudit();
 
     public:
-
         void removeDispatcher(Dispatcher* dispatcher);
 
-        bool isDuplicate(Dispatcher* dispatcher, decaf::lang::Pointer<commands::Message> message);
+        bool isDuplicate(Dispatcher*                             dispatcher,
+                         decaf::lang::Pointer<commands::Message> message);
 
-        void rollbackDuplicate(Dispatcher* dispatcher, decaf::lang::Pointer<commands::Message> message);
+        void rollbackDuplicate(Dispatcher* dispatcher,
+                               decaf::lang::Pointer<commands::Message> message);
 
     public:
-
-        bool isCheckForDuplicates() const {
+        bool isCheckForDuplicates() const
+        {
             return this->checkForDuplicates;
         }
 
-        void setCheckForDuplicates(bool checkForDuplicates) {
+        void setCheckForDuplicates(bool checkForDuplicates)
+        {
             this->checkForDuplicates = checkForDuplicates;
         }
 
-        int getAuditDepth() {
+        int getAuditDepth()
+        {
             return auditDepth;
         }
 
-        void setAuditDepth(int auditDepth) {
+        void setAuditDepth(int auditDepth)
+        {
             this->auditDepth = auditDepth;
         }
 
-        int getAuditMaximumProducerNumber() {
+        int getAuditMaximumProducerNumber()
+        {
             return auditMaximumProducerNumber;
         }
 
-        void setAuditMaximumProducerNumber(int auditMaximumProducerNumber) {
+        void setAuditMaximumProducerNumber(int auditMaximumProducerNumber)
+        {
             this->auditMaximumProducerNumber = auditMaximumProducerNumber;
         }
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_CONNECTIONAUDIT_H_ */

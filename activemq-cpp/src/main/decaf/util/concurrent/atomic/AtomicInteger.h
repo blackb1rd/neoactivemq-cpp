@@ -18,163 +18,171 @@
 #ifndef _DECAF_UTIL_CONCURRENT_ATOMIC_ATOMICINTEGER_H_
 #define _DECAF_UTIL_CONCURRENT_ATOMIC_ATOMICINTEGER_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/lang/Number.h>
+#include <decaf/util/Config.h>
 #include <string>
 
-namespace decaf {
-namespace util {
-namespace concurrent {
-namespace atomic {
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
+        namespace atomic
+        {
 
-    /**
-     * An int value that may be updated atomically. An AtomicInteger is used in
-     * applications such as atomically incremented counters, and cannot be used
-     * as a replacement for an Integer. However, this class does extend Number
-     * to allow uniform access by tools and utilities that deal with
-     * numerically-based classes.
-     */
-    class DECAF_API AtomicInteger : public decaf::lang::Number {
-    private:
+            /**
+             * An int value that may be updated atomically. An AtomicInteger is
+             * used in applications such as atomically incremented counters, and
+             * cannot be used as a replacement for an Integer. However, this
+             * class does extend Number to allow uniform access by tools and
+             * utilities that deal with numerically-based classes.
+             */
+            class DECAF_API AtomicInteger : public decaf::lang::Number
+            {
+            private:
+                volatile int value;
 
-        volatile int value;
+            private:
+                AtomicInteger(const AtomicInteger&);
+                AtomicInteger& operator=(const AtomicInteger&);
 
-    private:
+            public:
+                /**
+                 * Create a new AtomicInteger with an initial value of 0.
+                 */
+                AtomicInteger();
 
-        AtomicInteger(const AtomicInteger&);
-        AtomicInteger& operator= (const AtomicInteger&);
+                /**
+                 * Create a new AtomicInteger with the given initial value.
+                 * @param initialValue - The initial value of this object.
+                 */
+                AtomicInteger(int initialValue);
 
-    public:
+                virtual ~AtomicInteger()
+                {
+                }
 
-        /**
-         * Create a new AtomicInteger with an initial value of 0.
-         */
-        AtomicInteger();
+                /**
+                 * Gets the current value.
+                 * @return the current value.
+                 */
+                int get() const
+                {
+                    return this->value;
+                }
 
-        /**
-         * Create a new AtomicInteger with the given initial value.
-         * @param initialValue - The initial value of this object.
-         */
-        AtomicInteger( int initialValue );
+                /**
+                 * Sets to the given value.
+                 * @param newValue - the new value
+                 */
+                void set(int newValue)
+                {
+                    this->value = newValue;
+                }
 
-        virtual ~AtomicInteger() {}
+                /**
+                 * Atomically sets to the given value and returns the old value.
+                 * @param newValue - the new value.
+                 * @return the previous value.
+                 */
+                int getAndSet(int newValue);
 
-        /**
-         * Gets the current value.
-         * @return the current value.
-         */
-        int get() const {
-            return this->value;
-        }
+                /**
+                 * Atomically sets the value to the given updated value if the
+                 * current value == the expected value.
+                 *
+                 * @param expect - the expected value
+                 * @param update - the new value
+                 * @return true if successful. False return indicates that the
+                 * actual value was not equal to the expected value.
+                 */
+                bool compareAndSet(int expect, int update);
 
-        /**
-         * Sets to the given value.
-         * @param newValue - the new value
-         */
-        void set( int newValue ) {
-            this->value = newValue;
-        }
+                /**
+                 * Atomically increments by one the current value.
+                 * @return the previous value.
+                 */
+                int getAndIncrement();
 
-        /**
-         * Atomically sets to the given value and returns the old value.
-         * @param newValue - the new value.
-         * @return the previous value.
-         */
-        int getAndSet( int newValue );
+                /**
+                 * Atomically decrements by one the current value.
+                 * @return the previous value.
+                 */
+                int getAndDecrement();
 
-        /**
-         * Atomically sets the value to the given updated value if the current
-         * value == the expected value.
-         *
-         * @param expect - the expected value
-         * @param update - the new value
-         * @return true if successful. False return indicates that the actual
-         * value was not equal to the expected value.
-         */
-        bool compareAndSet( int expect, int update );
+                /**
+                 * Atomically adds the given value to the current value.
+                 * @param delta - The value to add.
+                 * @return the previous value.
+                 */
+                int getAndAdd(int delta);
 
-        /**
-         * Atomically increments by one the current value.
-         * @return the previous value.
-         */
-        int getAndIncrement();
+                /**
+                 * Atomically increments by one the current value.
+                 * @return the updated value.
+                 */
+                int incrementAndGet();
 
-        /**
-         * Atomically decrements by one the current value.
-         * @return the previous value.
-         */
-        int getAndDecrement();
+                /**
+                 * Atomically decrements by one the current value.
+                 * @return the updated value.
+                 */
+                int decrementAndGet();
 
-        /**
-         * Atomically adds the given value to the current value.
-         * @param delta - The value to add.
-         * @return the previous value.
-         */
-        int getAndAdd( int delta );
+                /**
+                 * Atomically adds the given value to the current value.
+                 * @param delta - the value to add.
+                 * @return the updated value.
+                 */
+                int addAndGet(int delta);
 
-        /**
-         * Atomically increments by one the current value.
-         * @return the updated value.
-         */
-        int incrementAndGet();
+                /**
+                 * Returns the String representation of the current value.
+                 * @return the String representation of the current value.
+                 */
+                std::string toString() const;
 
-        /**
-         * Atomically decrements by one the current value.
-         * @return the updated value.
-         */
-        int decrementAndGet();
+                /**
+                 * Description copied from class: Number
+                 * Returns the value of the specified number as an int. This may
+                 * involve rounding or truncation.
+                 * @return the numeric value represented by this object after
+                 * conversion to type int.
+                 */
+                int intValue() const;
 
-        /**
-         * Atomically adds the given value to the current value.
-         * @param delta - the value to add.
-         * @return the updated value.
-         */
-        int addAndGet( int delta );
+                /**
+                 * Description copied from class: Number
+                 * Returns the value of the specified number as a long. This may
+                 * involve rounding or truncation.
+                 * @return the numeric value represented by this object after
+                 * conversion to type long long.
+                 */
+                long long longValue() const;
 
-        /**
-         * Returns the String representation of the current value.
-         * @return the String representation of the current value.
-         */
-        std::string toString() const;
+                /**
+                 * Description copied from class: Number
+                 * Returns the value of the specified number as a float. This
+                 * may involve rounding.
+                 * @return the numeric value represented by this object after
+                 * conversion to type float.
+                 */
+                float floatValue() const;
 
-        /**
-         * Description copied from class: Number
-         * Returns the value of the specified number as an int. This may involve
-         * rounding or truncation.
-         * @return the numeric value represented by this object after conversion
-         * to type int.
-         */
-        int intValue() const;
+                /**
+                 * Description copied from class: Number
+                 * Returns the value of the specified number as a double. This
+                 * may involve rounding.
+                 * @return the numeric value represented by this object after
+                 * conversion to type double.
+                 */
+                double doubleValue() const;
+            };
 
-        /**
-         * Description copied from class: Number
-         * Returns the value of the specified number as a long. This may involve
-         * rounding or truncation.
-         * @return the numeric value represented by this object after conversion
-         * to type long long.
-         */
-        long long longValue() const;
-
-        /**
-         * Description copied from class: Number
-         * Returns the value of the specified number as a float. This may involve
-         * rounding.
-         * @return the numeric value represented by this object after conversion
-         * to type float.
-         */
-        float floatValue() const;
-
-        /**
-         * Description copied from class: Number
-         * Returns the value of the specified number as a double. This may
-         * involve rounding.
-         * @return the numeric value represented by this object after conversion
-         * to type double.
-         */
-        double doubleValue() const;
-
-    };
-
-}}}}
+        }  // namespace atomic
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_CONCURRENT_ATOMIC_ATOMICINTEGER_H_ */

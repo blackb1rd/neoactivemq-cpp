@@ -22,12 +22,14 @@
 #include <activemq/util/Usage.h>
 #include <decaf/util/concurrent/Mutex.h>
 
-namespace activemq {
-namespace util {
+namespace activemq
+{
+namespace util
+{
 
-    class AMQCPP_API MemoryUsage : public Usage {
+    class AMQCPP_API MemoryUsage : public Usage
+    {
     private:
-
         // The physical limit of memory usage this object allows.
         unsigned long long limit;
 
@@ -38,7 +40,6 @@ namespace util {
         mutable decaf::util::concurrent::Mutex mutex;
 
     public:
-
         /**
          * Default Constructor.
          */
@@ -65,11 +66,12 @@ namespace util {
         virtual void waitForSpace(unsigned int timeout);
 
         /**
-         * Tries to increase the usage by value amount but blocks if this object is
-         * currently full.
+         * Tries to increase the usage by value amount but blocks if this object
+         * is currently full.
          * @param value Amount of usage in bytes to add.
          */
-        virtual void enqueueUsage(unsigned long long value) {
+        virtual void enqueueUsage(unsigned long long value)
+        {
             waitForSpace();
             increaseUsage(value);
         }
@@ -95,7 +97,8 @@ namespace util {
          * Gets the current usage amount.
          * @return the amount of bytes currently used.
          */
-        unsigned long long getUsage() const {
+        unsigned long long getUsage() const
+        {
             return usage;
         }
 
@@ -103,7 +106,8 @@ namespace util {
          * Sets the current usage amount
          * @param usage - The amount to tag as used.
          */
-        void setUsage(unsigned long long usage) {
+        void setUsage(unsigned long long usage)
+        {
             this->usage = usage;
         }
 
@@ -111,7 +115,8 @@ namespace util {
          * Gets the current limit amount.
          * @return the amount that can be used before full.
          */
-        unsigned long long getLimit() const {
+        unsigned long long getLimit() const
+        {
             return limit;
         }
 
@@ -119,12 +124,13 @@ namespace util {
          * Sets the current limit amount
          * @param limit - The amount that can be used before full.
          */
-        void setLimit(unsigned long long limit) {
+        void setLimit(unsigned long long limit)
+        {
             this->limit = limit;
         }
-
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_UTIL_MEMORYUSAGE_H_*/

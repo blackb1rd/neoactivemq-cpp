@@ -25,12 +25,14 @@
 
 #include <utility>
 
-namespace decaf{
-namespace io{
+namespace decaf
+{
+namespace io
+{
 
-    class DECAF_API ByteArrayOutputStream: public OutputStream {
+    class DECAF_API ByteArrayOutputStream : public OutputStream
+    {
     private:
-
         /**
          * The internal buffer used to hold written bytes.
          */
@@ -47,45 +49,47 @@ namespace io{
         int count;
 
     private:
-
         ByteArrayOutputStream(const ByteArrayOutputStream&);
         ByteArrayOutputStream& operator=(const ByteArrayOutputStream&);
 
     public:
-
         /**
-         * Default Constructor - uses a default internal buffer of 32 bytes, the size
-         * increases as the need for more room arises.
+         * Default Constructor - uses a default internal buffer of 32 bytes, the
+         * size increases as the need for more room arises.
          */
         ByteArrayOutputStream();
 
         /**
-         * Creates a ByteArrayOutputStream with an internal buffer allocated with the
-         * given size.
+         * Creates a ByteArrayOutputStream with an internal buffer allocated
+         * with the given size.
          *
          * @param bufferSize
          *      The size to use for the internal buffer.
          *
-         * @throw IllegalArgumentException if the size is less than or equal to zero.
+         * @throw IllegalArgumentException if the size is less than or equal to
+         * zero.
          */
         ByteArrayOutputStream(int bufferSize);
 
         virtual ~ByteArrayOutputStream();
 
         /**
-         * Creates a newly allocated byte array. Its size is the current size of this output
-         * stream and the valid contents of the buffer have been copied into it.  The newly
-         * allocated array and its size are returned inside an STL pair structure, the caller
-         * is responsible for freeing the returned array.
+         * Creates a newly allocated byte array. Its size is the current size of
+         * this output stream and the valid contents of the buffer have been
+         * copied into it.  The newly allocated array and its size are returned
+         * inside an STL pair structure, the caller is responsible for freeing
+         * the returned array.
          *
          * @return an STL pair containing the copied array and its size.
          */
         std::pair<unsigned char*, int> toByteArray() const;
 
         /**
-         * Gets the current count of bytes written into this ByteArrayOutputStream.
+         * Gets the current count of bytes written into this
+         * ByteArrayOutputStream.
          *
-         * @return the number of valid bytes contained in the ByteArrayOutputStream.
+         * @return the number of valid bytes contained in the
+         * ByteArrayOutputStream.
          */
         long long size() const;
 
@@ -109,18 +113,19 @@ namespace io{
         void writeTo(OutputStream* out) const;
 
     protected:
-
         virtual void doWriteByte(unsigned char value);
 
-        virtual void doWriteArrayBounded(const unsigned char* buffer, int size, int offset, int length);
+        virtual void doWriteArrayBounded(const unsigned char* buffer,
+                                         int                  size,
+                                         int                  offset,
+                                         int                  length);
 
     private:
-
         // Expands the buffer if there's not enough room for the needed length.
         void checkExpandSize(int needed);
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /*_DECAF_IO_BYTEARRAYOUTPUTSTREAM_H_*/

@@ -21,22 +21,26 @@
 #include <activemq/test/CMSTestFixture.h>
 #include <activemq/util/IntegrationCommon.h>
 
-namespace activemq{
-namespace test{
+namespace activemq
+{
+namespace test
+{
 
-    class TransactionTest : public CMSTestFixture {
+    class TransactionTest : public CMSTestFixture
+    {
     private:
-
         static const int batchCount = 10;
-        static const int batchSize = 20;
+        static const int batchSize  = 20;
 
     public:
-
         TransactionTest();
         virtual ~TransactionTest();
 
-        void SetUp() override {
-            cmsProvider.reset(new util::CMSProvider(getBrokerURL(), cms::Session::SESSION_TRANSACTED));
+        void SetUp() override
+        {
+            cmsProvider.reset(
+                new util::CMSProvider(getBrokerURL(),
+                                      cms::Session::SESSION_TRANSACTED));
         };
 
         void testSendReceiveTransactedBatches();
@@ -45,9 +49,9 @@ namespace test{
         void testWithTTLSet();
         void testSendRollbackCommitRollback();
         void testSessionCommitAfterConsumerClosed();
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TEST_TRANSACTIONTEST_H_*/

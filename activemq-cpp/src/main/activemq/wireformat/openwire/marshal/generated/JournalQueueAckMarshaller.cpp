@@ -41,101 +41,142 @@ using namespace decaf::io;
 using namespace decaf::lang;
 
 ///////////////////////////////////////////////////////////////////////////////
-DataStructure* JournalQueueAckMarshaller::createObject() const {
+DataStructure* JournalQueueAckMarshaller::createObject() const
+{
     return new JournalQueueAck();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-unsigned char JournalQueueAckMarshaller::getDataStructureType() const {
+unsigned char JournalQueueAckMarshaller::getDataStructureType() const
+{
     return JournalQueueAck::ID_JOURNALQUEUEACK;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void JournalQueueAckMarshaller::tightUnmarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataInputStream* dataIn, BooleanStream* bs) {
+void JournalQueueAckMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
+                                               DataStructure*   dataStructure,
+                                               DataInputStream* dataIn,
+                                               BooleanStream*   bs)
+{
+    try
+    {
+        BaseDataStreamMarshaller::tightUnmarshal(wireFormat,
+                                                 dataStructure,
+                                                 dataIn,
+                                                 bs);
 
-    try {
-
-        BaseDataStreamMarshaller::tightUnmarshal(wireFormat, dataStructure, dataIn, bs);
-
-        JournalQueueAck* info =
-            dynamic_cast<JournalQueueAck*>(dataStructure);
-        info->setDestination(Pointer<ActiveMQDestination>(dynamic_cast<ActiveMQDestination* >(
-            tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
-        info->setMessageAck(Pointer<MessageAck>(dynamic_cast<MessageAck* >(
+        JournalQueueAck* info = dynamic_cast<JournalQueueAck*>(dataStructure);
+        info->setDestination(
+            Pointer<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+                tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
+        info->setMessageAck(Pointer<MessageAck>(dynamic_cast<MessageAck*>(
             tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int JournalQueueAckMarshaller::tightMarshal1(OpenWireFormat* wireFormat, DataStructure* dataStructure, BooleanStream* bs) {
+int JournalQueueAckMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
+                                             DataStructure*  dataStructure,
+                                             BooleanStream*  bs)
+{
+    try
+    {
+        JournalQueueAck* info = dynamic_cast<JournalQueueAck*>(dataStructure);
 
-    try {
-
-        JournalQueueAck* info =
-            dynamic_cast<JournalQueueAck*>(dataStructure);
-
-        int rc = BaseDataStreamMarshaller::tightMarshal1(wireFormat, dataStructure, bs);
-        rc += tightMarshalNestedObject1(wireFormat, info->getDestination().get(), bs);
-        rc += tightMarshalNestedObject1(wireFormat, info->getMessageAck().get(), bs);
+        int rc = BaseDataStreamMarshaller::tightMarshal1(wireFormat,
+                                                         dataStructure,
+                                                         bs);
+        rc += tightMarshalNestedObject1(wireFormat,
+                                        info->getDestination().get(),
+                                        bs);
+        rc += tightMarshalNestedObject1(wireFormat,
+                                        info->getMessageAck().get(),
+                                        bs);
 
         return rc + 0;
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void JournalQueueAckMarshaller::tightMarshal2(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataOutputStream* dataOut, BooleanStream* bs) {
+void JournalQueueAckMarshaller::tightMarshal2(OpenWireFormat*   wireFormat,
+                                              DataStructure*    dataStructure,
+                                              DataOutputStream* dataOut,
+                                              BooleanStream*    bs)
+{
+    try
+    {
+        BaseDataStreamMarshaller::tightMarshal2(wireFormat,
+                                                dataStructure,
+                                                dataOut,
+                                                bs);
 
-    try {
-
-        BaseDataStreamMarshaller::tightMarshal2(wireFormat, dataStructure, dataOut, bs );
-
-        JournalQueueAck* info =
-            dynamic_cast<JournalQueueAck*>(dataStructure);
-        tightMarshalNestedObject2(wireFormat, info->getDestination().get(), dataOut, bs);
-        tightMarshalNestedObject2(wireFormat, info->getMessageAck().get(), dataOut, bs);
+        JournalQueueAck* info = dynamic_cast<JournalQueueAck*>(dataStructure);
+        tightMarshalNestedObject2(wireFormat,
+                                  info->getDestination().get(),
+                                  dataOut,
+                                  bs);
+        tightMarshalNestedObject2(wireFormat,
+                                  info->getMessageAck().get(),
+                                  dataOut,
+                                  bs);
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT( exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void JournalQueueAckMarshaller::looseUnmarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataInputStream* dataIn) {
-
-    try {
-
-        BaseDataStreamMarshaller::looseUnmarshal(wireFormat, dataStructure, dataIn);
-        JournalQueueAck* info =
-            dynamic_cast<JournalQueueAck*>(dataStructure);
-        info->setDestination(Pointer<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
-            looseUnmarshalNestedObject(wireFormat, dataIn))));
+void JournalQueueAckMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
+                                               DataStructure*   dataStructure,
+                                               DataInputStream* dataIn)
+{
+    try
+    {
+        BaseDataStreamMarshaller::looseUnmarshal(wireFormat,
+                                                 dataStructure,
+                                                 dataIn);
+        JournalQueueAck* info = dynamic_cast<JournalQueueAck*>(dataStructure);
+        info->setDestination(
+            Pointer<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+                looseUnmarshalNestedObject(wireFormat, dataIn))));
         info->setMessageAck(Pointer<MessageAck>(dynamic_cast<MessageAck*>(
             looseUnmarshalNestedObject(wireFormat, dataIn))));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void JournalQueueAckMarshaller::looseMarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataOutputStream* dataOut) {
-
-    try {
-
-        JournalQueueAck* info =
-            dynamic_cast<JournalQueueAck*>(dataStructure);
-        BaseDataStreamMarshaller::looseMarshal(wireFormat, dataStructure, dataOut);
-        looseMarshalNestedObject(wireFormat, info->getDestination().get(), dataOut);
-        looseMarshalNestedObject(wireFormat, info->getMessageAck().get(), dataOut);
+void JournalQueueAckMarshaller::looseMarshal(OpenWireFormat*   wireFormat,
+                                             DataStructure*    dataStructure,
+                                             DataOutputStream* dataOut)
+{
+    try
+    {
+        JournalQueueAck* info = dynamic_cast<JournalQueueAck*>(dataStructure);
+        BaseDataStreamMarshaller::looseMarshal(wireFormat,
+                                               dataStructure,
+                                               dataOut);
+        looseMarshalNestedObject(wireFormat,
+                                 info->getDestination().get(),
+                                 dataOut);
+        looseMarshalNestedObject(wireFormat,
+                                 info->getMessageAck().get(),
+                                 dataOut);
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
-

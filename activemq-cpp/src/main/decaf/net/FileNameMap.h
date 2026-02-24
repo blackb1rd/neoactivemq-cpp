@@ -22,18 +22,21 @@
 
 #include <string>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
     /**
-     * Defines a scheme for mapping a filename type to a MIME content type. Mainly used
-     * by URLStreamHandler for determining the right content handler to handle the resource.
+     * Defines a scheme for mapping a filename type to a MIME content type.
+     * Mainly used by URLStreamHandler for determining the right content handler
+     * to handle the resource.
      *
      * @since 1.0
      */
-    class DECAF_API FileNameMap {
+    class DECAF_API FileNameMap
+    {
     public:
-
         virtual ~FileNameMap();
 
         /**
@@ -45,9 +48,9 @@ namespace net {
          * @return the appropriate MIME type of the given file.
          */
         virtual std::string getContentTypeFor(const std::string& filename) = 0;
-
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /* _DECAF_NET_FILENAMEMAP_H_ */

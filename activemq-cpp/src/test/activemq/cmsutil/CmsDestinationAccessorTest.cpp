@@ -15,72 +15,87 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include <activemq/cmsutil/DynamicDestinationResolver.h>
-#include <activemq/cmsutil/ResourceLifecycleManager.h>
 #include "DummyConnectionFactory.h"
 #include <activemq/cmsutil/CmsDestinationAccessor.h>
+#include <activemq/cmsutil/DynamicDestinationResolver.h>
+#include <activemq/cmsutil/ResourceLifecycleManager.h>
+#include <gtest/gtest.h>
 
 using namespace activemq;
 using namespace activemq::cmsutil;
 
-    class CmsDestinationAccessorTest : public ::testing::Test {
-    protected:
-
-        class MyAccessor : public CmsDestinationAccessor {
-        public:
-
-            virtual ~MyAccessor() {
-                try {
-                    destroy();
-                } catch( ... ) {
-                }
+class CmsDestinationAccessorTest : public ::testing::Test
+{
+protected:
+    class MyAccessor : public CmsDestinationAccessor
+    {
+    public:
+        virtual ~MyAccessor()
+        {
+            try
+            {
+                destroy();
             }
+            catch (...)
+            {
+            }
+        }
 
-            virtual cms::Connection* createConnection() {
-                return CmsDestinationAccessor::createConnection();
-            }
+        virtual cms::Connection* createConnection()
+        {
+            return CmsDestinationAccessor::createConnection();
+        }
 
-            virtual cms::Session* createSession(cms::Connection* con) {
-                return CmsDestinationAccessor::createSession(con);
-            }
-            virtual cms::Destination* resolveDestinationName( cms::Session* session,
-                                                              const std::string& destName ) {
-                return CmsDestinationAccessor::resolveDestinationName(session,destName);
-            }
-            virtual void init() {
-                CmsDestinationAccessor::init();
-            }
-            virtual void destroy() {
-                CmsDestinationAccessor::destroy();
-            }
-        };
+        virtual cms::Session* createSession(cms::Connection* con)
+        {
+            return CmsDestinationAccessor::createSession(con);
+        }
 
-        MyAccessor* accessor;
-        DummyConnectionFactory* cf;
+        virtual cms::Destination* resolveDestinationName(
+            cms::Session*      session,
+            const std::string& destName)
+        {
+            return CmsDestinationAccessor::resolveDestinationName(session,
+                                                                  destName);
+        }
 
-        void SetUp() override;
-        void TearDown() override;
+        virtual void init()
+        {
+            CmsDestinationAccessor::init();
+        }
+
+        virtual void destroy()
+        {
+            CmsDestinationAccessor::destroy();
+        }
     };
 
+    MyAccessor*             accessor;
+    DummyConnectionFactory* cf;
+
+    void SetUp() override;
+    void TearDown() override;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsDestinationAccessorTest::SetUp() {
-    cf = new DummyConnectionFactory();
+void CmsDestinationAccessorTest::SetUp()
+{
+    cf       = new DummyConnectionFactory();
     accessor = new MyAccessor();
     accessor->setConnectionFactory(cf);
     accessor->init();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsDestinationAccessorTest::TearDown() {
+void CmsDestinationAccessorTest::TearDown()
+{
     delete accessor;
     delete cf;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CmsDestinationAccessorTest, test) {
-
+TEST_F(CmsDestinationAccessorTest, test)
+{
     DummySession s(NULL);
 
     // Create a queue destination
@@ -92,7 +107,7 @@ TEST_F(CmsDestinationAccessorTest, test) {
     ASSERT_TRUE(queue1 != NULL);
 
     // Get the same queue again and make sure it's the same object
-    d = accessor->resolveDestinationName(&s, "hello");
+    d                  = accessor->resolveDestinationName(&s, "hello");
     cms::Queue* queue2 = dynamic_cast<cms::Queue*>(d);
     ASSERT_TRUE(queue2 == queue1);
 
@@ -101,7 +116,7 @@ TEST_F(CmsDestinationAccessorTest, test) {
     ASSERT_TRUE(accessor->isPubSubDomain() == true);
 
     // Get the same dest and make sure it's a topic.
-    d = accessor->resolveDestinationName(&s, "hello");
+    d                  = accessor->resolveDestinationName(&s, "hello");
     cms::Topic* topic1 = dynamic_cast<cms::Topic*>(d);
     ASSERT_TRUE(topic1 != NULL);
 }

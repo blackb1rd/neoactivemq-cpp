@@ -25,12 +25,13 @@ using namespace activemq;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::stomp;
 
-    class StompWireFormatTest : public ::testing::Test {
-    };
+class StompWireFormatTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StompWireFormatTest, testChangeDestinationPrefix) {
-
+TEST_F(StompWireFormatTest, testChangeDestinationPrefix)
+{
     StompWireFormat wireformat;
     wireformat.setTopicPrefix("mytopics://");
     StompHelper helper(&wireformat);

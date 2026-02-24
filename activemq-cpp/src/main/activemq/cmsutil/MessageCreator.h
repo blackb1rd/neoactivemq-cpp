@@ -20,20 +20,24 @@
 
 #include <activemq/util/Config.h>
 
-namespace cms{
-    class Session;
-    class Message;
-}
-namespace activemq {
-namespace cmsutil {
+namespace cms
+{
+class Session;
+class Message;
+}  // namespace cms
+
+namespace activemq
+{
+namespace cmsutil
+{
 
     /**
      * Creates the user-defined message to be sent by the
      * <code>CmsTemplate</code>.
      */
-    class AMQCPP_API MessageCreator {
+    class AMQCPP_API MessageCreator
+    {
     public:
-
         virtual ~MessageCreator();
 
         /**
@@ -45,9 +49,9 @@ namespace cmsutil {
          * @throws cms::CMSException if thrown by CMS API methods
          */
         virtual cms::Message* createMessage(cms::Session* session) = 0;
-
     };
 
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CMSUTIL_MESSAGECREATOR_H_*/

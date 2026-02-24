@@ -21,22 +21,33 @@ using namespace decaf;
 using namespace decaf::security;
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidKeyException::InvalidKeyException() : KeyException() {
+InvalidKeyException::InvalidKeyException()
+    : KeyException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidKeyException::InvalidKeyException(const Exception& ex) : KeyException() {
-    *(Exception*) this = ex;
+InvalidKeyException::InvalidKeyException(const Exception& ex)
+    : KeyException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidKeyException::InvalidKeyException(const InvalidKeyException& ex) : KeyException() {
-    *(Exception*) this = ex;
+InvalidKeyException::InvalidKeyException(const InvalidKeyException& ex)
+    : KeyException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidKeyException::InvalidKeyException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : KeyException(cause) {
-
+InvalidKeyException::InvalidKeyException(const char*           file,
+                                         const int             lineNumber,
+                                         const std::exception* cause,
+                                         const char*           msg,
+                                         ...)
+    : KeyException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -46,12 +57,18 @@ InvalidKeyException::InvalidKeyException(const char* file, const int lineNumber,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidKeyException::InvalidKeyException(const std::exception* cause) : KeyException(cause) {
+InvalidKeyException::InvalidKeyException(const std::exception* cause)
+    : KeyException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidKeyException::InvalidKeyException(const char* file, const int lineNumber, const char* msg, ...) : KeyException() {
-
+InvalidKeyException::InvalidKeyException(const char* file,
+                                         const int   lineNumber,
+                                         const char* msg,
+                                         ...)
+    : KeyException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -61,5 +78,6 @@ InvalidKeyException::InvalidKeyException(const char* file, const int lineNumber,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidKeyException::~InvalidKeyException() throw () {
+InvalidKeyException::~InvalidKeyException() throw()
+{
 }

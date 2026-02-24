@@ -36,43 +36,53 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
 
-    class TimerTest : public ::testing::Test {
-    protected:
-
-        decaf::util::concurrent::atomic::AtomicInteger timerCounter;
-        decaf::util::concurrent::Mutex gsync;
+class TimerTest : public ::testing::Test
+{
+protected:
+    decaf::util::concurrent::atomic::AtomicInteger timerCounter;
+    decaf::util::concurrent::Mutex                 gsync;
 
 public:
+    TimerTest()
+        : timerCounter(),
+          gsync()
+    {
+    }
 
-        TimerTest() : timerCounter(), gsync() {}
-
-        void SetUp() override;
-
-    };
+    void SetUp() override;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf{
-namespace util{
+namespace decaf
+{
+namespace util
+{
 
-    class TimerTaskReport{
+    class TimerTaskReport
+    {
     public:
-
         decaf::util::concurrent::atomic::AtomicInteger wasRun;
-        long long startedAt;
-        long long lastDelta;
+        long long                                      startedAt;
+        long long                                      lastDelta;
 
-        TimerTaskReport() : wasRun(), startedAt(0), lastDelta(0) {}
+        TimerTaskReport()
+            : wasRun(),
+              startedAt(0),
+              lastDelta(0)
+        {
+        }
 
-        void reset() {
+        void reset()
+        {
             this->wasRun.set(0);
             this->startedAt = 0;
             this->lastDelta = 0;
         }
     };
 
-    class TimerTestTask : public TimerTask {
+    class TimerTestTask : public TimerTask
+    {
     private:
-
         decaf::util::concurrent::Mutex* gsync;
 
         decaf::util::concurrent::atomic::AtomicInteger* timerCounter;
@@ -93,261 +103,339 @@ namespace util{
         Timer* timer;
 
     private:
-
         TimerTestTask(const TimerTestTask&);
-        TimerTestTask& operator= (const TimerTestTask&);
+        TimerTestTask& operator=(const TimerTestTask&);
 
     public:
-
-        TimerTestTask(AtomicInteger* counter, Mutex* gsync) : gsync(gsync),
-                                                              timerCounter(counter),
-                                                              report(NULL),
-                                                              sleepInRun(false),
-                                                              incrementCount(false),
-                                                              terminateCount(-1),
-                                                              timer(NULL) {
+        TimerTestTask(AtomicInteger* counter, Mutex* gsync)
+            : gsync(gsync),
+              timerCounter(counter),
+              report(NULL),
+              sleepInRun(false),
+              incrementCount(false),
+              terminateCount(-1),
+              timer(NULL)
+        {
         }
 
-        TimerTestTask(TimerTaskReport* report, AtomicInteger* counter, Mutex* gsync) :
-                gsync(gsync),
-                timerCounter(counter),
-                report(report),
-                sleepInRun(false),
-                incrementCount(false),
-                terminateCount(-1),
-                timer(NULL) {
+        TimerTestTask(TimerTaskReport* report,
+                      AtomicInteger*   counter,
+                      Mutex*           gsync)
+            : gsync(gsync),
+              timerCounter(counter),
+              report(report),
+              sleepInRun(false),
+              incrementCount(false),
+              terminateCount(-1),
+              timer(NULL)
+        {
         }
 
-        TimerTestTask(Timer* t, TimerTaskReport* report, AtomicInteger* counter, Mutex* gsync) :
-            gsync(gsync),
-            timerCounter(counter),
-            report(report),
-            sleepInRun(false),
-            incrementCount(false),
-            terminateCount(-1),
-            timer(t) {
+        TimerTestTask(Timer*           t,
+                      TimerTaskReport* report,
+                      AtomicInteger*   counter,
+                      Mutex*           gsync)
+            : gsync(gsync),
+              timerCounter(counter),
+              report(report),
+              sleepInRun(false),
+              incrementCount(false),
+              terminateCount(-1),
+              timer(t)
+        {
         }
 
-        virtual ~TimerTestTask() {}
+        virtual ~TimerTestTask()
+        {
+        }
 
-        void run() {
-
-            if( report != NULL ) {
+        void run()
+        {
+            if (report != NULL)
+            {
                 this->report->wasRun.incrementAndGet();
             }
 
-            if( incrementCount ) {
+            if (incrementCount)
+            {
                 timerCounter->incrementAndGet();
             }
 
-            if( terminateCount == timerCounter->get() && timer != NULL ) {
+            if (terminateCount == timerCounter->get() && timer != NULL)
+            {
                 timer->cancel();
             }
 
-            if( sleepInRun ) {
-                try {
-                    Thread::sleep( 200 );
-                } catch( InterruptedException& e ) {}
+            if (sleepInRun)
+            {
+                try
+                {
+                    Thread::sleep(200);
+                }
+                catch (InterruptedException& e)
+                {
+                }
             }
 
-            synchronized( gsync ) {
+            synchronized(gsync)
+            {
                 gsync->notify();
             }
         }
 
-        void setSleepInRun( bool sleepInRun ) {
+        void setSleepInRun(bool sleepInRun)
+        {
             this->sleepInRun = sleepInRun;
         }
 
-        void setIncrementCount( bool incrementCount ) {
+        void setIncrementCount(bool incrementCount)
+        {
             this->incrementCount = incrementCount;
         }
 
-        void setTerminateCount( int terminateCount ) {
+        void setTerminateCount(int terminateCount)
+        {
             this->terminateCount = terminateCount;
         }
     };
 
-    class SlowThenFastTask : public TimerTask {
+    class SlowThenFastTask : public TimerTask
+    {
     private:
-
         TimerTaskReport* report;
 
     private:
-
         SlowThenFastTask(const SlowThenFastTask&);
-        SlowThenFastTask& operator= (const SlowThenFastTask&);
+        SlowThenFastTask& operator=(const SlowThenFastTask&);
 
     public:
-
-        SlowThenFastTask( TimerTaskReport* report ) : report(report) {
+        SlowThenFastTask(TimerTaskReport* report)
+            : report(report)
+        {
         }
 
-        virtual ~SlowThenFastTask() {}
+        virtual ~SlowThenFastTask()
+        {
+        }
 
-        void run() {
-
-            if( report->wasRun.get() == 0 ) {
+        void run()
+        {
+            if (report->wasRun.get() == 0)
+            {
                 report->startedAt = System::currentTimeMillis();
             }
 
-            report->lastDelta = System::currentTimeMillis() -
-                                ( report->startedAt + ( 100 * report->wasRun.get() ) );
+            report->lastDelta =
+                System::currentTimeMillis() -
+                (report->startedAt + (100 * report->wasRun.get()));
 
-            if( report->wasRun.incrementAndGet() == 2 ) {
-                try {
-                    Thread::sleep( 200 );
-                } catch( InterruptedException& e ) {
+            if (report->wasRun.incrementAndGet() == 2)
+            {
+                try
+                {
+                    Thread::sleep(200);
+                }
+                catch (InterruptedException& e)
+                {
                 }
             }
         }
-
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimerTest::SetUp() {
-    timerCounter.set( 0 );
+void TimerTest::SetUp()
+{
+    timerCounter.set(0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTest, testConstructor) {
-
+TEST_F(TimerTest, testConstructor)
+{
     std::unique_ptr<Timer> t;
-    TimerTaskReport report;
+    TimerTaskReport        report;
 
     // Ensure a task is run
-    t.reset( new Timer() );
+    t.reset(new Timer());
 
-    TimerTestTask* testTask = new TimerTestTask( &report, &this->timerCounter, &this->gsync );
-    t->schedule( testTask, 200 );
+    TimerTestTask* testTask =
+        new TimerTestTask(&report, &this->timerCounter, &this->gsync);
+    t->schedule(testTask, 200);
 
-    synchronized( &this->gsync ) {
-        try {
-            this->gsync.wait( 2000000 );
-        } catch( InterruptedException& e ) {}
+    synchronized(&this->gsync)
+    {
+        try
+        {
+            this->gsync.wait(2000000);
+        }
+        catch (InterruptedException& e)
+        {
+        }
     }
 
-    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method not called after 200ms");
+    ASSERT_TRUE(1 == report.wasRun.get())
+        << ("TimerTask.run() method not called after 200ms");
 
     t->cancel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTest, testCancel) {
-
+TEST_F(TimerTest, testCancel)
+{
     std::unique_ptr<Timer> t;
-    TimerTaskReport report;
+    TimerTaskReport        report;
 
     // Ensure a task throws an IllegalStateException after cancelled
-    t.reset( new Timer() );
+    t.reset(new Timer());
 
-    TimerTestTask* testTask = new TimerTestTask( &report, &this->timerCounter, &this->gsync );
+    TimerTestTask* testTask =
+        new TimerTestTask(&report, &this->timerCounter, &this->gsync);
     t->cancel();
 
-    ASSERT_THROW(t->schedule( testTask, 100, 200 ), IllegalStateException) << ("Scheduling a task after Timer.cancel() should throw IllegalStateException");
+    ASSERT_THROW(t->schedule(testTask, 100, 200), IllegalStateException)
+        << ("Scheduling a task after Timer.cancel() should throw "
+            "IllegalStateException");
 
     // unscheduled tasks must be deleted
     delete testTask;
 
     // Ensure a task is run but not after cancel
-    t.reset( new Timer() );
-    testTask = new TimerTestTask( &report, &this->timerCounter, &this->gsync );
-    t->schedule( testTask, 100, 500 );
-    synchronized( &this->gsync ) {
-        try {
-            this->gsync.wait( 1000 );
-        } catch( InterruptedException& e ) {}
+    t.reset(new Timer());
+    testTask = new TimerTestTask(&report, &this->timerCounter, &this->gsync);
+    t->schedule(testTask, 100, 500);
+    synchronized(&this->gsync)
+    {
+        try
+        {
+            this->gsync.wait(1000);
+        }
+        catch (InterruptedException& e)
+        {
+        }
     }
 
-    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method not called after 200ms");
+    ASSERT_TRUE(1 == report.wasRun.get())
+        << ("TimerTask.run() method not called after 200ms");
 
     t->cancel();
-    synchronized( &this->gsync ) {
-        try {
-            this->gsync.wait( 500 );
-        } catch( InterruptedException& e ) {}
+    synchronized(&this->gsync)
+    {
+        try
+        {
+            this->gsync.wait(500);
+        }
+        catch (InterruptedException& e)
+        {
+        }
     }
 
-    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method should not have been run more than once");
+    ASSERT_TRUE(1 == report.wasRun.get())
+        << ("TimerTask.run() method should not have been run more than once");
 
     // Ensure you can call cancel more than once
-    report.wasRun.set( 0 );
-    t.reset( new Timer() );
-    testTask = new TimerTestTask( &report, &this->timerCounter, &this->gsync );
-    t->schedule( testTask, 100, 500 );
-    synchronized( &this->gsync ) {
-        try {
-            this->gsync.wait( 500 );
-        } catch( InterruptedException& e ) {}
+    report.wasRun.set(0);
+    t.reset(new Timer());
+    testTask = new TimerTestTask(&report, &this->timerCounter, &this->gsync);
+    t->schedule(testTask, 100, 500);
+    synchronized(&this->gsync)
+    {
+        try
+        {
+            this->gsync.wait(500);
+        }
+        catch (InterruptedException& e)
+        {
+        }
     }
 
-    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method not called after 200ms");
+    ASSERT_TRUE(1 == report.wasRun.get())
+        << ("TimerTask.run() method not called after 200ms");
 
     t->cancel();
     t->cancel();
     t->cancel();
 
-    synchronized( &this->gsync ) {
-        try {
-            this->gsync.wait( 500 );
-        } catch( InterruptedException& e ) {}
+    synchronized(&this->gsync)
+    {
+        try
+        {
+            this->gsync.wait(500);
+        }
+        catch (InterruptedException& e)
+        {
+        }
     }
 
-    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method should not have been called after cancel");
+    ASSERT_TRUE(1 == report.wasRun.get())
+        << ("TimerTask.run() method should not have been called after cancel");
 
     // Ensure that a call to cancel from within a timer ensures no more
     // run
-    report.wasRun.set( 0 );
-    t.reset( new Timer() );
-    testTask = new TimerTestTask( t.get(), &report, &this->timerCounter, &this->gsync );
-    testTask->setIncrementCount( true );
-    testTask->setTerminateCount( 5 ); // Terminate after 5 runs
-    t->schedule( testTask, 100, 100 );
-    synchronized( &this->gsync ) {
-        try {
-            this->gsync.wait( 500 );
-            this->gsync.wait( 500 );
-            this->gsync.wait( 500 );
-            this->gsync.wait( 500 );
-            this->gsync.wait( 500 );
-            this->gsync.wait( 500 );
-        } catch( InterruptedException& e ) {}
+    report.wasRun.set(0);
+    t.reset(new Timer());
+    testTask =
+        new TimerTestTask(t.get(), &report, &this->timerCounter, &this->gsync);
+    testTask->setIncrementCount(true);
+    testTask->setTerminateCount(5);  // Terminate after 5 runs
+    t->schedule(testTask, 100, 100);
+    synchronized(&this->gsync)
+    {
+        try
+        {
+            this->gsync.wait(500);
+            this->gsync.wait(500);
+            this->gsync.wait(500);
+            this->gsync.wait(500);
+            this->gsync.wait(500);
+            this->gsync.wait(500);
+        }
+        catch (InterruptedException& e)
+        {
+        }
     }
 
-    ASSERT_TRUE(5 == report.wasRun.get()) << (std::string( "TimerTask.run() method should be called 5 times not " ) +
-                            Integer::toString( report.wasRun.get() ));
+    ASSERT_TRUE(5 == report.wasRun.get())
+        << (std::string(
+                "TimerTask.run() method should be called 5 times not ") +
+            Integer::toString(report.wasRun.get()));
 
     t->cancel();
-    try {
-        Thread::sleep( 200 );
-    } catch( InterruptedException& e ) {}
-
+    try
+    {
+        Thread::sleep(200);
+    }
+    catch (InterruptedException& e)
+    {
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTest, testPurge) {
-
+TEST_F(TimerTest, testPurge)
+{
     std::unique_ptr<Timer> t;
 
-    t.reset( new Timer() );
+    t.reset(new Timer());
     ASSERT_TRUE(0 == t->purge());
 
-    std::vector< TimerTestTask* > tasks;
-    tasks.resize( 100 );
-    int delayTime[] = { 50, 80, 20, 70, 40, 10, 90, 30, 60 };
+    std::vector<TimerTestTask*> tasks;
+    tasks.resize(100);
+    int delayTime[] = {50, 80, 20, 70, 40, 10, 90, 30, 60};
 
     int j = 0;
-    for( int i = 0; i < 100; i++ ) {
+    for (int i = 0; i < 100; i++)
+    {
         tasks[i] = new TimerTestTask(&this->timerCounter, &this->gsync);
-        t->schedule( tasks[i], delayTime[j++], 200 );
-        if( j == 9 ) {
+        t->schedule(tasks[i], delayTime[j++], 200);
+        if (j == 9)
+        {
             j = 0;
         }
     }
 
-    for( int i = 0; i < 50; i++ ) {
+    for (int i = 0; i < 50; i++)
+    {
         tasks[i]->cancel();
     }
 
@@ -356,1317 +444,1727 @@ TEST_F(TimerTest, testPurge) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTest, testSchedule_TimerTask_Date) {
-
+TEST_F(TimerTest, testSchedule_TimerTask_Date)
+{
     std::unique_ptr<Timer> t;
-    TimerTaskReport report;
+    TimerTaskReport        report;
 
     // Ensure a Timer throws an IllegalStateException after cancelled
-    t.reset( new Timer() );
-    TimerTestTask* testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    Date d( System::currentTimeMillis() + 100 );
+    t.reset(new Timer());
+    TimerTestTask* testTask =
+        new TimerTestTask(&this->timerCounter, &this->gsync);
+    Date d(System::currentTimeMillis() + 100);
     t->cancel();
     bool exception = false;
 
-    try {
-        t->schedule( testTask, d );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, d);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
 
-    ASSERT_TRUE(exception == true) << ("Scheduling a task after Timer.cancel() should throw exception");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a task after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
-    t.reset( new Timer() );
+    t.reset(new Timer());
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    d.setTime( System::currentTimeMillis() + 100 );
+    d.setTime(System::currentTimeMillis() + 100);
     testTask->cancel();
     exception = false;
-    try {
-        t->schedule( testTask, d );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, d);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
 
-    ASSERT_TRUE(exception == true) << ("Scheduling a task after cancelling it should throw exception");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
-    t.reset( new Timer() );
+    t.reset(new Timer());
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    d.setTime( -100 );
+    d.setTime(-100);
     exception = false;
-    try {
-        t->schedule( testTask, d );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(testTask, d);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a task with negative date should throw IllegalArgumentException");
+    ASSERT_TRUE(exception == true) << ("Scheduling a task with negative date "
+                                       "should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
-    t.reset( new Timer() );
+    t.reset(new Timer());
     exception = false;
-    d.setTime( System::currentTimeMillis() + 100 );
-    try {
-        t->schedule( NULL, d );
-    } catch( NullPointerException& e ) {
+    d.setTime(System::currentTimeMillis() + 100);
+    try
+    {
+        t->schedule(NULL, d);
+    }
+    catch (NullPointerException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a null task should throw NullPointerException");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a null task should throw NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
-    t.reset( new Timer() );
-    d.setTime( -100 );
+    t.reset(new Timer());
+    d.setTime(-100);
     exception = false;
-    try {
-        t->schedule( NULL, d );
-    } catch( NullPointerException& e ) {
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(NULL, d);
+    }
+    catch (NullPointerException& e)
+    {
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a null task with negative date should throw IllegalArgumentException first");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a null task with negative date should throw "
+            "IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run
-    t.reset( new Timer() );
-    testTask = new TimerTestTask( &report, &this->timerCounter, &this->gsync );
-    d.setTime( System::currentTimeMillis() + 200 );
-    t->schedule( testTask, d );
-    try {
-        Thread::sleep( 400 );
-    } catch( InterruptedException& e ) {}
+    t.reset(new Timer());
+    testTask = new TimerTestTask(&report, &this->timerCounter, &this->gsync);
+    d.setTime(System::currentTimeMillis() + 200);
+    t->schedule(testTask, d);
+    try
+    {
+        Thread::sleep(400);
+    }
+    catch (InterruptedException& e)
+    {
+    }
 
-    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method not called after 200ms");
+    ASSERT_TRUE(1 == report.wasRun.get())
+        << ("TimerTask.run() method not called after 200ms");
     t->cancel();
 
     // Ensure multiple tasks are run
-    t.reset( new Timer() );
+    t.reset(new Timer());
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 100 );
-    t->schedule( testTask, d );
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 100);
+    t->schedule(testTask, d);
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 150 );
-    t->schedule( testTask, d );
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 150);
+    t->schedule(testTask, d);
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 70 );
-    t->schedule( testTask, d );
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 70);
+    t->schedule(testTask, d);
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 10 );
-    t->schedule( testTask, d );
-    try {
-        Thread::sleep( 400 );
-    } catch( InterruptedException& e ) {}
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 10);
+    t->schedule(testTask, d);
+    try
+    {
+        Thread::sleep(400);
+    }
+    catch (InterruptedException& e)
+    {
+    }
 
-    ASSERT_TRUE(timerCounter.get() == 4) << (std::string( "Multiple tasks should have incremented counter 4 times not " ) +
-                            Integer::toString( timerCounter.get() ));
+    ASSERT_TRUE(timerCounter.get() == 4)
+        << (std::string(
+                "Multiple tasks should have incremented counter 4 times not ") +
+            Integer::toString(timerCounter.get()));
     t->cancel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTest, testSchedule_TimerTask_Date2) {
-
+TEST_F(TimerTest, testSchedule_TimerTask_Date2)
+{
     std::unique_ptr<Timer> t;
-    TimerTaskReport report;
+    TimerTaskReport        report;
 
     // Ensure a Timer throws an IllegalStateException after cancelled
-    t.reset( new Timer() );
-    Pointer<TimerTestTask> testTask( new TimerTestTask(&this->timerCounter, &this->gsync) );
-    Date d( System::currentTimeMillis() + 100 );
+    t.reset(new Timer());
+    Pointer<TimerTestTask> testTask(
+        new TimerTestTask(&this->timerCounter, &this->gsync));
+    Date d(System::currentTimeMillis() + 100);
     t->cancel();
     bool exception = false;
 
-    try {
-        t->schedule( testTask, d );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, d);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
     }
 
-    ASSERT_TRUE(exception == true) << ("Scheduling a task after Timer.cancel() should throw exception");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a task after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    d.setTime( System::currentTimeMillis() + 100 );
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    d.setTime(System::currentTimeMillis() + 100);
     testTask->cancel();
     exception = false;
-    try {
-        t->schedule( testTask, d );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, d);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
     }
 
-    ASSERT_TRUE(exception == true) << ("Scheduling a task after cancelling it should throw exception");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    d.setTime( -100 );
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    d.setTime(-100);
     exception = false;
-    try {
-        t->schedule( testTask, d );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(testTask, d);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a task with negative date should throw IllegalArgumentException");
+    ASSERT_TRUE(exception == true) << ("Scheduling a task with negative date "
+                                       "should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
-    t.reset( new Timer() );
+    t.reset(new Timer());
     exception = false;
-    d.setTime( System::currentTimeMillis() + 100 );
-    try {
-        t->schedule( NULL, d );
-    } catch( NullPointerException& e ) {
+    d.setTime(System::currentTimeMillis() + 100);
+    try
+    {
+        t->schedule(NULL, d);
+    }
+    catch (NullPointerException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a null task should throw NullPointerException");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a null task should throw NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
-    t.reset( new Timer() );
-    d.setTime( -100 );
+    t.reset(new Timer());
+    d.setTime(-100);
     exception = false;
-    try {
-        t->schedule( NULL, d );
-    } catch( NullPointerException& e ) {
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(NULL, d);
+    }
+    catch (NullPointerException& e)
+    {
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a null task with negative date should throw IllegalArgumentException first");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a null task with negative date should throw "
+            "IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask( &report, &this->timerCounter, &this->gsync ) );
-    d.setTime( System::currentTimeMillis() + 200 );
-    t->schedule( testTask, d );
-    try {
-        Thread::sleep( 500 );
-    } catch( InterruptedException& e ) {}
+    t.reset(new Timer());
+    testTask.reset(
+        new TimerTestTask(&report, &this->timerCounter, &this->gsync));
+    d.setTime(System::currentTimeMillis() + 200);
+    t->schedule(testTask, d);
+    try
+    {
+        Thread::sleep(500);
+    }
+    catch (InterruptedException& e)
+    {
+    }
 
-    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method not called after 200ms");
+    ASSERT_TRUE(1 == report.wasRun.get())
+        << ("TimerTask.run() method not called after 200ms");
     t->cancel();
 
     // Ensure multiple tasks are run
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 100 );
-    t->schedule( testTask, d );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 150 );
-    t->schedule( testTask, d );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 70 );
-    t->schedule( testTask, d );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 10 );
-    t->schedule( testTask, d );
-    try {
-        Thread::sleep( 400 );
-    } catch( InterruptedException& e ) {}
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 100);
+    t->schedule(testTask, d);
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 150);
+    t->schedule(testTask, d);
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 70);
+    t->schedule(testTask, d);
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 10);
+    t->schedule(testTask, d);
+    try
+    {
+        Thread::sleep(400);
+    }
+    catch (InterruptedException& e)
+    {
+    }
 
-    ASSERT_TRUE(timerCounter.get() == 4) << (std::string( "Multiple tasks should have incremented counter 4 times not " ) +
-                            Integer::toString( timerCounter.get() ));
+    ASSERT_TRUE(timerCounter.get() == 4)
+        << (std::string(
+                "Multiple tasks should have incremented counter 4 times not ") +
+            Integer::toString(timerCounter.get()));
     t->cancel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTest, testSchedule_TimerTask_Long) {
-
+TEST_F(TimerTest, testSchedule_TimerTask_Long)
+{
     std::unique_ptr<Timer> t;
-    TimerTaskReport report;
+    TimerTaskReport        report;
 
     // Ensure a Timer throws an IllegalStateException after cancelled
-    t.reset( new Timer() );
-    TimerTestTask* testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
+    t.reset(new Timer());
+    TimerTestTask* testTask =
+        new TimerTestTask(&this->timerCounter, &this->gsync);
     t->cancel();
     bool exception = false;
-    try {
-        t->schedule( testTask, 100 );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a task after Timer.cancel() should throw exception");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a task after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
-    t.reset( new Timer() );
+    t.reset(new Timer());
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
     testTask->cancel();
     exception = false;
-    try {
-        t->schedule( testTask, 100 );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a task after cancelling it should throw exception");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
-    t.reset( new Timer() );
-    testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
+    t.reset(new Timer());
+    testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
-    try {
-        t->schedule( testTask, -100 );
-    } catch( IllegalArgumentException e ) {
+    try
+    {
+        t->schedule(testTask, -100);
+    }
+    catch (IllegalArgumentException e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a task with negative delay should throw IllegalArgumentException");
+    ASSERT_TRUE(exception == true) << ("Scheduling a task with negative delay "
+                                       "should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
-    t.reset( new Timer() );
+    t.reset(new Timer());
     exception = false;
-    try {
-        t->schedule( NULL, 10 );
-    } catch( NullPointerException e ) {
+    try
+    {
+        t->schedule(NULL, 10);
+    }
+    catch (NullPointerException e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a null task should throw NullPointerException");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a null task should throw NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
-    t.reset( new Timer() );
+    t.reset(new Timer());
     exception = false;
-    try {
-        t->schedule( NULL, -10 );
-    } catch( NullPointerException& e ) {
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(NULL, -10);
+    }
+    catch (NullPointerException& e)
+    {
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a null task with negative delays should throw IllegalArgumentException first");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a null task with negative delays should throw "
+            "IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run
-    t.reset( new Timer() );
-    testTask = new TimerTestTask( &report, &this->timerCounter, &this->gsync );
-    t->schedule( testTask, 200 );
-    try {
-        Thread::sleep( 400 );
-    } catch( InterruptedException& e ) {
+    t.reset(new Timer());
+    testTask = new TimerTestTask(&report, &this->timerCounter, &this->gsync);
+    t->schedule(testTask, 200);
+    try
+    {
+        Thread::sleep(400);
     }
-    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method not called after 200ms");
+    catch (InterruptedException& e)
+    {
+    }
+    ASSERT_TRUE(1 == report.wasRun.get())
+        << ("TimerTask.run() method not called after 200ms");
     t->cancel();
 
     // Ensure multiple tasks are run
-    t.reset( new Timer() );
+    t.reset(new Timer());
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 100 );
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 100);
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 150 );
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 150);
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 70 );
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 70);
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 10 );
-    try {
-        Thread::sleep( 400 );
-    } catch( InterruptedException& e ) {
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 10);
+    try
+    {
+        Thread::sleep(400);
+    }
+    catch (InterruptedException& e)
+    {
     }
 
-    ASSERT_TRUE(timerCounter.get() == 4) << (std::string( "Multiple tasks should have incremented counter 4 times not " ) +
-                            Integer::toString( timerCounter.get() ));
+    ASSERT_TRUE(timerCounter.get() == 4)
+        << (std::string(
+                "Multiple tasks should have incremented counter 4 times not ") +
+            Integer::toString(timerCounter.get()));
     t->cancel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTest, testSchedule_TimerTask_Long2) {
-
+TEST_F(TimerTest, testSchedule_TimerTask_Long2)
+{
     std::unique_ptr<Timer> t;
-    TimerTaskReport report;
+    TimerTaskReport        report;
 
     // Ensure a Timer throws an IllegalStateException after cancelled
-    t.reset( new Timer() );
-    Pointer<TimerTestTask> testTask( new TimerTestTask(&this->timerCounter, &this->gsync) );
+    t.reset(new Timer());
+    Pointer<TimerTestTask> testTask(
+        new TimerTestTask(&this->timerCounter, &this->gsync));
     t->cancel();
     bool exception = false;
-    try {
-        t->schedule( testTask, 100 );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a task after Timer.cancel() should throw exception");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a task after Timer.cancel() should throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync) );
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     testTask->cancel();
     exception = false;
-    try {
-        t->schedule( testTask, 100 );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a task after cancelling it should throw exception");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync) );
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
-    try {
-        t->schedule( testTask, -100 );
-    } catch( IllegalArgumentException e ) {
+    try
+    {
+        t->schedule(testTask, -100);
+    }
+    catch (IllegalArgumentException e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a task with negative delay should throw IllegalArgumentException");
+    ASSERT_TRUE(exception == true) << ("Scheduling a task with negative delay "
+                                       "should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
-    t.reset( new Timer() );
+    t.reset(new Timer());
     exception = false;
-    try {
-        t->schedule( NULL, 10 );
-    } catch( NullPointerException e ) {
+    try
+    {
+        t->schedule(NULL, 10);
+    }
+    catch (NullPointerException e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a null task should throw NullPointerException");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a null task should throw NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
-    t.reset( new Timer() );
+    t.reset(new Timer());
     exception = false;
-    try {
-        t->schedule( NULL, -10 );
-    } catch( NullPointerException& e ) {
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(NULL, -10);
+    }
+    catch (NullPointerException& e)
+    {
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception == true) << ("Scheduling a null task with negative delays should throw IllegalArgumentException first");
+    ASSERT_TRUE(exception == true)
+        << ("Scheduling a null task with negative delays should throw "
+            "IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask( &report, &this->timerCounter, &this->gsync ) );
-    t->schedule( testTask, 200 );
-    try {
-        Thread::sleep( 400 );
-    } catch( InterruptedException& e ) {
+    t.reset(new Timer());
+    testTask.reset(
+        new TimerTestTask(&report, &this->timerCounter, &this->gsync));
+    t->schedule(testTask, 200);
+    try
+    {
+        Thread::sleep(400);
     }
-    ASSERT_TRUE(1 == report.wasRun.get()) << ("TimerTask.run() method not called after 200ms");
+    catch (InterruptedException& e)
+    {
+    }
+    ASSERT_TRUE(1 == report.wasRun.get())
+        << ("TimerTask.run() method not called after 200ms");
     t->cancel();
 
     // Ensure multiple tasks are run
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 100 );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 150 );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 70 );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 10 );
-    try {
-        Thread::sleep( 400 );
-    } catch( InterruptedException& e ) {
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 100);
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 150);
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 70);
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 10);
+    try
+    {
+        Thread::sleep(400);
+    }
+    catch (InterruptedException& e)
+    {
     }
 
-    ASSERT_TRUE(timerCounter.get() == 4) << (std::string( "Multiple tasks should have incremented counter 4 times not " ) +
-                            Integer::toString( timerCounter.get() ));
+    ASSERT_TRUE(timerCounter.get() == 4)
+        << (std::string(
+                "Multiple tasks should have incremented counter 4 times not ") +
+            Integer::toString(timerCounter.get()));
     t->cancel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTest, testSchedule_TimerTask_Long_Long) {
-
+TEST_F(TimerTest, testSchedule_TimerTask_Long_Long)
+{
     std::unique_ptr<Timer> t;
-    TimerTaskReport report;
+    TimerTaskReport        report;
 
     // Ensure a Timer throws an IllegalStateException after cancelled
-    t.reset( new Timer() );
-    TimerTestTask* testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
+    t.reset(new Timer());
+    TimerTestTask* testTask =
+        new TimerTestTask(&this->timerCounter, &this->gsync);
     t->cancel();
     bool exception = false;
-    try {
-        t->schedule( testTask, 100, 100 );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, 100, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should throw exception");
+    ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should "
+                               "throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
-    t.reset( new Timer() );
+    t.reset(new Timer());
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
     testTask->cancel();
     exception = false;
-    try {
-        t->schedule( testTask, 100, 100 );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, 100, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task after cancelling it should throw exception");
+    ASSERT_TRUE(exception) << ("Scheduling a task after cancelling it should "
+                               "throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is
     // negative
-    t.reset( new Timer() );
-    testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
+    t.reset(new Timer());
+    testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
-    try {
-        t->schedule( testTask, -100, 100 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(testTask, -100, 100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task with negative delay should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative delay should "
+                               "throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is negative
-    t.reset( new Timer() );
-    testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
+    t.reset(new Timer());
+    testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
-    try {
-        t->schedule( testTask, 100, -100 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(testTask, 100, -100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task with negative period should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative period should "
+                               "throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is zero
-    t.reset( new Timer() );
-    testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
+    t.reset(new Timer());
+    testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
-    try {
-        t->schedule( testTask, 100, 0 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(testTask, 100, 0);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task with 0 period should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("Scheduling a task with 0 period should throw "
+                               "IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
-    t.reset( new Timer() );
+    t.reset(new Timer());
     exception = false;
-    try {
-        t->schedule( NULL, 10, 10 );
-    } catch( NullPointerException& e ) {
+    try
+    {
+        t->schedule(NULL, 10, 10);
+    }
+    catch (NullPointerException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a null task should throw NullPointerException");
+    ASSERT_TRUE(exception) << ("Scheduling a null task should throw "
+                               "NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
-    t.reset( new Timer() );
+    t.reset(new Timer());
     exception = false;
-    try {
-        t->schedule( NULL, -10, -10 );
-    } catch( NullPointerException& e ) {
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(NULL, -10, -10);
+    }
+    catch (NullPointerException& e)
+    {
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a null task with negative delays should throw IllegalArgumentException first");
+    ASSERT_TRUE(exception) << ("Scheduling a null task with negative delays "
+                               "should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run at least twice
-    t.reset( new Timer() );
-    testTask = new TimerTestTask( &report, &this->timerCounter, &this->gsync );
-    t->schedule( testTask, 100, 100 );
-    try {
-        Thread::sleep( 1000 ); // Increased for macOS CI scheduling latency
-    } catch( InterruptedException& e ) {
+    t.reset(new Timer());
+    testTask = new TimerTestTask(&report, &this->timerCounter, &this->gsync);
+    t->schedule(testTask, 100, 100);
+    try
+    {
+        Thread::sleep(1000);  // Increased for macOS CI scheduling latency
     }
-    ASSERT_TRUE(report.wasRun.get() >= 2) << ("TimerTask.run() method should have been called at least twice (" +
-                            Integer::toString( report.wasRun.get() ) + ")");
+    catch (InterruptedException& e)
+    {
+    }
+    ASSERT_TRUE(report.wasRun.get() >= 2)
+        << ("TimerTask.run() method should have been called at least twice (" +
+            Integer::toString(report.wasRun.get()) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
-    t.reset( new Timer() );
+    t.reset(new Timer());
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 100, 100 ); // at least 9 times
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 100, 100);  // at least 9 times
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 200, 100 ); // at least 7 times
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 200, 100);  // at least 7 times
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 300, 200 ); // at least 4 times
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 300, 200);  // at least 4 times
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 100, 200 ); // at least 4 times
-    try {
-        Thread::sleep( 2000 ); // Allowed more room for error (increased for macOS CI scheduling latency)
-    } catch( InterruptedException& e ) {
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 100, 200);  // at least 4 times
+    try
+    {
+        Thread::sleep(2000);  // Allowed more room for error (increased for
+                              // macOS CI scheduling latency)
     }
-    ASSERT_TRUE(timerCounter.get() >= 24) << (std::string( "Multiple tasks should have incremented counter 24 times not " ) +
-                            Integer::toString( timerCounter.get() ));
+    catch (InterruptedException& e)
+    {
+    }
+    ASSERT_TRUE(timerCounter.get() >= 24)
+        << (std::string("Multiple tasks should have incremented counter 24 "
+                        "times not ") +
+            Integer::toString(timerCounter.get()));
     t->cancel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2) {
-
+TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2)
+{
     std::unique_ptr<Timer> t;
-    TimerTaskReport report;
+    TimerTaskReport        report;
 
     // Ensure a Timer throws an IllegalStateException after cancelled
-    t.reset( new Timer() );
-    Pointer<TimerTestTask> testTask( new TimerTestTask(&this->timerCounter, &this->gsync) );
+    t.reset(new Timer());
+    Pointer<TimerTestTask> testTask(
+        new TimerTestTask(&this->timerCounter, &this->gsync));
     t->cancel();
     bool exception = false;
-    try {
-        t->schedule( testTask, 100, 100 );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, 100, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should throw exception");
+    ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should "
+                               "throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     testTask->cancel();
     exception = false;
-    try {
-        t->schedule( testTask, 100, 100 );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, 100, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task after cancelling it should throw exception");
+    ASSERT_TRUE(exception) << ("Scheduling a task after cancelling it should "
+                               "throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is
     // negative
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync) );
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
-    try {
-        t->schedule( testTask, -100, 100 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(testTask, -100, 100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task with negative delay should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative delay should "
+                               "throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is negative
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync) );
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
-    try {
-        t->schedule( testTask, 100, -100 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(testTask, 100, -100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task with negative period should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative period should "
+                               "throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is zero
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync) );
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
-    try {
-        t->schedule( testTask, 100, 0 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(testTask, 100, 0);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task with 0 period should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("Scheduling a task with 0 period should throw "
+                               "IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
-    t.reset( new Timer() );
+    t.reset(new Timer());
     exception = false;
-    try {
-        t->schedule( NULL, 10, 10 );
-    } catch( NullPointerException& e ) {
+    try
+    {
+        t->schedule(NULL, 10, 10);
+    }
+    catch (NullPointerException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a null task should throw NullPointerException");
+    ASSERT_TRUE(exception) << ("Scheduling a null task should throw "
+                               "NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
-    t.reset( new Timer() );
+    t.reset(new Timer());
     exception = false;
-    try {
-        t->schedule( NULL, -10, -10 );
-    } catch( NullPointerException& e ) {
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(NULL, -10, -10);
+    }
+    catch (NullPointerException& e)
+    {
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a null task with negative delays should throw IllegalArgumentException first");
+    ASSERT_TRUE(exception) << ("Scheduling a null task with negative delays "
+                               "should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run at least twice
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask( &report, &this->timerCounter, &this->gsync ) );
-    t->schedule( testTask, 100, 100 );
-    try {
-        Thread::sleep( 1000 ); // Increased for macOS CI scheduling latency
-    } catch( InterruptedException& e ) {
+    t.reset(new Timer());
+    testTask.reset(
+        new TimerTestTask(&report, &this->timerCounter, &this->gsync));
+    t->schedule(testTask, 100, 100);
+    try
+    {
+        Thread::sleep(1000);  // Increased for macOS CI scheduling latency
     }
-    ASSERT_TRUE(report.wasRun.get() >= 2) << ("TimerTask.run() method should have been called at least twice (" +
-                            Integer::toString( report.wasRun.get() ) + ")");
+    catch (InterruptedException& e)
+    {
+    }
+    ASSERT_TRUE(report.wasRun.get() >= 2)
+        << ("TimerTask.run() method should have been called at least twice (" +
+            Integer::toString(report.wasRun.get()) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 100, 100 ); // at least 9 times
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 200, 100 ); // at least 7 times
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 300, 200 ); // at least 4 times
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    t->schedule( testTask, 100, 200 ); // at least 4 times
-    try {
-        Thread::sleep( 2000 ); // Allowed more room for error (increased for macOS CI scheduling latency)
-    } catch( InterruptedException& e ) {
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 100, 100);  // at least 9 times
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 200, 100);  // at least 7 times
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 300, 200);  // at least 4 times
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    t->schedule(testTask, 100, 200);  // at least 4 times
+    try
+    {
+        Thread::sleep(2000);  // Allowed more room for error (increased for
+                              // macOS CI scheduling latency)
     }
-    ASSERT_TRUE(timerCounter.get() >= 24) << (std::string( "Multiple tasks should have incremented counter 24 times not " ) +
-                            Integer::toString( timerCounter.get() ));
+    catch (InterruptedException& e)
+    {
+    }
+    ASSERT_TRUE(timerCounter.get() >= 24)
+        << (std::string("Multiple tasks should have incremented counter 24 "
+                        "times not ") +
+            Integer::toString(timerCounter.get()));
     t->cancel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTest, testSchedule_TimerTask_Date_Long) {
-
+TEST_F(TimerTest, testSchedule_TimerTask_Date_Long)
+{
     std::unique_ptr<Timer> t;
-    TimerTaskReport report;
+    TimerTaskReport        report;
 
     // Ensure a Timer throws an IllegalStateException after cancelled
-    t.reset( new Timer() );
-    TimerTestTask* testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    Date d( System::currentTimeMillis() + 100 );
+    t.reset(new Timer());
+    TimerTestTask* testTask =
+        new TimerTestTask(&this->timerCounter, &this->gsync);
+    Date d(System::currentTimeMillis() + 100);
     t->cancel();
     bool exception = false;
-    try {
-        t->schedule( testTask, d, 100 );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, d, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should throw exception");
+    ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should "
+                               "throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
-    t.reset( new Timer() );
-    d.setTime( System::currentTimeMillis() + 100 );
+    t.reset(new Timer());
+    d.setTime(System::currentTimeMillis() + 100);
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
     testTask->cancel();
     exception = false;
-    try {
-        t->schedule( testTask, d, 100 );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, d, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task after cancelling it should throw exception");
+    ASSERT_TRUE(exception) << ("Scheduling a task after cancelling it should "
+                               "throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is
     // negative
-    t.reset( new Timer() );
-    d.setTime( -100 );
-    testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
+    t.reset(new Timer());
+    d.setTime(-100);
+    testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
-    try {
-        t->schedule( testTask, d, 100 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(testTask, d, 100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task with negative delay should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative delay should "
+                               "throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is
     // negative
-    t.reset( new Timer() );
-    d.setTime( System::currentTimeMillis() + 100 );
-    testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
+    t.reset(new Timer());
+    d.setTime(System::currentTimeMillis() + 100);
+    testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
-    try {
-        t->schedule( testTask, d, -100 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(testTask, d, -100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task with negative period should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative period should "
+                               "throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
-    t.reset( new Timer() );
-    d.setTime( System::currentTimeMillis() + 100 );
+    t.reset(new Timer());
+    d.setTime(System::currentTimeMillis() + 100);
     exception = false;
-    try {
-        t->schedule( NULL, d, 10 );
-    } catch( NullPointerException& e ) {
+    try
+    {
+        t->schedule(NULL, d, 10);
+    }
+    catch (NullPointerException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a null task should throw NullPointerException");
+    ASSERT_TRUE(exception) << ("Scheduling a null task should throw "
+                               "NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
-    t.reset( new Timer() );
-    d.setTime( -100 );
+    t.reset(new Timer());
+    d.setTime(-100);
     exception = false;
-    try {
-        t->schedule( NULL, d, 10 );
-    } catch( NullPointerException& e ) {
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(NULL, d, 10);
+    }
+    catch (NullPointerException& e)
+    {
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a null task with negative dates should throw IllegalArgumentException first");
+    ASSERT_TRUE(exception) << ("Scheduling a null task with negative dates "
+                               "should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run at least twice
-    t.reset( new Timer() );
-    d.setTime( System::currentTimeMillis() + 100 );
-    testTask = new TimerTestTask( &report, &this->timerCounter, &this->gsync );
-    t->schedule( testTask, d, 100 );
-    try {
-        Thread::sleep( 800 );
-    } catch( InterruptedException& e ) {
+    t.reset(new Timer());
+    d.setTime(System::currentTimeMillis() + 100);
+    testTask = new TimerTestTask(&report, &this->timerCounter, &this->gsync);
+    t->schedule(testTask, d, 100);
+    try
+    {
+        Thread::sleep(800);
     }
-    ASSERT_TRUE(report.wasRun.get() >= 2) << (std::string( "TimerTask.run() method should have been called at least twice (" ) +
-                            Integer::toString( report.wasRun.get() ) + ")");
+    catch (InterruptedException& e)
+    {
+    }
+    ASSERT_TRUE(report.wasRun.get() >= 2)
+        << (std::string("TimerTask.run() method should have been called at "
+                        "least twice (") +
+            Integer::toString(report.wasRun.get()) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
-    t.reset( new Timer() );
+    t.reset(new Timer());
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 100 );
-    t->schedule( testTask, d, 100 ); // at least 9 times
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 100);
+    t->schedule(testTask, d, 100);  // at least 9 times
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 200 );
-    t->schedule( testTask, d, 100 ); // at least 7 times
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 200);
+    t->schedule(testTask, d, 100);  // at least 7 times
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 300 );
-    t->schedule( testTask, d, 200 ); // at least 4 times
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 300);
+    t->schedule(testTask, d, 200);  // at least 4 times
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 100 );
-    t->schedule( testTask, d, 200 ); // at least 4 times
-    try {
-        Thread::sleep( 3000 );
-    } catch( InterruptedException& e ) {
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 100);
+    t->schedule(testTask, d, 200);  // at least 4 times
+    try
+    {
+        Thread::sleep(3000);
     }
-    ASSERT_TRUE(timerCounter.get() >= 24) << (std::string( "Multiple tasks should have incremented counter 24 times not " ) +
-                            Integer::toString( timerCounter.get() ));
+    catch (InterruptedException& e)
+    {
+    }
+    ASSERT_TRUE(timerCounter.get() >= 24)
+        << (std::string("Multiple tasks should have incremented counter 24 "
+                        "times not ") +
+            Integer::toString(timerCounter.get()));
     t->cancel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTest, testSchedule_TimerTask_Date_Long2) {
-
+TEST_F(TimerTest, testSchedule_TimerTask_Date_Long2)
+{
     std::unique_ptr<Timer> t;
-    TimerTaskReport report;
+    TimerTaskReport        report;
 
     // Ensure a Timer throws an IllegalStateException after cancelled
-    t.reset( new Timer() );
-    Pointer<TimerTestTask> testTask( new TimerTestTask(&this->timerCounter, &this->gsync) );
-    Date d( System::currentTimeMillis() + 100 );
+    t.reset(new Timer());
+    Pointer<TimerTestTask> testTask(
+        new TimerTestTask(&this->timerCounter, &this->gsync));
+    Date d(System::currentTimeMillis() + 100);
     t->cancel();
     bool exception = false;
-    try {
-        t->schedule( testTask, d, 100 );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, d, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should throw exception");
+    ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should "
+                               "throw exception");
 
     // Ensure a Timer throws an IllegalStateException if task already cancelled
-    t.reset( new Timer() );
-    d.setTime( System::currentTimeMillis() + 100 );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
+    t.reset(new Timer());
+    d.setTime(System::currentTimeMillis() + 100);
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     testTask->cancel();
     exception = false;
-    try {
-        t->schedule( testTask, d, 100 );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->schedule(testTask, d, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task after cancelling it should throw exception");
+    ASSERT_TRUE(exception) << ("Scheduling a task after cancelling it should "
+                               "throw exception");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if delay is
     // negative
-    t.reset( new Timer() );
-    d.setTime( -100 );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync) );
+    t.reset(new Timer());
+    d.setTime(-100);
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
-    try {
-        t->schedule( testTask, d, 100 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(testTask, d, 100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task with negative delay should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative delay should "
+                               "throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is
     // negative
-    t.reset( new Timer() );
-    d.setTime( System::currentTimeMillis() + 100 );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync) );
+    t.reset(new Timer());
+    d.setTime(System::currentTimeMillis() + 100);
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
-    try {
-        t->schedule( testTask, d, -100 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(testTask, d, -100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a task with negative period should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("Scheduling a task with negative period should "
+                               "throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws a NullPointerException if the task is null
-    t.reset( new Timer() );
-    d.setTime( System::currentTimeMillis() + 100 );
+    t.reset(new Timer());
+    d.setTime(System::currentTimeMillis() + 100);
     exception = false;
-    try {
-        t->schedule( NULL, d, 10 );
-    } catch( NullPointerException& e ) {
+    try
+    {
+        t->schedule(NULL, d, 10);
+    }
+    catch (NullPointerException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a null task should throw NullPointerException");
+    ASSERT_TRUE(exception) << ("Scheduling a null task should throw "
+                               "NullPointerException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
-    t.reset( new Timer() );
-    d.setTime( -100 );
+    t.reset(new Timer());
+    d.setTime(-100);
     exception = false;
-    try {
-        t->schedule( NULL, d, 10 );
-    } catch( NullPointerException& e ) {
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->schedule(NULL, d, 10);
+    }
+    catch (NullPointerException& e)
+    {
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a null task with negative dates should throw IllegalArgumentException first");
+    ASSERT_TRUE(exception) << ("Scheduling a null task with negative dates "
+                               "should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run at least twice
-    t.reset( new Timer() );
-    d.setTime( System::currentTimeMillis() + 100 );
-    testTask.reset( new TimerTestTask( &report, &this->timerCounter, &this->gsync ) );
-    t->schedule( testTask, d, 100 );
-    try {
-        Thread::sleep( 800 );
-    } catch( InterruptedException& e ) {
+    t.reset(new Timer());
+    d.setTime(System::currentTimeMillis() + 100);
+    testTask.reset(
+        new TimerTestTask(&report, &this->timerCounter, &this->gsync));
+    t->schedule(testTask, d, 100);
+    try
+    {
+        Thread::sleep(800);
     }
-    ASSERT_TRUE(report.wasRun.get() >= 2) << (std::string( "TimerTask.run() method should have been called at least twice (" ) +
-                            Integer::toString( report.wasRun.get() ) + ")");
+    catch (InterruptedException& e)
+    {
+    }
+    ASSERT_TRUE(report.wasRun.get() >= 2)
+        << (std::string("TimerTask.run() method should have been called at "
+                        "least twice (") +
+            Integer::toString(report.wasRun.get()) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 100 );
-    t->schedule( testTask, d, 100 ); // at least 9 times
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 200 );
-    t->schedule( testTask, d, 100 ); // at least 7 times
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 300 );
-    t->schedule( testTask, d, 200 ); // at least 4 times
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync));
-    testTask->setIncrementCount( true );
-    d.setTime( System::currentTimeMillis() + 100 );
-    t->schedule( testTask, d, 200 ); // at least 4 times
-    try {
-        Thread::sleep( 3000 );
-    } catch( InterruptedException& e ) {
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 100);
+    t->schedule(testTask, d, 100);  // at least 9 times
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 200);
+    t->schedule(testTask, d, 100);  // at least 7 times
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 300);
+    t->schedule(testTask, d, 200);  // at least 4 times
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
+    testTask->setIncrementCount(true);
+    d.setTime(System::currentTimeMillis() + 100);
+    t->schedule(testTask, d, 200);  // at least 4 times
+    try
+    {
+        Thread::sleep(3000);
     }
-    ASSERT_TRUE(timerCounter.get() >= 24) << (std::string( "Multiple tasks should have incremented counter 24 times not " ) +
-                            Integer::toString( timerCounter.get() ));
+    catch (InterruptedException& e)
+    {
+    }
+    ASSERT_TRUE(timerCounter.get() >= 24)
+        << (std::string("Multiple tasks should have incremented counter 24 "
+                        "times not ") +
+            Integer::toString(timerCounter.get()));
     t->cancel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long) {
-
+TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long)
+{
     std::unique_ptr<Timer> t;
-    TimerTaskReport report;
+    TimerTaskReport        report;
 
     // Ensure a Timer throws an IllegalStateException after cancelled
-    t.reset( new Timer() );
-    TimerTestTask* testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
+    t.reset(new Timer());
+    TimerTestTask* testTask =
+        new TimerTestTask(&this->timerCounter, &this->gsync);
     t->cancel();
     bool exception = false;
-    try {
-        t->scheduleAtFixedRate( testTask, 100, 100 );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->scheduleAtFixedRate(testTask, 100, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() should throw exception");
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() "
+                               "should throw exception");
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
-    t.reset( new Timer() );
-    testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
+    t.reset(new Timer());
+    testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
-    try {
-        t->scheduleAtFixedRate( testTask, -100, 100 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->scheduleAtFixedRate(testTask, -100, 100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative delay should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative delay should "
+                               "throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is negative
-    t.reset( new Timer() );
-    testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
+    t.reset(new Timer());
+    testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
-    try {
-        t->scheduleAtFixedRate( testTask, 100, -100 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->scheduleAtFixedRate(testTask, 100, -100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative period should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative period "
+                               "should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a task is run at least twice
-    t.reset( new Timer() );
-    testTask = new TimerTestTask( &report, &this->timerCounter, &this->gsync );
-    t->scheduleAtFixedRate( testTask, 100, 100 );
-    try {
-        Thread::sleep( 400 );
-    } catch( InterruptedException& e ) {
+    t.reset(new Timer());
+    testTask = new TimerTestTask(&report, &this->timerCounter, &this->gsync);
+    t->scheduleAtFixedRate(testTask, 100, 100);
+    try
+    {
+        Thread::sleep(400);
     }
-    ASSERT_TRUE(report.wasRun.get() >= 2) << (std::string( "TimerTask.run() method should have been called at least twice (" ) +
-                            Integer::toString( report.wasRun.get() ) + ")");
+    catch (InterruptedException& e)
+    {
+    }
+    ASSERT_TRUE(report.wasRun.get() >= 2)
+        << (std::string("TimerTask.run() method should have been called at "
+                        "least twice (") +
+            Integer::toString(report.wasRun.get()) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
-    t.reset( new Timer() );
+    t.reset(new Timer());
     report.reset();
-    SlowThenFastTask* slowThenFastTask = new SlowThenFastTask( &report );
+    SlowThenFastTask* slowThenFastTask = new SlowThenFastTask(&report);
 
     // at least 9 times even when asleep
-    t->scheduleAtFixedRate( slowThenFastTask, 100, 100 );
-    try {
-        Thread::sleep( 1000 );
-    } catch( InterruptedException& e ) {
+    t->scheduleAtFixedRate(slowThenFastTask, 100, 100);
+    try
+    {
+        Thread::sleep(1000);
+    }
+    catch (InterruptedException& e)
+    {
     }
     long long lastDelta = report.lastDelta;
-    ASSERT_TRUE(lastDelta < 300) << ("Fixed Rate Schedule should catch up, but is off by " +
-                            Long::toString( lastDelta ) + " ms");
+    ASSERT_TRUE(lastDelta < 300)
+        << ("Fixed Rate Schedule should catch up, but is off by " +
+            Long::toString(lastDelta) + " ms");
     t->cancel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long2) {
-
+TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long2)
+{
     std::unique_ptr<Timer> t;
-    TimerTaskReport report;
+    TimerTaskReport        report;
 
     // Ensure a Timer throws an IllegalStateException after cancelled
-    t.reset( new Timer() );
-    Pointer<TimerTestTask> testTask( new TimerTestTask(&this->timerCounter, &this->gsync) );
+    t.reset(new Timer());
+    Pointer<TimerTestTask> testTask(
+        new TimerTestTask(&this->timerCounter, &this->gsync));
     t->cancel();
     bool exception = false;
-    try {
-        t->scheduleAtFixedRate( testTask, 100, 100 );
-    } catch( IllegalStateException& e ) {
+    try
+    {
+        t->scheduleAtFixedRate(testTask, 100, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() should throw exception");
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() "
+                               "should throw exception");
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync) );
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
-    try {
-        t->scheduleAtFixedRate( testTask, -100, 100 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->scheduleAtFixedRate(testTask, -100, 100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative delay should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative delay should "
+                               "throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is negative
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync) );
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
-    try {
-        t->scheduleAtFixedRate( testTask, 100, -100 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->scheduleAtFixedRate(testTask, 100, -100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative period should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative period "
+                               "should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a task is run at least twice
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask( &report, &this->timerCounter, &this->gsync ) );
-    t->scheduleAtFixedRate( testTask, 100, 100 );
-    try {
-        Thread::sleep( 400 );
-    } catch( InterruptedException& e ) {
+    t.reset(new Timer());
+    testTask.reset(
+        new TimerTestTask(&report, &this->timerCounter, &this->gsync));
+    t->scheduleAtFixedRate(testTask, 100, 100);
+    try
+    {
+        Thread::sleep(400);
     }
-    ASSERT_TRUE(report.wasRun.get() >= 2) << (std::string( "TimerTask.run() method should have been called at least twice (" ) +
-                            Integer::toString( report.wasRun.get() ) + ")");
+    catch (InterruptedException& e)
+    {
+    }
+    ASSERT_TRUE(report.wasRun.get() >= 2)
+        << (std::string("TimerTask.run() method should have been called at "
+                        "least twice (") +
+            Integer::toString(report.wasRun.get()) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
-    t.reset( new Timer() );
+    t.reset(new Timer());
     report.reset();
-    Pointer<SlowThenFastTask> slowThenFastTask( new SlowThenFastTask( &report ) );
+    Pointer<SlowThenFastTask> slowThenFastTask(new SlowThenFastTask(&report));
 
     // at least 9 times even when asleep
-    t->scheduleAtFixedRate( slowThenFastTask, 100, 100 );
-    try {
-        Thread::sleep( 1000 );
-    } catch( InterruptedException& e ) {
+    t->scheduleAtFixedRate(slowThenFastTask, 100, 100);
+    try
+    {
+        Thread::sleep(1000);
+    }
+    catch (InterruptedException& e)
+    {
     }
     long long lastDelta = report.lastDelta;
-    ASSERT_TRUE(lastDelta < 300) << ("Fixed Rate Schedule should catch up, but is off by " +
-                            Long::toString( lastDelta ) + " ms");
+    ASSERT_TRUE(lastDelta < 300)
+        << ("Fixed Rate Schedule should catch up, but is off by " +
+            Long::toString(lastDelta) + " ms");
     t->cancel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long) {
-
+TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long)
+{
     std::unique_ptr<Timer> t;
-    TimerTaskReport report;
+    TimerTaskReport        report;
 
     // Ensure a Timer throws an IllegalStateException after cancelled
-    t.reset( new Timer() );
-    TimerTestTask* testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
+    t.reset(new Timer());
+    TimerTestTask* testTask =
+        new TimerTestTask(&this->timerCounter, &this->gsync);
     t->cancel();
     bool exception = false;
-    Date d( System::currentTimeMillis() + 100 );
-    try {
-        t->scheduleAtFixedRate( testTask, d, 100 );
-    } catch( IllegalStateException& e ) {
+    Date d(System::currentTimeMillis() + 100);
+    try
+    {
+        t->scheduleAtFixedRate(testTask, d, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() should throw exception");
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() "
+                               "should throw exception");
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
-    t.reset( new Timer() );
-    testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
+    t.reset(new Timer());
+    testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
-    d.setTime( -100 );
-    try {
-        t->scheduleAtFixedRate( testTask, d, 100 );
-    } catch( IllegalArgumentException& e ) {
+    d.setTime(-100);
+    try
+    {
+        t->scheduleAtFixedRate(testTask, d, 100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative Date should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative Date should "
+                               "throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is negative
-    t.reset( new Timer() );
-    testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
+    t.reset(new Timer());
+    testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
-    try {
-        t->scheduleAtFixedRate( testTask, d, -100 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->scheduleAtFixedRate(testTask, d, -100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
         // unscheduled tasks must be deleted
         delete testTask;
     }
-    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative period should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative period "
+                               "should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
-    t.reset( new Timer() );
+    t.reset(new Timer());
     exception = false;
-    d.setTime( -100 );
-    try {
-        t->scheduleAtFixedRate( NULL, d, 10 );
-    } catch( NullPointerException& e ) {
-    } catch( IllegalArgumentException& e ) {
+    d.setTime(-100);
+    try
+    {
+        t->scheduleAtFixedRate(NULL, d, 10);
+    }
+    catch (NullPointerException& e)
+    {
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a null task with negative date should throw IllegalArgumentException first");
+    ASSERT_TRUE(exception) << ("Scheduling a null task with negative date "
+                               "should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure proper sequence of exceptions
-    t.reset( new Timer() );
+    t.reset(new Timer());
     exception = false;
-    try {
-        t->scheduleAtFixedRate( NULL, d, -10 );
-    } catch( NullPointerException& e ) {
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->scheduleAtFixedRate(NULL, d, -10);
+    }
+    catch (NullPointerException& e)
+    {
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a null task & negative period should throw IllegalArgumentException first");
+    ASSERT_TRUE(exception) << ("Scheduling a null task & negative period "
+                               "should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run at least twice
-    t.reset( new Timer() );
-    testTask = new TimerTestTask( &report, &this->timerCounter, &this->gsync );
-    d.setTime( System::currentTimeMillis() + 100 );
-    t->scheduleAtFixedRate( testTask, d, 100 );
-    try {
-        Thread::sleep( 400 );
-    } catch( InterruptedException& e ) {
+    t.reset(new Timer());
+    testTask = new TimerTestTask(&report, &this->timerCounter, &this->gsync);
+    d.setTime(System::currentTimeMillis() + 100);
+    t->scheduleAtFixedRate(testTask, d, 100);
+    try
+    {
+        Thread::sleep(400);
     }
-    ASSERT_TRUE(report.wasRun.get() >= 2) << (std::string( "TimerTask.run() method should have been called at least twice (" ) +
-                            Integer::toString( report.wasRun.get() ) + ")");
+    catch (InterruptedException& e)
+    {
+    }
+    ASSERT_TRUE(report.wasRun.get() >= 2)
+        << (std::string("TimerTask.run() method should have been called at "
+                        "least twice (") +
+            Integer::toString(report.wasRun.get()) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
-    t.reset( new Timer() );
+    t.reset(new Timer());
     report.reset();
-    SlowThenFastTask* slowThenFastTask = new SlowThenFastTask( &report );
-    d.setTime( System::currentTimeMillis() + 100 );
+    SlowThenFastTask* slowThenFastTask = new SlowThenFastTask(&report);
+    d.setTime(System::currentTimeMillis() + 100);
 
     // at least 9 times even when asleep
-    t->scheduleAtFixedRate( slowThenFastTask, d, 100 );
-    try {
-        Thread::sleep( 1000 );
-    } catch( InterruptedException& e ) {
+    t->scheduleAtFixedRate(slowThenFastTask, d, 100);
+    try
+    {
+        Thread::sleep(1000);
+    }
+    catch (InterruptedException& e)
+    {
     }
     long long lastDelta = report.lastDelta;
-    ASSERT_TRUE(lastDelta < 300) << (std::string( "Fixed Rate Schedule should catch up, but is off by " ) +
-                            Long::toString( lastDelta ) + " ms");
+    ASSERT_TRUE(lastDelta < 300)
+        << (std::string("Fixed Rate Schedule should catch up, but is off by ") +
+            Long::toString(lastDelta) + " ms");
     t->cancel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long2) {
-
+TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long2)
+{
     std::unique_ptr<Timer> t;
-    TimerTaskReport report;
+    TimerTaskReport        report;
 
     // Ensure a Timer throws an IllegalStateException after cancelled
-    t.reset( new Timer() );
-    Pointer<TimerTestTask> testTask( new TimerTestTask(&this->timerCounter, &this->gsync) );
+    t.reset(new Timer());
+    Pointer<TimerTestTask> testTask(
+        new TimerTestTask(&this->timerCounter, &this->gsync));
     t->cancel();
     bool exception = false;
-    Date d( System::currentTimeMillis() + 100 );
-    try {
-        t->scheduleAtFixedRate( testTask, d, 100 );
-    } catch( IllegalStateException& e ) {
+    Date d(System::currentTimeMillis() + 100);
+    try
+    {
+        t->scheduleAtFixedRate(testTask, d, 100);
+    }
+    catch (IllegalStateException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() should throw exception");
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() "
+                               "should throw exception");
 
     // Ensure a Timer throws an IllegalArgumentException if delay is negative
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync) );
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
-    d.setTime( -100 );
-    try {
-        t->scheduleAtFixedRate( testTask, d, 100 );
-    } catch( IllegalArgumentException& e ) {
+    d.setTime(-100);
+    try
+    {
+        t->scheduleAtFixedRate(testTask, d, 100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative Date should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative Date should "
+                               "throw IllegalArgumentException");
     t->cancel();
 
     // Ensure a Timer throws an IllegalArgumentException if period is negative
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask(&this->timerCounter, &this->gsync) );
+    t.reset(new Timer());
+    testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
-    try {
-        t->scheduleAtFixedRate( testTask, d, -100 );
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->scheduleAtFixedRate(testTask, d, -100);
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative period should throw IllegalArgumentException");
+    ASSERT_TRUE(exception) << ("scheduleAtFixedRate with negative period "
+                               "should throw IllegalArgumentException");
     t->cancel();
 
     // Ensure proper sequence of exceptions
-    t.reset( new Timer() );
+    t.reset(new Timer());
     exception = false;
-    d.setTime( -100 );
-    try {
-        t->scheduleAtFixedRate( NULL, d, 10 );
-    } catch( NullPointerException& e ) {
-    } catch( IllegalArgumentException& e ) {
+    d.setTime(-100);
+    try
+    {
+        t->scheduleAtFixedRate(NULL, d, 10);
+    }
+    catch (NullPointerException& e)
+    {
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a null task with negative date should throw IllegalArgumentException first");
+    ASSERT_TRUE(exception) << ("Scheduling a null task with negative date "
+                               "should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure proper sequence of exceptions
-    t.reset( new Timer() );
+    t.reset(new Timer());
     exception = false;
-    try {
-        t->scheduleAtFixedRate( NULL, d, -10 );
-    } catch( NullPointerException& e ) {
-    } catch( IllegalArgumentException& e ) {
+    try
+    {
+        t->scheduleAtFixedRate(NULL, d, -10);
+    }
+    catch (NullPointerException& e)
+    {
+    }
+    catch (IllegalArgumentException& e)
+    {
         exception = true;
     }
-    ASSERT_TRUE(exception) << ("Scheduling a null task & negative period should throw IllegalArgumentException first");
+    ASSERT_TRUE(exception) << ("Scheduling a null task & negative period "
+                               "should throw IllegalArgumentException first");
     t->cancel();
 
     // Ensure a task is run at least twice
-    t.reset( new Timer() );
-    testTask.reset( new TimerTestTask( &report, &this->timerCounter, &this->gsync ) );
-    d.setTime( System::currentTimeMillis() + 100 );
-    t->scheduleAtFixedRate( testTask, d, 100 );
-    try {
-        Thread::sleep( 400 );
-    } catch( InterruptedException& e ) {
+    t.reset(new Timer());
+    testTask.reset(
+        new TimerTestTask(&report, &this->timerCounter, &this->gsync));
+    d.setTime(System::currentTimeMillis() + 100);
+    t->scheduleAtFixedRate(testTask, d, 100);
+    try
+    {
+        Thread::sleep(400);
     }
-    ASSERT_TRUE(report.wasRun.get() >= 2) << (std::string( "TimerTask.run() method should have been called at least twice (" ) +
-                            Integer::toString( report.wasRun.get() ) + ")");
+    catch (InterruptedException& e)
+    {
+    }
+    ASSERT_TRUE(report.wasRun.get() >= 2)
+        << (std::string("TimerTask.run() method should have been called at "
+                        "least twice (") +
+            Integer::toString(report.wasRun.get()) + ")");
     t->cancel();
 
     // Ensure multiple tasks are run
-    t.reset( new Timer() );
+    t.reset(new Timer());
     report.reset();
-    Pointer<SlowThenFastTask> slowThenFastTask( new SlowThenFastTask( &report ) );
-    d.setTime( System::currentTimeMillis() + 100 );
+    Pointer<SlowThenFastTask> slowThenFastTask(new SlowThenFastTask(&report));
+    d.setTime(System::currentTimeMillis() + 100);
 
     // at least 9 times even when asleep
-    t->scheduleAtFixedRate( slowThenFastTask, d, 100 );
-    try {
-        Thread::sleep( 1000 );
-    } catch( InterruptedException& e ) {
+    t->scheduleAtFixedRate(slowThenFastTask, d, 100);
+    try
+    {
+        Thread::sleep(1000);
+    }
+    catch (InterruptedException& e)
+    {
     }
     long long lastDelta = report.lastDelta;
-    ASSERT_TRUE(lastDelta < 300) << (std::string( "Fixed Rate Schedule should catch up, but is off by " ) +
-                            Long::toString( lastDelta ) + " ms");
+    ASSERT_TRUE(lastDelta < 300)
+        << (std::string("Fixed Rate Schedule should catch up, but is off by ") +
+            Long::toString(lastDelta) + " ms");
     t->cancel();
 }

@@ -23,38 +23,41 @@
 #include <decaf/net/SocketImpl.h>
 #include <decaf/net/SocketImplFactory.h>
 
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/net/UnknownHostException.h>
-#include <decaf/net/SocketTimeoutException.h>
 #include <decaf/io/IOException.h>
+#include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/net/SocketTimeoutException.h>
+#include <decaf/net/UnknownHostException.h>
 
 #include <string>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
     class Socket;
     class SocketImpl;
 
     /**
-     * This class implements server sockets. A server socket waits for requests to come in over
-     * the network.
+     * This class implements server sockets. A server socket waits for requests
+     * to come in over the network.
      *
-     * The actual work of the server socket is performed by an instance of the SocketImpl class.
-     * An application can change the socket factory that creates the socket implementation to configure
-     * itself to create sockets of a particular type.
+     * The actual work of the server socket is performed by an instance of the
+     * SocketImpl class. An application can change the socket factory that
+     * creates the socket implementation to configure itself to create sockets
+     * of a particular type.
      *
      * @since 1.0
      */
-    class DECAF_API ServerSocket {
+    class DECAF_API ServerSocket
+    {
     private:
-
         // Factory for creating sockets, if not set a Plan TCP Socket is created
         static SocketImplFactory* factory;
 
         // The actual Socket that this Socket represents.
-        mutable SocketImpl* impl;
+        mutable SocketImpl*   impl;
         mutable volatile bool created;
 
         bool closed;
@@ -64,77 +67,89 @@ namespace net {
         int port;
 
     private:
-
         ServerSocket(const ServerSocket&);
         ServerSocket& operator=(const ServerSocket&);
 
     public:
-
         /**
          * Creates a non-bound server socket.
          */
         ServerSocket();
 
         /**
-         * Creates a new ServerSocket bound to the specified port, if the value of port is 0, then
-         * any free port is chosen.
+         * Creates a new ServerSocket bound to the specified port, if the value
+         * of port is 0, then any free port is chosen.
          *
-         * When this constructor is called the size of the backlog queue is set at 50, connections
-         * that arrive after the backlog has been reached are refused.
+         * When this constructor is called the size of the backlog queue is set
+         * at 50, connections that arrive after the backlog has been reached are
+         * refused.
          *
-         * If a SocketImplFactory is registered then the createSocketImpl method on the factory
-         * will be called otherwise a default SocketImpl is created.
+         * If a SocketImplFactory is registered then the createSocketImpl method
+         * on the factory will be called otherwise a default SocketImpl is
+         * created.
          *
          * @param port
          *      The port to bind the ServerSocket to.
          *
-         * @throws IOException if there is an I/O error while performing this operation.
-         * @throws IllegalArgumentException if the port value is negative or greater than 65535.
+         * @throws IOException if there is an I/O error while performing this
+         * operation.
+         * @throws IllegalArgumentException if the port value is negative or
+         * greater than 65535.
          */
         ServerSocket(int port);
 
         /**
-         * Creates a new ServerSocket bound to the specified port, if the value of port is 0, then
-         * any free port is chosen.
+         * Creates a new ServerSocket bound to the specified port, if the value
+         * of port is 0, then any free port is chosen.
          *
-         * When this constructor is called the size of the backlog queue is set at backlog, connections
-         * that arrive after the backlog has been reached are refused.  If backlog is zero or negative
-         * then the default backlog value of 50 is used.
+         * When this constructor is called the size of the backlog queue is set
+         * at backlog, connections that arrive after the backlog has been
+         * reached are refused.  If backlog is zero or negative then the default
+         * backlog value of 50 is used.
          *
-         * If a SocketImplFactory is registered then the createSocketImpl method on the factory
-         * will be called otherwise a default SocketImpl is created.
+         * If a SocketImplFactory is registered then the createSocketImpl method
+         * on the factory will be called otherwise a default SocketImpl is
+         * created.
          *
          * @param port
          *      The port to bind the ServerSocket to.
          * @param backlog
-         *      The the number of incoming connection attempts to queue before connections are refused.
+         *      The the number of incoming connection attempts to queue before
+         * connections are refused.
          *
-         * @throws IOException if there is an I/O error while performing this operation.
-         * @throws IllegalArgumentException if the port value is negative or greater than 65535.
+         * @throws IOException if there is an I/O error while performing this
+         * operation.
+         * @throws IllegalArgumentException if the port value is negative or
+         * greater than 65535.
          */
         ServerSocket(int port, int backlog);
 
         /**
-         * Creates a new ServerSocket bound to the specified port, if the value of port is 0, then
-         * any free port is chosen.  If the value of the ifAddress is empty or NULL then the ANY address
-         * is used.
+         * Creates a new ServerSocket bound to the specified port, if the value
+         * of port is 0, then any free port is chosen.  If the value of the
+         * ifAddress is empty or NULL then the ANY address is used.
          *
-         * When this constructor is called the size of the backlog queue is set at backlog, connections
-         * that arrive after the backlog has been reached are refused.  If backlog is zero or negative
-         * then the default backlog value of 50 is used.
+         * When this constructor is called the size of the backlog queue is set
+         * at backlog, connections that arrive after the backlog has been
+         * reached are refused.  If backlog is zero or negative then the default
+         * backlog value of 50 is used.
          *
-         * If a SocketImplFactory is registered then the createSocketImpl method on the factory
-         * will be called otherwise a default SocketImpl is created.
+         * If a SocketImplFactory is registered then the createSocketImpl method
+         * on the factory will be called otherwise a default SocketImpl is
+         * created.
          *
          * @param port
          *      The port to bind the ServerSocket to.
          * @param backlog
-         *      The the number of incoming connection attempts to queue before connections are refused.
+         *      The the number of incoming connection attempts to queue before
+         * connections are refused.
          * @param address
          *      The IP Address to bind to on the local machine.
          *
-         * @throws IOException if there is an I/O error while performing this operation.
-         * @throws IllegalArgumentException if the port value is negative or greater than 65535.
+         * @throws IOException if there is an I/O error while performing this
+         * operation.
+         * @throws IllegalArgumentException if the port value is negative or
+         * greater than 65535.
          */
         ServerSocket(int port, int backlog, const InetAddress* address);
 
@@ -144,11 +159,11 @@ namespace net {
         virtual ~ServerSocket();
 
     protected:
-
         /**
-         * Creates a ServerSocket wrapping the provided SocketImpl instance, this Socket is
-         * considered unconnected.  The ServerSocket class takes ownership of this SocketImpl
-         * pointer and will delete it when the Socket class is destroyed.
+         * Creates a ServerSocket wrapping the provided SocketImpl instance,
+         * this Socket is considered unconnected.  The ServerSocket class takes
+         * ownership of this SocketImpl pointer and will delete it when the
+         * Socket class is destroyed.
          *
          * @param impl
          *      The SocketImpl instance to wrap.
@@ -158,11 +173,10 @@ namespace net {
         ServerSocket(SocketImpl* impl);
 
     public:
-
         /**
-         * Bind and listen to given local IPAddress and port, if the address is empty
-         * than a valid local address will be chosen, and if the port of 0 than an
-         * available open port will be chosen.
+         * Bind and listen to given local IPAddress and port, if the address is
+         * empty than a valid local address will be chosen, and if the port of 0
+         * than an available open port will be chosen.
          *
          * @param host
          *      The IP address or host name.
@@ -175,12 +189,13 @@ namespace net {
         virtual void bind(const std::string& host, int port);
 
         /**
-         * Bind and listen to given local IPAddress and port, if the address is empty
-         * than a valid local address will be chosen, and if the port of 0 than an
-         * available open port will be chosen.
+         * Bind and listen to given local IPAddress and port, if the address is
+         * empty than a valid local address will be chosen, and if the port of 0
+         * than an available open port will be chosen.
          *
-         * If the backlog is greater than zero it will be used instead of the default
-         * value, otherwise the default value is used and no error is generated.
+         * If the backlog is greater than zero it will be used instead of the
+         * default value, otherwise the default value is used and no error is
+         * generated.
          *
          * @param host
          *      The IP address or host name.
@@ -195,24 +210,28 @@ namespace net {
         virtual void bind(const std::string& host, int port, int backlog);
 
         /**
-         * Listens for a connection request on the bound IPAddress and Port for this ServerSocket, the
-         * caller blocks until a connection is made.  If the SO_TIMEOUT option is set this method could
-         * throw a SocketTimeoutException if the operation times out.
+         * Listens for a connection request on the bound IPAddress and Port for
+         * this ServerSocket, the caller blocks until a connection is made.  If
+         * the SO_TIMEOUT option is set this method could throw a
+         * SocketTimeoutException if the operation times out.
          *
-         * @return a new Socket object pointer. Never returns NULL, the returned pointer is owned by
-         *         the caller and must be explicitly freed by them.
+         * @return a new Socket object pointer. Never returns NULL, the returned
+         * pointer is owned by the caller and must be explicitly freed by them.
          *
          * @throws IOException if an I/O error occurs while binding the socket.
-         * @throws SocketException if an error occurs while blocking on the accept call.
-         * @throws SocketTimeoutException if the SO_TIMEOUT option was used and the accept timed out.
+         * @throws SocketException if an error occurs while blocking on the
+         * accept call.
+         * @throws SocketTimeoutException if the SO_TIMEOUT option was used and
+         * the accept timed out.
          */
         virtual Socket* accept();
 
         /**
-         * Closes the server socket, causing any Threads blocked on an accept call to
-         * throw an Exception.
+         * Closes the server socket, causing any Threads blocked on an accept
+         * call to throw an Exception.
          *
-         * @throws IOException if an I/O error occurs while performing this operation.
+         * @throws IOException if an I/O error occurs while performing this
+         * operation.
          */
         virtual void close();
 
@@ -227,8 +246,9 @@ namespace net {
         virtual bool isBound() const;
 
         /**
-         * Gets the receive buffer size for this socket, SO_RCVBUF.  This is the buffer used
-         * by the underlying platform socket to buffer received data.
+         * Gets the receive buffer size for this socket, SO_RCVBUF.  This is the
+         * buffer used by the underlying platform socket to buffer received
+         * data.
          *
          * @return the receive buffer size in bytes.
          *
@@ -276,8 +296,8 @@ namespace net {
         virtual int getSoTimeout() const;
 
         /**
-         * Sets the timeout for socket operations, SO_TIMEOUT.  A value of zero indicates that timeout
-         * is infinite for operations on this socket.
+         * Sets the timeout for socket operations, SO_TIMEOUT.  A value of zero
+         * indicates that timeout is infinite for operations on this socket.
          *
          * @param timeout
          *      The timeout in milliseconds for socket operations.
@@ -288,9 +308,11 @@ namespace net {
         virtual void setSoTimeout(int timeout);
 
         /**
-         * Gets the port number on the Local machine that this ServerSocket is bound to.
+         * Gets the port number on the Local machine that this ServerSocket is
+         * bound to.
          *
-         * @return the port number of this machine that is bound, if not bound returns -1.
+         * @return the port number of this machine that is bound, if not bound
+         * returns -1.
          */
         virtual int getLocalPort() const;
 
@@ -300,30 +322,34 @@ namespace net {
         virtual std::string toString() const;
 
     public:
-
         /**
-         * Sets the instance of a SocketImplFactory that the ServerSocket class should use when new
-         * instances of this class are created.  This method is only allowed to be used once
-         * during the lifetime of the application.
+         * Sets the instance of a SocketImplFactory that the ServerSocket class
+         * should use when new instances of this class are created.  This method
+         * is only allowed to be used once during the lifetime of the
+         * application.
          *
          * @param factory
-         *      The instance of a SocketImplFactory to use when new SocketImpl objects are created.
+         *      The instance of a SocketImplFactory to use when new SocketImpl
+         * objects are created.
          *
-         * @throws IOException if an I/O error occurs while performing this operation.
-         * @throws SocketException if this method has already been called with a valid factory.
+         * @throws IOException if an I/O error occurs while performing this
+         * operation.
+         * @throws SocketException if this method has already been called with a
+         * valid factory.
          */
         static void setSocketImplFactory(SocketImplFactory* factory);
 
     protected:
-
         /**
-         * Virtual method that allows a ServerSocket subclass to override the accept call and
-         * provide its own SocketImpl for the socket.
+         * Virtual method that allows a ServerSocket subclass to override the
+         * accept call and provide its own SocketImpl for the socket.
          *
          * @param socket
-         *      The socket object whose SocketImpl should be used for the accept call.
+         *      The socket object whose SocketImpl should be used for the accept
+         * call.
          *
-         * @throws IOException if an I/O error occurs while performing this operation.
+         * @throws IOException if an I/O error occurs while performing this
+         * operation.
          */
         virtual void implAccept(Socket* socket);
 
@@ -335,19 +361,20 @@ namespace net {
         virtual int getDefaultBacklog();
 
     protected:
-
         // Check for already closed and throw an error if so.
         void checkClosed() const;
 
-        // Create but don't connect the underlying OS Socket instance, if not already created.
+        // Create but don't connect the underlying OS Socket instance, if not
+        // already created.
         void ensureCreated() const;
 
         // Binds and sets up the Listen for this Server Socket
-        void setupSocketImpl(int port, int backlog, const InetAddress* ifAddress);
-
+        void setupSocketImpl(int                port,
+                             int                backlog,
+                             const InetAddress* ifAddress);
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
-#endif // _DECAF_NET_SERVERSOCKETIMPL_H_
-
+#endif  // _DECAF_NET_SERVERSOCKETIMPL_H_

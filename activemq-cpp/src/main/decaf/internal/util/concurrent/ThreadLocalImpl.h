@@ -20,68 +20,75 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace internal {
-namespace util {
-namespace concurrent {
+namespace decaf
+{
+namespace internal
+{
+    namespace util
+    {
+        namespace concurrent
+        {
 
-    class DECAF_API ThreadLocalImpl {
-    private:
+            class DECAF_API ThreadLocalImpl
+            {
+            private:
+                int tlsKey;
 
-        int tlsKey;
+            private:
+                ThreadLocalImpl(const ThreadLocalImpl&);
+                ThreadLocalImpl& operator=(const ThreadLocalImpl&);
 
-    private:
+            public:
+                ThreadLocalImpl();
 
-        ThreadLocalImpl(const ThreadLocalImpl&);
-        ThreadLocalImpl& operator= (const ThreadLocalImpl&);
+                virtual ~ThreadLocalImpl();
 
-    public:
+                /**
+                 * Returns the current threads assigned value, but retains
+                 * ownership to this value unless the remove method is
+                 * subsequently called.
+                 *
+                 * @return the currently held value for this thread.
+                 */
+                void* getRawValue() const;
 
-        ThreadLocalImpl();
+                /**
+                 * Sets the raw void* value for the current thread.  If the
+                 * value is NULL and the old value is non-NULL then the library
+                 * will call the doDelete method to destroy the previous value.
+                 *
+                 * @param value
+                 *      Pointer to the value to be stored for the current thread
+                 * or NULL.
+                 */
+                void setRawValue(void* value);
 
-        virtual ~ThreadLocalImpl();
+                /**
+                 * Removes from all threads any allocated data stored for this
+                 * ThreadLocal instance.  Subclasses should call this method in
+                 * their destructor to ensure that all the values that are
+                 * stored in each thread can be deallocated using their custom
+                 * doDelete method.
+                 */
+                void removeAll();
 
-        /**
-         * Returns the current threads assigned value, but retains ownership
-         * to this value unless the remove method is subsequently called.
-         *
-         * @return the currently held value for this thread.
-         */
-        void* getRawValue() const;
+            public:
+                /**
+                 * Called to destroy the value held by the current thread or by
+                 * the library on shutdown if there are still ThreadLocalImpl
+                 * instances that have assigned TLS slots.  Its up to the
+                 * implementor if this interface to ensure that the value held
+                 * in the void* is cleaned up correctly.
+                 *
+                 * @param value
+                 *      The value to be destroyed for the current thread.
+                 */
+                virtual void doDelete(void* value) = 0;
+            };
 
-        /**
-         * Sets the raw void* value for the current thread.  If the value
-         * is NULL and the old value is non-NULL then the library will call
-         * the doDelete method to destroy the previous value.
-         *
-         * @param value
-         *      Pointer to the value to be stored for the current thread or NULL.
-         */
-        void setRawValue(void* value);
-
-        /**
-         * Removes from all threads any allocated data stored for this ThreadLocal
-         * instance.  Subclasses should call this method in their destructor to ensure
-         * that all the values that are stored in each thread can be deallocated using
-         * their custom doDelete method.
-         */
-        void removeAll();
-
-    public:
-
-        /**
-         * Called to destroy the value held by the current thread or by the
-         * library on shutdown if there are still ThreadLocalImpl instances that
-         * have assigned TLS slots.  Its up to the implementor if this interface
-         * to ensure that the value held in the void* is cleaned up correctly.
-         *
-         * @param value
-         *      The value to be destroyed for the current thread.
-         */
-        virtual void doDelete(void* value) = 0;
-
-    };
-
-}}}}
+        }  // namespace concurrent
+    }  // namespace util
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_UTIL_CONCURRENT_THREADLOCALIMPL_H_ */

@@ -17,13 +17,13 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/Set.h>
-#include <decaf/util/Iterator.h>
-#include <decaf/util/HashMap.h>
-#include <decaf/util/StlMap.h>
-#include <decaf/util/ArrayList.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/util/ArrayList.h>
+#include <decaf/util/HashMap.h>
+#include <decaf/util/Iterator.h>
+#include <decaf/util/Set.h>
+#include <decaf/util/StlMap.h>
 
 using namespace std;
 using namespace decaf;
@@ -31,51 +31,58 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class HashMapTest : public ::testing::Test {
+class HashMapTest : public ::testing::Test
+{
 public:
+    HashMapTest();
+    virtual ~HashMapTest();
 
-        HashMapTest();
-        virtual ~HashMapTest();
-
-        void SetUp() override;
-
-    };
+    void SetUp() override;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    const int MAP_SIZE = 1000;
+const int MAP_SIZE = 1000;
 
-    void populateMap(HashMap<int, std::string>& hashMap) {
-        for (int i = 0; i < MAP_SIZE; ++i) {
-            hashMap.put(i, Integer::toString(i));
-        }
-    }
-
-    HashMap<int, std::string> populateMapAndReturn() {
-        HashMap<int, std::string> hashMap;
-        for (int i = 0; i < MAP_SIZE; ++i) {
-            hashMap.put(i, Integer::toString(i));
-        }
-        return hashMap;
+void populateMap(HashMap<int, std::string>& hashMap)
+{
+    for (int i = 0; i < MAP_SIZE; ++i)
+    {
+        hashMap.put(i, Integer::toString(i));
     }
 }
 
+HashMap<int, std::string> populateMapAndReturn()
+{
+    HashMap<int, std::string> hashMap;
+    for (int i = 0; i < MAP_SIZE; ++i)
+    {
+        hashMap.put(i, Integer::toString(i));
+    }
+    return hashMap;
+}
+}  // namespace
+
 ////////////////////////////////////////////////////////////////////////////////
-HashMapTest::HashMapTest() {
+HashMapTest::HashMapTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-HashMapTest::~HashMapTest() {
+HashMapTest::~HashMapTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashMapTest::SetUp() {
+void HashMapTest::SetUp()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testConstructor) {
-
+TEST_F(HashMapTest, testConstructor)
+{
     HashMap<int, std::string> map;
     ASSERT_TRUE(map.isEmpty());
     ASSERT_EQ(0, map.size());
@@ -84,60 +91,73 @@ TEST_F(HashMapTest, testConstructor) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testConstructorI) {
-
+TEST_F(HashMapTest, testConstructorI)
+{
     HashMap<int, std::string> map(5);
 
     ASSERT_EQ(0, map.size()) << ("Created incorrect HashMap");
 
-    try {
+    try
+    {
         HashMap<int, std::string> map(-1);
-        FAIL() << ("Should have thrown IllegalArgumentException for negative arg.");
-    } catch (IllegalArgumentException& e) {
+        FAIL() << ("Should have thrown IllegalArgumentException for negative "
+                   "arg.");
+    }
+    catch (IllegalArgumentException& e)
+    {
     }
 
     HashMap<int, std::string> empty(0);
-    ASSERT_THROW(empty.get(1), NoSuchElementException) << ("Should have thrown NoSuchElementException");
+    ASSERT_THROW(empty.get(1), NoSuchElementException)
+        << ("Should have thrown NoSuchElementException");
     empty.put(1, "here");
     ASSERT_TRUE(empty.get(1) == std::string("here")) << ("cannot get element");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testConstructorIF) {
-
+TEST_F(HashMapTest, testConstructorIF)
+{
     HashMap<int, std::string> map(5, 0.5f);
 
     ASSERT_EQ(0, map.size()) << ("Created incorrect HashMap");
 
-    try {
+    try
+    {
         HashMap<int, std::string> map(0, 0);
-        FAIL() << ("Should have thrown IllegalArgumentException for negative arg.");
-    } catch (IllegalArgumentException& e) {
+        FAIL() << ("Should have thrown IllegalArgumentException for negative "
+                   "arg.");
+    }
+    catch (IllegalArgumentException& e)
+    {
     }
 
     HashMap<int, std::string> empty(0, 0.25f);
-    ASSERT_THROW(empty.get(1), NoSuchElementException) << ("Should have thrown NoSuchElementException");
+    ASSERT_THROW(empty.get(1), NoSuchElementException)
+        << ("Should have thrown NoSuchElementException");
     empty.put(1, "here");
     ASSERT_TRUE(empty.get(1) == std::string("here")) << ("cannot get element");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testConstructorMap) {
-
+TEST_F(HashMapTest, testConstructorMap)
+{
     HashMap<int, int> myMap;
-    for (int counter = 0; counter < 125; counter++) {
+    for (int counter = 0; counter < 125; counter++)
+    {
         myMap.put(counter, counter);
     }
 
     HashMap<int, int> hashMap(myMap);
-    for (int counter = 0; counter < 125; counter++) {
-        ASSERT_TRUE(myMap.get(counter) == hashMap.get(counter)) << ("Failed to construct correct HashMap");
+    for (int counter = 0; counter < 125; counter++)
+    {
+        ASSERT_TRUE(myMap.get(counter) == hashMap.get(counter))
+            << ("Failed to construct correct HashMap");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testCopyConstructor) {
-
+TEST_F(HashMapTest, testCopyConstructor)
+{
     HashMap<int, std::string> map1;
     HashMap<int, std::string> map2;
 
@@ -152,8 +172,8 @@ TEST_F(HashMapTest, testCopyConstructor) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testClear) {
-
+TEST_F(HashMapTest, testClear)
+{
     HashMap<int, std::string> hashMap;
     hashMap.put(1, "one");
     hashMap.put(3, "three");
@@ -161,25 +181,30 @@ TEST_F(HashMapTest, testClear) {
 
     hashMap.clear();
     ASSERT_EQ(0, hashMap.size()) << ("Clear failed to reset size");
-    for (int i = 0; i < 125; i++) {
-        ASSERT_THROW(hashMap.get(i), NoSuchElementException) << ("Failed to clear all elements");
+    for (int i = 0; i < 125; i++)
+    {
+        ASSERT_THROW(hashMap.get(i), NoSuchElementException)
+            << ("Failed to clear all elements");
     }
 
     // Check clear on a large loaded map of Integer keys
     HashMap<int, std::string> map;
-    for (int i = -32767; i < 32768; i++) {
+    for (int i = -32767; i < 32768; i++)
+    {
         map.put(i, "foobar");
     }
     map.clear();
     ASSERT_EQ(0, map.size()) << ("Failed to reset size on large integer map");
-    for (int i = -32767; i < 32768; i++) {
-        ASSERT_THROW(map.get(i), NoSuchElementException) << ("Failed to clear all elements");
+    for (int i = -32767; i < 32768; i++)
+    {
+        ASSERT_THROW(map.get(i), NoSuchElementException)
+            << ("Failed to clear all elements");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testContainsKey) {
-
+TEST_F(HashMapTest, testContainsKey)
+{
     HashMap<int, std::string> hashMap;
 
     hashMap.put(876, "test");
@@ -190,36 +215,44 @@ TEST_F(HashMapTest, testContainsKey) {
     HashMap<int, std::string> hashMap2;
     hashMap2.put(0, "test");
     ASSERT_TRUE(hashMap2.containsKey(0)) << ("Failed with key");
-    ASSERT_TRUE(!hashMap2.containsKey(1)) << ("Failed with missing key matching hash");
+    ASSERT_TRUE(!hashMap2.containsKey(1))
+        << ("Failed with missing key matching hash");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testContainsValue) {
-
+TEST_F(HashMapTest, testContainsValue)
+{
     HashMap<int, std::string> hashMap;
 
     hashMap.put(876, "test");
 
-    ASSERT_TRUE(hashMap.containsValue("test")) << ("Returned false for valid value");
-    ASSERT_TRUE(!hashMap.containsValue("")) << ("Returned true for invalid valie");
+    ASSERT_TRUE(hashMap.containsValue("test"))
+        << ("Returned false for valid value");
+    ASSERT_TRUE(!hashMap.containsValue(""))
+        << ("Returned true for invalid valie");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testEntrySet) {
-
+TEST_F(HashMapTest, testEntrySet)
+{
     HashMap<int, std::string> hashMap;
 
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 50; i++)
+    {
         hashMap.put(i, Integer::toString(i));
     }
 
-    Set<MapEntry<int, std::string> >& set = hashMap.entrySet();
-    Pointer< Iterator<MapEntry<int, std::string> > > iterator(set.iterator());
+    Set<MapEntry<int, std::string>>&              set = hashMap.entrySet();
+    Pointer<Iterator<MapEntry<int, std::string>>> iterator(set.iterator());
 
-    ASSERT_TRUE(hashMap.size() == set.size()) << ("Returned set of incorrect size");
-    while (iterator->hasNext()) {
+    ASSERT_TRUE(hashMap.size() == set.size())
+        << ("Returned set of incorrect size");
+    while (iterator->hasNext())
+    {
         MapEntry<int, std::string> entry = iterator->next();
-        ASSERT_TRUE(hashMap.containsKey(entry.getKey()) && hashMap.containsValue(entry.getValue())) << ("Returned incorrect entry set");
+        ASSERT_TRUE(hashMap.containsKey(entry.getKey()) &&
+                    hashMap.containsValue(entry.getValue()))
+            << ("Returned incorrect entry set");
     }
 
     iterator.reset(set.iterator());
@@ -228,18 +261,20 @@ TEST_F(HashMapTest, testEntrySet) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testGet) {
-
+TEST_F(HashMapTest, testGet)
+{
     HashMap<int, std::string> hashMap;
 
-    ASSERT_THROW(hashMap.get(1), NoSuchElementException) << ("Should have thrown NoSuchElementException");
+    ASSERT_THROW(hashMap.get(1), NoSuchElementException)
+        << ("Should have thrown NoSuchElementException");
     hashMap.put(22, "HELLO");
-    ASSERT_EQ(std::string("HELLO"), hashMap.get(22)) << ("Get returned incorrect value for existing key");
+    ASSERT_EQ(std::string("HELLO"), hashMap.get(22))
+        << ("Get returned incorrect value for existing key");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testIsEmpty) {
-
+TEST_F(HashMapTest, testIsEmpty)
+{
     HashMap<int, std::string> hashMap;
 
     ASSERT_TRUE(hashMap.isEmpty()) << ("Returned false for new map");
@@ -250,14 +285,17 @@ TEST_F(HashMapTest, testIsEmpty) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testKeySet) {
-
+TEST_F(HashMapTest, testKeySet)
+{
     HashMap<int, std::string> hashMap;
     populateMap(hashMap);
     Set<int>& set = hashMap.keySet();
-    ASSERT_TRUE(set.size() == hashMap.size()) << ("Returned set of incorrect size()");
-    for (int i = 0; i < MAP_SIZE; i++) {
-        ASSERT_TRUE(set.contains(i)) << ("Returned set does not contain all keys");
+    ASSERT_TRUE(set.size() == hashMap.size())
+        << ("Returned set of incorrect size()");
+    for (int i = 0; i < MAP_SIZE; i++)
+    {
+        ASSERT_TRUE(set.contains(i))
+            << ("Returned set does not contain all keys");
     }
 
     {
@@ -272,9 +310,9 @@ TEST_F(HashMapTest, testKeySet) {
         localMap.put(102, "102");
         localMap.put(203, "203");
 
-        Set<int>& intSet = localMap.keySet();
-        Pointer< Iterator<int> > it(intSet.iterator());
-        int remove1 = it->next();
+        Set<int>&              intSet = localMap.keySet();
+        Pointer<Iterator<int>> it(intSet.iterator());
+        int                    remove1 = it->next();
         it->hasNext();
         it->remove();
         int remove2 = it->next();
@@ -298,15 +336,18 @@ TEST_F(HashMapTest, testKeySet) {
         map2.put(1, "1");
         map2.put(4, "4");
 
-        Set<int>& intSet = map2.keySet();
-        Pointer< Iterator<int> > it2(intSet.iterator());
+        Set<int>&              intSet = map2.keySet();
+        Pointer<Iterator<int>> it2(intSet.iterator());
 
         int remove3 = it2->next();
         int next;
 
-        if (remove3 == 1) {
+        if (remove3 == 1)
+        {
             next = 4;
-        } else {
+        }
+        else
+        {
             next = 1;
         }
         it2->hasNext();
@@ -319,68 +360,78 @@ TEST_F(HashMapTest, testKeySet) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class MyKey {
-    private:
+class MyKey
+{
+private:
+    static int COUNTER;
 
-        static int COUNTER;
+    int id;
 
-        int id;
-
-    public:
-
-        MyKey() : id(++COUNTER) {
-        }
-
-        int hashCode() const {
-            return 0;
-        }
-
-        bool operator==(const MyKey& key) const {
-            return this->id == key.id;
-        }
-
-        friend std::ostream& operator<<(std::ostream& stream, const MyKey& key);
-    };
-
-    std::ostream& operator<<(std::ostream& stream, const MyKey& key) {
-        stream << "MyKey: " << key.id;
-        return stream;
+public:
+    MyKey()
+        : id(++COUNTER)
+    {
     }
 
-    int MyKey::COUNTER = 0;
+    int hashCode() const
+    {
+        return 0;
+    }
+
+    bool operator==(const MyKey& key) const
+    {
+        return this->id == key.id;
+    }
+
+    friend std::ostream& operator<<(std::ostream& stream, const MyKey& key);
+};
+
+std::ostream& operator<<(std::ostream& stream, const MyKey& key)
+{
+    stream << "MyKey: " << key.id;
+    return stream;
 }
+
+int MyKey::COUNTER = 0;
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace decaf {
-namespace util {
-    template<>
-    struct HashCode<MyKey> {
-
+namespace decaf
+{
+namespace util
+{
+    template <>
+    struct HashCode<MyKey>
+    {
         typedef MyKey argument_type;
-        typedef int result_type;
+        typedef int   result_type;
 
-        int operator()(const MyKey& arg) const {
+        int operator()(const MyKey& arg) const
+        {
             return arg.hashCode();
         }
     };
-}
-}
+}  // namespace util
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testPut) {
-
+TEST_F(HashMapTest, testPut)
+{
     {
         HashMap<std::string, std::string> hashMap(101);
         hashMap.put("KEY", "VALUE");
-        ASSERT_EQ(std::string("VALUE"), hashMap.get("KEY")) << ("Failed to install key/value pair");
+        ASSERT_EQ(std::string("VALUE"), hashMap.get("KEY"))
+            << ("Failed to install key/value pair");
     }
     {
         // Check my actual key instance is returned
         HashMap<int, std::string> map;
-        for (int i = -32767; i < 32768; i++) {
+        for (int i = -32767; i < 32768; i++)
+        {
             map.put(i, "foobar");
         }
         int myKey = 0;
@@ -388,13 +439,15 @@ TEST_F(HashMapTest, testPut) {
         map.put(myKey, "myValue");
         ASSERT_TRUE(map.containsKey(myKey));
         ASSERT_EQ(std::string("myValue"), map.get(myKey));
-        bool found = false;
-        Set<int>& intSet = map.keySet();
-        Pointer< Iterator<int> > itr(intSet.iterator());
-        while (itr->hasNext()) {
+        bool                   found  = false;
+        Set<int>&              intSet = map.keySet();
+        Pointer<Iterator<int>> itr(intSet.iterator());
+        while (itr->hasNext())
+        {
             int key = itr->next();
-            found = (key == myKey);
-            if (found) {
+            found   = (key == myKey);
+            if (found)
+            {
                 break;
             }
         }
@@ -406,10 +459,12 @@ TEST_F(HashMapTest, testPut) {
         ASSERT_TRUE(map.containsKey(myKey));
         ASSERT_EQ(std::string("myValue"), map.get(myKey));
         itr.reset(intSet.iterator());
-        while (itr->hasNext()) {
+        while (itr->hasNext())
+        {
             int key = itr->next();
-            found = (key == myKey);
-            if (found) {
+            found   = (key == myKey);
+            if (found)
+            {
                 break;
             }
         }
@@ -424,7 +479,8 @@ TEST_F(HashMapTest, testPut) {
         ASSERT_TRUE(!map.containsKey(aKey));
         map.put(aKey, "value");
         MyKey aKey2;
-        ASSERT_THROW(map.remove(aKey2), NoSuchElementException) << ("Should have thrown NoSuchElementException");
+        ASSERT_THROW(map.remove(aKey2), NoSuchElementException)
+            << ("Should have thrown NoSuchElementException");
         MyKey aKey3;
         map.put(aKey3, "foobar");
         ASSERT_EQ(std::string("foobar"), map.get(aKey3));
@@ -433,50 +489,64 @@ TEST_F(HashMapTest, testPut) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testPutAll) {
-
+TEST_F(HashMapTest, testPutAll)
+{
     HashMap<int, std::string> hashMap;
     populateMap(hashMap);
 
     HashMap<int, std::string> hashMap2;
     hashMap2.putAll(hashMap);
-    for (int i = 0; i < 1000; i++) {
-        ASSERT_TRUE(hashMap2.get(i) == Integer::toString(i)) << ("Failed to put all elements into new Map");
+    for (int i = 0; i < 1000; i++)
+    {
+        ASSERT_TRUE(hashMap2.get(i) == Integer::toString(i))
+            << ("Failed to put all elements into new Map");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testRemove) {
-
+TEST_F(HashMapTest, testRemove)
+{
     {
         HashMap<int, std::string> hashMap;
         populateMap(hashMap);
 
         int size = hashMap.size();
-        ASSERT_NO_THROW(hashMap.remove(9)) << ("Remove returned incorrect value");
-        ASSERT_THROW(hashMap.get(9), NoSuchElementException) << ("Should have thrown a NoSuchElementException on get of non-existent key.");
+        ASSERT_NO_THROW(hashMap.remove(9))
+            << ("Remove returned incorrect value");
+        ASSERT_THROW(hashMap.get(9), NoSuchElementException)
+            << ("Should have thrown a NoSuchElementException on get of "
+                "non-existent key.");
 
-        ASSERT_TRUE(hashMap.size() == (size - 1)) << ("Failed to decrement size");
-        ASSERT_THROW(hashMap.remove(9), NoSuchElementException) << ("Should have thrown a NoSuchElementException on remove of non-existent key.");
+        ASSERT_TRUE(hashMap.size() == (size - 1))
+            << ("Failed to decrement size");
+        ASSERT_THROW(hashMap.remove(9), NoSuchElementException)
+            << ("Should have thrown a NoSuchElementException on remove of "
+                "non-existent key.");
     }
     {
         HashMap<int, std::string> hashMap;
-        for (int i = 0; i < 8192; i++) {
+        for (int i = 0; i < 8192; i++)
+        {
             hashMap.put(i, "const");
         }
-        for (int i = 0; i < 8192; i++) {
+        for (int i = 0; i < 8192; i++)
+        {
             hashMap.put(i, Integer::toString(i));
         }
-        for (int i = 8191; i >= 0; i--) {
+        for (int i = 8191; i >= 0; i--)
+        {
             std::string iValue = Integer::toString(i);
-            ASSERT_TRUE(hashMap.containsValue(iValue)) << (std::string("Failed to replace value: ") + iValue);
+            ASSERT_TRUE(hashMap.containsValue(iValue))
+                << (std::string("Failed to replace value: ") + iValue);
             hashMap.remove(i);
-            ASSERT_TRUE(!hashMap.containsValue(iValue)) << (std::string("Failed to remove same value: ") + iValue);
+            ASSERT_TRUE(!hashMap.containsValue(iValue))
+                << (std::string("Failed to remove same value: ") + iValue);
         }
     }
 
     {
-        // Ensure keys with identical hashcode are stored separately and removed correctly.
+        // Ensure keys with identical hashcode are stored separately and removed
+        // correctly.
         HashMap<MyKey, std::string> map;
 
         // Put non-equal object with same hashcode
@@ -484,7 +554,8 @@ TEST_F(HashMapTest, testRemove) {
         ASSERT_TRUE(!map.containsKey(aKey));
         map.put(aKey, "value");
         MyKey aKey2;
-        ASSERT_THROW(map.remove(aKey2), NoSuchElementException) << ("Should have thrown NoSuchElementException");
+        ASSERT_THROW(map.remove(aKey2), NoSuchElementException)
+            << ("Should have thrown NoSuchElementException");
         MyKey aKey3;
         map.put(aKey3, "foobar");
         ASSERT_EQ(std::string("foobar"), map.get(aKey3));
@@ -497,7 +568,8 @@ TEST_F(HashMapTest, testRemove) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testRehash) {
+TEST_F(HashMapTest, testRehash)
+{
     // This map should rehash on adding the ninth element.
     HashMap<MyKey, int> hashMap(10, 0.5f);
 
@@ -505,14 +577,16 @@ TEST_F(HashMapTest, testRehash) {
     MyKey keyOrder[9];
 
     // Store eight elements
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++)
+    {
         hashMap.put(keyOrder[i], i);
     }
 
     // Check expected ordering (inverse of adding order)
-    Set<MyKey>& keySet = hashMap.keySet();
+    Set<MyKey>&        keySet       = hashMap.keySet();
     std::vector<MyKey> returnedKeys = keySet.toArray();
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++)
+    {
         ASSERT_EQ(keyOrder[i], returnedKeys[7 - i]);
     }
 
@@ -520,13 +594,15 @@ TEST_F(HashMapTest, testRehash) {
     hashMap.put(keyOrder[8], 8);
     // Check expected new ordering (adding order)
     returnedKeys = keySet.toArray();
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < 9; i++)
+    {
         ASSERT_EQ(keyOrder[i], returnedKeys[i]);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testSize) {
+TEST_F(HashMapTest, testSize)
+{
     HashMap<int, std::string> hashMap;
     populateMap(hashMap);
 
@@ -534,24 +610,28 @@ TEST_F(HashMapTest, testSize) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testValues) {
-
+TEST_F(HashMapTest, testValues)
+{
     HashMap<int, std::string> hashMap;
     populateMap(hashMap);
 
     Collection<std::string>& c = hashMap.values();
-    ASSERT_TRUE(c.size() == hashMap.size()) << ("Returned collection of incorrect size()");
-    for (int i = 0; i < MAP_SIZE; i++) {
-        ASSERT_TRUE(c.contains(Integer::toString(i))) << ("Returned collection does not contain all keys");
+    ASSERT_TRUE(c.size() == hashMap.size())
+        << ("Returned collection of incorrect size()");
+    for (int i = 0; i < MAP_SIZE; i++)
+    {
+        ASSERT_TRUE(c.contains(Integer::toString(i)))
+            << ("Returned collection does not contain all keys");
     }
 
     c.remove("10");
-    ASSERT_TRUE(!hashMap.containsKey(10)) << ("Removing from collection should alter Map");
+    ASSERT_TRUE(!hashMap.containsKey(10))
+        << ("Removing from collection should alter Map");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testToString) {
-
+TEST_F(HashMapTest, testToString)
+{
     HashMap<int, std::string> hashMap;
     populateMap(hashMap);
     std::string result = hashMap.toString();
@@ -559,92 +639,111 @@ TEST_F(HashMapTest, testToString) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testEntrySetIterator) {
-
+TEST_F(HashMapTest, testEntrySetIterator)
+{
     HashMap<int, std::string> map;
     populateMap(map);
 
-    int count = 0;
-    Pointer< Iterator<MapEntry<int, std::string> > > iterator(map.entrySet().iterator());
-    while (iterator->hasNext()) {
+    int                                           count = 0;
+    Pointer<Iterator<MapEntry<int, std::string>>> iterator(
+        map.entrySet().iterator());
+    while (iterator->hasNext())
+    {
         MapEntry<int, std::string> entry = iterator->next();
         ASSERT_EQ(count, entry.getKey());
         ASSERT_EQ(Integer::toString(count), entry.getValue());
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't cover the expected range");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.entrySet().iterator());
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 
     count = 0;
-    while (iterator->hasNext()) {
+    while (iterator->hasNext())
+    {
         iterator->next();
         iterator->remove();
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't remove the expected range");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testKeySetIterator) {
-
+TEST_F(HashMapTest, testKeySetIterator)
+{
     HashMap<int, std::string> map;
     populateMap(map);
 
-    int count = 0;
-    Pointer< Iterator<int> > iterator(map.keySet().iterator());
-    while (iterator->hasNext()) {
+    int                    count = 0;
+    Pointer<Iterator<int>> iterator(map.keySet().iterator());
+    while (iterator->hasNext())
+    {
         int key = iterator->next();
         ASSERT_EQ(count, key);
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't cover the expected range");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.keySet().iterator());
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 
     count = 0;
-    while (iterator->hasNext()) {
+    while (iterator->hasNext())
+    {
         iterator->next();
         iterator->remove();
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't remove the expected range");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashMapTest, testValuesIterator) {
-
+TEST_F(HashMapTest, testValuesIterator)
+{
     HashMap<int, std::string> map;
     populateMap(map);
 
-    int count = 0;
-    Pointer< Iterator<std::string> > iterator(map.values().iterator());
-    while (iterator->hasNext()) {
+    int                            count = 0;
+    Pointer<Iterator<std::string>> iterator(map.values().iterator());
+    while (iterator->hasNext())
+    {
         std::string value = iterator->next();
         ASSERT_EQ(Integer::toString(count), value);
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't cover the expected range");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.values().iterator());
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 
     count = 0;
-    while (iterator->hasNext()) {
+    while (iterator->hasNext())
+    {
         iterator->next();
         iterator->remove();
         count++;
     }
 
-    ASSERT_TRUE(count++ == MAP_SIZE) << ("Iterator didn't remove the expected range");
-    ASSERT_THROW(iterator->remove(), IllegalStateException) << ("Should throw an IllegalStateException");
+    ASSERT_TRUE(count++ == MAP_SIZE)
+        << ("Iterator didn't remove the expected range");
+    ASSERT_THROW(iterator->remove(), IllegalStateException)
+        << ("Should throw an IllegalStateException");
 }

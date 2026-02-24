@@ -22,30 +22,43 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-ClassCastException::ClassCastException() : Exception() {
+ClassCastException::ClassCastException()
+    : Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ClassCastException::~ClassCastException() throw () {
+ClassCastException::~ClassCastException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ClassCastException::ClassCastException(const Exception& ex) : Exception() {
-    *(Exception*) this = ex;
+ClassCastException::ClassCastException(const Exception& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ClassCastException::ClassCastException(const ClassCastException& ex) : Exception() {
-    *(Exception*) this = ex;
+ClassCastException::ClassCastException(const ClassCastException& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ClassCastException::ClassCastException(const std::exception* cause) : Exception(cause) {
+ClassCastException::ClassCastException(const std::exception* cause)
+    : Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ClassCastException::ClassCastException(const char* file, const int lineNumber, const char* msg, ...) : Exception() {
-
+ClassCastException::ClassCastException(const char* file,
+                                       const int   lineNumber,
+                                       const char* msg,
+                                       ...)
+    : Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +68,13 @@ ClassCastException::ClassCastException(const char* file, const int lineNumber, c
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ClassCastException::ClassCastException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : Exception(cause) {
-
+ClassCastException::ClassCastException(const char*           file,
+                                       const int             lineNumber,
+                                       const std::exception* cause,
+                                       const char*           msg,
+                                       ...)
+    : Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

@@ -17,18 +17,27 @@
 
 #include <activemq/test/SimpleRollbackTest.h>
 
-namespace activemq{
-namespace test{
-namespace stomp{
-    class StompSimpleRollbackTest : public SimpleRollbackTest {
-public:
-        StompSimpleRollbackTest();
-        virtual ~StompSimpleRollbackTest();
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getStompURL();
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace stomp
+    {
+        class StompSimpleRollbackTest : public SimpleRollbackTest
+        {
+        public:
+            StompSimpleRollbackTest();
+            virtual ~StompSimpleRollbackTest();
+
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getStompURL();
+            }
+        };
+    }  // namespace stomp
+}  // namespace test
+}  // namespace activemq
 
 using namespace std;
 using namespace cms;
@@ -37,13 +46,18 @@ using namespace activemq::test;
 using namespace activemq::test::stomp;
 
 ////////////////////////////////////////////////////////////////////////////////
-StompSimpleRollbackTest::StompSimpleRollbackTest() {
+StompSimpleRollbackTest::StompSimpleRollbackTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StompSimpleRollbackTest::~StompSimpleRollbackTest() {
+StompSimpleRollbackTest::~StompSimpleRollbackTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompSimpleRollbackTest, DISABLED_testRollbacks) { testRollbacks(); }
+TEST_F(StompSimpleRollbackTest, DISABLED_testRollbacks)
+{
+    testRollbacks();
+}

@@ -17,12 +17,14 @@
 #ifndef _ACTIVEMQ_CMSUTIL_CMSACCESSOR_H_
 #define _ACTIVEMQ_CMSUTIL_CMSACCESSOR_H_
 
-#include <cms/ConnectionFactory.h>
 #include <activemq/cmsutil/ResourceLifecycleManager.h>
 #include <activemq/util/Config.h>
+#include <cms/ConnectionFactory.h>
 
-namespace activemq {
-namespace cmsutil {
+namespace activemq
+{
+namespace cmsutil
+{
 
     /**
      * Base class for {@link activemq.cmsutil.CmsTemplate} and other
@@ -36,9 +38,9 @@ namespace cmsutil {
      * @see activemq.cmsutil.CmsDestinationAccessor
      * @see activemq.cmsutil.CmsTemplate
      */
-    class AMQCPP_API CmsAccessor {
+    class AMQCPP_API CmsAccessor
+    {
     private:
-
         ResourceLifecycleManager resourceLifecycleManager;
 
         cms::ConnectionFactory* connectionFactory;
@@ -46,28 +48,31 @@ namespace cmsutil {
         cms::Session::AcknowledgeMode sessionAcknowledgeMode;
 
     protected:
-
         CmsAccessor(const CmsAccessor&);
         CmsAccessor& operator=(const CmsAccessor&);
 
     public:
-
         CmsAccessor();
 
         virtual ~CmsAccessor();
 
-        virtual ResourceLifecycleManager* getResourceLifecycleManager() {
+        virtual ResourceLifecycleManager* getResourceLifecycleManager()
+        {
             return &resourceLifecycleManager;
         }
 
-        virtual const ResourceLifecycleManager* getResourceLifecycleManager() const {
+        virtual const ResourceLifecycleManager* getResourceLifecycleManager()
+            const
+        {
             return &resourceLifecycleManager;
         }
 
         /**
          * Set the ConnectionFactory to use for obtaining CMS Connections.
          */
-        virtual void setConnectionFactory(cms::ConnectionFactory* connectionFactory) {
+        virtual void setConnectionFactory(
+            cms::ConnectionFactory* connectionFactory)
+        {
             this->connectionFactory = connectionFactory;
         }
 
@@ -75,7 +80,8 @@ namespace cmsutil {
          * Return the ConnectionFactory that this accessor uses for
          * obtaining CMS Connections.
          */
-        virtual const cms::ConnectionFactory* getConnectionFactory() const {
+        virtual const cms::ConnectionFactory* getConnectionFactory() const
+        {
             return this->connectionFactory;
         }
 
@@ -83,7 +89,8 @@ namespace cmsutil {
          * Return the ConnectionFactory that this accessor uses for
          * obtaining CMS Connections.
          */
-        virtual cms::ConnectionFactory* getConnectionFactory() {
+        virtual cms::ConnectionFactory* getConnectionFactory()
+        {
             return this->connectionFactory;
         }
 
@@ -95,7 +102,9 @@ namespace cmsutil {
          * @param sessionAcknowledgeMode
          *      The acknowledgment mode to assign to the Session.
          */
-        virtual void setSessionAcknowledgeMode(cms::Session::AcknowledgeMode sessionAcknowledgeMode) {
+        virtual void setSessionAcknowledgeMode(
+            cms::Session::AcknowledgeMode sessionAcknowledgeMode)
+        {
             this->sessionAcknowledgeMode = sessionAcknowledgeMode;
         }
 
@@ -104,18 +113,20 @@ namespace cmsutil {
          *
          * @return the acknowledgment mode applied by this accessor
          */
-        virtual cms::Session::AcknowledgeMode getSessionAcknowledgeMode() const {
+        virtual cms::Session::AcknowledgeMode getSessionAcknowledgeMode() const
+        {
             return this->sessionAcknowledgeMode;
         }
 
     protected:
-
         /**
-         * Initializes this object and prepares it for use.  This should be called
-         * before any other methods are called.  This version does nothing.
+         * Initializes this object and prepares it for use.  This should be
+         * called before any other methods are called.  This version does
+         * nothing.
          *
          * @throws CMSException if an error occurs during initialization.
-         * @throws IllegalStateException if this object has already been initialized.
+         * @throws IllegalStateException if this object has already been
+         * initialized.
          */
         virtual void init();
 
@@ -123,9 +134,11 @@ namespace cmsutil {
          * Shuts down this object and destroys any allocated resources.
          *
          * @throws CMSException if an error occurs during destruction.
-         * @throws IllegalStateException if this object has already been destroyed.
+         * @throws IllegalStateException if this object has already been
+         * destroyed.
          */
-        virtual void destroy() {
+        virtual void destroy()
+        {
             resourceLifecycleManager.destroy();
         }
 
@@ -135,7 +148,8 @@ namespace cmsutil {
          * @return the new CMS Connection
          *
          * @throws CMSException if thrown by CMS API methods
-         * @throws IllegalStateException if this object has not been initialized.
+         * @throws IllegalStateException if this object has not been
+         * initialized.
          */
         virtual cms::Connection* createConnection();
 
@@ -148,19 +162,21 @@ namespace cmsutil {
          * @return the new CMS Session
          *
          * @throws CMSException if thrown by CMS API methods
-         * @throws IllegalStateException if this object has not been initialized.
+         * @throws IllegalStateException if this object has not been
+         * initialized.
          */
         virtual cms::Session* createSession(cms::Connection* con);
 
         /**
          * Verifies that the connection factory is valid.
          *
-         * @throws IllegalStateException if this object has not been initialized.
+         * @throws IllegalStateException if this object has not been
+         * initialized.
          */
         virtual void checkConnectionFactory();
-
     };
 
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CMSUTIL_CMSACCESSOR_H_ */

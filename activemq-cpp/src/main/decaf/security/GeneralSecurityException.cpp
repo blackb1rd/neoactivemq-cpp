@@ -21,22 +21,34 @@ using namespace decaf;
 using namespace decaf::security;
 
 ////////////////////////////////////////////////////////////////////////////////
-GeneralSecurityException::GeneralSecurityException() {}
+GeneralSecurityException::GeneralSecurityException()
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-GeneralSecurityException::GeneralSecurityException(const decaf::lang::Exception& ex) : decaf::lang::Exception() {
+GeneralSecurityException::GeneralSecurityException(
+    const decaf::lang::Exception& ex)
+    : decaf::lang::Exception()
+{
     *(decaf::lang::Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-GeneralSecurityException::GeneralSecurityException(const GeneralSecurityException& ex) : decaf::lang::Exception() {
+GeneralSecurityException::GeneralSecurityException(
+    const GeneralSecurityException& ex)
+    : decaf::lang::Exception()
+{
     *(decaf::lang::Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-GeneralSecurityException::GeneralSecurityException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) :
-    decaf::lang::Exception(cause) {
-
+GeneralSecurityException::GeneralSecurityException(const char* file,
+                                                   const int   lineNumber,
+                                                   const std::exception* cause,
+                                                   const char*           msg,
+                                                   ...)
+    : decaf::lang::Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -46,14 +58,18 @@ GeneralSecurityException::GeneralSecurityException(const char* file, const int l
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-GeneralSecurityException::GeneralSecurityException( const std::exception* cause ) :
-    decaf::lang::Exception(cause) {
+GeneralSecurityException::GeneralSecurityException(const std::exception* cause)
+    : decaf::lang::Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-GeneralSecurityException::GeneralSecurityException(const char* file, const int lineNumber, const char* msg, ...) :
-    decaf::lang::Exception() {
-
+GeneralSecurityException::GeneralSecurityException(const char* file,
+                                                   const int   lineNumber,
+                                                   const char* msg,
+                                                   ...)
+    : decaf::lang::Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -63,5 +79,6 @@ GeneralSecurityException::GeneralSecurityException(const char* file, const int l
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-GeneralSecurityException::~GeneralSecurityException() throw() {
+GeneralSecurityException::~GeneralSecurityException() throw()
+{
 }

@@ -21,14 +21,12 @@ using namespace cms;
 using namespace activemq::cmsutil;
 
 ////////////////////////////////////////////////////////////////////////////////
-CachedConsumer::CachedConsumer(cms::MessageConsumer* consumer) : consumer(consumer) {
-
+CachedConsumer::CachedConsumer(cms::MessageConsumer* consumer)
+    : consumer(consumer)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CachedConsumer::~CachedConsumer() {
-
+CachedConsumer::~CachedConsumer()
+{
 }
-
-
-

@@ -22,8 +22,10 @@
 
 #include <string>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
     class URLStreamHandler;
 
@@ -33,9 +35,9 @@ namespace net {
      *
      * @since 1.0
      */
-    class URLStreamHandlerFactory {
+    class URLStreamHandlerFactory
+    {
     public:
-
         virtual ~URLStreamHandlerFactory();
 
         /**
@@ -47,10 +49,11 @@ namespace net {
          *
          * @return pointer to the created handler.
          */
-        virtual URLStreamHandler* createURLStreamHandler(const std::string& protocol) = 0;
-
+        virtual URLStreamHandler* createURLStreamHandler(
+            const std::string& protocol) = 0;
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /* _DECAF_NET_URLSTREAMHANDLERFACTORY_H_ */

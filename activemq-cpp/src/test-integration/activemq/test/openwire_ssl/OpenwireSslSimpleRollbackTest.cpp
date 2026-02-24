@@ -15,26 +15,34 @@
  * limitations under the License.
  */
 
+#include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/test/SimpleRollbackTest.h>
 #include <activemq/util/CMSListener.h>
 #include <activemq/util/IntegrationCommon.h>
-#include <activemq/exceptions/ActiveMQException.h>
 
 #include <decaf/lang/Thread.h>
 #include <decaf/util/UUID.h>
 
 #include <sstream>
 
-namespace activemq{
-namespace test{
-namespace openwire_ssl {
-    class OpenwireSslSimpleRollbackTest : public SimpleRollbackTest {
-public:
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL();
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace openwire_ssl
+    {
+        class OpenwireSslSimpleRollbackTest : public SimpleRollbackTest
+        {
+        public:
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getSslOpenwireURL();
+            }
+        };
+    }  // namespace openwire_ssl
+}  // namespace test
+}  // namespace activemq
 
 using namespace std;
 using namespace cms;
@@ -47,10 +55,10 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslSimpleRollbackTest, testRollbacks) {
-
-    try {
-
+TEST_F(OpenwireSslSimpleRollbackTest, testRollbacks)
+{
+    try
+    {
         // Create CMS Object for Comms
         cms::Session* session(cmsProvider->getSession());
 
@@ -61,9 +69,11 @@ TEST_F(OpenwireSslSimpleRollbackTest, testRollbacks) {
         cms::MessageProducer* producer = cmsProvider->getProducer();
         producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
-        std::unique_ptr<cms::TextMessage> txtMessage(session->createTextMessage());
+        std::unique_ptr<cms::TextMessage> txtMessage(
+            session->createTextMessage());
 
-        for (unsigned int i = 0; i < IntegrationCommon::defaultMsgCount; ++i) {
+        for (unsigned int i = 0; i < IntegrationCommon::defaultMsgCount; ++i)
+        {
             ostringstream lcStream;
             lcStream << "SimpleTest - Message #" << i << ends;
             txtMessage->setText(lcStream.str());
@@ -81,7 +91,8 @@ TEST_F(OpenwireSslSimpleRollbackTest, testRollbacks) {
         session->commit();
         Thread::sleep(50);
 
-        for (unsigned int i = 0; i < 5; ++i) {
+        for (unsigned int i = 0; i < 5; ++i)
+        {
             ostringstream lcStream;
             lcStream << "SimpleTest - Message #" << i << ends;
             txtMessage->setText(lcStream.str());
@@ -110,8 +121,9 @@ TEST_F(OpenwireSslSimpleRollbackTest, testRollbacks) {
         listener.asyncWaitForMessages(1);
         ASSERT_TRUE(listener.getNumReceived() == 1);
         session->commit();
-
-    } catch (std::exception& ex) {
+    }
+    catch (std::exception& ex)
+    {
         std::cout << ex.what() << std::endl;
         throw ex;
     }

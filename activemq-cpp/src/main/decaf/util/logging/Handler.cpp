@@ -17,9 +17,9 @@
 
 #include "Handler.h"
 
-#include <decaf/util/logging/Level.h>
 #include <decaf/util/logging/ErrorManager.h>
 #include <decaf/util/logging/Filter.h>
+#include <decaf/util/logging/Level.h>
 
 using namespace std;
 using namespace decaf;
@@ -28,53 +28,71 @@ using namespace decaf::util;
 using namespace decaf::util::logging;
 
 ////////////////////////////////////////////////////////////////////////////////
-Handler::Handler() : formatter(NULL), filter(NULL), errorManager(new ErrorManager()),
-                     level(Level::ALL), prefix("Handler") {
+Handler::Handler()
+    : formatter(NULL),
+      filter(NULL),
+      errorManager(new ErrorManager()),
+      level(Level::ALL),
+      prefix("Handler")
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Handler::~Handler() {
+Handler::~Handler()
+{
     delete errorManager;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Handler::setFormatter( Formatter* formatter ) {
-
-    if( formatter == NULL ) {
+void Handler::setFormatter(Formatter* formatter)
+{
+    if (formatter == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__, "The Formatter cannot be set to NULL." );
+            __FILE__,
+            __LINE__,
+            "The Formatter cannot be set to NULL.");
     }
 
     this->formatter = formatter;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Handler::setErrorManager( ErrorManager* errorManager ) {
-
-    if( errorManager == NULL ) {
+void Handler::setErrorManager(ErrorManager* errorManager)
+{
+    if (errorManager == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__, "Error Manager cannot be set to NULL." );
+            __FILE__,
+            __LINE__,
+            "Error Manager cannot be set to NULL.");
     }
 
     this->errorManager = errorManager;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Handler::isLoggable( const LogRecord& record ) const {
-
-    if( this->level.intValue() == Level::OFF.intValue() ) {
+bool Handler::isLoggable(const LogRecord& record) const
+{
+    if (this->level.intValue() == Level::OFF.intValue())
+    {
         return false;
-    } else if( record.getLevel().intValue() >= this->level.intValue()) {
-        return NULL == this->filter || this->filter->isLoggable( record );
+    }
+    else if (record.getLevel().intValue() >= this->level.intValue())
+    {
+        return NULL == this->filter || this->filter->isLoggable(record);
     }
 
     return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Handler::reportError( const std::string& message, decaf::lang::Exception* ex, int code ) {
-
-    if( this->errorManager != NULL ) {
-        this->errorManager->error( message, ex, code );
+void Handler::reportError(const std::string&      message,
+                          decaf::lang::Exception* ex,
+                          int                     code)
+{
+    if (this->errorManager != NULL)
+    {
+        this->errorManager->error(message, ex, code);
     }
 }

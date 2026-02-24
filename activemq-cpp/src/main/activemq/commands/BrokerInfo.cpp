@@ -38,19 +38,31 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-BrokerInfo::BrokerInfo() :
-    BaseCommand(), brokerId(NULL), brokerURL(""), peerBrokerInfos(), brokerName(""), slaveBroker(false), masterBroker(false), 
-      faultTolerantConfiguration(false), duplexConnection(false), networkConnection(false), connectionId(0), brokerUploadUrl(""), 
-      networkProperties("") {
-
+BrokerInfo::BrokerInfo()
+    : BaseCommand(),
+      brokerId(NULL),
+      brokerURL(""),
+      peerBrokerInfos(),
+      brokerName(""),
+      slaveBroker(false),
+      masterBroker(false),
+      faultTolerantConfiguration(false),
+      duplexConnection(false),
+      networkConnection(false),
+      connectionId(0),
+      brokerUploadUrl(""),
+      networkProperties("")
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BrokerInfo::~BrokerInfo() {
+BrokerInfo::~BrokerInfo()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BrokerInfo* BrokerInfo::cloneDataStructure() const {
+BrokerInfo* BrokerInfo::cloneDataStructure() const
+{
     std::unique_ptr<BrokerInfo> brokerInfo(new BrokerInfo());
 
     // Copy the data from the base class or classes
@@ -60,18 +72,21 @@ BrokerInfo* BrokerInfo::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfo::copyDataStructure(const DataStructure* src) {
-
+void BrokerInfo::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const BrokerInfo* srcPtr = dynamic_cast<const BrokerInfo*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "BrokerInfo::copyDataStructure - src is NULL or invalid");
     }
 
@@ -93,13 +108,14 @@ void BrokerInfo::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char BrokerInfo::getDataStructureType() const {
+unsigned char BrokerInfo::getDataStructureType() const
+{
     return BrokerInfo::ID_BROKERINFO;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string BrokerInfo::toString() const {
-
+std::string BrokerInfo::toString() const
+{
     ostringstream stream;
 
     stream << "BrokerInfo { "
@@ -107,26 +123,40 @@ std::string BrokerInfo::toString() const {
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "BrokerId = ";
-    if (this->getBrokerId() != NULL) {
+    if (this->getBrokerId() != NULL)
+    {
         stream << this->getBrokerId()->toString();
-    } else {
+    }
+    else
+    {
         stream << "NULL";
     }
     stream << ", ";
     stream << "BrokerURL = " << this->getBrokerURL();
     stream << ", ";
     stream << "PeerBrokerInfos = ";
-    if (this->getPeerBrokerInfos().size() > 0) {
+    if (this->getPeerBrokerInfos().size() > 0)
+    {
         stream << "[";
-        for (size_t ipeerBrokerInfos = 0; ipeerBrokerInfos < this->getPeerBrokerInfos().size(); ++ipeerBrokerInfos) {
-            if (this->getPeerBrokerInfos()[ipeerBrokerInfos] != NULL) {
-                stream << this->getPeerBrokerInfos()[ipeerBrokerInfos]->toString() << ", ";
-            } else {
+        for (size_t ipeerBrokerInfos = 0;
+             ipeerBrokerInfos < this->getPeerBrokerInfos().size();
+             ++ipeerBrokerInfos)
+        {
+            if (this->getPeerBrokerInfos()[ipeerBrokerInfos] != NULL)
+            {
+                stream
+                    << this->getPeerBrokerInfos()[ipeerBrokerInfos]->toString()
+                    << ", ";
+            }
+            else
+            {
                 stream << "NULL" << ", ";
             }
         }
         stream << "]";
-    } else {
+    }
+    else
+    {
         stream << "NULL";
     }
     stream << ", ";
@@ -136,7 +166,8 @@ std::string BrokerInfo::toString() const {
     stream << ", ";
     stream << "MasterBroker = " << this->isMasterBroker();
     stream << ", ";
-    stream << "FaultTolerantConfiguration = " << this->isFaultTolerantConfiguration();
+    stream << "FaultTolerantConfiguration = "
+           << this->isFaultTolerantConfiguration();
     stream << ", ";
     stream << "DuplexConnection = " << this->isDuplexConnection();
     stream << ", ";
@@ -153,221 +184,281 @@ std::string BrokerInfo::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool BrokerInfo::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool BrokerInfo::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const BrokerInfo* valuePtr = dynamic_cast<const BrokerInfo*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getBrokerId() != NULL) {
-        if (!this->getBrokerId()->equals(valuePtr->getBrokerId().get())) {
+    if (this->getBrokerId() != NULL)
+    {
+        if (!this->getBrokerId()->equals(valuePtr->getBrokerId().get()))
+        {
             return false;
         }
-    } else if (valuePtr->getBrokerId() != NULL) {
+    }
+    else if (valuePtr->getBrokerId() != NULL)
+    {
         return false;
     }
-    if (this->getBrokerURL() != valuePtr->getBrokerURL()) {
+    if (this->getBrokerURL() != valuePtr->getBrokerURL())
+    {
         return false;
     }
-    for (size_t ipeerBrokerInfos = 0; ipeerBrokerInfos < this->getPeerBrokerInfos().size(); ++ipeerBrokerInfos) {
-        if (this->getPeerBrokerInfos()[ipeerBrokerInfos] != NULL ) {
-            if (!this->getPeerBrokerInfos()[ipeerBrokerInfos]->equals(valuePtr->getPeerBrokerInfos()[ipeerBrokerInfos].get())) {
+    for (size_t ipeerBrokerInfos = 0;
+         ipeerBrokerInfos < this->getPeerBrokerInfos().size();
+         ++ipeerBrokerInfos)
+    {
+        if (this->getPeerBrokerInfos()[ipeerBrokerInfos] != NULL)
+        {
+            if (!this->getPeerBrokerInfos()[ipeerBrokerInfos]->equals(
+                    valuePtr->getPeerBrokerInfos()[ipeerBrokerInfos].get()))
+            {
                 return false;
             }
-        } else if (valuePtr->getPeerBrokerInfos()[ipeerBrokerInfos] != NULL) {
+        }
+        else if (valuePtr->getPeerBrokerInfos()[ipeerBrokerInfos] != NULL)
+        {
             return false;
         }
     }
-    if (this->getBrokerName() != valuePtr->getBrokerName()) {
+    if (this->getBrokerName() != valuePtr->getBrokerName())
+    {
         return false;
     }
-    if (this->isSlaveBroker() != valuePtr->isSlaveBroker()) {
+    if (this->isSlaveBroker() != valuePtr->isSlaveBroker())
+    {
         return false;
     }
-    if (this->isMasterBroker() != valuePtr->isMasterBroker()) {
+    if (this->isMasterBroker() != valuePtr->isMasterBroker())
+    {
         return false;
     }
-    if (this->isFaultTolerantConfiguration() != valuePtr->isFaultTolerantConfiguration()) {
+    if (this->isFaultTolerantConfiguration() !=
+        valuePtr->isFaultTolerantConfiguration())
+    {
         return false;
     }
-    if (this->isDuplexConnection() != valuePtr->isDuplexConnection()) {
+    if (this->isDuplexConnection() != valuePtr->isDuplexConnection())
+    {
         return false;
     }
-    if (this->isNetworkConnection() != valuePtr->isNetworkConnection()) {
+    if (this->isNetworkConnection() != valuePtr->isNetworkConnection())
+    {
         return false;
     }
-    if (this->getConnectionId() != valuePtr->getConnectionId()) {
+    if (this->getConnectionId() != valuePtr->getConnectionId())
+    {
         return false;
     }
-    if (this->getBrokerUploadUrl() != valuePtr->getBrokerUploadUrl()) {
+    if (this->getBrokerUploadUrl() != valuePtr->getBrokerUploadUrl())
+    {
         return false;
     }
-    if (this->getNetworkProperties() != valuePtr->getNetworkProperties()) {
+    if (this->getNetworkProperties() != valuePtr->getNetworkProperties())
+    {
         return false;
     }
-    if (!BaseCommand::equals(value)) {
+    if (!BaseCommand::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<BrokerId>& BrokerInfo::getBrokerId() const {
+const decaf::lang::Pointer<BrokerId>& BrokerInfo::getBrokerId() const
+{
     return brokerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<BrokerId>& BrokerInfo::getBrokerId() {
+decaf::lang::Pointer<BrokerId>& BrokerInfo::getBrokerId()
+{
     return brokerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfo::setBrokerId(const decaf::lang::Pointer<BrokerId>& brokerId) {
+void BrokerInfo::setBrokerId(const decaf::lang::Pointer<BrokerId>& brokerId)
+{
     this->brokerId = brokerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::string& BrokerInfo::getBrokerURL() const {
+const std::string& BrokerInfo::getBrokerURL() const
+{
     return brokerURL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string& BrokerInfo::getBrokerURL() {
+std::string& BrokerInfo::getBrokerURL()
+{
     return brokerURL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfo::setBrokerURL(const std::string& brokerURL) {
+void BrokerInfo::setBrokerURL(const std::string& brokerURL)
+{
     this->brokerURL = brokerURL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector< decaf::lang::Pointer<BrokerInfo> >& BrokerInfo::getPeerBrokerInfos() const {
+const std::vector<decaf::lang::Pointer<BrokerInfo>>&
+BrokerInfo::getPeerBrokerInfos() const
+{
     return peerBrokerInfos;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector< decaf::lang::Pointer<BrokerInfo> >& BrokerInfo::getPeerBrokerInfos() {
+std::vector<decaf::lang::Pointer<BrokerInfo>>& BrokerInfo::getPeerBrokerInfos()
+{
     return peerBrokerInfos;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfo::setPeerBrokerInfos(const std::vector< decaf::lang::Pointer<BrokerInfo> >& peerBrokerInfos) {
+void BrokerInfo::setPeerBrokerInfos(
+    const std::vector<decaf::lang::Pointer<BrokerInfo>>& peerBrokerInfos)
+{
     this->peerBrokerInfos = peerBrokerInfos;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::string& BrokerInfo::getBrokerName() const {
+const std::string& BrokerInfo::getBrokerName() const
+{
     return brokerName;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string& BrokerInfo::getBrokerName() {
+std::string& BrokerInfo::getBrokerName()
+{
     return brokerName;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfo::setBrokerName(const std::string& brokerName) {
+void BrokerInfo::setBrokerName(const std::string& brokerName)
+{
     this->brokerName = brokerName;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool BrokerInfo::isSlaveBroker() const {
+bool BrokerInfo::isSlaveBroker() const
+{
     return slaveBroker;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfo::setSlaveBroker(bool slaveBroker) {
+void BrokerInfo::setSlaveBroker(bool slaveBroker)
+{
     this->slaveBroker = slaveBroker;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool BrokerInfo::isMasterBroker() const {
+bool BrokerInfo::isMasterBroker() const
+{
     return masterBroker;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfo::setMasterBroker(bool masterBroker) {
+void BrokerInfo::setMasterBroker(bool masterBroker)
+{
     this->masterBroker = masterBroker;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool BrokerInfo::isFaultTolerantConfiguration() const {
+bool BrokerInfo::isFaultTolerantConfiguration() const
+{
     return faultTolerantConfiguration;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfo::setFaultTolerantConfiguration(bool faultTolerantConfiguration) {
+void BrokerInfo::setFaultTolerantConfiguration(bool faultTolerantConfiguration)
+{
     this->faultTolerantConfiguration = faultTolerantConfiguration;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool BrokerInfo::isDuplexConnection() const {
+bool BrokerInfo::isDuplexConnection() const
+{
     return duplexConnection;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfo::setDuplexConnection(bool duplexConnection) {
+void BrokerInfo::setDuplexConnection(bool duplexConnection)
+{
     this->duplexConnection = duplexConnection;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool BrokerInfo::isNetworkConnection() const {
+bool BrokerInfo::isNetworkConnection() const
+{
     return networkConnection;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfo::setNetworkConnection(bool networkConnection) {
+void BrokerInfo::setNetworkConnection(bool networkConnection)
+{
     this->networkConnection = networkConnection;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long BrokerInfo::getConnectionId() const {
+long long BrokerInfo::getConnectionId() const
+{
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfo::setConnectionId(long long connectionId) {
+void BrokerInfo::setConnectionId(long long connectionId)
+{
     this->connectionId = connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::string& BrokerInfo::getBrokerUploadUrl() const {
+const std::string& BrokerInfo::getBrokerUploadUrl() const
+{
     return brokerUploadUrl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string& BrokerInfo::getBrokerUploadUrl() {
+std::string& BrokerInfo::getBrokerUploadUrl()
+{
     return brokerUploadUrl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfo::setBrokerUploadUrl(const std::string& brokerUploadUrl) {
+void BrokerInfo::setBrokerUploadUrl(const std::string& brokerUploadUrl)
+{
     this->brokerUploadUrl = brokerUploadUrl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::string& BrokerInfo::getNetworkProperties() const {
+const std::string& BrokerInfo::getNetworkProperties() const
+{
     return networkProperties;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string& BrokerInfo::getNetworkProperties() {
+std::string& BrokerInfo::getNetworkProperties()
+{
     return networkProperties;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfo::setNetworkProperties(const std::string& networkProperties) {
+void BrokerInfo::setNetworkProperties(const std::string& networkProperties)
+{
     this->networkProperties = networkProperties;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> BrokerInfo::visit(activemq::state::CommandVisitor* visitor) {
+decaf::lang::Pointer<commands::Command> BrokerInfo::visit(
+    activemq::state::CommandVisitor* visitor)
+{
     return visitor->processBrokerInfo(this);
 }

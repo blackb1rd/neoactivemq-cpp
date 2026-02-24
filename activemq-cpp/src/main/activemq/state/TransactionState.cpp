@@ -29,22 +29,31 @@ using namespace decaf::util;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-TransactionState::TransactionState(Pointer<TransactionId> id) :
-    commands(), id(id), disposed(false), prepared(false), preparedResult(0), producers() {
+TransactionState::TransactionState(Pointer<TransactionId> id)
+    : commands(),
+      id(id),
+      disposed(false),
+      prepared(false),
+      preparedResult(0),
+      producers()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TransactionState::~TransactionState() {
-    try {
+TransactionState::~TransactionState()
+{
+    try
+    {
         clear();
     }
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string TransactionState::toString() const {
-
-    if (this->id != NULL) {
+std::string TransactionState::toString() const
+{
+    if (this->id != NULL)
+    {
         return this->id->toString();
     }
 
@@ -52,34 +61,43 @@ std::string TransactionState::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransactionState::shutdown() {
+void TransactionState::shutdown()
+{
     this->disposed.set(true);
     this->clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransactionState::clear() {
+void TransactionState::clear()
+{
     this->commands.clear();
     this->producers.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransactionState::addCommand(Pointer<Command> operation) {
+void TransactionState::addCommand(Pointer<Command> operation)
+{
     checkShutdown();
     commands.add(operation);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransactionState::checkShutdown() const {
-    if (this->disposed.get()) {
+void TransactionState::checkShutdown() const
+{
+    if (this->disposed.get())
+    {
         throw decaf::lang::exceptions::IllegalStateException(
-            __FILE__, __LINE__, "Transaction already Disposed");
+            __FILE__,
+            __LINE__,
+            "Transaction already Disposed");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransactionState::addProducerState(Pointer<ProducerState> producerState) {
-    if (producerState != NULL) {
+void TransactionState::addProducerState(Pointer<ProducerState> producerState)
+{
+    if (producerState != NULL)
+    {
         // Ensure the producer doesn't hold a link to this TX state to avoid a
         // circular reference that could lead to memory leaks.
         producerState->getTransactionState().reset(NULL);
@@ -88,6 +106,8 @@ void TransactionState::addProducerState(Pointer<ProducerState> producerState) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::util::Collection<Pointer<ProducerState> >& TransactionState::getProducerStates() {
+const decaf::util::Collection<Pointer<ProducerState>>&
+TransactionState::getProducerStates()
+{
     return this->producers.values();
 }

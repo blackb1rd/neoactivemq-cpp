@@ -18,21 +18,24 @@
 #ifndef _ACTIVEMQ_THREADS_TASKRUNNER_H_
 #define _ACTIVEMQ_THREADS_TASKRUNNER_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/threads/Task.h>
+#include <activemq/util/Config.h>
 
-namespace activemq {
-namespace threads {
+namespace activemq
+{
+namespace threads
+{
 
-    class AMQCPP_API TaskRunner {
+    class AMQCPP_API TaskRunner
+    {
     public:
-
         virtual ~TaskRunner();
 
         /**
-         * Starts the task runner.  Prior to call this method tasks can be added to a
-         * Runner, but no executions will occur.  The start method will create the
-         * background Thread(s) which do the work for this task runner.
+         * Starts the task runner.  Prior to call this method tasks can be added
+         * to a Runner, but no executions will occur.  The start method will
+         * create the background Thread(s) which do the work for this task
+         * runner.
          */
         virtual void start() = 0;
 
@@ -50,19 +53,20 @@ namespace threads {
         virtual void shutdown(long long timeout) = 0;
 
         /**
-         * Shutdown once the task has finished and the TaskRunner's thread has exited.
+         * Shutdown once the task has finished and the TaskRunner's thread has
+         * exited.
          */
         virtual void shutdown() = 0;
 
         /**
-         * Signal the TaskRunner to wakeup and execute another iteration cycle on
-         * the task, the Task instance will be run until its iterate method has
-         * returned false indicating it is done.
+         * Signal the TaskRunner to wakeup and execute another iteration cycle
+         * on the task, the Task instance will be run until its iterate method
+         * has returned false indicating it is done.
          */
         virtual void wakeup() = 0;
-
     };
 
-}}
+}  // namespace threads
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_THREADS_TASKRUNNER_H_*/

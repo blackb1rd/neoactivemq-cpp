@@ -44,45 +44,52 @@ using namespace decaf::internal::util;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionId::ConnectionId() :
-    BaseDataStructure(), value("") {
-
+ConnectionId::ConnectionId()
+    : BaseDataStructure(),
+      value("")
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionId::ConnectionId(const ConnectionId& other) :
-    BaseDataStructure(), value("") {
-
+ConnectionId::ConnectionId(const ConnectionId& other)
+    : BaseDataStructure(),
+      value("")
+{
     this->copyDataStructure(&other);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ConnectionId::ConnectionId(const SessionId* sessionId)
-    : BaseDataStructure(), value("") {
-
+    : BaseDataStructure(),
+      value("")
+{
     this->value = sessionId->getConnectionId();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ConnectionId::ConnectionId(const ProducerId* producerId)
-    : BaseDataStructure(), value("") {
-
+    : BaseDataStructure(),
+      value("")
+{
     this->value = producerId->getConnectionId();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ConnectionId::ConnectionId(const ConsumerId* consumerId)
-    : BaseDataStructure(), value("") {
-
+    : BaseDataStructure(),
+      value("")
+{
     this->value = consumerId->getConnectionId();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionId::~ConnectionId() {
+ConnectionId::~ConnectionId()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionId* ConnectionId::cloneDataStructure() const {
+ConnectionId* ConnectionId::cloneDataStructure() const
+{
     std::unique_ptr<ConnectionId> connectionId(new ConnectionId());
 
     // Copy the data from the base class or classes
@@ -92,18 +99,21 @@ ConnectionId* ConnectionId::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionId::copyDataStructure(const DataStructure* src) {
-
+void ConnectionId::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const ConnectionId* srcPtr = dynamic_cast<const ConnectionId*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "ConnectionId::copyDataStructure - src is NULL or invalid");
     }
 
@@ -114,62 +124,73 @@ void ConnectionId::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ConnectionId::getDataStructureType() const {
+unsigned char ConnectionId::getDataStructureType() const
+{
     return ConnectionId::ID_CONNECTIONID;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ConnectionId::toString() const {
-
+std::string ConnectionId::toString() const
+{
     return this->value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ConnectionId::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool ConnectionId::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const ConnectionId* valuePtr = dynamic_cast<const ConnectionId*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getValue() != valuePtr->getValue()) {
+    if (this->getValue() != valuePtr->getValue())
+    {
         return false;
     }
-    if (!BaseDataStructure::equals(value)) {
+    if (!BaseDataStructure::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::string& ConnectionId::getValue() const {
+const std::string& ConnectionId::getValue() const
+{
     return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string& ConnectionId::getValue() {
+std::string& ConnectionId::getValue()
+{
     return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionId::setValue(const std::string& value) {
+void ConnectionId::setValue(const std::string& value)
+{
     this->value = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ConnectionId::compareTo(const ConnectionId& value) const {
-
-    if (this == &value) {
+int ConnectionId::compareTo(const ConnectionId& value) const
+{
+    if (this == &value)
+    {
         return 0;
     }
 
-    int valueComp = StringUtils::compareIgnoreCase(this->value.c_str(), value.value.c_str());
-    if (valueComp != 0) {
+    int valueComp = StringUtils::compareIgnoreCase(this->value.c_str(),
+                                                   value.value.c_str());
+    if (valueComp != 0)
+    {
         return valueComp;
     }
 
@@ -177,28 +198,32 @@ int ConnectionId::compareTo(const ConnectionId& value) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ConnectionId::equals(const ConnectionId& value) const {
+bool ConnectionId::equals(const ConnectionId& value) const
+{
     return this->equals((const DataStructure*)&value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ConnectionId::operator==(const ConnectionId& value) const {
+bool ConnectionId::operator==(const ConnectionId& value) const
+{
     return this->compareTo(value) == 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ConnectionId::operator<(const ConnectionId& value) const {
+bool ConnectionId::operator<(const ConnectionId& value) const
+{
     return this->compareTo(value) < 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionId& ConnectionId::operator= (const ConnectionId& other) {
+ConnectionId& ConnectionId::operator=(const ConnectionId& other)
+{
     this->copyDataStructure(&other);
     return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ConnectionId::getHashCode() const {
+int ConnectionId::getHashCode() const
+{
     return decaf::util::HashCode<std::string>()(this->toString());
 }
-

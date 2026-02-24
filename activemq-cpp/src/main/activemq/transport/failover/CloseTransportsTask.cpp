@@ -30,34 +30,39 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-CloseTransportsTask::CloseTransportsTask() :
-    transports() {
+CloseTransportsTask::CloseTransportsTask()
+    : transports()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CloseTransportsTask::~CloseTransportsTask() {
-
+CloseTransportsTask::~CloseTransportsTask()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CloseTransportsTask::add(const Pointer<Transport> transport) {
+void CloseTransportsTask::add(const Pointer<Transport> transport)
+{
     transports.put(transport);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool CloseTransportsTask::isPending() const {
+bool CloseTransportsTask::isPending() const
+{
     bool result = false;
-    result = !transports.isEmpty();
+    result      = !transports.isEmpty();
     return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool CloseTransportsTask::iterate() {
-
-    while (!transports.isEmpty()) {
+bool CloseTransportsTask::iterate()
+{
+    while (!transports.isEmpty())
+    {
         Pointer<Transport> transport = transports.take();
 
-        try {
+        try
+        {
             transport->close();
         }
         AMQ_CATCHALL_NOTHROW()

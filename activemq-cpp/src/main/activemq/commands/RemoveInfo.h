@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseCommand.h>
@@ -30,8 +30,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -44,23 +46,20 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API RemoveInfo : public BaseCommand {
+    class AMQCPP_API RemoveInfo : public BaseCommand
+    {
     protected:
-
         Pointer<DataStructure> objectId;
-        long long lastDeliveredSequenceId;
+        long long              lastDeliveredSequenceId;
 
     public:
-
         const static unsigned char ID_REMOVEINFO = 12;
 
     private:
-
         RemoveInfo(const RemoveInfo&);
-        RemoveInfo& operator= (const RemoveInfo&);
+        RemoveInfo& operator=(const RemoveInfo&);
 
     public:
-
         RemoveInfo();
 
         virtual ~RemoveInfo();
@@ -76,23 +75,25 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const Pointer<DataStructure>& getObjectId() const;
-        virtual Pointer<DataStructure>& getObjectId();
+        virtual Pointer<DataStructure>&       getObjectId();
         virtual void setObjectId(const Pointer<DataStructure>& objectId);
 
         virtual long long getLastDeliveredSequenceId() const;
-        virtual void setLastDeliveredSequenceId(long long lastDeliveredSequenceId);
+        virtual void      setLastDeliveredSequenceId(
+                 long long lastDeliveredSequenceId);
 
         /**
          * @return an answer of true to the isRemoveInfo() query.
          */
-        virtual bool isRemoveInfo() const {
+        virtual bool isRemoveInfo() const
+        {
             return true;
         }
 
         virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_REMOVEINFO_H_*/

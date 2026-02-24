@@ -15,20 +15,21 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include "DummyConnection.h"
-#include <activemq/cmsutil/SessionPool.h>
 #include <activemq/cmsutil/ResourceLifecycleManager.h>
+#include <activemq/cmsutil/SessionPool.h>
+#include <gtest/gtest.h>
 
 using namespace activemq::cmsutil;
 
-    class SessionPoolTest : public ::testing::Test {
-    };
+class SessionPoolTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SessionPoolTest, testTakeSession) {
-
-    DummyConnection connection(NULL);
+TEST_F(SessionPoolTest, testTakeSession)
+{
+    DummyConnection          connection(NULL);
     ResourceLifecycleManager mgr;
 
     SessionPool pool(&connection, cms::Session::AUTO_ACKNOWLEDGE, &mgr);
@@ -46,9 +47,9 @@ TEST_F(SessionPoolTest, testTakeSession) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SessionPoolTest, testReturnSession) {
-
-    DummyConnection connection(NULL);
+TEST_F(SessionPoolTest, testReturnSession)
+{
+    DummyConnection          connection(NULL);
     ResourceLifecycleManager mgr;
 
     SessionPool pool(&connection, cms::Session::AUTO_ACKNOWLEDGE, &mgr);
@@ -69,9 +70,9 @@ TEST_F(SessionPoolTest, testReturnSession) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SessionPoolTest, testCloseSession) {
-
-    DummyConnection connection(NULL);
+TEST_F(SessionPoolTest, testCloseSession)
+{
+    DummyConnection          connection(NULL);
     ResourceLifecycleManager mgr;
 
     SessionPool pool(&connection, cms::Session::AUTO_ACKNOWLEDGE, &mgr);

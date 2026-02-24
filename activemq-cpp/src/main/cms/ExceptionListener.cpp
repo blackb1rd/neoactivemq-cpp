@@ -20,7 +20,6 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-ExceptionListener::~ExceptionListener() {
-
+ExceptionListener::~ExceptionListener()
+{
 }
-

@@ -18,25 +18,26 @@
 #ifndef _DECAF_LANG_FLOAT_H_
 #define _DECAF_LANG_FLOAT_H_
 
-#include <decaf/util/Config.h>
+#include <decaf/lang/Comparable.h>
 #include <decaf/lang/Number.h>
 #include <decaf/lang/String.h>
-#include <decaf/lang/Comparable.h>
 #include <decaf/lang/exceptions/NumberFormatException.h>
+#include <decaf/util/Config.h>
 #include <string>
 
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
 
     class DECAF_API Float : public Number,
                             public Comparable<Float>,
-                            public Comparable<float> {
+                            public Comparable<float>
+    {
     private:
-
         float value;
 
     public:
-
         /** The size in bits of the primitive int type */
         static const int SIZE;
 
@@ -56,7 +57,6 @@ namespace lang {
         static const float NEGATIVE_INFINITY;
 
     public:
-
         /**
          * @param value - the primitive type to wrap
          */
@@ -72,7 +72,9 @@ namespace lang {
          */
         Float(const String& value);
 
-        virtual ~Float() {}
+        virtual ~Float()
+        {
+        }
 
         /**
          * Compares this Float instance with another.
@@ -88,7 +90,8 @@ namespace lang {
          * @param f - the Float object to compare against.
          * @return true if the two Float Objects have the same value.
          */
-        bool equals(const Float& f) const {
+        bool equals(const Float& f) const
+        {
             return this->value == f.value;
         }
 
@@ -97,7 +100,8 @@ namespace lang {
          * @param f - the value to be compared to this one.
          * @return true if this object is equal to the one passed.
          */
-        virtual bool operator==(const Float& f) const {
+        virtual bool operator==(const Float& f) const
+        {
             return this->value == f.value;
         }
 
@@ -107,7 +111,8 @@ namespace lang {
          * @param f - the value to be compared to this one.
          * @return true if this object is equal to the one passed.
          */
-        virtual bool operator<(const Float& f) const {
+        virtual bool operator<(const Float& f) const
+        {
             return this->value < f.value;
         }
 
@@ -125,7 +130,8 @@ namespace lang {
          * @param f - the Float object to compare against.
          * @return true if the two Float Objects have the same value.
          */
-        bool equals(const float& f) const {
+        bool equals(const float& f) const
+        {
             return this->value == f;
         }
 
@@ -134,7 +140,8 @@ namespace lang {
          * @param f - the value to be compared to this one.
          * @return true if this object is equal to the one passed.
          */
-        virtual bool operator==(const float& f) const {
+        virtual bool operator==(const float& f) const
+        {
             return this->value == f;
         }
 
@@ -144,7 +151,8 @@ namespace lang {
          * @param f - the value to be compared to this one.
          * @return true if this object is equal to the one passed.
          */
-        virtual bool operator<(const float& f) const {
+        virtual bool operator<(const float& f) const
+        {
             return this->value < f;
         }
 
@@ -157,15 +165,17 @@ namespace lang {
          * Answers the double value which the receiver represents
          * @return double the value of the receiver.
          */
-        virtual double doubleValue() const {
-            return (double) this->value;
+        virtual double doubleValue() const
+        {
+            return (double)this->value;
         }
 
         /**
          * Answers the float value which the receiver represents
          * @return float the value of the receiver.
          */
-        virtual float floatValue() const {
+        virtual float floatValue() const
+        {
             return this->value;
         }
 
@@ -173,32 +183,36 @@ namespace lang {
          * Answers the byte value which the receiver represents
          * @return byte the value of the receiver.
          */
-        virtual unsigned char byteValue() const {
-            return (unsigned char) this->value;
+        virtual unsigned char byteValue() const
+        {
+            return (unsigned char)this->value;
         }
 
         /**
          * Answers the short value which the receiver represents
          * @return short the value of the receiver.
          */
-        virtual short shortValue() const {
-            return (short) this->value;
+        virtual short shortValue() const
+        {
+            return (short)this->value;
         }
 
         /**
          * Answers the int value which the receiver represents
          * @return int the value of the receiver.
          */
-        virtual int intValue() const {
-            return (int) this->value;
+        virtual int intValue() const
+        {
+            return (int)this->value;
         }
 
         /**
          * Answers the long value which the receiver represents
          * @return long the value of the receiver.
          */
-        virtual long long longValue() const {
-            return (long long) this->value;
+        virtual long long longValue() const
+        {
+            return (long long)this->value;
         }
 
         /**
@@ -215,26 +229,27 @@ namespace lang {
         // Statics
 
         /**
-         * Compares the two specified double values. The sign of the integer value
-         * returned is the same as that of the integer that would be returned by the
-         * call: Float( f1 ).compareTo( Float( f2) )
+         * Compares the two specified double values. The sign of the integer
+         * value returned is the same as that of the integer that would be
+         * returned by the call: Float( f1 ).compareTo( Float( f2) )
          * @param f1 - the first double to compare
          * @param f2 - the second double to compare
-         * @return the value 0 if d1 is numerically equal to f2; a value less than
-         * 0 if f1 is numerically less than f2; and a value greater than 0  if f1 is
-         * numerically greater than f2.
+         * @return the value 0 if d1 is numerically equal to f2; a value less
+         * than 0 if f1 is numerically less than f2; and a value greater than 0
+         * if f1 is numerically greater than f2.
          */
         static int compare(float f1, float f2);
 
         /**
-         * Returns a representation of the specified floating-point value according
-         * to the IEEE 754 floating-point "single format" bit layout.
+         * Returns a representation of the specified floating-point value
+         * according to the IEEE 754 floating-point "single format" bit layout.
          *
-         * Bit 31 (the bit that is selected by the mask 0x80000000) represents the
-         * sign of the floating-point number. Bits 30-23 (the bits that are selected
-         * by the mask 0x7f800000) represent the exponent. Bits 22-0 (the bits that
-         * are selected by the mask 0x007fffff) represent the significand (sometimes
-         * called the mantissa) of the floating-point number.
+         * Bit 31 (the bit that is selected by the mask 0x80000000) represents
+         * the sign of the floating-point number. Bits 30-23 (the bits that are
+         * selected by the mask 0x7f800000) represent the exponent. Bits 22-0
+         * (the bits that are selected by the mask 0x007fffff) represent the
+         * significand (sometimes called the mantissa) of the floating-point
+         * number.
          *
          * If the argument is positive infinity, the result is 0x7f800000.
          * If the argument is negative infinity, the result is 0xff800000.
@@ -250,15 +265,16 @@ namespace lang {
         static int floatToIntBits(float value);
 
         /**
-         * Returns a representation of the specified floating-point value according
-         * to the IEEE 754 floating-point "single format" bit layout, preserving
-         * Not-a-Number (NaN) values.
+         * Returns a representation of the specified floating-point value
+         * according to the IEEE 754 floating-point "single format" bit layout,
+         * preserving Not-a-Number (NaN) values.
          *
-         * Bit 31 (the bit that is selected by the mask 0x80000000) represents the
-         * sign of the floating-point number. Bits 30-23 (the bits that are selected
-         * by the mask 0x7f800000) represent the exponent. Bits 22-0 (the bits that
-         * are selected by the mask 0x007fffff) represent the significand (sometimes
-         * called the mantissa) of the floating-point number.
+         * Bit 31 (the bit that is selected by the mask 0x80000000) represents
+         * the sign of the floating-point number. Bits 30-23 (the bits that are
+         * selected by the mask 0x7f800000) represent the exponent. Bits 22-0
+         * (the bits that are selected by the mask 0x007fffff) represent the
+         * significand (sometimes called the mantissa) of the floating-point
+         * number.
          *
          * If the argument is positive infinity, the result is 0x7f800000.
          * If the argument is negative infinity, the result is 0xff800000.
@@ -268,8 +284,8 @@ namespace lang {
          * "canonical" NaN value.
          *
          * In all cases, the result is an integer that, when given to the
-         * intBitsToFloat(int) method, will produce a floating-point value the same
-         * as the argument to floatToRawIntBits.
+         * intBitsToFloat(int) method, will produce a floating-point value the
+         * same as the argument to floatToRawIntBits.
          * @param value
          *      The float to convert to a raw int.
          * @return the raw int value of the float
@@ -277,18 +293,19 @@ namespace lang {
         static int floatToRawIntBits(float value);
 
         /**
-         * Returns the float value corresponding to a given bit representation. The
-         * argument is considered to be a representation of a floating-point value
-         * according to the IEEE 754 floating-point "single format" bit layout.
+         * Returns the float value corresponding to a given bit representation.
+         * The argument is considered to be a representation of a floating-point
+         * value according to the IEEE 754 floating-point "single format" bit
+         * layout.
          *
          * If the argument is 0x7f800000, the result is positive infinity.
          * If the argument is 0xff800000, the result is negative infinity.
-         * If the argument is any value in the range 0x7f800001 through 0x7fffffff
-         * or in the range 0xff800001 through 0xffffffff, the result is a NaN. No
-         * IEEE 754 floating-point operation provided by C++ can distinguish
-         * between two NaN values of the same type with different bit patterns.
-         * Distinct values of NaN are only distinguishable by use of the
-         * Float::floatToRawIntBits method.
+         * If the argument is any value in the range 0x7f800001 through
+         * 0x7fffffff or in the range 0xff800001 through 0xffffffff, the result
+         * is a NaN. No IEEE 754 floating-point operation provided by C++ can
+         * distinguish between two NaN values of the same type with different
+         * bit patterns. Distinct values of NaN are only distinguishable by use
+         * of the Float::floatToRawIntBits method.
          *
          * @param bits - the bits of the float encoded as a float
          * @return a new float created from the int bits.
@@ -325,35 +342,36 @@ namespace lang {
         static float parseFloat(const String& value);
 
         /**
-         * Returns a hexadecimal string representation of the float argument. All
-         * characters mentioned below are ASCII characters.
+         * Returns a hexadecimal string representation of the float argument.
+         * All characters mentioned below are ASCII characters.
          *
          *  * If the argument is NaN, the result is the string "NaN".
-         *  * Otherwise, the result is a string that represents the sign and magnitude
-         *    (absolute value) of the argument. If the sign is negative, the first
-         *    character of the result is '-'; if the sign is positive, no sign
-         *    character appears in the result. As for the magnitude m:
-         *      o If m is infinity, it is represented by the string "Infinity"; thus,
+         *  * Otherwise, the result is a string that represents the sign and
+         * magnitude (absolute value) of the argument. If the sign is negative,
+         * the first character of the result is '-'; if the sign is positive, no
+         * sign character appears in the result. As for the magnitude m: o If m
+         * is infinity, it is represented by the string "Infinity"; thus,
          *        positive infinity produces the result "Infinity" and negative
          *        infinity produces the result "-Infinity".
          *      o If m is zero, it is represented by the string "0x0.0p0"; thus,
          *        negative zero produces the result "-0x0.0p0" and positive zero
          *        produces the result "0x0.0p0".
-         *      o If m is a float value with a normalized representation, substrings
-         *        are used to represent the significand and exponent fields. The
-         *        significand is represented by the characters "0x1." followed by a
+         *      o If m is a float value with a normalized representation,
+         * substrings are used to represent the significand and exponent fields.
+         * The significand is represented by the characters "0x1." followed by a
          *        lowercase hexadecimal representation of the rest of the
          *        significand as a fraction. Trailing zeros in the hexadecimal
-         *        representation are removed unless all the digits are zero, in which
-         *        case a single zero is used. Next, the exponent is represented by
-         *        "p" followed by a decimal string of the unbiased exponent as if
+         *        representation are removed unless all the digits are zero, in
+         * which case a single zero is used. Next, the exponent is represented
+         * by "p" followed by a decimal string of the unbiased exponent as if
          *        produced by a call to Integer.toString on the exponent value.
          *      o If m is a float value with a subnormal representation, the
-         *        significand is represented by the characters "0x0." followed by a
-         *        hexadecimal representation of the rest of the significand as a
+         *        significand is represented by the characters "0x0." followed
+         * by a hexadecimal representation of the rest of the significand as a
          *        fraction. Trailing zeros in the hexadecimal representation are
-         *        removed. Next, the exponent is represented by "p-126". Note that
-         *        there must be at least one nonzero digit in a subnormal significand.
+         *        removed. Next, the exponent is represented by "p-126". Note
+         * that there must be at least one nonzero digit in a subnormal
+         * significand.
          *
          * @param value - The float to convert to a string
          * @return the Hex formatted float string.
@@ -361,33 +379,32 @@ namespace lang {
         static std::string toHexString(float value);
 
         /**
-         * Returns a string representation of the float  argument. All characters
-         * mentioned below are ASCII characters.
+         * Returns a string representation of the float  argument. All
+         * characters mentioned below are ASCII characters.
          *
          * If the argument is NaN, the result is the string "NaN".
-         * Otherwise, the result is a string that represents the sign and magnitude
-         * (absolute value) of the argument. If the sign is negative, the first
-         * character of the result is '-'; if the sign is positive, no
+         * Otherwise, the result is a string that represents the sign and
+         * magnitude (absolute value) of the argument. If the sign is negative,
+         * the first character of the result is '-'; if the sign is positive, no
          * sign character appears in the result. As for the magnitude m:
-         *  o If m is infinity, it is represented by the characters "Infinity"; thus,
-         *    positive infinity produces the result "Infinity" and negative infinity
-         *    produces the result "-Infinity".
-         *  o If m is zero, it is represented by the characters "0.0"; thus, negative
-         *    zero produces the result "-0.0" and positive zero produces the result
-         *    "0.0".
-         *  o If m is greater than or equal to 10-3 but less than 107, then it is
-         *    represented as the integer part of m, in decimal form with no leading
-         *    zeroes, followed by '.', followed by one or more decimal digits
-         *    representing the fractional part of m.
-         *  o If m is less than 10-3 or greater than or equal to 107, then it is
-         *    represented in so-called "computerized scientific notation." Let n be
-         *    the unique integer such that 10n <= m < 10n+1; then let a be the
-         *    mathematically exact quotient of m and 10n so that 1 <= a < 10.
-         *    The magnitude is then represented as the integer part of a, as a
-         *    single decimal digit, followed by '.', followed by decimal digits
-         *    representing the fractional part of a, followed by the letter 'E',
-         *    followed by a representation of n as a decimal integer, as produced
-         *    by the method Integer.toString(int).
+         *  o If m is infinity, it is represented by the characters "Infinity";
+         * thus, positive infinity produces the result "Infinity" and negative
+         * infinity produces the result "-Infinity". o If m is zero, it is
+         * represented by the characters "0.0"; thus, negative zero produces the
+         * result "-0.0" and positive zero produces the result "0.0". o If m is
+         * greater than or equal to 10-3 but less than 107, then it is
+         *    represented as the integer part of m, in decimal form with no
+         * leading zeroes, followed by '.', followed by one or more decimal
+         * digits representing the fractional part of m. o If m is less than
+         * 10-3 or greater than or equal to 107, then it is represented in
+         * so-called "computerized scientific notation." Let n be the unique
+         * integer such that 10n <= m < 10n+1; then let a be the mathematically
+         * exact quotient of m and 10n so that 1 <= a < 10. The magnitude is
+         * then represented as the integer part of a, as a single decimal digit,
+         * followed by '.', followed by decimal digits representing the
+         * fractional part of a, followed by the letter 'E', followed by a
+         * representation of n as a decimal integer, as produced by the method
+         * Integer.toString(int).
          *
          * @param value
          *      The float to convert to a string
@@ -414,13 +431,12 @@ namespace lang {
         static Float valueOf(const String& value);
 
     private:
-
         static const unsigned int SINGLE_EXPONENT_MASK;
         static const unsigned int SINGLE_MANTISSA_MASK;
         static const unsigned int SINGLE_NAN_BITS;
-
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 #endif /*_DECAF_LANG_FLOAT_H_*/

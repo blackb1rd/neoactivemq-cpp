@@ -23,31 +23,37 @@ using namespace activemq::util;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQProperties::ActiveMQProperties() : properties() {
+ActiveMQProperties::ActiveMQProperties()
+    : properties()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQProperties::~ActiveMQProperties() {
+ActiveMQProperties::~ActiveMQProperties()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProperties::copy(const CMSProperties* source) {
-
-    if (source == NULL) {
+void ActiveMQProperties::copy(const CMSProperties* source)
+{
+    if (source == NULL)
+    {
         return;
     }
 
     properties.clear();
 
-    std::vector<std::pair<std::string, std::string> > vec = source->toArray();
+    std::vector<std::pair<std::string, std::string>> vec = source->toArray();
 
-    for (unsigned int ix = 0; ix < vec.size(); ++ix) {
+    for (unsigned int ix = 0; ix < vec.size(); ++ix)
+    {
         properties.setProperty(vec[ix].first, vec[ix].second);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::CMSProperties* ActiveMQProperties::clone() const {
+cms::CMSProperties* ActiveMQProperties::clone() const
+{
     ActiveMQProperties* props = new ActiveMQProperties();
     props->copy(this);
     return props;

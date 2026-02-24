@@ -23,25 +23,29 @@ using namespace activemq::transport;
 using namespace activemq::transport::discovery;
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveredBrokerData::DiscoveredBrokerData() : DiscoveryEvent(),
-                                               lastHeartBeatTime(0),
-                                               nextRecoveryTime(0),
-                                               failureCount(0),
-                                               failed(false) {
+DiscoveredBrokerData::DiscoveredBrokerData()
+    : DiscoveryEvent(),
+      lastHeartBeatTime(0),
+      nextRecoveryTime(0),
+      failureCount(0),
+      failed(false)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveredBrokerData::DiscoveredBrokerData(const std::string& brokerName, const std::string& service) :
-    DiscoveryEvent(),
-    lastHeartBeatTime(0),
-    nextRecoveryTime(0),
-    failureCount(0),
-    failed(false) {
-
+DiscoveredBrokerData::DiscoveredBrokerData(const std::string& brokerName,
+                                           const std::string& service)
+    : DiscoveryEvent(),
+      lastHeartBeatTime(0),
+      nextRecoveryTime(0),
+      failureCount(0),
+      failed(false)
+{
     setBrokerName(brokerName);
     setServiceName(service);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveredBrokerData::~DiscoveredBrokerData() {
+DiscoveredBrokerData::~DiscoveredBrokerData()
+{
 }

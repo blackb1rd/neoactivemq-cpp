@@ -25,33 +25,43 @@ using namespace activemq::cmsutil;
 /**
  * A catch-all that throws an CMSException.
  */
-#define CMSTEMPLATE_CATCHALL() \
-    catch(cms::CMSException& ex){ \
-        throw; \
-    } catch(std::exception& ex) { \
-        throw CMSException(ex.what(), NULL); \
-    } catch( ... ){ \
+#define CMSTEMPLATE_CATCHALL()                                \
+    catch (cms::CMSException & ex)                            \
+    {                                                         \
+        throw;                                                \
+    }                                                         \
+    catch (std::exception & ex)                               \
+    {                                                         \
+        throw CMSException(ex.what(), NULL);                  \
+    }                                                         \
+    catch (...)                                               \
+    {                                                         \
         throw CMSException("caught unknown exception", NULL); \
     }
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsAccessor::CmsAccessor() :
-    resourceLifecycleManager(), connectionFactory(NULL), sessionAcknowledgeMode(cms::Session::AUTO_ACKNOWLEDGE) {
+CmsAccessor::CmsAccessor()
+    : resourceLifecycleManager(),
+      connectionFactory(NULL),
+      sessionAcknowledgeMode(cms::Session::AUTO_ACKNOWLEDGE)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsAccessor::~CmsAccessor() {
+CmsAccessor::~CmsAccessor()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsAccessor::init() {
+void CmsAccessor::init()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Connection* CmsAccessor::createConnection() {
-
-    try {
-
+cms::Connection* CmsAccessor::createConnection()
+{
+    try
+    {
         checkConnectionFactory();
 
         // Create the connection.
@@ -66,11 +76,12 @@ cms::Connection* CmsAccessor::createConnection() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Session* CmsAccessor::createSession(cms::Connection* con) {
-
-    try {
-
-        if (con == NULL) {
+cms::Session* CmsAccessor::createSession(cms::Connection* con)
+{
+    try
+    {
+        if (con == NULL)
+        {
             throw CMSException("connection object is invalid", NULL);
         }
 
@@ -86,8 +97,11 @@ cms::Session* CmsAccessor::createSession(cms::Connection* con) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsAccessor::checkConnectionFactory() {
-    if (getConnectionFactory() == NULL) {
-        throw IllegalStateException("Property 'connectionFactory' is required", NULL);
+void CmsAccessor::checkConnectionFactory()
+{
+    if (getConnectionFactory() == NULL)
+    {
+        throw IllegalStateException("Property 'connectionFactory' is required",
+                                    NULL);
     }
 }

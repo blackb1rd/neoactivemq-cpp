@@ -18,34 +18,40 @@
 #ifndef _ACTIVEMQ_WIREFORMAT_WIREFORMATNEGOTIATOR_H_
 #define _ACTIVEMQ_WIREFORMAT_WIREFORMATNEGOTIATOR_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/transport/TransportFilter.h>
+#include <activemq/util/Config.h>
 #include <decaf/lang/Pointer.h>
 
-namespace activemq {
-namespace wireformat {
+namespace activemq
+{
+namespace wireformat
+{
 
     using decaf::lang::Pointer;
 
     /**
      * Defines a WireFormatNegotiator which allows a WireFormat to
      */
-    class AMQCPP_API WireFormatNegotiator : public activemq::transport::TransportFilter {
+    class AMQCPP_API WireFormatNegotiator
+        : public activemq::transport::TransportFilter
+    {
     public:
-
         /**
-         * Creates a new instance of a WireFormat Negotiator wrapping the Transport passed.
+         * Creates a new instance of a WireFormat Negotiator wrapping the
+         * Transport passed.
          *
          * @param next
          *      The next Transport in the chain
          */
-        WireFormatNegotiator(const Pointer<transport::Transport> next) :
-            transport::TransportFilter(next) {}
+        WireFormatNegotiator(const Pointer<transport::Transport> next)
+            : transport::TransportFilter(next)
+        {
+        }
 
         virtual ~WireFormatNegotiator();
-
     };
 
-}}
+}  // namespace wireformat
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_WIREFORMAT_WIREFORMATNEGOTIATOR_H_ */

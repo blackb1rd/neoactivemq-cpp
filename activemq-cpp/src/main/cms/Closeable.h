@@ -18,35 +18,35 @@
 #ifndef _CMS_CLOSEABLE_H
 #define _CMS_CLOSEABLE_H
 
-#include <cms/Config.h>
 #include <cms/CMSException.h>
+#include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * Interface for a class that implements the close method.
+ *
+ * A class that implements this interface should release all resources upon the
+ * close call and should throw an exception from any methods that require those
+ * resources after they have been closed.
+ *
+ * @since 1.0
+ */
+class CMS_API Closeable
+{
+public:
+    virtual ~Closeable();
 
     /**
-     * Interface for a class that implements the close method.
+     * Closes this object and deallocates the appropriate resources.
+     * The object is generally no longer usable after calling close.
      *
-     * A class that implements this interface should release all resources upon the close
-     * call and should throw an exception from any methods that require those resources
-     * after they have been closed.
-     *
-     * @since 1.0
+     * @throws CMSException - If an error occurs while the resource is being
+     * closed.
      */
-    class CMS_API Closeable {
-
-    public:
-
-        virtual ~Closeable();
-
-        /**
-         * Closes this object and deallocates the appropriate resources.
-         * The object is generally no longer usable after calling close.
-         *
-         * @throws CMSException - If an error occurs while the resource is being closed.
-         */
-        virtual void close() = 0;
-
-    };
-}
+    virtual void close() = 0;
+};
+}  // namespace cms
 
 #endif /*_CMS_CLOSEABLE_H*/

@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseDataStructure.h>
@@ -30,8 +30,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -44,18 +46,17 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API TransactionId : public BaseDataStructure, public decaf::lang::Comparable<TransactionId> {
+    class AMQCPP_API TransactionId
+        : public BaseDataStructure,
+          public decaf::lang::Comparable<TransactionId>
+    {
     protected:
-
-
     public:
-
         const static unsigned char ID_TRANSACTIONID = 0;
 
         typedef decaf::lang::PointerComparator<TransactionId> COMPARATOR;
 
     public:
-
         TransactionId();
 
         TransactionId(const TransactionId& other);
@@ -72,11 +73,13 @@ namespace commands {
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual bool isLocalTransactionId() const {
+        virtual bool isLocalTransactionId() const
+        {
             return false;
         }
 
-        virtual bool isXATransactionId() const {
+        virtual bool isXATransactionId() const
+        {
             return false;
         }
 
@@ -88,12 +91,12 @@ namespace commands {
 
         virtual bool operator<(const TransactionId& value) const;
 
-        TransactionId& operator= (const TransactionId& other);
+        TransactionId& operator=(const TransactionId& other);
 
         int getHashCode() const;
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_TRANSACTIONID_H_*/

@@ -18,49 +18,55 @@
 #ifndef _DECAF_UTIL_CONCURRENT_REJECTEDEXECUTIONHANDLER_H_
 #define _DECAF_UTIL_CONCURRENT_REJECTEDEXECUTIONHANDLER_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/lang/Runnable.h>
+#include <decaf/util/Config.h>
 #include <decaf/util/concurrent/RejectedExecutionException.h>
 
-namespace decaf {
-namespace util {
-namespace concurrent {
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
 
-    class ThreadPoolExecutor;
-
-    /**
-     * A handler for tasks that cannot be executed by a {@link ThreadPoolExecutor}.
-     *
-     * @since 1.0
-     */
-    class DECAF_API RejectedExecutionHandler {
-    public:
-
-        RejectedExecutionHandler();
-        virtual ~RejectedExecutionHandler();
+        class ThreadPoolExecutor;
 
         /**
-         * Method that may be invoked by a {@link ThreadPoolExecutor} when
-         * {@link ThreadPoolExecutor#execute execute} cannot accept a
-         * task.  This may occur when no more threads or queue slots are
-         * available because their bounds would be exceeded, or upon
-         * shutdown of the Executor.
+         * A handler for tasks that cannot be executed by a {@link
+         * ThreadPoolExecutor}.
          *
-         * <p>In the absence of other alternatives, the method may throw
-         * an {@link RejectedExecutionException}, which will be propagated to
-         * the caller of {@link ThreadPoolExecutor#execute execute}.
-         *
-         * @param task
-         *      The pointer to the runnable task requested to be executed.
-         * @param executor
-         *      The pointer to the executor attempting to execute this task.
-         *
-         * @throws RejectedExecutionException if there is no remedy.
+         * @since 1.0
          */
-        virtual void rejectedExecution(decaf::lang::Runnable* task, ThreadPoolExecutor* executor) = 0;
+        class DECAF_API RejectedExecutionHandler
+        {
+        public:
+            RejectedExecutionHandler();
+            virtual ~RejectedExecutionHandler();
 
-    };
+            /**
+             * Method that may be invoked by a {@link ThreadPoolExecutor} when
+             * {@link ThreadPoolExecutor#execute execute} cannot accept a
+             * task.  This may occur when no more threads or queue slots are
+             * available because their bounds would be exceeded, or upon
+             * shutdown of the Executor.
+             *
+             * <p>In the absence of other alternatives, the method may throw
+             * an {@link RejectedExecutionException}, which will be propagated
+             * to the caller of {@link ThreadPoolExecutor#execute execute}.
+             *
+             * @param task
+             *      The pointer to the runnable task requested to be executed.
+             * @param executor
+             *      The pointer to the executor attempting to execute this task.
+             *
+             * @throws RejectedExecutionException if there is no remedy.
+             */
+            virtual void rejectedExecution(decaf::lang::Runnable* task,
+                                           ThreadPoolExecutor*    executor) = 0;
+        };
 
-}}}
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_CONCURRENT_REJECTEDEXECUTIONHANDLER_H_ */

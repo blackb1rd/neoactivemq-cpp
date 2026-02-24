@@ -22,51 +22,59 @@
 
 #include <decaf/net/ServerSocketFactory.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
-
-    /**
-     * Default implementation of the Decaf ServerSocketFactory, creates ServerSocket
-     * objects with supplied options.
-     *
-     * @since 1.0
-     */
-    class DefaultServerSocketFactory : public decaf::net::ServerSocketFactory {
-    private:
-
-        DefaultServerSocketFactory( const DefaultServerSocketFactory& );
-        DefaultServerSocketFactory& operator= ( const DefaultServerSocketFactory& );
-
-    public:
-
-        DefaultServerSocketFactory();
-
-        virtual ~DefaultServerSocketFactory();
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
 
         /**
-         * {@inheritDoc}
+         * Default implementation of the Decaf ServerSocketFactory, creates
+         * ServerSocket objects with supplied options.
+         *
+         * @since 1.0
          */
-        virtual decaf::net::ServerSocket* createServerSocket();
+        class DefaultServerSocketFactory
+            : public decaf::net::ServerSocketFactory
+        {
+        private:
+            DefaultServerSocketFactory(const DefaultServerSocketFactory&);
+            DefaultServerSocketFactory& operator=(
+                const DefaultServerSocketFactory&);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::ServerSocket* createServerSocket( int port );
+        public:
+            DefaultServerSocketFactory();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::ServerSocket* createServerSocket( int port, int backlog );
+            virtual ~DefaultServerSocketFactory();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::ServerSocket* createServerSocket(
-            int port, int backlog, const decaf::net::InetAddress* address );
+            /**
+             * {@inheritDoc}
+             */
+            virtual decaf::net::ServerSocket* createServerSocket();
 
-    };
+            /**
+             * {@inheritDoc}
+             */
+            virtual decaf::net::ServerSocket* createServerSocket(int port);
 
-}}}
+            /**
+             * {@inheritDoc}
+             */
+            virtual decaf::net::ServerSocket* createServerSocket(int port,
+                                                                 int backlog);
+
+            /**
+             * {@inheritDoc}
+             */
+            virtual decaf::net::ServerSocket* createServerSocket(
+                int                            port,
+                int                            backlog,
+                const decaf::net::InetAddress* address);
+        };
+
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_DEFAULTSERVERSOCKETFACTORY_H_ */

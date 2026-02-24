@@ -17,15 +17,15 @@
 
 #include "TempDestinationAdvisoryConsumer.h"
 
-#include <cms/Topic.h>
-#include <cms/Message.h>
-#include <cms/TextMessage.h>
-#include <activemq/core/ActiveMQConstants.h>
 #include <activemq/commands/ActiveMQMessage.h>
 #include <activemq/commands/DestinationInfo.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/ClassCastException.h>
+#include <activemq/core/ActiveMQConstants.h>
+#include <cms/Message.h>
+#include <cms/TextMessage.h>
+#include <cms/Topic.h>
 #include <decaf/lang/Integer.h>
+#include <decaf/lang/exceptions/ClassCastException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 
 using namespace std;
 using namespace activemqcpp;
@@ -39,68 +39,83 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-TempDestinationAdvisoryConsumer::TempDestinationAdvisoryConsumer( cms::Session* session )
-    : session( session ), consumer() {
-
-    if( session == NULL ) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Session Object passed was Null." );
+TempDestinationAdvisoryConsumer::TempDestinationAdvisoryConsumer(
+    cms::Session* session)
+    : session(session),
+      consumer()
+{
+    if (session == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Session Object passed was Null.");
     }
 
-    std::unique_ptr<cms::Topic> advisories( session->createTopic(
-        "ActiveMQ.Advisory.TempTopic,ActiveMQ.Advisory.TempQueue" ) );
+    std::unique_ptr<cms::Topic> advisories(session->createTopic(
+        "ActiveMQ.Advisory.TempTopic,ActiveMQ.Advisory.TempQueue"));
 
-    this->consumer.reset( session->createConsumer( advisories.get() ) );
-    this->consumer->setMessageListener( this );
+    this->consumer.reset(session->createConsumer(advisories.get()));
+    this->consumer->setMessageListener(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TempDestinationAdvisoryConsumer::~TempDestinationAdvisoryConsumer() {
+TempDestinationAdvisoryConsumer::~TempDestinationAdvisoryConsumer()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TempDestinationAdvisoryConsumer::onMessage( const cms::Message* message ) {
-
-    if( message->getCMSType() == "Advisory" ) {
-
+void TempDestinationAdvisoryConsumer::onMessage(const cms::Message* message)
+{
+    if (message->getCMSType() == "Advisory")
+    {
         std::cout << "Received an Advisory Message!" << std::endl;
 
         const ActiveMQMessage* amqMessage =
-            dynamic_cast<const ActiveMQMessage*>( message );
+            dynamic_cast<const ActiveMQMessage*>(message);
 
-        if( amqMessage != NULL && amqMessage->getDataStructure() != NULL ) {
-            std::cout << "Advisory Message contains a Command Object!" << std::endl;
+        if (amqMessage != NULL && amqMessage->getDataStructure() != NULL)
+        {
+            std::cout << "Advisory Message contains a Command Object!"
+                      << std::endl;
 
-            try {
-
+            try
+            {
                 Pointer<DestinationInfo> info =
-                    amqMessage->getDataStructure().dynamicCast<DestinationInfo>();
+                    amqMessage->getDataStructure()
+                        .dynamicCast<DestinationInfo>();
 
                 unsigned char operationType = info->getOperationType();
 
-                if( operationType == ActiveMQConstants::DESTINATION_REMOVE_OPERATION ) {
+                if (operationType ==
+                    ActiveMQConstants::DESTINATION_REMOVE_OPERATION)
+                {
                     std::cout << "Temporary Destination {"
                               << info->getDestination()->getPhysicalName()
-                              << "} Removed."
-                              << std::endl;
-                } else if( operationType == ActiveMQConstants::DESTINATION_ADD_OPERATION ) {
+                              << "} Removed." << std::endl;
+                }
+                else if (operationType ==
+                         ActiveMQConstants::DESTINATION_ADD_OPERATION)
+                {
                     std::cout << "Temporary Destination {"
                               << info->getDestination()->getPhysicalName()
-                              << "} Added."
-                              << std::endl;
-                } else {
+                              << "} Added." << std::endl;
+                }
+                else
+                {
                     std::cout << "ERROR: I have no Idea what just happened!"
                               << std::endl;
                 }
-
-            } catch( ClassCastException& ex ) {
-                std::cout << "ERROR: Expected the Command to be a DestinationInfo, "
-                          << "it wasn't so PANIC!!"
-                          << std::endl;
+            }
+            catch (ClassCastException& ex)
+            {
+                std::cout << "ERROR: Expected the Command to be a "
+                             "DestinationInfo, "
+                          << "it wasn't so PANIC!!" << std::endl;
             }
         }
-
-    } else {
+    }
+    else
+    {
         std::cout << "Received a Non-Advisory Message!" << std::endl;
     }
 }

@@ -21,86 +21,97 @@
 #include <decaf/util/Config.h>
 #include <decaf/util/zip/Checksum.h>
 
-namespace decaf {
-namespace util {
-namespace zip {
-
-    /**
-     * Clas that can be used to compute an Adler-32 Checksum for a data stream.  The
-     * Alder-32 checksum trades reliability for speed over the CRC-32 algorithm.
-     *
-     * @since 1.0
-     */
-    class DECAF_API Adler32 : public Checksum {
-    private:
-
-        long long value;
-
-    public:
-
-        Adler32();
-
-        virtual ~Adler32();
+namespace decaf
+{
+namespace util
+{
+    namespace zip
+    {
 
         /**
-         * @return the current checksum value.
-         */
-        virtual long long getValue() const;
-
-        /**
-         * Reset the checksum to its initial value.
-         */
-        virtual void reset();
-
-        /**
-         * Updates the current checksum with the specified vector of bytes.
+         * Clas that can be used to compute an Adler-32 Checksum for a data
+         * stream.  The Alder-32 checksum trades reliability for speed over the
+         * CRC-32 algorithm.
          *
-         * @param buffer
-         *      The buffer to read the updated bytes from.
+         * @since 1.0
          */
-        virtual void update(const std::vector<unsigned char>& buffer);
+        class DECAF_API Adler32 : public Checksum
+        {
+        private:
+            long long value;
 
-        /**
-         * Updates the current checksum with the specified array of bytes.
-         *
-         * @param buffer
-         *      The buffer to read the updated bytes from.
-         * @param offset
-         *      The position in the buffer to start reading.
-         * @param length
-         *      The amount of data to read from the byte buffer.
-         *
-         * @throw IndexOutOfBoundsException if offset + length > size of the buffer.
-         */
-        virtual void update(const std::vector<unsigned char>& buffer, int offset, int length);
+        public:
+            Adler32();
 
-        /**
-         * Updates the current checksum with the specified array of bytes.
-         *
-         * @param buffer
-         *      The buffer to read the updated bytes from.
-         * @param size
-         *      The size of the passed buffer.
-         * @param offset
-         *      The position in the buffer to start reading.
-         * @param length
-         *      The amount of data to read from the byte buffer.
-         *
-         * @throw NullPointerException if the passed buffer is NULL.
-         * @throw IndexOutOfBoundsException if offset + length > size of the buffer.
-         */
-        virtual void update(const unsigned char* buffer, int size, int offset, int length);
+            virtual ~Adler32();
 
-        /**
-         * Updates the current checksum with the specified byte value.
-         *
-         * @param byte
-         *      The byte value to update the current Checksum with (0..255).
-         */
-        virtual void update(int byte);
+            /**
+             * @return the current checksum value.
+             */
+            virtual long long getValue() const;
 
-    };
+            /**
+             * Reset the checksum to its initial value.
+             */
+            virtual void reset();
 
-}}}
+            /**
+             * Updates the current checksum with the specified vector of bytes.
+             *
+             * @param buffer
+             *      The buffer to read the updated bytes from.
+             */
+            virtual void update(const std::vector<unsigned char>& buffer);
+
+            /**
+             * Updates the current checksum with the specified array of bytes.
+             *
+             * @param buffer
+             *      The buffer to read the updated bytes from.
+             * @param offset
+             *      The position in the buffer to start reading.
+             * @param length
+             *      The amount of data to read from the byte buffer.
+             *
+             * @throw IndexOutOfBoundsException if offset + length > size of the
+             * buffer.
+             */
+            virtual void update(const std::vector<unsigned char>& buffer,
+                                int                               offset,
+                                int                               length);
+
+            /**
+             * Updates the current checksum with the specified array of bytes.
+             *
+             * @param buffer
+             *      The buffer to read the updated bytes from.
+             * @param size
+             *      The size of the passed buffer.
+             * @param offset
+             *      The position in the buffer to start reading.
+             * @param length
+             *      The amount of data to read from the byte buffer.
+             *
+             * @throw NullPointerException if the passed buffer is NULL.
+             * @throw IndexOutOfBoundsException if offset + length > size of the
+             * buffer.
+             */
+            virtual void update(const unsigned char* buffer,
+                                int                  size,
+                                int                  offset,
+                                int                  length);
+
+            /**
+             * Updates the current checksum with the specified byte value.
+             *
+             * @param byte
+             *      The byte value to update the current Checksum with (0..255).
+             */
+            virtual void update(int byte);
+        };
+
+    }  // namespace zip
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_ZIP_ADLER32_H_ */

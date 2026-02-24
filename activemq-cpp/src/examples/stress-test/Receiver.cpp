@@ -16,15 +16,15 @@
  */
 
 #include "Receiver.h"
-#include "MessagingTask.h"
-#include "ConnectionFactoryMgr.h"
 #include "BrokerMonitor.h"
 #include "CmsMessageCreator.h"
+#include "ConnectionFactoryMgr.h"
+#include "MessagingTask.h"
 
-#include <cms/Message.h>
 #include <activemq/cmsutil/MessageCreator.h>
-#include <decaf/lang/System.h>
+#include <cms/Message.h>
 #include <decaf/lang/Exception.h>
+#include <decaf/lang/System.h>
 #include <decaf/util/concurrent/TimeUnit.h>
 #include <stdio.h>
 
@@ -35,173 +35,223 @@ using namespace cms;
 using namespace cms::stress;
 
 ////////////////////////////////////////////////////////////////////////////////
-Receiver::Receiver(const std::string& url, const std::string& queueOrTopicName,
-                   bool isTopic, BrokerMonitor* monitor, CountDownLatch* quit,
-                   long long receiveTimeout, bool useThreadPool) :
-    url(url),
-    mutexForCmsTemplate(),
-    mutexGeneral(),
-    closing(false),
-    brokerOnline(true),
-    ready(1),
-    quit(quit),
-    messageListener(NULL),
-    cmsTemplate(NULL),
-    asyncReceiverThread(NULL),
-    receiveTimeout(receiveTimeout),
-    cmsTemplateCreateTime(System::currentTimeMillis()),
-    useThreadPool(useThreadPool),
-    numOfMessagingTasks(0),
-    monitor(monitor),
-    selector() {
-
-    ConnectionFactory* connectionFactory = ConnectionFactoryMgr::getConnectionFactory(url);
+Receiver::Receiver(const std::string& url,
+                   const std::string& queueOrTopicName,
+                   bool               isTopic,
+                   BrokerMonitor*     monitor,
+                   CountDownLatch*    quit,
+                   long long          receiveTimeout,
+                   bool               useThreadPool)
+    : url(url),
+      mutexForCmsTemplate(),
+      mutexGeneral(),
+      closing(false),
+      brokerOnline(true),
+      ready(1),
+      quit(quit),
+      messageListener(NULL),
+      cmsTemplate(NULL),
+      asyncReceiverThread(NULL),
+      receiveTimeout(receiveTimeout),
+      cmsTemplateCreateTime(System::currentTimeMillis()),
+      useThreadPool(useThreadPool),
+      numOfMessagingTasks(0),
+      monitor(monitor),
+      selector()
+{
+    ConnectionFactory* connectionFactory =
+        ConnectionFactoryMgr::getConnectionFactory(url);
     cmsTemplateCreateTime = System::currentTimeMillis();
-    cmsTemplate = new CmsTemplate(connectionFactory);
+    cmsTemplate           = new CmsTemplate(connectionFactory);
     cmsTemplate->setDefaultDestinationName(queueOrTopicName);
     cmsTemplate->setPubSubDomain(isTopic);
     cmsTemplate->setReceiveTimeout(receiveTimeout);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Receiver::~Receiver() {
-
+Receiver::~Receiver()
+{
     closing = true;
 
-    //delete cmsTemplate
+    // delete cmsTemplate
     mutexForCmsTemplate.lock();
-    if (cmsTemplate) {
+    if (cmsTemplate)
+    {
         delete cmsTemplate;
         cmsTemplate = NULL;
     }
     mutexForCmsTemplate.unlock();
 
-    //wait until all outstanding messaging tasks are done
-    while (getNumOfMessagingTasks() > 0) {
+    // wait until all outstanding messaging tasks are done
+    while (getNumOfMessagingTasks() > 0)
+    {
         Thread::sleep(100);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::receiveMessage(std::string& message, ErrorCode& errorCode,
-                              const std::string &selector, bool retryOnError) {
-
+void Receiver::receiveMessage(std::string&       message,
+                              ErrorCode&         errorCode,
+                              const std::string& selector,
+                              bool               retryOnError)
+{
     long long stopRetryTime = System::currentTimeMillis() + receiveTimeout;
-    errorCode = CMS_SUCCESS;
+    errorCode               = CMS_SUCCESS;
 
-    if (receiveTimeout == 0 /*CmsTemplate::RECEIVE_TIMEOUT_NO_WAIT*/) {
+    if (receiveTimeout == 0 /*CmsTemplate::RECEIVE_TIMEOUT_NO_WAIT*/)
+    {
         retryOnError = false;
-    } else if (receiveTimeout == -1 /*CmsTemplate::RECEIVE_TIMEOUT_INDEFINITE_WAIT*/) {
+    }
+    else if (receiveTimeout ==
+             -1 /*CmsTemplate::RECEIVE_TIMEOUT_INDEFINITE_WAIT*/)
+    {
         retryOnError = true;
     }
 
-    if (monitor != NULL) {
-        if (monitor->isBrokerOk()) {
-            if (!brokerOnline) {
+    if (monitor != NULL)
+    {
+        if (monitor->isBrokerOk())
+        {
+            if (!brokerOnline)
+            {
                 mutexForCmsTemplate.lock();
-                if (cmsTemplate) {
+                if (cmsTemplate)
+                {
                     cmsTemplateCreateTime = System::currentTimeMillis();
-                    CmsTemplate* cmsTemplate = new CmsTemplate(cmsTemplate->getConnectionFactory());
-                    cmsTemplate->setDefaultDestinationName(cmsTemplate->getDefaultDestinationName());
+                    CmsTemplate* cmsTemplate =
+                        new CmsTemplate(cmsTemplate->getConnectionFactory());
+                    cmsTemplate->setDefaultDestinationName(
+                        cmsTemplate->getDefaultDestinationName());
                     cmsTemplate->setPubSubDomain(cmsTemplate->isPubSubDomain());
-                    cmsTemplate->setReceiveTimeout(cmsTemplate->getReceiveTimeout());
+                    cmsTemplate->setReceiveTimeout(
+                        cmsTemplate->getReceiveTimeout());
                     delete cmsTemplate;
                 }
                 mutexForCmsTemplate.unlock();
 
                 brokerOnline = true;
             }
-        } else {
+        }
+        else
+        {
             brokerOnline = false;
-            errorCode = CMS_ERROR_MESSAGE_BROKER_ERROR;
+            errorCode    = CMS_ERROR_MESSAGE_BROKER_ERROR;
             return;
         }
     }
 
-    do {
+    do
+    {
         long long timeoutForThisLoop;
-        if (receiveTimeout <= 0) {
+        if (receiveTimeout <= 0)
+        {
             timeoutForThisLoop = receiveTimeout;
-        } else {
+        }
+        else
+        {
             timeoutForThisLoop = stopRetryTime - System::currentTimeMillis();
-            if (timeoutForThisLoop <= 0) {
+            if (timeoutForThisLoop <= 0)
+            {
                 errorCode = CMS_ERROR_RECEIVER_TIMEDOUT;
                 break;
             }
         }
 
         mutexForCmsTemplate.lock();
-        if (cmsTemplate) {
+        if (cmsTemplate)
+        {
             cmsTemplate->setReceiveTimeout(timeoutForThisLoop);
 
             cms::Message* cmsMessage = NULL;
-            try {
-                if (selector != "") {
+            try
+            {
+                if (selector != "")
+                {
                     cmsMessage = cmsTemplate->receiveSelected(selector);
-                } else {
+                }
+                else
+                {
                     cmsMessage = cmsTemplate->receive();
                 }
-            } catch (cms::CMSException& ex) {
+            }
+            catch (cms::CMSException& ex)
+            {
                 mutexForCmsTemplate.unlock();
                 errorCode = CMS_ERROR_CAUGHT_CMS_EXCEPTION;
                 break;
             }
 
             mutexForCmsTemplate.unlock();
-            if (cmsMessage == NULL) {
+            if (cmsMessage == NULL)
+            {
                 break;
             }
 
-            if (isMessageExpired(cmsMessage)) {
+            if (isMessageExpired(cmsMessage))
+            {
                 errorCode = CMS_ERROR_INVALID_MESSAGE;
                 delete cmsMessage;
                 continue;
             }
 
-            wstring text;
-            cms::TextMessage* txtMessage = dynamic_cast<cms::TextMessage*>(cmsMessage);
-            if (txtMessage) {
+            wstring           text;
+            cms::TextMessage* txtMessage =
+                dynamic_cast<cms::TextMessage*>(cmsMessage);
+            if (txtMessage)
+            {
                 message = txtMessage->getText();
             }
             delete cmsMessage;
-        } else {
+        }
+        else
+        {
             mutexForCmsTemplate.unlock();
         }
-    } while (errorCode != CMS_SUCCESS && retryOnError && System::currentTimeMillis() < stopRetryTime);
+    } while (errorCode != CMS_SUCCESS && retryOnError &&
+             System::currentTimeMillis() < stopRetryTime);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::waitUntilReady() {
+void Receiver::waitUntilReady()
+{
     ready.await();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::registerMessageListener(ReceiverListener* messageListener, ErrorCode& errorCode,
-                                       const std::string& selector, int id) {
+void Receiver::registerMessageListener(ReceiverListener*  messageListener,
+                                       ErrorCode&         errorCode,
+                                       const std::string& selector,
+                                       int                id)
+{
     errorCode = CMS_SUCCESS;
     char buffer[512];
 
-    if (id != 0) {
+    if (id != 0)
+    {
         sprintf(buffer, "TestListener-%d", id);
-    } else {
+    }
+    else
+    {
         sprintf(buffer, "TestAsyncListener");
     }
 
     mutexGeneral.lock();
-    if (messageListener == NULL) {
+    if (messageListener == NULL)
+    {
         errorCode = CMS_ERROR_INVALID_MESSAGELISTENER;
         mutexGeneral.unlock();
         return;
     }
 
-    if (messageListener != NULL) {
+    if (messageListener != NULL)
+    {
         errorCode = CMS_ERROR_A_MESSAGELISTENER_HAS_BEEN_REGISTERED_ALREADY;
         mutexGeneral.unlock();
         return;
     }
 
     this->messageListener = messageListener;
-    this->selector = selector;
+    this->selector        = selector;
 
     asyncReceiverThread = new Thread(this, buffer);
     asyncReceiverThread->start();
@@ -211,38 +261,53 @@ void Receiver::registerMessageListener(ReceiverListener* messageListener, ErrorC
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::run() {
+void Receiver::run()
+{
     ready.countDown();
-    while (!closing) {
+    while (!closing)
+    {
         std::string message = "";
 
         ErrorCode errorCode = CMS_SUCCESS;
 
         Receiver::receiveMessage(message, errorCode, selector, false);
-        if (quit->getCount() == 0) {
+        if (quit->getCount() == 0)
+        {
             closing = true;
         }
 
-        if ((message != "") && (!closing)) {
-            if (useThreadPool) {
+        if ((message != "") && (!closing))
+        {
+            if (useThreadPool)
+            {
                 MessagingTask* task = new MessagingTask(this, message);
 
                 increaseNumOfMessagingTasks();
                 task->queue();
-            } else {
-                try {
+            }
+            else
+            {
+                try
+                {
                     executeMessagingTask(message, false);
-                } catch (...) {
+                }
+                catch (...)
+                {
                 }
             }
-        } else if (!closing) {
-            if (errorCode == CMS_ERROR_CAUGHT_CMS_EXCEPTION || errorCode == CMS_ERROR_MESSAGE_BROKER_ERROR) {
+        }
+        else if (!closing)
+        {
+            if (errorCode == CMS_ERROR_CAUGHT_CMS_EXCEPTION ||
+                errorCode == CMS_ERROR_MESSAGE_BROKER_ERROR)
+            {
                 long long sleepTime = 0;
                 mutexForCmsTemplate.lock();
                 sleepTime = cmsTemplate->getReceiveTimeout();
                 mutexForCmsTemplate.unlock();
 
-                if (quit->await(sleepTime)) {
+                if (quit->await(sleepTime))
+                {
                     closing = true;
                 }
             }
@@ -251,47 +316,57 @@ void Receiver::run() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::executeMessagingTask(const std::string& message, bool isDecreaseNumOfMessagingTasks) {
-    if (!closing) {
+void Receiver::executeMessagingTask(const std::string& message,
+                                    bool isDecreaseNumOfMessagingTasks)
+{
+    if (!closing)
+    {
         mutexGeneral.lock();
         ReceiverListener* copy = messageListener;
         mutexGeneral.unlock();
-        if (copy) {
+        if (copy)
+        {
             copy->onMessage(message);
         }
     }
 
-    if (isDecreaseNumOfMessagingTasks) {
+    if (isDecreaseNumOfMessagingTasks)
+    {
         decreaseNumOfMessagingTasks();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Receiver::isMessageExpired(cms::Message* message) {
-    long long expireTime = message->getCMSExpiration();
+bool Receiver::isMessageExpired(cms::Message* message)
+{
+    long long expireTime  = message->getCMSExpiration();
     long long currentTime = System::currentTimeMillis();
-    if (expireTime > 0 && currentTime > expireTime) {
+    if (expireTime > 0 && currentTime > expireTime)
+    {
         return true;
     }
     return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::increaseNumOfMessagingTasks() {
+void Receiver::increaseNumOfMessagingTasks()
+{
     mutexGeneral.lock();
     numOfMessagingTasks++;
     mutexGeneral.unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::decreaseNumOfMessagingTasks() {
+void Receiver::decreaseNumOfMessagingTasks()
+{
     mutexGeneral.lock();
     numOfMessagingTasks--;
     mutexGeneral.unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long Receiver::getNumOfMessagingTasks() {
+long Receiver::getNumOfMessagingTasks()
+{
     long result = 0;
 
     mutexGeneral.lock();
@@ -302,9 +377,11 @@ long Receiver::getNumOfMessagingTasks() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Receiver::close() {
+void Receiver::close()
+{
     closing = true;
-    if (asyncReceiverThread) {
+    if (asyncReceiverThread)
+    {
         asyncReceiverThread->join();
         delete asyncReceiverThread;
         asyncReceiverThread = NULL;

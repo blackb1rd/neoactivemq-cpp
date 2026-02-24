@@ -28,47 +28,57 @@ using namespace decaf::internal::net;
 using namespace decaf::internal::net::ssl;
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultSSLServerSocketFactory::DefaultSSLServerSocketFactory( const std::string& errorMessage ) :
-    SSLServerSocketFactory(), errorMessage( errorMessage ) {
-
+DefaultSSLServerSocketFactory::DefaultSSLServerSocketFactory(
+    const std::string& errorMessage)
+    : SSLServerSocketFactory(),
+      errorMessage(errorMessage)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultSSLServerSocketFactory::~DefaultSSLServerSocketFactory() {
+DefaultSSLServerSocketFactory::~DefaultSSLServerSocketFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServerSocket* DefaultSSLServerSocketFactory::createServerSocket() {
-
-    throw IOException( __FILE__, __LINE__, errorMessage.c_str() );
+ServerSocket* DefaultSSLServerSocketFactory::createServerSocket()
+{
+    throw IOException(__FILE__, __LINE__, errorMessage.c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServerSocket* DefaultSSLServerSocketFactory::createServerSocket( int port DECAF_UNUSED ) {
-
-    throw IOException( __FILE__, __LINE__, errorMessage.c_str() );
+ServerSocket* DefaultSSLServerSocketFactory::createServerSocket(
+    int port DECAF_UNUSED)
+{
+    throw IOException(__FILE__, __LINE__, errorMessage.c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServerSocket* DefaultSSLServerSocketFactory::createServerSocket( int port DECAF_UNUSED, int backlog DECAF_UNUSED ) {
-
-    throw IOException( __FILE__, __LINE__, errorMessage.c_str() );
+ServerSocket* DefaultSSLServerSocketFactory::createServerSocket(
+    int port    DECAF_UNUSED,
+    int backlog DECAF_UNUSED)
+{
+    throw IOException(__FILE__, __LINE__, errorMessage.c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServerSocket* DefaultSSLServerSocketFactory::createServerSocket( int port DECAF_UNUSED,
-                                                                 int backlog DECAF_UNUSED,
-                                                                 const InetAddress* address DECAF_UNUSED ) {
-
-    throw IOException( __FILE__, __LINE__, errorMessage.c_str() );
+ServerSocket* DefaultSSLServerSocketFactory::createServerSocket(
+    int port                   DECAF_UNUSED,
+    int backlog                DECAF_UNUSED,
+    const InetAddress* address DECAF_UNUSED)
+{
+    throw IOException(__FILE__, __LINE__, errorMessage.c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> DefaultSSLServerSocketFactory::getDefaultCipherSuites() {
+std::vector<std::string> DefaultSSLServerSocketFactory::getDefaultCipherSuites()
+{
     return std::vector<std::string>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> DefaultSSLServerSocketFactory::getSupportedCipherSuites() {
+std::vector<std::string>
+DefaultSSLServerSocketFactory::getSupportedCipherSuites()
+{
     return std::vector<std::string>();
 }

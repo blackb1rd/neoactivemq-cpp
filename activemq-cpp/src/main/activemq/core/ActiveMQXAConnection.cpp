@@ -27,30 +27,38 @@ using namespace activemq::core::kernels;
 using namespace activemq::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQXAConnection::ActiveMQXAConnection(const Pointer<transport::Transport>& transport,
-                                           const Pointer<decaf::util::Properties>& properties)
-  : ActiveMQConnection(transport, properties) {
+ActiveMQXAConnection::ActiveMQXAConnection(
+    const Pointer<transport::Transport>&    transport,
+    const Pointer<decaf::util::Properties>& properties)
+    : ActiveMQConnection(transport, properties)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQXAConnection::~ActiveMQXAConnection() {
+ActiveMQXAConnection::~ActiveMQXAConnection()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::XASession* ActiveMQXAConnection::createXASession() {
-    return dynamic_cast<cms::XASession*>(this->createSession(cms::Session::SESSION_TRANSACTED));
+cms::XASession* ActiveMQXAConnection::createXASession()
+{
+    return dynamic_cast<cms::XASession*>(
+        this->createSession(cms::Session::SESSION_TRANSACTED));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Session* ActiveMQXAConnection::createSession(cms::Session::AcknowledgeMode ackMode AMQCPP_UNUSED) {
-
-    try {
-
+cms::Session* ActiveMQXAConnection::createSession(
+    cms::Session::AcknowledgeMode ackMode AMQCPP_UNUSED)
+{
+    try
+    {
         checkClosedOrFailed();
         ensureConnectionInfoSent();
 
         Pointer<ActiveMQXASessionKernel> session(
-            new ActiveMQXASessionKernel(this, getNextSessionId(), this->getProperties()));
+            new ActiveMQXASessionKernel(this,
+                                        getNextSessionId(),
+                                        this->getProperties()));
 
         this->addSession(session);
 

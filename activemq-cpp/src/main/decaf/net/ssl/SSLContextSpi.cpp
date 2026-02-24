@@ -17,9 +17,9 @@
 
 #include "SSLContextSpi.h"
 
+#include <decaf/net/ssl/SSLParameters.h>
 #include <decaf/net/ssl/SSLSocket.h>
 #include <decaf/net/ssl/SSLSocketFactory.h>
-#include <decaf/net/ssl/SSLParameters.h>
 
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 
@@ -32,61 +32,63 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLContextSpi::~SSLContextSpi() {
-
+SSLContextSpi::~SSLContextSpi()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLParameters* SSLContextSpi::providerGetSupportedSSLParameters() {
-
+SSLParameters* SSLContextSpi::providerGetSupportedSSLParameters()
+{
     SocketFactory* factory = NULL;
 
-    std::unique_ptr<SSLParameters> params( new SSLParameters() );
-    std::unique_ptr<SSLSocket> socket;
+    std::unique_ptr<SSLParameters> params(new SSLParameters());
+    std::unique_ptr<SSLSocket>     socket;
 
-    try{
-
+    try
+    {
         factory = SSLSocketFactory::getDefault();
 
-        socket.reset( dynamic_cast<SSLSocket*>( factory->createSocket() ) );
+        socket.reset(dynamic_cast<SSLSocket*>(factory->createSocket()));
 
-        if( socket.get() == NULL ) {
+        if (socket.get() == NULL)
+        {
             return NULL;
         }
 
-        params->setCipherSuites( socket->getSupportedCipherSuites() );
-        params->setProtocols( socket->getSupportedProtocols() );
+        params->setCipherSuites(socket->getSupportedCipherSuites());
+        params->setProtocols(socket->getSupportedProtocols());
 
         return params.release();
     }
-    DECAF_CATCH_RETHROW( UnsupportedOperationException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, UnsupportedOperationException )
-    DECAF_CATCHALL_THROW( UnsupportedOperationException )
+    DECAF_CATCH_RETHROW(UnsupportedOperationException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, UnsupportedOperationException)
+    DECAF_CATCHALL_THROW(UnsupportedOperationException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLParameters* SSLContextSpi::providerGetDefaultSSLParameters() {
-
-    std::unique_ptr<SSLParameters> params( new SSLParameters() );
+SSLParameters* SSLContextSpi::providerGetDefaultSSLParameters()
+{
+    std::unique_ptr<SSLParameters> params(new SSLParameters());
     std::unique_ptr<SocketFactory> factory;
-    std::unique_ptr<SSLSocket> socket;
+    std::unique_ptr<SSLSocket>     socket;
 
-    try{
+    try
+    {
+        factory.reset(SSLSocketFactory::getDefault());
 
-        factory.reset( SSLSocketFactory::getDefault() );
+        socket.reset(dynamic_cast<SSLSocket*>(factory->createSocket()));
 
-        socket.reset( dynamic_cast<SSLSocket*>( factory->createSocket() ) );
-
-        if( socket.get() == NULL ) {
+        if (socket.get() == NULL)
+        {
             return NULL;
         }
 
-        params->setCipherSuites( socket->getEnabledCipherSuites() );
-        params->setProtocols( socket->getEnabledProtocols() );
+        params->setCipherSuites(socket->getEnabledCipherSuites());
+        params->setProtocols(socket->getEnabledProtocols());
 
         return params.release();
     }
-    DECAF_CATCH_RETHROW( UnsupportedOperationException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, UnsupportedOperationException )
-    DECAF_CATCHALL_THROW( UnsupportedOperationException )
+    DECAF_CATCH_RETHROW(UnsupportedOperationException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, UnsupportedOperationException)
+    DECAF_CATCHALL_THROW(UnsupportedOperationException)
 }

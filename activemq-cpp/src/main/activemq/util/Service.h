@@ -20,27 +20,29 @@
 
 #include <activemq/util/Config.h>
 
-namespace activemq {
-namespace util {
+namespace activemq
+{
+namespace util
+{
 
     /**
-     * Base interface for all classes that run as a Service inside the application
+     * Base interface for all classes that run as a Service inside the
+     * application
      *
      * @since 3.3.0
      */
-    class AMQCPP_API Service {
+    class AMQCPP_API Service
+    {
     public:
-
         virtual ~Service();
 
     public:
-
         virtual void start() = 0;
 
         virtual void stop() = 0;
-
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_UTIL_SERVICE_H_ */

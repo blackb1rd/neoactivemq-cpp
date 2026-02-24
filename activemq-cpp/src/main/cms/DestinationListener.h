@@ -21,33 +21,34 @@
 #include <cms/Config.h>
 #include <cms/DestinationEvent.h>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * A listener class that the client can implement to receive events related
+ * to Destination addition or removal on the CMS Provider.
+ *
+ * @since 3.2
+ */
+class CMS_API DestinationListener
+{
+public:
+    virtual ~DestinationListener();
 
     /**
-     * A listener class that the client can implement to receive events related
-     * to Destination addition or removal on the CMS Provider.
+     * Event call-back method that provides a pointer to an Event object which
+     * contains information on destination add / remove activity on the CMS
+     * Provider.
      *
-     * @since 3.2
+     * The passed object remains the property of the caller and should never be
+     * deleted by the event listener implementation.
+     *
+     * @param event
+     *      The destination event that triggers this call-back.
      */
-    class CMS_API DestinationListener {
-    public:
+    virtual void onDestinationEvent(cms::DestinationEvent* event) = 0;
+};
 
-        virtual ~DestinationListener();
-
-        /**
-         * Event call-back method that provides a pointer to an Event object which
-         * contains information on destination add / remove activity on the CMS Provider.
-         *
-         * The passed object remains the property of the caller and should never be
-         * deleted by the event listener implementation.
-         *
-         * @param event
-         *      The destination event that triggers this call-back.
-         */
-        virtual void onDestinationEvent(cms::DestinationEvent* event) = 0;
-
-    };
-
-}
+}  // namespace cms
 
 #endif /* _CMS_DESTINATIONLISTENER_H_ */

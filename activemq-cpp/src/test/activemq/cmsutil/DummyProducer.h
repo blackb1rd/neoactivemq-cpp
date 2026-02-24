@@ -18,70 +18,117 @@
 #ifndef ACTIVEMQ_CMSUTIL_DUMMYPRODUCER_H_
 #define ACTIVEMQ_CMSUTIL_DUMMYPRODUCER_H_
 
-#include <cms/MessageProducer.h>
 #include <activemq/cmsutil/MessageContext.h>
+#include <cms/MessageProducer.h>
 
-namespace activemq {
-namespace cmsutil {
+namespace activemq
+{
+namespace cmsutil
+{
 
-    class DummyProducer : public cms::MessageProducer {
+    class DummyProducer : public cms::MessageProducer
+    {
     private:
-
-        const cms::Destination* dest;
-        int deliveryMode;
-        bool disableMessageId;
-        bool disableMessageTimestamp;
-        int priority;
-        long long ttl;
-        MessageContext* messageContext;
+        const cms::Destination*  dest;
+        int                      deliveryMode;
+        bool                     disableMessageId;
+        bool                     disableMessageTimestamp;
+        int                      priority;
+        long long                ttl;
+        MessageContext*          messageContext;
         cms::MessageTransformer* transformer;
 
     private:
-
         DummyProducer(const DummyProducer&);
-        DummyProducer& operator= (const DummyProducer&);
+        DummyProducer& operator=(const DummyProducer&);
 
     public:
-
-        DummyProducer(MessageContext* messageContext, const cms::Destination* dest) :
-            dest(dest), deliveryMode(1), disableMessageId(false), disableMessageTimestamp(false),
-            priority(4), ttl(0LL), messageContext(messageContext), transformer(NULL) {
+        DummyProducer(MessageContext*         messageContext,
+                      const cms::Destination* dest)
+            : dest(dest),
+              deliveryMode(1),
+              disableMessageId(false),
+              disableMessageTimestamp(false),
+              priority(4),
+              ttl(0LL),
+              messageContext(messageContext),
+              transformer(NULL)
+        {
         }
 
-        virtual ~DummyProducer() {}
+        virtual ~DummyProducer()
+        {
+        }
 
-        virtual void close() {}
+        virtual void close()
+        {
+        }
 
-        virtual void send(cms::Message* message) {
+        virtual void send(cms::Message* message)
+        {
             send(message, deliveryMode, priority, ttl);
         }
 
-        virtual void send(cms::Message* message, cms::AsyncCallback* onComplate) {
+        virtual void send(cms::Message* message, cms::AsyncCallback* onComplate)
+        {
             send(message, deliveryMode, priority, ttl, onComplate);
         }
 
-        virtual void send(cms::Message* message, int deliveryMode, int priority, long long timeToLive) {
+        virtual void send(cms::Message* message,
+                          int           deliveryMode,
+                          int           priority,
+                          long long     timeToLive)
+        {
             send(dest, message, deliveryMode, priority, timeToLive);
         }
 
-        virtual void send(cms::Message* message, int deliveryMode, int priority, long long timeToLive, cms::AsyncCallback* onComplete) {
+        virtual void send(cms::Message*       message,
+                          int                 deliveryMode,
+                          int                 priority,
+                          long long           timeToLive,
+                          cms::AsyncCallback* onComplete)
+        {
             send(dest, message, deliveryMode, priority, timeToLive, onComplete);
         }
 
-        virtual void send(const cms::Destination* destination, cms::Message* message) {
+        virtual void send(const cms::Destination* destination,
+                          cms::Message*           message)
+        {
             send(dest, message, deliveryMode, priority, ttl);
         }
 
-        virtual void send(const cms::Destination* destination, cms::Message* message, cms::AsyncCallback* onComplete) {
+        virtual void send(const cms::Destination* destination,
+                          cms::Message*           message,
+                          cms::AsyncCallback*     onComplete)
+        {
             send(dest, message, deliveryMode, priority, ttl, onComplete);
         }
 
-        virtual void send(const cms::Destination* destination, cms::Message* message, int deliveryMode, int priority, long long timeToLive) {
-            messageContext->send(destination, message, deliveryMode, priority, timeToLive);
+        virtual void send(const cms::Destination* destination,
+                          cms::Message*           message,
+                          int                     deliveryMode,
+                          int                     priority,
+                          long long               timeToLive)
+        {
+            messageContext->send(destination,
+                                 message,
+                                 deliveryMode,
+                                 priority,
+                                 timeToLive);
         }
 
-        virtual void send(const cms::Destination* destination, cms::Message* message, int deliveryMode, int priority, long long timeToLive, cms::AsyncCallback* onComplete) {
-            messageContext->send(destination, message, deliveryMode, priority, timeToLive);
+        virtual void send(const cms::Destination* destination,
+                          cms::Message*           message,
+                          int                     deliveryMode,
+                          int                     priority,
+                          long long               timeToLive,
+                          cms::AsyncCallback*     onComplete)
+        {
+            messageContext->send(destination,
+                                 message,
+                                 deliveryMode,
+                                 priority,
+                                 timeToLive);
         }
 
         /**
@@ -90,7 +137,8 @@ namespace cmsutil {
          * @param mode
          *      The DeliveryMode
          */
-        virtual void setDeliveryMode(int mode) {
+        virtual void setDeliveryMode(int mode)
+        {
             this->deliveryMode = mode;
         }
 
@@ -99,7 +147,8 @@ namespace cmsutil {
          *
          * @return The DeliveryMode
          */
-        virtual int getDeliveryMode() const {
+        virtual int getDeliveryMode() const
+        {
             return deliveryMode;
         }
 
@@ -109,7 +158,8 @@ namespace cmsutil {
          * @param value
          *      boolean indicating enable / disable (true / false)
          */
-        virtual void setDisableMessageID(bool value) {
+        virtual void setDisableMessageID(bool value)
+        {
             disableMessageId = value;
         }
 
@@ -118,7 +168,8 @@ namespace cmsutil {
          *
          * @return boolean indicating enable / disable (true / false)
          */
-        virtual bool getDisableMessageID() const {
+        virtual bool getDisableMessageID() const
+        {
             return disableMessageId;
         }
 
@@ -126,7 +177,8 @@ namespace cmsutil {
          * Sets if Message Time Stamps are disbled for this Producer
          * @param value - boolean indicating enable / disable (true / false)
          */
-        virtual void setDisableMessageTimeStamp(bool value) {
+        virtual void setDisableMessageTimeStamp(bool value)
+        {
             disableMessageTimestamp = value;
         }
 
@@ -135,7 +187,8 @@ namespace cmsutil {
          *
          * @return boolean indicating enable / disable (true / false)
          */
-        virtual bool getDisableMessageTimeStamp() const {
+        virtual bool getDisableMessageTimeStamp() const
+        {
             return disableMessageTimestamp;
         }
 
@@ -145,7 +198,8 @@ namespace cmsutil {
          * @param priority
          *      int value for Priority level
          */
-        virtual void setPriority(int priority) {
+        virtual void setPriority(int priority)
+        {
             this->priority = priority;
         }
 
@@ -154,7 +208,8 @@ namespace cmsutil {
          *
          * @return int based priority level
          */
-        virtual int getPriority() const {
+        virtual int getPriority() const
+        {
             return priority;
         }
 
@@ -166,7 +221,8 @@ namespace cmsutil {
          * @param time
          *      default time to live value in milliseconds
          */
-        virtual void setTimeToLive(long long time) {
+        virtual void setTimeToLive(long long time)
+        {
             ttl = time;
         }
 
@@ -175,19 +231,23 @@ namespace cmsutil {
          *
          * @return Time to live value in milliseconds
          */
-        virtual long long getTimeToLive() const {
+        virtual long long getTimeToLive() const
+        {
             return ttl;
         }
 
-        virtual cms::MessageTransformer* getMessageTransformer() const {
+        virtual cms::MessageTransformer* getMessageTransformer() const
+        {
             return transformer;
         }
 
-        virtual void setMessageTransformer(cms::MessageTransformer* transformer) {
+        virtual void setMessageTransformer(cms::MessageTransformer* transformer)
+        {
             this->transformer = transformer;
         }
     };
 
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /*ACTIVEMQ_CMSUTIL_DUMMYPRODUCER_H_*/

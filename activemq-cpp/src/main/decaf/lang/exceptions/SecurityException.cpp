@@ -22,30 +22,43 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-SecurityException::SecurityException() : Exception() {
+SecurityException::SecurityException()
+    : Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SecurityException::~SecurityException() throw () {
+SecurityException::~SecurityException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SecurityException::SecurityException(const Exception& ex) : Exception() {
-    *(Exception*) this = ex;
+SecurityException::SecurityException(const Exception& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SecurityException::SecurityException(const SecurityException& ex) : Exception() {
-    *(Exception*) this = ex;
+SecurityException::SecurityException(const SecurityException& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SecurityException::SecurityException(const std::exception* cause) : Exception(cause) {
+SecurityException::SecurityException(const std::exception* cause)
+    : Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SecurityException::SecurityException(const char* file, const int lineNumber, const char* msg, ...) : Exception() {
-
+SecurityException::SecurityException(const char* file,
+                                     const int   lineNumber,
+                                     const char* msg,
+                                     ...)
+    : Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +68,13 @@ SecurityException::SecurityException(const char* file, const int lineNumber, con
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SecurityException::SecurityException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : Exception(cause) {
-
+SecurityException::SecurityException(const char*           file,
+                                     const int             lineNumber,
+                                     const std::exception* cause,
+                                     const char*           msg,
+                                     ...)
+    : Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

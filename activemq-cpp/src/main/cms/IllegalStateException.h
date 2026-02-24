@@ -18,39 +18,42 @@
 #ifndef _CMS_ILLEGALSTATEEXCEPTION_H_
 #define _CMS_ILLEGALSTATEEXCEPTION_H_
 
-#include <cms/Config.h>
 #include <cms/CMSException.h>
+#include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
 
-    /**
-     * This exception is thrown when a method is invoked at an illegal or inappropriate
-     * time or if the provider is not in an appropriate state for the requested operation.
-     * For example, this exception must be thrown if Session.commit is called on a
-     * non-transacted session.
-     *
-     * @since 1.3
-     */
-    class CMS_API IllegalStateException : public CMSException {
-    public:
+/**
+ * This exception is thrown when a method is invoked at an illegal or
+ * inappropriate time or if the provider is not in an appropriate state for the
+ * requested operation. For example, this exception must be thrown if
+ * Session.commit is called on a non-transacted session.
+ *
+ * @since 1.3
+ */
+class CMS_API IllegalStateException : public CMSException
+{
+public:
+    IllegalStateException();
 
-        IllegalStateException();
+    IllegalStateException(const IllegalStateException& ex);
 
-        IllegalStateException(const IllegalStateException& ex);
+    IllegalStateException(const std::string& message);
 
-        IllegalStateException(const std::string& message);
+    IllegalStateException(const std::string&    message,
+                          const std::exception* cause);
 
-        IllegalStateException(const std::string& message, const std::exception* cause);
+    IllegalStateException(
+        const std::string&                              message,
+        const std::exception*                           cause,
+        const std::vector<std::pair<std::string, int>>& stackTrace);
 
-        IllegalStateException(const std::string& message, const std::exception* cause,
-                              const std::vector<std::pair<std::string, int> >& stackTrace);
+    virtual ~IllegalStateException() throw();
 
-        virtual ~IllegalStateException() throw();
+    virtual IllegalStateException* clone();
+};
 
-        virtual IllegalStateException* clone();
-
-    };
-
-}
+}  // namespace cms
 
 #endif /*_CMS_ILLEGALSTATEEXCEPTION_H_*/

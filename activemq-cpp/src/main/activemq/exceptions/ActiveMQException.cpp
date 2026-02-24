@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include <stdio.h>
 #include "ActiveMQException.h"
 #include <decaf/util/logging/LoggerDefines.h>
+#include <stdio.h>
 
 using namespace activemq;
 using namespace activemq::exceptions;
@@ -30,21 +30,30 @@ using namespace std;
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQException::ActiveMQException() : decaf::lang::Exception() {
+ActiveMQException::ActiveMQException()
+    : decaf::lang::Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQException::ActiveMQException(const ActiveMQException& ex) : decaf::lang::Exception(ex) {
+ActiveMQException::ActiveMQException(const ActiveMQException& ex)
+    : decaf::lang::Exception(ex)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQException::ActiveMQException(const Exception& ex) : decaf::lang::Exception(ex.clone()) {
+ActiveMQException::ActiveMQException(const Exception& ex)
+    : decaf::lang::Exception(ex.clone())
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQException::ActiveMQException(const char* file, const int lineNumber, const char* msg, ...) :
-    decaf::lang::Exception() {
-
+ActiveMQException::ActiveMQException(const char* file,
+                                     const int   lineNumber,
+                                     const char* msg,
+                                     ...)
+    : decaf::lang::Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -54,9 +63,13 @@ ActiveMQException::ActiveMQException(const char* file, const int lineNumber, con
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQException::ActiveMQException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) :
-    decaf::lang::Exception(cause) {
-
+ActiveMQException::ActiveMQException(const char*           file,
+                                     const int             lineNumber,
+                                     const std::exception* cause,
+                                     const char*           msg,
+                                     ...)
+    : decaf::lang::Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -66,25 +79,32 @@ ActiveMQException::ActiveMQException(const char* file, const int lineNumber, con
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQException::~ActiveMQException() throw () {
+ActiveMQException::~ActiveMQException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQException* ActiveMQException::clone() const {
+ActiveMQException* ActiveMQException::clone() const
+{
     return new ActiveMQException(*this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::CMSException ActiveMQException::convertToCMSException() const {
-
+cms::CMSException ActiveMQException::convertToCMSException() const
+{
     std::exception* result = NULL;
 
-    if (this->getCause() != NULL) {
-        const Exception* ptrCause = dynamic_cast<const Exception*>(this->getCause());
+    if (this->getCause() != NULL)
+    {
+        const Exception* ptrCause =
+            dynamic_cast<const Exception*>(this->getCause());
 
-        if (ptrCause == NULL) {
+        if (ptrCause == NULL)
+        {
             result = new Exception(__FILE__, __LINE__, getCause()->what());
-        } else {
+        }
+        else
+        {
             result = ptrCause->clone();
         }
     }

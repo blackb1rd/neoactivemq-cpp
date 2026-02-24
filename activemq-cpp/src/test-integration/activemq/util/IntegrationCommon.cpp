@@ -23,28 +23,29 @@ using namespace util;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-const int IntegrationCommon::defaultDelay = 1000;
+const int          IntegrationCommon::defaultDelay    = 1000;
 const unsigned int IntegrationCommon::defaultMsgCount = 200;
-bool IntegrationCommon::debug = false;
+bool               IntegrationCommon::debug           = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 IntegrationCommon::IntegrationCommon()
-    : urlCommon()
-    , stompURL()
-    , openwireURL()
-    , sslOpenwireURL()
-    , openwireURL1()
-    , openwireURL2()
-    , openwireURL3()
-    , failoverURL() {
-
-    this->urlCommon = "tcp://localhost:";
-    this->stompURL = this->urlCommon + "61613?wireFormat=stomp";
+    : urlCommon(),
+      stompURL(),
+      openwireURL(),
+      sslOpenwireURL(),
+      openwireURL1(),
+      openwireURL2(),
+      openwireURL3(),
+      failoverURL()
+{
+    this->urlCommon   = "tcp://localhost:";
+    this->stompURL    = this->urlCommon + "61613?wireFormat=stomp";
     this->openwireURL = this->urlCommon + "61616?transport.trace=false";
 
     // SSL URL for SSL integration testing
-    // Requires: docker compose --profile ssl up (certificates generated automatically)
-    // Peer verification uses ca.pem injected via SSL_CERT_FILE by CTest (see CMakeLists.txt)
+    // Requires: docker compose --profile ssl up (certificates generated
+    // automatically) Peer verification uses ca.pem injected via SSL_CERT_FILE
+    // by CTest (see CMakeLists.txt)
     this->sslOpenwireURL = "ssl://localhost:61617?transport.trace=false";
 
     // Multi-broker URLs for failover testing
@@ -63,7 +64,8 @@ IntegrationCommon::IntegrationCommon()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IntegrationCommon& IntegrationCommon::getInstance() {
+IntegrationCommon& IntegrationCommon::getInstance()
+{
     static IntegrationCommon instance;
 
     return instance;

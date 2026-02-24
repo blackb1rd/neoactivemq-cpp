@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseDataStructure.h>
@@ -30,8 +30,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -44,24 +46,21 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API JournalTransaction : public BaseDataStructure {
+    class AMQCPP_API JournalTransaction : public BaseDataStructure
+    {
     protected:
-
         Pointer<TransactionId> transactionId;
-        unsigned char type;
-        bool wasPrepared;
+        unsigned char          type;
+        bool                   wasPrepared;
 
     public:
-
         const static unsigned char ID_JOURNALTRANSACTION = 54;
 
     private:
-
         JournalTransaction(const JournalTransaction&);
-        JournalTransaction& operator= (const JournalTransaction&);
+        JournalTransaction& operator=(const JournalTransaction&);
 
     public:
-
         JournalTransaction();
 
         virtual ~JournalTransaction();
@@ -77,17 +76,18 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const Pointer<TransactionId>& getTransactionId() const;
-        virtual Pointer<TransactionId>& getTransactionId();
-        virtual void setTransactionId(const Pointer<TransactionId>& transactionId);
+        virtual Pointer<TransactionId>&       getTransactionId();
+        virtual void                          setTransactionId(
+                                     const Pointer<TransactionId>& transactionId);
 
         virtual unsigned char getType() const;
-        virtual void setType(unsigned char type);
+        virtual void          setType(unsigned char type);
 
         virtual bool getWasPrepared() const;
         virtual void setWasPrepared(bool wasPrepared);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_JOURNALTRANSACTION_H_*/

@@ -20,115 +20,121 @@
 
 #include <decaf/util/Config.h>
 
-#include <decaf/util/concurrent/Mutex.h>
-#include <decaf/internal/util/Resource.h>
 #include <decaf/internal/util/GenericResource.h>
+#include <decaf/internal/util/Resource.h>
+#include <decaf/util/concurrent/Mutex.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
 
-    class NetworkData;
-
-    /**
-     * Internal class used to manage Networking related resources and hide platform
-     * dependent calls from the higher level API.
-     *
-     * @since 1.0
-     */
-    class DECAF_API Network {
-    private:
-
-        NetworkData* data;
-
-        static Network* networkRuntime;
-
-    private:
-
-        Network(const Network&);
-        Network& operator=(const Network&);
-
-    protected:
-
-        Network();
-
-    public:
-
-        virtual ~Network();
+        class NetworkData;
 
         /**
-         * Gets a pointer to the Network Runtime's Lock object, this can be used by
-         * Network layer APIs to synchronize around certain actions such as adding
-         * a resource to the Network layer, etc.
+         * Internal class used to manage Networking related resources and hide
+         * platform dependent calls from the higher level API.
          *
-         * The pointer returned is owned by the Network runtime and should not be
-         * deleted or copied by the caller.
-         *
-         * @return a pointer to the Network Runtime's single Lock instance.
+         * @since 1.0
          */
-        decaf::util::concurrent::Mutex* getRuntimeLock();
+        class DECAF_API Network
+        {
+        private:
+            NetworkData* data;
 
-        /**
-         * Adds a Resource to the Network Runtime, this resource will be held by the
-         * runtime until the Library shutdown method is called at which time all the
-         * Resources held by the Network Runtime are destroyed.
-         *
-         * @param value
-         *      The Resource to add to the Network Runtime.
-         *
-         * @throw NullPointerException if the Resource value passed is null.
-         */
-        void addNetworkResource(decaf::internal::util::Resource* value);
+            static Network* networkRuntime;
 
-        template<typename T>
-        void addAsResource(T* value) {
-            util::GenericResource<T>* resource = new util::GenericResource<T>(value);
-            this->addNetworkResource(resource);
-        }
+        private:
+            Network(const Network&);
+            Network& operator=(const Network&);
 
-        /**
-         * Register a Runnable to be called when the Network Runtime is shutdown to provide
-         * a chance to cleanup any data or references that could cause problems should the
-         * Network Runtime be re-initialized.  The Runnable pointer ownership is transfered
-         * to the NetworkRuntime to guarantee the timing of resource cleanup.
-         *
-         * The cleanup tasks are run at a critical time in the Shutdown process and should
-         * be as simple as possible and make every attempt to not throw any exceptions.  If an
-         * exception is thrown it is ignored and processing of the next task is started.
-         *
-         * The tasks should not assume that any Network resources are still available and
-         * should execute as quickly as possible.
-         *
-         * @param task
-         *      Pointer to a Runnable object that will now be owned by the Network Runtime.
-         */
-        void addShutdownTask(decaf::lang::Runnable* task);
+        protected:
+            Network();
 
-    public:   // Static methods
+        public:
+            virtual ~Network();
 
-        /**
-         * Gets the one and only instance of the Network class, if this is called before
-         * the Network layer has been initialized or after it has been shutdown then an
-         * IllegalStateException is thrown.
-         *
-         * @return pointer to the Network runtime for the Decaf library.
-         */
-        static Network* getNetworkRuntime();
+            /**
+             * Gets a pointer to the Network Runtime's Lock object, this can be
+             * used by Network layer APIs to synchronize around certain actions
+             * such as adding a resource to the Network layer, etc.
+             *
+             * The pointer returned is owned by the Network runtime and should
+             * not be deleted or copied by the caller.
+             *
+             * @return a pointer to the Network Runtime's single Lock instance.
+             */
+            decaf::util::concurrent::Mutex* getRuntimeLock();
 
-        /**
-         * Initialize the Networking layer.
-         */
-        static void initializeNetworking();
+            /**
+             * Adds a Resource to the Network Runtime, this resource will be
+             * held by the runtime until the Library shutdown method is called
+             * at which time all the Resources held by the Network Runtime are
+             * destroyed.
+             *
+             * @param value
+             *      The Resource to add to the Network Runtime.
+             *
+             * @throw NullPointerException if the Resource value passed is null.
+             */
+            void addNetworkResource(decaf::internal::util::Resource* value);
 
-        /**
-         * Shutdown the Network layer and free any associated resources, classes in the
-         * Decaf library that use the networking layer will now fail if used after calling
-         * the shutdown method.
-         */
-        static void shutdownNetworking();
+            template <typename T>
+            void addAsResource(T* value)
+            {
+                util::GenericResource<T>* resource =
+                    new util::GenericResource<T>(value);
+                this->addNetworkResource(resource);
+            }
 
-    };
+            /**
+             * Register a Runnable to be called when the Network Runtime is
+             * shutdown to provide a chance to cleanup any data or references
+             * that could cause problems should the Network Runtime be
+             * re-initialized.  The Runnable pointer ownership is transfered to
+             * the NetworkRuntime to guarantee the timing of resource cleanup.
+             *
+             * The cleanup tasks are run at a critical time in the Shutdown
+             * process and should be as simple as possible and make every
+             * attempt to not throw any exceptions.  If an exception is thrown
+             * it is ignored and processing of the next task is started.
+             *
+             * The tasks should not assume that any Network resources are still
+             * available and should execute as quickly as possible.
+             *
+             * @param task
+             *      Pointer to a Runnable object that will now be owned by the
+             * Network Runtime.
+             */
+            void addShutdownTask(decaf::lang::Runnable* task);
 
-}}}
+        public:  // Static methods
+            /**
+             * Gets the one and only instance of the Network class, if this is
+             * called before the Network layer has been initialized or after it
+             * has been shutdown then an IllegalStateException is thrown.
+             *
+             * @return pointer to the Network runtime for the Decaf library.
+             */
+            static Network* getNetworkRuntime();
+
+            /**
+             * Initialize the Networking layer.
+             */
+            static void initializeNetworking();
+
+            /**
+             * Shutdown the Network layer and free any associated resources,
+             * classes in the Decaf library that use the networking layer will
+             * now fail if used after calling the shutdown method.
+             */
+            static void shutdownNetworking();
+        };
+
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_NETWORK_H_ */

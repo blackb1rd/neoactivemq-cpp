@@ -17,14 +17,29 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/net/ssl/SSLSocketFactory.h>
-#include <decaf/net/ssl/SSLSocket.h>
-#include <decaf/net/ssl/SSLParameters.h>
-#include <decaf/net/SocketException.h>
 #include <decaf/io/IOException.h>
 #include <decaf/lang/Thread.h>
+#include <decaf/net/SocketException.h>
+#include <decaf/net/ssl/SSLParameters.h>
+#include <decaf/net/ssl/SSLSocket.h>
+#include <decaf/net/ssl/SSLSocketFactory.h>
 
-namespace decaf { namespace internal { namespace net { namespace ssl { namespace openssl {} } } } }
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
+        namespace ssl
+        {
+            namespace openssl
+            {
+            }
+        }  // namespace ssl
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
+
 using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::net::ssl;
@@ -32,54 +47,57 @@ using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::internal::net::ssl::openssl;
 
-    class OpenSSLSocketTest : public ::testing::Test {
+class OpenSSLSocketTest : public ::testing::Test
+{
 public:
+    OpenSSLSocketTest();
+    virtual ~OpenSSLSocketTest();
 
-        OpenSSLSocketTest();
-        virtual ~OpenSSLSocketTest();
+    void SetUp() override;
+    void TearDown() override;
 
-        void SetUp() override;
-        void TearDown() override;
+    /**
+     * Tests that SSL handshake is performed immediately after connect()
+     * This verifies the fix for the timeout issue where handshake was
+     * deferred until first read/write operation.
+     */
 
-        /**
-         * Tests that SSL handshake is performed immediately after connect()
-         * This verifies the fix for the timeout issue where handshake was
-         * deferred until first read/write operation.
-         */
+    /**
+     * Tests that calling startHandshake multiple times is safe and idempotent.
+     */
 
-        /**
-         * Tests that calling startHandshake multiple times is safe and idempotent.
-         */
+    /**
+     * Tests connection failure scenarios with invalid hosts.
+     */
 
-        /**
-         * Tests connection failure scenarios with invalid hosts.
-         */
-
-        /**
-         * Tests that server name (SNI) is properly configured.
-         */
-
-    };
+    /**
+     * Tests that server name (SNI) is properly configured.
+     */
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketTest::OpenSSLSocketTest() {
+OpenSSLSocketTest::OpenSSLSocketTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketTest::~OpenSSLSocketTest() {
+OpenSSLSocketTest::~OpenSSLSocketTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenSSLSocketTest::SetUp() {
+void OpenSSLSocketTest::SetUp()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenSSLSocketTest::TearDown() {
+void OpenSSLSocketTest::TearDown()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenSSLSocketTest, testHandshakeCalledAfterConnect) {
-
+TEST_F(OpenSSLSocketTest, testHandshakeCalledAfterConnect)
+{
     // This test validates the critical fix for the SSL timeout issue.
     // Prior to the fix, the SSL handshake was deferred until the first
     // read() or write() operation, causing timeouts during connection.
@@ -87,7 +105,8 @@ TEST_F(OpenSSLSocketTest, testHandshakeCalledAfterConnect) {
     // After the fix, startHandshake() is called immediately in connect(),
     // ensuring the SSL connection is fully established before returning.
 
-    try {
+    try
+    {
         // Note: This test demonstrates the expected behavior.
         // In production, the handshake occurs in OpenSSLSocket::connect()
         // immediately after setting up the BIO.
@@ -102,22 +121,25 @@ TEST_F(OpenSSLSocketTest, testHandshakeCalledAfterConnect) {
         // Without the fix, step 3 was deferred to first I/O operation,
         // causing the "TcpSocket::connect() timed out" error.
 
-        ASSERT_TRUE(true) << ("Handshake should be performed in connect(), not deferred to first I/O");
-
-    } catch (Exception& ex) {
+        ASSERT_TRUE(true) << ("Handshake should be performed in connect(), not "
+                              "deferred to first I/O");
+    }
+    catch (Exception& ex)
+    {
         FAIL() << (std::string("Unexpected exception: ") + ex.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenSSLSocketTest, testHandshakeIdempotency) {
-
+TEST_F(OpenSSLSocketTest, testHandshakeIdempotency)
+{
     // Tests that calling startHandshake() multiple times is safe.
     // After the fix, connect() calls startHandshake(), and subsequent
     // read/write operations also check and call it if needed.
     // The handshakeLock ensures thread-safety and idempotency.
 
-    try {
+    try
+    {
         // The OpenSSLSocket implementation uses handshakeStarted flag
         // to ensure startHandshake() only executes once.
 
@@ -126,58 +148,71 @@ TEST_F(OpenSSLSocketTest, testHandshakeIdempotency) {
         // 2. read() and write() also check and call startHandshake()
         // 3. Multiple calls should be safe and not re-execute handshake
 
-        ASSERT_TRUE(true) << ("Multiple startHandshake() calls should be idempotent");
-
-    } catch (Exception& ex) {
+        ASSERT_TRUE(true) << ("Multiple startHandshake() calls should be "
+                              "idempotent");
+    }
+    catch (Exception& ex)
+    {
         FAIL() << (std::string("Unexpected exception: ") + ex.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenSSLSocketTest, testConnectWithInvalidHost) {
-
-    try {
+TEST_F(OpenSSLSocketTest, testConnectWithInvalidHost)
+{
+    try
+    {
         // Test connection failure with invalid host
         // This should fail during TCP connection, before SSL handshake
 
         SocketFactory* factory = SSLSocketFactory::getDefault();
         SSLSocket* socket = dynamic_cast<SSLSocket*>(factory->createSocket());
 
-        if (socket != NULL) {
+        if (socket != NULL)
+        {
             bool exceptionThrown = false;
-            try {
+            try
+            {
                 // Use non-routable IP address from TEST-NET-1 (RFC 5737)
                 socket->connect("192.0.2.1", 61617, 1000);
-            } catch (IOException& ex) {
+            }
+            catch (IOException& ex)
+            {
                 exceptionThrown = true;
                 // Expected exception
-            } catch (...) {
+            }
+            catch (...)
+            {
                 delete socket;
                 throw;
             }
 
             delete socket;
 
-            ASSERT_TRUE(exceptionThrown) << ("Should throw IOException for invalid host");
+            ASSERT_TRUE(exceptionThrown)
+                << ("Should throw IOException for invalid host");
         }
-
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         // Any exception is acceptable for this test case
         ASSERT_TRUE(true);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenSSLSocketTest, testServerNameConfiguration) {
-
-    try {
+TEST_F(OpenSSLSocketTest, testServerNameConfiguration)
+{
+    try
+    {
         // Tests that SNI (Server Name Indication) is properly configured
         // The fix ensures the server name is set before handshake
 
         SocketFactory* factory = SSLSocketFactory::getDefault();
         SSLSocket* socket = dynamic_cast<SSLSocket*>(factory->createSocket());
 
-        if (socket != NULL) {
+        if (socket != NULL)
+        {
             // Configure SSL parameters with server name
             SSLParameters params = socket->getSSLParameters();
 
@@ -189,15 +224,17 @@ TEST_F(OpenSSLSocketTest, testServerNameConfiguration) {
 
             // Verify server names were set
             SSLParameters retrievedParams = socket->getSSLParameters();
-            std::vector<std::string> retrievedNames = retrievedParams.getServerNames();
+            std::vector<std::string> retrievedNames =
+                retrievedParams.getServerNames();
 
             delete socket;
 
             ASSERT_EQ((size_t)1, retrievedNames.size());
             ASSERT_EQ(std::string("test.example.com"), retrievedNames[0]);
         }
-
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         FAIL() << (std::string("Unexpected exception: ") + ex.getMessage());
     }
 }

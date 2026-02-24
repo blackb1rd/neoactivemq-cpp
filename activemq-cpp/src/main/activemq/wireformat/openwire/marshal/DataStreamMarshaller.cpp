@@ -23,5 +23,6 @@ using namespace activemq::wireformat::openwire;
 using namespace activemq::wireformat::openwire::marshal;
 
 ////////////////////////////////////////////////////////////////////////////////
-DataStreamMarshaller::~DataStreamMarshaller() {}
-
+DataStreamMarshaller::~DataStreamMarshaller()
+{
+}

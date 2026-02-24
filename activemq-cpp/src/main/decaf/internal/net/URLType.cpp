@@ -22,17 +22,21 @@ using namespace decaf::internal;
 using namespace decaf::internal::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-URLType::URLType() : file(),
-                     protocol(),
-                     host(),
-                     port(-1),
-                     authority(),
-                     userInfo(),
-                     path(),
-                     query(),
-                     ref(),
-                     hashCode(-1) {
+URLType::URLType()
+    : file(),
+      protocol(),
+      host(),
+      port(-1),
+      authority(),
+      userInfo(),
+      path(),
+      query(),
+      ref(),
+      hashCode(-1)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URLType::~URLType() {}
+URLType::~URLType()
+{
+}

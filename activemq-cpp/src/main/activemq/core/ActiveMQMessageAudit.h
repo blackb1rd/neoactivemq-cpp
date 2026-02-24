@@ -24,25 +24,26 @@
 #include <activemq/commands/ProducerId.h>
 #include <decaf/lang/Pointer.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     class MessageAuditImpl;
 
-    class AMQCPP_API ActiveMQMessageAudit {
+    class AMQCPP_API ActiveMQMessageAudit
+    {
     private:
-
         MessageAuditImpl* impl;
 
     public:
-
         static const int DEFAULT_WINDOW_SIZE;
         static const int MAXIMUM_PRODUCER_COUNT;
 
     public:
-
         /**
-         * Default Constructor windowSize = 2048, maximumNumberOfProducersToTrack = 64
+         * Default Constructor windowSize = 2048,
+         * maximumNumberOfProducersToTrack = 64
          */
         ActiveMQMessageAudit();
 
@@ -54,12 +55,12 @@ namespace core {
          * @param maximumNumberOfProducersToTrack
          *      The number of producers expected in the system
          */
-        ActiveMQMessageAudit(int auditDepth, int maximumNumberOfProducersToTrack);
+        ActiveMQMessageAudit(int auditDepth,
+                             int maximumNumberOfProducersToTrack);
 
         ~ActiveMQMessageAudit();
 
     public:
-
         /**
          * Gets the currently configured Audit Depth
          *
@@ -146,17 +147,19 @@ namespace core {
         bool isInOrder(decaf::lang::Pointer<commands::MessageId> msgId) const;
 
         /**
-         * @return the last sequence Id that we've audited for the given producer.
+         * @return the last sequence Id that we've audited for the given
+         * producer.
          */
-        long long getLastSeqId(decaf::lang::Pointer<commands::ProducerId> id) const;
+        long long getLastSeqId(
+            decaf::lang::Pointer<commands::ProducerId> id) const;
 
         /**
          * Clears this Audit.
          */
         void clear();
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_ACTIVEMQMESSAGEAUDIT_H_ */

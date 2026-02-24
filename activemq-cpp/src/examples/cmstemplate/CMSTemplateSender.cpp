@@ -15,25 +15,25 @@
  * limitations under the License.
  */
 
-#include <decaf/lang/Thread.h>
-#include <decaf/lang/Runnable.h>
-#include <decaf/util/concurrent/CountDownLatch.h>
-#include <decaf/lang/Long.h>
-#include <decaf/util/Date.h>
-#include <activemq/core/ActiveMQConnectionFactory.h>
-#include <activemq/util/Config.h>
-#include <activemq/library/ActiveMQCPP.h>
 #include <activemq/cmsutil/CmsTemplate.h>
 #include <activemq/cmsutil/MessageCreator.h>
+#include <activemq/core/ActiveMQConnectionFactory.h>
+#include <activemq/library/ActiveMQCPP.h>
+#include <activemq/util/Config.h>
+#include <cms/BytesMessage.h>
 #include <cms/Connection.h>
+#include <cms/ExceptionListener.h>
+#include <cms/MapMessage.h>
+#include <cms/MessageListener.h>
 #include <cms/Session.h>
 #include <cms/TextMessage.h>
-#include <cms/BytesMessage.h>
-#include <cms/MapMessage.h>
-#include <cms/ExceptionListener.h>
-#include <cms/MessageListener.h>
-#include <stdlib.h>
+#include <decaf/lang/Long.h>
+#include <decaf/lang/Runnable.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/util/Date.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
 #include <memory>
 
@@ -48,31 +48,38 @@ using namespace cms;
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace{
+namespace
+{
 
-    class TextMessageCreator: public activemq::cmsutil::MessageCreator {
-    public:
+class TextMessageCreator : public activemq::cmsutil::MessageCreator
+{
+public:
+    TextMessageCreator()
+        : MessageCreator()
+    {
+    }
 
-        TextMessageCreator() : MessageCreator() {}
+    virtual ~TextMessageCreator()
+    {
+    }
 
-        virtual ~TextMessageCreator() {}
+    virtual cms::Message* createMessage(cms::Session* session)
+    {
+        cms::Message* message = NULL;
 
-        virtual cms::Message* createMessage( cms::Session* session ) {
-
-            cms::Message* message = NULL;
-
-            if( session != NULL ) {
-                message = session->createTextMessage("test text message");
-            }
-
-            return message;
+        if (session != NULL)
+        {
+            message = session->createTextMessage("test text message");
         }
-    };
-}
+
+        return message;
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-int main(int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED) {
-
+int main(int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED)
+{
     std::cout << "=====================================================\n";
     std::cout << "Starting the MessageSender application..." << std::endl;
 
@@ -80,36 +87,40 @@ int main(int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED) {
     activemq::library::ActiveMQCPP::initializeLibrary();
 
     ActiveMQConnectionFactory* connectionFactory =
-        new ActiveMQConnectionFactory( "failover://(tcp://127.0.0.1:61616)" );
+        new ActiveMQConnectionFactory("failover://(tcp://127.0.0.1:61616)");
 
-    CmsTemplate* cmsTemplate = new CmsTemplate( connectionFactory );
-    cmsTemplate->setDefaultDestinationName( "CMSTemplateExamples" );
-    cmsTemplate->setPubSubDomain( true );
+    CmsTemplate* cmsTemplate = new CmsTemplate(connectionFactory);
+    cmsTemplate->setDefaultDestinationName("CMSTemplateExamples");
+    cmsTemplate->setPubSubDomain(true);
 
     TextMessageCreator* textMessageCreator = new TextMessageCreator();
 
-    for( int i = 0; i < 100; i++ ) {
+    for (int i = 0; i < 100; i++)
+    {
+        std::cout << "Iteration " << i << ". Sending 3 messages..."
+                  << std::endl;
 
-        std::cout << "Iteration " << i << ". Sending 3 messages..." << std::endl;
-
-        for( int j = 0; j < 3; j++ ) {
-
-            try {
-                cmsTemplate->send( textMessageCreator );
+        for (int j = 0; j < 3; j++)
+        {
+            try
+            {
+                cmsTemplate->send(textMessageCreator);
                 std::cout << "Sent a message successfully." << endl;
-            } catch( cms::CMSException& ex ) {
+            }
+            catch (cms::CMSException& ex)
+            {
                 std::cout << "Caught CMSException:  ";
                 std::cout << ex.getMessage().c_str() << endl;
             }
         }
 
         std::cout << "Sleeping 15000 milliseconds..." << std::endl;
-        Thread::sleep( 15000 );
+        Thread::sleep(15000);
     }
 
     std::cout << "Shutting down MessageSender..." << std::endl;
 
-    //shut down ActiveMQCPP library
+    // shut down ActiveMQCPP library
     delete textMessageCreator;
     delete cmsTemplate;
     delete connectionFactory;

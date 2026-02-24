@@ -19,55 +19,63 @@
 #include <decaf/lang/Boolean.h>
 
 #include <gtest/gtest.h>
-#include <string>
 #include <iostream>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
 
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
 
-    class BooleanBenchmark : public ::testing::Test {
+    class BooleanBenchmark : public ::testing::Test
+    {
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BooleanBenchmark, runBenchmark) {
-
+TEST_F(BooleanBenchmark, runBenchmark)
+{
     benchmark::PerformanceTimer timer;
-    int iterations = 100;
+    int                         iterations = 100;
 
-    for( int iter = 0; iter < iterations; ++iter ) {
+    for (int iter = 0; iter < iterations; ++iter)
+    {
         timer.start();
 
-        int numRuns = 8000;
-        Boolean boolean( false );
+        int     numRuns = 8000;
+        Boolean boolean(false);
 
         std::string value = "";
 
-        for( int i = 0; i < numRuns; ++i ) {
+        for (int i = 0; i < numRuns; ++i)
+        {
             value = boolean.toString();
         }
 
-        for( int i = 0; i < numRuns; ++i ) {
-            value = boolean.toString( false );
-            value = boolean.toString( true );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            value = boolean.toString(false);
+            value = boolean.toString(true);
         }
 
-        for( int i = 0; i < numRuns; ++i ) {
-            bool value1 = Boolean::parseBoolean( "false" );
-            bool value2 = Boolean::parseBoolean( "true" );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            bool value1 = Boolean::parseBoolean("false");
+            bool value2 = Boolean::parseBoolean("true");
 
-            value = Boolean::valueOf( value1 ).toString();
-            value = Boolean::valueOf( value2 ).toString();
+            value = Boolean::valueOf(value1).toString();
+            value = Boolean::valueOf(value2).toString();
         }
 
         timer.stop();
     }
 
-    std::cout << typeid( Boolean ).name() << " Benchmark Time = "
-              << timer.getAverageTime() << " Millisecs"
+    std::cout << typeid(Boolean).name()
+              << " Benchmark Time = " << timer.getAverageTime() << " Millisecs"
               << std::endl;
 }

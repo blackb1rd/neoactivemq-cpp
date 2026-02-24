@@ -18,37 +18,46 @@
 #ifndef _ACTIVEMQ_TRANSPORT_TCP_TCPTRANSPORTFACTORY_H_
 #define _ACTIVEMQ_TRANSPORT_TCP_TCPTRANSPORTFACTORY_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/transport/AbstractTransportFactory.h>
+#include <activemq/util/Config.h>
 
-namespace activemq {
-namespace transport {
-namespace tcp {
+namespace activemq
+{
+namespace transport
+{
+    namespace tcp
+    {
 
-    using decaf::lang::Pointer;
+        using decaf::lang::Pointer;
 
-    /**
-     * Factory Responsible for creating the TcpTransport.
-     */
-    class AMQCPP_API TcpTransportFactory : public AbstractTransportFactory {
-    public:
+        /**
+         * Factory Responsible for creating the TcpTransport.
+         */
+        class AMQCPP_API TcpTransportFactory : public AbstractTransportFactory
+        {
+        public:
+            virtual ~TcpTransportFactory()
+            {
+            }
 
-        virtual ~TcpTransportFactory() {}
+            virtual Pointer<Transport> create(const decaf::net::URI& location);
 
-        virtual Pointer<Transport> create(const decaf::net::URI& location);
+            virtual Pointer<Transport> createComposite(
+                const decaf::net::URI& location);
 
-        virtual Pointer<Transport> createComposite(const decaf::net::URI& location);
+        protected:
+            virtual Pointer<Transport> doCreateComposite(
+                const decaf::net::URI&                location,
+                const Pointer<wireformat::WireFormat> wireFormat,
+                const decaf::util::Properties&        properties);
 
-    protected:
+            virtual void doConfigureTransport(
+                Pointer<Transport>,
+                const decaf::util::Properties& properties);
+        };
 
-        virtual Pointer<Transport> doCreateComposite(const decaf::net::URI& location,
-                                                     const Pointer<wireformat::WireFormat> wireFormat,
-                                                     const decaf::util::Properties& properties);
-
-        virtual void doConfigureTransport(Pointer<Transport>, const decaf::util::Properties& properties);
-
-    };
-
-}}}
+    }  // namespace tcp
+}  // namespace transport
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TRANSPORT_TCP_TCPTRANSPORTFACTORY_H_*/

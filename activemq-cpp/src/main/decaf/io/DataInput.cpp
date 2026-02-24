@@ -21,5 +21,6 @@ using namespace decaf;
 using namespace decaf::io;
 
 ////////////////////////////////////////////////////////////////////////////////
-DataInput::~DataInput() {
+DataInput::~DataInput()
+{
 }

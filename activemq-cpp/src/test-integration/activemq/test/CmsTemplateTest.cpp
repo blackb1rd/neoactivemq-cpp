@@ -17,14 +17,14 @@
 
 #include "CmsTemplateTest.h"
 
-#include <activemq/util/IntegrationCommon.h>
-#include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/cmsutil/CmsTemplate.h>
 #include <activemq/cmsutil/MessageCreator.h>
+#include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/IntegrationCommon.h>
 
-#include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/lang/Thread.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
 
 using namespace std;
 using namespace cms;
@@ -39,45 +39,55 @@ using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace test {
+namespace activemq
+{
+namespace test
+{
 
-    class TextMessageCreator : public activemq::cmsutil::MessageCreator {
+    class TextMessageCreator : public activemq::cmsutil::MessageCreator
+    {
     private:
-
         std::string text;
 
     public:
-
-        TextMessageCreator(const std::string& text) :
-            activemq::cmsutil::MessageCreator(), text(text) {
+        TextMessageCreator(const std::string& text)
+            : activemq::cmsutil::MessageCreator(),
+              text(text)
+        {
         }
 
-        virtual ~TextMessageCreator() {
+        virtual ~TextMessageCreator()
+        {
         }
 
-        std::string getText() const {
+        std::string getText() const
+        {
             return text;
         }
 
-        virtual cms::Message* createMessage(cms::Session* session) {
-
+        virtual cms::Message* createMessage(cms::Session* session)
+        {
             return session->createTextMessage(text);
         }
     };
 
-    class Sender: public decaf::lang::Runnable {
+    class Sender : public decaf::lang::Runnable
+    {
     private:
-
         activemq::core::ActiveMQConnectionFactory cf;
-        activemq::cmsutil::CmsTemplate cmsTemplate;
-        int count;
+        activemq::cmsutil::CmsTemplate            cmsTemplate;
+        int                                       count;
 
     public:
-
-        Sender(const std::string& url, bool pubSub, const std::string& destName, int count) :
-            decaf::lang::Runnable(), cf(), cmsTemplate(), count(count) {
-
+        Sender(const std::string& url,
+               bool               pubSub,
+               const std::string& destName,
+               int                count)
+            : decaf::lang::Runnable(),
+              cf(),
+              cmsTemplate(),
+              count(count)
+        {
             cf.setBrokerURI(url);
             cmsTemplate.setConnectionFactory(&cf);
             cmsTemplate.setPubSubDomain(pubSub);
@@ -85,37 +95,49 @@ namespace test {
             cmsTemplate.setDeliveryPersistent(false);
         }
 
-        virtual ~Sender() {}
+        virtual ~Sender()
+        {
+        }
 
-        virtual void run() {
-            try {
-
+        virtual void run()
+        {
+            try
+            {
                 // Send a batch of messages.
                 TextMessageCreator tmc("hello world");
-                for (int ix = 0; ix < count; ++ix) {
+                for (int ix = 0; ix < count; ++ix)
+                {
                     cmsTemplate.send(&tmc);
                 }
-
-            } catch (cms::CMSException& ex) {
+            }
+            catch (cms::CMSException& ex)
+            {
                 ex.printStackTrace();
             }
         }
     };
 
-    class Receiver: public decaf::lang::Runnable {
+    class Receiver : public decaf::lang::Runnable
+    {
     private:
-
         activemq::core::ActiveMQConnectionFactory cf;
-        activemq::cmsutil::CmsTemplate cmsTemplate;
-        int count;
-        int numReceived;
-        decaf::util::concurrent::CountDownLatch ready;
+        activemq::cmsutil::CmsTemplate            cmsTemplate;
+        int                                       count;
+        int                                       numReceived;
+        decaf::util::concurrent::CountDownLatch   ready;
 
     public:
-
-        Receiver(const std::string& url, bool pubSub, const std::string& destName, int count) :
-            decaf::lang::Runnable(), cf(), cmsTemplate(), count(count), numReceived(), ready(1) {
-
+        Receiver(const std::string& url,
+                 bool               pubSub,
+                 const std::string& destName,
+                 int                count)
+            : decaf::lang::Runnable(),
+              cf(),
+              cmsTemplate(),
+              count(count),
+              numReceived(),
+              ready(1)
+        {
             cf.setBrokerURI(url);
             cmsTemplate.setConnectionFactory(&cf);
             cmsTemplate.setPubSubDomain(pubSub);
@@ -123,44 +145,51 @@ namespace test {
             cmsTemplate.setDeliveryPersistent(false);
         }
 
-        virtual ~Receiver() {
+        virtual ~Receiver()
+        {
         }
 
-        int getNumReceived() const {
+        int getNumReceived() const
+        {
             return numReceived;
         }
 
-        virtual void waitUntilReady() {
+        virtual void waitUntilReady()
+        {
             ready.await();
         }
 
-        virtual void run() {
-
-            try {
+        virtual void run()
+        {
+            try
+            {
                 numReceived = 0;
 
                 ready.countDown();
                 // Receive a batch of messages.
-                for (int ix = 0; ix < count; ++ix) {
+                for (int ix = 0; ix < count; ++ix)
+                {
                     cms::Message* message = cmsTemplate.receive();
                     numReceived++;
                     delete message;
                 }
-
-            } catch (cms::CMSException& ex) {
+            }
+            catch (cms::CMSException& ex)
+            {
                 ex.printStackTrace();
             }
         }
     };
-}}
+}  // namespace test
+}  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplateTest::testBasics() {
-
+void CmsTemplateTest::testBasics()
+{
     const unsigned int NUM_MESSAGES = IntegrationCommon::defaultMsgCount;
 
     Receiver receiver(this->getBrokerURL(), false, "testBasics1", NUM_MESSAGES);
-    Thread rt(&receiver);
+    Thread   rt(&receiver);
     rt.start();
 
     // Wait for receiver thread to start.
@@ -178,17 +207,20 @@ void CmsTemplateTest::testBasics() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplateTest::testReceiveException() {
-
+void CmsTemplateTest::testReceiveException()
+{
     // First, try receiving from a bad url
     activemq::core::ActiveMQConnectionFactory cf("tcp://localhost:61666");
-    activemq::cmsutil::CmsTemplate cmsTemplate(&cf);
+    activemq::cmsutil::CmsTemplate            cmsTemplate(&cf);
     cmsTemplate.setDefaultDestinationName("testReceive1");
 
-    try {
+    try
+    {
         cmsTemplate.receive();
         FAIL() << ("failed to throw expected exception");
-    } catch (CMSException& ex) {
+    }
+    catch (CMSException& ex)
+    {
         // Expected.
     }
 
@@ -210,17 +242,20 @@ void CmsTemplateTest::testReceiveException() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsTemplateTest::testSendException() {
-
+void CmsTemplateTest::testSendException()
+{
     // First, try sending to a bad url.
     activemq::core::ActiveMQConnectionFactory cf("tcp://localhost:61666");
-    activemq::cmsutil::CmsTemplate cmsTemplate(&cf);
+    activemq::cmsutil::CmsTemplate            cmsTemplate(&cf);
     cmsTemplate.setDefaultDestinationName("testSend1");
-    try {
+    try
+    {
         TextMessageCreator msgCreator("hello world");
         cmsTemplate.send(&msgCreator);
         FAIL() << ("failed to throw expected exception");
-    } catch (CMSException& ex) {
+    }
+    catch (CMSException& ex)
+    {
         // Expected.
     }
 

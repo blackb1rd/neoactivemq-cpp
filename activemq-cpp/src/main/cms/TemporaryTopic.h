@@ -18,38 +18,39 @@
 #ifndef _CMS_TEMPORARYTOPIC_H_
 #define _CMS_TEMPORARYTOPIC_H_
 
+#include <cms/CMSException.h>
 #include <cms/Config.h>
 #include <cms/Topic.h>
-#include <cms/CMSException.h>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * Defines a Temporary Topic based Destination.
+ *
+ * A TemporaryTopic is a special type of Topic Destination that can only be
+ * consumed from the Connection which created it.  TemporaryTopics are most
+ * commonly used as the reply to address for Message's that implement the
+ * request response pattern.
+ *
+ * A TemporaryTopic is guaranteed to exist at the Provider only for the lifetime
+ * of the Connection that created it.
+ *
+ * @since 1.0
+ */
+class CMS_API TemporaryTopic : public Topic
+{
+public:
+    virtual ~TemporaryTopic();
 
     /**
-     * Defines a Temporary Topic based Destination.
+     * Destroy's the Temporary Destination at the Provider
      *
-     * A TemporaryTopic is a special type of Topic Destination that can only be consumed
-     * from the Connection which created it.  TemporaryTopics are most commonly used as the
-     * reply to address for Message's that implement the request response pattern.
-     *
-     * A TemporaryTopic is guaranteed to exist at the Provider only for the lifetime of the
-     * Connection that created it.
-     *
-     * @since 1.0
+     * @throws CMSException
      */
-    class CMS_API TemporaryTopic : public Topic {
-    public:
+    virtual void destroy() = 0;
+};
 
-        virtual ~TemporaryTopic();
-
-        /**
-         * Destroy's the Temporary Destination at the Provider
-         *
-         * @throws CMSException
-         */
-        virtual void destroy() = 0;
-
-   };
-
-}
+}  // namespace cms
 
 #endif /*_CMS_TEMPORARYTOPIC_H_*/

@@ -20,45 +20,45 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/ActiveMQDestination.h>
 #include <activemq/exceptions/ActiveMQException.h>
-#include <decaf/lang/Exception.h>
+#include <activemq/util/Config.h>
 #include <cms/Queue.h>
-#include <vector>
-#include <string>
+#include <decaf/lang/Exception.h>
 #include <memory>
+#include <string>
+#include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
-    class AMQCPP_API ActiveMQQueue : public ActiveMQDestination, public cms::Queue {
+    class AMQCPP_API ActiveMQQueue : public ActiveMQDestination,
+                                     public cms::Queue
+    {
     public:
-
         const static unsigned char ID_ACTIVEMQQUEUE = 100;
 
     public:
-
         using ActiveMQDestination::compareTo;
         using ActiveMQDestination::equals;
         using ActiveMQDestination::operator<;
         using ActiveMQDestination::operator==;
 
     private:
-
         ActiveMQQueue(const ActiveMQQueue&);
         ActiveMQQueue& operator=(const ActiveMQQueue&);
 
     public:
-
         ActiveMQQueue();
 
         ActiveMQQueue(const std::string& name);
 
-        virtual ~ActiveMQQueue() throw ();
+        virtual ~ActiveMQQueue() throw();
 
         virtual unsigned char getDataStructureType() const;
 
@@ -70,38 +70,43 @@ namespace commands {
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const cms::Queue* getCMSDestination() const {
+        virtual const cms::Queue* getCMSDestination() const
+        {
             return this;
         }
 
-    public:   // CMS Destination
-
-        virtual cms::Destination::DestinationType getDestinationType() const {
+    public:  // CMS Destination
+        virtual cms::Destination::DestinationType getDestinationType() const
+        {
             return cms::Destination::QUEUE;
         }
 
-        virtual cms::Destination* clone() const {
+        virtual cms::Destination* clone() const
+        {
             return dynamic_cast<cms::Destination*>(this->cloneDataStructure());
         }
 
-        virtual void copy(const cms::Destination& source) {
-            this->copyDataStructure(dynamic_cast<const DataStructure*>(&source));
+        virtual void copy(const cms::Destination& source)
+        {
+            this->copyDataStructure(
+                dynamic_cast<const DataStructure*>(&source));
         }
 
-        virtual const cms::CMSProperties& getCMSProperties() const {
+        virtual const cms::CMSProperties& getCMSProperties() const
+        {
             return this->getOptions();
         }
 
         virtual bool equals(const cms::Destination& other) const;
 
     public:  // CMS Queue
-
-        virtual std::string getQueueName() const {
+        virtual std::string getQueueName() const
+        {
             return this->getPhysicalName();
         }
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_ACTIVEMQQUEUE_H_*/

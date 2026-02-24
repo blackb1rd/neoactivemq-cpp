@@ -22,27 +22,34 @@
 
 #include <decaf/net/URLStreamHandler.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
-namespace file {
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
+        namespace file
+        {
 
-    class DECAF_API FileHandler : public decaf::net::URLStreamHandler {
-    public:
+            class DECAF_API FileHandler : public decaf::net::URLStreamHandler
+            {
+            public:
+                virtual ~FileHandler();
 
-        virtual ~FileHandler();
+            public:
+                virtual decaf::net::URLConnection* openConnection(
+                    const decaf::net::URL& url);
 
-    public:
+                virtual decaf::net::URLConnection* openConnection(
+                    const decaf::net::URL&   url,
+                    const decaf::net::Proxy* proxy);
 
-        virtual decaf::net::URLConnection* openConnection(const decaf::net::URL& url);
+                virtual int getDefaultPort() const;
+            };
 
-        virtual decaf::net::URLConnection* openConnection(const decaf::net::URL& url,
-                                                          const decaf::net::Proxy* proxy);
-
-        virtual int getDefaultPort() const;
-
-    };
-
-}}}}
+        }  // namespace file
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_FILE_FILEHANDLER_H_ */

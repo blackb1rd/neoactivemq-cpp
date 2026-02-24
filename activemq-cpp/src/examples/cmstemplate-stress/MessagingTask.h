@@ -21,28 +21,26 @@
 #include "Receiver.h"
 #include <decaf/lang/Runnable.h>
 
-namespace cmstemplate {
+namespace cmstemplate
+{
 
-    class MessagingTask : public decaf::lang::Runnable {
-    private:
+class MessagingTask : public decaf::lang::Runnable
+{
+private:
+    Receiver*   receiver;
+    std::string message;
 
-        Receiver* receiver;
-        std::string message;
+private:
+    MessagingTask(const MessagingTask&);
+    MessagingTask& operator=(const MessagingTask&);
 
-    private:
+public:
+    MessagingTask(Receiver* receiver, const std::string& message);
 
-        MessagingTask(const MessagingTask&);
-        MessagingTask& operator= (const MessagingTask&);
+    virtual ~MessagingTask();
 
-    public:
-
-        MessagingTask(Receiver* receiver, const std::string& message);
-
-        virtual ~MessagingTask();
-
-        virtual void run();
-
-    };
-}
+    virtual void run();
+};
+}  // namespace cmstemplate
 
 #endif /** _CMSTEMPLATE_MESSAGINGTASK_H_ */

@@ -15,36 +15,58 @@
  * limitations under the License.
  */
 
-#include <activemq/util/IntegrationCommon.h>
 #include <activemq/test/CmsTemplateTest.h>
+#include <activemq/util/IntegrationCommon.h>
 
-namespace activemq{
-namespace test{
-namespace stomp{
-    class StompCmsTemplateTest : public CmsTemplateTest {
-public:
-        StompCmsTemplateTest();
-        virtual ~StompCmsTemplateTest();
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getStompURL();
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace stomp
+    {
+        class StompCmsTemplateTest : public CmsTemplateTest
+        {
+        public:
+            StompCmsTemplateTest();
+            virtual ~StompCmsTemplateTest();
+
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getStompURL();
+            }
+        };
+    }  // namespace stomp
+}  // namespace test
+}  // namespace activemq
 
 using namespace activemq;
 using namespace activemq::test;
 using namespace activemq::test::stomp;
 
 ////////////////////////////////////////////////////////////////////////////////
-StompCmsTemplateTest::StompCmsTemplateTest() {
+StompCmsTemplateTest::StompCmsTemplateTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StompCmsTemplateTest::~StompCmsTemplateTest() {
+StompCmsTemplateTest::~StompCmsTemplateTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompCmsTemplateTest, DISABLED_testBasics) { testBasics(); }
-TEST_F(StompCmsTemplateTest, DISABLED_testReceiveException) { testReceiveException(); }
-TEST_F(StompCmsTemplateTest, DISABLED_testSendException) { testSendException(); }
+TEST_F(StompCmsTemplateTest, DISABLED_testBasics)
+{
+    testBasics();
+}
+
+TEST_F(StompCmsTemplateTest, DISABLED_testReceiveException)
+{
+    testReceiveException();
+}
+
+TEST_F(StompCmsTemplateTest, DISABLED_testSendException)
+{
+    testSendException();
+}

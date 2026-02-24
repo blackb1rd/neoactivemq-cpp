@@ -22,42 +22,45 @@
 
 #include <decaf/net/ssl/SSLContext.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
-namespace ssl {
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
+        namespace ssl
+        {
 
-    /**
-     * Default SSLContext manager for the Decaf library.  If the user doesn't supply or
-     * specify the SSLContext that they wish to use then we load the Decaf library's
-     * default SSLContext using whatever SSL provider is enabled an preferred.
-     *
-     * @since 1.0
-     */
-    class DefaultSSLContext {
-    private:
+            /**
+             * Default SSLContext manager for the Decaf library.  If the user
+             * doesn't supply or specify the SSLContext that they wish to use
+             * then we load the Decaf library's default SSLContext using
+             * whatever SSL provider is enabled an preferred.
+             *
+             * @since 1.0
+             */
+            class DefaultSSLContext
+            {
+            private:
+                static decaf::net::ssl::SSLContext* defaultSSLContext;
 
-        static decaf::net::ssl::SSLContext* defaultSSLContext;
+            private:
+                DefaultSSLContext(const DefaultSSLContext&);
+                DefaultSSLContext& operator=(const DefaultSSLContext&);
 
-    private:
+            protected:
+                DefaultSSLContext();
 
-        DefaultSSLContext( const DefaultSSLContext& );
-        DefaultSSLContext& operator= ( const DefaultSSLContext& );
+            public:
+                virtual ~DefaultSSLContext();
 
-    protected:
+            public:
+                static decaf::net::ssl::SSLContext* getContext();
+            };
 
-        DefaultSSLContext();
-
-    public:
-
-        virtual ~DefaultSSLContext();
-
-    public:
-
-        static decaf::net::ssl::SSLContext* getContext();
-
-    };
-
-}}}}
+        }  // namespace ssl
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_SSL_DEFAULTSSLCONTEXT_H_ */

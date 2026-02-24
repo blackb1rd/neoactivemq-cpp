@@ -19,85 +19,101 @@
 
 #include <decaf/lang/Exception.h>
 
-namespace decaf {
-namespace util {
-namespace concurrent {
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
 
-    /*
-     * Exception thrown by an Executor when a task cannot be accepted for execution.
-     *
-     * @since 1.0
-     */
-    class DECAF_API RejectedExecutionException : public decaf::lang::Exception {
-    public:
-
-        /**
-         * Default Constructor
-         */
-        RejectedExecutionException();
-
-        /**
-         * Conversion Constructor from some other Exception
+        /*
+         * Exception thrown by an Executor when a task cannot be accepted for
+         * execution.
          *
-         * @param ex
-         *      An exception that should become this type of Exception
+         * @since 1.0
          */
-        RejectedExecutionException(const Exception& ex);
+        class DECAF_API RejectedExecutionException
+            : public decaf::lang::Exception
+        {
+        public:
+            /**
+             * Default Constructor
+             */
+            RejectedExecutionException();
 
-        /**
-         * Copy Constructor
-         *
-         * @param ex - The Exception to copy in this new instance.
-         */
-        RejectedExecutionException(const RejectedExecutionException& ex);
+            /**
+             * Conversion Constructor from some other Exception
+             *
+             * @param ex
+             *      An exception that should become this type of Exception
+             */
+            RejectedExecutionException(const Exception& ex);
 
-        /**
-         * Constructor
-         *
-         * @param cause Pointer to the exception that caused this one to
-         * be thrown, the object is cloned caller retains ownership.
-         */
-        RejectedExecutionException(const std::exception* cause);
+            /**
+             * Copy Constructor
+             *
+             * @param ex - The Exception to copy in this new instance.
+             */
+            RejectedExecutionException(const RejectedExecutionException& ex);
 
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         *
-         * @param file - The file name where exception occurs
-         * @param lineNumber - The line number where the exception occurred.
-         * @param msg - The message to report
-         * @param ... - list of primitives that are formatted into the message
-         */
-        RejectedExecutionException(const char* file, const int lineNumber, const char* msg, ...);
+            /**
+             * Constructor
+             *
+             * @param cause Pointer to the exception that caused this one to
+             * be thrown, the object is cloned caller retains ownership.
+             */
+            RejectedExecutionException(const std::exception* cause);
 
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         *
-         * @param file - The file name where exception occurs
-         * @param lineNumber - The line number where the exception occurred.
-         * @param cause - The exception that was the cause for this one to be thrown.
-         * @param msg - The message to report
-         * @param ... - list of primitives that are formatted into the message
-         */
-        RejectedExecutionException(const char* file, const int lineNumber,
-                                   const std::exception* cause, const char* msg, ...);
+            /**
+             * Constructor - Initializes the file name and line number where
+             * this message occurred.  Sets the message to report, using an
+             * optional list of arguments to parse into the message
+             *
+             * @param file - The file name where exception occurs
+             * @param lineNumber - The line number where the exception occurred.
+             * @param msg - The message to report
+             * @param ... - list of primitives that are formatted into the
+             * message
+             */
+            RejectedExecutionException(const char* file,
+                                       const int   lineNumber,
+                                       const char* msg,
+                                       ...);
 
-        /**
-         * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
-         *
-         * @return A new instance this exception type with a copy the current state.
-         */
-        virtual RejectedExecutionException* clone() const;
+            /**
+             * Constructor - Initializes the file name and line number where
+             * this message occurred.  Sets the message to report, using an
+             * optional list of arguments to parse into the message
+             *
+             * @param file - The file name where exception occurs
+             * @param lineNumber - The line number where the exception occurred.
+             * @param cause - The exception that was the cause for this one to
+             * be thrown.
+             * @param msg - The message to report
+             * @param ... - list of primitives that are formatted into the
+             * message
+             */
+            RejectedExecutionException(const char*           file,
+                                       const int             lineNumber,
+                                       const std::exception* cause,
+                                       const char*           msg,
+                                       ...);
 
-        virtual ~RejectedExecutionException() throw ();
+            /**
+             * Clones this exception.  This is useful for cases where you need
+             * to preserve the type of the original exception as well as the
+             * message. All subclasses should override.
+             *
+             * @return A new instance this exception type with a copy the
+             * current state.
+             */
+            virtual RejectedExecutionException* clone() const;
 
-    };
+            virtual ~RejectedExecutionException() throw();
+        };
 
-}}}
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_CONCURRENT_REJECTEDEXECUTIONEXCEPTION_H_*/

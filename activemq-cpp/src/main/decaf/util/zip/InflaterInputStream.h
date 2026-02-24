@@ -26,159 +26,182 @@
 
 #include <vector>
 
-namespace decaf {
-namespace util {
-namespace zip {
-
-    /**
-     * A FilterInputStream that decompresses data read from the wrapped InputStream instance.
-     *
-     * @since 1.0
-     */
-    class DECAF_API InflaterInputStream : public decaf::io::FilterInputStream {
-    protected:
+namespace decaf
+{
+namespace util
+{
+    namespace zip
+    {
 
         /**
-         * The Inflater instance to use.
-         */
-        Inflater* inflater;
-
-        /**
-         * The buffer to hold chunks of data read from the stream before inflation.
-         */
-        std::vector<unsigned char> buff;
-
-        /**
-         * The amount of data currently stored in the input buffer.
-         */
-        int length;
-
-        bool ownInflater;
-        bool atEOF;
-
-        static const int DEFAULT_BUFFER_SIZE;
-
-    private:
-
-        InflaterInputStream(const InflaterInputStream&);
-        InflaterInputStream& operator=(const InflaterInputStream&);
-
-    public:
-
-        /**
-         * Create an instance of this class with a default inflater and buffer size.
+         * A FilterInputStream that decompresses data read from the wrapped
+         * InputStream instance.
          *
-         * @param inputStream
-         *      The InputStream instance to wrap.
-         * @param own
-         *      Should this Filter take ownership of the InputStream pointer (defaults to false).
+         * @since 1.0
          */
-        InflaterInputStream(decaf::io::InputStream* inputStream, bool own = false);
+        class DECAF_API InflaterInputStream
+            : public decaf::io::FilterInputStream
+        {
+        protected:
+            /**
+             * The Inflater instance to use.
+             */
+            Inflater* inflater;
 
-        /**
-         * Creates a new InflaterInputStream with a user supplied Inflater and a default buffer size.
-         * When the user supplied a Inflater instance the InflaterInputStream does not take ownership
-         * of the Inflater pointer unless the ownInflater parameter is set to true, otherwise the
-         * caller is still responsible for deleting the Inflater.
-         *
-         * @param inputStream
-         *      The InputStream instance to wrap.
-         * @param inflater
-         *      The user supplied Inflater to use for decompression. (
-         * @param own
-         *      Should this filter take ownership of the InputStream pointer (default is false).
-         * @param ownInflater
-         *      Should the filter take ownership of the passed Inflater object (default is false).
-         *
-         * @throws NullPointerException if the Inflater given is NULL.
-         */
-        InflaterInputStream(decaf::io::InputStream* inputStream, Inflater* inflater,
-                            bool own = false, bool ownInflater = false);
+            /**
+             * The buffer to hold chunks of data read from the stream before
+             * inflation.
+             */
+            std::vector<unsigned char> buff;
 
-        /**
-         * Creates a new DeflateOutputStream with a user supplied Inflater and specified buffer size.
-         * When the user supplied a Inflater instance the InflaterInputStream does not take ownership
-         * of the Inflater pointer unless the ownInflater parameter is set to true, otherwise the caller
-         * is still responsible for deleting the Inflater.
-         *
-         * @param inputStream
-         *      The InputStream instance to wrap.
-         * @param inflater
-         *      The user supplied Inflater to use for decompression.
-         * @param bufferSize
-         *      The size of the input buffer.
-         * @param own
-         *      Should this filter take ownership of the InputStream pointer (default is false).
-         * @param ownInflater
-         *      Should the filter take ownership of the passed Inflater object (default is false).
-         *
-         * @throws NullPointerException if the Inflater given is NULL.
-         * @throws IllegalArgumentException if the bufferSize value is zero.
-         */
-        InflaterInputStream(decaf::io::InputStream* inputStream, Inflater* inflater,
-                            int bufferSize, bool own = false, bool ownInflater = false);
+            /**
+             * The amount of data currently stored in the input buffer.
+             */
+            int length;
 
-        virtual ~InflaterInputStream();
+            bool ownInflater;
+            bool atEOF;
 
-        /**
-         * {@inheritDoc}
-         *
-         * Until EOF this method always returns 1, thereafter it always returns 0.
-         */
-        virtual int available() const;
+            static const int DEFAULT_BUFFER_SIZE;
 
-        /**
-         * {@inheritDoc}
-         *
-         * Closes any resources associated with this InflaterInputStream.
-         */
-        virtual void close();
+        private:
+            InflaterInputStream(const InflaterInputStream&);
+            InflaterInputStream& operator=(const InflaterInputStream&);
 
-        /**
-         * {@inheritDoc}
-         *
-         * Skips the specified amount of uncompressed input data.
-         */
-        virtual long long skip(long long num);
+        public:
+            /**
+             * Create an instance of this class with a default inflater and
+             * buffer size.
+             *
+             * @param inputStream
+             *      The InputStream instance to wrap.
+             * @param own
+             *      Should this Filter take ownership of the InputStream pointer
+             * (defaults to false).
+             */
+            InflaterInputStream(decaf::io::InputStream* inputStream,
+                                bool                    own = false);
 
-        /**
-         * {@inheritDoc}
-         *
-         * Does nothing.
-         */
-        virtual void mark(int readLimit);
+            /**
+             * Creates a new InflaterInputStream with a user supplied Inflater
+             * and a default buffer size. When the user supplied a Inflater
+             * instance the InflaterInputStream does not take ownership of the
+             * Inflater pointer unless the ownInflater parameter is set to true,
+             * otherwise the caller is still responsible for deleting the
+             * Inflater.
+             *
+             * @param inputStream
+             *      The InputStream instance to wrap.
+             * @param inflater
+             *      The user supplied Inflater to use for decompression. (
+             * @param own
+             *      Should this filter take ownership of the InputStream pointer
+             * (default is false).
+             * @param ownInflater
+             *      Should the filter take ownership of the passed Inflater
+             * object (default is false).
+             *
+             * @throws NullPointerException if the Inflater given is NULL.
+             */
+            InflaterInputStream(decaf::io::InputStream* inputStream,
+                                Inflater*               inflater,
+                                bool                    own         = false,
+                                bool                    ownInflater = false);
 
-        /**
-         * {@inheritDoc}
-         *
-         * Always throws an IOException when called.
-         */
-        virtual void reset();
+            /**
+             * Creates a new DeflateOutputStream with a user supplied Inflater
+             * and specified buffer size. When the user supplied a Inflater
+             * instance the InflaterInputStream does not take ownership of the
+             * Inflater pointer unless the ownInflater parameter is set to true,
+             * otherwise the caller is still responsible for deleting the
+             * Inflater.
+             *
+             * @param inputStream
+             *      The InputStream instance to wrap.
+             * @param inflater
+             *      The user supplied Inflater to use for decompression.
+             * @param bufferSize
+             *      The size of the input buffer.
+             * @param own
+             *      Should this filter take ownership of the InputStream pointer
+             * (default is false).
+             * @param ownInflater
+             *      Should the filter take ownership of the passed Inflater
+             * object (default is false).
+             *
+             * @throws NullPointerException if the Inflater given is NULL.
+             * @throws IllegalArgumentException if the bufferSize value is zero.
+             */
+            InflaterInputStream(decaf::io::InputStream* inputStream,
+                                Inflater*               inflater,
+                                int                     bufferSize,
+                                bool                    own         = false,
+                                bool                    ownInflater = false);
 
-        /**
-         * {@inheritDoc}
-         *
-         * Always returns false.
-         */
-        virtual bool markSupported() const;
+            virtual ~InflaterInputStream();
 
-    protected:
+            /**
+             * {@inheritDoc}
+             *
+             * Until EOF this method always returns 1, thereafter it always
+             * returns 0.
+             */
+            virtual int available() const;
 
-        /**
-         * Fills the input buffer with the next chunk of data.
-         *
-         * @throws IOException if an I/O error occurs.
-         */
-        virtual void fill();
+            /**
+             * {@inheritDoc}
+             *
+             * Closes any resources associated with this InflaterInputStream.
+             */
+            virtual void close();
 
-    protected:
+            /**
+             * {@inheritDoc}
+             *
+             * Skips the specified amount of uncompressed input data.
+             */
+            virtual long long skip(long long num);
 
-        virtual int doReadByte();
+            /**
+             * {@inheritDoc}
+             *
+             * Does nothing.
+             */
+            virtual void mark(int readLimit);
 
-        virtual int doReadArrayBounded(unsigned char* buffer, int size, int offset, int length);
+            /**
+             * {@inheritDoc}
+             *
+             * Always throws an IOException when called.
+             */
+            virtual void reset();
 
-    };
+            /**
+             * {@inheritDoc}
+             *
+             * Always returns false.
+             */
+            virtual bool markSupported() const;
 
-}}}
+        protected:
+            /**
+             * Fills the input buffer with the next chunk of data.
+             *
+             * @throws IOException if an I/O error occurs.
+             */
+            virtual void fill();
+
+        protected:
+            virtual int doReadByte();
+
+            virtual int doReadArrayBounded(unsigned char* buffer,
+                                           int            size,
+                                           int            offset,
+                                           int            length);
+        };
+
+    }  // namespace zip
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_ZIP_INFLATERINPUTSTREAM_H_ */

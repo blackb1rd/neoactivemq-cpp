@@ -20,11 +20,13 @@
 
 #include <decaf/util/Config.h>
 
-#include <vector>
 #include <string>
+#include <vector>
 
-namespace decaf {
-namespace security {
+namespace decaf
+{
+namespace security
+{
 
     /**
      * The Key interface is the top-level interface for all keys. It defines the
@@ -61,9 +63,9 @@ namespace security {
      * This is the name of the format of the encoded key. It is returned by the
      * getFormat method.
      */
-    class DECAF_API Key {
+    class DECAF_API Key
+    {
     public:
-
         virtual ~Key();
 
         /**
@@ -98,8 +100,8 @@ namespace security {
          * @return the primary encoding format of the key.
          */
         virtual std::string getFormat() const = 0;
-
     };
-}}
+}  // namespace security
+}  // namespace decaf
 
 #endif /*_DECAF_SECURITY_KEY_H*/

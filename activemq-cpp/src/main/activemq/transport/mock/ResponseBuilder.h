@@ -26,44 +26,49 @@
 #include <decaf/lang/Pointer.h>
 #include <decaf/util/LinkedList.h>
 
-namespace activemq {
-namespace transport {
-namespace mock {
+namespace activemq
+{
+namespace transport
+{
+    namespace mock
+    {
 
-    using decaf::lang::Pointer;
-    using activemq::commands::Command;
-    using activemq::commands::Response;
-
-    /**
-     * Interface for all Protocols to implement that defines the behavior
-     * of the Broker in response to messages of that protocol.
-     */
-    class AMQCPP_API ResponseBuilder {
-    public:
-
-        virtual ~ResponseBuilder();
+        using activemq::commands::Command;
+        using activemq::commands::Response;
+        using decaf::lang::Pointer;
 
         /**
-         * Given a Command, check if it requires a response and return the
-         * appropriate Response that the Broker would send for this Command
-         * @param command - The command to build a response for
-         * @return A Response object pointer, or NULL if no response.
+         * Interface for all Protocols to implement that defines the behavior
+         * of the Broker in response to messages of that protocol.
          */
-        virtual Pointer<Response> buildResponse(const Pointer<Command> command) = 0;
+        class AMQCPP_API ResponseBuilder
+        {
+        public:
+            virtual ~ResponseBuilder();
 
-        /**
-         * When called the ResponseBuilder must construct all the
-         * Responses or Asynchronous commands that would be sent to
-         * this client by the Broker upon receipt of the passed command.
-         * @param command - The Command being sent to the Broker.
-         * @param queue - Queue of Command sent back from the broker.
-         */
-        virtual void buildIncomingCommands(
-            const Pointer<Command> command,
-            decaf::util::LinkedList< Pointer<Command> >& queue ) = 0;
+            /**
+             * Given a Command, check if it requires a response and return the
+             * appropriate Response that the Broker would send for this Command
+             * @param command - The command to build a response for
+             * @return A Response object pointer, or NULL if no response.
+             */
+            virtual Pointer<Response> buildResponse(
+                const Pointer<Command> command) = 0;
 
-    };
+            /**
+             * When called the ResponseBuilder must construct all the
+             * Responses or Asynchronous commands that would be sent to
+             * this client by the Broker upon receipt of the passed command.
+             * @param command - The Command being sent to the Broker.
+             * @param queue - Queue of Command sent back from the broker.
+             */
+            virtual void buildIncomingCommands(
+                const Pointer<Command>                     command,
+                decaf::util::LinkedList<Pointer<Command>>& queue) = 0;
+        };
 
-}}}
+    }  // namespace mock
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_MOCK_RESPONSEBUILDER_H_ */

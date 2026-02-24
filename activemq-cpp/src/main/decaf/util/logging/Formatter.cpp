@@ -22,7 +22,7 @@ using namespace decaf::util;
 using namespace decaf::util::logging;
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Formatter::formatMessage( const LogRecord& record ) const {
-
+std::string Formatter::formatMessage(const LogRecord& record) const
+{
     return record.getMessage();
 }

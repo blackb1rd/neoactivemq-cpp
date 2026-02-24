@@ -15,41 +15,39 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <decaf/lang/Byte.h>
+#include <gtest/gtest.h>
 
 using namespace decaf;
 using namespace decaf::lang;
 
-    class ByteTest : public ::testing::Test
-    {
+class ByteTest : public ::testing::Test
+{
 public:
-
-        ByteTest();
-
-    };
+    ByteTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-ByteTest::ByteTest(){
+ByteTest::ByteTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ByteTest, test) {
+TEST_F(ByteTest, test)
+{
+    Byte ubyte('b');
 
-    Byte ubyte( 'b' );
+    ASSERT_TRUE((ubyte < 'a') == false);
+    ASSERT_TRUE(ubyte.compareTo('a') == 1);
+    ASSERT_TRUE(ubyte.compareTo('b') == 0);
+    ASSERT_TRUE(ubyte.compareTo('c') == -1);
 
-    ASSERT_TRUE(( ubyte < 'a' ) == false);
-    ASSERT_TRUE(ubyte.compareTo( 'a' ) == 1);
-    ASSERT_TRUE(ubyte.compareTo( 'b' ) == 0);
-    ASSERT_TRUE(ubyte.compareTo( 'c' ) == -1);
+    ASSERT_TRUE(ubyte.parseByte("60") == 60);
+    ASSERT_TRUE(ubyte.parseByte("ff", 16) == 255);
 
-    ASSERT_TRUE(ubyte.parseByte( "60" ) == 60);
-    ASSERT_TRUE(ubyte.parseByte( "ff", 16 ) == 255);
+    ASSERT_TRUE(ubyte.toString(60) == "60");
+    ASSERT_TRUE(ubyte.toString(255) == "255");
 
-    ASSERT_TRUE(ubyte.toString( 60 ) == "60");
-    ASSERT_TRUE(ubyte.toString( 255 ) == "255");
-
-    ASSERT_TRUE(ubyte.decode( "0xFF" ) == 255);
-    ASSERT_TRUE(ubyte.decode( "255" ) == 255);
-
+    ASSERT_TRUE(ubyte.decode("0xFF") == 255);
+    ASSERT_TRUE(ubyte.decode("255") == 255);
 }

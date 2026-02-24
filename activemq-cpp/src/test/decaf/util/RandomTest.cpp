@@ -15,17 +15,19 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <decaf/util/Random.h>
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 
-    class RandomTest : public ::testing::Test {};
+class RandomTest : public ::testing::Test
+{
+};
 
-TEST_F(RandomTest, test){
-
+TEST_F(RandomTest, test)
+{
     Random rand(122760);
     ASSERT_EQ(-1524104671, rand.nextInt());
     ASSERT_EQ(2785759620113032781LL, rand.nextLong());
@@ -76,10 +78,12 @@ TEST_F(RandomTest, test){
     ASSERT_EQ(-270809961, rand.nextInt());
 
     bool ok = true;
-    rand = Random(0);
-    for (int i=0; i < 1000000; ++i) {
+    rand    = Random(0);
+    for (int i = 0; i < 1000000; ++i)
+    {
         int x = rand.nextInt(1000);
-        if (x < 0 || x >= 1000) {
+        if (x < 0 || x >= 1000)
+        {
             ok = false;
         }
     }

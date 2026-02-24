@@ -21,6 +21,6 @@ using namespace cms;
 using namespace activemq::cmsutil;
 
 ////////////////////////////////////////////////////////////////////////////////
-ProducerCallback::~ProducerCallback() {
-
+ProducerCallback::~ProducerCallback()
+{
 }

@@ -24,27 +24,40 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-ConcurrentModificationException::ConcurrentModificationException() {
+ConcurrentModificationException::ConcurrentModificationException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConcurrentModificationException::~ConcurrentModificationException() throw () {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-ConcurrentModificationException::ConcurrentModificationException(const lang::Exception& ex) : lang::exceptions::RuntimeException() {
-    *(lang::Exception*) this = ex;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-ConcurrentModificationException::ConcurrentModificationException(const ConcurrentModificationException& ex) : lang::exceptions::RuntimeException() {
-    *(lang::Exception*) this = ex;
+ConcurrentModificationException::~ConcurrentModificationException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ConcurrentModificationException::ConcurrentModificationException(
-    const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : lang::exceptions::RuntimeException(cause) {
+    const lang::Exception& ex)
+    : lang::exceptions::RuntimeException()
+{
+    *(lang::Exception*)this = ex;
+}
 
+////////////////////////////////////////////////////////////////////////////////
+ConcurrentModificationException::ConcurrentModificationException(
+    const ConcurrentModificationException& ex)
+    : lang::exceptions::RuntimeException()
+{
+    *(lang::Exception*)this = ex;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+ConcurrentModificationException::ConcurrentModificationException(
+    const char*           file,
+    const int             lineNumber,
+    const std::exception* cause,
+    const char*           msg,
+    ...)
+    : lang::exceptions::RuntimeException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -54,12 +67,20 @@ ConcurrentModificationException::ConcurrentModificationException(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConcurrentModificationException::ConcurrentModificationException(const std::exception* cause) : lang::exceptions::RuntimeException(cause) {
+ConcurrentModificationException::ConcurrentModificationException(
+    const std::exception* cause)
+    : lang::exceptions::RuntimeException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConcurrentModificationException::ConcurrentModificationException(const char* file, const int lineNumber, const char* msg, ...) : lang::exceptions::RuntimeException() {
-
+ConcurrentModificationException::ConcurrentModificationException(
+    const char* file,
+    const int   lineNumber,
+    const char* msg,
+    ...)
+    : lang::exceptions::RuntimeException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

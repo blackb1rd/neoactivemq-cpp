@@ -17,20 +17,20 @@
 
 #include "CmsSendWithAsyncCallbackTest.h"
 
-#include <cms/ConnectionFactory.h>
 #include <cms/Connection.h>
-#include <cms/Destination.h>
-#include <cms/Session.h>
+#include <cms/ConnectionFactory.h>
 #include <cms/DeliveryMode.h>
+#include <cms/Destination.h>
 #include <cms/MessageConsumer.h>
+#include <cms/Session.h>
 
-#include <activemq/util/IntegrationCommon.h>
 #include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/core/ActiveMQProducer.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/IntegrationCommon.h>
 
-#include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/lang/Thread.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
 
 using namespace std;
 using namespace cms;
@@ -44,128 +44,156 @@ using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class MyMessageListener: public cms::MessageListener {
-    public:
-
-        virtual ~MyMessageListener() {
-        }
-
-        virtual void onMessage(const cms::Message* message) {
-
-        }
-    };
-
-    class MyAsyncCallback : public cms::AsyncCallback {
-    private:
-
-        CountDownLatch* latch;
-
-    private:
-
-        MyAsyncCallback(const MyAsyncCallback&);
-        MyAsyncCallback& operator= (const MyAsyncCallback&);
-
-    public:
-
-        MyAsyncCallback(CountDownLatch* latch) : cms::AsyncCallback(), latch(latch) {}
-        virtual ~MyAsyncCallback() {}
-
-        virtual void onSuccess() {
-            latch->countDown();
-        }
-        virtual void onException(const cms::CMSException& ex) {
-            ex.printStackTrace();
-        }
-    };
-
-    double benchmarkNonCallbackRate(int count, cms::Connection* connection, cms::Destination* destination) {
-        std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
-
-        std::unique_ptr<ActiveMQProducer> producer(
-                dynamic_cast<ActiveMQProducer*>(session->createProducer(destination)));
-        producer->setDeliveryMode(DeliveryMode::PERSISTENT);
-
-        long long start = System::currentTimeMillis();
-
-        for (int i = 0; i < count; i++) {
-            std::unique_ptr<cms::TextMessage> message(session->createTextMessage("Hello"));
-            producer->send(message.get());
-        }
-
-        return 1000.0 * count / (double)((System::currentTimeMillis() - start));
+class MyMessageListener : public cms::MessageListener
+{
+public:
+    virtual ~MyMessageListener()
+    {
     }
 
-    double benchmarkCallbackRate(int count, cms::Connection* connection, cms::Destination* destination) {
-        std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
-        CountDownLatch messagesSent(count);
-        MyAsyncCallback onComplete(&messagesSent);
-
-        std::unique_ptr<ActiveMQProducer> producer(
-                dynamic_cast<ActiveMQProducer*>(session->createProducer(destination)));
-        producer->setDeliveryMode(DeliveryMode::PERSISTENT);
-
-        long long start = System::currentTimeMillis();
-
-        for (int i = 0; i < count; i++) {
-            std::unique_ptr<cms::TextMessage> message(session->createTextMessage("Hello"));
-            producer->send(message.get(), &onComplete);
-        }
-
-        messagesSent.await();
-        return 1000.0 * count / (double)((System::currentTimeMillis() - start));
+    virtual void onMessage(const cms::Message* message)
+    {
     }
+};
+
+class MyAsyncCallback : public cms::AsyncCallback
+{
+private:
+    CountDownLatch* latch;
+
+private:
+    MyAsyncCallback(const MyAsyncCallback&);
+    MyAsyncCallback& operator=(const MyAsyncCallback&);
+
+public:
+    MyAsyncCallback(CountDownLatch* latch)
+        : cms::AsyncCallback(),
+          latch(latch)
+    {
+    }
+
+    virtual ~MyAsyncCallback()
+    {
+    }
+
+    virtual void onSuccess()
+    {
+        latch->countDown();
+    }
+
+    virtual void onException(const cms::CMSException& ex)
+    {
+        ex.printStackTrace();
+    }
+};
+
+double benchmarkNonCallbackRate(int               count,
+                                cms::Connection*  connection,
+                                cms::Destination* destination)
+{
+    std::unique_ptr<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
+
+    std::unique_ptr<ActiveMQProducer> producer(
+        dynamic_cast<ActiveMQProducer*>(session->createProducer(destination)));
+    producer->setDeliveryMode(DeliveryMode::PERSISTENT);
+
+    long long start = System::currentTimeMillis();
+
+    for (int i = 0; i < count; i++)
+    {
+        std::unique_ptr<cms::TextMessage> message(
+            session->createTextMessage("Hello"));
+        producer->send(message.get());
+    }
+
+    return 1000.0 * count / (double)((System::currentTimeMillis() - start));
+}
+
+double benchmarkCallbackRate(int               count,
+                             cms::Connection*  connection,
+                             cms::Destination* destination)
+{
+    std::unique_ptr<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    CountDownLatch  messagesSent(count);
+    MyAsyncCallback onComplete(&messagesSent);
+
+    std::unique_ptr<ActiveMQProducer> producer(
+        dynamic_cast<ActiveMQProducer*>(session->createProducer(destination)));
+    producer->setDeliveryMode(DeliveryMode::PERSISTENT);
+
+    long long start = System::currentTimeMillis();
+
+    for (int i = 0; i < count; i++)
+    {
+        std::unique_ptr<cms::TextMessage> message(
+            session->createTextMessage("Hello"));
+        producer->send(message.get(), &onComplete);
+    }
+
+    messagesSent.await();
+    return 1000.0 * count / (double)((System::currentTimeMillis() - start));
+}
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+CmsSendWithAsyncCallbackTest::CmsSendWithAsyncCallbackTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsSendWithAsyncCallbackTest::CmsSendWithAsyncCallbackTest() {
-
+CmsSendWithAsyncCallbackTest::~CmsSendWithAsyncCallbackTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsSendWithAsyncCallbackTest::~CmsSendWithAsyncCallbackTest() {
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void CmsSendWithAsyncCallbackTest::SetUp() {
-
-    factory.reset(ConnectionFactory::createCMSConnectionFactory(getBrokerURL()));
+void CmsSendWithAsyncCallbackTest::SetUp()
+{
+    factory.reset(
+        ConnectionFactory::createCMSConnectionFactory(getBrokerURL()));
     connection.reset(factory->createConnection());
-    std::unique_ptr<cms::Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    std::unique_ptr<cms::Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
     destination.reset(session->createQueue("CmsSendWithAsyncCallbackTest"));
 
     session->close();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsSendWithAsyncCallbackTest::TearDown() {
-
+void CmsSendWithAsyncCallbackTest::TearDown()
+{
     factory.reset();
     connection.reset();
     destination.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsSendWithAsyncCallbackTest::testAsyncCallbackIsFaster() {
-
+void CmsSendWithAsyncCallbackTest::testAsyncCallbackIsFaster()
+{
     MyMessageListener listener;
 
     connection->start();
 
-    std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    std::unique_ptr<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
 
     // setup a consumer to drain messages..
-    std::unique_ptr<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    std::unique_ptr<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
     consumer->setMessageListener(&listener);
 
     // warmup...
     benchmarkNonCallbackRate(20, connection.get(), destination.get());
     benchmarkCallbackRate(20, connection.get(), destination.get());
 
-    double callbackRate = benchmarkCallbackRate(30, connection.get(), destination.get());
-    double nonCallbackRate = benchmarkNonCallbackRate(30, connection.get(), destination.get());
+    double callbackRate =
+        benchmarkCallbackRate(30, connection.get(), destination.get());
+    double nonCallbackRate =
+        benchmarkNonCallbackRate(30, connection.get(), destination.get());
 
     ASSERT_TRUE(callbackRate > 0);
     ASSERT_TRUE(nonCallbackRate > 0);

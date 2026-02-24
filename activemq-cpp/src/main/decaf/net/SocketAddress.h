@@ -20,22 +20,24 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
     /**
-     * Base class for protocol specific Socket addresses.  These classes provide an
-     * immutable address object that is used by the Socket classes.
+     * Base class for protocol specific Socket addresses.  These classes provide
+     * an immutable address object that is used by the Socket classes.
      *
      * @since 1.0
      */
-    class DECAF_API SocketAddress {
+    class DECAF_API SocketAddress
+    {
     public:
-
         virtual ~SocketAddress();
-
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /* _DECAF_NET_SOCKETADDRESS_H_ */

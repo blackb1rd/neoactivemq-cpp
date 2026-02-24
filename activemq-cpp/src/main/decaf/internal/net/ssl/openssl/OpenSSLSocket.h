@@ -25,229 +25,272 @@
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
-namespace ssl {
-namespace openssl {
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
+        namespace ssl
+        {
+            namespace openssl
+            {
 
-    class OpenSSLParameters;
-    class SocketData;
+                class OpenSSLParameters;
+                class SocketData;
 
-    /**
-     * Wraps a a Normal Socket object and extends or overrides functions in that class to make
-     * use of the OpenSSL Socket API.
-     *
-     * @since 1.0
-     */
-    class DECAF_API OpenSSLSocket: public decaf::net::ssl::SSLSocket {
-    private:
+                /**
+                 * Wraps a a Normal Socket object and extends or overrides
+                 * functions in that class to make use of the OpenSSL Socket
+                 * API.
+                 *
+                 * @since 1.0
+                 */
+                class DECAF_API OpenSSLSocket
+                    : public decaf::net::ssl::SSLSocket
+                {
+                private:
+                    // Private data related to the OpenSSL Socket impl.
+                    SocketData* data;
 
-        // Private data related to the OpenSSL Socket impl.
-        SocketData* data;
+                    // Parameters object containing the OpenSSL settings and
+                    // objects for this Socket.
+                    OpenSSLParameters* parameters;
 
-        // Parameters object containing the OpenSSL settings and objects for this Socket.
-        OpenSSLParameters* parameters;
+                    // The InputStream owned by this Socket
+                    decaf::io::InputStream* input;
 
-        // The InputStream owned by this Socket
-        decaf::io::InputStream* input;
+                    // The OutputStream owned by this Socket
+                    decaf::io::OutputStream* output;
 
-        // The OutputStream owned by this Socket
-        decaf::io::OutputStream* output;
+                private:
+                    OpenSSLSocket(const OpenSSLSocket&);
+                    OpenSSLSocket& operator=(const OpenSSLSocket&);
 
-    private:
+                public:
+                    OpenSSLSocket(OpenSSLParameters* parameters);
 
-        OpenSSLSocket(const OpenSSLSocket&);
-        OpenSSLSocket& operator=(const OpenSSLSocket&);
+                    OpenSSLSocket(OpenSSLParameters*             parameters,
+                                  const decaf::net::InetAddress* address,
+                                  int                            port);
 
-    public:
+                    OpenSSLSocket(OpenSSLParameters*             parameters,
+                                  const decaf::net::InetAddress* address,
+                                  int                            port,
+                                  const decaf::net::InetAddress* localAddress,
+                                  int                            localPort);
 
-        OpenSSLSocket(OpenSSLParameters* parameters);
+                    OpenSSLSocket(OpenSSLParameters* parameters,
+                                  const std::string& host,
+                                  int                port);
 
-        OpenSSLSocket(OpenSSLParameters* parameters, const decaf::net::InetAddress* address, int port);
+                    OpenSSLSocket(OpenSSLParameters*             parameters,
+                                  const std::string&             host,
+                                  int                            port,
+                                  const decaf::net::InetAddress* localAddress,
+                                  int                            localPort);
 
-        OpenSSLSocket(OpenSSLParameters* parameters, const decaf::net::InetAddress* address, int port, const decaf::net::InetAddress* localAddress, int localPort);
+                    virtual ~OpenSSLSocket();
 
-        OpenSSLSocket(OpenSSLParameters* parameters, const std::string& host, int port);
+                public:  // Socket Overrides.
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void connect(const std::string& host,
+                                         int                port,
+                                         int                timeout);
 
-        OpenSSLSocket(OpenSSLParameters* parameters, const std::string& host, int port, const decaf::net::InetAddress* localAddress, int localPort);
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void close();
 
-        virtual ~OpenSSLSocket();
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual decaf::io::InputStream* getInputStream();
 
-    public: // Socket Overrides.
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual decaf::io::OutputStream* getOutputStream();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void connect(const std::string& host, int port, int timeout);
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void shutdownInput();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void close();
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void shutdownOutput();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::io::InputStream* getInputStream();
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void setOOBInline(bool value);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::io::OutputStream* getOutputStream();
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void sendUrgentData(int data);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void shutdownInput();
+                public:  // SSLSocket Overrides
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual decaf::net::ssl::SSLParameters getSSLParameters()
+                        const;
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void shutdownOutput();
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void setSSLParameters(
+                        const decaf::net::ssl::SSLParameters& value);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void setOOBInline(bool value);
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual std::vector<std::string> getSupportedCipherSuites()
+                        const;
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void sendUrgentData(int data);
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual std::vector<std::string> getSupportedProtocols()
+                        const;
 
-    public: // SSLSocket Overrides
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual std::vector<std::string> getEnabledCipherSuites()
+                        const;
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::ssl::SSLParameters getSSLParameters() const;
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void setEnabledCipherSuites(
+                        const std::vector<std::string>& suites);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void setSSLParameters(const decaf::net::ssl::SSLParameters& value);
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual std::vector<std::string> getEnabledProtocols() const;
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual std::vector<std::string> getSupportedCipherSuites() const;
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void setEnabledProtocols(
+                        const std::vector<std::string>& protocols);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual std::vector<std::string> getSupportedProtocols() const;
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void startHandshake();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual std::vector<std::string> getEnabledCipherSuites() const;
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void setUseClientMode(bool value);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void setEnabledCipherSuites(const std::vector<std::string>& suites);
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual bool getUseClientMode() const;
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual std::vector<std::string> getEnabledProtocols() const;
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void setNeedClientAuth(bool value);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void setEnabledProtocols(const std::vector<std::string>& protocols);
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual bool getNeedClientAuth() const;
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void startHandshake();
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void setWantClientAuth(bool value);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void setUseClientMode(bool value);
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual bool getWantClientAuth() const;
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual bool getUseClientMode() const;
+                public:
+                    /**
+                     * Reads the requested data from the Socket and write it
+                     * into the passed in buffer.
+                     *
+                     * @param buffer
+                     *      The buffer to read into
+                     * @param size
+                     *      The size of the specified buffer
+                     * @param offset
+                     *      The offset into the buffer where reading should
+                     * start filling.
+                     * @param length
+                     *      The number of bytes past offset to fill with data.
+                     *
+                     * @return the actual number of bytes read or -1 if at EOF.
+                     *
+                     * @throw IOException if an I/O error occurs during the
+                     * read.
+                     * @throw NullPointerException if buffer is Null.
+                     * @throw IndexOutOfBoundsException if offset + length is
+                     * greater than buffer size.
+                     */
+                    int read(unsigned char* buffer,
+                             int            size,
+                             int            offset,
+                             int            length);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void setNeedClientAuth(bool value);
+                    /**
+                     * Writes the specified data in the passed in buffer to the
+                     * Socket.
+                     *
+                     * @param buffer
+                     *      The buffer to write to the socket.
+                     * @param size
+                     *      The size of the specified buffer.
+                     * @param offset
+                     *      The offset into the buffer where the data to write
+                     * starts at.
+                     * @param length
+                     *      The number of bytes past offset to write.
+                     *
+                     * @throw IOException if an I/O error occurs during the
+                     * write.
+                     * @throw NullPointerException if buffer is Null.
+                     * @throw IndexOutOfBoundsException if offset + length is
+                     * greater than buffer size.
+                     */
+                    void write(const unsigned char* buffer,
+                               int                  size,
+                               int                  offset,
+                               int                  length);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual bool getNeedClientAuth() const;
+                    /**
+                     * Gets the number of bytes in the Socket buffer that can be
+                     * read without blocking.
+                     *
+                     * @return the number of bytes that can be read from the
+                     * Socket without blocking.
+                     *
+                     * @throws IOException if an I/O error occurs while
+                     * performing this operation.
+                     */
+                    int available();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void setWantClientAuth(bool value);
+                public:
+                    using decaf::net::Socket::connect;
+                };
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual bool getWantClientAuth() const;
-
-    public:
-
-        /**
-         * Reads the requested data from the Socket and write it into the passed in buffer.
-         *
-         * @param buffer
-         *      The buffer to read into
-         * @param size
-         *      The size of the specified buffer
-         * @param offset
-         *      The offset into the buffer where reading should start filling.
-         * @param length
-         *      The number of bytes past offset to fill with data.
-         *
-         * @return the actual number of bytes read or -1 if at EOF.
-         *
-         * @throw IOException if an I/O error occurs during the read.
-         * @throw NullPointerException if buffer is Null.
-         * @throw IndexOutOfBoundsException if offset + length is greater than buffer size.
-         */
-        int read(unsigned char* buffer, int size, int offset, int length);
-
-        /**
-         * Writes the specified data in the passed in buffer to the Socket.
-         *
-         * @param buffer
-         *      The buffer to write to the socket.
-         * @param size
-         *      The size of the specified buffer.
-         * @param offset
-         *      The offset into the buffer where the data to write starts at.
-         * @param length
-         *      The number of bytes past offset to write.
-         *
-         * @throw IOException if an I/O error occurs during the write.
-         * @throw NullPointerException if buffer is Null.
-         * @throw IndexOutOfBoundsException if offset + length is greater than buffer size.
-         */
-        void write(const unsigned char* buffer, int size, int offset, int length);
-
-        /**
-         * Gets the number of bytes in the Socket buffer that can be read without blocking.
-         *
-         * @return the number of bytes that can be read from the Socket without blocking.
-         *
-         * @throws IOException if an I/O error occurs while performing this operation.
-         */
-        int available();
-
-    public:
-
-        using decaf::net::Socket::connect;
-
-    };
-
-}}}}}
+            }  // namespace openssl
+        }  // namespace ssl
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_SSL_OPENSSL_OPENSSLSOCKET_H_ */

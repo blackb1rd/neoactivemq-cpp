@@ -18,24 +18,25 @@
 #ifndef _DECAF_INTERNAL_DECAFRUNTIME_H
 #define _DECAF_INTERNAL_DECAFRUNTIME_H
 
-#include <decaf/util/Config.h>
 #include <decaf/lang/Runtime.h>
+#include <decaf/util/Config.h>
 #include <decaf/util/concurrent/Mutex.h>
 
-namespace decaf {
-namespace internal {
+namespace decaf
+{
+namespace internal
+{
 
     /**
      * Handles runtime initialization and termination.
      */
-    class DECAF_API DecafRuntime: public decaf::lang::Runtime {
+    class DECAF_API DecafRuntime : public decaf::lang::Runtime
+    {
     private:
-
         DecafRuntime(const DecafRuntime&);
         DecafRuntime& operator=(const DecafRuntime&);
 
     public:
-
         /**
          * Initializes the runtime for a library.
          */
@@ -47,9 +48,9 @@ namespace internal {
         virtual ~DecafRuntime();
 
         /**
-         * Gets a pointer to the Decaf Runtime's Global Lock object, this can be used by
-         * Decaf APIs to synchronize around certain actions such as adding or acquiring
-         * a resource that must be Thread safe.
+         * Gets a pointer to the Decaf Runtime's Global Lock object, this can be
+         * used by Decaf APIs to synchronize around certain actions such as
+         * adding or acquiring a resource that must be Thread safe.
          *
          * The pointer returned is owned by the Decaf runtime and should not be
          * deleted or copied by the caller.
@@ -57,9 +58,9 @@ namespace internal {
          * @return a pointer to the Decaf Runtime's global Lock instance.
          */
         decaf::util::concurrent::Mutex* getGlobalLock();
-
     };
 
-}}
+}  // namespace internal
+}  // namespace decaf
 
 #endif /*_DECAF_INTERNAL_DECAFRUNTIME_H*/

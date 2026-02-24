@@ -24,57 +24,69 @@ using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang::exceptions;
 
-    class OutputStreamTest : public ::testing::Test {
+class OutputStreamTest : public ::testing::Test
+{
 public:
-
-        OutputStreamTest();
-        virtual ~OutputStreamTest();
-
-    };
+    OutputStreamTest();
+    virtual ~OutputStreamTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class MockOutputStream : public OutputStream {
-    private:
+class MockOutputStream : public OutputStream
+{
+private:
+    std::vector<unsigned char> buffer;
 
-        std::vector<unsigned char> buffer;
+public:
+    MockOutputStream()
+        : buffer()
+    {
+    }
 
-    public:
+    virtual ~MockOutputStream()
+    {
+    }
 
-        MockOutputStream() : buffer() {}
+    virtual void doWriteByte(unsigned char c)
+    {
+        buffer.push_back(c);
+    }
 
-        virtual ~MockOutputStream() {}
+    const std::vector<unsigned char>& getBuffer()
+    {
+        return this->buffer;
+    }
+};
 
-        virtual void doWriteByte( unsigned char c ) {
-            buffer.push_back( c );
-        }
+}  // namespace
 
-        const std::vector<unsigned char>& getBuffer() {
-            return this->buffer;
-        }
-    };
-
+////////////////////////////////////////////////////////////////////////////////
+OutputStreamTest::OutputStreamTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OutputStreamTest::OutputStreamTest() {
+OutputStreamTest::~OutputStreamTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OutputStreamTest::~OutputStreamTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-TEST_F(OutputStreamTest, test) {
-
+TEST_F(OutputStreamTest, test)
+{
     MockOutputStream ostream;
 
-    ostream.write( 'h' );
-    ostream.write( (const unsigned char*)std::string( "ello " ).c_str(), 5 );
-    ostream.write( (const unsigned char*)std::string( "hello world" ).c_str(), 11, 6, 5 );
+    ostream.write('h');
+    ostream.write((const unsigned char*)std::string("ello ").c_str(), 5);
+    ostream.write((const unsigned char*)std::string("hello world").c_str(),
+                  11,
+                  6,
+                  5);
 
-    std::string result( ostream.getBuffer().begin(), ostream.getBuffer().end() );
+    std::string result(ostream.getBuffer().begin(), ostream.getBuffer().end());
 
-    ASSERT_EQ(std::string( "hello world" ), result) << ("Written string not what was expected");
+    ASSERT_EQ(std::string("hello world"), result)
+        << ("Written string not what was expected");
 }

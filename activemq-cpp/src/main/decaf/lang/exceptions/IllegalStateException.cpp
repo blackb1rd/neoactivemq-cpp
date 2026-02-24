@@ -22,30 +22,43 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalStateException::IllegalStateException() : Exception() {
+IllegalStateException::IllegalStateException()
+    : Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalStateException::~IllegalStateException() throw () {
+IllegalStateException::~IllegalStateException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalStateException::IllegalStateException(const Exception& ex) : Exception() {
-    *(Exception*) this = ex;
+IllegalStateException::IllegalStateException(const Exception& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalStateException::IllegalStateException(const IllegalStateException& ex) : Exception() {
-    *(Exception*) this = ex;
+IllegalStateException::IllegalStateException(const IllegalStateException& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalStateException::IllegalStateException(const std::exception* cause) : Exception(cause) {
+IllegalStateException::IllegalStateException(const std::exception* cause)
+    : Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalStateException::IllegalStateException(const char* file, const int lineNumber, const char* msg, ...) : Exception() {
-
+IllegalStateException::IllegalStateException(const char* file,
+                                             const int   lineNumber,
+                                             const char* msg,
+                                             ...)
+    : Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +68,13 @@ IllegalStateException::IllegalStateException(const char* file, const int lineNum
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IllegalStateException::IllegalStateException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : Exception(cause) {
-
+IllegalStateException::IllegalStateException(const char*           file,
+                                             const int             lineNumber,
+                                             const std::exception* cause,
+                                             const char*           msg,
+                                             ...)
+    : Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

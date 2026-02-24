@@ -28,71 +28,84 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultRedeliveryPolicy::DefaultRedeliveryPolicy() : backOffMultiplier(5.0),
-                                                     collisionAvoidanceFactor(0.15),
-                                                     initialRedeliveryDelay(1000LL),
-                                                     maximumRedeliveries(6),
-                                                     useCollisionAvoidance(false),
-                                                     useExponentialBackOff(false),
-                                                     redeliveryDelay(initialRedeliveryDelay),
-                                                     maximumRedeliveryDelay(-1) {
+DefaultRedeliveryPolicy::DefaultRedeliveryPolicy()
+    : backOffMultiplier(5.0),
+      collisionAvoidanceFactor(0.15),
+      initialRedeliveryDelay(1000LL),
+      maximumRedeliveries(6),
+      useCollisionAvoidance(false),
+      useExponentialBackOff(false),
+      redeliveryDelay(initialRedeliveryDelay),
+      maximumRedeliveryDelay(-1)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultRedeliveryPolicy::~DefaultRedeliveryPolicy() {
+DefaultRedeliveryPolicy::~DefaultRedeliveryPolicy()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-short DefaultRedeliveryPolicy::getCollisionAvoidancePercent() const {
-    return (short) Math::round(this->collisionAvoidanceFactor * 100);
+short DefaultRedeliveryPolicy::getCollisionAvoidancePercent() const
+{
+    return (short)Math::round(this->collisionAvoidanceFactor * 100);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DefaultRedeliveryPolicy::setCollisionAvoidancePercent(short value) {
+void DefaultRedeliveryPolicy::setCollisionAvoidancePercent(short value)
+{
     this->collisionAvoidanceFactor = value * 0.01;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long DefaultRedeliveryPolicy::getNextRedeliveryDelay(long long previousDelay) {
-
+long long DefaultRedeliveryPolicy::getNextRedeliveryDelay(
+    long long previousDelay)
+{
     static Random randomNumberGenerator;
 
     long long nextDelay = redeliveryDelay;
 
-    if (previousDelay > 0 && useExponentialBackOff && (int) backOffMultiplier > 1) {
-        nextDelay = (long long) ((double) previousDelay * backOffMultiplier);
-        if (maximumRedeliveryDelay != -1 && nextDelay > maximumRedeliveryDelay) {
-            // in case the user made max redelivery delay less than redelivery delay for some reason.
+    if (previousDelay > 0 && useExponentialBackOff &&
+        (int)backOffMultiplier > 1)
+    {
+        nextDelay = (long long)((double)previousDelay * backOffMultiplier);
+        if (maximumRedeliveryDelay != -1 && nextDelay > maximumRedeliveryDelay)
+        {
+            // in case the user made max redelivery delay less than redelivery
+            // delay for some reason.
             nextDelay = Math::max(maximumRedeliveryDelay, redeliveryDelay);
         }
     }
 
-    if (useCollisionAvoidance) {
+    if (useCollisionAvoidance)
+    {
         /*
          * First random determines +/-, second random determines how far to
          * go in that direction. -cgs
          */
-        double variance = (randomNumberGenerator.nextBoolean() ?
-                collisionAvoidanceFactor : -collisionAvoidanceFactor) * randomNumberGenerator.nextDouble();
-        nextDelay += (long long) ((double) nextDelay * variance);
+        double variance = (randomNumberGenerator.nextBoolean()
+                               ? collisionAvoidanceFactor
+                               : -collisionAvoidanceFactor) *
+                          randomNumberGenerator.nextDouble();
+        nextDelay += (long long)((double)nextDelay * variance);
     }
 
     return nextDelay;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-RedeliveryPolicy* DefaultRedeliveryPolicy::clone() const {
-
+RedeliveryPolicy* DefaultRedeliveryPolicy::clone() const
+{
     DefaultRedeliveryPolicy* copy = new DefaultRedeliveryPolicy;
 
     copy->collisionAvoidanceFactor = this->collisionAvoidanceFactor;
-    copy->maximumRedeliveries = this->maximumRedeliveries;
-    copy->initialRedeliveryDelay = this->initialRedeliveryDelay;
-    copy->useCollisionAvoidance = this->useCollisionAvoidance;
-    copy->useExponentialBackOff = this->useExponentialBackOff;
-    copy->backOffMultiplier = this->backOffMultiplier;
-    copy->redeliveryDelay = this->redeliveryDelay;
-    copy->maximumRedeliveryDelay = this->maximumRedeliveryDelay;
+    copy->maximumRedeliveries      = this->maximumRedeliveries;
+    copy->initialRedeliveryDelay   = this->initialRedeliveryDelay;
+    copy->useCollisionAvoidance    = this->useCollisionAvoidance;
+    copy->useExponentialBackOff    = this->useExponentialBackOff;
+    copy->backOffMultiplier        = this->backOffMultiplier;
+    copy->redeliveryDelay          = this->redeliveryDelay;
+    copy->maximumRedeliveryDelay   = this->maximumRedeliveryDelay;
 
     return copy;
 }

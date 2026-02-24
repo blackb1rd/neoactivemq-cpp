@@ -38,17 +38,21 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryEvent::DiscoveryEvent() :
-    BaseDataStructure(), serviceName(""), brokerName("") {
-
+DiscoveryEvent::DiscoveryEvent()
+    : BaseDataStructure(),
+      serviceName(""),
+      brokerName("")
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryEvent::~DiscoveryEvent() {
+DiscoveryEvent::~DiscoveryEvent()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryEvent* DiscoveryEvent::cloneDataStructure() const {
+DiscoveryEvent* DiscoveryEvent::cloneDataStructure() const
+{
     std::unique_ptr<DiscoveryEvent> discoveryEvent(new DiscoveryEvent());
 
     // Copy the data from the base class or classes
@@ -58,18 +62,21 @@ DiscoveryEvent* DiscoveryEvent::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryEvent::copyDataStructure(const DataStructure* src) {
-
+void DiscoveryEvent::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const DiscoveryEvent* srcPtr = dynamic_cast<const DiscoveryEvent*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "DiscoveryEvent::copyDataStructure - src is NULL or invalid");
     }
 
@@ -81,13 +88,14 @@ void DiscoveryEvent::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char DiscoveryEvent::getDataStructureType() const {
+unsigned char DiscoveryEvent::getDataStructureType() const
+{
     return DiscoveryEvent::ID_DISCOVERYEVENT;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string DiscoveryEvent::toString() const {
-
+std::string DiscoveryEvent::toString() const
+{
     ostringstream stream;
 
     stream << "DiscoveryEvent { ";
@@ -100,57 +108,67 @@ std::string DiscoveryEvent::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool DiscoveryEvent::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool DiscoveryEvent::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const DiscoveryEvent* valuePtr = dynamic_cast<const DiscoveryEvent*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getServiceName() != valuePtr->getServiceName()) {
+    if (this->getServiceName() != valuePtr->getServiceName())
+    {
         return false;
     }
-    if (this->getBrokerName() != valuePtr->getBrokerName()) {
+    if (this->getBrokerName() != valuePtr->getBrokerName())
+    {
         return false;
     }
-    if (!BaseDataStructure::equals(value)) {
+    if (!BaseDataStructure::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::string& DiscoveryEvent::getServiceName() const {
+const std::string& DiscoveryEvent::getServiceName() const
+{
     return serviceName;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string& DiscoveryEvent::getServiceName() {
+std::string& DiscoveryEvent::getServiceName()
+{
     return serviceName;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryEvent::setServiceName(const std::string& serviceName) {
+void DiscoveryEvent::setServiceName(const std::string& serviceName)
+{
     this->serviceName = serviceName;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::string& DiscoveryEvent::getBrokerName() const {
+const std::string& DiscoveryEvent::getBrokerName() const
+{
     return brokerName;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string& DiscoveryEvent::getBrokerName() {
+std::string& DiscoveryEvent::getBrokerName()
+{
     return brokerName;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryEvent::setBrokerName(const std::string& brokerName) {
+void DiscoveryEvent::setBrokerName(const std::string& brokerName)
+{
     this->brokerName = brokerName;
 }
-

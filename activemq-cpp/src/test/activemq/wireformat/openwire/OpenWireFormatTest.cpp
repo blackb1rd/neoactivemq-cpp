@@ -17,9 +17,9 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/Properties.h>
-#include <activemq/wireformat/openwire/OpenWireFormatFactory.h>
 #include <activemq/wireformat/openwire/OpenWireFormat.h>
+#include <activemq/wireformat/openwire/OpenWireFormatFactory.h>
+#include <decaf/util/Properties.h>
 
 #include <activemq/core/ActiveMQConnectionMetaData.h>
 
@@ -34,20 +34,31 @@ using namespace activemq::exceptions;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 
-    class OpenWireFormatTest : public ::testing::Test {
-    };
+class OpenWireFormatTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenWireFormatTest, testProviderInfoInWireFormat) {
+TEST_F(OpenWireFormatTest, testProviderInfoInWireFormat)
+{
     ActiveMQConnectionMetaData meta;
 
     OpenWireFormatFactory factory;
-    Properties properties;
+    Properties            properties;
 
     Pointer<OpenWireFormat> myWireFormat =
-            factory.createWireFormat(properties).dynamicCast<OpenWireFormat>();
+        factory.createWireFormat(properties).dynamicCast<OpenWireFormat>();
 
-    ASSERT_EQ(meta.getCMSProviderName(), myWireFormat->getPreferedWireFormatInfo()->getProperties().getString("ProviderName"));
-    ASSERT_EQ(meta.getProviderVersion(), myWireFormat->getPreferedWireFormatInfo()->getProperties().getString("ProviderVersion"));
-    ASSERT_TRUE(!myWireFormat->getPreferedWireFormatInfo()->getProperties().getString("PlatformDetails").empty());
+    ASSERT_EQ(
+        meta.getCMSProviderName(),
+        myWireFormat->getPreferedWireFormatInfo()->getProperties().getString(
+            "ProviderName"));
+    ASSERT_EQ(
+        meta.getProviderVersion(),
+        myWireFormat->getPreferedWireFormatInfo()->getProperties().getString(
+            "ProviderVersion"));
+    ASSERT_TRUE(!myWireFormat->getPreferedWireFormatInfo()
+                     ->getProperties()
+                     .getString("PlatformDetails")
+                     .empty());
 }

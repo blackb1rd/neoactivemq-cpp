@@ -21,31 +21,40 @@ using namespace decaf;
 using namespace decaf::io;
 
 ////////////////////////////////////////////////////////////////////////////////
-FileDescriptor FileDescriptor::in( 0, true );
-FileDescriptor FileDescriptor::out( 1, false );
-FileDescriptor FileDescriptor::err( 2, false );
+FileDescriptor FileDescriptor::in(0, true);
+FileDescriptor FileDescriptor::out(1, false);
+FileDescriptor FileDescriptor::err(2, false);
 
 ////////////////////////////////////////////////////////////////////////////////
-FileDescriptor::FileDescriptor() : descriptor( -1 ), readonly( false ) {
+FileDescriptor::FileDescriptor()
+    : descriptor(-1),
+      readonly(false)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-FileDescriptor::FileDescriptor(intptr_t value, bool readonly) : descriptor(value), readonly(readonly) {
+FileDescriptor::FileDescriptor(intptr_t value, bool readonly)
+    : descriptor(value),
+      readonly(readonly)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-FileDescriptor::~FileDescriptor() {
+FileDescriptor::~FileDescriptor()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FileDescriptor::sync() {
-
-    if (!this->readonly) {
+void FileDescriptor::sync()
+{
+    if (!this->readonly)
+    {
         // TODO - Implement a Sync method for each OS.
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FileDescriptor::valid() {
+bool FileDescriptor::valid()
+{
     return this->descriptor != -1 ? true : false;
 }

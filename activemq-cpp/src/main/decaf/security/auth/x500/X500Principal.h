@@ -21,38 +21,49 @@
 #include <string>
 #include <vector>
 
+#include <decaf/io/InputStream.h>
 #include <decaf/security/Principal.h>
 #include <decaf/util/Map.h>
-#include <decaf/io/InputStream.h>
 
-namespace decaf {
-namespace security {
-namespace auth {
-namespace x500 {
+namespace decaf
+{
+namespace security
+{
+    namespace auth
+    {
+        namespace x500
+        {
 
-    class X500Principal : public Principal {
-    public:
+            class X500Principal : public Principal
+            {
+            public:
+                /*X500Principal( unsigned char* name, int offset, int len );
+                X500Principal( decaf::io::InputStream& is );
+                X500Principal( const std::string& name );
+                X500Principal( const std::string& name,
+                        const decaf::util::Map<std::string, std::string>&
+                keywordMap );*/
 
-        /*X500Principal( unsigned char* name, int offset, int len );
-        X500Principal( decaf::io::InputStream& is );
-        X500Principal( const std::string& name );
-        X500Principal( const std::string& name,
-                const decaf::util::Map<std::string, std::string>& keywordMap );*/
+                virtual ~X500Principal();
 
-        virtual ~X500Principal();
+                virtual std::string getName() const = 0;
 
-        virtual std::string getName() const = 0;
+                virtual void getEncoded(
+                    std::vector<unsigned char>& output) const = 0;
 
-        virtual void getEncoded( std::vector<unsigned char>& output ) const = 0;
+                virtual int hashCode() const = 0;
 
-        virtual int hashCode() const = 0;
+                /*virtual std::string getName( const std::string& format )
+                const;
 
-        /*virtual std::string getName( const std::string& format ) const;
+                virtual std::string getName(const std::string& format,
+                        const decaf::util::Map<std::string, std::string>& oldMap
+                );*/
+            };
 
-        virtual std::string getName(const std::string& format,
-                const decaf::util::Map<std::string, std::string>& oldMap );*/
-    };
-
-}}}}
+        }  // namespace x500
+    }  // namespace auth
+}  // namespace security
+}  // namespace decaf
 
 #endif /*_DECAF_SECURITY_AUTH_X500_X500PRINCIPAL_H_*/

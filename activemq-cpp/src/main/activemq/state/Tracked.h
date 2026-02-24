@@ -18,33 +18,38 @@
 #ifndef _ACTIVEMQ_STATE_TRACKED_H_
 #define _ACTIVEMQ_STATE_TRACKED_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/Response.h>
-#include <decaf/lang/Runnable.h>
+#include <activemq/util/Config.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/lang/Runnable.h>
 
-namespace activemq {
-namespace state {
+namespace activemq
+{
+namespace state
+{
 
-    class AMQCPP_API Tracked : public commands::Response {
+    class AMQCPP_API Tracked : public commands::Response
+    {
     private:
-
         decaf::lang::Pointer<decaf::lang::Runnable> runnable;
 
     public:
-
         Tracked();
         Tracked(decaf::lang::Pointer<decaf::lang::Runnable> runnable);
 
-        virtual ~Tracked() {}
+        virtual ~Tracked()
+        {
+        }
 
         void onResponse();
 
-        bool isWaitingForResponse() const {
+        bool isWaitingForResponse() const
+        {
             return runnable != NULL;
         }
     };
 
-}}
+}  // namespace state
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_STATE_TRACKED_H_*/

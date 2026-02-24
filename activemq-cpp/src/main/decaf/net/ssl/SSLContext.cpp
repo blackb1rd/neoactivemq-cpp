@@ -38,84 +38,102 @@ using namespace decaf::internal::net::ssl;
 SSLContext* SSLContext::defaultSSLContext = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLContext::SSLContext( SSLContextSpi* contextImpl ) : contextImpl( contextImpl ) {
-
-    if( contextImpl == NULL ) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "SSLContextSpi cannot be NULL" );
+SSLContext::SSLContext(SSLContextSpi* contextImpl)
+    : contextImpl(contextImpl)
+{
+    if (contextImpl == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "SSLContextSpi cannot be NULL");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLContext::~SSLContext() {
-    try{
+SSLContext::~SSLContext()
+{
+    try
+    {
         delete contextImpl;
     }
-    DECAF_CATCH_NOTHROW( Exception )
+    DECAF_CATCH_NOTHROW(Exception)
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLContext* SSLContext::getDefault() {
-    try{
-        if( SSLContext::defaultSSLContext != NULL ) {
+SSLContext* SSLContext::getDefault()
+{
+    try
+    {
+        if (SSLContext::defaultSSLContext != NULL)
+        {
             return SSLContext::defaultSSLContext;
         }
 
         return DefaultSSLContext::getContext();
     }
-    DECAF_CATCH_RETHROW( IllegalStateException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IllegalStateException)
-    DECAF_CATCHALL_THROW( IllegalStateException)
+    DECAF_CATCH_RETHROW(IllegalStateException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IllegalStateException)
+    DECAF_CATCHALL_THROW(IllegalStateException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SSLContext::setDefault( SSLContext* context ) {
-
-    if( context == NULL ) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "SSLContextSpi cannot be NULL" );
+void SSLContext::setDefault(SSLContext* context)
+{
+    if (context == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "SSLContextSpi cannot be NULL");
     }
 
     SSLContext::defaultSSLContext = context;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketFactory* SSLContext::getSocketFactory() {
-    try{
+SocketFactory* SSLContext::getSocketFactory()
+{
+    try
+    {
         return this->contextImpl->providerGetSocketFactory();
     }
-    DECAF_CATCH_RETHROW( IllegalStateException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IllegalStateException)
-    DECAF_CATCHALL_THROW( IllegalStateException)
+    DECAF_CATCH_RETHROW(IllegalStateException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IllegalStateException)
+    DECAF_CATCHALL_THROW(IllegalStateException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServerSocketFactory* SSLContext::getServerSocketFactory() {
-    try{
+ServerSocketFactory* SSLContext::getServerSocketFactory()
+{
+    try
+    {
         return this->contextImpl->providerGetServerSocketFactory();
     }
-    DECAF_CATCH_RETHROW( IllegalStateException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IllegalStateException)
-    DECAF_CATCHALL_THROW( IllegalStateException)
+    DECAF_CATCH_RETHROW(IllegalStateException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IllegalStateException)
+    DECAF_CATCHALL_THROW(IllegalStateException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLParameters* SSLContext::getDefaultSSLParameters() {
-    try{
+SSLParameters* SSLContext::getDefaultSSLParameters()
+{
+    try
+    {
         return this->contextImpl->providerGetDefaultSSLParameters();
     }
-    DECAF_CATCH_RETHROW( IllegalStateException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IllegalStateException)
-    DECAF_CATCHALL_THROW( IllegalStateException)
+    DECAF_CATCH_RETHROW(IllegalStateException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IllegalStateException)
+    DECAF_CATCHALL_THROW(IllegalStateException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLParameters* SSLContext::getSupportedSSLParameters() {
-    try{
+SSLParameters* SSLContext::getSupportedSSLParameters()
+{
+    try
+    {
         return this->contextImpl->providerGetSupportedSSLParameters();
     }
-    DECAF_CATCH_RETHROW( IllegalStateException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IllegalStateException)
-    DECAF_CATCHALL_THROW( IllegalStateException)
+    DECAF_CATCH_RETHROW(IllegalStateException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IllegalStateException)
+    DECAF_CATCHALL_THROW(IllegalStateException)
 }

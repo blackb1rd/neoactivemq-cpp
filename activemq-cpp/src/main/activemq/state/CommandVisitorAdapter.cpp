@@ -23,13 +23,18 @@ using namespace decaf;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-CommandVisitorAdapter::~CommandVisitorAdapter() {}
+CommandVisitorAdapter::~CommandVisitorAdapter()
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<commands::Command> CommandVisitorAdapter::processTransactionInfo(commands::TransactionInfo* info) {
-
-    if (info != decaf::lang::Pointer<commands::Command>()) {
-        switch (info->getType()) {
+Pointer<commands::Command> CommandVisitorAdapter::processTransactionInfo(
+    commands::TransactionInfo* info)
+{
+    if (info != decaf::lang::Pointer<commands::Command>())
+    {
+        switch (info->getType())
+        {
             case core::ActiveMQConstants::TRANSACTION_STATE_BEGIN:
                 return this->processBeginTransaction(info);
             case core::ActiveMQConstants::TRANSACTION_STATE_COMMITONEPHASE:
@@ -48,7 +53,9 @@ Pointer<commands::Command> CommandVisitorAdapter::processTransactionInfo(command
                 return this->processRollbackTransaction(info);
             default:
                 throw exceptions::ActiveMQException(
-                    __FILE__, __LINE__, "Unknown Transaction Info Type.");
+                    __FILE__,
+                    __LINE__,
+                    "Unknown Transaction Info Type.");
         }
     }
 
@@ -56,25 +63,34 @@ Pointer<commands::Command> CommandVisitorAdapter::processTransactionInfo(command
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<commands::Command> CommandVisitorAdapter::processRemoveInfo(commands::RemoveInfo* info) {
-
-    if (info != decaf::lang::Pointer<commands::Command>()) {
-        switch (info->getObjectId()->getDataStructureType()) {
+Pointer<commands::Command> CommandVisitorAdapter::processRemoveInfo(
+    commands::RemoveInfo* info)
+{
+    if (info != decaf::lang::Pointer<commands::Command>())
+    {
+        switch (info->getObjectId()->getDataStructureType())
+        {
             case commands::ConnectionId::ID_CONNECTIONID:
                 return this->processRemoveConnection(
-                    dynamic_cast<commands::ConnectionId*> (info->getObjectId().get()));
+                    dynamic_cast<commands::ConnectionId*>(
+                        info->getObjectId().get()));
             case commands::SessionId::ID_SESSIONID:
                 return this->processRemoveSession(
-                    dynamic_cast<commands::SessionId*> (info->getObjectId().get()));
+                    dynamic_cast<commands::SessionId*>(
+                        info->getObjectId().get()));
             case commands::ConsumerId::ID_CONSUMERID:
                 return this->processRemoveConsumer(
-                    dynamic_cast<commands::ConsumerId*> (info->getObjectId().get()));
+                    dynamic_cast<commands::ConsumerId*>(
+                        info->getObjectId().get()));
             case commands::ProducerId::ID_PRODUCERID:
                 return this->processRemoveProducer(
-                    dynamic_cast<commands::ProducerId*> (info->getObjectId().get()));
+                    dynamic_cast<commands::ProducerId*>(
+                        info->getObjectId().get()));
             default:
                 throw exceptions::ActiveMQException(
-                    __FILE__, __LINE__, "Unknown Remove Info Type.");
+                    __FILE__,
+                    __LINE__,
+                    "Unknown Remove Info Type.");
         }
     }
 

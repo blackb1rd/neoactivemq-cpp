@@ -20,17 +20,20 @@
 
 #include <activemq/util/Config.h>
 
-namespace activemq {
-namespace threads {
+namespace activemq
+{
+namespace threads
+{
 
     /**
-     * Represents a unit of work that requires one or more iterations to complete.
+     * Represents a unit of work that requires one or more iterations to
+     * complete.
      *
      * @since 3.0
      */
-    class AMQCPP_API Task {
+    class AMQCPP_API Task
+    {
     public:
-
         virtual ~Task();
 
         /**
@@ -42,9 +45,9 @@ namespace threads {
          *         has completed and the runner should wait for a wakeup call.
          */
         virtual bool iterate() = 0;
-
     };
 
-}}
+}  // namespace threads
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_THREADS_TASK_H_ */

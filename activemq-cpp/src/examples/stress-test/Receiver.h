@@ -20,65 +20,66 @@
 
 #include <decaf/util/Config.h>
 
-#include <decaf/lang/Runnable.h>
 #include <activemq/cmsutil/CmsTemplate.h>
-#include <decaf/util/concurrent/CountDownLatch.h>
+#include <decaf/lang/Runnable.h>
 #include <decaf/lang/exceptions/RuntimeException.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
 
 #include <string>
 
 #include "CmsMessageHandlerDefinitions.h"
 
-namespace cms {
-namespace stress {
+namespace cms
+{
+namespace stress
+{
 
     class BrokerMonitor;
 
-    class ReceiverListener {
+    class ReceiverListener
+    {
     public:
-
-        virtual ~ReceiverListener() {}
+        virtual ~ReceiverListener()
+        {
+        }
 
         virtual void onMessage(const std::string& message) = 0;
-
     };
 
-    class Receiver: public decaf::lang::Runnable {
+    class Receiver : public decaf::lang::Runnable
+    {
     private:
-
-        std::string url;
-        decaf::util::concurrent::Mutex mutexForCmsTemplate;
-        decaf::util::concurrent::Mutex mutexGeneral;
-        bool closing;
-        bool brokerOnline;
-        decaf::util::concurrent::CountDownLatch ready;
+        std::string                              url;
+        decaf::util::concurrent::Mutex           mutexForCmsTemplate;
+        decaf::util::concurrent::Mutex           mutexGeneral;
+        bool                                     closing;
+        bool                                     brokerOnline;
+        decaf::util::concurrent::CountDownLatch  ready;
         decaf::util::concurrent::CountDownLatch* quit;
-        ReceiverListener* messageListener;
-        activemq::cmsutil::CmsTemplate* cmsTemplate;
-        decaf::lang::Thread* asyncReceiverThread;
-        long long receiveTimeout;
-        long long cmsTemplateCreateTime;
-        bool useThreadPool;
-        long numOfMessagingTasks;
-        BrokerMonitor* monitor;
-        std::string selector;
+        ReceiverListener*                        messageListener;
+        activemq::cmsutil::CmsTemplate*          cmsTemplate;
+        decaf::lang::Thread*                     asyncReceiverThread;
+        long long                                receiveTimeout;
+        long long                                cmsTemplateCreateTime;
+        bool                                     useThreadPool;
+        long                                     numOfMessagingTasks;
+        BrokerMonitor*                           monitor;
+        std::string                              selector;
 
     private:
-
         virtual void waitUntilReady();
-        void increaseNumOfMessagingTasks();
-        void decreaseNumOfMessagingTasks();
-        long getNumOfMessagingTasks();
+        void         increaseNumOfMessagingTasks();
+        void         decreaseNumOfMessagingTasks();
+        long         getNumOfMessagingTasks();
 
     public:
-
-        Receiver(const std::string& url,
-                 const std::string& queueOrTopicName,
-                 bool isTopic,
-                 BrokerMonitor* monitor,
+        Receiver(const std::string&                       url,
+                 const std::string&                       queueOrTopicName,
+                 bool                                     isTopic,
+                 BrokerMonitor*                           monitor,
                  decaf::util::concurrent::CountDownLatch* quit,
-                 long long receiveTimeout = 2000,
-                 bool useThreadPool = true);
+                 long long                                receiveTimeout = 2000,
+                 bool                                     useThreadPool = true);
 
         virtual ~Receiver();
 
@@ -86,19 +87,23 @@ namespace stress {
 
         virtual void run();
 
-        void registerMessageListener(ReceiverListener* messageListener,
-                                     ErrorCode& errorCode, const std::string& selector, int id = 0);
+        void registerMessageListener(ReceiverListener*  messageListener,
+                                     ErrorCode&         errorCode,
+                                     const std::string& selector,
+                                     int                id = 0);
 
-        void receiveMessage(std::string& message, ErrorCode& errorCode,
-                            const std::string& selector, bool retryOnError = true);
+        void receiveMessage(std::string&       message,
+                            ErrorCode&         errorCode,
+                            const std::string& selector,
+                            bool               retryOnError = true);
 
         static bool isMessageExpired(cms::Message* message);
 
         void executeMessagingTask(const std::string& message,
                                   bool bDecreaseNumOfMessagingTasks = true);
-
     };
 
-}}
+}  // namespace stress
+}  // namespace cms
 
 #endif /** _CMS_STRESS_RECEIVER_H_ */

@@ -22,26 +22,38 @@ using namespace decaf::net;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-BindException::BindException() : SocketException() {
+BindException::BindException()
+    : SocketException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BindException::~BindException() throw() {
+BindException::~BindException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BindException::BindException(const Exception& ex) : SocketException() {
-    *(Exception*) this = ex;
+BindException::BindException(const Exception& ex)
+    : SocketException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BindException::BindException(const BindException& ex) : SocketException() {
-    *(Exception*) this = ex;
+BindException::BindException(const BindException& ex)
+    : SocketException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BindException::BindException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : SocketException(cause) {
-
+BindException::BindException(const char*           file,
+                             const int             lineNumber,
+                             const std::exception* cause,
+                             const char*           msg,
+                             ...)
+    : SocketException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -51,12 +63,18 @@ BindException::BindException(const char* file, const int lineNumber, const std::
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BindException::BindException(const std::exception* cause) : SocketException(cause) {
+BindException::BindException(const std::exception* cause)
+    : SocketException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BindException::BindException(const char* file, const int lineNumber, const char* msg, ...) : SocketException() {
-
+BindException::BindException(const char* file,
+                             const int   lineNumber,
+                             const char* msg,
+                             ...)
+    : SocketException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

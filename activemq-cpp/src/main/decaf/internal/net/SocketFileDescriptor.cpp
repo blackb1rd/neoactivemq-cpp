@@ -24,14 +24,18 @@ using namespace decaf::internal;
 using namespace decaf::internal::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketFileDescriptor::SocketFileDescriptor( intptr_t value ) : FileDescriptor( value, false ) {
+SocketFileDescriptor::SocketFileDescriptor(intptr_t value)
+    : FileDescriptor(value, false)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketFileDescriptor::~SocketFileDescriptor() {
+SocketFileDescriptor::~SocketFileDescriptor()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-intptr_t SocketFileDescriptor::getValue() const {
+intptr_t SocketFileDescriptor::getValue() const
+{
     return this->descriptor;
 }

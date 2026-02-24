@@ -18,37 +18,37 @@
 #ifndef _CMS_TOPIC_
 #define _CMS_TOPIC_
 
+#include <cms/CMSException.h>
 #include <cms/Config.h>
 #include <cms/Destination.h>
-#include <cms/CMSException.h>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * An interface encapsulating a provider-specific topic name.
+ *
+ * A Topic is a Publish / Subscribe type Destination.  All Messages sent to a
+ * Topic are broadcast to all Subscribers of that Topic unless the Subscriber
+ * defines a Message selector that filters out that Message.
+ *
+ * @since 1.0
+ */
+class CMS_API Topic : public Destination
+{
+public:
+    virtual ~Topic();
 
     /**
-     * An interface encapsulating a provider-specific topic name.
+     * Gets the name of this topic.
      *
-     * A Topic is a Publish / Subscribe type Destination.  All Messages sent to a Topic are
-     * broadcast to all Subscribers of that Topic unless the Subscriber defines a Message
-     * selector that filters out that Message.
+     * @return The topic name.
      *
-     * @since 1.0
+     * @throws CMSException - If an internal error occurs.
      */
-    class CMS_API Topic : public Destination {
-    public:
+    virtual std::string getTopicName() const = 0;
+};
 
-        virtual ~Topic();
-
-        /**
-         * Gets the name of this topic.
-         *
-         * @return The topic name.
-         *
-         * @throws CMSException - If an internal error occurs.
-         */
-        virtual std::string getTopicName() const = 0;
-
-    };
-
-}
+}  // namespace cms
 
 #endif /*_CMS_TOPIC_*/

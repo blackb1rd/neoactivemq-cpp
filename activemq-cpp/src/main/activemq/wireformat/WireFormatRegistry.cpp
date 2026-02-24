@@ -26,62 +26,84 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
-    WireFormatRegistry* theOnlyInstance;
+namespace
+{
+WireFormatRegistry* theOnlyInstance;
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+WireFormatRegistry::WireFormatRegistry()
+    : registry()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-WireFormatRegistry::WireFormatRegistry() : registry() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-WireFormatRegistry::~WireFormatRegistry() {
-
-    try {
+WireFormatRegistry::~WireFormatRegistry()
+{
+    try
+    {
         this->unregisterAllFactories();
-    } catch(...) {}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-WireFormatFactory* WireFormatRegistry::findFactory( const std::string& name ) const {
-
-    if( !this->registry.containsKey( name ) ) {
-        throw NoSuchElementException( __FILE__, __LINE__,
-            "No Matching Factory Registered for format := %s", name.c_str() );
     }
-
-    return this->registry.get( name );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void WireFormatRegistry::registerFactory( const std::string& name, WireFormatFactory* factory ) {
-
-    if( name == "" ) {
-        throw IllegalArgumentException( __FILE__, __LINE__,
-            "WireFormatFactory name cannot be the empty string" );
-    }
-
-    if( factory == NULL ) {
-        throw NullPointerException( __FILE__, __LINE__,
-            "Supplied WireFormatFactory pointer was NULL" );
-    }
-
-    this->registry.put( name, factory );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void WireFormatRegistry::unregisterFactory( const std::string& name ) {
-    if( this->registry.containsKey( name ) ) {
-        delete this->registry.get( name );
-        this->registry.remove( name );
+    catch (...)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WireFormatRegistry::unregisterAllFactories() {
+WireFormatFactory* WireFormatRegistry::findFactory(const std::string& name) const
+{
+    if (!this->registry.containsKey(name))
+    {
+        throw NoSuchElementException(
+            __FILE__,
+            __LINE__,
+            "No Matching Factory Registered for format := %s",
+            name.c_str());
+    }
 
-    Pointer< Iterator<WireFormatFactory*> > iterator(this->registry.values().iterator());
-    while (iterator->hasNext()) {
+    return this->registry.get(name);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void WireFormatRegistry::registerFactory(const std::string& name,
+                                         WireFormatFactory* factory)
+{
+    if (name == "")
+    {
+        throw IllegalArgumentException(
+            __FILE__,
+            __LINE__,
+            "WireFormatFactory name cannot be the empty string");
+    }
+
+    if (factory == NULL)
+    {
+        throw NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Supplied WireFormatFactory pointer was NULL");
+    }
+
+    this->registry.put(name, factory);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void WireFormatRegistry::unregisterFactory(const std::string& name)
+{
+    if (this->registry.containsKey(name))
+    {
+        delete this->registry.get(name);
+        this->registry.remove(name);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void WireFormatRegistry::unregisterAllFactories()
+{
+    Pointer<Iterator<WireFormatFactory*>> iterator(
+        this->registry.values().iterator());
+    while (iterator->hasNext())
+    {
         delete iterator->next();
     }
 
@@ -89,22 +111,26 @@ void WireFormatRegistry::unregisterAllFactories() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> WireFormatRegistry::getWireFormatNames() const {
+std::vector<std::string> WireFormatRegistry::getWireFormatNames() const
+{
     return this->registry.keySet().toArray();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-WireFormatRegistry& WireFormatRegistry::getInstance() {
+WireFormatRegistry& WireFormatRegistry::getInstance()
+{
     return *theOnlyInstance;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WireFormatRegistry::initialize() {
+void WireFormatRegistry::initialize()
+{
     theOnlyInstance = new WireFormatRegistry();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void WireFormatRegistry::shutdown() {
+void WireFormatRegistry::shutdown()
+{
     theOnlyInstance->unregisterAllFactories();
     delete theOnlyInstance;
     theOnlyInstance = NULL;

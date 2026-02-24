@@ -20,11 +20,13 @@
 
 #include <activemq/util/Config.h>
 
-#include <decaf/util/TimerTask.h>
 #include <decaf/lang/Runnable.h>
+#include <decaf/util/TimerTask.h>
 
-namespace activemq {
-namespace threads {
+namespace activemq
+{
+namespace threads
+{
 
     /**
      * Extension of the Decaf TimerTask that adds a Runnable instance which is
@@ -32,19 +34,17 @@ namespace threads {
      *
      * @since 3.3.0
      */
-    class AMQCPP_API SchedulerTimerTask : public decaf::util::TimerTask {
+    class AMQCPP_API SchedulerTimerTask : public decaf::util::TimerTask
+    {
     private:
-
         decaf::lang::Runnable* task;
-        bool ownsTask;
+        bool                   ownsTask;
 
     private:
-
         SchedulerTimerTask(const SchedulerTimerTask&);
-        SchedulerTimerTask& operator= (const SchedulerTimerTask&);
+        SchedulerTimerTask& operator=(const SchedulerTimerTask&);
 
     public:
-
         SchedulerTimerTask(decaf::lang::Runnable* task, bool ownsTask = true);
 
         virtual ~SchedulerTimerTask();
@@ -52,6 +52,7 @@ namespace threads {
         virtual void run();
     };
 
-}}
+}  // namespace threads
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_THREADS_SCHEDULERTIMERTASK_H_ */

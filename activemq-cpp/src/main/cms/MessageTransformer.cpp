@@ -20,6 +20,6 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageTransformer::~MessageTransformer() {
+MessageTransformer::~MessageTransformer()
+{
 }
-

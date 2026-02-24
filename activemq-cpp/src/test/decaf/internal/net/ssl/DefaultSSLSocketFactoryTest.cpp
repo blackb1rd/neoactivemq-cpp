@@ -30,61 +30,70 @@ using namespace decaf::internal;
 using namespace decaf::internal::net;
 using namespace decaf::internal::net::ssl;
 
-    class DefaultSSLSocketFactoryTest : public ::testing::Test {
+class DefaultSSLSocketFactoryTest : public ::testing::Test
+{
 public:
-
-        DefaultSSLSocketFactoryTest();
-        virtual ~DefaultSSLSocketFactoryTest();
-
-    };
+    DefaultSSLSocketFactoryTest();
+    virtual ~DefaultSSLSocketFactoryTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultSSLSocketFactoryTest::DefaultSSLSocketFactoryTest() {
+DefaultSSLSocketFactoryTest::DefaultSSLSocketFactoryTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultSSLSocketFactoryTest::~DefaultSSLSocketFactoryTest() {
+DefaultSSLSocketFactoryTest::~DefaultSSLSocketFactoryTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(DefaultSSLSocketFactoryTest, testConstructor) {
+TEST_F(DefaultSSLSocketFactoryTest, testConstructor)
+{
+    DefaultSSLSocketFactory factory("Error Message");
 
-    DefaultSSLSocketFactory factory( "Error Message" );
-
-    try{
+    try
+    {
         factory.createSocket();
         FAIL() << ("Should have thrown an Exception");
-    } catch( Exception& ex ) {
+    }
+    catch (Exception& ex)
+    {
         ASSERT_EQ(std::string("Error Message"), ex.getMessage());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(DefaultSSLSocketFactoryTest, testCreateSocket) {
+TEST_F(DefaultSSLSocketFactoryTest, testCreateSocket)
+{
+    std::unique_ptr<SocketFactory> factory(new DefaultSSLSocketFactory("Test"));
 
-    std::unique_ptr<SocketFactory> factory( new DefaultSSLSocketFactory( "Test" ) );
+    ASSERT_THROW(factory->createSocket(), IOException)
+        << ("Should have thrown an IOException");
 
-    ASSERT_THROW(factory->createSocket(), IOException) << ("Should have thrown an IOException");
+    ASSERT_THROW(factory->createSocket("127.0.0.1", 61616), IOException)
+        << ("Should have thrown an IOException");
 
-    ASSERT_THROW(factory->createSocket( "127.0.0.1", 61616 ), IOException) << ("Should have thrown an IOException");
-
-    SSLSocketFactory* sslFactory = dynamic_cast<SSLSocketFactory*>( factory.get() );
+    SSLSocketFactory* sslFactory =
+        dynamic_cast<SSLSocketFactory*>(factory.get());
 
     ASSERT_TRUE(sslFactory != NULL);
 
-    ASSERT_THROW(sslFactory->createSocket( NULL, "127.0.0.1", 61616, true ), IOException) << ("Should have thrown an IOException");
+    ASSERT_THROW(sslFactory->createSocket(NULL, "127.0.0.1", 61616, true),
+                 IOException)
+        << ("Should have thrown an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(DefaultSSLSocketFactoryTest, testGetDefaultCipherSuites) {
-
-    DefaultSSLSocketFactory factory( "Error Message" );
+TEST_F(DefaultSSLSocketFactoryTest, testGetDefaultCipherSuites)
+{
+    DefaultSSLSocketFactory factory("Error Message");
     ASSERT_TRUE(factory.getDefaultCipherSuites().empty());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(DefaultSSLSocketFactoryTest, testGetSupportedCipherSuites) {
-
-    DefaultSSLSocketFactory factory( "Error Message" );
+TEST_F(DefaultSSLSocketFactoryTest, testGetSupportedCipherSuites)
+{
+    DefaultSSLSocketFactory factory("Error Message");
     ASSERT_TRUE(factory.getSupportedCipherSuites().empty());
 }

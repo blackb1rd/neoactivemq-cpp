@@ -18,68 +18,69 @@
 #ifndef _DECAF_CONCURRENT_MUTEX_H_
 #define _DECAF_CONCURRENT_MUTEX_H_
 
-#include <decaf/util/concurrent/Synchronizable.h>
-#include <decaf/util/concurrent/Concurrent.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/Config.h>
+#include <decaf/util/concurrent/Concurrent.h>
+#include <decaf/util/concurrent/Synchronizable.h>
 
-namespace decaf {
-namespace util {
-namespace concurrent {
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
 
-    class MutexProperties;
+        class MutexProperties;
 
-    /**
-     * Mutex object that offers recursive support on all platforms as well as
-     * providing the ability to use the standard wait / notify pattern used in
-     * languages like Java.
-     *
-     * @since 1.0
-     */
-    class DECAF_API Mutex: public Synchronizable {
-    private:
+        /**
+         * Mutex object that offers recursive support on all platforms as well
+         * as providing the ability to use the standard wait / notify pattern
+         * used in languages like Java.
+         *
+         * @since 1.0
+         */
+        class DECAF_API Mutex : public Synchronizable
+        {
+        private:
+            MutexProperties* properties;
 
-        MutexProperties* properties;
+        private:
+            Mutex(const Mutex& src);
+            Mutex& operator=(const Mutex& src);
 
-    private:
+        public:
+            Mutex();
 
-        Mutex(const Mutex& src);
-        Mutex& operator=(const Mutex& src);
+            Mutex(const std::string& name);
 
-    public:
+            virtual ~Mutex();
 
-        Mutex();
+            std::string getName() const;
 
-        Mutex(const std::string& name);
+            std::string toString() const;
 
-        virtual ~Mutex();
+            bool isLocked() const;
 
-        std::string getName() const;
+        public:
+            virtual void lock();
 
-        std::string toString() const;
+            virtual bool tryLock();
 
-        bool isLocked() const;
+            virtual void unlock();
 
-    public:
+            virtual void wait();
 
-        virtual void lock();
+            virtual void wait(long long millisecs);
 
-        virtual bool tryLock();
+            virtual void wait(long long millisecs, int nanos);
 
-        virtual void unlock();
+            virtual void notify();
 
-        virtual void wait();
+            virtual void notifyAll();
+        };
 
-        virtual void wait(long long millisecs);
-
-        virtual void wait(long long millisecs, int nanos);
-
-        virtual void notify();
-
-        virtual void notifyAll();
-
-    };
-
-}}}
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_CONCURRENT_MUTEX_H_*/

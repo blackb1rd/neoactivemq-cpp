@@ -21,27 +21,34 @@
 #include <activemq/test/CMSTestFixture.h>
 #include <activemq/util/IntegrationCommon.h>
 
-namespace activemq{
-namespace test{
+namespace activemq
+{
+namespace test
+{
 
     class SlowListener;
 
-    class SlowListenerTest : public CMSTestFixture {
+    class SlowListenerTest : public CMSTestFixture
+    {
+        //
+    public:
+        SlowListenerTest()
+        {
+        }
 
-//
-public:
-
-        SlowListenerTest() {}
-        virtual ~SlowListenerTest() {}
+        virtual ~SlowListenerTest()
+        {
+        }
 
         virtual void testSlowListener();
 
     protected:
-
-        void waitForMessages(unsigned int count, long long maxWaitTime, SlowListener* listener);
-
+        void waitForMessages(unsigned int  count,
+                             long long     maxWaitTime,
+                             SlowListener* listener);
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TEST_OPENWIRESLOWLISTENERTEST_H_*/

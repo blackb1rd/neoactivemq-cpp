@@ -43,55 +43,90 @@ using namespace decaf::internal::util;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageId::MessageId() :
-    BaseDataStructure(), textView(""), producerId(NULL), producerSequenceId(0), brokerSequenceId(0), key("") {
-
+MessageId::MessageId()
+    : BaseDataStructure(),
+      textView(""),
+      producerId(NULL),
+      producerSequenceId(0),
+      brokerSequenceId(0),
+      key("")
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageId::MessageId(const MessageId& other) :
-    BaseDataStructure(), textView(""), producerId(NULL), producerSequenceId(0), brokerSequenceId(0), key("") {
-
+MessageId::MessageId(const MessageId& other)
+    : BaseDataStructure(),
+      textView(""),
+      producerId(NULL),
+      producerSequenceId(0),
+      brokerSequenceId(0),
+      key("")
+{
     this->copyDataStructure(&other);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageId::MessageId(const std::string& messageKey) :
-    BaseDataStructure(), textView(""), producerId(NULL), producerSequenceId(0), brokerSequenceId(0), key("") {
-
+MessageId::MessageId(const std::string& messageKey)
+    : BaseDataStructure(),
+      textView(""),
+      producerId(NULL),
+      producerSequenceId(0),
+      brokerSequenceId(0),
+      key("")
+{
     this->setValue(messageKey);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageId::MessageId(const Pointer<ProducerInfo>& producerInfo, long long producerSequenceId) :
-    BaseDataStructure(), textView(""), producerId(NULL), producerSequenceId(0), brokerSequenceId(0), key("") {
-
-    this->producerId = producerInfo->getProducerId();
+MessageId::MessageId(const Pointer<ProducerInfo>& producerInfo,
+                     long long                    producerSequenceId)
+    : BaseDataStructure(),
+      textView(""),
+      producerId(NULL),
+      producerSequenceId(0),
+      brokerSequenceId(0),
+      key("")
+{
+    this->producerId         = producerInfo->getProducerId();
     this->producerSequenceId = producerSequenceId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageId::MessageId(const Pointer<ProducerId>& producerId, long long producerSequenceId) :
-    BaseDataStructure(), textView(""), producerId(NULL), producerSequenceId(0), brokerSequenceId(0), key("") {
-
-    this->producerId = producerId;
+MessageId::MessageId(const Pointer<ProducerId>& producerId,
+                     long long                  producerSequenceId)
+    : BaseDataStructure(),
+      textView(""),
+      producerId(NULL),
+      producerSequenceId(0),
+      brokerSequenceId(0),
+      key("")
+{
+    this->producerId         = producerId;
     this->producerSequenceId = producerSequenceId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageId::MessageId(const std::string& producerId, long long producerSequenceId) :
-    BaseDataStructure(), textView(""), producerId(NULL), producerSequenceId(0), brokerSequenceId(0), key("") {
-
+MessageId::MessageId(const std::string& producerId,
+                     long long          producerSequenceId)
+    : BaseDataStructure(),
+      textView(""),
+      producerId(NULL),
+      producerSequenceId(0),
+      brokerSequenceId(0),
+      key("")
+{
     this->producerId.reset(new ProducerId(producerId));
     this->producerSequenceId = producerSequenceId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageId::~MessageId() {
+MessageId::~MessageId()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageId* MessageId::cloneDataStructure() const {
+MessageId* MessageId::cloneDataStructure() const
+{
     std::unique_ptr<MessageId> messageId(new MessageId());
 
     // Copy the data from the base class or classes
@@ -101,18 +136,21 @@ MessageId* MessageId::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageId::copyDataStructure(const DataStructure* src) {
-
+void MessageId::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const MessageId* srcPtr = dynamic_cast<const MessageId*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "MessageId::copyDataStructure - src is NULL or invalid");
     }
 
@@ -126,22 +164,30 @@ void MessageId::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char MessageId::getDataStructureType() const {
+unsigned char MessageId::getDataStructureType() const
+{
     return MessageId::ID_MESSAGEID;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string MessageId::toString() const {
-
-    if (key.empty()) {
-        if (!textView.empty()) {
-            if (textView.find_first_of("ID:") == 0) {
+std::string MessageId::toString() const
+{
+    if (key.empty())
+    {
+        if (!textView.empty())
+        {
+            if (textView.find_first_of("ID:") == 0)
+            {
                 key = textView;
-            } else {
+            }
+            else
+            {
                 key = "ID:" + textView;
             }
-        } else {
-            this->key = this->producerId->toString() + ":" + 
+        }
+        else
+        {
+            this->key = this->producerId->toString() + ":" +
                         Long::toString(this->producerSequenceId);
         }
     }
@@ -150,116 +196,146 @@ std::string MessageId::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool MessageId::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool MessageId::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const MessageId* valuePtr = dynamic_cast<const MessageId*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getTextView() != valuePtr->getTextView()) {
+    if (this->getTextView() != valuePtr->getTextView())
+    {
         return false;
     }
-    if (this->getProducerId() != NULL) {
-        if (!this->getProducerId()->equals(valuePtr->getProducerId().get())) {
+    if (this->getProducerId() != NULL)
+    {
+        if (!this->getProducerId()->equals(valuePtr->getProducerId().get()))
+        {
             return false;
         }
-    } else if (valuePtr->getProducerId() != NULL) {
+    }
+    else if (valuePtr->getProducerId() != NULL)
+    {
         return false;
     }
-    if (this->getProducerSequenceId() != valuePtr->getProducerSequenceId()) {
+    if (this->getProducerSequenceId() != valuePtr->getProducerSequenceId())
+    {
         return false;
     }
-    if (this->getBrokerSequenceId() != valuePtr->getBrokerSequenceId()) {
+    if (this->getBrokerSequenceId() != valuePtr->getBrokerSequenceId())
+    {
         return false;
     }
-    if (!BaseDataStructure::equals(value)) {
+    if (!BaseDataStructure::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::string& MessageId::getTextView() const {
+const std::string& MessageId::getTextView() const
+{
     return textView;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string& MessageId::getTextView() {
+std::string& MessageId::getTextView()
+{
     return textView;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageId::setTextView(const std::string& textView) {
+void MessageId::setTextView(const std::string& textView)
+{
     this->textView = textView;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ProducerId>& MessageId::getProducerId() const {
+const decaf::lang::Pointer<ProducerId>& MessageId::getProducerId() const
+{
     return producerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ProducerId>& MessageId::getProducerId() {
+decaf::lang::Pointer<ProducerId>& MessageId::getProducerId()
+{
     return producerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageId::setProducerId(const decaf::lang::Pointer<ProducerId>& producerId) {
+void MessageId::setProducerId(const decaf::lang::Pointer<ProducerId>& producerId)
+{
     this->producerId = producerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long MessageId::getProducerSequenceId() const {
+long long MessageId::getProducerSequenceId() const
+{
     return producerSequenceId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageId::setProducerSequenceId(long long producerSequenceId) {
+void MessageId::setProducerSequenceId(long long producerSequenceId)
+{
     this->producerSequenceId = producerSequenceId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long MessageId::getBrokerSequenceId() const {
+long long MessageId::getBrokerSequenceId() const
+{
     return brokerSequenceId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageId::setBrokerSequenceId(long long brokerSequenceId) {
+void MessageId::setBrokerSequenceId(long long brokerSequenceId)
+{
     this->brokerSequenceId = brokerSequenceId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int MessageId::compareTo(const MessageId& value) const {
-
-    if (this == &value) {
+int MessageId::compareTo(const MessageId& value) const
+{
+    if (this == &value)
+    {
         return 0;
     }
 
-    int textViewComp = StringUtils::compareIgnoreCase(this->textView.c_str(), value.textView.c_str());
-    if (textViewComp != 0) {
+    int textViewComp = StringUtils::compareIgnoreCase(this->textView.c_str(),
+                                                      value.textView.c_str());
+    if (textViewComp != 0)
+    {
         return textViewComp;
     }
 
     int producerIdComp = this->producerId->compareTo(*(value.producerId));
-    if (producerIdComp != 0) {
+    if (producerIdComp != 0)
+    {
         return producerIdComp;
     }
 
-    if (this->producerSequenceId > value.producerSequenceId) {
+    if (this->producerSequenceId > value.producerSequenceId)
+    {
         return 1;
-    } else if(this->producerSequenceId < value.producerSequenceId) {
+    }
+    else if (this->producerSequenceId < value.producerSequenceId)
+    {
         return -1;
     }
 
-    if (this->brokerSequenceId > value.brokerSequenceId) {
+    if (this->brokerSequenceId > value.brokerSequenceId)
+    {
         return 1;
-    } else if(this->brokerSequenceId < value.brokerSequenceId) {
+    }
+    else if (this->brokerSequenceId < value.brokerSequenceId)
+    {
         return -1;
     }
 
@@ -267,45 +343,51 @@ int MessageId::compareTo(const MessageId& value) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool MessageId::equals(const MessageId& value) const {
+bool MessageId::equals(const MessageId& value) const
+{
     return this->equals((const DataStructure*)&value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool MessageId::operator==(const MessageId& value) const {
+bool MessageId::operator==(const MessageId& value) const
+{
     return this->compareTo(value) == 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool MessageId::operator<(const MessageId& value) const {
+bool MessageId::operator<(const MessageId& value) const
+{
     return this->compareTo(value) < 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageId& MessageId::operator= (const MessageId& other) {
+MessageId& MessageId::operator=(const MessageId& other)
+{
     this->copyDataStructure(&other);
     return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int MessageId::getHashCode() const {
+int MessageId::getHashCode() const
+{
     return decaf::util::HashCode<std::string>()(this->toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageId::setValue(const std::string& key) {
-
+void MessageId::setValue(const std::string& key)
+{
     std::string messageKey = key;
 
     // Parse off the sequenceId
-    std::size_t p = messageKey.rfind( ':' );
+    std::size_t p = messageKey.rfind(':');
 
-    if (p != std::string::npos) {
-        producerSequenceId = Long::parseLong(messageKey.substr(p + 1, std::string::npos));
+    if (p != std::string::npos)
+    {
+        producerSequenceId =
+            Long::parseLong(messageKey.substr(p + 1, std::string::npos));
         messageKey = messageKey.substr(0, p);
     }
 
     this->producerId.reset(new ProducerId(messageKey));
     this->key = messageKey;
 }
-

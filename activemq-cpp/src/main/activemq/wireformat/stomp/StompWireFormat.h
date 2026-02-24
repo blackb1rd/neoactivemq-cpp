@@ -21,201 +21,216 @@
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
 #include <activemq/wireformat/stomp/StompFrame.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 #include <decaf/io/IOException.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 
-namespace activemq {
-namespace wireformat {
-namespace stomp {
+namespace activemq
+{
+namespace wireformat
+{
+    namespace stomp
+    {
 
-    using decaf::lang::Pointer;
-    using activemq::commands::Command;
+        using activemq::commands::Command;
+        using decaf::lang::Pointer;
 
-    class StompHelper;
-    class StompWireformatProperties;
+        class StompHelper;
+        class StompWireformatProperties;
 
-    class AMQCPP_API StompWireFormat : public WireFormat {
-    private:
+        class AMQCPP_API StompWireFormat : public WireFormat
+        {
+        private:
+            /**
+             * Performs conversions for STOMP types and canonical types.
+             */
+            StompHelper* helper;
 
-        /**
-         * Performs conversions for STOMP types and canonical types.
-         */
-        StompHelper* helper;
+            // Stored after we connect to use when validating that a durable
+            // subscribe and unsubscribe are set to use the client Id.
+            std::string clientId;
 
-        // Stored after we connect to use when validating that a durable subscribe
-        // and unsubscribe are set to use the client Id.
-        std::string clientId;
+            // Indicates when we are in the doUnmarshal call
+            decaf::util::concurrent::atomic::AtomicBoolean receiving;
 
-        // Indicates when we are in the doUnmarshal call
-        decaf::util::concurrent::atomic::AtomicBoolean receiving;
+            // Internal structure for holding class internal data that can
+            // change without affecting binary compatibility.
+            StompWireformatProperties* properties;
 
-        // Internal structure for holding class internal data that can change without
-        // affecting binary compatibility.
-        StompWireformatProperties* properties;
+        private:
+            StompWireFormat(const StompWireFormat&);
+            StompWireFormat& operator=(const StompWireFormat&);
 
-    private:
+        public:
+            StompWireFormat();
 
-        StompWireFormat(const StompWireFormat&);
-        StompWireFormat& operator=(const StompWireFormat&);
+            virtual ~StompWireFormat();
 
-    public:
+        public:
+            /**
+             * Stream based marshaling of a Command, this method blocks until
+             * the entire Command has been written out to the output stream.
+             *
+             * @param command
+             *      The Command to Marshal to the output stream.
+             * @param transport
+             *      The Transport that initiated this marshal call.
+             * @param out
+             *      The output stream to write the command to.
+             *
+             * @throws IOException
+             */
+            virtual void marshal(const Pointer<commands::Command> command,
+                                 const activemq::transport::Transport* transport,
+                                 decaf::io::DataOutputStream* out);
 
-        StompWireFormat();
+            /**
+             * Stream based un-marshaling, blocks on reads on the input stream
+             * until a complete command has been read and unmarshaled into the
+             * correct form.  Returns a Pointer to the newly unmarshaled
+             * Command.
+             *
+             * @param transport - Pointer to the transport that is making this
+             * request.
+             * @param in - the input stream to read the command from.
+             * @return the newly marshaled Command, caller owns the pointer
+             * @throws IOException
+             */
+            virtual Pointer<commands::Command> unmarshal(
+                const activemq::transport::Transport* transport,
+                decaf::io::DataInputStream*           in);
 
-        virtual ~StompWireFormat();
+            /**
+             * Set the Version
+             * @param the version of the wire format
+             */
+            virtual void setVersion(int version AMQCPP_UNUSED)
+            {
+            }
 
-    public:
+            /**
+             * Get the Version
+             * @return the version of the wire format
+             */
+            virtual int getVersion() const
+            {
+                return 1;
+            }
 
-        /**
-         * Stream based marshaling of a Command, this method blocks until the entire
-         * Command has been written out to the output stream.
-         *
-         * @param command
-         *      The Command to Marshal to the output stream.
-         * @param transport
-         *      The Transport that initiated this marshal call.
-         * @param out
-         *      The output stream to write the command to.
-         *
-         * @throws IOException
-         */
-        virtual void marshal(const Pointer<commands::Command> command,
-                             const activemq::transport::Transport* transport,
-                             decaf::io::DataOutputStream* out);
+            /**
+             * Gets the prefix used to address Topics
+             *
+             * @return the string prefix used to address Topics.
+             */
+            std::string getTopicPrefix() const;
 
-        /**
-         * Stream based un-marshaling, blocks on reads on the input stream until a complete
-         * command has been read and unmarshaled into the correct form.  Returns a Pointer
-         * to the newly unmarshaled Command.
-         *
-         * @param transport - Pointer to the transport that is making this request.
-         * @param in - the input stream to read the command from.
-         * @return the newly marshaled Command, caller owns the pointer
-         * @throws IOException
-         */
-        virtual Pointer<commands::Command> unmarshal(const activemq::transport::Transport* transport,
-                                                     decaf::io::DataInputStream* in);
+            /**
+             * Sets the prefix used to address Topics.
+             *
+             * @param prefix
+             *      The prefix to use.
+             */
+            void setTopicPrefix(const std::string& prefix);
 
-        /**
-         * Set the Version
-         * @param the version of the wire format
-         */
-        virtual void setVersion(int version AMQCPP_UNUSED) {}
+            /**
+             * Gets the prefix used to address Queues
+             *
+             * @return the string prefix used to address Queues.
+             */
+            std::string getQueuePrefix() const;
 
-        /**
-         * Get the Version
-         * @return the version of the wire format
-         */
-        virtual int getVersion() const {
-            return 1;
-        }
+            /**
+             * Sets the prefix used to address Queues.
+             *
+             * @param prefix
+             *      The prefix to use.
+             */
+            void setQueuePrefix(const std::string& prefix);
 
-        /**
-         * Gets the prefix used to address Topics
-         *
-         * @return the string prefix used to address Topics.
-         */
-        std::string getTopicPrefix() const;
+            /**
+             * Gets the prefix used to address Temporary Topics
+             *
+             * @return the string prefix used to address Temporary Topics.
+             */
+            std::string getTempTopicPrefix() const;
 
-        /**
-         * Sets the prefix used to address Topics.
-         *
-         * @param prefix
-         *      The prefix to use.
-         */
-        void setTopicPrefix(const std::string& prefix);
+            /**
+             * Sets the prefix used to address Temporary Topics.
+             *
+             * @param prefix
+             *      The prefix to use.
+             */
+            void setTempTopicPrefix(const std::string& prefix);
 
-        /**
-         * Gets the prefix used to address Queues
-         *
-         * @return the string prefix used to address Queues.
-         */
-        std::string getQueuePrefix() const;
+            /**
+             * Gets the prefix used to address Temporary Queues
+             *
+             * @return the string prefix used to address Temporary Queues.
+             */
+            std::string getTempQueuePrefix() const;
 
-        /**
-         * Sets the prefix used to address Queues.
-         *
-         * @param prefix
-         *      The prefix to use.
-         */
-        void setQueuePrefix(const std::string& prefix);
+            /**
+             * Sets the prefix used to address Temporary Queues.
+             *
+             * @param prefix
+             *      The prefix to use.
+             */
+            void setTempQueuePrefix(const std::string& prefix);
 
-        /**
-         * Gets the prefix used to address Temporary Topics
-         *
-         * @return the string prefix used to address Temporary Topics.
-         */
-        std::string getTempTopicPrefix() const;
+            /**
+             * Is there a Message being unmarshaled?
+             *
+             * @return true while in the doUnmarshal method.
+             */
+            virtual bool inReceive() const
+            {
+                return this->receiving.get();
+            }
 
-        /**
-         * Sets the prefix used to address Temporary Topics.
-         *
-         * @param prefix
-         *      The prefix to use.
-         */
-        void setTempTopicPrefix(const std::string& prefix);
+            /**
+             * Returns true if this WireFormat has a Negotiator that needs to
+             * wrap the Transport that uses it.
+             * @return true if the WireFormat provides a Negotiator.
+             */
+            virtual bool hasNegotiator() const
+            {
+                return false;
+            }
 
-        /**
-         * Gets the prefix used to address Temporary Queues
-         *
-         * @return the string prefix used to address Temporary Queues.
-         */
-        std::string getTempQueuePrefix() const;
+            /**
+             * If the Transport Provides a Negotiator this method will create
+             * and return a news instance of the Negotiator.
+             * @return new instance of a WireFormatNegotiator.
+             * @throws UnsupportedOperationException if the WireFormat doesn't
+             * have a Negotiator.
+             */
+            virtual Pointer<transport::Transport> createNegotiator(
+                const Pointer<transport::Transport> transport);
 
-        /**
-         * Sets the prefix used to address Temporary Queues.
-         *
-         * @param prefix
-         *      The prefix to use.
-         */
-        void setTempQueuePrefix(const std::string& prefix);
+        private:
+            Pointer<Command> unmarshalMessage(const Pointer<StompFrame> frame);
+            Pointer<Command> unmarshalReceipt(const Pointer<StompFrame> frame);
+            Pointer<Command> unmarshalConnected(const Pointer<StompFrame> frame);
+            Pointer<Command> unmarshalError(const Pointer<StompFrame> frame);
 
-        /**
-         * Is there a Message being unmarshaled?
-         *
-         * @return true while in the doUnmarshal method.
-         */
-        virtual bool inReceive() const {
-            return this->receiving.get();
-        }
+            Pointer<StompFrame> marshalMessage(const Pointer<Command> command);
+            Pointer<StompFrame> marshalAck(const Pointer<Command> command);
+            Pointer<StompFrame> marshalConnectionInfo(
+                const Pointer<Command> command);
+            Pointer<StompFrame> marshalTransactionInfo(
+                const Pointer<Command> command);
+            Pointer<StompFrame> marshalShutdownInfo(
+                const Pointer<Command> command);
+            Pointer<StompFrame> marshalRemoveInfo(
+                const Pointer<Command> command);
+            Pointer<StompFrame> marshalConsumerInfo(
+                const Pointer<Command> command);
+            Pointer<StompFrame> marshalRemoveSubscriptionInfo(
+                const Pointer<Command> command);
+        };
 
-        /**
-         * Returns true if this WireFormat has a Negotiator that needs to wrap the
-         * Transport that uses it.
-         * @return true if the WireFormat provides a Negotiator.
-         */
-        virtual bool hasNegotiator() const {
-            return false;
-        }
-
-        /**
-         * If the Transport Provides a Negotiator this method will create and return
-         * a news instance of the Negotiator.
-         * @return new instance of a WireFormatNegotiator.
-         * @throws UnsupportedOperationException if the WireFormat doesn't have a Negotiator.
-         */
-        virtual Pointer<transport::Transport> createNegotiator(
-            const Pointer<transport::Transport> transport);
-
-    private:
-
-        Pointer<Command> unmarshalMessage(const Pointer<StompFrame> frame);
-        Pointer<Command> unmarshalReceipt(const Pointer<StompFrame> frame);
-        Pointer<Command> unmarshalConnected(const Pointer<StompFrame> frame);
-        Pointer<Command> unmarshalError(const Pointer<StompFrame> frame);
-
-        Pointer<StompFrame> marshalMessage(const Pointer<Command> command);
-        Pointer<StompFrame> marshalAck(const Pointer<Command> command);
-        Pointer<StompFrame> marshalConnectionInfo(const Pointer<Command> command);
-        Pointer<StompFrame> marshalTransactionInfo(const Pointer<Command> command);
-        Pointer<StompFrame> marshalShutdownInfo(const Pointer<Command> command);
-        Pointer<StompFrame> marshalRemoveInfo(const Pointer<Command> command);
-        Pointer<StompFrame> marshalConsumerInfo(const Pointer<Command> command);
-        Pointer<StompFrame> marshalRemoveSubscriptionInfo(const Pointer<Command> command);
-
-    };
-
-}}}
+    }  // namespace stomp
+}  // namespace wireformat
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_WIREFORMAT_STOMP_STOMPWIREFORMAT_H_ */

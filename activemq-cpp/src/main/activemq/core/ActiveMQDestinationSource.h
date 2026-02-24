@@ -22,30 +22,29 @@
 
 #include <activemq/util/Config.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     class DestinationSourceImpl;
     class ActiveMQConnection;
 
-    class AMQCPP_API ActiveMQDestinationSource : public cms::DestinationSource {
+    class AMQCPP_API ActiveMQDestinationSource : public cms::DestinationSource
+    {
     private:
-
         ActiveMQDestinationSource(ActiveMQDestinationSource&);
-        ActiveMQDestinationSource& operator= (const ActiveMQDestinationSource&);
+        ActiveMQDestinationSource& operator=(const ActiveMQDestinationSource&);
 
     private:
-
         DestinationSourceImpl* impl;
 
     public:
-
         ActiveMQDestinationSource(ActiveMQConnection* connection);
 
         virtual ~ActiveMQDestinationSource();
 
     public:
-
         virtual void start();
 
         virtual void stop();
@@ -61,9 +60,9 @@ namespace core {
         virtual std::vector<cms::TemporaryQueue*> getTemporaryQueues() const;
 
         virtual std::vector<cms::TemporaryTopic*> getTemporaryTopics() const;
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_ACTIVEMQDESTINATIONSOURCE_H_ */

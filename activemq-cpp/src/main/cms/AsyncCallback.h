@@ -22,30 +22,30 @@
 
 #include <cms/ExceptionListener.h>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * Asynchronous event interface for CMS asynchronous operations.
+ *
+ * For operations in CMS that allow for Asynchronous execution the caller
+ * provides an instance of this interface.  If the asynchronous action is
+ * successful the onSuccess method is invoked, otherwise the onException
+ * method of cms::ExceptionListener is called.
+ *
+ * @since 3.0
+ */
+class CMS_API AsyncCallback : public ExceptionListener
+{
+public:
+    virtual ~AsyncCallback();
 
     /**
-     * Asynchronous event interface for CMS asynchronous operations.
-     *
-     * For operations in CMS that allow for Asynchronous execution the caller
-     * provides an instance of this interface.  If the asynchronous action is
-     * successful the onSuccess method is invoked, otherwise the onException
-     * method of cms::ExceptionListener is called.
-     *
-     * @since 3.0
+     * Called when the asynchronous operation has completed successfully.
      */
-    class CMS_API AsyncCallback : public ExceptionListener {
-    public:
+    virtual void onSuccess() = 0;
+};
 
-        virtual ~AsyncCallback();
-
-        /**
-         * Called when the asynchronous operation has completed successfully.
-         */
-        virtual void onSuccess() = 0;
-
-    };
-
-}
+}  // namespace cms
 
 #endif /* ASYNCCALLBACK_H_ */

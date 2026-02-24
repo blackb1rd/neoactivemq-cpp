@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-#include <activemq/transport/mock/MockTransportFactory.h>
+#include <activemq/transport/Transport.h>
 #include <activemq/transport/correlator/ResponseCorrelator.h>
 #include <activemq/transport/logging/LoggingTransport.h>
-#include <activemq/wireformat/openwire/OpenWireResponseBuilder.h>
-#include <activemq/transport/Transport.h>
 #include <activemq/transport/mock/MockTransport.h>
+#include <activemq/transport/mock/MockTransportFactory.h>
 #include <activemq/transport/mock/ResponseBuilder.h>
 #include <activemq/util/URISupport.h>
+#include <activemq/wireformat/openwire/OpenWireResponseBuilder.h>
 
+#include <decaf/io/IOException.h>
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Integer.h>
-#include <decaf/io/IOException.h>
 
 using namespace activemq;
 using namespace activemq::util;
@@ -42,22 +42,27 @@ using namespace decaf::io;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> MockTransportFactory::create(const decaf::net::URI& location) {
-
-    try {
-
-        Properties properties = activemq::util::URISupport::parseQuery(location.getQuery());
+Pointer<Transport> MockTransportFactory::create(const decaf::net::URI& location)
+{
+    try
+    {
+        Properties properties =
+            activemq::util::URISupport::parseQuery(location.getQuery());
 
         Pointer<WireFormat> wireFormat = this->createWireFormat(properties);
 
         // Create the initial Transport, then wrap it in the normal Filters
-        Pointer<Transport> transport(doCreateComposite(location, wireFormat, properties));
+        Pointer<Transport> transport(
+            doCreateComposite(location, wireFormat, properties));
 
         // Create the Transport for response correlator
         transport.reset(new ResponseCorrelator(transport));
 
-        // If command tracing was enabled, wrap the transport with a logging transport.
-        if (properties.getProperty("transport.commandTracingEnabled", "false") == "true") {
+        // If command tracing was enabled, wrap the transport with a logging
+        // transport.
+        if (properties.getProperty("transport.commandTracingEnabled",
+                                   "false") == "true")
+        {
             // Create the Transport for response correlator
             transport.reset(new LoggingTransport(transport));
         }
@@ -70,11 +75,13 @@ Pointer<Transport> MockTransportFactory::create(const decaf::net::URI& location)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> MockTransportFactory::createComposite(const decaf::net::URI& location) {
-
-    try {
-
-        Properties properties = activemq::util::URISupport::parseQuery(location.getQuery());
+Pointer<Transport> MockTransportFactory::createComposite(
+    const decaf::net::URI& location)
+{
+    try
+    {
+        Properties properties =
+            activemq::util::URISupport::parseQuery(location.getQuery());
 
         Pointer<WireFormat> wireFormat = this->createWireFormat(properties);
 
@@ -87,41 +94,52 @@ Pointer<Transport> MockTransportFactory::createComposite(const decaf::net::URI& 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> MockTransportFactory::doCreateComposite(const decaf::net::URI& location AMQCPP_UNUSED,
-                                                           const Pointer<wireformat::WireFormat> wireFormat,
-                                                           const decaf::util::Properties& properties) {
+Pointer<Transport> MockTransportFactory::doCreateComposite(
+    const decaf::net::URI& location       AMQCPP_UNUSED,
+    const Pointer<wireformat::WireFormat> wireFormat,
+    const decaf::util::Properties&        properties)
+{
+    try
+    {
+        std::string wireFormatName =
+            properties.getProperty("wireFormat", "openwire");
 
-    try {
-
-        std::string wireFormatName = properties.getProperty("wireFormat", "openwire");
-
-        if (properties.getProperty("failOnCreate", "false") == "true") {
-            throw IOException(__FILE__, __LINE__, "Failed to Create MockTransport.");
+        if (properties.getProperty("failOnCreate", "false") == "true")
+        {
+            throw IOException(__FILE__,
+                              __LINE__,
+                              "Failed to Create MockTransport.");
         }
 
         Pointer<ResponseBuilder> builder;
 
-        if (wireFormatName == "openwire" || wireFormatName == "stomp") {
+        if (wireFormatName == "openwire" || wireFormatName == "stomp")
+        {
             builder.reset(new wireformat::openwire::OpenWireResponseBuilder());
-        } else {
-            throw ActiveMQException(__FILE__, __LINE__,
-                "No Response Builder known for this Wireformat, can't create a Mock.");
+        }
+        else
+        {
+            throw ActiveMQException(__FILE__,
+                                    __LINE__,
+                                    "No Response Builder known for this "
+                                    "Wireformat, can't create a Mock.");
         }
 
-        Pointer<MockTransport> transport(new MockTransport(wireFormat, builder));
+        Pointer<MockTransport> transport(
+            new MockTransport(wireFormat, builder));
 
-        transport->setFailOnSendMessage(
-            Boolean::parseBoolean(properties.getProperty("failOnSendMessage", "false")));
-        transport->setNumSentMessageBeforeFail(
-            Integer::parseInt(properties.getProperty("numSentMessageBeforeFail", "0")));
-        transport->setFailOnReceiveMessage(
-            Boolean::parseBoolean(properties.getProperty("failOnReceiveMessage", "false")));
-        transport->setNumReceivedMessageBeforeFail(
-            Integer::parseInt(properties.getProperty("numReceivedMessageBeforeFail", "0")));
-        transport->setFailOnKeepAliveSends(
-            Boolean::parseBoolean(properties.getProperty("failOnKeepAliveSends", "false")));
-        transport->setNumSentKeepAlivesBeforeFail(
-            Integer::parseInt(properties.getProperty("numSentKeepAlivesBeforeFail", "0")));
+        transport->setFailOnSendMessage(Boolean::parseBoolean(
+            properties.getProperty("failOnSendMessage", "false")));
+        transport->setNumSentMessageBeforeFail(Integer::parseInt(
+            properties.getProperty("numSentMessageBeforeFail", "0")));
+        transport->setFailOnReceiveMessage(Boolean::parseBoolean(
+            properties.getProperty("failOnReceiveMessage", "false")));
+        transport->setNumReceivedMessageBeforeFail(Integer::parseInt(
+            properties.getProperty("numReceivedMessageBeforeFail", "0")));
+        transport->setFailOnKeepAliveSends(Boolean::parseBoolean(
+            properties.getProperty("failOnKeepAliveSends", "false")));
+        transport->setNumSentKeepAlivesBeforeFail(Integer::parseInt(
+            properties.getProperty("numSentKeepAlivesBeforeFail", "0")));
         transport->setName(properties.getProperty("name", ""));
 
         return transport;

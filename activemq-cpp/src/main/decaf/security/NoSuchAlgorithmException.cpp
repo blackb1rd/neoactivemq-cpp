@@ -21,22 +21,34 @@ using namespace decaf;
 using namespace decaf::security;
 
 ////////////////////////////////////////////////////////////////////////////////
-NoSuchAlgorithmException::NoSuchAlgorithmException() : GeneralSecurityException() {
+NoSuchAlgorithmException::NoSuchAlgorithmException()
+    : GeneralSecurityException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoSuchAlgorithmException::NoSuchAlgorithmException(const Exception& ex) : GeneralSecurityException() {
-    *(Exception*) this = ex;
+NoSuchAlgorithmException::NoSuchAlgorithmException(const Exception& ex)
+    : GeneralSecurityException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoSuchAlgorithmException::NoSuchAlgorithmException(const NoSuchAlgorithmException& ex) : GeneralSecurityException() {
-    *(Exception*) this = ex;
+NoSuchAlgorithmException::NoSuchAlgorithmException(
+    const NoSuchAlgorithmException& ex)
+    : GeneralSecurityException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoSuchAlgorithmException::NoSuchAlgorithmException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : GeneralSecurityException(cause) {
-
+NoSuchAlgorithmException::NoSuchAlgorithmException(const char* file,
+                                                   const int   lineNumber,
+                                                   const std::exception* cause,
+                                                   const char*           msg,
+                                                   ...)
+    : GeneralSecurityException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -46,12 +58,18 @@ NoSuchAlgorithmException::NoSuchAlgorithmException(const char* file, const int l
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoSuchAlgorithmException::NoSuchAlgorithmException(const std::exception* cause) : GeneralSecurityException(cause) {
+NoSuchAlgorithmException::NoSuchAlgorithmException(const std::exception* cause)
+    : GeneralSecurityException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoSuchAlgorithmException::NoSuchAlgorithmException(const char* file, const int lineNumber, const char* msg, ...) : GeneralSecurityException() {
-
+NoSuchAlgorithmException::NoSuchAlgorithmException(const char* file,
+                                                   const int   lineNumber,
+                                                   const char* msg,
+                                                   ...)
+    : GeneralSecurityException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -61,5 +79,6 @@ NoSuchAlgorithmException::NoSuchAlgorithmException(const char* file, const int l
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoSuchAlgorithmException::~NoSuchAlgorithmException() throw () {
+NoSuchAlgorithmException::~NoSuchAlgorithmException() throw()
+{
 }

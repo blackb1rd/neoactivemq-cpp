@@ -17,14 +17,14 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/HashSet.h>
-#include <decaf/util/Iterator.h>
-#include <decaf/util/HashMap.h>
-#include <decaf/util/StlMap.h>
-#include <decaf/util/ArrayList.h>
-#include <decaf/util/LinkedList.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/util/ArrayList.h>
+#include <decaf/util/HashMap.h>
+#include <decaf/util/HashSet.h>
+#include <decaf/util/Iterator.h>
+#include <decaf/util/LinkedList.h>
+#include <decaf/util/StlMap.h>
 
 using namespace std;
 using namespace decaf;
@@ -32,72 +32,79 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class HashSetTest : public ::testing::Test {
+class HashSetTest : public ::testing::Test
+{
 public:
+    HashSetTest();
+    virtual ~HashSetTest();
 
-        HashSetTest();
-        virtual ~HashSetTest();
-
-        void testConstructor();
-        void testConstructorI();
-        void testConstructorIF();
-        void testConstructorCollection();
-        void testCopyConstructor();
-        void testAdd();
-        void testClear();
-        void testContains();
-        void testIsEmpty();
-        void testIterator();
-        void testRemove();
-        void testSize();
-        void testToString();
-        void testToArray();
-        void testCopy1();
-        void testCopy2();
-        void testEquals();
-        void testRemoveAll();
-        void testRetainAll();
-
-    };
-
+    void testConstructor();
+    void testConstructorI();
+    void testConstructorIF();
+    void testConstructorCollection();
+    void testCopyConstructor();
+    void testAdd();
+    void testClear();
+    void testContains();
+    void testIsEmpty();
+    void testIterator();
+    void testRemove();
+    void testSize();
+    void testToString();
+    void testToArray();
+    void testCopy1();
+    void testCopy2();
+    void testEquals();
+    void testRemoveAll();
+    void testRetainAll();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    const int SET_SIZE = 1000;
+const int SET_SIZE = 1000;
 
-    void populateSet(HashSet<int>& hashSet) {
-        for (int i = 0; i < SET_SIZE; ++i) {
-            hashSet.add(i);
-        }
-    }
-
-    void populateSet(HashSet<int>& hashSet, int count) {
-        for (int i = 0; i < count; ++i) {
-            hashSet.add(i);
-        }
-    }
-
-    HashSet<int> populateSetAndReturn(int count) {
-        HashSet<int> result;
-        for (int i = 0; i < count; ++i) {
-            result.add(i);
-        }
-        return result;
+void populateSet(HashSet<int>& hashSet)
+{
+    for (int i = 0; i < SET_SIZE; ++i)
+    {
+        hashSet.add(i);
     }
 }
 
+void populateSet(HashSet<int>& hashSet, int count)
+{
+    for (int i = 0; i < count; ++i)
+    {
+        hashSet.add(i);
+    }
+}
+
+HashSet<int> populateSetAndReturn(int count)
+{
+    HashSet<int> result;
+    for (int i = 0; i < count; ++i)
+    {
+        result.add(i);
+    }
+    return result;
+}
+}  // namespace
+
 ////////////////////////////////////////////////////////////////////////////////
-HashSetTest::HashSetTest() {
+HashSetTest::HashSetTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-HashSetTest::~HashSetTest() {
+HashSetTest::~HashSetTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testConstructor() {
-
+void HashSetTest::testConstructor()
+{
     HashSet<int> set;
     ASSERT_TRUE(set.isEmpty());
     ASSERT_EQ(0, set.size());
@@ -105,14 +112,17 @@ void HashSetTest::testConstructor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testConstructorI() {
-
+void HashSetTest::testConstructorI()
+{
     HashSet<int> set;
     ASSERT_EQ(0, set.size()) << ("Created incorrect HashSet");
 
-    try {
+    try
+    {
         HashSet<int> set(-1);
-    } catch (IllegalArgumentException& e) {
+    }
+    catch (IllegalArgumentException& e)
+    {
         return;
     }
 
@@ -120,23 +130,27 @@ void HashSetTest::testConstructorI() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testConstructorIF() {
-
+void HashSetTest::testConstructorIF()
+{
     HashSet<int> set(5, 0.5);
     ASSERT_EQ(0, set.size()) << ("Created incorrect HashSet");
 
-    try {
+    try
+    {
         HashSet<int> set(0, 0);
-    } catch (IllegalArgumentException& e) {
+    }
+    catch (IllegalArgumentException& e)
+    {
         return;
     }
 
-    FAIL() << ("Failed to throw IllegalArgumentException for initial load factor <= 0");
+    FAIL() << ("Failed to throw IllegalArgumentException for initial load "
+               "factor <= 0");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testConstructorCollection() {
-
+void HashSetTest::testConstructorCollection()
+{
     ArrayList<int> intList;
     intList.add(1);
     intList.add(1);
@@ -145,16 +159,19 @@ void HashSetTest::testConstructorCollection() {
     intList.add(4);
 
     HashSet<int> set(intList);
-    for (int counter = 0; counter < intList.size(); counter++) {
-        ASSERT_TRUE(set.contains(intList.get(counter))) << ("HashSet does not contain correct elements");
+    for (int counter = 0; counter < intList.size(); counter++)
+    {
+        ASSERT_TRUE(set.contains(intList.get(counter)))
+            << ("HashSet does not contain correct elements");
     }
 
-    ASSERT_TRUE(set.size() == intList.size() - 1) << ("HashSet created from collection incorrect size");
+    ASSERT_TRUE(set.size() == intList.size() - 1)
+        << ("HashSet created from collection incorrect size");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testCopyConstructor() {
-
+void HashSetTest::testCopyConstructor()
+{
     HashSet<int> set1;
     HashSet<int> set2;
 
@@ -170,8 +187,8 @@ void HashSetTest::testCopyConstructor() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testEquals() {
-
+void HashSetTest::testEquals()
+{
     HashSet<int> set1;
     populateSet(set1);
     HashSet<int> set2;
@@ -189,22 +206,24 @@ void HashSetTest::testEquals() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testAdd() {
-
+void HashSetTest::testAdd()
+{
     HashSet<int> set;
     populateSet(set);
     int size = set.size();
 
     set.add(8);
-    ASSERT_TRUE(set.size() == size) << ("Added element already contained by set");
+    ASSERT_TRUE(set.size() == size)
+        << ("Added element already contained by set");
     set.add(-9);
-    ASSERT_TRUE(set.size() == size + 1) << ("Failed to increment set size after add");
+    ASSERT_TRUE(set.size() == size + 1)
+        << ("Failed to increment set size after add");
     ASSERT_TRUE(set.contains(-9)) << ("Failed to add element to set");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testClear() {
-
+void HashSetTest::testClear()
+{
     HashSet<int> set;
     populateSet(set);
 
@@ -215,34 +234,39 @@ void HashSetTest::testClear() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testContains() {
-
+void HashSetTest::testContains()
+{
     HashSet<int> set;
     populateSet(set);
 
     ASSERT_TRUE(set.contains(90)) << ("Returned false for valid object");
-    ASSERT_TRUE(!set.contains(SET_SIZE + 1)) << ("Returned true for invalid Object");
+    ASSERT_TRUE(!set.contains(SET_SIZE + 1))
+        << ("Returned true for invalid Object");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testIsEmpty() {
+void HashSetTest::testIsEmpty()
+{
     HashSet<int> set;
     ASSERT_TRUE(set.isEmpty()) << ("Empty set returned true");
     set.add(1);
     ASSERT_TRUE(!set.isEmpty()) << ("Non-empty set returned true");
 
-    ASSERT_TRUE(HashSet<std::string>().isEmpty()) << ("Empty set returned false");
+    ASSERT_TRUE(HashSet<std::string>().isEmpty())
+        << ("Empty set returned false");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testIterator() {
-
+void HashSetTest::testIterator()
+{
     HashSet<int> set;
     populateSet(set);
-    Pointer< Iterator<int> > iter(set.iterator());
-    int x = 0;
-    while (iter->hasNext()) {
-        ASSERT_TRUE(set.contains(iter->next())) << ("Failed to iterate over all elements");
+    Pointer<Iterator<int>> iter(set.iterator());
+    int                    x = 0;
+    while (iter->hasNext())
+    {
+        ASSERT_TRUE(set.contains(iter->next()))
+            << ("Failed to iterate over all elements");
         ++x;
     }
     ASSERT_TRUE(set.size() == x) << ("Returned iteration of incorrect size");
@@ -250,16 +274,17 @@ void HashSetTest::testIterator() {
     {
         HashSet<string> set;
 
-        set.add( "fred1" );
-        set.add( "fred2" );
-        set.add( "fred3" );
+        set.add("fred1");
+        set.add("fred2");
+        set.add("fred3");
 
         Iterator<string>* iterator1 = set.iterator();
         ASSERT_TRUE(iterator1 != NULL);
         ASSERT_TRUE(iterator1->hasNext() == true);
 
         int count = 0;
-        while( iterator1->hasNext() ) {
+        while (iterator1->hasNext())
+        {
             iterator1->next();
             ++count;
         }
@@ -268,7 +293,8 @@ void HashSetTest::testIterator() {
 
         Iterator<string>* iterator2 = set.iterator();
 
-        while( iterator2->hasNext() ) {
+        while (iterator2->hasNext())
+        {
             iterator2->next();
             iterator2->remove();
         }
@@ -281,8 +307,8 @@ void HashSetTest::testIterator() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testRemove() {
-
+void HashSetTest::testRemove()
+{
     HashSet<int> set;
     populateSet(set);
     int size = set.size();
@@ -292,8 +318,8 @@ void HashSetTest::testRemove() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testSize() {
-
+void HashSetTest::testSize()
+{
     HashSet<int> set;
     populateSet(set);
 
@@ -303,15 +329,17 @@ void HashSetTest::testSize() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testToString() {
+void HashSetTest::testToString()
+{
     HashSet<std::string> s;
-    std::string result = s.toString();
-    ASSERT_TRUE(result.find("HashSet") != std::string::npos) << ("toString returned bad value");
+    std::string          result = s.toString();
+    ASSERT_TRUE(result.find("HashSet") != std::string::npos)
+        << ("toString returned bad value");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testToArray() {
-
+void HashSetTest::testToArray()
+{
     HashSet<int> set;
     populateSet(set);
 
@@ -320,11 +348,12 @@ void HashSetTest::testToArray() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testCopy1() {
-
+void HashSetTest::testCopy1()
+{
     HashSet<int> set1;
 
-    for (int i = 0; i < 50; ++i) {
+    for (int i = 0; i < 50; ++i)
+    {
         set1.add(i);
     }
 
@@ -334,7 +363,8 @@ void HashSetTest::testCopy1() {
 
     ASSERT_TRUE(set1.size() == set2.size());
 
-    for (int i = 0; i < 50; ++i) {
+    for (int i = 0; i < 50; ++i)
+    {
         ASSERT_TRUE(set2.contains(i));
     }
 
@@ -342,11 +372,12 @@ void HashSetTest::testCopy1() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testCopy2() {
-
+void HashSetTest::testCopy2()
+{
     LinkedList<int> collection;
 
-    for (int i = 0; i < 50; ++i) {
+    for (int i = 0; i < 50; ++i)
+    {
         collection.add(i);
     }
 
@@ -356,7 +387,8 @@ void HashSetTest::testCopy2() {
 
     ASSERT_TRUE(collection.size() == set.size());
 
-    for (int i = 0; i < 50; ++i) {
+    for (int i = 0; i < 50; ++i)
+    {
         ASSERT_TRUE(set.contains(i));
     }
 
@@ -364,8 +396,8 @@ void HashSetTest::testCopy2() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testRemoveAll() {
-
+void HashSetTest::testRemoveAll()
+{
     HashSet<int> set;
     populateSet(set, 3);
 
@@ -390,8 +422,8 @@ void HashSetTest::testRemoveAll() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void HashSetTest::testRetainAll() {
-
+void HashSetTest::testRetainAll()
+{
     HashSet<int> set;
     populateSet(set, 3);
 

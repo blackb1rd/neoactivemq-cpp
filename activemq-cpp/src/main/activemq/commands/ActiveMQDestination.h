@@ -18,28 +18,32 @@
 #ifndef _ACTIVEMQ_COMMANDS_ACTIVEMQDESTINATION_H_
 #define _ACTIVEMQ_COMMANDS_ACTIVEMQDESTINATION_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/BaseDataStructure.h>
 #include <activemq/util/ActiveMQProperties.h>
+#include <activemq/util/Config.h>
 #include <cms/Destination.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/Comparable.h>
+#include <decaf/lang/Pointer.h>
 #include <decaf/util/ArrayList.h>
 
-#include <vector>
-#include <string>
 #include <map>
+#include <string>
+#include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
-    class AMQCPP_API ActiveMQDestination : public BaseDataStructure,
-                                           public decaf::lang::Comparable<ActiveMQDestination> {
+    class AMQCPP_API ActiveMQDestination
+        : public BaseDataStructure,
+          public decaf::lang::Comparable<ActiveMQDestination>
+    {
     protected:
-
-        struct DestinationFilter{
+        struct DestinationFilter
+        {
             static const std::string ANY_CHILD;
             static const std::string ANY_DESCENDENT;
         };
@@ -62,15 +66,15 @@ namespace commands {
         bool exclusive;
         bool ordered;
         bool advisory;
-        mutable decaf::util::ArrayList< Pointer<ActiveMQDestination> > compositeDestinations;
+        mutable decaf::util::ArrayList<Pointer<ActiveMQDestination>>
+                    compositeDestinations;
         std::string orderedTarget;
 
-        std::string physicalName;
+        std::string              physicalName;
         util::ActiveMQProperties options;
-        int hashCode;
+        int                      hashCode;
 
     public:
-
         const static unsigned char ID_ACTIVEMQDESTINATION = 0;
 
         static const std::string TEMP_DESTINATION_NAME_PREFIX;
@@ -78,19 +82,18 @@ namespace commands {
         typedef decaf::lang::PointerComparator<ActiveMQDestination> COMPARATOR;
 
     private:
-
         ActiveMQDestination(const ActiveMQDestination&);
         ActiveMQDestination& operator=(const ActiveMQDestination&);
 
     public:
-
         ActiveMQDestination();
 
         ActiveMQDestination(const std::string& physicalName);
 
         virtual ~ActiveMQDestination() throw();
 
-        virtual ActiveMQDestination* cloneDataStructure() const {
+        virtual ActiveMQDestination* cloneDataStructure() const
+        {
             return NULL;
         }
 
@@ -102,17 +105,18 @@ namespace commands {
 
         virtual std::string toString() const;
 
-        int getHashCode() const {
+        int getHashCode() const
+        {
             return this->hashCode;
         }
 
     public:
-
         /**
          * Fetch this destination's physical name
          * @return const string containing the name
          */
-        virtual std::string getPhysicalName() const {
+        virtual std::string getPhysicalName() const
+        {
             return this->physicalName;
         }
 
@@ -125,56 +129,64 @@ namespace commands {
         /**
          * @return Returns the advisory.
          */
-        virtual bool isAdvisory() const {
+        virtual bool isAdvisory() const
+        {
             return advisory;
         }
 
         /**
          * @param advisory The advisory to set.
          */
-        virtual void setAdvisory(bool advisory) {
+        virtual void setAdvisory(bool advisory)
+        {
             this->advisory = advisory;
         }
 
         /**
          * @return Returns the exclusive.
          */
-        virtual bool isExclusive() const {
+        virtual bool isExclusive() const
+        {
             return exclusive;
         }
 
         /**
          * @param exclusive The exclusive to set.
          */
-        virtual void setExclusive( bool exclusive ) {
+        virtual void setExclusive(bool exclusive)
+        {
             this->exclusive = exclusive;
         }
 
         /**
          * @return Returns the ordered.
          */
-        virtual bool isOrdered() const {
+        virtual bool isOrdered() const
+        {
             return ordered;
         }
 
         /**
          * @param ordered The ordered to set.
          */
-        virtual void setOrdered(bool ordered) {
+        virtual void setOrdered(bool ordered)
+        {
             this->ordered = ordered;
         }
 
         /**
          * @return Returns the orderedTarget.
          */
-        virtual std::string getOrderedTarget() const {
+        virtual std::string getOrderedTarget() const
+        {
             return orderedTarget;
         }
 
         /**
          * @param orderedTarget The orderedTarget to set.
          */
-        virtual void setOrderedTarget(const std::string& orderedTarget) {
+        virtual void setOrderedTarget(const std::string& orderedTarget)
+        {
             this->orderedTarget = orderedTarget;
         }
 
@@ -185,10 +197,12 @@ namespace commands {
         virtual cms::Destination::DestinationType getDestinationType() const = 0;
 
         /**
-         * Returns the type of Destination that this object represents as a string, the
-         * available string values are, "Queue", "Topic", "TempQueue" and "TempTopic".
+         * Returns the type of Destination that this object represents as a
+         * string, the available string values are, "Queue", "Topic",
+         * "TempQueue" and "TempTopic".
          *
-         * @return The string value that represents the type of this destination.
+         * @return The string value that represents the type of this
+         * destination.
          */
         std::string getDestinationTypeAsString() const;
 
@@ -196,7 +210,8 @@ namespace commands {
          * Returns true if a temporary Destination
          * @return true/false
          */
-        virtual bool isTemporary() const {
+        virtual bool isTemporary() const
+        {
             return getDestinationType() == cms::Destination::TEMPORARY_TOPIC ||
                    getDestinationType() == cms::Destination::TEMPORARY_QUEUE;
         }
@@ -205,7 +220,8 @@ namespace commands {
          * Returns true if a Topic Destination
          * @return true/false
          */
-        virtual bool isTopic() const {
+        virtual bool isTopic() const
+        {
             return getDestinationType() == cms::Destination::TOPIC ||
                    getDestinationType() == cms::Destination::TEMPORARY_TOPIC;
         }
@@ -214,7 +230,8 @@ namespace commands {
          * Returns true if a Queue Destination
          * @return true/false
          */
-        virtual bool isQueue() const {
+        virtual bool isQueue() const
+        {
             return !isTopic();
         }
 
@@ -226,29 +243,38 @@ namespace commands {
          * @return true if this destination represents a collection of child
          *         destinations.
          */
-        virtual bool isComposite() const {
-            return physicalName.find_first_of(COMPOSITE_SEPARATOR) != std::string::npos;
+        virtual bool isComposite() const
+        {
+            return physicalName.find_first_of(COMPOSITE_SEPARATOR) !=
+                   std::string::npos;
         }
 
         /**
-         * Returns an ArrayList containing all the ActiveMQDestinations that comprise this
-         * Composite destination, if this destination is composite, otherwise it returns an
-         * empty list.
+         * Returns an ArrayList containing all the ActiveMQDestinations that
+         * comprise this Composite destination, if this destination is
+         * composite, otherwise it returns an empty list.
          */
-        decaf::util::ArrayList< Pointer<ActiveMQDestination> > getCompositeDestinations() const;
+        decaf::util::ArrayList<Pointer<ActiveMQDestination>>
+        getCompositeDestinations() const;
 
         /**
-         * @return true if the destination matches multiple possible destinations
+         * @return true if the destination matches multiple possible
+         * destinations
          */
-        virtual bool isWildcard() const {
-            return physicalName.find_first_of(DestinationFilter::ANY_CHILD) != std::string::npos||
-                   physicalName.find_first_of(DestinationFilter::ANY_DESCENDENT) != std::string::npos;
+        virtual bool isWildcard() const
+        {
+            return physicalName.find_first_of(DestinationFilter::ANY_CHILD) !=
+                       std::string::npos ||
+                   physicalName.find_first_of(
+                       DestinationFilter::ANY_DESCENDENT) != std::string::npos;
         }
 
         /**
-         * @return a reference (const) to the options properties for this Destination.
+         * @return a reference (const) to the options properties for this
+         * Destination.
          */
-        const activemq::util::ActiveMQProperties& getOptions() const {
+        const activemq::util::ActiveMQProperties& getOptions() const
+        {
             return options;
         }
 
@@ -256,7 +282,8 @@ namespace commands {
          * @return the cms::Destination interface pointer that the
          *          objects that derive from this class implement.
          */
-        virtual const cms::Destination* getCMSDestination() const {
+        virtual const cms::Destination* getCMSDestination() const
+        {
             return NULL;
         }
 
@@ -269,8 +296,11 @@ namespace commands {
          *
          * @return Pointer to a new ActiveMQDestination.
          */
-        Pointer<ActiveMQDestination> createDestination(const std::string& name) const {
-            return ActiveMQDestination::createDestination(getDestinationType(), name);
+        Pointer<ActiveMQDestination> createDestination(
+            const std::string& name) const
+        {
+            return ActiveMQDestination::createDestination(getDestinationType(),
+                                                          name);
         }
 
         virtual int compareTo(const ActiveMQDestination& value) const;
@@ -282,19 +312,20 @@ namespace commands {
         virtual bool operator<(const ActiveMQDestination& value) const;
 
     public:  // Statics
-
         /**
          * Create a temporary name from the clientId
          *
          * @param clientId
          * @return
          */
-        static std::string createTemporaryName(const std::string& clientId) {
+        static std::string createTemporaryName(const std::string& clientId)
+        {
             return TEMP_PREFIX + clientId + TEMP_POSTFIX;
         }
 
         /**
-         * From a temporary destination find the clientId of the Connection that created it
+         * From a temporary destination find the clientId of the Connection that
+         * created it
          *
          * @param destination
          * @return the clientId or null if not a temporary destination
@@ -309,10 +340,12 @@ namespace commands {
          *
          * @return Pointer to a new ActiveMQDestination instance.
          */
-        static Pointer<ActiveMQDestination> createDestination(int type, const std::string& name);
-
+        static Pointer<ActiveMQDestination> createDestination(
+            int                type,
+            const std::string& name);
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_ACTIVEMQDESTINATION_H_*/

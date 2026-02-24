@@ -22,30 +22,31 @@
 
 #include <decaf/net/InetAddress.h>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
-    class DECAF_API Inet6Address: public InetAddress {
+    class DECAF_API Inet6Address : public InetAddress
+    {
     private:
-
         friend class InetAddress;
 
     protected:
-
         Inet6Address();
         Inet6Address(const unsigned char* ipAddress, int numBytes);
-        Inet6Address(const std::string& hostname, const unsigned char* ipAddress, int numBytes);
+        Inet6Address(const std::string&   hostname,
+                     const unsigned char* ipAddress,
+                     int                  numBytes);
 
     public:
-
         virtual ~Inet6Address();
 
     public:
-
         virtual InetAddress* clone() const;
-
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /* _DECAF_API_INET6ADDRESS_H_ */

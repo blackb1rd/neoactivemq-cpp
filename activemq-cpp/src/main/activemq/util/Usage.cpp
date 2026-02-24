@@ -21,4 +21,6 @@ using namespace activemq;
 using namespace activemq::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-Usage::~Usage() {}
+Usage::~Usage()
+{
+}

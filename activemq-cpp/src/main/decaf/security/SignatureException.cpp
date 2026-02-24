@@ -21,22 +21,33 @@ using namespace decaf;
 using namespace decaf::security;
 
 ////////////////////////////////////////////////////////////////////////////////
-SignatureException::SignatureException() : GeneralSecurityException() {
+SignatureException::SignatureException()
+    : GeneralSecurityException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SignatureException::SignatureException(const Exception& ex) : GeneralSecurityException() {
-    *(Exception*) this = ex;
+SignatureException::SignatureException(const Exception& ex)
+    : GeneralSecurityException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SignatureException::SignatureException(const SignatureException& ex) : GeneralSecurityException() {
-    *(Exception*) this = ex;
+SignatureException::SignatureException(const SignatureException& ex)
+    : GeneralSecurityException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SignatureException::SignatureException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : GeneralSecurityException(cause) {
-
+SignatureException::SignatureException(const char*           file,
+                                       const int             lineNumber,
+                                       const std::exception* cause,
+                                       const char*           msg,
+                                       ...)
+    : GeneralSecurityException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -46,12 +57,18 @@ SignatureException::SignatureException(const char* file, const int lineNumber, c
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SignatureException::SignatureException(const std::exception* cause) : GeneralSecurityException(cause) {
+SignatureException::SignatureException(const std::exception* cause)
+    : GeneralSecurityException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SignatureException::SignatureException(const char* file, const int lineNumber, const char* msg, ...) : GeneralSecurityException() {
-
+SignatureException::SignatureException(const char* file,
+                                       const int   lineNumber,
+                                       const char* msg,
+                                       ...)
+    : GeneralSecurityException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -61,5 +78,6 @@ SignatureException::SignatureException(const char* file, const int lineNumber, c
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SignatureException::~SignatureException() throw () {
+SignatureException::~SignatureException() throw()
+{
 }

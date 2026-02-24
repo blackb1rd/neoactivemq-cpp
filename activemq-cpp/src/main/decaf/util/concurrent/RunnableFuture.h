@@ -23,25 +23,31 @@
 #include <decaf/lang/Runnable.h>
 #include <decaf/util/concurrent/Future.h>
 
-namespace decaf {
-namespace util {
-namespace concurrent {
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
 
-    /**
-     * A Runnable version of the Future type.  When the run method has completed
-     * successfully the Future will be considered complete and its get method will
-     * return the produced result.
-     *
-     * @since 1.0
-     */
-    template<typename T>
-    class RunnableFuture : public Future<T>, public decaf::lang::Runnable {
-    public:
+        /**
+         * A Runnable version of the Future type.  When the run method has
+         * completed successfully the Future will be considered complete and its
+         * get method will return the produced result.
+         *
+         * @since 1.0
+         */
+        template <typename T>
+        class RunnableFuture : public Future<T>, public decaf::lang::Runnable
+        {
+        public:
+            virtual ~RunnableFuture()
+            {
+            }
+        };
 
-        virtual ~RunnableFuture() {}
-
-    };
-
-}}}
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_CONCURRENT_RUNNABLEFUTURE_H_ */

@@ -21,21 +21,22 @@ using namespace decaf;
 using namespace decaf::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-const int SocketOptions::SOCKET_OPTION_TCP_NODELAY = 1;
-const int SocketOptions::SOCKET_OPTION_BINDADDR = 2;
-const int SocketOptions::SOCKET_OPTION_REUSEADDR = 3;
-const int SocketOptions::SOCKET_OPTION_BROADCAST = 4;
-const int SocketOptions::SOCKET_OPTION_IP_MULTICAST_IF = 5;
+const int SocketOptions::SOCKET_OPTION_TCP_NODELAY       = 1;
+const int SocketOptions::SOCKET_OPTION_BINDADDR          = 2;
+const int SocketOptions::SOCKET_OPTION_REUSEADDR         = 3;
+const int SocketOptions::SOCKET_OPTION_BROADCAST         = 4;
+const int SocketOptions::SOCKET_OPTION_IP_MULTICAST_IF   = 5;
 const int SocketOptions::SOCKET_OPTION_IP_MULTICAST_LOOP = 6;
-const int SocketOptions::SOCKET_OPTION_IP_MULTICAST_IF2 = 7;
-const int SocketOptions::SOCKET_OPTION_IP_TOS = 8;
-const int SocketOptions::SOCKET_OPTION_LINGER = 9;
-const int SocketOptions::SOCKET_OPTION_TIMEOUT = 10;
-const int SocketOptions::SOCKET_OPTION_SNDBUF = 11;
-const int SocketOptions::SOCKET_OPTION_RCVBUF = 12;
-const int SocketOptions::SOCKET_OPTION_KEEPALIVE = 13;
-const int SocketOptions::SOCKET_OPTION_OOBINLINE = 14;
+const int SocketOptions::SOCKET_OPTION_IP_MULTICAST_IF2  = 7;
+const int SocketOptions::SOCKET_OPTION_IP_TOS            = 8;
+const int SocketOptions::SOCKET_OPTION_LINGER            = 9;
+const int SocketOptions::SOCKET_OPTION_TIMEOUT           = 10;
+const int SocketOptions::SOCKET_OPTION_SNDBUF            = 11;
+const int SocketOptions::SOCKET_OPTION_RCVBUF            = 12;
+const int SocketOptions::SOCKET_OPTION_KEEPALIVE         = 13;
+const int SocketOptions::SOCKET_OPTION_OOBINLINE         = 14;
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketOptions::~SocketOptions() {
+SocketOptions::~SocketOptions()
+{
 }

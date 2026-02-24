@@ -18,18 +18,20 @@
 #ifndef _DECAF_SECURITY_KEYMANAGEMENTEXCEPTION_H_
 #define _DECAF_SECURITY_KEYMANAGEMENTEXCEPTION_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/security/KeyException.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace security {
+namespace decaf
+{
+namespace security
+{
 
     /*
      * A basic key exception
      */
-    class DECAF_API KeyManagementException : public KeyException {
+    class DECAF_API KeyManagementException : public KeyException
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -67,7 +69,11 @@ namespace security {
          * @param ...
          *      list of primitives that are formatted into the message
          */
-        KeyManagementException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ... );
+        KeyManagementException(const char*           file,
+                               const int             lineNumber,
+                               const std::exception* cause,
+                               const char*           msg,
+                               ...);
 
         /**
          * Constructor
@@ -92,23 +98,27 @@ namespace security {
          * @param ...
          *      list of primitives that are formatted into the message
          */
-        KeyManagementException(const char* file, const int lineNumber, const char* msg, ...);
+        KeyManagementException(const char* file,
+                               const int   lineNumber,
+                               const char* msg,
+                               ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
          * @return A deep copy of this exception.
          */
-        virtual KeyManagementException* clone() const{
+        virtual KeyManagementException* clone() const
+        {
             return new KeyManagementException(*this);
         }
 
         virtual ~KeyManagementException() throw();
+    };
 
-   };
-
-}}
+}  // namespace security
+}  // namespace decaf
 
 #endif /*_DECAF_SECURITY_KEYMANAGEMENTEXCEPTION_H_*/

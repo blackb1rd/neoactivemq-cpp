@@ -21,6 +21,6 @@ using namespace decaf;
 using namespace decaf::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketImplFactory::~SocketImplFactory() {
-
+SocketImplFactory::~SocketImplFactory()
+{
 }

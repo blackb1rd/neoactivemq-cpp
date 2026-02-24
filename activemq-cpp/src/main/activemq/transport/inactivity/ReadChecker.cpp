@@ -31,29 +31,38 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-ReadChecker::ReadChecker(InactivityMonitor* parent) : TimerTask(), parent(parent), lastRunTime(0) {
-
-    if (this->parent == NULL) {
-        throw NullPointerException(__FILE__, __LINE__, "ReadChecker created with NULL parent.");
+ReadChecker::ReadChecker(InactivityMonitor* parent)
+    : TimerTask(),
+      parent(parent),
+      lastRunTime(0)
+{
+    if (this->parent == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "ReadChecker created with NULL parent.");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ReadChecker::~ReadChecker() {
+ReadChecker::~ReadChecker()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReadChecker::run() {
-
-    long long now = System::currentTimeMillis();
+void ReadChecker::run()
+{
+    long long now     = System::currentTimeMillis();
     long long elapsed = (now - this->lastRunTime);
 
     // Perhaps the timer executed a read check late.. and then executes
     // the next read check on time which causes the time elapsed between
     // read checks to be small..
 
-    // If less than 90% of the read check Time elapsed then abort this readcheck.
-    if (!this->parent->allowReadCheck(elapsed)) {
+    // If less than 90% of the read check Time elapsed then abort this
+    // readcheck.
+    if (!this->parent->allowReadCheck(elapsed))
+    {
         return;
     }
 

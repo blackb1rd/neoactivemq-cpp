@@ -20,37 +20,43 @@
 
 #include <activemq/util/Config.h>
 
-namespace activemq {
-namespace util {
+namespace activemq
+{
+namespace util
+{
 
     /**
-     * Interface for any resouce that support a suspend / resume style of operation.
+     * Interface for any resouce that support a suspend / resume style of
+     * operation.
      *
      * @since 3.9.0
      */
-    class AMQCPP_API Suspendable {
+    class AMQCPP_API Suspendable
+    {
     public:
-
         virtual ~Suspendable();
 
         /**
-         * Suspend the given resource, all activity within the resource should halt and
-         * enter a waiting state.  When a call to resume is made this resource should then
-         * resume normal operation.
+         * Suspend the given resource, all activity within the resource should
+         * halt and enter a waiting state.  When a call to resume is made this
+         * resource should then resume normal operation.
          *
-         * @throws Exception if an error occurs while the resource is being suspended.
+         * @throws Exception if an error occurs while the resource is being
+         * suspended.
          */
         virtual void suspend() = 0;
 
         /**
-         * Resumes normal operation of this resource after it has been suspended.
+         * Resumes normal operation of this resource after it has been
+         * suspended.
          *
-         * @throws Exception if an error occurs while the resource is being resumed.
+         * @throws Exception if an error occurs while the resource is being
+         * resumed.
          */
         virtual void resume() = 0;
-
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_UTIL_SUSPENDABLE_H_ */

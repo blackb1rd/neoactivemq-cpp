@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/TransactionId.h>
@@ -31,8 +31,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -45,33 +47,33 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API XATransactionId : public TransactionId, public cms::Xid, public decaf::lang::Comparable<XATransactionId> {
+    class AMQCPP_API XATransactionId
+        : public TransactionId,
+          public cms::Xid,
+          public decaf::lang::Comparable<XATransactionId>
+    {
     protected:
-
         using TransactionId::compareTo;
         using TransactionId::equals;
-        using TransactionId::operator <;
+        using TransactionId::operator<;
         using TransactionId::operator==;
 
     protected:
-
-        int formatId;
+        int                        formatId;
         std::vector<unsigned char> globalTransactionId;
         std::vector<unsigned char> branchQualifier;
 
     public:
-
         const static unsigned char ID_XATRANSACTIONID = 112;
 
         typedef decaf::lang::PointerComparator<XATransactionId> COMPARATOR;
 
     public:
-
         XATransactionId();
 
         XATransactionId(const XATransactionId& other);
 
-        XATransactionId( const cms::Xid* xid );
+        XATransactionId(const cms::Xid* xid);
 
         virtual ~XATransactionId();
 
@@ -85,30 +87,33 @@ namespace commands {
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual bool isXATransactionId() const {
+        virtual bool isXATransactionId() const
+        {
             return true;
         }
 
     public:  // Xid interface implementation.
-
         virtual Xid* clone() const;
 
         virtual bool equals(const Xid* other) const;
 
         virtual int getBranchQualifier(unsigned char* buffer, int size) const;
 
-        virtual int getGlobalTransactionId(unsigned char* buffer, int size) const;
+        virtual int getGlobalTransactionId(unsigned char* buffer,
+                                           int            size) const;
 
-        virtual int getFormatId() const;
+        virtual int  getFormatId() const;
         virtual void setFormatId(int formatId);
 
         virtual const std::vector<unsigned char>& getGlobalTransactionId() const;
         virtual std::vector<unsigned char>& getGlobalTransactionId();
-        virtual void setGlobalTransactionId(const std::vector<unsigned char>& globalTransactionId);
+        virtual void                        setGlobalTransactionId(
+                                   const std::vector<unsigned char>& globalTransactionId);
 
         virtual const std::vector<unsigned char>& getBranchQualifier() const;
-        virtual std::vector<unsigned char>& getBranchQualifier();
-        virtual void setBranchQualifier(const std::vector<unsigned char>& branchQualifier);
+        virtual std::vector<unsigned char>&       getBranchQualifier();
+        virtual void                              setBranchQualifier(
+                                         const std::vector<unsigned char>& branchQualifier);
 
         virtual int compareTo(const XATransactionId& value) const;
 
@@ -118,12 +123,12 @@ namespace commands {
 
         virtual bool operator<(const XATransactionId& value) const;
 
-        XATransactionId& operator= (const XATransactionId& other);
+        XATransactionId& operator=(const XATransactionId& other);
 
         int getHashCode() const;
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_XATRANSACTIONID_H_*/

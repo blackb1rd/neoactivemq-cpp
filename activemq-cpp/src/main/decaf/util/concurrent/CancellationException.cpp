@@ -23,40 +23,38 @@ using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-CancellationException::CancellationException() : decaf::lang::Exception() {
+CancellationException::CancellationException()
+    : decaf::lang::Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CancellationException::CancellationException(const decaf::lang::Exception& ex) : decaf::lang::Exception() {
-    *(Exception*) this = ex;
+CancellationException::CancellationException(const decaf::lang::Exception& ex)
+    : decaf::lang::Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CancellationException::CancellationException(const CancellationException& ex) : decaf::lang::Exception() {
-    *(Exception*) this = ex;
+CancellationException::CancellationException(const CancellationException& ex)
+    : decaf::lang::Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CancellationException::CancellationException(const std::exception* cause) : decaf::lang::Exception(cause) {
+CancellationException::CancellationException(const std::exception* cause)
+    : decaf::lang::Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CancellationException::CancellationException(const char* file, const int lineNumber, const char* msg, ...) :
-        decaf::lang::Exception() {
-
-    va_list vargs;
-    va_start( vargs, msg);
-    buildMessage(msg, vargs);
-
-    // Set the first mark for this exception.
-    setMark(file, lineNumber);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-CancellationException::CancellationException(const char* file, const int lineNumber,
-                                             const std::exception* cause, const char* msg, ...) :
-    decaf::lang::Exception(cause) {
-
+CancellationException::CancellationException(const char* file,
+                                             const int   lineNumber,
+                                             const char* msg,
+                                             ...)
+    : decaf::lang::Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -66,10 +64,28 @@ CancellationException::CancellationException(const char* file, const int lineNum
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CancellationException::~CancellationException() throw () {
+CancellationException::CancellationException(const char*           file,
+                                             const int             lineNumber,
+                                             const std::exception* cause,
+                                             const char*           msg,
+                                             ...)
+    : decaf::lang::Exception(cause)
+{
+    va_list vargs;
+    va_start(vargs, msg);
+    buildMessage(msg, vargs);
+
+    // Set the first mark for this exception.
+    setMark(file, lineNumber);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CancellationException* CancellationException::clone() const {
+CancellationException::~CancellationException() throw()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+CancellationException* CancellationException::clone() const
+{
     return new CancellationException(*this);
 }

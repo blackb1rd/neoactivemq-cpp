@@ -27,21 +27,31 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLServerSocket::SSLServerSocket() {
+SSLServerSocket::SSLServerSocket()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLServerSocket::SSLServerSocket( int port ) : ServerSocket( port ) {
+SSLServerSocket::SSLServerSocket(int port)
+    : ServerSocket(port)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLServerSocket::SSLServerSocket( int port, int backlog ) : ServerSocket( port, backlog ) {
+SSLServerSocket::SSLServerSocket(int port, int backlog)
+    : ServerSocket(port, backlog)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLServerSocket::SSLServerSocket( int port, int backlog, const InetAddress* address ) : ServerSocket( port, backlog, address ) {
+SSLServerSocket::SSLServerSocket(int                port,
+                                 int                backlog,
+                                 const InetAddress* address)
+    : ServerSocket(port, backlog, address)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLServerSocket::~SSLServerSocket() {
+SSLServerSocket::~SSLServerSocket()
+{
 }

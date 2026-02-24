@@ -22,24 +22,24 @@
 
 #include <decaf/lang/Exception.h>
 
-namespace activemq {
-namespace util {
+namespace activemq
+{
+namespace util
+{
 
     class Service;
 
-    class AMQCPP_API ServiceStopper {
+    class AMQCPP_API ServiceStopper
+    {
     private:
-
         decaf::lang::Exception firstException;
-        bool hasException;
+        bool                   hasException;
 
     private:
-
         ServiceStopper(const ServiceStopper&);
-        ServiceStopper& operator= (const ServiceStopper&);
+        ServiceStopper& operator=(const ServiceStopper&);
 
     public:
-
         ServiceStopper();
         virtual ~ServiceStopper();
 
@@ -48,9 +48,9 @@ namespace util {
         void throwFirstException();
 
         virtual void onException(Service* service, decaf::lang::Exception& ex);
-
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_UTIL_SERVICESTOPPER_H_ */

@@ -17,9 +17,9 @@
 
 #include "SecurityRuntime.h"
 
-#include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/internal/security/ServiceRegistry.h>
 #include <decaf/internal/security/provider/DefaultProvider.h>
+#include <decaf/lang/exceptions/IllegalStateException.h>
 
 using namespace decaf;
 using namespace decaf::security;
@@ -35,78 +35,98 @@ using namespace decaf::util::concurrent;
 SecurityRuntime* SecurityRuntime::securityRuntime = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf {
-namespace internal {
-namespace security {
+namespace decaf
+{
+namespace internal
+{
+    namespace security
+    {
 
-    class SecurityRuntimeImpl {
-    private:
+        class SecurityRuntimeImpl
+        {
+        private:
+            SecurityRuntimeImpl(const SecurityRuntimeImpl&);
+            SecurityRuntimeImpl& operator=(const SecurityRuntimeImpl&);
 
-        SecurityRuntimeImpl(const SecurityRuntimeImpl&);
-        SecurityRuntimeImpl& operator=(const SecurityRuntimeImpl&);
+        public:
+            Mutex            lock;
+            ServiceRegistry* registry;
+            Provider*        defaultProvider;
 
-    public:
+            SecurityRuntimeImpl()
+                : lock(),
+                  registry(),
+                  defaultProvider()
+            {
+                registry = new ServiceRegistry();
+            }
 
-        Mutex lock;
-        ServiceRegistry* registry;
-        Provider* defaultProvider;
+            ~SecurityRuntimeImpl()
+            {
+                delete registry;
+                delete defaultProvider;
+            }
+        };
 
-        SecurityRuntimeImpl() : lock(), registry(), defaultProvider() {
-            registry = new ServiceRegistry();
-        }
-
-        ~SecurityRuntimeImpl() {
-            delete registry;
-            delete defaultProvider;
-        }
-    };
-
-}}}
+    }  // namespace security
+}  // namespace internal
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-SecurityRuntime::SecurityRuntime() : impl(new SecurityRuntimeImpl) {
+SecurityRuntime::SecurityRuntime()
+    : impl(new SecurityRuntimeImpl)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SecurityRuntime::~SecurityRuntime() {
-    try {
+SecurityRuntime::~SecurityRuntime()
+{
+    try
+    {
         delete this->impl;
     }
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SecurityRuntime* SecurityRuntime::getSecurityRuntime() {
-
-    if( SecurityRuntime::securityRuntime == NULL ) {
+SecurityRuntime* SecurityRuntime::getSecurityRuntime()
+{
+    if (SecurityRuntime::securityRuntime == NULL)
+    {
         throw IllegalStateException(
-            __FILE__, __LINE__, "SecurityRuntime Runtime is not Initialized." );
+            __FILE__,
+            __LINE__,
+            "SecurityRuntime Runtime is not Initialized.");
     }
 
     return SecurityRuntime::securityRuntime;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Mutex* SecurityRuntime::getRuntimeLock() {
+Mutex* SecurityRuntime::getRuntimeLock()
+{
     return &(this->impl->lock);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServiceRegistry* SecurityRuntime::getServiceRegistry() {
+ServiceRegistry* SecurityRuntime::getServiceRegistry()
+{
     return this->impl->registry;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SecurityRuntime::initializeSecurity() {
+void SecurityRuntime::initializeSecurity()
+{
     SecurityRuntime::securityRuntime = new SecurityRuntime();
 
-    DefaultProvider* defaultProvider = new DefaultProvider();
+    DefaultProvider* defaultProvider       = new DefaultProvider();
     securityRuntime->impl->defaultProvider = defaultProvider;
     defaultProvider->initialize();
     securityRuntime->impl->registry->addProvider(defaultProvider);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SecurityRuntime::shutdownSecurity() {
+void SecurityRuntime::shutdownSecurity()
+{
     delete SecurityRuntime::securityRuntime;
 }

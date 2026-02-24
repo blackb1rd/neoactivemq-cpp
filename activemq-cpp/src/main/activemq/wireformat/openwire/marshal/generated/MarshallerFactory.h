@@ -19,34 +19,42 @@
 
 //       Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/wireformat/openwire/OpenWireFormat.h>
 
-namespace activemq {
-namespace wireformat {
-namespace openwire {
-namespace marshal {
-namespace generated {
+namespace activemq
+{
+namespace wireformat
+{
+    namespace openwire
+    {
+        namespace marshal
+        {
+            namespace generated
+            {
 
-    /**
-     * Used to create marshallers for a specific version of the wire
-     * protocol.
-     *
-     *  NOTE!: This file is auto generated - do not modify!
-     *         if you need to make a change, please see the Groovy scripts
-     *         in the activemq-openwire-generator module
-     */
-    class MarshallerFactory {
-    public:
+                /**
+                 * Used to create marshallers for a specific version of the wire
+                 * protocol.
+                 *
+                 *  NOTE!: This file is auto generated - do not modify!
+                 *         if you need to make a change, please see the Groovy
+                 * scripts in the activemq-openwire-generator module
+                 */
+                class MarshallerFactory
+                {
+                public:
+                    virtual ~MarshallerFactory() {};
 
-        virtual ~MarshallerFactory() {};
+                    virtual void configure(OpenWireFormat* format);
+                };
 
-        virtual void configure(OpenWireFormat* format);
-
-    };
-
-}}}}}
+            }  // namespace generated
+        }  // namespace marshal
+    }  // namespace openwire
+}  // namespace wireformat
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_WIREFORMAT_OPENWIRE_MARSHAL_GENERATED_MARSHALLERFACTORY_H_*/

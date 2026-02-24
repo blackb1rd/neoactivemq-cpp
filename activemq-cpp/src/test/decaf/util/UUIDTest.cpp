@@ -18,31 +18,31 @@
 #include <gtest/gtest.h>
 
 #include <decaf/lang/Long.h>
-#include <decaf/util/UUID.h>
-#include <decaf/lang/exceptions/NumberFormatException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/NumberFormatException.h>
+#include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <decaf/util/UUID.h>
 
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class UUIDTest : public ::testing::Test {
+class UUIDTest : public ::testing::Test
+{
 public:
-
-        UUIDTest();
-
-    };
+    UUIDTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-UUIDTest::UUIDTest() {
+UUIDTest::UUIDTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testConstructor1) {
+TEST_F(UUIDTest, testConstructor1)
+{
     UUID uuid(0xF81D4FAE7DEC11D0LL, 0xA76500A0C91E6BF6LL);
     ASSERT_EQ(2, uuid.variant());
     ASSERT_EQ(1, uuid.version());
@@ -53,7 +53,8 @@ TEST_F(UUIDTest, testConstructor1) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testGetLeastSignificantBits) {
+TEST_F(UUIDTest, testGetLeastSignificantBits)
+{
     UUID uuid(0, 0);
     ASSERT_EQ(0LL, uuid.getLeastSignificantBits());
     uuid = UUID(0, Long::MIN_VALUE);
@@ -63,7 +64,8 @@ TEST_F(UUIDTest, testGetLeastSignificantBits) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testGetMostSignificantBits) {
+TEST_F(UUIDTest, testGetMostSignificantBits)
+{
     UUID uuid(0, 0);
     ASSERT_EQ(0LL, uuid.getMostSignificantBits());
     uuid = UUID(Long::MIN_VALUE, 0LL);
@@ -73,7 +75,8 @@ TEST_F(UUIDTest, testGetMostSignificantBits) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testVersion) {
+TEST_F(UUIDTest, testVersion)
+{
     UUID uuid(0, 0);
     ASSERT_EQ(0, uuid.version());
     uuid = UUID(0x0000000000001000LL, 0);
@@ -89,7 +92,8 @@ TEST_F(UUIDTest, testVersion) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testVariant) {
+TEST_F(UUIDTest, testVariant)
+{
     UUID uuid(0, 0x0000000000000000LL);
     ASSERT_EQ(0, uuid.variant());
     uuid = UUID(0, 0x7000000000000000LL);
@@ -120,7 +124,8 @@ TEST_F(UUIDTest, testVariant) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testTimestamp) {
+TEST_F(UUIDTest, testTimestamp)
+{
     UUID uuid(0x0000000000001000LL, 0x8000000000000000LL);
     ASSERT_EQ(0x0LL, uuid.timestamp());
 
@@ -128,14 +133,17 @@ TEST_F(UUIDTest, testTimestamp) {
     ASSERT_EQ(0x333555577777777LL, uuid.timestamp());
 
     uuid = UUID(0x0000000000000000LL, 0x8000000000000000LL);
-    ASSERT_THROW(uuid.timestamp(), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException exception");
+    ASSERT_THROW(uuid.timestamp(), UnsupportedOperationException)
+        << ("Should throw an UnsupportedOperationException exception");
 
     uuid = UUID(0x0000000000002000LL, 0x8000000000000000LL);
-    ASSERT_THROW(uuid.timestamp(), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException exception");
+    ASSERT_THROW(uuid.timestamp(), UnsupportedOperationException)
+        << ("Should throw an UnsupportedOperationException exception");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testClockSequence) {
+TEST_F(UUIDTest, testClockSequence)
+{
     UUID uuid(0x0000000000001000LL, 0x8000000000000000LL);
     ASSERT_EQ(0x0, uuid.clockSequence());
 
@@ -146,14 +154,17 @@ TEST_F(UUIDTest, testClockSequence) {
     ASSERT_EQ(0x3FFF, uuid.clockSequence());
 
     uuid = UUID(0x0000000000000000LL, 0x8000000000000000LL);
-    ASSERT_THROW(uuid.clockSequence(), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException exception");
+    ASSERT_THROW(uuid.clockSequence(), UnsupportedOperationException)
+        << ("Should throw an UnsupportedOperationException exception");
 
     uuid = UUID(0x0000000000002000LL, 0x8000000000000000LL);
-    ASSERT_THROW(uuid.clockSequence(), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException exception");
+    ASSERT_THROW(uuid.clockSequence(), UnsupportedOperationException)
+        << ("Should throw an UnsupportedOperationException exception");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testNode) {
+TEST_F(UUIDTest, testNode)
+{
     UUID uuid(0x0000000000001000LL, 0x8000000000000000LL);
     ASSERT_EQ(0x0LL, uuid.node());
 
@@ -161,14 +172,17 @@ TEST_F(UUIDTest, testNode) {
     ASSERT_EQ(0xFFFFFFFFFFFFLL, uuid.node());
 
     uuid = UUID(0x0000000000000000LL, 0x8000000000000000LL);
-    ASSERT_THROW(uuid.node(), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException exception");
+    ASSERT_THROW(uuid.node(), UnsupportedOperationException)
+        << ("Should throw an UnsupportedOperationException exception");
 
     uuid = UUID(0x0000000000002000LL, 0x8000000000000000LL);
-    ASSERT_THROW(uuid.node(), UnsupportedOperationException) << ("Should throw an UnsupportedOperationException exception");
+    ASSERT_THROW(uuid.node(), UnsupportedOperationException)
+        << ("Should throw an UnsupportedOperationException exception");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testCompareTo) {
+TEST_F(UUIDTest, testCompareTo)
+{
     UUID uuid1(0, 0);
     ASSERT_EQ(0, uuid1.compareTo(uuid1));
     UUID uuid2(1, 0);
@@ -181,7 +195,8 @@ TEST_F(UUIDTest, testCompareTo) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testHashCode) {
+TEST_F(UUIDTest, testHashCode)
+{
     UUID uuid(0, 0);
     ASSERT_EQ(0, uuid.hashCode());
     uuid = UUID(123, 123);
@@ -190,7 +205,8 @@ TEST_F(UUIDTest, testHashCode) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testEquals) {
+TEST_F(UUIDTest, testEquals)
+{
     UUID uuid1(0, 0);
     ASSERT_TRUE(uuid1.equals(uuid1));
 
@@ -209,52 +225,71 @@ TEST_F(UUIDTest, testEquals) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testToString) {
-    UUID uuid(0xf81d4fae7dec11d0LL, 0xa76500a0c91e6bf6LL);
+TEST_F(UUIDTest, testToString)
+{
+    UUID        uuid(0xf81d4fae7dec11d0LL, 0xa76500a0c91e6bf6LL);
     std::string actual = uuid.toString();
     ASSERT_EQ(std::string("f81d4fae-7dec-11d0-a765-00a0c91e6bf6"), actual);
 
-    uuid = UUID(0x0000000000001000L, 0x8000000000000000L);
+    uuid   = UUID(0x0000000000001000L, 0x8000000000000000L);
     actual = uuid.toString();
     ASSERT_EQ(std::string("00000000-0000-1000-8000-000000000000"), actual);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testRandomUUID) {
+TEST_F(UUIDTest, testRandomUUID)
+{
     UUID uuid = UUID::randomUUID();
     ASSERT_EQ(2, uuid.variant());
     ASSERT_EQ(4, uuid.version());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testNameUUIDFromBytes) {
-    char name[16] = {
-        (char) 0x6b, (char) 0xa7, (char) 0xb8, (char) 0x11,
-        (char) 0x9d, (char) 0xad, (char) 0x11, (char) 0xd1,
-        (char) 0x80, (char) 0xb4, (char) 0x00, (char) 0xc0,
-        (char) 0x4f, (char) 0xd4, (char) 0x30, (char) 0xc8 };
+TEST_F(UUIDTest, testNameUUIDFromBytes)
+{
+    char name[16] = {(char)0x6b,
+                     (char)0xa7,
+                     (char)0xb8,
+                     (char)0x11,
+                     (char)0x9d,
+                     (char)0xad,
+                     (char)0x11,
+                     (char)0xd1,
+                     (char)0x80,
+                     (char)0xb4,
+                     (char)0x00,
+                     (char)0xc0,
+                     (char)0x4f,
+                     (char)0xd4,
+                     (char)0x30,
+                     (char)0xc8};
 
     UUID uuid = UUID::nameUUIDFromBytes(&name[0], 16);
 
     ASSERT_EQ(2, uuid.variant());
     ASSERT_EQ(3, uuid.version());
 
-    ASSERT_EQ(0xaff565bc2f771745ULL, (unsigned long long) uuid.getLeastSignificantBits());
+    ASSERT_EQ(0xaff565bc2f771745ULL,
+              (unsigned long long)uuid.getLeastSignificantBits());
     ASSERT_EQ(0x14cdb9b4de013faaLL, uuid.getMostSignificantBits());
 
     uuid = UUID::nameUUIDFromBytes(std::vector<char>());
     ASSERT_EQ(2, uuid.variant());
     ASSERT_EQ(3, uuid.version());
 
-    ASSERT_EQ(0xa9800998ecf8427eULL, (unsigned long long) uuid.getLeastSignificantBits());
-    ASSERT_EQ(0xd41d8cd98f003204ULL, (unsigned long long) uuid.getMostSignificantBits());
+    ASSERT_EQ(0xa9800998ecf8427eULL,
+              (unsigned long long)uuid.getLeastSignificantBits());
+    ASSERT_EQ(0xd41d8cd98f003204ULL,
+              (unsigned long long)uuid.getMostSignificantBits());
 
-    ASSERT_THROW(UUID::nameUUIDFromBytes(NULL, 1), NullPointerException) << ("Should throw an NullPointerException exception");
+    ASSERT_THROW(UUID::nameUUIDFromBytes(NULL, 1), NullPointerException)
+        << ("Should throw an NullPointerException exception");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testFromString) {
-    UUID actual = UUID::fromString("f81d4fae-7dec-11d0-a765-00a0c91e6bf6");
+TEST_F(UUIDTest, testFromString)
+{
+    UUID actual   = UUID::fromString("f81d4fae-7dec-11d0-a765-00a0c91e6bf6");
     UUID expected = UUID(0xf81d4fae7dec11d0LL, 0xa76500a0c91e6bf6LL);
     ASSERT_TRUE(expected.equals(actual));
 
@@ -264,7 +299,7 @@ TEST_F(UUIDTest, testFromString) {
     ASSERT_EQ(10085, actual.clockSequence());
     ASSERT_EQ(690568981494LL, actual.node());
 
-    actual = UUID::fromString("00000000-0000-1000-8000-000000000000");
+    actual   = UUID::fromString("00000000-0000-1000-8000-000000000000");
     expected = UUID(0x0000000000001000LL, 0x8000000000000000L);
     ASSERT_TRUE(expected.equals(actual));
 
@@ -274,39 +309,57 @@ TEST_F(UUIDTest, testFromString) {
     ASSERT_EQ(0, actual.clockSequence());
     ASSERT_EQ(0LL, actual.node());
 
-    ASSERT_THROW(UUID::fromString(""), IllegalArgumentException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString(""), IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("f81d4fae_7dec-11d0-a765-00a0c91e6bf6"), IllegalArgumentException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("f81d4fae_7dec-11d0-a765-00a0c91e6bf6"),
+                 IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("f81d4fae-7dec_11d0-a765-00a0c91e6bf6"), IllegalArgumentException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("f81d4fae-7dec_11d0-a765-00a0c91e6bf6"),
+                 IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("f81d4fae-7dec-11d0_a765-00a0c91e6bf6"), IllegalArgumentException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("f81d4fae-7dec-11d0_a765-00a0c91e6bf6"),
+                 IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("f81d4fae-7dec-11d0-a765_00a0c91e6bf6"), IllegalArgumentException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("f81d4fae-7dec-11d0-a765_00a0c91e6bf6"),
+                 IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException exception");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(UUIDTest, testFromStringStringException) {
-
+TEST_F(UUIDTest, testFromStringStringException)
+{
     UUID uuid = UUID::fromString("0-0-0-0-0");
 
-    ASSERT_THROW(UUID::fromString("0-0-0-0-"), IllegalArgumentException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("0-0-0-0-"), IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("00000"), IllegalArgumentException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("00000"), IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("----"), IllegalArgumentException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("----"), IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("-0-0-0-0-0"), IllegalArgumentException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("-0-0-0-0-0"), IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("-0-0-0-0"), IllegalArgumentException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("-0-0-0-0"), IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("-0-0-0-"), IllegalArgumentException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("-0-0-0-"), IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("0--0-0-0"), IllegalArgumentException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("0--0-0-0"), IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("0-0-0-0-"), IllegalArgumentException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("0-0-0-0-"), IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("-1-0-0-0-0"), IllegalArgumentException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("-1-0-0-0-0"), IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException exception");
 
     uuid = UUID::fromString("123456789-0-0-0-0");
     ASSERT_EQ(0x2345678900000000LL, uuid.getMostSignificantBits());
@@ -317,20 +370,30 @@ TEST_F(UUIDTest, testFromStringStringException) {
     ASSERT_EQ(0x0LL, uuid.getLeastSignificantBits());
 
     uuid = UUID::fromString("7fffffffffffffff-0-0-0-0");
-    ASSERT_EQ(0xffffffff00000000ULL, (unsigned long long) uuid.getMostSignificantBits());
+    ASSERT_EQ(0xffffffff00000000ULL,
+              (unsigned long long)uuid.getMostSignificantBits());
     ASSERT_EQ(0x0LL, uuid.getLeastSignificantBits());
 
-    ASSERT_THROW(UUID::fromString("8000000000000000-0-0-0-0"), NumberFormatException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("8000000000000000-0-0-0-0"),
+                 NumberFormatException)
+        << ("Should throw an IllegalArgumentException exception");
 
-    uuid = UUID::fromString("7fffffffffffffff-7fffffffffffffff-7fffffffffffffff-0-0");
-    ASSERT_EQ(0xffffffffffffffffULL, (unsigned long long) uuid.getMostSignificantBits());
+    uuid = UUID::fromString(
+        "7fffffffffffffff-7fffffffffffffff-7fffffffffffffff-0-0");
+    ASSERT_EQ(0xffffffffffffffffULL,
+              (unsigned long long)uuid.getMostSignificantBits());
     ASSERT_EQ(0x0LL, uuid.getLeastSignificantBits());
 
     uuid = UUID::fromString("0-0-0-7fffffffffffffff-7fffffffffffffff");
     ASSERT_EQ(0x0LL, uuid.getMostSignificantBits());
-    ASSERT_EQ(0xffffffffffffffffULL, (unsigned long long) uuid.getLeastSignificantBits());
+    ASSERT_EQ(0xffffffffffffffffULL,
+              (unsigned long long)uuid.getLeastSignificantBits());
 
-    ASSERT_THROW(UUID::fromString("0-0-0-8000000000000000-0"), NumberFormatException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("0-0-0-8000000000000000-0"),
+                 NumberFormatException)
+        << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("0-0-0-0-8000000000000000"), NumberFormatException) << ("Should throw an IllegalArgumentException exception");
+    ASSERT_THROW(UUID::fromString("0-0-0-0-8000000000000000"),
+                 NumberFormatException)
+        << ("Should throw an IllegalArgumentException exception");
 }

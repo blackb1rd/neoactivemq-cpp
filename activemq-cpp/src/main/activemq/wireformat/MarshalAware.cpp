@@ -21,5 +21,6 @@ using namespace activemq;
 using namespace activemq::wireformat;
 
 ////////////////////////////////////////////////////////////////////////////////
-MarshalAware::~MarshalAware() {}
-
+MarshalAware::~MarshalAware()
+{
+}

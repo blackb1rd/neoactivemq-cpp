@@ -17,18 +17,18 @@
 
 #include <activemq/transport/discovery/http/HttpDiscoveryAgent.h>
 
+#include <decaf/io/BufferedInputStream.h>
+#include <decaf/io/BufferedOutputStream.h>
+#include <decaf/io/DataInputStream.h>
+#include <decaf/io/DataOutputStream.h>
+#include <decaf/io/InputStream.h>
+#include <decaf/io/OutputStream.h>
 #include <decaf/lang/Long.h>
+#include <decaf/net/Socket.h>
+#include <decaf/net/SocketFactory.h>
 #include <decaf/net/URI.h>
 #include <decaf/util/HashSet.h>
 #include <decaf/util/concurrent/Mutex.h>
-#include <decaf/net/SocketFactory.h>
-#include <decaf/net/Socket.h>
-#include <decaf/io/InputStream.h>
-#include <decaf/io/OutputStream.h>
-#include <decaf/io/DataInputStream.h>
-#include <decaf/io/DataOutputStream.h>
-#include <decaf/io/BufferedInputStream.h>
-#include <decaf/io/BufferedOutputStream.h>
 
 using namespace activemq;
 using namespace activemq::util;
@@ -44,89 +44,112 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace transport {
-namespace discovery {
-namespace http {
+namespace activemq
+{
+namespace transport
+{
+    namespace discovery
+    {
+        namespace http
+        {
 
-    enum UpdateState {
-        SUSPENDED,
-        RESUMING,
-        RESUMED
-    };
+            enum UpdateState
+            {
+                SUSPENDED,
+                RESUMING,
+                RESUMED
+            };
 
-    class HttpDiscoveryAgentImpl {
-    private:
+            class HttpDiscoveryAgentImpl
+            {
+            private:
+                HttpDiscoveryAgentImpl(const HttpDiscoveryAgentImpl&);
+                HttpDiscoveryAgentImpl& operator=(const HttpDiscoveryAgentImpl&);
 
-        HttpDiscoveryAgentImpl(const HttpDiscoveryAgentImpl&);
-        HttpDiscoveryAgentImpl& operator= (const HttpDiscoveryAgentImpl&);
+            public:
+                UpdateState updateState;
+                Mutex       updateLock;
+                long long   updateInterval;
+                URI         registryUrl;
 
-    public:
+            public:
+                HttpDiscoveryAgentImpl()
+                    : updateState(RESUMED),
+                      updateLock(),
+                      updateInterval(10 * 1000),
+                      registryUrl()
+                {
+                }
 
-        UpdateState updateState;
-        Mutex updateLock;
-        long long updateInterval;
-        URI registryUrl;
+                HashSet<std::string> doLookup()
+                {
+                    HashSet<std::string> result;
+                    try
+                    {
+                        return result;
+                    }
+                    catch (Exception& e)
+                    {
+                        std::cout << "Caught exception: " << e.getMessage()
+                                  << std::endl;
+                    }
 
-    public:
+                    return result;
+                }
+            };
 
-        HttpDiscoveryAgentImpl() : updateState(RESUMED),
-                                   updateLock(),
-                                   updateInterval(10 * 1000),
-                                   registryUrl() {
-        }
-
-        HashSet<std::string> doLookup() {
-
-            HashSet<std::string> result;
-            try {
-                return result;
-            } catch (Exception& e) {
-                std::cout << "Caught exception: " << e.getMessage() << std::endl;
-            }
-
-            return result;
-        }
-    };
-
-}}}}
+        }  // namespace http
+    }  // namespace discovery
+}  // namespace transport
+}  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-HttpDiscoveryAgent::HttpDiscoveryAgent() : AbstractDiscoveryAgent(), impl(new HttpDiscoveryAgentImpl) {
+HttpDiscoveryAgent::HttpDiscoveryAgent()
+    : AbstractDiscoveryAgent(),
+      impl(new HttpDiscoveryAgentImpl)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-HttpDiscoveryAgent::~HttpDiscoveryAgent() {
-    try {
+HttpDiscoveryAgent::~HttpDiscoveryAgent()
+{
+    try
+    {
         delete this->impl;
     }
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string HttpDiscoveryAgent::toString() const {
+std::string HttpDiscoveryAgent::toString() const
+{
     return "HttpDiscoveryAgent";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HttpDiscoveryAgent::suspend() {
-    synchronized(&impl->updateLock) {
+void HttpDiscoveryAgent::suspend()
+{
+    synchronized(&impl->updateLock)
+    {
         impl->updateState = SUSPENDED;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HttpDiscoveryAgent::resume() {
-    synchronized(&impl->updateLock) {
+void HttpDiscoveryAgent::resume()
+{
+    synchronized(&impl->updateLock)
+    {
         impl->updateState = RESUMING;
         impl->updateLock.notify();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HttpDiscoveryAgent::doStart() {
-
-    if (impl->registryUrl.toString().empty()) {
+void HttpDiscoveryAgent::doStart()
+{
+    if (impl->registryUrl.toString().empty())
+    {
         impl->registryUrl = getDiscoveryURI();
     }
 
@@ -134,61 +157,80 @@ void HttpDiscoveryAgent::doStart() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HttpDiscoveryAgent::doStop() {
+void HttpDiscoveryAgent::doStop()
+{
     suspend();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HttpDiscoveryAgent::doAdvertizeSelf() {
-
+void HttpDiscoveryAgent::doAdvertizeSelf()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HttpDiscoveryAgent::setUpdateInterval(long long updateInterval) {
+void HttpDiscoveryAgent::setUpdateInterval(long long updateInterval)
+{
     impl->updateInterval = updateInterval;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long HttpDiscoveryAgent::getUpdateInterval() const {
+long long HttpDiscoveryAgent::getUpdateInterval() const
+{
     return impl->updateInterval;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HttpDiscoveryAgent::setRegistryURL(const std::string& registryUrl) {
+void HttpDiscoveryAgent::setRegistryURL(const std::string& registryUrl)
+{
     impl->registryUrl.create(registryUrl);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string HttpDiscoveryAgent::getRegistryURL() const{
+std::string HttpDiscoveryAgent::getRegistryURL() const
+{
     return impl->registryUrl.toString();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HttpDiscoveryAgent::doDiscovery() {
-    try {
+void HttpDiscoveryAgent::doDiscovery()
+{
+    try
+    {
         updateServices();
-        synchronized(&impl->updateLock) {
-            do {
-                if (impl->updateState == RESUMING) {
+        synchronized(&impl->updateLock)
+        {
+            do
+            {
+                if (impl->updateState == RESUMING)
+                {
                     impl->updateState = RESUMED;
-                } else {
+                }
+                else
+                {
                     impl->updateLock.wait(impl->updateInterval);
                 }
             } while (impl->updateState == SUSPENDED && isStarted());
         }
-    } catch (InterruptedException& e) {
+    }
+    catch (InterruptedException& e)
+    {
         return;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void HttpDiscoveryAgent::updateServices() {
+void HttpDiscoveryAgent::updateServices()
+{
     DiscoveryListener* discoveryListener = getDiscoveryListener();
-    if (discoveryListener != NULL) {
+    if (discoveryListener != NULL)
+    {
         HashSet<std::string> activeServices = impl->doLookup();
-        if (activeServices.isEmpty()) {
-            Pointer< Iterator<std::string> > discovered(activeServices.iterator());
-            while (discovered->hasNext()) {
+        if (activeServices.isEmpty())
+        {
+            Pointer<Iterator<std::string>> discovered(
+                activeServices.iterator());
+            while (discovered->hasNext())
+            {
                 std::string service = discovered->next();
                 processLiveService("", service);
             }

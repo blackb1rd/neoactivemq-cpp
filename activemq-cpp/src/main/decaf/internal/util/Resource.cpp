@@ -22,5 +22,6 @@ using namespace decaf::internal;
 using namespace decaf::internal::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-Resource::~Resource() {
+Resource::~Resource()
+{
 }

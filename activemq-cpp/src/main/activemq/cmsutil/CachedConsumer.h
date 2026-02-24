@@ -18,27 +18,27 @@
 #ifndef _ACTIVEMQ_CMSUTIL_CACHEDCONSUMER_H_
 #define _ACTIVEMQ_CMSUTIL_CACHEDCONSUMER_H_
 
-#include <cms/MessageConsumer.h>
 #include <activemq/util/Config.h>
+#include <cms/MessageConsumer.h>
 
-namespace activemq {
-namespace cmsutil {
+namespace activemq
+{
+namespace cmsutil
+{
 
     /**
      * A cached message consumer contained within a pooled session.
      */
-    class AMQCPP_API CachedConsumer: public cms::MessageConsumer {
+    class AMQCPP_API CachedConsumer : public cms::MessageConsumer
+    {
     private:
-
         cms::MessageConsumer* consumer;
 
     private:
-
         CachedConsumer(const CachedConsumer&);
         CachedConsumer& operator=(const CachedConsumer&);
 
     public:
-
         CachedConsumer(cms::MessageConsumer* consumer);
 
         virtual ~CachedConsumer();
@@ -47,60 +47,75 @@ namespace cmsutil {
          * Does nothing - the real producer resource will be closed
          * by the lifecycle manager.
          */
-        virtual void close() {
+        virtual void close()
+        {
             // Do nothing.
         }
 
-        virtual void start() {
+        virtual void start()
+        {
             consumer->start();
         }
 
-        virtual void stop() {
+        virtual void stop()
+        {
             consumer->stop();
         }
 
-        virtual cms::Message* receive() {
+        virtual cms::Message* receive()
+        {
             return consumer->receive();
         }
 
-        virtual cms::Message* receive(int millisecs) {
+        virtual cms::Message* receive(int millisecs)
+        {
             return consumer->receive(millisecs);
         }
 
-        virtual cms::Message* receiveNoWait() {
+        virtual cms::Message* receiveNoWait()
+        {
             return consumer->receiveNoWait();
         }
 
-        virtual void setMessageListener(cms::MessageListener* listener) {
+        virtual void setMessageListener(cms::MessageListener* listener)
+        {
             consumer->setMessageListener(listener);
         }
 
-        virtual cms::MessageListener* getMessageListener() const {
+        virtual cms::MessageListener* getMessageListener() const
+        {
             return consumer->getMessageListener();
         }
 
-        virtual std::string getMessageSelector() const {
+        virtual std::string getMessageSelector() const
+        {
             return consumer->getMessageSelector();
         }
 
-        virtual void setMessageAvailableListener(cms::MessageAvailableListener* listener) {
+        virtual void setMessageAvailableListener(
+            cms::MessageAvailableListener* listener)
+        {
             consumer->setMessageAvailableListener(listener);
         }
 
-        virtual cms::MessageAvailableListener* getMessageAvailableListener() const {
+        virtual cms::MessageAvailableListener* getMessageAvailableListener()
+            const
+        {
             return consumer->getMessageAvailableListener();
         }
 
-        virtual void setMessageTransformer(cms::MessageTransformer* transformer) {
+        virtual void setMessageTransformer(cms::MessageTransformer* transformer)
+        {
             consumer->setMessageTransformer(transformer);
         }
 
-        virtual cms::MessageTransformer* getMessageTransformer() const {
+        virtual cms::MessageTransformer* getMessageTransformer() const
+        {
             return consumer->getMessageTransformer();
         }
-
     };
 
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CMSUTIL_CACHEDCONSUMER_H_*/

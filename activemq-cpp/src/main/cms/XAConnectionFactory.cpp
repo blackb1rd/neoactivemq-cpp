@@ -20,5 +20,6 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-XAConnectionFactory::~XAConnectionFactory() {
+XAConnectionFactory::~XAConnectionFactory()
+{
 }

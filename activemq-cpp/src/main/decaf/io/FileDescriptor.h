@@ -18,75 +18,82 @@
 #ifndef _DECAF_IO_FILEDESCRIPTOR_H_
 #define _DECAF_IO_FILEDESCRIPTOR_H_
 
-#include <cstdint>
 #include <decaf/util/Config.h>
+#include <cstdint>
 
-namespace decaf {
-namespace io {
+namespace decaf
+{
+namespace io
+{
 
     /**
-     * This class servers as an opaque wrapper around an underlying OS level resource that can
-     * be used as a source / sink for byte level data such as sockets and files.
+     * This class servers as an opaque wrapper around an underlying OS level
+     * resource that can be used as a source / sink for byte level data such as
+     * sockets and files.
      *
      * @since 1.0
      */
-    class DECAF_API FileDescriptor {
+    class DECAF_API FileDescriptor
+    {
     public:
-
         /**
-         * A handle to the standard input stream. Usually, this file descriptor is not used
-         * directly, but rather via the input stream known as System::in.
+         * A handle to the standard input stream. Usually, this file descriptor
+         * is not used directly, but rather via the input stream known as
+         * System::in.
          */
         static FileDescriptor in;
 
         /**
-         * A handle to the standard output stream. Usually, this file descriptor is not used
-         * directly, but rather via the output stream known as System::out.
+         * A handle to the standard output stream. Usually, this file descriptor
+         * is not used directly, but rather via the output stream known as
+         * System::out.
          */
         static FileDescriptor out;
 
         /**
-         * A handle to the standard error stream. Usually, this file descriptor is not used
-         * directly, but rather via the output stream known as System::err.
+         * A handle to the standard error stream. Usually, this file descriptor
+         * is not used directly, but rather via the output stream known as
+         * System::err.
          */
         static FileDescriptor err;
 
     protected:
-
         // Use intptr_t to properly store file/socket handles on all platforms
-        // On Windows x64, SOCKET is 64-bit (UINT_PTR) which doesn't fit in 32-bit long
+        // On Windows x64, SOCKET is 64-bit (UINT_PTR) which doesn't fit in
+        // 32-bit long
         intptr_t descriptor;
-        bool readonly;
+        bool     readonly;
 
     protected:
-
         FileDescriptor(intptr_t value, bool readonly);
 
     public:
-
         FileDescriptor();
 
         virtual ~FileDescriptor();
 
         /**
-         * Force any/all buffered data for this FileDescriptor to be flushed to the underlying device.
+         * Force any/all buffered data for this FileDescriptor to be flushed to
+         * the underlying device.
          *
-         * This method blocks until all data is flushed to the underlying device and is used to place
-         * the device into a known state.  In the case of data that is buffered at a higher level such
-         * as a BufferedOutputStream the stream must first be flushed before this method can force
-         * the data to be sent to the output device.
+         * This method blocks until all data is flushed to the underlying device
+         * and is used to place the device into a known state.  In the case of
+         * data that is buffered at a higher level such as a
+         * BufferedOutputStream the stream must first be flushed before this
+         * method can force the data to be sent to the output device.
          */
         void sync();
 
         /**
          * Indicates whether the File Descriptor is valid.
          *
-         * @return true for a valid descriptor such as open socket or file, false otherwise.
+         * @return true for a valid descriptor such as open socket or file,
+         * false otherwise.
          */
         bool valid();
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /* _DECAF_IO_FILEDESCRIPTOR_H_ */

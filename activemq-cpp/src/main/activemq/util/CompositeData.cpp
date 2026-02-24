@@ -17,9 +17,9 @@
 
 #include "CompositeData.h"
 
-#include <sstream>
-#include <memory>
 #include <activemq/util/URISupport.h>
+#include <memory>
+#include <sstream>
 
 using namespace std;
 using namespace activemq;
@@ -29,32 +29,46 @@ using namespace decaf::net;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-CompositeData::CompositeData() : host(), scheme(), path(), components(), parameters(), fragment() {
+CompositeData::CompositeData()
+    : host(),
+      scheme(),
+      path(),
+      components(),
+      parameters(),
+      fragment()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CompositeData::~CompositeData() {
+CompositeData::~CompositeData()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URI CompositeData::toURI() const {
-
+URI CompositeData::toURI() const
+{
     ostringstream sb;
 
-    if (scheme != "") {
+    if (scheme != "")
+    {
         sb << scheme << ":";
     }
 
-    if (host.size() != 0) {
+    if (host.size() != 0)
+    {
         sb << host;
-    } else {
+    }
+    else
+    {
         sb << "(";
 
-        bool firstTime = true;
-        std::unique_ptr<Iterator<URI> > iter(components.iterator());
+        bool                           firstTime = true;
+        std::unique_ptr<Iterator<URI>> iter(components.iterator());
 
-        while (iter->hasNext()) {
-            if (firstTime == true) {
+        while (iter->hasNext())
+        {
+            if (firstTime == true)
+            {
                 sb << ",";
                 firstTime = false;
             }
@@ -64,15 +78,18 @@ URI CompositeData::toURI() const {
         sb << ")";
     }
 
-    if (path != "") {
+    if (path != "")
+    {
         sb << "/" << path;
     }
 
-    if (!parameters.isEmpty()) {
+    if (!parameters.isEmpty())
+    {
         sb << "?" << URISupport::createQueryString(parameters);
     }
 
-    if (fragment != "") {
+    if (fragment != "")
+    {
         sb << "#" << fragment;
     }
 

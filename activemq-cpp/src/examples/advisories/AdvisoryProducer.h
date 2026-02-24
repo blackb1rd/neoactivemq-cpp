@@ -18,68 +18,71 @@
 #ifndef _ACTIVEMQCPP_EXAMPLES_ADVISORIES_ADVISORYPRODUCER_H_
 #define _ACTIVEMQCPP_EXAMPLES_ADVISORIES_ADVISORYPRODUCER_H_
 
-#include <string>
 #include <memory>
+#include <string>
 
-#include <cms/Session.h>
-#include <cms/MessageProducer.h>
 #include <cms/MessageConsumer.h>
 #include <cms/MessageListener.h>
+#include <cms/MessageProducer.h>
+#include <cms/Session.h>
 
 #include <decaf/lang/Runnable.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
 
-namespace activemqcpp {
-namespace examples {
-namespace advisories {
-
-    /**
-     * A sample Producer that will only send Messages on its Topic when it has
-     * received an advisory indicating that there is an active MessageConsumer
-     * on the Topic.  Once another message comes in indicating that there is no
-     * longer a consumer then this Producer stops producing again.
-     *
-     * @since 3.0
-     */
-    class AdvisoryProducer : public decaf::lang::Runnable,
-                             public cms::MessageListener {
-    private:
-
-        volatile bool consumerOnline;
-        volatile bool shutdown;
-        decaf::util::concurrent::CountDownLatch shutdownLatch;
-
-        cms::Session* session;
-        std::unique_ptr<cms::MessageConsumer> consumer;
-        std::unique_ptr<cms::MessageProducer> producer;
-
-    private:
-
-        AdvisoryProducer( const AdvisoryProducer& );
-        AdvisoryProducer& operator= ( const AdvisoryProducer& );
-
-    public:
-
-        AdvisoryProducer( cms::Session* session );
-        virtual ~AdvisoryProducer();
+namespace activemqcpp
+{
+namespace examples
+{
+    namespace advisories
+    {
 
         /**
-         * Shut down the processing that occurs in the Run method.
+         * A sample Producer that will only send Messages on its Topic when it
+         * has received an advisory indicating that there is an active
+         * MessageConsumer on the Topic.  Once another message comes in
+         * indicating that there is no longer a consumer then this Producer
+         * stops producing again.
+         *
+         * @since 3.0
          */
-        void stop();
+        class AdvisoryProducer : public decaf::lang::Runnable,
+                                 public cms::MessageListener
+        {
+        private:
+            volatile bool                           consumerOnline;
+            volatile bool                           shutdown;
+            decaf::util::concurrent::CountDownLatch shutdownLatch;
 
-        /**
-         * Run the producer code.
-         */
-        virtual void run();
+            cms::Session*                         session;
+            std::unique_ptr<cms::MessageConsumer> consumer;
+            std::unique_ptr<cms::MessageProducer> producer;
 
-        /**
-         * Async Message callback.
-         */
-        virtual void onMessage( const cms::Message* message );
+        private:
+            AdvisoryProducer(const AdvisoryProducer&);
+            AdvisoryProducer& operator=(const AdvisoryProducer&);
 
-    };
+        public:
+            AdvisoryProducer(cms::Session* session);
+            virtual ~AdvisoryProducer();
 
-}}}
+            /**
+             * Shut down the processing that occurs in the Run method.
+             */
+            void stop();
+
+            /**
+             * Run the producer code.
+             */
+            virtual void run();
+
+            /**
+             * Async Message callback.
+             */
+            virtual void onMessage(const cms::Message* message);
+        };
+
+    }  // namespace advisories
+}  // namespace examples
+}  // namespace activemqcpp
 
 #endif /* _ACTIVEMQCPP_EXAMPLES_ADVISORIES_ADVISORYPRODUCER_H_ */

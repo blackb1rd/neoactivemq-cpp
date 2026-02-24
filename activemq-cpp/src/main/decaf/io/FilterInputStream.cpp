@@ -26,20 +26,27 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-FilterInputStream::FilterInputStream(InputStream* inputStream, bool own) :
-    InputStream(), inputStream(inputStream), own(own), closed(inputStream == NULL ? true : false) {
+FilterInputStream::FilterInputStream(InputStream* inputStream, bool own)
+    : InputStream(),
+      inputStream(inputStream),
+      own(own),
+      closed(inputStream == NULL ? true : false)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-FilterInputStream::~FilterInputStream() {
-
-    try {
+FilterInputStream::~FilterInputStream()
+{
+    try
+    {
         this->close();
     }
     DECAF_CATCHALL_NOTHROW()
 
-    try {
-        if (own) {
+    try
+    {
+        if (own)
+        {
             delete inputStream;
         }
         inputStream = NULL;
@@ -48,12 +55,16 @@ FilterInputStream::~FilterInputStream() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int FilterInputStream::available() const {
-
-    try {
-
-        if (isClosed()) {
-            throw IOException(__FILE__, __LINE__, "FilterInputStream::available - Stream is closed");
+int FilterInputStream::available() const
+{
+    try
+    {
+        if (isClosed())
+        {
+            throw IOException(
+                __FILE__,
+                __LINE__,
+                "FilterInputStream::available - Stream is closed");
         }
 
         return inputStream->available();
@@ -63,10 +74,12 @@ int FilterInputStream::available() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilterInputStream::close() {
-
-    try {
-        if (!closed && inputStream != NULL) {
+void FilterInputStream::close()
+{
+    try
+    {
+        if (!closed && inputStream != NULL)
+        {
             inputStream->close();
         }
         this->closed = true;
@@ -76,9 +89,12 @@ void FilterInputStream::close() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilterInputStream::mark(int readLimit) {
-    try {
-        if (!isClosed()) {
+void FilterInputStream::mark(int readLimit)
+{
+    try
+    {
+        if (!isClosed())
+        {
             inputStream->mark(readLimit);
         }
     }
@@ -86,10 +102,15 @@ void FilterInputStream::mark(int readLimit) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilterInputStream::reset() {
-    try {
-        if (isClosed()) {
-            throw IOException(__FILE__, __LINE__, "FilterInputStream::reset - Stream is closed");
+void FilterInputStream::reset()
+{
+    try
+    {
+        if (isClosed())
+        {
+            throw IOException(__FILE__,
+                              __LINE__,
+                              "FilterInputStream::reset - Stream is closed");
         }
 
         return inputStream->reset();
@@ -99,9 +120,12 @@ void FilterInputStream::reset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FilterInputStream::markSupported() const {
-    try {
-        if (!isClosed()) {
+bool FilterInputStream::markSupported() const
+{
+    try
+    {
+        if (!isClosed())
+        {
             return inputStream->markSupported();
         }
     }
@@ -110,12 +134,15 @@ bool FilterInputStream::markSupported() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long FilterInputStream::skip(long long num) {
-
-    try {
-
-        if (isClosed()) {
-            throw IOException(__FILE__, __LINE__, "FilterInputStream::skip - Stream is closed");
+long long FilterInputStream::skip(long long num)
+{
+    try
+    {
+        if (isClosed())
+        {
+            throw IOException(__FILE__,
+                              __LINE__,
+                              "FilterInputStream::skip - Stream is closed");
         }
 
         return inputStream->skip(num);
@@ -126,12 +153,16 @@ long long FilterInputStream::skip(long long num) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int FilterInputStream::doReadByte() {
-
-    try {
-
-        if (isClosed()) {
-            throw IOException(__FILE__, __LINE__, "FilterInputStream::doReadByte - Stream is closed");
+int FilterInputStream::doReadByte()
+{
+    try
+    {
+        if (isClosed())
+        {
+            throw IOException(
+                __FILE__,
+                __LINE__,
+                "FilterInputStream::doReadByte - Stream is closed");
         }
 
         return inputStream->read();
@@ -141,12 +172,16 @@ int FilterInputStream::doReadByte() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int FilterInputStream::doReadArray(unsigned char* buffer, int size) {
-
-    try {
-
-        if (isClosed()) {
-            throw IOException(__FILE__, __LINE__, "FilterInputStream::doReadArray - Stream is closed");
+int FilterInputStream::doReadArray(unsigned char* buffer, int size)
+{
+    try
+    {
+        if (isClosed())
+        {
+            throw IOException(
+                __FILE__,
+                __LINE__,
+                "FilterInputStream::doReadArray - Stream is closed");
         }
 
         return doReadArrayBounded(buffer, size, 0, size);
@@ -157,12 +192,19 @@ int FilterInputStream::doReadArray(unsigned char* buffer, int size) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int FilterInputStream::doReadArrayBounded(unsigned char* buffer, int size, int offset, int length) {
-
-    try {
-
-        if (isClosed()) {
-            throw IOException(__FILE__, __LINE__, "FilterInputStream::doReadArrayBounded - Stream is closed");
+int FilterInputStream::doReadArrayBounded(unsigned char* buffer,
+                                          int            size,
+                                          int            offset,
+                                          int            length)
+{
+    try
+    {
+        if (isClosed())
+        {
+            throw IOException(
+                __FILE__,
+                __LINE__,
+                "FilterInputStream::doReadArrayBounded - Stream is closed");
         }
 
         return inputStream->read(buffer, size, offset, length);
@@ -174,6 +216,7 @@ int FilterInputStream::doReadArrayBounded(unsigned char* buffer, int size, int o
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FilterInputStream::isClosed() const {
+bool FilterInputStream::isClosed() const
+{
     return this->closed || this->inputStream == NULL;
 }

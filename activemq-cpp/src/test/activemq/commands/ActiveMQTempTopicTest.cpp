@@ -17,35 +17,42 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/UUID.h>
-#include <activemq/commands/ActiveMQTempTopic.h>
 #include <activemq/commands/ActiveMQDestination.h>
+#include <activemq/commands/ActiveMQTempTopic.h>
+#include <decaf/util/UUID.h>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
 
-class ActiveMQTempTopicTest : public ::testing::Test {};
+class ActiveMQTempTopicTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQTempTopicTest, test) {
+TEST_F(ActiveMQTempTopicTest, test)
+{
     ActiveMQTempTopic myTopic;
 
-    ASSERT_TRUE(myTopic.getDestinationType() == cms::Destination::TEMPORARY_TOPIC);
+    ASSERT_TRUE(myTopic.getDestinationType() ==
+                cms::Destination::TEMPORARY_TOPIC);
 
     myTopic.setPhysicalName("ID:SomeValue:0:1");
     std::string connectionId = myTopic.getConnectionId();
 
-    ASSERT_EQ(std::string("ID:SomeValue:0"), myTopic.getConnectionId()) << ("ConnectionId did not parse correctly");
+    ASSERT_EQ(std::string("ID:SomeValue:0"), myTopic.getConnectionId())
+        << ("ConnectionId did not parse correctly");
 
     myTopic.setPhysicalName("");
     myTopic.setPhysicalName("ID:SomeValue:0:A");
     connectionId = myTopic.getConnectionId();
-    ASSERT_EQ(std::string("ID:SomeValue:0"), myTopic.getConnectionId()) << ("ConnectionId should not have parsed");
+    ASSERT_EQ(std::string("ID:SomeValue:0"), myTopic.getConnectionId())
+        << ("ConnectionId should not have parsed");
 
     myTopic.setPhysicalName("");
     myTopic.setPhysicalName("SomeValueThatWillNotParse");
     connectionId = myTopic.getConnectionId();
-    ASSERT_EQ(std::string(""), myTopic.getConnectionId()) << ("ConnectionId should not have parsed");
+    ASSERT_EQ(std::string(""), myTopic.getConnectionId())
+        << ("ConnectionId should not have parsed");
 }

@@ -21,6 +21,6 @@ using namespace activemq;
 using namespace activemq::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-Suspendable::~Suspendable() {
+Suspendable::~Suspendable()
+{
 }
-

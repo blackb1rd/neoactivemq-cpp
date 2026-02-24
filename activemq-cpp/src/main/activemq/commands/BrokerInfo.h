@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseCommand.h>
@@ -31,8 +31,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -45,33 +47,30 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API BrokerInfo : public BaseCommand {
+    class AMQCPP_API BrokerInfo : public BaseCommand
+    {
     protected:
-
-        Pointer<BrokerId> brokerId;
-        std::string brokerURL;
-        std::vector< decaf::lang::Pointer<BrokerInfo> > peerBrokerInfos;
-        std::string brokerName;
-        bool slaveBroker;
-        bool masterBroker;
-        bool faultTolerantConfiguration;
-        bool duplexConnection;
-        bool networkConnection;
-        long long connectionId;
+        Pointer<BrokerId>                             brokerId;
+        std::string                                   brokerURL;
+        std::vector<decaf::lang::Pointer<BrokerInfo>> peerBrokerInfos;
+        std::string                                   brokerName;
+        bool                                          slaveBroker;
+        bool                                          masterBroker;
+        bool        faultTolerantConfiguration;
+        bool        duplexConnection;
+        bool        networkConnection;
+        long long   connectionId;
         std::string brokerUploadUrl;
         std::string networkProperties;
 
     public:
-
         const static unsigned char ID_BROKERINFO = 2;
 
     private:
-
         BrokerInfo(const BrokerInfo&);
-        BrokerInfo& operator= (const BrokerInfo&);
+        BrokerInfo& operator=(const BrokerInfo&);
 
     public:
-
         BrokerInfo();
 
         virtual ~BrokerInfo();
@@ -87,20 +86,24 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const Pointer<BrokerId>& getBrokerId() const;
-        virtual Pointer<BrokerId>& getBrokerId();
+        virtual Pointer<BrokerId>&       getBrokerId();
         virtual void setBrokerId(const Pointer<BrokerId>& brokerId);
 
         virtual const std::string& getBrokerURL() const;
-        virtual std::string& getBrokerURL();
-        virtual void setBrokerURL(const std::string& brokerURL);
+        virtual std::string&       getBrokerURL();
+        virtual void               setBrokerURL(const std::string& brokerURL);
 
-        virtual const std::vector< decaf::lang::Pointer<BrokerInfo> >& getPeerBrokerInfos() const;
-        virtual std::vector< decaf::lang::Pointer<BrokerInfo> >& getPeerBrokerInfos();
-        virtual void setPeerBrokerInfos(const std::vector< decaf::lang::Pointer<BrokerInfo> >& peerBrokerInfos);
+        virtual const std::vector<decaf::lang::Pointer<BrokerInfo>>&
+        getPeerBrokerInfos() const;
+        virtual std::vector<decaf::lang::Pointer<BrokerInfo>>&
+                     getPeerBrokerInfos();
+        virtual void setPeerBrokerInfos(
+            const std::vector<decaf::lang::Pointer<BrokerInfo>>&
+                peerBrokerInfos);
 
         virtual const std::string& getBrokerName() const;
-        virtual std::string& getBrokerName();
-        virtual void setBrokerName(const std::string& brokerName);
+        virtual std::string&       getBrokerName();
+        virtual void               setBrokerName(const std::string& brokerName);
 
         virtual bool isSlaveBroker() const;
         virtual void setSlaveBroker(bool slaveBroker);
@@ -109,7 +112,8 @@ namespace commands {
         virtual void setMasterBroker(bool masterBroker);
 
         virtual bool isFaultTolerantConfiguration() const;
-        virtual void setFaultTolerantConfiguration(bool faultTolerantConfiguration);
+        virtual void setFaultTolerantConfiguration(
+            bool faultTolerantConfiguration);
 
         virtual bool isDuplexConnection() const;
         virtual void setDuplexConnection(bool duplexConnection);
@@ -118,27 +122,28 @@ namespace commands {
         virtual void setNetworkConnection(bool networkConnection);
 
         virtual long long getConnectionId() const;
-        virtual void setConnectionId(long long connectionId);
+        virtual void      setConnectionId(long long connectionId);
 
         virtual const std::string& getBrokerUploadUrl() const;
-        virtual std::string& getBrokerUploadUrl();
+        virtual std::string&       getBrokerUploadUrl();
         virtual void setBrokerUploadUrl(const std::string& brokerUploadUrl);
 
         virtual const std::string& getNetworkProperties() const;
-        virtual std::string& getNetworkProperties();
+        virtual std::string&       getNetworkProperties();
         virtual void setNetworkProperties(const std::string& networkProperties);
 
         /**
          * @return an answer of true to the isBrokerInfo() query.
          */
-        virtual bool isBrokerInfo() const {
+        virtual bool isBrokerInfo() const
+        {
             return true;
         }
 
         virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_BROKERINFO_H_*/

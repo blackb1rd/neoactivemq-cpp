@@ -15,14 +15,23 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include <decaf/nio/LongBuffer.h>
-#include <decaf/lang/Long.h>
-#include <decaf/lang/Integer.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
+#include <decaf/lang/Integer.h>
+#include <decaf/lang/Long.h>
+#include <decaf/nio/LongBuffer.h>
+#include <gtest/gtest.h>
 
-namespace decaf { namespace internal { namespace nio {} } }
+namespace decaf
+{
+namespace internal
+{
+    namespace nio
+    {
+    }
+}  // namespace internal
+}  // namespace decaf
+
 using namespace std;
 using namespace decaf;
 using namespace decaf::nio;
@@ -30,99 +39,118 @@ using namespace decaf::internal::nio;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class LongArrayBufferTest : public ::testing::Test {
-    protected:
+class LongArrayBufferTest : public ::testing::Test
+{
+protected:
+    decaf::nio::LongBuffer* testBuffer1;
+    long long*              testData1;
 
-decaf::nio::LongBuffer* testBuffer1;
-        long long* testData1;
+    static const int testData1Size;
+    static const int SMALL_TEST_LENGTH;
+    static const int BUFFER_LENGTH;
 
-        static const int testData1Size;
-        static const int SMALL_TEST_LENGTH;
-        static const int BUFFER_LENGTH;
+public:
+    LongArrayBufferTest()
+        : testBuffer1(),
+          testData1()
+    {
+    }
 
-    public:
+    void SetUp() override
+    {
+        testBuffer1 = decaf::nio::LongBuffer::allocate(testData1Size);
 
-        LongArrayBufferTest() : testBuffer1(), testData1() {}
-
-        void SetUp() override {
-            testBuffer1 = decaf::nio::LongBuffer::allocate( testData1Size );
-
-            testData1 = new long long[testData1Size];
-            for( int i = 0; i < testData1Size; ++i ){
-                testData1[i] = (long long)i;
-            }
+        testData1 = new long long[testData1Size];
+        for (int i = 0; i < testData1Size; ++i)
+        {
+            testData1[i] = (long long)i;
         }
+    }
 
-        void TearDown() override {
-            delete testBuffer1;
-            delete [] testData1;
+    void TearDown() override
+    {
+        delete testBuffer1;
+        delete[] testData1;
+    }
+
+protected:
+    void loadTestData1(long long* array, int offset, int length)
+    {
+        for (int i = 0; i < length; i++)
+        {
+            array[offset + i] = (long long)i;
         }
+    }
 
-    protected:
-
-        void loadTestData1( long long* array, int offset, int length ) {
-            for( int i = 0; i < length; i++ ) {
-                array[offset + i] = (long long)i;
-            }
+    void loadTestData2(long long* array, int offset, int length)
+    {
+        for (int i = 0; i < length; i++)
+        {
+            array[offset + i] = (long long)length - i;
         }
+    }
 
-        void loadTestData2( long long* array, int offset, int length ) {
-            for( int i = 0; i < length; i++ ) {
-                array[offset + i] = (long long)length - i;
-            }
+    void loadTestData1(decaf::nio::LongBuffer* buf)
+    {
+        buf->clear();
+        for (int i = 0; i < buf->capacity(); i++)
+        {
+            buf->put(i, (long long)i);
         }
+    }
 
-        void loadTestData1( decaf::nio::LongBuffer* buf ) {
-            buf->clear();
-            for( int i = 0; i < buf->capacity(); i++ ) {
-                buf->put( i, (long long)i );
-            }
+    void loadTestData2(decaf::nio::LongBuffer* buf)
+    {
+        buf->clear();
+        for (int i = 0; i < buf->capacity(); i++)
+        {
+            buf->put(i, (long long)buf->capacity() - i);
         }
+    }
 
-        void loadTestData2( decaf::nio::LongBuffer* buf ) {
-            buf->clear();
-            for( int i = 0; i < buf->capacity(); i++ ) {
-                buf->put(i, (long long) buf->capacity() - i);
-            }
+    void assertContentEquals(decaf::nio::LongBuffer* buf,
+                             long long*              array,
+                             int                     offset,
+                             int                     length)
+    {
+        for (int i = 0; i < length; i++)
+        {
+            ASSERT_TRUE(buf->get(i) == array[offset + i]);
         }
+    }
 
-        void assertContentEquals( decaf::nio::LongBuffer* buf, long long* array,
-                                  int offset, int length) {
-
-            for( int i = 0; i < length; i++ ) {
-                ASSERT_TRUE(buf->get(i) == array[offset + i]);
-            }
+    void assertContentEquals(decaf::nio::LongBuffer* buf,
+                             decaf::nio::LongBuffer* other)
+    {
+        ASSERT_TRUE(buf->capacity() == other->capacity());
+        for (int i = 0; i < buf->capacity(); i++)
+        {
+            ASSERT_TRUE(buf->get(i) == other->get(i));
         }
+    }
 
-        void assertContentEquals( decaf::nio::LongBuffer* buf,
-                                  decaf::nio::LongBuffer* other ) {
-            ASSERT_TRUE(buf->capacity() == other->capacity());
-            for( int i = 0; i < buf->capacity(); i++ ) {
-                ASSERT_TRUE(buf->get(i) == other->get(i));
-            }
+    void assertContentLikeTestData1(decaf::nio::LongBuffer* buf,
+                                    int                     startIndex,
+                                    long long               startValue,
+                                    int                     length)
+    {
+        long long value = startValue;
+        for (int i = 0; i < length; i++)
+        {
+            ASSERT_TRUE(buf->get(startIndex + i) == value);
+            value = value + 1;
         }
-
-        void assertContentLikeTestData1(
-            decaf::nio::LongBuffer* buf, int startIndex,
-            long long startValue, int length ) {
-
-            long long value = startValue;
-            for( int i = 0; i < length; i++ ) {
-                ASSERT_TRUE(buf->get( startIndex + i ) == value);
-                value = value + 1;
-            }
-        }
-
-    };
+    }
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-const int LongArrayBufferTest::testData1Size = 100;
+const int LongArrayBufferTest::testData1Size     = 100;
 const int LongArrayBufferTest::SMALL_TEST_LENGTH = 5;
-const int LongArrayBufferTest::BUFFER_LENGTH = 250;
+const int LongArrayBufferTest::BUFFER_LENGTH     = 250;
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, test) {
-
+TEST_F(LongArrayBufferTest, test)
+{
     // Check that we have setup the array and our initial assumptions on state
     // are correct.  This is the first test run.
     ASSERT_TRUE(testBuffer1 != NULL);
@@ -138,74 +166,101 @@ TEST_F(LongArrayBufferTest, test) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testArray) {
-
+TEST_F(LongArrayBufferTest, testArray)
+{
     long long* array = testBuffer1->array();
 
-    testBuffer1->put( 0, 10 );
+    testBuffer1->put(0, 10);
     ASSERT_TRUE(array[0] == 10.0);
 
-    assertContentEquals(
-        testBuffer1, array, testBuffer1->arrayOffset(), testBuffer1->capacity() );
-
-    loadTestData1( array, testBuffer1->arrayOffset(), testBuffer1->capacity() );
-    assertContentEquals(
-        testBuffer1, array, testBuffer1->arrayOffset(), testBuffer1->capacity()) ;
-
-    loadTestData2( array, testBuffer1->arrayOffset(), testBuffer1->capacity());
-    assertContentEquals(
-        testBuffer1, array, testBuffer1->arrayOffset(), testBuffer1->capacity() );
-
-    loadTestData1( testBuffer1 );
-    assertContentEquals(
-        testBuffer1, array, testBuffer1->arrayOffset(), testBuffer1->capacity() );
-
-    loadTestData2( testBuffer1 );
-    assertContentEquals(
-        testBuffer1, array, testBuffer1->arrayOffset(), testBuffer1->capacity() );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testArrayOffset) {
-
-    long long* array = testBuffer1->array();
-
-    assertContentEquals(testBuffer1, array, testBuffer1->arrayOffset(), testBuffer1->capacity());
+    assertContentEquals(testBuffer1,
+                        array,
+                        testBuffer1->arrayOffset(),
+                        testBuffer1->capacity());
 
     loadTestData1(array, testBuffer1->arrayOffset(), testBuffer1->capacity());
-    assertContentEquals(testBuffer1, array, testBuffer1->arrayOffset(), testBuffer1->capacity());
+    assertContentEquals(testBuffer1,
+                        array,
+                        testBuffer1->arrayOffset(),
+                        testBuffer1->capacity());
 
     loadTestData2(array, testBuffer1->arrayOffset(), testBuffer1->capacity());
-    assertContentEquals(testBuffer1, array, testBuffer1->arrayOffset(), testBuffer1->capacity());
+    assertContentEquals(testBuffer1,
+                        array,
+                        testBuffer1->arrayOffset(),
+                        testBuffer1->capacity());
 
     loadTestData1(testBuffer1);
-    assertContentEquals(testBuffer1, array, testBuffer1->arrayOffset(), testBuffer1->capacity());
+    assertContentEquals(testBuffer1,
+                        array,
+                        testBuffer1->arrayOffset(),
+                        testBuffer1->capacity());
 
     loadTestData2(testBuffer1);
-    assertContentEquals(testBuffer1, array, testBuffer1->arrayOffset(), testBuffer1->capacity());
+    assertContentEquals(testBuffer1,
+                        array,
+                        testBuffer1->arrayOffset(),
+                        testBuffer1->capacity());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testReadOnlyArray) {
+TEST_F(LongArrayBufferTest, testArrayOffset)
+{
+    long long* array = testBuffer1->array();
 
+    assertContentEquals(testBuffer1,
+                        array,
+                        testBuffer1->arrayOffset(),
+                        testBuffer1->capacity());
+
+    loadTestData1(array, testBuffer1->arrayOffset(), testBuffer1->capacity());
+    assertContentEquals(testBuffer1,
+                        array,
+                        testBuffer1->arrayOffset(),
+                        testBuffer1->capacity());
+
+    loadTestData2(array, testBuffer1->arrayOffset(), testBuffer1->capacity());
+    assertContentEquals(testBuffer1,
+                        array,
+                        testBuffer1->arrayOffset(),
+                        testBuffer1->capacity());
+
+    loadTestData1(testBuffer1);
+    assertContentEquals(testBuffer1,
+                        array,
+                        testBuffer1->arrayOffset(),
+                        testBuffer1->capacity());
+
+    loadTestData2(testBuffer1);
+    assertContentEquals(testBuffer1,
+                        array,
+                        testBuffer1->arrayOffset(),
+                        testBuffer1->capacity());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(LongArrayBufferTest, testReadOnlyArray)
+{
     LongBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
 
     ASSERT_TRUE(readOnly != NULL);
     ASSERT_TRUE(readOnly->isReadOnly() == true);
 
-    ASSERT_THROW(readOnly->array(), UnsupportedOperationException) << ("Should throw UnsupportedOperationException");
+    ASSERT_THROW(readOnly->array(), UnsupportedOperationException)
+        << ("Should throw UnsupportedOperationException");
 
-    ASSERT_THROW(readOnly->arrayOffset(), UnsupportedOperationException) << ("Should throw UnsupportedOperationException");
+    ASSERT_THROW(readOnly->arrayOffset(), UnsupportedOperationException)
+        << ("Should throw UnsupportedOperationException");
 
     delete readOnly;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testAsReadOnlyBuffer) {
-
+TEST_F(LongArrayBufferTest, testAsReadOnlyBuffer)
+{
     testBuffer1->clear();
     testBuffer1->mark();
-    testBuffer1->position( testBuffer1->limit() );
+    testBuffer1->position(testBuffer1->limit());
 
     // readonly's contents should be the same as testBuffer1
     LongBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
@@ -214,8 +269,9 @@ TEST_F(LongArrayBufferTest, testAsReadOnlyBuffer) {
     ASSERT_TRUE(testBuffer1->position() == readOnly->position());
     ASSERT_TRUE(testBuffer1->limit() == readOnly->limit());
 
-    for( int i = 0; i < testBuffer1->capacity(); ++i ) {
-        ASSERT_TRUE(testBuffer1->get( i ) == readOnly->get( i ));
+    for (int i = 0; i < testBuffer1->capacity(); ++i)
+    {
+        ASSERT_TRUE(testBuffer1->get(i) == readOnly->get(i));
     }
 
     // readOnly's position, mark, and limit should be independent to testBuffer1
@@ -230,9 +286,9 @@ TEST_F(LongArrayBufferTest, testAsReadOnlyBuffer) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testCompact) {
-
-    loadTestData1( testBuffer1 );
+TEST_F(LongArrayBufferTest, testCompact)
+{
+    loadTestData1(testBuffer1);
 
     // case: buffer is full
     testBuffer1->clear();
@@ -243,9 +299,10 @@ TEST_F(LongArrayBufferTest, testCompact) {
     ASSERT_TRUE(testBuffer1->position() == testBuffer1->capacity());
     ASSERT_TRUE(testBuffer1->limit() == testBuffer1->capacity());
 
-    assertContentLikeTestData1( testBuffer1, 0, 0, testBuffer1->capacity() );
+    assertContentLikeTestData1(testBuffer1, 0, 0, testBuffer1->capacity());
 
-    ASSERT_THROW(testBuffer1->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
+    ASSERT_THROW(testBuffer1->reset(), InvalidMarkException)
+        << ("Should throw InvalidMarkException");
 
     // case: buffer is empty
     testBuffer1->position(0);
@@ -258,7 +315,8 @@ TEST_F(LongArrayBufferTest, testCompact) {
 
     assertContentLikeTestData1(testBuffer1, 0, 0, testBuffer1->capacity());
 
-    ASSERT_THROW(testBuffer1->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
+    ASSERT_THROW(testBuffer1->reset(), InvalidMarkException)
+        << ("Should throw InvalidMarkException");
 
     // case: normal
     ASSERT_TRUE(testBuffer1->capacity() > 5);
@@ -273,41 +331,45 @@ TEST_F(LongArrayBufferTest, testCompact) {
 
     assertContentLikeTestData1(testBuffer1, 0, 1, 4);
 
-    ASSERT_THROW(testBuffer1->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
+    ASSERT_THROW(testBuffer1->reset(), InvalidMarkException)
+        << ("Should throw InvalidMarkException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testCompareTo) {
-
-    LongBuffer* other = LongBuffer::allocate( testBuffer1->capacity() );
+TEST_F(LongArrayBufferTest, testCompareTo)
+{
+    LongBuffer* other = LongBuffer::allocate(testBuffer1->capacity());
 
     loadTestData1(testBuffer1);
     loadTestData1(other);
 
-    ASSERT_TRUE(0 == testBuffer1->compareTo( *other ));
-    ASSERT_TRUE(0 == other->compareTo( *testBuffer1 ));
+    ASSERT_TRUE(0 == testBuffer1->compareTo(*other));
+    ASSERT_TRUE(0 == other->compareTo(*testBuffer1));
     testBuffer1->position(1);
-    ASSERT_TRUE(testBuffer1->compareTo( *other ) > 0);
-    ASSERT_TRUE(other->compareTo( *testBuffer1 ) < 0);
-    other->position( 2 );
-    ASSERT_TRUE(testBuffer1->compareTo( *other ) < 0);
-    ASSERT_TRUE(other->compareTo( *testBuffer1 ) > 0);
+    ASSERT_TRUE(testBuffer1->compareTo(*other) > 0);
+    ASSERT_TRUE(other->compareTo(*testBuffer1) < 0);
+    other->position(2);
+    ASSERT_TRUE(testBuffer1->compareTo(*other) < 0);
+    ASSERT_TRUE(other->compareTo(*testBuffer1) > 0);
     testBuffer1->position(2);
     other->limit(5);
-    ASSERT_TRUE(testBuffer1->compareTo( *other ) > 0);
-    ASSERT_TRUE(other->compareTo( *testBuffer1 ) < 0);
+    ASSERT_TRUE(testBuffer1->compareTo(*other) > 0);
+    ASSERT_TRUE(other->compareTo(*testBuffer1) < 0);
 
-    std::vector<long long> array1( 1, 555555 );
-    std::vector<long long> array2( 1, 555555 );
-    std::vector<long long> array3( 1, 42 );
+    std::vector<long long> array1(1, 555555);
+    std::vector<long long> array2(1, 555555);
+    std::vector<long long> array3(1, 42);
 
-    LongBuffer* dbuffer1 = LongBuffer::wrap( array1 );
-    LongBuffer* dbuffer2 = LongBuffer::wrap( array2 );
-    LongBuffer* dbuffer3 = LongBuffer::wrap( array3 );
+    LongBuffer* dbuffer1 = LongBuffer::wrap(array1);
+    LongBuffer* dbuffer2 = LongBuffer::wrap(array2);
+    LongBuffer* dbuffer3 = LongBuffer::wrap(array3);
 
-    ASSERT_TRUE(dbuffer1->compareTo( *dbuffer2 ) == 0) << ("Failed equal comparison with Long entry");
-    ASSERT_TRUE(dbuffer3->compareTo( *dbuffer1 )) << ("Failed greater than comparison with Long entry");
-    ASSERT_TRUE(dbuffer1->compareTo( *dbuffer3 )) << ("Failed greater than comparison with Long entry");
+    ASSERT_TRUE(dbuffer1->compareTo(*dbuffer2) == 0)
+        << ("Failed equal comparison with Long entry");
+    ASSERT_TRUE(dbuffer3->compareTo(*dbuffer1))
+        << ("Failed greater than comparison with Long entry");
+    ASSERT_TRUE(dbuffer1->compareTo(*dbuffer3))
+        << ("Failed greater than comparison with Long entry");
 
     delete other;
     delete dbuffer1;
@@ -316,7 +378,8 @@ TEST_F(LongArrayBufferTest, testCompareTo) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testDuplicate) {
+TEST_F(LongArrayBufferTest, testDuplicate)
+{
     testBuffer1->clear();
     testBuffer1->mark();
     testBuffer1->position(testBuffer1->limit());
@@ -327,9 +390,10 @@ TEST_F(LongArrayBufferTest, testDuplicate) {
     ASSERT_TRUE(testBuffer1->position() == duplicate->position());
     ASSERT_TRUE(testBuffer1->limit() == duplicate->limit());
     ASSERT_TRUE(testBuffer1->isReadOnly() == duplicate->isReadOnly());
-    assertContentEquals( testBuffer1, duplicate );
+    assertContentEquals(testBuffer1, duplicate);
 
-    // duplicate's position, mark, and limit should be independent to testBuffer1
+    // duplicate's position, mark, and limit should be independent to
+    // testBuffer1
     duplicate->reset();
     ASSERT_TRUE(duplicate->position() == 0);
     duplicate->clear();
@@ -341,207 +405,293 @@ TEST_F(LongArrayBufferTest, testDuplicate) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testEquals) {
-
+TEST_F(LongArrayBufferTest, testEquals)
+{
     // equal to self
-    ASSERT_TRUE(testBuffer1->equals( *testBuffer1 ));
+    ASSERT_TRUE(testBuffer1->equals(*testBuffer1));
     LongBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
-    ASSERT_TRUE(testBuffer1->equals( *readOnly ));
+    ASSERT_TRUE(testBuffer1->equals(*readOnly));
     LongBuffer* duplicate = testBuffer1->duplicate();
-    ASSERT_TRUE(testBuffer1->equals( *duplicate ));
+    ASSERT_TRUE(testBuffer1->equals(*duplicate));
 
     ASSERT_TRUE(testBuffer1->capacity() > 5);
 
-    testBuffer1->limit( testBuffer1->capacity() ).position(0);
-    readOnly->limit( readOnly->capacity() ).position( 1 );
-    ASSERT_TRUE(!testBuffer1->equals( *readOnly ));
+    testBuffer1->limit(testBuffer1->capacity()).position(0);
+    readOnly->limit(readOnly->capacity()).position(1);
+    ASSERT_TRUE(!testBuffer1->equals(*readOnly));
 
-    testBuffer1->limit( testBuffer1->capacity() - 1).position(0);
-    duplicate->limit( duplicate->capacity() ).position( 0 );
-    ASSERT_TRUE(!testBuffer1->equals( *duplicate ));
+    testBuffer1->limit(testBuffer1->capacity() - 1).position(0);
+    duplicate->limit(duplicate->capacity()).position(0);
+    ASSERT_TRUE(!testBuffer1->equals(*duplicate));
 
     delete readOnly;
     delete duplicate;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testGet) {
-
+TEST_F(LongArrayBufferTest, testGet)
+{
     testBuffer1->clear();
-    for( int i = 0; i < testBuffer1->capacity(); i++ ) {
+    for (int i = 0; i < testBuffer1->capacity(); i++)
+    {
         ASSERT_TRUE(testBuffer1->position() == i);
         ASSERT_TRUE(testBuffer1->get() == testBuffer1->get(i));
     }
 
-    ASSERT_THROW(testBuffer1->get(), BufferUnderflowException) << ("Should throw BufferUnderflowException");
+    ASSERT_THROW(testBuffer1->get(), BufferUnderflowException)
+        << ("Should throw BufferUnderflowException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testGetLongArray) {
-
+TEST_F(LongArrayBufferTest, testGetLongArray)
+{
     std::vector<long long> array(1);
     testBuffer1->clear();
 
-    for( int i = 0; i < testBuffer1->capacity(); i++ ) {
+    for (int i = 0; i < testBuffer1->capacity(); i++)
+    {
         ASSERT_TRUE(testBuffer1->position() == i);
-        LongBuffer& ret = testBuffer1->get( array );
+        LongBuffer& ret = testBuffer1->get(array);
         ASSERT_TRUE(array[0] == testBuffer1->get(i));
         ASSERT_TRUE(&ret == testBuffer1);
     }
 
-    ASSERT_THROW(testBuffer1->get( array ), BufferUnderflowException) << ("Should throw BufferUnderflowException");
+    ASSERT_THROW(testBuffer1->get(array), BufferUnderflowException)
+        << ("Should throw BufferUnderflowException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testGetLongArray2) {
-
+TEST_F(LongArrayBufferTest, testGetLongArray2)
+{
     testBuffer1->clear();
     long long* array1 = new long long[testBuffer1->capacity()];
     long long* array2 = new long long[testBuffer1->capacity() + 1];
 
-    ASSERT_THROW(testBuffer1->get( array2, testBuffer1->capacity() + 1, 0, testBuffer1->capacity() + 1 ), BufferUnderflowException) << ("Should throw BufferUnderflowException");
+    ASSERT_THROW(testBuffer1->get(array2,
+                                  testBuffer1->capacity() + 1,
+                                  0,
+                                  testBuffer1->capacity() + 1),
+                 BufferUnderflowException)
+        << ("Should throw BufferUnderflowException");
 
     ASSERT_TRUE(testBuffer1->position() == 0);
 
-    testBuffer1->get( array1, testBuffer1->capacity(), 10, 0 );
+    testBuffer1->get(array1, testBuffer1->capacity(), 10, 0);
 
-    ASSERT_THROW(testBuffer1->get( array1, testBuffer1->capacity(), -1, testBuffer1->capacity() ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->get(array1,
+                                  testBuffer1->capacity(),
+                                  -1,
+                                  testBuffer1->capacity()),
+                 IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
 
-    ASSERT_THROW(testBuffer1->get( array1, testBuffer1->capacity(), testBuffer1->capacity() + 1, 1 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->get(array1,
+                                  testBuffer1->capacity(),
+                                  testBuffer1->capacity() + 1,
+                                  1),
+                 IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
 
-    ASSERT_THROW(testBuffer1->get( array1, testBuffer1->capacity(), 2, -1 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->get(array1, testBuffer1->capacity(), 2, -1),
+                 IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
 
-    ASSERT_THROW(testBuffer1->get( array1, testBuffer1->capacity(), 2, testBuffer1->capacity() ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->get(array1,
+                                  testBuffer1->capacity(),
+                                  2,
+                                  testBuffer1->capacity()),
+                 IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
 
-    ASSERT_THROW(testBuffer1->get( array1, testBuffer1->capacity(), 1, Integer::MAX_VALUE ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
+    ASSERT_THROW(
+        testBuffer1->get(array1, testBuffer1->capacity(), 1, Integer::MAX_VALUE),
+        IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
 
-    ASSERT_THROW(testBuffer1->get( array1, testBuffer1->capacity(), Integer::MAX_VALUE, 1 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
+    ASSERT_THROW(
+        testBuffer1->get(array1, testBuffer1->capacity(), Integer::MAX_VALUE, 1),
+        IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
 
-    ASSERT_THROW(testBuffer1->get( NULL, testBuffer1->capacity(), 1, Integer::MAX_VALUE ), NullPointerException) << ("Should throw NullPointerException");
+    ASSERT_THROW(
+        testBuffer1->get(NULL, testBuffer1->capacity(), 1, Integer::MAX_VALUE),
+        NullPointerException)
+        << ("Should throw NullPointerException");
 
     ASSERT_TRUE(testBuffer1->position() == 0);
 
     testBuffer1->clear();
-    LongBuffer& ret = testBuffer1->get( array1, testBuffer1->capacity(), 0, testBuffer1->capacity() );
+    LongBuffer& ret = testBuffer1->get(array1,
+                                       testBuffer1->capacity(),
+                                       0,
+                                       testBuffer1->capacity());
     ASSERT_TRUE(testBuffer1->position() == testBuffer1->capacity());
-    assertContentEquals( testBuffer1, array1, 0, testBuffer1->capacity() );
+    assertContentEquals(testBuffer1, array1, 0, testBuffer1->capacity());
     ASSERT_TRUE(&ret == testBuffer1);
 
-    delete [] array1;
-    delete [] array2;
+    delete[] array1;
+    delete[] array2;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testGet2) {
-
+TEST_F(LongArrayBufferTest, testGet2)
+{
     testBuffer1->clear();
-    for( int i = 0; i < testBuffer1->capacity(); i++ ) {
+    for (int i = 0; i < testBuffer1->capacity(); i++)
+    {
         ASSERT_TRUE(testBuffer1->position() == i);
         ASSERT_TRUE(testBuffer1->get() == testBuffer1->get(i));
     }
 
-    ASSERT_THROW(testBuffer1->get( -1 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->get(-1), IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
 
-    ASSERT_THROW(testBuffer1->get( testBuffer1->limit() ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->get(testBuffer1->limit()),
+                 IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testHasArray) {
+TEST_F(LongArrayBufferTest, testHasArray)
+{
     ASSERT_TRUE(testBuffer1->hasArray());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testPutLong) {
-
+TEST_F(LongArrayBufferTest, testPutLong)
+{
     testBuffer1->clear();
 
-    for( int i = 0; i < testBuffer1->capacity(); i++) {
+    for (int i = 0; i < testBuffer1->capacity(); i++)
+    {
         ASSERT_TRUE(testBuffer1->position() == i);
-        LongBuffer& ret = testBuffer1->put( (long long)i );
+        LongBuffer& ret = testBuffer1->put((long long)i);
         ASSERT_TRUE(testBuffer1->get(i) == (long long)i);
         ASSERT_TRUE(&ret == testBuffer1);
     }
 
-    ASSERT_THROW(testBuffer1->put( 0 ), BufferOverflowException) << ("Should throw BufferOverflowException");
+    ASSERT_THROW(testBuffer1->put(0), BufferOverflowException)
+        << ("Should throw BufferOverflowException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testPutLongArray) {
-
+TEST_F(LongArrayBufferTest, testPutLongArray)
+{
     long long* array = new long long[1];
 
     testBuffer1->clear();
-    for( int i = 0; i < testBuffer1->capacity(); i++ ) {
+    for (int i = 0; i < testBuffer1->capacity(); i++)
+    {
         ASSERT_TRUE(testBuffer1->position() == i);
-        array[0] = (long long) i;
-        LongBuffer& ret = testBuffer1->put( array, 1, 0, 1 );
+        array[0]        = (long long)i;
+        LongBuffer& ret = testBuffer1->put(array, 1, 0, 1);
         ASSERT_TRUE(testBuffer1->get(i) == (long long)i);
         ASSERT_TRUE(&ret == testBuffer1);
     }
 
-    ASSERT_THROW(testBuffer1->put( array, 1, 0, 1 ), BufferOverflowException) << ("Should throw BufferOverflowException");
+    ASSERT_THROW(testBuffer1->put(array, 1, 0, 1), BufferOverflowException)
+        << ("Should throw BufferOverflowException");
 
-    delete [] array;
+    delete[] array;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testPutLongArray2) {
-
+TEST_F(LongArrayBufferTest, testPutLongArray2)
+{
     testBuffer1->clear();
-    long long* array1 = new long long[ testBuffer1->capacity() ];
-    long long* array2 = new long long[ testBuffer1->capacity() + 1 ];
+    long long* array1 = new long long[testBuffer1->capacity()];
+    long long* array2 = new long long[testBuffer1->capacity() + 1];
 
-    ASSERT_THROW(testBuffer1->put( array2, testBuffer1->capacity() + 1, 0, testBuffer1->capacity() + 1 ), BufferOverflowException) << ("Should throw BufferOverflowException");
-
-    ASSERT_TRUE(testBuffer1->position() == 0);
-
-    testBuffer1->put( array1, testBuffer1->capacity(), testBuffer1->capacity() + 1, 0 );
-    ASSERT_TRUE(testBuffer1->position() == 0);
-
-    ASSERT_THROW(testBuffer1->put( array1, testBuffer1->capacity(), -1, testBuffer1->capacity() ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
-
-    ASSERT_THROW(testBuffer1->put( array1, testBuffer1->capacity(), testBuffer1->capacity() + 1, 1 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
-
-    ASSERT_THROW(testBuffer1->put( array1, testBuffer1->capacity(), 2, -1 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
-
-    ASSERT_THROW(testBuffer1->put( array1, testBuffer1->capacity(), 2, testBuffer1->capacity() ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
-
-    ASSERT_THROW(testBuffer1->put( array1, testBuffer1->capacity(), 1, Integer::MAX_VALUE ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
-
-    ASSERT_THROW(testBuffer1->put( array1, testBuffer1->capacity(), Integer::MAX_VALUE, 1 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
-
-    ASSERT_THROW(testBuffer1->put( NULL, testBuffer1->capacity(), 1, Integer::MAX_VALUE ), NullPointerException) << ("Should throw NullPointerException");
+    ASSERT_THROW(testBuffer1->put(array2,
+                                  testBuffer1->capacity() + 1,
+                                  0,
+                                  testBuffer1->capacity() + 1),
+                 BufferOverflowException)
+        << ("Should throw BufferOverflowException");
 
     ASSERT_TRUE(testBuffer1->position() == 0);
 
-    loadTestData2( array1, 0, testBuffer1->capacity() );
-    LongBuffer& ret = testBuffer1->put( array1, testBuffer1->capacity(), 0, testBuffer1->capacity() );
+    testBuffer1->put(array1,
+                     testBuffer1->capacity(),
+                     testBuffer1->capacity() + 1,
+                     0);
+    ASSERT_TRUE(testBuffer1->position() == 0);
+
+    ASSERT_THROW(testBuffer1->put(array1,
+                                  testBuffer1->capacity(),
+                                  -1,
+                                  testBuffer1->capacity()),
+                 IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
+
+    ASSERT_THROW(testBuffer1->put(array1,
+                                  testBuffer1->capacity(),
+                                  testBuffer1->capacity() + 1,
+                                  1),
+                 IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
+
+    ASSERT_THROW(testBuffer1->put(array1, testBuffer1->capacity(), 2, -1),
+                 IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
+
+    ASSERT_THROW(testBuffer1->put(array1,
+                                  testBuffer1->capacity(),
+                                  2,
+                                  testBuffer1->capacity()),
+                 IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
+
+    ASSERT_THROW(
+        testBuffer1->put(array1, testBuffer1->capacity(), 1, Integer::MAX_VALUE),
+        IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
+
+    ASSERT_THROW(
+        testBuffer1->put(array1, testBuffer1->capacity(), Integer::MAX_VALUE, 1),
+        IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
+
+    ASSERT_THROW(
+        testBuffer1->put(NULL, testBuffer1->capacity(), 1, Integer::MAX_VALUE),
+        NullPointerException)
+        << ("Should throw NullPointerException");
+
+    ASSERT_TRUE(testBuffer1->position() == 0);
+
+    loadTestData2(array1, 0, testBuffer1->capacity());
+    LongBuffer& ret = testBuffer1->put(array1,
+                                       testBuffer1->capacity(),
+                                       0,
+                                       testBuffer1->capacity());
     ASSERT_TRUE(testBuffer1->position() == testBuffer1->capacity());
-    assertContentEquals( testBuffer1, array1, 0, testBuffer1->capacity() );
+    assertContentEquals(testBuffer1, array1, 0, testBuffer1->capacity());
     ASSERT_TRUE(&ret == testBuffer1);
 
-    delete [] array1;
-    delete [] array2;
+    delete[] array1;
+    delete[] array2;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testPutLongBuffer) {
+TEST_F(LongArrayBufferTest, testPutLongBuffer)
+{
+    LongBuffer* other  = LongBuffer::allocate(testBuffer1->capacity());
+    LongBuffer* other1 = LongBuffer::allocate(testBuffer1->capacity() + 1);
 
-    LongBuffer* other = LongBuffer::allocate( testBuffer1->capacity() );
-    LongBuffer* other1 = LongBuffer::allocate( testBuffer1->capacity() + 1 );
+    ASSERT_THROW(testBuffer1->put(*testBuffer1), IllegalArgumentException)
+        << ("Should throw IllegalArgumentException");
 
-    ASSERT_THROW(testBuffer1->put( *testBuffer1 ), IllegalArgumentException) << ("Should throw IllegalArgumentException");
-
-    ASSERT_THROW(testBuffer1->put( *other1 ), BufferOverflowException) << ("Should throw BufferOverflowException");
+    ASSERT_THROW(testBuffer1->put(*other1), BufferOverflowException)
+        << ("Should throw BufferOverflowException");
 
     loadTestData2(other);
     other->clear();
     testBuffer1->clear();
-    LongBuffer& ret = testBuffer1->put( *other );
+    LongBuffer& ret = testBuffer1->put(*other);
 
     ASSERT_TRUE(other->position() == other->capacity());
     ASSERT_TRUE(testBuffer1->position() == testBuffer1->capacity());
-    assertContentEquals( other, testBuffer1 );
+    assertContentEquals(other, testBuffer1);
     ASSERT_TRUE(&ret == testBuffer1);
 
     delete other;
@@ -549,47 +699,56 @@ TEST_F(LongArrayBufferTest, testPutLongBuffer) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testGetWithIndex) {
-
+TEST_F(LongArrayBufferTest, testGetWithIndex)
+{
     testBuffer1->clear();
 
-    for( int i = 0; i < testBuffer1->capacity(); i++ ) {
+    for (int i = 0; i < testBuffer1->capacity(); i++)
+    {
         ASSERT_TRUE(testBuffer1->position() == 0);
-        LongBuffer& ret = testBuffer1->put( i, (long long)i );
+        LongBuffer& ret = testBuffer1->put(i, (long long)i);
         ASSERT_TRUE(testBuffer1->get(i) == (long long)i);
         ASSERT_TRUE(&ret == testBuffer1);
     }
 
-    ASSERT_THROW(testBuffer1->put( -1, 0 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->put(-1, 0), IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
 
-    ASSERT_THROW(testBuffer1->put( testBuffer1->limit(), 0 ), IndexOutOfBoundsException) << ("Should throw IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->put(testBuffer1->limit(), 0),
+                 IndexOutOfBoundsException)
+        << ("Should throw IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testPutIndexed) {
-
+TEST_F(LongArrayBufferTest, testPutIndexed)
+{
     LongBuffer* readOnly = testBuffer1->asReadOnlyBuffer();
     readOnly->clear();
-    ASSERT_THROW(readOnly->put( 0, 0 ), ReadOnlyBufferException) << ("Should throw a ReadOnlyBufferException");
+    ASSERT_THROW(readOnly->put(0, 0), ReadOnlyBufferException)
+        << ("Should throw a ReadOnlyBufferException");
     delete readOnly;
 
     testBuffer1->clear();
 
-    for( int i = 0; i < testBuffer1->capacity(); i++ ) {
+    for (int i = 0; i < testBuffer1->capacity(); i++)
+    {
         ASSERT_TRUE(testBuffer1->position() == 0);
-        LongBuffer& ret = testBuffer1->put(i, i );
+        LongBuffer& ret = testBuffer1->put(i, i);
         ASSERT_TRUE(testBuffer1->get(i) == (long long)i);
         ASSERT_TRUE(&ret == testBuffer1);
     }
 
-    ASSERT_THROW(testBuffer1->put( -1, 0 ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->put(-1, 0), IndexOutOfBoundsException)
+        << ("Should throw a IndexOutOfBoundsException");
 
-    ASSERT_THROW(testBuffer1->put( testBuffer1->limit(), 0 ), IndexOutOfBoundsException) << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->put(testBuffer1->limit(), 0),
+                 IndexOutOfBoundsException)
+        << ("Should throw a IndexOutOfBoundsException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testSlice) {
-
+TEST_F(LongArrayBufferTest, testSlice)
+{
     ASSERT_TRUE(testBuffer1->capacity() > 5);
     testBuffer1->position(1);
     testBuffer1->limit(testBuffer1->capacity() - 1);
@@ -600,24 +759,28 @@ TEST_F(LongArrayBufferTest, testSlice) {
     ASSERT_TRUE(slice->limit() == testBuffer1->remaining());
     ASSERT_TRUE(slice->capacity() == testBuffer1->remaining());
 
-    ASSERT_THROW(slice->reset(), InvalidMarkException) << ("Should throw InvalidMarkException");
+    ASSERT_THROW(slice->reset(), InvalidMarkException)
+        << ("Should throw InvalidMarkException");
 
     // slice share the same content with testBuffer1
     // FIXME:
     loadTestData1(slice);
     assertContentLikeTestData1(testBuffer1, 1, 0, slice->capacity());
-    testBuffer1->put( 2, 500 );
+    testBuffer1->put(2, 500);
     ASSERT_TRUE(slice->get(1) == 500);
 
     delete slice;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-TEST_F(LongArrayBufferTest, testToString) {
-
+TEST_F(LongArrayBufferTest, testToString)
+{
     std::string str = testBuffer1->toString();
     ASSERT_TRUE(str.find("Long") != string::npos);
-    ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->position() ) ) != string::npos);
-    ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->limit() ) ) != string::npos);
-    ASSERT_TRUE(str.find( Integer::toString( (int)testBuffer1->capacity() ) ) != string::npos);
+    ASSERT_TRUE(str.find(Integer::toString((int)testBuffer1->position())) !=
+                string::npos);
+    ASSERT_TRUE(str.find(Integer::toString((int)testBuffer1->limit())) !=
+                string::npos);
+    ASSERT_TRUE(str.find(Integer::toString((int)testBuffer1->capacity())) !=
+                string::npos);
 }

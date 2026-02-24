@@ -22,29 +22,32 @@
 
 #include <decaf/io/IOException.h>
 
-namespace decaf {
-namespace io {
+namespace decaf
+{
+namespace io
+{
 
     /**
-     * A Flushable is a destination of data that can be flushed. The flush method is
-     * invoked to write any buffered output to the underlying stream.
+     * A Flushable is a destination of data that can be flushed. The flush
+     * method is invoked to write any buffered output to the underlying stream.
      *
      * @since 1.0
      */
-    class DECAF_API Flushable {
+    class DECAF_API Flushable
+    {
     public:
-
         virtual ~Flushable();
 
         /**
-         * Flushes this stream by writing any buffered output to the underlying stream.
+         * Flushes this stream by writing any buffered output to the underlying
+         * stream.
          *
          * @throws IOException if an I/O error occurs.
          */
         virtual void flush() = 0;
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /* _DECAF_IO_FLUSHABLE_H_ */

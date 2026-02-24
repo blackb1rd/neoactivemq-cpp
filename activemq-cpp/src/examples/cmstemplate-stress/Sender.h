@@ -20,34 +20,35 @@
 
 #include <activemq/cmsutil/CmsTemplate.h>
 #include <activemq/cmsutil/MessageCreator.h>
-#include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/lang/Runnable.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
 
 #include "CmsMessageHandlerDefinitions.h"
 
-namespace cmstemplate {
+namespace cmstemplate
+{
 
-    class Sender {
-    private:
+class Sender
+{
+private:
+    decaf::util::concurrent::Mutex                  cmsTemplateMutex;
+    std::unique_ptr<activemq::cmsutil::CmsTemplate> cmsTemplate;
 
-        decaf::util::concurrent::Mutex cmsTemplateMutex;
-        std::unique_ptr<activemq::cmsutil::CmsTemplate> cmsTemplate;
+private:
+    Sender(const Sender&);
+    Sender& operator=(const Sender&);
 
-    private:
+public:
+    Sender(const std::string& url,
+           const std::string& queueOrTopicName,
+           bool               isTopic,
+           bool               isDeliveryPersistent,
+           int                timeToLive);
 
-        Sender(const Sender&);
-        Sender& operator= (const Sender&);
+    virtual ~Sender();
 
-    public:
-
-        Sender(const std::string& url, const std::string& queueOrTopicName,
-               bool isTopic, bool isDeliveryPersistent, int timeToLive);
-
-        virtual ~Sender();
-
-        void SendMessage(std::string& msg, ErrorCode& errorCode);
-
-    };
-}
+    void SendMessage(std::string& msg, ErrorCode& errorCode);
+};
+}  // namespace cmstemplate
 
 #endif /** _CMSTEMPLATE_SENDER_H_ */

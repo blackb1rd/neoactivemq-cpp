@@ -39,17 +39,21 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-SessionInfo::SessionInfo() :
-    BaseCommand(), sessionId(NULL), ackMode((unsigned int)cms::Session::AUTO_ACKNOWLEDGE) {
-
+SessionInfo::SessionInfo()
+    : BaseCommand(),
+      sessionId(NULL),
+      ackMode((unsigned int)cms::Session::AUTO_ACKNOWLEDGE)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SessionInfo::~SessionInfo() {
+SessionInfo::~SessionInfo()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SessionInfo* SessionInfo::cloneDataStructure() const {
+SessionInfo* SessionInfo::cloneDataStructure() const
+{
     std::unique_ptr<SessionInfo> sessionInfo(new SessionInfo());
 
     // Copy the data from the base class or classes
@@ -59,18 +63,21 @@ SessionInfo* SessionInfo::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SessionInfo::copyDataStructure(const DataStructure* src) {
-
+void SessionInfo::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const SessionInfo* srcPtr = dynamic_cast<const SessionInfo*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "SessionInfo::copyDataStructure - src is NULL or invalid");
     }
 
@@ -81,13 +88,14 @@ void SessionInfo::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char SessionInfo::getDataStructureType() const {
+unsigned char SessionInfo::getDataStructureType() const
+{
     return SessionInfo::ID_SESSIONINFO;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string SessionInfo::toString() const {
-
+std::string SessionInfo::toString() const
+{
     ostringstream stream;
 
     stream << "SessionInfo { "
@@ -95,9 +103,12 @@ std::string SessionInfo::toString() const {
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "SessionId = ";
-    if (this->getSessionId() != NULL) {
+    if (this->getSessionId() != NULL)
+    {
         stream << this->getSessionId()->toString();
-    } else {
+    }
+    else
+    {
         stream << "NULL";
     }
     stream << " }";
@@ -106,55 +117,68 @@ std::string SessionInfo::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool SessionInfo::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool SessionInfo::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const SessionInfo* valuePtr = dynamic_cast<const SessionInfo*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getSessionId() != NULL) {
-        if (!this->getSessionId()->equals(valuePtr->getSessionId().get())) {
+    if (this->getSessionId() != NULL)
+    {
+        if (!this->getSessionId()->equals(valuePtr->getSessionId().get()))
+        {
             return false;
         }
-    } else if (valuePtr->getSessionId() != NULL) {
+    }
+    else if (valuePtr->getSessionId() != NULL)
+    {
         return false;
     }
-    if (!BaseCommand::equals(value)) {
+    if (!BaseCommand::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<SessionId>& SessionInfo::getSessionId() const {
+const decaf::lang::Pointer<SessionId>& SessionInfo::getSessionId() const
+{
     return sessionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<SessionId>& SessionInfo::getSessionId() {
+decaf::lang::Pointer<SessionId>& SessionInfo::getSessionId()
+{
     return sessionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SessionInfo::setSessionId(const decaf::lang::Pointer<SessionId>& sessionId) {
+void SessionInfo::setSessionId(const decaf::lang::Pointer<SessionId>& sessionId)
+{
     this->sessionId = sessionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> SessionInfo::visit(activemq::state::CommandVisitor* visitor) {
+decaf::lang::Pointer<commands::Command> SessionInfo::visit(
+    activemq::state::CommandVisitor* visitor)
+{
     return visitor->processSessionInfo(this);
 }
+
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<RemoveInfo> SessionInfo::createRemoveCommand() const {
+Pointer<RemoveInfo> SessionInfo::createRemoveCommand() const
+{
     Pointer<RemoveInfo> info(new RemoveInfo());
     info->setResponseRequired(this->isResponseRequired());
     info->setObjectId(this->getSessionId());
     return info;
 }
-

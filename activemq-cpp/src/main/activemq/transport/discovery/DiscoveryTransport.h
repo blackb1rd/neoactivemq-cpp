@@ -18,90 +18,97 @@
 #ifndef _ACTIVEMQ_TRANSPORT_DISCOVERY_DISCOVERYTRANSPORT_H_
 #define _ACTIVEMQ_TRANSPORT_DISCOVERY_DISCOVERYTRANSPORT_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/transport/CompositeTransport.h>
 #include <activemq/transport/TransportFilter.h>
-#include <activemq/transport/discovery/DiscoveryListener.h>
 #include <activemq/transport/discovery/DiscoveryAgent.h>
+#include <activemq/transport/discovery/DiscoveryListener.h>
+#include <activemq/util/Config.h>
 #include <decaf/net/URI.h>
 #include <decaf/util/Properties.h>
 
-namespace activemq {
-namespace transport {
-namespace discovery {
+namespace activemq
+{
+namespace transport
+{
+    namespace discovery
+    {
 
-    class DiscoveryTransportData;
+        class DiscoveryTransportData;
 
-    class AMQCPP_API DiscoveryTransport : public TransportFilter, public DiscoveryListener {
-    public:
+        class AMQCPP_API DiscoveryTransport : public TransportFilter,
+                                              public DiscoveryListener
+        {
+        public:
+            static const std::string DISCOVERED_OPTION_PREFIX;
 
-        static const std::string DISCOVERED_OPTION_PREFIX;
+        private:
+            DiscoveryTransport(const DiscoveryTransport&);
+            DiscoveryTransport& operator=(const DiscoveryTransport&);
 
-    private:
+        private:
+            DiscoveryTransportData* impl;
 
-        DiscoveryTransport(const DiscoveryTransport&);
-        DiscoveryTransport& operator=(const DiscoveryTransport&);
+        public:
+            DiscoveryTransport(Pointer<CompositeTransport> next);
 
-    private:
+            virtual ~DiscoveryTransport();
 
-        DiscoveryTransportData* impl;
+            virtual void start();
 
-    public:
+            virtual void stop();
 
-        DiscoveryTransport(Pointer<CompositeTransport> next);
+            /**
+             * Sets the Discovery Agent that this transport will use to discover
+             * new Brokers.
+             *
+             * @param agent
+             *      The Discovery Agent to use in this transport.
+             */
+            void setDiscoveryAgent(decaf::lang::Pointer<DiscoveryAgent> agent);
 
-        virtual ~DiscoveryTransport();
+            /**
+             * Returns the currently configured Discovery Agent
+             *
+             * @return the pointer to the currently configured agent or NULL if
+             * not set.
+             */
+            Pointer<DiscoveryAgent> getDiscoveryAgent() const;
 
-        virtual void start();
+            /**
+             * Sets the properties that are used for configuration of discovered
+             * brokers.
+             *
+             * @param properties
+             *      The supplied properties to use to configure new services.
+             */
+            void setParameters(const decaf::util::Properties& properties);
 
-        virtual void stop();
+            /**
+             * Gets the currently set parameters that are applied to newly
+             * discovered services URIs.
+             *
+             * @return the currently set Properties to apply to new service
+             * URIs.
+             */
+            decaf::util::Properties getParameters() const;
 
-        /**
-         * Sets the Discovery Agent that this transport will use to discover new Brokers.
-         *
-         * @param agent
-         *      The Discovery Agent to use in this transport.
-         */
-        void setDiscoveryAgent(decaf::lang::Pointer<DiscoveryAgent> agent);
+        public:
+            virtual void onServiceAdd(
+                const activemq::commands::DiscoveryEvent* event);
 
-        /**
-         * Returns the currently configured Discovery Agent
-         *
-         * @return the pointer to the currently configured agent or NULL if not set.
-         */
-        Pointer<DiscoveryAgent> getDiscoveryAgent() const;
+            virtual void onServiceRemove(
+                const activemq::commands::DiscoveryEvent* event);
 
-        /**
-         * Sets the properties that are used for configuration of discovered brokers.
-         *
-         * @param properties
-         *      The supplied properties to use to configure new services.
-         */
-        void setParameters(const decaf::util::Properties& properties);
+            virtual void transportInterrupted();
 
-        /**
-         * Gets the currently set parameters that are applied to newly discovered services URIs.
-         *
-         * @return the currently set Properties to apply to new service URIs.
-         */
-        decaf::util::Properties getParameters() const;
+            virtual void transportResumed();
 
-    public:
+        protected:
+            virtual void doClose();
+        };
 
-        virtual void onServiceAdd(const activemq::commands::DiscoveryEvent* event);
-
-        virtual void onServiceRemove(const activemq::commands::DiscoveryEvent* event);
-
-        virtual void transportInterrupted();
-
-        virtual void transportResumed();
-
-    protected:
-
-        virtual void doClose();
-
-    };
-
-}}}
+    }  // namespace discovery
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_DISCOVERY_DISCOVERYTRANSPORT_H_ */

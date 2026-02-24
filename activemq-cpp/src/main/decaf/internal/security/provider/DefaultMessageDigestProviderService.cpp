@@ -30,22 +30,30 @@ using namespace decaf::internal::security::provider::crypto;
 
 ////////////////////////////////////////////////////////////////////////////////
 DefaultMessageDigestProviderService::DefaultMessageDigestProviderService(
-    const Provider* provider, const std::string& algorithmName) :
-        ProviderService(provider, "MessageDigest", algorithmName) {
+    const Provider*    provider,
+    const std::string& algorithmName)
+    : ProviderService(provider, "MessageDigest", algorithmName)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultMessageDigestProviderService::~DefaultMessageDigestProviderService() {
+DefaultMessageDigestProviderService::~DefaultMessageDigestProviderService()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SecuritySpi* DefaultMessageDigestProviderService::newInstance() {
-
-    if (getAlgorithm() == "MD4") {
+SecuritySpi* DefaultMessageDigestProviderService::newInstance()
+{
+    if (getAlgorithm() == "MD4")
+    {
         return new MD4MessageDigestSpi();
-    } else if (getAlgorithm() == "MD5") {
+    }
+    else if (getAlgorithm() == "MD5")
+    {
         return new MD5MessageDigestSpi();
-    } else {
+    }
+    else
+    {
         return new SHA1MessageDigestSpi();
     }
 

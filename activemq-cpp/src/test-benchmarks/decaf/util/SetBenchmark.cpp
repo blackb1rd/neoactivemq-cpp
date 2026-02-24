@@ -16,85 +16,95 @@
  */
 
 #include <benchmark/PerformanceTimer.h>
-#include <decaf/util/StlSet.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/util/Iterator.h>
+#include <decaf/util/StlSet.h>
 
 #include <gtest/gtest.h>
-#include <string>
 #include <iostream>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 
-namespace decaf {
-namespace util {
+namespace decaf
+{
+namespace util
+{
 
-    class SetBenchmark : public ::testing::Test {
+    class SetBenchmark : public ::testing::Test
+    {
     protected:
-
-        StlSet<int> intSet;
+        StlSet<int>         intSet;
         StlSet<std::string> stringSet;
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SetBenchmark, runBenchmark) {
-
+TEST_F(SetBenchmark, runBenchmark)
+{
     benchmark::PerformanceTimer timer;
-    int iterations = 100;
+    int                         iterations = 100;
 
-    for( int iter = 0; iter < iterations; ++iter ) {
+    for (int iter = 0; iter < iterations; ++iter)
+    {
         timer.start();
 
-        int numRuns = 500;
-        std::string test = "test";
-        std::string resultStr = "";
+        int                 numRuns   = 500;
+        std::string         test      = "test";
+        std::string         resultStr = "";
         StlSet<std::string> stringCopy;
-        StlSet<int> intCopy;
+        StlSet<int>         intCopy;
 
-        for( int i = 0; i < numRuns; ++i ) {
-            stringSet.add( test + Integer::toString(i) );
-            intSet.add( 100 + i );
-            stringSet.contains( test + Integer::toString(i) );
-            intSet.contains( 100 + i );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            stringSet.add(test + Integer::toString(i));
+            intSet.add(100 + i);
+            stringSet.contains(test + Integer::toString(i));
+            intSet.contains(100 + i);
         }
 
-        for( int i = 0; i < numRuns; ++i ) {
-            stringSet.remove( test + Integer::toString(i) );
-            intSet.remove( 100 + i );
-            stringSet.contains( test + Integer::toString(i) );
-            intSet.contains( 100 + i );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            stringSet.remove(test + Integer::toString(i));
+            intSet.remove(100 + i);
+            stringSet.contains(test + Integer::toString(i));
+            intSet.contains(100 + i);
         }
 
-        for( int i = 0; i < numRuns; ++i ) {
-            stringSet.add( test + Integer::toString(i) );
-            intSet.add( 100 + i );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            stringSet.add(test + Integer::toString(i));
+            intSet.add(100 + i);
         }
 
         std::vector<std::string> stringVec;
-        std::vector<int> intVec;
+        std::vector<int>         intVec;
 
-        for( int i = 0; i < numRuns / 2; ++i ) {
+        for (int i = 0; i < numRuns / 2; ++i)
+        {
             stringVec = stringSet.toArray();
-            intVec = intSet.toArray();
+            intVec    = intSet.toArray();
         }
 
         std::string tempStr = "";
-        int tempInt = 0;
+        int         tempInt = 0;
 
-        for( int i = 0; i < numRuns / 2; ++i ) {
-
+        for (int i = 0; i < numRuns / 2; ++i)
+        {
             Iterator<std::string>* strIter = stringSet.iterator();
-            Iterator<int>* intIter = intSet.iterator();
+            Iterator<int>*         intIter = intSet.iterator();
 
-            while( strIter->hasNext() ){
+            while (strIter->hasNext())
+            {
                 tempStr = strIter->next();
             }
 
-            while( intIter->hasNext() ){
+            while (intIter->hasNext())
+            {
                 tempInt = intIter->next();
                 tempInt++;
             }
@@ -103,17 +113,18 @@ TEST_F(SetBenchmark, runBenchmark) {
             delete intIter;
         }
 
-        for( int i = 0; i < numRuns / 2; ++i ) {
-            stringCopy.copy( stringSet );
+        for (int i = 0; i < numRuns / 2; ++i)
+        {
+            stringCopy.copy(stringSet);
             stringCopy.clear();
-            intCopy.copy( intSet );
+            intCopy.copy(intSet);
             intCopy.clear();
         }
 
         timer.stop();
     }
 
-    std::cout << typeid( StlSet<int> ).name() << " Benchmark Time = "
-              << timer.getAverageTime() << " Millisecs"
+    std::cout << typeid(StlSet<int>).name()
+              << " Benchmark Time = " << timer.getAverageTime() << " Millisecs"
               << std::endl;
 }

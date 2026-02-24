@@ -28,19 +28,25 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-SchedulerTimerTask::SchedulerTimerTask(Runnable* task, bool ownsTask) :
-    task(task), ownsTask(ownsTask) {
-
-    if (task == NULL) {
-        throw NullPointerException(__FILE__, __LINE__, "Assigned Task cannot be NULL.");
+SchedulerTimerTask::SchedulerTimerTask(Runnable* task, bool ownsTask)
+    : task(task),
+      ownsTask(ownsTask)
+{
+    if (task == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Assigned Task cannot be NULL.");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SchedulerTimerTask::~SchedulerTimerTask() {
-
-    try {
-        if (ownsTask) {
+SchedulerTimerTask::~SchedulerTimerTask()
+{
+    try
+    {
+        if (ownsTask)
+        {
             delete this->task;
         }
     }
@@ -48,8 +54,10 @@ SchedulerTimerTask::~SchedulerTimerTask() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SchedulerTimerTask::run() {
-    if (this->task != NULL) {
+void SchedulerTimerTask::run()
+{
+    if (this->task != NULL)
+    {
         this->task->run();
     }
 }

@@ -18,52 +18,65 @@
 #ifndef _ACTIVEMQ_COMMANDS_BASECOMMAND_H_
 #define _ACTIVEMQ_COMMANDS_BASECOMMAND_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/Command.h>
+#include <activemq/util/Config.h>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
-    class AMQCPP_API BaseCommand : public Command {
+    class AMQCPP_API BaseCommand : public Command
+    {
     private:
-
         bool responseRequired;
-        int commandId;
+        int  commandId;
 
 #if defined(_WIN32) && defined(_DEBUG)
         // MSVC debug codegen (/RTC1) writes a zero-init byte at offset 12 when
-        // constructing dllimport-derived classes with no additional data members
-        // (e.g., FlushCommand, KeepAliveInfo, ShutdownInfo). Without this padding,
-        // that write corrupts the CRT debug heap guard zone (1-byte buffer overrun).
-        // This only affects debug builds; release builds don't have this codegen.
+        // constructing dllimport-derived classes with no additional data
+        // members (e.g., FlushCommand, KeepAliveInfo, ShutdownInfo). Without
+        // this padding, that write corrupts the CRT debug heap guard zone
+        // (1-byte buffer overrun). This only affects debug builds; release
+        // builds don't have this codegen.
         char _msvc_rtc_padding = 0;
 #endif
 
     public:
-
-        BaseCommand() : Command(), responseRequired(false), commandId(0) {
+        BaseCommand()
+            : Command(),
+              responseRequired(false),
+              commandId(0)
+        {
         }
 
-        virtual ~BaseCommand() {}
+        virtual ~BaseCommand()
+        {
+        }
 
-            virtual void setCommandId(int id) {
+        virtual void setCommandId(int id)
+        {
             this->commandId = id;
         }
 
-        virtual int getCommandId() const {
+        virtual int getCommandId() const
+        {
             return commandId;
         }
 
-        virtual void setResponseRequired(const bool required) {
+        virtual void setResponseRequired(const bool required)
+        {
             this->responseRequired = required;
         }
 
-        virtual bool isResponseRequired() const {
+        virtual bool isResponseRequired() const
+        {
             return responseRequired;
         }
 
-        virtual void copyDataStructure(const DataStructure* src) {
-            const BaseCommand* command = dynamic_cast<const BaseCommand*> (src);
+        virtual void copyDataStructure(const DataStructure* src)
+        {
+            const BaseCommand* command = dynamic_cast<const BaseCommand*>(src);
             this->setResponseRequired(command->isResponseRequired());
             this->setCommandId(command->getCommandId());
         }
@@ -73,7 +86,8 @@ namespace commands {
          * such as its type and value of its elements.
          * @return formatted string useful for debugging.
          */
-        virtual std::string toString() const {
+        virtual std::string toString() const
+        {
             std::ostringstream stream;
 
             stream << "Begin Class = BaseCommand" << std::endl;
@@ -91,88 +105,138 @@ namespace commands {
          * same type, and that each element of the objects are the same.
          * @return true if DataStructure's are Equal.
          */
-        virtual bool equals(const DataStructure* value) const {
+        virtual bool equals(const DataStructure* value) const
+        {
             return BaseDataStructure::equals(value);
         }
 
-        virtual bool isBrokerInfo() const  {
-            return false;
-        }
-        virtual bool isControlCommand() const {
-            return false;
-        }
-        virtual bool isConnectionControl() const {
-            return false;
-        }
-        virtual bool isConnectionError() const {
-            return false;
-        }
-        virtual bool isConnectionInfo() const {
-            return false;
-        }
-        virtual bool isConsumerInfo() const {
-            return false;
-        }
-        virtual bool isConsumerControl() const {
-            return false;
-        }
-        virtual bool isDestinationInfo() const {
-            return false;
-        }
-        virtual bool isFlushCommand() const {
-            return false;
-        }
-        virtual bool isMessage() const  {
-            return false;
-        }
-        virtual bool isMessageAck() const  {
-            return false;
-        }
-        virtual bool isMessagePull() const  {
-            return false;
-        }
-        virtual bool isKeepAliveInfo() const {
-            return false;
-        }
-        virtual bool isMessageDispatch() const  {
-            return false;
-        }
-        virtual bool isMessageDispatchNotification() const  {
-            return false;
-        }
-        virtual bool isProducerAck() const  {
-            return false;
-        }
-        virtual bool isProducerInfo() const  {
-            return false;
-        }
-        virtual bool isResponse() const {
-            return false;
-        }
-        virtual bool isRemoveInfo() const {
-            return false;
-        }
-        virtual bool isRemoveSubscriptionInfo() const {
-            return false;
-        }
-        virtual bool isReplayCommand() const {
-            return false;
-        }
-        virtual bool isSessionInfo() const  {
-            return false;
-        }
-        virtual bool isShutdownInfo() const  {
-            return false;
-        }
-        virtual bool isTransactionInfo() const {
-            return false;
-        }
-        virtual bool isWireFormatInfo() const  {
+        virtual bool isBrokerInfo() const
+        {
             return false;
         }
 
+        virtual bool isControlCommand() const
+        {
+            return false;
+        }
+
+        virtual bool isConnectionControl() const
+        {
+            return false;
+        }
+
+        virtual bool isConnectionError() const
+        {
+            return false;
+        }
+
+        virtual bool isConnectionInfo() const
+        {
+            return false;
+        }
+
+        virtual bool isConsumerInfo() const
+        {
+            return false;
+        }
+
+        virtual bool isConsumerControl() const
+        {
+            return false;
+        }
+
+        virtual bool isDestinationInfo() const
+        {
+            return false;
+        }
+
+        virtual bool isFlushCommand() const
+        {
+            return false;
+        }
+
+        virtual bool isMessage() const
+        {
+            return false;
+        }
+
+        virtual bool isMessageAck() const
+        {
+            return false;
+        }
+
+        virtual bool isMessagePull() const
+        {
+            return false;
+        }
+
+        virtual bool isKeepAliveInfo() const
+        {
+            return false;
+        }
+
+        virtual bool isMessageDispatch() const
+        {
+            return false;
+        }
+
+        virtual bool isMessageDispatchNotification() const
+        {
+            return false;
+        }
+
+        virtual bool isProducerAck() const
+        {
+            return false;
+        }
+
+        virtual bool isProducerInfo() const
+        {
+            return false;
+        }
+
+        virtual bool isResponse() const
+        {
+            return false;
+        }
+
+        virtual bool isRemoveInfo() const
+        {
+            return false;
+        }
+
+        virtual bool isRemoveSubscriptionInfo() const
+        {
+            return false;
+        }
+
+        virtual bool isReplayCommand() const
+        {
+            return false;
+        }
+
+        virtual bool isSessionInfo() const
+        {
+            return false;
+        }
+
+        virtual bool isShutdownInfo() const
+        {
+            return false;
+        }
+
+        virtual bool isTransactionInfo() const
+        {
+            return false;
+        }
+
+        virtual bool isWireFormatInfo() const
+        {
+            return false;
+        }
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_BASECOMMAND_H_*/

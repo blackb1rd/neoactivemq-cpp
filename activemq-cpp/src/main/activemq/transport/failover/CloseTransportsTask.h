@@ -18,50 +18,58 @@
 #ifndef _ACTIVEMQ_TRANSPORT_FAILOVER_CLOSETRANSPORTSTASK_H_
 #define _ACTIVEMQ_TRANSPORT_FAILOVER_CLOSETRANSPORTSTASK_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/threads/CompositeTask.h>
 #include <activemq/transport/Transport.h>
+#include <activemq/util/Config.h>
 
-#include <decaf/util/concurrent/LinkedBlockingQueue.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/util/concurrent/LinkedBlockingQueue.h>
 
-namespace activemq {
-namespace transport {
-namespace failover {
+namespace activemq
+{
+namespace transport
+{
+    namespace failover
+    {
 
-    using decaf::lang::Pointer;
+        using decaf::lang::Pointer;
 
-    class AMQCPP_API CloseTransportsTask: public activemq::threads::CompositeTask {
-    private:
+        class AMQCPP_API CloseTransportsTask
+            : public activemq::threads::CompositeTask
+        {
+        private:
+            mutable decaf::util::concurrent::LinkedBlockingQueue<
+                Pointer<Transport>>
+                transports;
 
-        mutable decaf::util::concurrent::LinkedBlockingQueue< Pointer<Transport> > transports;
+        public:
+            CloseTransportsTask();
 
-    public:
+            virtual ~CloseTransportsTask();
 
-        CloseTransportsTask();
+            /**
+             * Add a new Transport to close.
+             */
+            void add(const Pointer<Transport> transport);
 
-        virtual ~CloseTransportsTask();
+            /**
+             * This Task is pending if there are transports in the Queue that
+             * need to be closed.
+             *
+             * @return true if there is a transport in the queue that needs
+             * closed.
+             */
+            virtual bool isPending() const;
 
-        /**
-         * Add a new Transport to close.
-         */
-        void add(const Pointer<Transport> transport);
+            /**
+             * Return true until all transports have been closed and removed
+             * from the queue.
+             */
+            virtual bool iterate();
+        };
 
-        /**
-         * This Task is pending if there are transports in the Queue that need to be
-         * closed.
-         *
-         * @return true if there is a transport in the queue that needs closed.
-         */
-        virtual bool isPending() const;
-
-        /**
-         * Return true until all transports have been closed and removed from the queue.
-         */
-        virtual bool iterate();
-
-    };
-
-}}}
+    }  // namespace failover
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_FAILOVER_CLOSETRANSPORTSTASK_H_ */

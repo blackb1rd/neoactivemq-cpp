@@ -24,18 +24,18 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
 
-    class DoubleTest : public ::testing::Test
-    {
+class DoubleTest : public ::testing::Test
+{
 public:
-
-        DoubleTest();
-
-    };
+    DoubleTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-DoubleTest::DoubleTest() {
+DoubleTest::DoubleTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(DoubleTest, test) {
+TEST_F(DoubleTest, test)
+{
 }

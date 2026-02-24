@@ -25,20 +25,21 @@
 #include <activemq/cmsutil/CmsTemplate.h>
 #include <activemq/cmsutil/MessageCreator.h>
 
-namespace cms {
-namespace stress {
+namespace cms
+{
+namespace stress
+{
 
-    class CmsMessageCreator: public activemq::cmsutil::MessageCreator {
+    class CmsMessageCreator : public activemq::cmsutil::MessageCreator
+    {
     private:
-
         std::string text;
         std::string headerName;
         std::string headerValue;
 
     public:
-
         CmsMessageCreator(const std::string& txt,
-                          const std::string& name = "",
+                          const std::string& name  = "",
                           const std::string& value = "");
 
         virtual ~CmsMessageCreator();
@@ -46,6 +47,7 @@ namespace stress {
         virtual cms::Message* createMessage(cms::Session* session);
     };
 
-}}
+}  // namespace stress
+}  // namespace cms
 
 #endif /** _CMS_STRESS_CMSMESSAGECREATOR_H_ */

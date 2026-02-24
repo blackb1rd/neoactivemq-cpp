@@ -20,42 +20,42 @@
 
 #include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
 
-    class Message;
+class Message;
+
+/**
+ * A <code>MessageListener</code> object is used to receive asynchronously
+ * delivered messages.
+ *
+ * @since 1.0
+ */
+class CMS_API MessageListener
+{
+public:
+    virtual ~MessageListener();
 
     /**
-     * A <code>MessageListener</code> object is used to receive asynchronously
-     * delivered messages.
+     * Called asynchronously when a new message is received, the message
+     * reference can be to any of the Message types. a dynamic cast is used
+     * to find out what type of message this is.  The lifetime of this
+     * object is only guaranteed to be for life of the onMessage function
+     * after this call-back returns the message may no longer exists.  Users
+     * should copy the data or clone the message if they wish to retain
+     * information that was contained in this Message.
      *
-     * @since 1.0
+     * It is considered a programming error for this method to throw an
+     * exception.  The method has been tagged with the 'throw()' qualifier,
+     * this implies that you application will segfault if you throw an error
+     * from an implementation of this method.
+     *
+     * @param message
+     *      Message object {const} pointer recipient does not own.
      */
-    class CMS_API MessageListener {
-    public:
+    virtual void onMessage(const Message* message) = 0;
+};
 
-        virtual ~MessageListener();
-
-        /**
-         * Called asynchronously when a new message is received, the message
-         * reference can be to any of the Message types. a dynamic cast is used
-         * to find out what type of message this is.  The lifetime of this
-         * object is only guaranteed to be for life of the onMessage function
-         * after this call-back returns the message may no longer exists.  Users should
-         * copy the data or clone the message if they wish to retain information that
-         * was contained in this Message.
-         *
-         * It is considered a programming error for this method to throw an
-         * exception.  The method has been tagged with the 'throw()' qualifier,
-         * this implies that you application will segfault if you throw an error
-         * from an implementation of this method.
-         *
-         * @param message
-         *      Message object {const} pointer recipient does not own.
-         */
-        virtual void onMessage(const Message* message) = 0;
-
-    };
-
-}
+}  // namespace cms
 
 #endif /*_CMS_MESSAGELISTENER_H_*/

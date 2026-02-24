@@ -18,10 +18,10 @@
 #include "ServiceRegistry.h"
 
 #include <decaf/lang/Pointer.h>
-#include <decaf/util/ArrayList.h>
-#include <decaf/util/HashMap.h>
 #include <decaf/security/Provider.h>
 #include <decaf/security/ProviderService.h>
+#include <decaf/util/ArrayList.h>
+#include <decaf/util/HashMap.h>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -31,65 +31,79 @@ using namespace decaf::internal;
 using namespace decaf::internal::security;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf {
-namespace internal {
-namespace security {
+namespace decaf
+{
+namespace internal
+{
+    namespace security
+    {
 
-    class ServiceRegistryImpl {
-    private:
+        class ServiceRegistryImpl
+        {
+        private:
+            ServiceRegistryImpl(const ServiceRegistryImpl&);
+            ServiceRegistryImpl& operator=(const ServiceRegistryImpl&);
 
-        ServiceRegistryImpl(const ServiceRegistryImpl&);
-        ServiceRegistryImpl& operator= (const ServiceRegistryImpl&);
+        public:
+            ArrayList<const Provider*>             providers;
+            HashMap<std::string, ProviderService*> services;
 
-    public:
+        public:
+            ServiceRegistryImpl()
+                : providers(),
+                  services()
+            {
+            }
+        };
 
-        ArrayList<const Provider*> providers;
-        HashMap<std::string, ProviderService*> services;
-
-    public:
-
-        ServiceRegistryImpl() : providers(), services() {
-        }
-    };
-
-}}}
+    }  // namespace security
+}  // namespace internal
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-ServiceRegistry::ServiceRegistry() : impl(new ServiceRegistryImpl) {
-
+ServiceRegistry::ServiceRegistry()
+    : impl(new ServiceRegistryImpl)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServiceRegistry::~ServiceRegistry() {
+ServiceRegistry::~ServiceRegistry()
+{
     delete this->impl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServiceRegistry::addProvider(const Provider* provider) {
-
-    if (provider == NULL) {
+void ServiceRegistry::addProvider(const Provider* provider)
+{
+    if (provider == NULL)
+    {
         return;
     }
 
     this->impl->providers.add(provider);
 
-    Pointer< Iterator<ProviderService*> > iter(provider->getServices().iterator());
-    while (iter->hasNext()) {
+    Pointer<Iterator<ProviderService*>> iter(
+        provider->getServices().iterator());
+    while (iter->hasNext())
+    {
         ProviderService* service = iter->next();
 
-        std::string type = service->getType();
+        std::string type      = service->getType();
         std::string algorithm = service->getAlgorithm();
-        std::string name = type + "." + algorithm;
+        std::string name      = type + "." + algorithm;
 
-        if (!this->impl->services.containsKey(name)) {
+        if (!this->impl->services.containsKey(name))
+        {
             this->impl->services.put(name, service);
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProviderService* ServiceRegistry::getService(const std::string& name) {
-    if (this->impl->services.containsKey(name)) {
+ProviderService* ServiceRegistry::getService(const std::string& name)
+{
+    if (this->impl->services.containsKey(name))
+    {
         return this->impl->services.get(name);
     }
 

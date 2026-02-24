@@ -22,16 +22,18 @@
 #include <activemq/util/Config.h>
 #include <decaf/lang/Pointer.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     /**
      * Interface for an object responsible for dispatching messages to
      * consumers.
      */
-    class AMQCPP_API Dispatcher {
+    class AMQCPP_API Dispatcher
+    {
     public:
-
         virtual ~Dispatcher();
 
         /**
@@ -40,17 +42,19 @@ namespace core {
          * @param message
          *      The message to be dispatched to a waiting consumer.
          */
-        virtual void dispatch(const decaf::lang::Pointer<commands::MessageDispatch>& message) = 0;
+        virtual void dispatch(
+            const decaf::lang::Pointer<commands::MessageDispatch>& message) = 0;
 
         /**
-         * HashCode method allowing Dispatcher instances to be used in HashMap etc.
+         * HashCode method allowing Dispatcher instances to be used in HashMap
+         * etc.
          *
          * @return hash value for this Dispatcher.
          */
         virtual int getHashCode() const = 0;
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /*ACTIVEMQ_CORE_DISPATCHER_H_*/

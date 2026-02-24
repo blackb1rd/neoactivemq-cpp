@@ -18,81 +18,103 @@
 #ifndef ACTIVEMQ_CMSUTIL_DUMMYCONNECTION_H_
 #define ACTIVEMQ_CMSUTIL_DUMMYCONNECTION_H_
 
-#include <cms/Connection.h>
 #include <activemq/cmsutil/DummySession.h>
+#include <cms/Connection.h>
 
-namespace activemq {
-namespace cmsutil {
+namespace activemq
+{
+namespace cmsutil
+{
 
     class MessageContext;
 
-    class DummyConnection: public cms::Connection {
+    class DummyConnection : public cms::Connection
+    {
     private:
-
-        cms::ExceptionListener* listener;
+        cms::ExceptionListener*  listener;
         cms::MessageTransformer* transformer;
-        std::string clientId;
-        MessageContext* messageContext;
+        std::string              clientId;
+        MessageContext*          messageContext;
 
     private:
-
         DummyConnection(const DummyConnection&);
-        DummyConnection& operator= (const DummyConnection&);
+        DummyConnection& operator=(const DummyConnection&);
 
     public:
+        DummyConnection(MessageContext* messageContext)
+            : listener(),
+              transformer(),
+              clientId(),
+              messageContext(messageContext)
+        {
+        }
 
-        DummyConnection(MessageContext* messageContext) :
-            listener(), transformer(), clientId(), messageContext(messageContext) {}
-        virtual ~DummyConnection() {}
+        virtual ~DummyConnection()
+        {
+        }
 
-        virtual const cms::ConnectionMetaData* getMetaData() const {
+        virtual const cms::ConnectionMetaData* getMetaData() const
+        {
             return NULL;
         }
 
-        virtual void close() {
+        virtual void close()
+        {
         }
 
-        virtual void start() {
+        virtual void start()
+        {
         }
 
-        virtual void stop() {
+        virtual void stop()
+        {
         }
 
-        virtual cms::Session* createSession() {
+        virtual cms::Session* createSession()
+        {
             return new DummySession(messageContext);
         }
 
-        virtual cms::Session* createSession(cms::Session::AcknowledgeMode ackMode) {
+        virtual cms::Session* createSession(
+            cms::Session::AcknowledgeMode ackMode)
+        {
             DummySession* s = new DummySession(messageContext);
             s->setAcknowledgeMode(ackMode);
             return s;
         }
 
-        virtual std::string getClientID() const {
+        virtual std::string getClientID() const
+        {
             return clientId;
         }
 
-        virtual void setClientID(const std::string& id) {
+        virtual void setClientID(const std::string& id)
+        {
             this->clientId = id;
         }
 
-        virtual cms::ExceptionListener* getExceptionListener() const {
+        virtual cms::ExceptionListener* getExceptionListener() const
+        {
             return listener;
         }
 
-        virtual void setExceptionListener(cms::ExceptionListener* listener) {
+        virtual void setExceptionListener(cms::ExceptionListener* listener)
+        {
             this->listener = listener;
         }
 
-        virtual cms::MessageTransformer* getMessageTransformer() const {
+        virtual cms::MessageTransformer* getMessageTransformer() const
+        {
             return transformer;
         }
 
-        virtual void setMessageTransformer(cms::MessageTransformer* transformer) {
+        virtual void setMessageTransformer(cms::MessageTransformer* transformer)
+        {
             this->transformer = transformer;
         }
     };
 
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /*ACTIVEMQ_CMSUTIL_DUMMYCONNECTION_H_*/

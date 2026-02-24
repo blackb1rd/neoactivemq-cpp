@@ -24,19 +24,25 @@ using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractOwnableSynchronizer::AbstractOwnableSynchronizer() : ownerThread() {
+AbstractOwnableSynchronizer::AbstractOwnableSynchronizer()
+    : ownerThread()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractOwnableSynchronizer::~AbstractOwnableSynchronizer() {
+AbstractOwnableSynchronizer::~AbstractOwnableSynchronizer()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Thread* AbstractOwnableSynchronizer::getExclusiveOwnerThread() const {
+decaf::lang::Thread* AbstractOwnableSynchronizer::getExclusiveOwnerThread() const
+{
     return this->ownerThread;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractOwnableSynchronizer::setExclusiveOwnerThread(decaf::lang::Thread* thread) {
+void AbstractOwnableSynchronizer::setExclusiveOwnerThread(
+    decaf::lang::Thread* thread)
+{
     this->ownerThread = thread;
 }

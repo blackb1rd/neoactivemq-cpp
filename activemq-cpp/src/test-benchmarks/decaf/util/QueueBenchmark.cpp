@@ -16,75 +16,85 @@
  */
 
 #include <benchmark/PerformanceTimer.h>
-#include <decaf/util/StlQueue.h>
 #include <decaf/lang/Integer.h>
+#include <decaf/util/StlQueue.h>
 
 #include <gtest/gtest.h>
-#include <string>
 #include <iostream>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 
-namespace decaf {
-namespace util {
+namespace decaf
+{
+namespace util
+{
 
-    class QueueBenchmark : public ::testing::Test {
+    class QueueBenchmark : public ::testing::Test
+    {
     protected:
-
         StlQueue<std::string> stringQ;
-        StlQueue<int> intQ;
+        StlQueue<int>         intQ;
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(QueueBenchmark, runBenchmark) {
-
+TEST_F(QueueBenchmark, runBenchmark)
+{
     benchmark::PerformanceTimer timer;
-    int iterations = 100;
+    int                         iterations = 100;
 
-    for( int iter = 0; iter < iterations; ++iter ) {
+    for (int iter = 0; iter < iterations; ++iter)
+    {
         timer.start();
 
-        int numRuns = 300;
-        std::string test = "test";
-        std::string resultStr = "";
-        int resultInt = 0;
+        int                   numRuns   = 300;
+        std::string           test      = "test";
+        std::string           resultStr = "";
+        int                   resultInt = 0;
         StlQueue<std::string> stringQCopy;
-        StlQueue<int> intQCopy;
+        StlQueue<int>         intQCopy;
 
-        for( int i = 0; i < numRuns; ++i ) {
-            stringQ.push( test );
-            intQ.push( 65536 );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            stringQ.push(test);
+            intQ.push(65536);
         }
 
-        for( int i = 0; i < numRuns; ++i ) {
+        for (int i = 0; i < numRuns; ++i)
+        {
             stringQ.pop();
             intQ.pop();
         }
 
-        for( int i = 0; i < numRuns; ++i ) {
-            stringQ.enqueueFront( test );
-            intQ.enqueueFront( 1024 );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            stringQ.enqueueFront(test);
+            intQ.enqueueFront(1024);
         }
 
-        for( int i = 0; i < numRuns; ++i ) {
-            stringQ.reverse( stringQCopy );
-            intQ.reverse( intQCopy );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            stringQ.reverse(stringQCopy);
+            intQ.reverse(intQCopy);
         }
 
         std::vector<std::string> stringVec;
-        std::vector<int> intVec;
+        std::vector<int>         intVec;
 
-        for( int i = 0; i < numRuns; ++i ) {
+        for (int i = 0; i < numRuns; ++i)
+        {
             stringVec = stringQ.toArray();
-            intVec = intQ.toArray();
+            intVec    = intQ.toArray();
         }
 
-        for( int i = 0; i < numRuns; ++i ) {
+        for (int i = 0; i < numRuns; ++i)
+        {
             resultStr = stringQ.front();
             resultStr = stringQ.back();
             resultInt = intQ.front();
@@ -97,7 +107,7 @@ TEST_F(QueueBenchmark, runBenchmark) {
         timer.stop();
     }
 
-    std::cout << typeid( StlQueue<int> ).name() << " Benchmark Time = "
-              << timer.getAverageTime() << " Millisecs"
+    std::cout << typeid(StlQueue<int>).name()
+              << " Benchmark Time = " << timer.getAverageTime() << " Millisecs"
               << std::endl;
 }

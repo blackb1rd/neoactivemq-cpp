@@ -17,8 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/internal/util/concurrent/TransferStack.h>
 #include <decaf/internal/util/ByteArrayAdapter.h>
+#include <decaf/internal/util/concurrent/TransferStack.h>
 #include <decaf/util/Config.h>
 
 using namespace decaf;
@@ -26,28 +26,27 @@ using namespace decaf::internal;
 using namespace decaf::internal::util;
 using namespace decaf::internal::util::concurrent;
 
-    class TransferStackTest : public ::testing::Test {
+class TransferStackTest : public ::testing::Test
+{
 public:
+    TransferStackTest();
+    virtual ~TransferStackTest();
 
-        TransferStackTest();
-        virtual ~TransferStackTest();
-
-        void test();
-
-    };
-
+    void test();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TransferStackTest::TransferStackTest() {
+TransferStackTest::TransferStackTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TransferStackTest::~TransferStackTest() {
+TransferStackTest::~TransferStackTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransferStackTest::test() {
-
+void TransferStackTest::test()
+{
     TransferStack<int> stack;
-
 }

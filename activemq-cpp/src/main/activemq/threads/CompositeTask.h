@@ -18,21 +18,23 @@
 #ifndef _ACTIVEMQ_THREADS_COMPOSITETASK_H_
 #define _ACTIVEMQ_THREADS_COMPOSITETASK_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/threads/Task.h>
+#include <activemq/util/Config.h>
 
-namespace activemq {
-namespace threads {
+namespace activemq
+{
+namespace threads
+{
 
     /**
-     * Represents a single task that can be part of a set of Tasks that are contained
-     * in a <code>CompositeTaskRunner</code>.
+     * Represents a single task that can be part of a set of Tasks that are
+     * contained in a <code>CompositeTaskRunner</code>.
      *
      * @since 3.0
      */
-    class AMQCPP_API CompositeTask : public activemq::threads::Task {
+    class AMQCPP_API CompositeTask : public activemq::threads::Task
+    {
     public:
-
         virtual ~CompositeTask();
 
         /**
@@ -45,9 +47,9 @@ namespace threads {
          * @since 3.0
          */
         virtual bool isPending() const = 0;
-
     };
 
-}}
+}  // namespace threads
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_THREADS_COMPOSITETASK_H_ */

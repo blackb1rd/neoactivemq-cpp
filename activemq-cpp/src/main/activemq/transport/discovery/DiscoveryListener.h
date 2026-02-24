@@ -22,33 +22,42 @@
 
 #include <activemq/commands/DiscoveryEvent.h>
 
-namespace activemq {
-namespace transport {
-namespace discovery {
+namespace activemq
+{
+namespace transport
+{
+    namespace discovery
+    {
 
-    class AMQCPP_API DiscoveryListener {
-    public:
+        class AMQCPP_API DiscoveryListener
+        {
+        public:
+            virtual ~DiscoveryListener();
 
-        virtual ~DiscoveryListener();
+            /**
+             * Called when an discovery agent becomes aware of a new service.
+             *
+             * @param event
+             *      A DiscoveryEvent that contains information on the newly
+             * discovered service.
+             */
+            virtual void onServiceAdd(
+                const activemq::commands::DiscoveryEvent* event) = 0;
 
-        /**
-         * Called when an discovery agent becomes aware of a new service.
-         *
-         * @param event
-         *      A DiscoveryEvent that contains information on the newly discovered service.
-         */
-        virtual void onServiceAdd(const activemq::commands::DiscoveryEvent* event) = 0;
+            /**
+             * Called when an discovery agent determines that a service is no
+             * longer available.
+             *
+             * @param event
+             *      A DiscoveryEvent that contains information on the removed
+             * service.
+             */
+            virtual void onServiceRemove(
+                const activemq::commands::DiscoveryEvent* event) = 0;
+        };
 
-        /**
-         * Called when an discovery agent determines that a service is no longer available.
-         *
-         * @param event
-         *      A DiscoveryEvent that contains information on the removed service.
-         */
-        virtual void onServiceRemove(const activemq::commands::DiscoveryEvent* event) = 0;
-
-    };
-
-}}}
+    }  // namespace discovery
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_DISCOVERY_DISCOVERYLISTENER_H_ */

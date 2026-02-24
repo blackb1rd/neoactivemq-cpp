@@ -19,121 +19,137 @@
 
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 
-namespace decaf {
-namespace lang {
-namespace exceptions {
+namespace decaf
+{
+namespace lang
+{
+    namespace exceptions
+    {
 
-    /*
-     * Thrown when an operation is requested, but the state of the object
-     * servicing the request is not correct for that request.
-     *
-     * @since 1.0
-     */
-    class DECAF_API StringIndexOutOfBoundsException : public IndexOutOfBoundsException {
-    public:
-
-        /**
-         * Default Constructor
-         */
-        StringIndexOutOfBoundsException();
-
-        /**
-         * Create a new StringIndexOutOfBoundsException with the given index value
-         * to use to create the error message.
+        /*
+         * Thrown when an operation is requested, but the state of the object
+         * servicing the request is not correct for that request.
          *
-         * @param index
-         *      The given string index that was out of bounds.
+         * @since 1.0
          */
-        StringIndexOutOfBoundsException(int index);
+        class DECAF_API StringIndexOutOfBoundsException
+            : public IndexOutOfBoundsException
+        {
+        public:
+            /**
+             * Default Constructor
+             */
+            StringIndexOutOfBoundsException();
 
-        /**
-         * Conversion Constructor from some other Exception
-         *
-         * @param ex
-         *      The Exception whose data is to be copied into this one.
-         */
-        StringIndexOutOfBoundsException(const Exception& ex);
+            /**
+             * Create a new StringIndexOutOfBoundsException with the given index
+             * value to use to create the error message.
+             *
+             * @param index
+             *      The given string index that was out of bounds.
+             */
+            StringIndexOutOfBoundsException(int index);
 
-        /**
-         * Copy Constructor
-         *
-         * @param ex
-         *      The Exception whose data is to be copied into this one.
-         */
-        StringIndexOutOfBoundsException(const StringIndexOutOfBoundsException& ex);
+            /**
+             * Conversion Constructor from some other Exception
+             *
+             * @param ex
+             *      The Exception whose data is to be copied into this one.
+             */
+            StringIndexOutOfBoundsException(const Exception& ex);
 
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         *
-         * @param file
-         *      The file name where exception occurs
-         * @param lineNumber
-         *      The line number where the exception occurred.
-         * @param cause
-         *      The exception that was the cause for this one to be thrown.
-         * @param msg
-         *      The message to report
-         * @param ...
-         *      list of primitives that are formatted into the message
-         */
-        StringIndexOutOfBoundsException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+            /**
+             * Copy Constructor
+             *
+             * @param ex
+             *      The Exception whose data is to be copied into this one.
+             */
+            StringIndexOutOfBoundsException(
+                const StringIndexOutOfBoundsException& ex);
 
-        /**
-         * Constructor
-         *
-         * @param cause
-         *      Pointer to the exception that caused this one to be thrown, the
-         *      object is cloned caller retains ownership.
-         */
-        StringIndexOutOfBoundsException(const std::exception* cause);
+            /**
+             * Constructor - Initializes the file name and line number where
+             * this message occurred.  Sets the message to report, using an
+             * optional list of arguments to parse into the message
+             *
+             * @param file
+             *      The file name where exception occurs
+             * @param lineNumber
+             *      The line number where the exception occurred.
+             * @param cause
+             *      The exception that was the cause for this one to be thrown.
+             * @param msg
+             *      The message to report
+             * @param ...
+             *      list of primitives that are formatted into the message
+             */
+            StringIndexOutOfBoundsException(const char*           file,
+                                            const int             lineNumber,
+                                            const std::exception* cause,
+                                            const char*           msg,
+                                            ...);
 
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         *
-         * @param file
-         *      The file name where exception occurs
-         * @param lineNumber
-         *      The line number where the exception occurred.
-         * @param msg
-         *      The message to report
-         * @param ...
-         *      list of primitives that are formatted into the message
-         */
-        StringIndexOutOfBoundsException(const char* file, const int lineNumber, const char* msg, ...);
+            /**
+             * Constructor
+             *
+             * @param cause
+             *      Pointer to the exception that caused this one to be thrown,
+             * the object is cloned caller retains ownership.
+             */
+            StringIndexOutOfBoundsException(const std::exception* cause);
 
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using the
-         * given index.
-         *
-         * @param file
-         *      The file name where exception occurs
-         * @param lineNumber
-         *      The line number where the exception occurred.
-         * @param index
-         *      The string index that was out of bounds.
-         */
-        StringIndexOutOfBoundsException(const char* file, const int lineNumber, int index);
+            /**
+             * Constructor - Initializes the file name and line number where
+             * this message occurred.  Sets the message to report, using an
+             * optional list of arguments to parse into the message
+             *
+             * @param file
+             *      The file name where exception occurs
+             * @param lineNumber
+             *      The line number where the exception occurred.
+             * @param msg
+             *      The message to report
+             * @param ...
+             *      list of primitives that are formatted into the message
+             */
+            StringIndexOutOfBoundsException(const char* file,
+                                            const int   lineNumber,
+                                            const char* msg,
+                                            ...);
 
-        /**
-         * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
-         *
-         * @return an new Exception instance that is a copy of this one.
-         */
-        virtual StringIndexOutOfBoundsException* clone() const {
-            return new StringIndexOutOfBoundsException(*this);
-        }
+            /**
+             * Constructor - Initializes the file name and line number where
+             * this message occurred.  Sets the message to report, using the
+             * given index.
+             *
+             * @param file
+             *      The file name where exception occurs
+             * @param lineNumber
+             *      The line number where the exception occurred.
+             * @param index
+             *      The string index that was out of bounds.
+             */
+            StringIndexOutOfBoundsException(const char* file,
+                                            const int   lineNumber,
+                                            int         index);
 
-        virtual ~StringIndexOutOfBoundsException() throw();
+            /**
+             * Clones this exception.  This is useful for cases where you need
+             * to preserve the type of the original exception as well as the
+             * message. All subclasses should override.
+             *
+             * @return an new Exception instance that is a copy of this one.
+             */
+            virtual StringIndexOutOfBoundsException* clone() const
+            {
+                return new StringIndexOutOfBoundsException(*this);
+            }
 
-    };
+            virtual ~StringIndexOutOfBoundsException() throw();
+        };
 
-}}}
+    }  // namespace exceptions
+}  // namespace lang
+}  // namespace decaf
 
 #endif /*_DECAF_LANG_EXCEPTIONS_STRINGINDEXOUTOFBOUNDSEXCEPTION_H_*/

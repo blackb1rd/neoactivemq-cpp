@@ -22,59 +22,67 @@
 
 #include <string>
 
-namespace decaf {
-namespace security {
+namespace decaf
+{
+namespace security
+{
     class Provider;
     class ProviderService;
-}
-namespace internal {
-namespace security {
+}  // namespace security
 
-    class ServiceRegistryImpl;
+namespace internal
+{
+    namespace security
+    {
 
-    /**
-     * Serves as a registry for all the Providers for services using the naming
-     * format of "ServiceName.Algorithm".
-     */
-    class DECAF_API ServiceRegistry {
-    private:
-
-        ServiceRegistryImpl* impl;
-
-    private:
-
-        ServiceRegistry(const ServiceRegistry&);
-        ServiceRegistry& operator=(const ServiceRegistry&);
-
-    public:
-
-        ServiceRegistry();
-
-        virtual ~ServiceRegistry();
+        class ServiceRegistryImpl;
 
         /**
-         * Adds the Provider into the registry so that its services can be looked up
-         * by the registry clients.
-         *
-         * @param provider
-         *      The instance of the Provider which is to be added to the registry
+         * Serves as a registry for all the Providers for services using the
+         * naming format of "ServiceName.Algorithm".
          */
-        void addProvider(const decaf::security::Provider* provider);
+        class DECAF_API ServiceRegistry
+        {
+        private:
+            ServiceRegistryImpl* impl;
 
-        /**
-         * Attempts to locate a ProviderService implementation for the named service and
-         * return a new instance of the service.  If no service exists for the given name
-         * this method returns NULL.
-         *
-         * @param name
-         *      The name of the service to find, format is "serviceName.algorithmName"
-         *
-         * @return a caller owned pointer to a new ProviderService for the named service.
-         */
-        decaf::security::ProviderService* getService(const std::string& name);
+        private:
+            ServiceRegistry(const ServiceRegistry&);
+            ServiceRegistry& operator=(const ServiceRegistry&);
 
-    };
+        public:
+            ServiceRegistry();
 
-}}}
+            virtual ~ServiceRegistry();
+
+            /**
+             * Adds the Provider into the registry so that its services can be
+             * looked up by the registry clients.
+             *
+             * @param provider
+             *      The instance of the Provider which is to be added to the
+             * registry
+             */
+            void addProvider(const decaf::security::Provider* provider);
+
+            /**
+             * Attempts to locate a ProviderService implementation for the named
+             * service and return a new instance of the service.  If no service
+             * exists for the given name this method returns NULL.
+             *
+             * @param name
+             *      The name of the service to find, format is
+             * "serviceName.algorithmName"
+             *
+             * @return a caller owned pointer to a new ProviderService for the
+             * named service.
+             */
+            decaf::security::ProviderService* getService(
+                const std::string& name);
+        };
+
+    }  // namespace security
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_SECURITY_SERVICEREGISTRY_H_ */

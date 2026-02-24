@@ -17,12 +17,12 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/concurrent/Mutex.h>
 #include <decaf/lang/System.h>
-#include <decaf/util/ArrayList.h>
-#include <decaf/util/Random.h>
 #include <decaf/lang/exceptions/InterruptedException.h>
 #include <decaf/lang/exceptions/RuntimeException.h>
+#include <decaf/util/ArrayList.h>
+#include <decaf/util/Random.h>
+#include <decaf/util/concurrent/Mutex.h>
 
 #include <memory>
 
@@ -33,70 +33,93 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
-    class ThreadTest : public ::testing::Test {};
+class ThreadTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf{
-namespace lang{
+namespace decaf
+{
+namespace lang
+{
 
-    class SimpleThread : public Runnable {
+    class SimpleThread : public Runnable
+    {
     private:
-
         int delay;
 
     public:
-
         decaf::util::concurrent::Mutex lock;
 
-        virtual void run() {
-            try {
-
-                synchronized( &lock ) {
+        virtual void run()
+        {
+            try
+            {
+                synchronized(&lock)
+                {
                     lock.notify();
-                    lock.wait( delay );
+                    lock.wait(delay);
                 }
-
-            } catch( decaf::lang::exceptions::InterruptedException& e ) {
+            }
+            catch (decaf::lang::exceptions::InterruptedException& e)
+            {
                 return;
             }
         }
 
-        SimpleThread( int d ) : delay(0), lock() {
-            if( d >= 0 ) {
+        SimpleThread(int d)
+            : delay(0),
+              lock()
+        {
+            if (d >= 0)
+            {
                 delay = d;
             }
         }
 
-        virtual ~SimpleThread() {}
+        virtual ~SimpleThread()
+        {
+        }
     };
 
-    class ChildThread1 : public Thread {
+    class ChildThread1 : public Thread
+    {
     private:
-
         Thread* parent;
-        bool sync;
+        bool    sync;
 
     private:
-
         ChildThread1(const ChildThread1&);
-        ChildThread1& operator= (const ChildThread1&);
+        ChildThread1& operator=(const ChildThread1&);
 
     public:
+        ChildThread1(Thread* parent, bool sync)
+            : Thread(),
+              parent(parent),
+              sync(sync),
+              lock()
+        {
+        }
 
-        ChildThread1(Thread* parent, bool sync) : Thread(), parent(parent), sync(sync), lock() {}
-
-        virtual ~ChildThread1() {}
+        virtual ~ChildThread1()
+        {
+        }
 
         decaf::util::concurrent::Mutex lock;
 
-        virtual void run() {
-
-            if (sync) {
-                synchronized(&lock) {
+        virtual void run()
+        {
+            if (sync)
+            {
+                synchronized(&lock)
+                {
                     lock.notify();
-                    try {
+                    try
+                    {
                         lock.wait();
-                    } catch(InterruptedException& e) {
+                    }
+                    catch (InterruptedException& e)
+                    {
                     }
                 }
             }
@@ -104,299 +127,387 @@ namespace lang{
         }
     };
 
-    class SpinThread : public Runnable {
+    class SpinThread : public Runnable
+    {
     public:
+        SpinThread()
+            : Runnable(),
+              done(false)
+        {
+        }
 
-        SpinThread() : Runnable(), done(false) {}
-
-        virtual ~SpinThread() {}
+        virtual ~SpinThread()
+        {
+        }
 
         bool done;
 
-        virtual void run() {
-            while (!Thread::currentThread()->isInterrupted());
-            while (!done);
+        virtual void run()
+        {
+            while (!Thread::currentThread()->isInterrupted())
+                ;
+            while (!done)
+                ;
         }
     };
 
-    class RunThread : public Runnable {
+    class RunThread : public Runnable
+    {
     public:
+        RunThread()
+            : Runnable(),
+              didThreadRun(false)
+        {
+        }
 
-        RunThread() : Runnable(), didThreadRun(false) {}
-
-        virtual ~RunThread() {}
+        virtual ~RunThread()
+        {
+        }
 
         bool didThreadRun;
 
-        virtual void run() {
+        virtual void run()
+        {
             didThreadRun = true;
         }
     };
 
-    class YieldThread : public Runnable {
+    class YieldThread : public Runnable
+    {
     private:
-
         volatile int delay;
 
     public:
-
-        virtual void run() {
+        virtual void run()
+        {
             int x = 0;
-            while (true) {
+            while (true)
+            {
                 ++x;
             }
         }
 
-        YieldThread(int d) : delay(0) {
-            if (d >= 0) {
+        YieldThread(int d)
+            : delay(0)
+        {
+            if (d >= 0)
+            {
                 delay = d;
             }
         }
     };
 
-    class Delegate : public Runnable{
+    class Delegate : public Runnable
+    {
     private:
-
         int stuff;
 
     public:
+        Delegate()
+            : stuff(0)
+        {
+        }
 
-        Delegate() : stuff(0) {}
-        virtual ~Delegate(){}
+        virtual ~Delegate()
+        {
+        }
 
-        int getStuff(){
+        int getStuff()
+        {
             return stuff;
         }
 
-        virtual void run(){
+        virtual void run()
+        {
             stuff = 1;
         }
     };
 
-    class Derived : public Thread{
+    class Derived : public Thread
+    {
     private:
-
         int stuff;
 
     public:
+        Derived()
+            : stuff(0)
+        {
+        }
 
-        Derived() : stuff(0) {}
-        virtual ~Derived() {}
+        virtual ~Derived()
+        {
+        }
 
-        int getStuff() {
+        int getStuff()
+        {
             return stuff;
         }
 
-        virtual void run() {
+        virtual void run()
+        {
             stuff = 1;
         }
     };
 
-    class JoinTest : public Thread{
+    class JoinTest : public Thread
+    {
     public:
+        JoinTest()
+        {
+        }
 
-        JoinTest() {}
-        virtual ~JoinTest() {}
+        virtual ~JoinTest()
+        {
+        }
 
-        virtual void run() {
+        virtual void run()
+        {
             Thread::sleep(1000);
         }
     };
 
-    class RandomSleepRun : public Thread{
+    class RandomSleepRun : public Thread
+    {
     private:
-
         static Random rand;
 
     public:
+        RandomSleepRun()
+        {
+        }
 
-        RandomSleepRun() {}
-        virtual ~RandomSleepRun(){}
+        virtual ~RandomSleepRun()
+        {
+        }
 
-        virtual void run() {
+        virtual void run()
+        {
             // Sleep for Random time.
             Thread::sleep(rand.nextInt(2000));
         }
     };
 
-    Random RandomSleepRun::rand( System::currentTimeMillis() );
+    Random RandomSleepRun::rand(System::currentTimeMillis());
 
-    class BadRunnable : public Runnable {
+    class BadRunnable : public Runnable
+    {
     public:
+        BadRunnable()
+        {
+        }
 
-        BadRunnable(){}
-        virtual ~BadRunnable(){}
+        virtual ~BadRunnable()
+        {
+        }
 
-        virtual void run() {
-
+        virtual void run()
+        {
             Thread::sleep(100);
             throw RuntimeException(__FILE__, __LINE__, "Planned");
         }
     };
 
-    class InterruptibleSleeper : public Runnable {
+    class InterruptibleSleeper : public Runnable
+    {
     private:
-
         bool interrupted;
 
     public:
+        InterruptibleSleeper()
+            : Runnable(),
+              interrupted(false)
+        {
+        }
 
-        InterruptibleSleeper() : Runnable(), interrupted(false) {}
+        virtual ~InterruptibleSleeper()
+        {
+        }
 
-        virtual ~InterruptibleSleeper() {}
-
-        virtual void run() {
-
-            try {
+        virtual void run()
+        {
+            try
+            {
                 Thread::sleep(10000);
-            } catch(InterruptedException& ex) {
+            }
+            catch (InterruptedException& ex)
+            {
                 interrupted = true;
             }
         }
 
-        bool wasInterrupted() const {
+        bool wasInterrupted() const
+        {
             return interrupted;
         }
     };
 
-    class InterruptibleJoiner : public Runnable {
+    class InterruptibleJoiner : public Runnable
+    {
     private:
-
-        bool interrupted;
+        bool    interrupted;
         Thread* parent;
 
     private:
-
         InterruptibleJoiner(const InterruptibleJoiner&);
-        InterruptibleJoiner& operator= (const InterruptibleJoiner&);
+        InterruptibleJoiner& operator=(const InterruptibleJoiner&);
 
     public:
+        InterruptibleJoiner(Thread* parent)
+            : Runnable(),
+              interrupted(false),
+              parent(parent)
+        {
+        }
 
-        InterruptibleJoiner(Thread* parent) : Runnable(), interrupted(false), parent(parent) {}
+        virtual ~InterruptibleJoiner()
+        {
+        }
 
-        virtual ~InterruptibleJoiner() {}
-
-        virtual void run() {
-
-            try {
+        virtual void run()
+        {
+            try
+            {
                 parent->join(10000);
-            } catch(InterruptedException& ex) {
+            }
+            catch (InterruptedException& ex)
+            {
                 interrupted = true;
             }
         }
 
-        bool wasInterrupted() const {
+        bool wasInterrupted() const
+        {
             return interrupted;
         }
     };
 
-    class InterruptibleWaiter : public Runnable {
+    class InterruptibleWaiter : public Runnable
+    {
     private:
-
         bool interrupted;
 
     public:
-
         decaf::util::concurrent::Mutex lock;
 
-        InterruptibleWaiter() : Runnable(), interrupted(false), lock() {}
+        InterruptibleWaiter()
+            : Runnable(),
+              interrupted(false),
+              lock()
+        {
+        }
 
-        virtual ~InterruptibleWaiter(){}
+        virtual ~InterruptibleWaiter()
+        {
+        }
 
-        virtual void run() {
-
-            synchronized(&lock) {
-                try {
+        virtual void run()
+        {
+            synchronized(&lock)
+            {
+                try
+                {
                     lock.wait();
-                } catch(InterruptedException& e) {
+                }
+                catch (InterruptedException& e)
+                {
                     interrupted = true;
                 }
             }
         }
 
-        bool wasInterrupted() const {
+        bool wasInterrupted() const
+        {
             return interrupted;
         }
     };
 
-    class Handler : public Thread::UncaughtExceptionHandler {
+    class Handler : public Thread::UncaughtExceptionHandler
+    {
     public:
-
         bool executed;
 
-        Handler() : executed(false) {}
+        Handler()
+            : executed(false)
+        {
+        }
 
-        virtual void uncaughtException(const Thread* t, const Throwable& error) {
+        virtual void uncaughtException(const Thread* t, const Throwable& error)
+        {
             this->executed = true;
         }
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testConstructor) {
-
+TEST_F(ThreadTest, testConstructor)
+{
     Thread ct;
     ct.start();
     ct.join();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testConstructor_1) {
-
-    std::unique_ptr<Runnable> runnable( new SimpleThread( 10 ) );
-    Thread ct( runnable.get() );
+TEST_F(ThreadTest, testConstructor_1)
+{
+    std::unique_ptr<Runnable> runnable(new SimpleThread(10));
+    Thread                    ct(runnable.get());
     ct.start();
     ct.join();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testConstructor_2) {
-
-    std::unique_ptr<Runnable> runnable( new SimpleThread( 10 ) );
-    Thread ct( runnable.get(), "SimpleThread_1" );
+TEST_F(ThreadTest, testConstructor_2)
+{
+    std::unique_ptr<Runnable> runnable(new SimpleThread(10));
+    Thread                    ct(runnable.get(), "SimpleThread_1");
     ASSERT_TRUE(ct.getName() == "SimpleThread_1");
     ct.start();
     ct.join();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testConstructor_3) {
-
-    Thread ct( "SimpleThread_1" );
+TEST_F(ThreadTest, testConstructor_3)
+{
+    Thread ct("SimpleThread_1");
     ASSERT_TRUE(ct.getName() == "SimpleThread_1");
     ct.start();
     ct.join();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testRun) {
-
+TEST_F(ThreadTest, testRun)
+{
     RunThread rt;
-    Thread t(&rt);
+    Thread    t(&rt);
 
-    try {
+    try
+    {
         t.start();
         int count = 0;
-        while (!rt.didThreadRun && count < 20) {
+        while (!rt.didThreadRun && count < 20)
+        {
             Thread::sleep(100);
             count++;
         }
         ASSERT_TRUE(rt.didThreadRun) << ("Thread did not run");
         t.join();
-    } catch(InterruptedException& e) {
+    }
+    catch (InterruptedException& e)
+    {
         FAIL() << ("Joined thread was interrupted");
     }
     ASSERT_TRUE(!t.isAlive()) << ("Joined thread is still alive");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testDelegate){
-
+TEST_F(ThreadTest, testDelegate)
+{
     Delegate test;
-    int initialValue = test.getStuff();
+    int      initialValue = test.getStuff();
 
-    Thread thread( &test );
+    Thread thread(&test);
     thread.start();
     thread.join();
 
@@ -408,10 +519,10 @@ TEST_F(ThreadTest, testDelegate){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testDerived) {
-
+TEST_F(ThreadTest, testDerived)
+{
     Derived test;
-    int initialValue = test.getStuff();
+    int     initialValue = test.getStuff();
 
     test.start();
     test.join();
@@ -424,20 +535,20 @@ TEST_F(ThreadTest, testDerived) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testJoin1) {
-
+TEST_F(ThreadTest, testJoin1)
+{
     JoinTest test;
 
     // Joining a non-started thread should just return.
     ASSERT_NO_THROW(test.join());
-    ASSERT_NO_THROW(test.join( 10 ));
-    ASSERT_NO_THROW(test.join( 10, 10 ));
+    ASSERT_NO_THROW(test.join(10));
+    ASSERT_NO_THROW(test.join(10, 10));
 
     ASSERT_TRUE(!test.isAlive()) << ("Thread is alive");
-    time_t startTime = time( NULL );
+    time_t startTime = time(NULL);
     test.start();
     test.join();
-    time_t endTime = time( NULL );
+    time_t endTime = time(NULL);
     ASSERT_TRUE(!test.isAlive()) << ("Joined Thread is still alive");
 
     time_t delta = endTime - startTime;
@@ -446,24 +557,24 @@ TEST_F(ThreadTest, testJoin1) {
     ASSERT_TRUE(delta >= 1 && delta <= 3);
 
     // Thread should be able to join itself, use a timeout so we don't freeze
-    Thread::currentThread()->join( 5 );
+    Thread::currentThread()->join(5);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testJoin2) {
-
+TEST_F(ThreadTest, testJoin2)
+{
     JoinTest test;
 
     // Joining a non-started thread should just return.
     ASSERT_NO_THROW(test.join());
-    ASSERT_NO_THROW(test.join( 10 ));
-    ASSERT_NO_THROW(test.join( 10, 10 ));
+    ASSERT_NO_THROW(test.join(10));
+    ASSERT_NO_THROW(test.join(10, 10));
 
     ASSERT_TRUE(!test.isAlive()) << ("Thread is alive");
-    time_t startTime = time( NULL );
+    time_t startTime = time(NULL);
     test.start();
-    test.join( 3500, 999999 );
-    time_t endTime = time( NULL );
+    test.join(3500, 999999);
+    time_t endTime = time(NULL);
     ASSERT_TRUE(!test.isAlive()) << ("Joined Thread is still alive");
 
     time_t delta = endTime - startTime;
@@ -472,82 +583,91 @@ TEST_F(ThreadTest, testJoin2) {
     ASSERT_TRUE(delta >= 1 && delta <= 3);
 
     // Thread should be able to join itself, use a timeout so we don't freeze
-    Thread::currentThread()->join( 5 );
+    Thread::currentThread()->join(5);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testJoin3) {
-
+TEST_F(ThreadTest, testJoin3)
+{
     JoinTest test;
 
     // Joining a non-started thread should just return.
     ASSERT_NO_THROW(test.join());
-    ASSERT_NO_THROW(test.join( 10 ));
-    ASSERT_NO_THROW(test.join( 10, 10 ));
+    ASSERT_NO_THROW(test.join(10));
+    ASSERT_NO_THROW(test.join(10, 10));
 
     ASSERT_TRUE(!test.isAlive()) << ("Thread is alive");
     test.start();
-    test.join( 0, 999999 );
+    test.join(0, 999999);
     ASSERT_TRUE(test.isAlive()) << ("Joined Thread is not still alive");
-    test.join( 3500, 999999 );
+    test.join(3500, 999999);
     ASSERT_TRUE(!test.isAlive()) << ("Joined Thread is still alive");
 
     // Thread should be able to join itself, use a timeout so we don't freeze
-    Thread::currentThread()->join( 5 );
+    Thread::currentThread()->join(5);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testJoin4) {
-
+TEST_F(ThreadTest, testJoin4)
+{
     // Start all the threads.
     const unsigned int numThreads = 200;
-    RandomSleepRun threads[numThreads];
-    for( unsigned int ix = 0; ix < numThreads; ++ix ){
+    RandomSleepRun     threads[numThreads];
+    for (unsigned int ix = 0; ix < numThreads; ++ix)
+    {
         threads[ix].start();
     }
 
     // Join them all to ensure they complete as expected
-    for( unsigned int ix = 0; ix < numThreads; ++ix ){
+    for (unsigned int ix = 0; ix < numThreads; ++ix)
+    {
         threads[ix].join();
     }
 
     // Thread should be able to join itself, use a timeout so we don't freeze
-    Thread::currentThread()->join( 5 );
+    Thread::currentThread()->join(5);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testSetPriority) {
-
-    std::unique_ptr<Runnable> runnable( new SimpleThread( 10 ) );
-    Thread ct( runnable.get() );
+TEST_F(ThreadTest, testSetPriority)
+{
+    std::unique_ptr<Runnable> runnable(new SimpleThread(10));
+    Thread                    ct(runnable.get());
     ASSERT_TRUE(ct.getPriority() == Thread::NORM_PRIORITY);
-    ct.setPriority( Thread::MAX_PRIORITY );
+    ct.setPriority(Thread::MAX_PRIORITY);
     ASSERT_TRUE(ct.getPriority() == Thread::MAX_PRIORITY);
     ct.start();
     ct.join();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testIsAlive) {
-
-    std::unique_ptr<SimpleThread> runnable( new SimpleThread( 500 ) );
-    Thread ct( runnable.get() );
+TEST_F(ThreadTest, testIsAlive)
+{
+    std::unique_ptr<SimpleThread> runnable(new SimpleThread(500));
+    Thread                        ct(runnable.get());
 
     ASSERT_TRUE(!ct.isAlive()) << ("A thread that wasn't started is alive.");
 
-    synchronized( &( runnable->lock ) ) {
+    synchronized(&(runnable->lock))
+    {
         ct.start();
-        try {
+        try
+        {
             runnable->lock.wait();
-        } catch( InterruptedException& e ) {
+        }
+        catch (InterruptedException& e)
+        {
         }
     }
 
     ASSERT_TRUE(ct.isAlive()) << ("Started thread returned false");
 
-    try {
+    try
+    {
         ct.join();
-    } catch( InterruptedException& e ) {
+    }
+    catch (InterruptedException& e)
+    {
         FAIL() << ("Thread did not die");
     }
 
@@ -555,72 +675,92 @@ TEST_F(ThreadTest, testIsAlive) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testGetId) {
+TEST_F(ThreadTest, testGetId)
+{
     // Check that the thread ID is valid (not default-constructed)
     ASSERT_TRUE(Thread::currentThread()->getId() != std::thread::id());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testSleep) {
-
+TEST_F(ThreadTest, testSleep)
+{
     long long startTime = 0LL;
-    long long endTime = 0LL;
+    long long endTime   = 0LL;
 
-    try {
+    try
+    {
         startTime = System::currentTimeMillis();
-        Thread::sleep( 1000 );
+        Thread::sleep(1000);
         endTime = System::currentTimeMillis();
-    } catch( InterruptedException& e ) {
+    }
+    catch (InterruptedException& e)
+    {
         FAIL() << ("Unexpected interrupt received");
     }
 
-    ASSERT_TRUE(( endTime - startTime ) >= 800) << ("Failed to sleep long enough");
+    ASSERT_TRUE((endTime - startTime) >= 800)
+        << ("Failed to sleep long enough");
 
-    ASSERT_THROW(Thread::sleep( -1 ), IllegalArgumentException) << ("Should throw an IllegalArgumentException");
+    ASSERT_THROW(Thread::sleep(-1), IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testSleep2Arg) {
-
+TEST_F(ThreadTest, testSleep2Arg)
+{
     long long startTime = 0LL;
-    long long endTime = 0LL;
+    long long endTime   = 0LL;
 
-    try {
+    try
+    {
         startTime = System::currentTimeMillis();
-        Thread::sleep( 1000, 10 );
+        Thread::sleep(1000, 10);
         endTime = System::currentTimeMillis();
-    } catch( InterruptedException& e ) {
+    }
+    catch (InterruptedException& e)
+    {
         FAIL() << ("Unexpected interrupt received");
     }
 
-    ASSERT_TRUE(( endTime - startTime ) >= 800) << ("Failed to sleep long enough");
+    ASSERT_TRUE((endTime - startTime) >= 800)
+        << ("Failed to sleep long enough");
 
-    ASSERT_THROW(Thread::sleep( -1, 0 ), IllegalArgumentException) << ("Should throw an IllegalArgumentException");
+    ASSERT_THROW(Thread::sleep(-1, 0), IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException");
 
-    ASSERT_THROW(Thread::sleep( 1000, 10000000 ), IllegalArgumentException) << ("Should throw an IllegalArgumentException");
+    ASSERT_THROW(Thread::sleep(1000, 10000000), IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testGetState) {
-    std::unique_ptr<SimpleThread> runnable( new SimpleThread( 1000 ) );
-    Thread ct( runnable.get() );
+TEST_F(ThreadTest, testGetState)
+{
+    std::unique_ptr<SimpleThread> runnable(new SimpleThread(1000));
+    Thread                        ct(runnable.get());
 
     ASSERT_TRUE(!ct.isAlive()) << ("A thread that wasn't started is alive.");
 
-    synchronized( &( runnable->lock ) ) {
+    synchronized(&(runnable->lock))
+    {
         ct.start();
-        try {
+        try
+        {
             runnable->lock.wait();
-        } catch( InterruptedException& e ) {
+        }
+        catch (InterruptedException& e)
+        {
         }
     }
 
     ASSERT_TRUE(ct.isAlive()) << ("Started thread returned false");
     ASSERT_TRUE(ct.getState() == Thread::TIMED_WAITING);
 
-    try {
+    try
+    {
         ct.join();
-    } catch( InterruptedException& e ) {
+    }
+    catch (InterruptedException& e)
+    {
         FAIL() << ("Thread did not die");
     }
 
@@ -629,20 +769,20 @@ TEST_F(ThreadTest, testGetState) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testUncaughtExceptionHandler) {
-
-    std::unique_ptr<BadRunnable> runnable( new BadRunnable() );
-    Thread t1( runnable.get() );
-    Handler myHandler;
+TEST_F(ThreadTest, testUncaughtExceptionHandler)
+{
+    std::unique_ptr<BadRunnable> runnable(new BadRunnable());
+    Thread                       t1(runnable.get());
+    Handler                      myHandler;
 
     t1.start();
     t1.join();
 
-    Thread t2( runnable.get() );
+    Thread t2(runnable.get());
 
     ASSERT_TRUE(myHandler.executed == false);
     ASSERT_TRUE(t2.getUncaughtExceptionHandler() == NULL);
-    t2.setUncaughtExceptionHandler( &myHandler );
+    t2.setUncaughtExceptionHandler(&myHandler);
     ASSERT_TRUE(t2.getUncaughtExceptionHandler() == &myHandler);
 
     t2.start();
@@ -652,29 +792,36 @@ TEST_F(ThreadTest, testUncaughtExceptionHandler) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testCurrentThread) {
-
+TEST_F(ThreadTest, testCurrentThread)
+{
     ASSERT_TRUE(Thread::currentThread() != NULL);
     ASSERT_TRUE(Thread::currentThread()->getName() != "");
-    ASSERT_TRUE(Thread::currentThread()->getPriority() == Thread::NORM_PRIORITY);
+    ASSERT_TRUE(Thread::currentThread()->getPriority() ==
+                Thread::NORM_PRIORITY);
     ASSERT_TRUE(Thread::currentThread()->getState() == Thread::RUNNABLE);
 
     ASSERT_TRUE(Thread::currentThread() == Thread::currentThread());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testInterrupt) {
-
+TEST_F(ThreadTest, testInterrupt)
+{
     bool interrupted = false;
-    try {
+    try
+    {
         ChildThread1 ct(Thread::currentThread(), false);
-        synchronized(&ct.lock) {
+        synchronized(&ct.lock)
+        {
             ct.start();
             ct.lock.wait();
         }
-    } catch(InterruptedException& e) {
+    }
+    catch (InterruptedException& e)
+    {
         interrupted = true;
-    } catch(Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         ex.printStackTrace();
         FAIL() << ("Caught unexpected message.");
     }
@@ -682,17 +829,23 @@ TEST_F(ThreadTest, testInterrupt) {
     ASSERT_TRUE(interrupted) << ("Failed to Interrupt thread1");
 
     interrupted = false;
-    try {
+    try
+    {
         ChildThread1 ct(Thread::currentThread(), true);
-        synchronized(&ct.lock) {
+        synchronized(&ct.lock)
+        {
             ct.start();
             ct.lock.wait();
             ct.lock.notify();
         }
         Thread::sleep(20000);
-    } catch(InterruptedException& e) {
+    }
+    catch (InterruptedException& e)
+    {
         interrupted = true;
-    } catch(Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         ex.printStackTrace();
         FAIL() << ("Caught unexpected message.");
     }
@@ -700,28 +853,35 @@ TEST_F(ThreadTest, testInterrupt) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testInterrupted) {
-
-    ASSERT_TRUE(!Thread::interrupted()) << ("Interrupted returned true for non-interrupted thread");
+TEST_F(ThreadTest, testInterrupted)
+{
+    ASSERT_TRUE(!Thread::interrupted())
+        << ("Interrupted returned true for non-interrupted thread");
     Thread::currentThread()->interrupt();
-    ASSERT_TRUE(Thread::interrupted()) << ("Interrupted returned true for non-interrupted thread");
+    ASSERT_TRUE(Thread::interrupted())
+        << ("Interrupted returned true for non-interrupted thread");
     ASSERT_TRUE(!Thread::interrupted()) << ("Failed to clear interrupted flag");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testIsInterrupted) {
-
+TEST_F(ThreadTest, testIsInterrupted)
+{
     SpinThread spin;
-    Thread spinner(&spin);
+    Thread     spinner(&spin);
     spinner.start();
     Thread::sleep(100);
 
-    try {
-        ASSERT_TRUE(!spinner.isInterrupted()) << ("Non-Interrupted thread returned true");
+    try
+    {
+        ASSERT_TRUE(!spinner.isInterrupted())
+            << ("Non-Interrupted thread returned true");
         spinner.interrupt();
-        ASSERT_TRUE(spinner.isInterrupted()) << ("Interrupted thread returned false");
+        ASSERT_TRUE(spinner.isInterrupted())
+            << ("Interrupted thread returned false");
         spin.done = true;
-    } catch(...) {
+    }
+    catch (...)
+    {
         spinner.interrupt();
         spin.done = true;
     }
@@ -730,37 +890,47 @@ TEST_F(ThreadTest, testIsInterrupted) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testSetName) {
-
+TEST_F(ThreadTest, testSetName)
+{
     JoinTest st;
     st.setName("Bogus Name");
-    ASSERT_EQ(std::string("Bogus Name"), st.getName()) << ("Failed to set thread name");
+    ASSERT_EQ(std::string("Bogus Name"), st.getName())
+        << ("Failed to set thread name");
     st.setName("Another Bogus Name");
-    ASSERT_EQ(std::string("Another Bogus Name"), st.getName()) << ("Failed to set thread name");
+    ASSERT_EQ(std::string("Another Bogus Name"), st.getName())
+        << ("Failed to set thread name");
     st.start();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testInterruptSleep) {
-
+TEST_F(ThreadTest, testInterruptSleep)
+{
     std::unique_ptr<InterruptibleSleeper> runnable(new InterruptibleSleeper());
-    Thread ct( runnable.get() );
+    Thread                                ct(runnable.get());
     ct.start();
 
-    for(int i = 0; i < 10; ++i) {
-        if (ct.getState() == Thread::SLEEPING) {
+    for (int i = 0; i < 10; ++i)
+    {
+        if (ct.getState() == Thread::SLEEPING)
+        {
             break;
-        } else {
+        }
+        else
+        {
             Thread::sleep(10);
         }
     }
     ASSERT_TRUE(ct.getState() == Thread::SLEEPING);
 
     ct.interrupt();
-    for(int i = 0; i < 10; ++i) {
-        if (runnable->wasInterrupted()) {
+    for (int i = 0; i < 10; ++i)
+    {
+        if (runnable->wasInterrupted())
+        {
             break;
-        } else {
+        }
+        else
+        {
             Thread::sleep(10);
         }
     }
@@ -770,26 +940,35 @@ TEST_F(ThreadTest, testInterruptSleep) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testInterruptJoin) {
-
-    std::unique_ptr<InterruptibleJoiner> runnable(new InterruptibleJoiner(Thread::currentThread()));
-    Thread ct( runnable.get() );
+TEST_F(ThreadTest, testInterruptJoin)
+{
+    std::unique_ptr<InterruptibleJoiner> runnable(
+        new InterruptibleJoiner(Thread::currentThread()));
+    Thread ct(runnable.get());
     ct.start();
 
-    for(int i = 0; i < 10; ++i) {
-        if (ct.getState() == Thread::SLEEPING) {
+    for (int i = 0; i < 10; ++i)
+    {
+        if (ct.getState() == Thread::SLEEPING)
+        {
             break;
-        } else {
+        }
+        else
+        {
             Thread::sleep(10);
         }
     }
     ASSERT_TRUE(ct.getState() == Thread::SLEEPING);
 
     ct.interrupt();
-    for(int i = 0; i < 10; ++i) {
-        if (runnable->wasInterrupted()) {
+    for (int i = 0; i < 10; ++i)
+    {
+        if (runnable->wasInterrupted())
+        {
             break;
-        } else {
+        }
+        else
+        {
             Thread::sleep(10);
         }
     }
@@ -799,26 +978,34 @@ TEST_F(ThreadTest, testInterruptJoin) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testInterruptWait) {
-
+TEST_F(ThreadTest, testInterruptWait)
+{
     std::unique_ptr<InterruptibleWaiter> runnable(new InterruptibleWaiter());
-    Thread ct( runnable.get() );
+    Thread                               ct(runnable.get());
     ct.start();
 
-    for(int i = 0; i < 10; ++i) {
-        if (ct.getState() == Thread::WAITING) {
+    for (int i = 0; i < 10; ++i)
+    {
+        if (ct.getState() == Thread::WAITING)
+        {
             break;
-        } else {
+        }
+        else
+        {
             Thread::sleep(10);
         }
     }
     ASSERT_TRUE(ct.getState() == Thread::WAITING);
 
     ct.interrupt();
-    for(int i = 0; i < 10; ++i) {
-        if (runnable->wasInterrupted()) {
+    for (int i = 0; i < 10; ++i)
+    {
+        if (runnable->wasInterrupted())
+        {
             break;
-        } else {
+        }
+        else
+        {
             Thread::sleep(10);
         }
     }
@@ -828,9 +1015,10 @@ TEST_F(ThreadTest, testInterruptWait) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testRapidCreateAndDestroy) {
-
-    for (int i = 0; i < 200; i++) {
+TEST_F(ThreadTest, testRapidCreateAndDestroy)
+{
+    for (int i = 0; i < 200; i++)
+    {
         JoinTest* st = new JoinTest;
         st->start();
         delete st;
@@ -838,57 +1026,75 @@ TEST_F(ThreadTest, testRapidCreateAndDestroy) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class QuickThread : public Thread{
-    public:
+class QuickThread : public Thread
+{
+public:
+    QuickThread()
+    {
+    }
 
-        QuickThread() {}
-        virtual ~QuickThread() {}
+    virtual ~QuickThread()
+    {
+    }
 
-        virtual void run() {
-            Thread::sleep(10);
+    virtual void run()
+    {
+        Thread::sleep(10);
+    }
+};
+
+class RapidCreateDestoryThread : public Thread
+{
+public:
+    RapidCreateDestoryThread()
+    {
+    }
+
+    virtual ~RapidCreateDestoryThread()
+    {
+    }
+
+    virtual void run()
+    {
+        for (int i = 0; i < 500; i++)
+        {
+            QuickThread* t = new QuickThread;
+            t->start();
+            delete t;
         }
-    };
-
-    class RapidCreateDestoryThread : public Thread{
-    public:
-
-        RapidCreateDestoryThread(){}
-        virtual ~RapidCreateDestoryThread(){}
-
-        virtual void run() {
-            for (int i = 0; i < 500; i++) {
-                QuickThread* t = new QuickThread;
-                t->start();
-                delete t;
-            }
-        }
-    };
-}
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testConcurrentRapidCreateAndDestroy) {
-
+TEST_F(ThreadTest, testConcurrentRapidCreateAndDestroy)
+{
     ArrayList<Thread*> threads;
-    const int NUM_THREADS = 32;
+    const int          NUM_THREADS = 32;
 
-    for (int i = 0; i < NUM_THREADS; ++i) {
+    for (int i = 0; i < NUM_THREADS; ++i)
+    {
         threads.add(new RapidCreateDestoryThread);
     }
 
-    Pointer<Iterator<Thread*> > threadsIter(threads.iterator());
-    while (threadsIter->hasNext()) {
+    Pointer<Iterator<Thread*>> threadsIter(threads.iterator());
+    while (threadsIter->hasNext())
+    {
         threadsIter->next()->start();
     }
 
     threadsIter.reset(threads.iterator());
-    while (threadsIter->hasNext()) {
+    while (threadsIter->hasNext())
+    {
         threadsIter->next()->join();
     }
 
     threadsIter.reset(threads.iterator());
-    while (threadsIter->hasNext()) {
+    while (threadsIter->hasNext())
+    {
         delete threadsIter->next();
     }
 
@@ -896,19 +1102,21 @@ TEST_F(ThreadTest, testConcurrentRapidCreateAndDestroy) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadTest, testCreatedButNotStarted) {
-
+TEST_F(ThreadTest, testCreatedButNotStarted)
+{
     RunThread runnable;
 
     ArrayList<Thread*> threads;
-    const int NUM_THREADS = 32;
+    const int          NUM_THREADS = 32;
 
-    for (int i = 0; i < NUM_THREADS; ++i) {
+    for (int i = 0; i < NUM_THREADS; ++i)
+    {
         threads.add(new Thread(&runnable));
     }
 
-    Pointer<Iterator<Thread*> > threadsIter(threads.iterator());
-    while (threadsIter->hasNext()) {
+    Pointer<Iterator<Thread*>> threadsIter(threads.iterator());
+    while (threadsIter->hasNext())
+    {
         delete threadsIter->next();
     }
 

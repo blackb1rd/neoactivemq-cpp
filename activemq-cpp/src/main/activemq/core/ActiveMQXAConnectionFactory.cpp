@@ -23,50 +23,60 @@ using namespace activemq;
 using namespace activemq::core;
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::XAConnectionFactory* cms::XAConnectionFactory::createCMSXAConnectionFactory( const std::string& brokerURI ) {
-    return new ActiveMQXAConnectionFactory( brokerURI );
+cms::XAConnectionFactory* cms::XAConnectionFactory::createCMSXAConnectionFactory(
+    const std::string& brokerURI)
+{
+    return new ActiveMQXAConnectionFactory(brokerURI);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQXAConnectionFactory::ActiveMQXAConnectionFactory() :
-    ActiveMQConnectionFactory() {
+ActiveMQXAConnectionFactory::ActiveMQXAConnectionFactory()
+    : ActiveMQConnectionFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQXAConnectionFactory::ActiveMQXAConnectionFactory( const std::string& uri,
-                                                          const std::string& username,
-                                                          const std::string& password ) :
-    ActiveMQConnectionFactory( uri, username, password ) {
-
+ActiveMQXAConnectionFactory::ActiveMQXAConnectionFactory(
+    const std::string& uri,
+    const std::string& username,
+    const std::string& password)
+    : ActiveMQConnectionFactory(uri, username, password)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQXAConnectionFactory::ActiveMQXAConnectionFactory( const decaf::net::URI& uri,
-                                                          const std::string& username,
-                                                          const std::string& password ) :
-    ActiveMQConnectionFactory( uri, username, password ) {
-
+ActiveMQXAConnectionFactory::ActiveMQXAConnectionFactory(
+    const decaf::net::URI& uri,
+    const std::string&     username,
+    const std::string&     password)
+    : ActiveMQConnectionFactory(uri, username, password)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQXAConnectionFactory::~ActiveMQXAConnectionFactory() {
+ActiveMQXAConnectionFactory::~ActiveMQXAConnectionFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::XAConnection* ActiveMQXAConnectionFactory::createXAConnection() {
-    return dynamic_cast<cms::XAConnection*>( createConnection() );
+cms::XAConnection* ActiveMQXAConnectionFactory::createXAConnection()
+{
+    return dynamic_cast<cms::XAConnection*>(createConnection());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::XAConnection* ActiveMQXAConnectionFactory::createXAConnection( const std::string& userName,
-                                                                    const std::string& password ) {
-    return dynamic_cast<cms::XAConnection*>( createConnection( userName, password ) );
+cms::XAConnection* ActiveMQXAConnectionFactory::createXAConnection(
+    const std::string& userName,
+    const std::string& password)
+{
+    return dynamic_cast<cms::XAConnection*>(
+        createConnection(userName, password));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQConnection* ActiveMQXAConnectionFactory::createActiveMQConnection(
-    const Pointer<transport::Transport>& transport,
-    const Pointer<decaf::util::Properties>& properties ) {
-
-    return new ActiveMQXAConnection( transport, properties );
+    const Pointer<transport::Transport>&    transport,
+    const Pointer<decaf::util::Properties>& properties)
+{
+    return new ActiveMQXAConnection(transport, properties);
 }

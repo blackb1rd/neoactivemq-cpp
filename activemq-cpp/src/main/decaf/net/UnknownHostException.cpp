@@ -22,26 +22,38 @@ using namespace decaf::net;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-UnknownHostException::UnknownHostException() : io::IOException() {
+UnknownHostException::UnknownHostException()
+    : io::IOException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnknownHostException::~UnknownHostException() throw() {
+UnknownHostException::~UnknownHostException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnknownHostException::UnknownHostException(const Exception& ex) : io::IOException() {
-    *(Exception*) this = ex;
+UnknownHostException::UnknownHostException(const Exception& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnknownHostException::UnknownHostException(const UnknownHostException& ex) : io::IOException() {
-    *(Exception*) this = ex;
+UnknownHostException::UnknownHostException(const UnknownHostException& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnknownHostException::UnknownHostException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : io::IOException(cause) {
-
+UnknownHostException::UnknownHostException(const char*           file,
+                                           const int             lineNumber,
+                                           const std::exception* cause,
+                                           const char*           msg,
+                                           ...)
+    : io::IOException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -51,12 +63,18 @@ UnknownHostException::UnknownHostException(const char* file, const int lineNumbe
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnknownHostException::UnknownHostException(const std::exception* cause) : io::IOException(cause) {
+UnknownHostException::UnknownHostException(const std::exception* cause)
+    : io::IOException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnknownHostException::UnknownHostException(const char* file, const int lineNumber, const char* msg, ...) : io::IOException() {
-
+UnknownHostException::UnknownHostException(const char* file,
+                                           const int   lineNumber,
+                                           const char* msg,
+                                           ...)
+    : io::IOException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

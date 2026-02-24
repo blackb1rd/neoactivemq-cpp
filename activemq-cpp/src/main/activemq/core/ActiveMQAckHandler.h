@@ -19,11 +19,15 @@
 
 #include <activemq/util/Config.h>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
     class Message;
-}
-namespace core {
+}  // namespace commands
+
+namespace core
+{
 
     /**
      * Interface class that is used to give CMS Messages an interface to
@@ -31,24 +35,25 @@ namespace core {
      *
      * @since 2.0
      */
-    class AMQCPP_API ActiveMQAckHandler {
+    class AMQCPP_API ActiveMQAckHandler
+    {
     public:
-
         virtual ~ActiveMQAckHandler();
 
         /**
-         * Method called to acknowledge the message once it has been received by a
-         * MessageConsumer.
+         * Method called to acknowledge the message once it has been received by
+         * a MessageConsumer.
          *
          * @param message
          *      The Message to Acknowledge.
          *
-         * @throw CMSException if an error occurs while acknowledging the given Message.
+         * @throw CMSException if an error occurs while acknowledging the given
+         * Message.
          */
         virtual void acknowledgeMessage(const commands::Message* message) = 0;
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CORE_ACTIVEMQACKHANDLER_H_*/

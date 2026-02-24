@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/ActiveMQDestination.h>
@@ -34,8 +34,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -48,45 +50,41 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API ConsumerInfo : public BaseCommand {
+    class AMQCPP_API ConsumerInfo : public BaseCommand
+    {
     protected:
-
-        Pointer<ConsumerId> consumerId;
-        bool browser;
-        Pointer<ActiveMQDestination> destination;
-        int prefetchSize;
-        int maximumPendingMessageLimit;
-        bool dispatchAsync;
-        std::string selector;
-        std::string clientId;
-        std::string subscriptionName;
-        bool noLocal;
-        bool exclusive;
-        bool retroactive;
-        unsigned char priority;
-        std::vector< decaf::lang::Pointer<BrokerId> > brokerPath;
-        Pointer<BooleanExpression> additionalPredicate;
-        bool networkSubscription;
-        bool optimizedAcknowledge;
-        bool noRangeAcks;
-        std::vector< decaf::lang::Pointer<ConsumerId> > networkConsumerPath;
+        Pointer<ConsumerId>                         consumerId;
+        bool                                        browser;
+        Pointer<ActiveMQDestination>                destination;
+        int                                         prefetchSize;
+        int                                         maximumPendingMessageLimit;
+        bool                                        dispatchAsync;
+        std::string                                 selector;
+        std::string                                 clientId;
+        std::string                                 subscriptionName;
+        bool                                        noLocal;
+        bool                                        exclusive;
+        bool                                        retroactive;
+        unsigned char                               priority;
+        std::vector<decaf::lang::Pointer<BrokerId>> brokerPath;
+        Pointer<BooleanExpression>                  additionalPredicate;
+        bool                                        networkSubscription;
+        bool                                        optimizedAcknowledge;
+        bool                                        noRangeAcks;
+        std::vector<decaf::lang::Pointer<ConsumerId>> networkConsumerPath;
 
     public:
-
         const static unsigned char ID_CONSUMERINFO = 5;
 
     private:
-
         // Prefetch size that is controlled by the Broker.
         int currentPrefetchSize;
 
     private:
-
         ConsumerInfo(const ConsumerInfo&);
-        ConsumerInfo& operator= (const ConsumerInfo&);
+        ConsumerInfo& operator=(const ConsumerInfo&);
 
     public:
-
         ConsumerInfo();
 
         virtual ~ConsumerInfo();
@@ -103,44 +101,48 @@ namespace commands {
 
         Pointer<RemoveInfo> createRemoveCommand() const;
 
-        int getCurrentPrefetchSize() const {
+        int getCurrentPrefetchSize() const
+        {
             return this->currentPrefetchSize;
         }
 
-        void setCurrentPrefetchSize(int currentPrefetchSize) {
+        void setCurrentPrefetchSize(int currentPrefetchSize)
+        {
             this->currentPrefetchSize = currentPrefetchSize;
         }
 
         virtual const Pointer<ConsumerId>& getConsumerId() const;
-        virtual Pointer<ConsumerId>& getConsumerId();
+        virtual Pointer<ConsumerId>&       getConsumerId();
         virtual void setConsumerId(const Pointer<ConsumerId>& consumerId);
 
         virtual bool isBrowser() const;
         virtual void setBrowser(bool browser);
 
         virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>& getDestination();
-        virtual void setDestination(const Pointer<ActiveMQDestination>& destination);
+        virtual Pointer<ActiveMQDestination>&       getDestination();
+        virtual void                                setDestination(
+                                           const Pointer<ActiveMQDestination>& destination);
 
-        virtual int getPrefetchSize() const;
+        virtual int  getPrefetchSize() const;
         virtual void setPrefetchSize(int prefetchSize);
 
-        virtual int getMaximumPendingMessageLimit() const;
-        virtual void setMaximumPendingMessageLimit(int maximumPendingMessageLimit);
+        virtual int  getMaximumPendingMessageLimit() const;
+        virtual void setMaximumPendingMessageLimit(
+            int maximumPendingMessageLimit);
 
         virtual bool isDispatchAsync() const;
         virtual void setDispatchAsync(bool dispatchAsync);
 
         virtual const std::string& getSelector() const;
-        virtual std::string& getSelector();
-        virtual void setSelector(const std::string& selector);
+        virtual std::string&       getSelector();
+        virtual void               setSelector(const std::string& selector);
 
         virtual const std::string& getClientId() const;
-        virtual std::string& getClientId();
-        virtual void setClientId(const std::string& clientId);
+        virtual std::string&       getClientId();
+        virtual void               setClientId(const std::string& clientId);
 
         virtual const std::string& getSubscriptionName() const;
-        virtual std::string& getSubscriptionName();
+        virtual std::string&       getSubscriptionName();
         virtual void setSubscriptionName(const std::string& subscriptionName);
 
         virtual bool isNoLocal() const;
@@ -153,15 +155,18 @@ namespace commands {
         virtual void setRetroactive(bool retroactive);
 
         virtual unsigned char getPriority() const;
-        virtual void setPriority(unsigned char priority);
+        virtual void          setPriority(unsigned char priority);
 
-        virtual const std::vector< decaf::lang::Pointer<BrokerId> >& getBrokerPath() const;
-        virtual std::vector< decaf::lang::Pointer<BrokerId> >& getBrokerPath();
-        virtual void setBrokerPath(const std::vector< decaf::lang::Pointer<BrokerId> >& brokerPath);
+        virtual const std::vector<decaf::lang::Pointer<BrokerId>>&
+        getBrokerPath() const;
+        virtual std::vector<decaf::lang::Pointer<BrokerId>>& getBrokerPath();
+        virtual void                                         setBrokerPath(
+                                                    const std::vector<decaf::lang::Pointer<BrokerId>>& brokerPath);
 
         virtual const Pointer<BooleanExpression>& getAdditionalPredicate() const;
         virtual Pointer<BooleanExpression>& getAdditionalPredicate();
-        virtual void setAdditionalPredicate(const Pointer<BooleanExpression>& additionalPredicate);
+        virtual void                        setAdditionalPredicate(
+                                   const Pointer<BooleanExpression>& additionalPredicate);
 
         virtual bool isNetworkSubscription() const;
         virtual void setNetworkSubscription(bool networkSubscription);
@@ -172,21 +177,26 @@ namespace commands {
         virtual bool isNoRangeAcks() const;
         virtual void setNoRangeAcks(bool noRangeAcks);
 
-        virtual const std::vector< decaf::lang::Pointer<ConsumerId> >& getNetworkConsumerPath() const;
-        virtual std::vector< decaf::lang::Pointer<ConsumerId> >& getNetworkConsumerPath();
-        virtual void setNetworkConsumerPath(const std::vector< decaf::lang::Pointer<ConsumerId> >& networkConsumerPath);
+        virtual const std::vector<decaf::lang::Pointer<ConsumerId>>&
+        getNetworkConsumerPath() const;
+        virtual std::vector<decaf::lang::Pointer<ConsumerId>>&
+                     getNetworkConsumerPath();
+        virtual void setNetworkConsumerPath(
+            const std::vector<decaf::lang::Pointer<ConsumerId>>&
+                networkConsumerPath);
 
         /**
          * @return an answer of true to the isConsumerInfo() query.
          */
-        virtual bool isConsumerInfo() const {
+        virtual bool isConsumerInfo() const
+        {
             return true;
         }
 
         virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_CONSUMERINFO_H_*/

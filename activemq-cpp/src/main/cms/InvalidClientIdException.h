@@ -18,37 +18,40 @@
 #ifndef _CMS_INVALICLIENTIDEXCEPTION_H_
 #define _CMS_INVALICLIENTIDEXCEPTION_H_
 
-#include <cms/Config.h>
 #include <cms/CMSException.h>
+#include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
 
-    /**
-     * This exception must be thrown when a client attempts to set a connection's
-     * client ID to a value that is rejected by a provider.
-     *
-     * @since 1.3
-     */
-    class CMS_API InvalidClientIdException : public CMSException {
-    public:
+/**
+ * This exception must be thrown when a client attempts to set a connection's
+ * client ID to a value that is rejected by a provider.
+ *
+ * @since 1.3
+ */
+class CMS_API InvalidClientIdException : public CMSException
+{
+public:
+    InvalidClientIdException();
 
-        InvalidClientIdException();
+    InvalidClientIdException(const InvalidClientIdException& ex);
 
-        InvalidClientIdException(const InvalidClientIdException& ex);
+    InvalidClientIdException(const std::string& message);
 
-        InvalidClientIdException(const std::string& message);
+    InvalidClientIdException(const std::string&    message,
+                             const std::exception* cause);
 
-        InvalidClientIdException(const std::string& message, const std::exception* cause);
+    InvalidClientIdException(
+        const std::string&                              message,
+        const std::exception*                           cause,
+        const std::vector<std::pair<std::string, int>>& stackTrace);
 
-        InvalidClientIdException(const std::string& message, const std::exception* cause,
-                                 const std::vector<std::pair<std::string, int> >& stackTrace);
+    virtual ~InvalidClientIdException() throw();
 
-        virtual ~InvalidClientIdException() throw();
+    virtual InvalidClientIdException* clone();
+};
 
-        virtual InvalidClientIdException* clone();
-
-    };
-
-}
+}  // namespace cms
 
 #endif /*_CMS_INVALICLIENTIDEXCEPTION_H_*/

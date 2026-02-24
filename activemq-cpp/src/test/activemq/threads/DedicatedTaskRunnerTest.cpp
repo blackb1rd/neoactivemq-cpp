@@ -19,8 +19,8 @@
 
 #include <memory>
 
-#include <activemq/threads/Task.h>
 #include <activemq/threads/DedicatedTaskRunner.h>
+#include <activemq/threads/Task.h>
 
 #include <decaf/lang/Thread.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
@@ -30,77 +30,97 @@ using namespace activemq::threads;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-class DedicatedTaskRunnerTest : public ::testing::Test {};
-
-
-////////////////////////////////////////////////////////////////////////////////
-namespace {
-
-    class SimpleCountingTask : public Task {
-    private:
-
-        unsigned int count;
-
-    public:
-
-        SimpleCountingTask() : count(0) {}
-        virtual ~SimpleCountingTask() {}
-
-        virtual bool iterate() {
-
-            count++;
-            return false;
-        }
-
-        unsigned int getCount() const { return count; }
-    };
-
-    class InfiniteCountingTask : public Task {
-    private:
-
-        unsigned int count;
-
-    public:
-
-        InfiniteCountingTask() : count(0) {}
-        virtual ~InfiniteCountingTask() {}
-
-        virtual bool iterate() {
-
-            count++;
-            return true;
-        }
-
-        unsigned int getCount() const { return count; }
-    };
-}
+class DedicatedTaskRunnerTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(DedicatedTaskRunnerTest, testSimple) {
+namespace
+{
 
-    ASSERT_THROW(std::unique_ptr<TaskRunner>( new DedicatedTaskRunner( NULL ) ), NullPointerException) << ("Should throw a NullPointerException");
+class SimpleCountingTask : public Task
+{
+private:
+    unsigned int count;
+
+public:
+    SimpleCountingTask()
+        : count(0)
+    {
+    }
+
+    virtual ~SimpleCountingTask()
+    {
+    }
+
+    virtual bool iterate()
+    {
+        count++;
+        return false;
+    }
+
+    unsigned int getCount() const
+    {
+        return count;
+    }
+};
+
+class InfiniteCountingTask : public Task
+{
+private:
+    unsigned int count;
+
+public:
+    InfiniteCountingTask()
+        : count(0)
+    {
+    }
+
+    virtual ~InfiniteCountingTask()
+    {
+    }
+
+    virtual bool iterate()
+    {
+        count++;
+        return true;
+    }
+
+    unsigned int getCount() const
+    {
+        return count;
+    }
+};
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(DedicatedTaskRunnerTest, testSimple)
+{
+    ASSERT_THROW(std::unique_ptr<TaskRunner>(new DedicatedTaskRunner(NULL)),
+                 NullPointerException)
+        << ("Should throw a NullPointerException");
 
     SimpleCountingTask simpleTask;
     ASSERT_TRUE(simpleTask.getCount() == 0);
-    DedicatedTaskRunner simpleTaskRunner( &simpleTask );
+    DedicatedTaskRunner simpleTaskRunner(&simpleTask);
 
     simpleTaskRunner.start();
 
     simpleTaskRunner.wakeup();
-    Thread::sleep( 250 );
+    Thread::sleep(250);
     ASSERT_TRUE(simpleTask.getCount() >= 1);
     simpleTaskRunner.wakeup();
-    Thread::sleep( 250 );
+    Thread::sleep(250);
     ASSERT_TRUE(simpleTask.getCount() >= 2);
 
     InfiniteCountingTask infiniteTask;
     ASSERT_TRUE(infiniteTask.getCount() == 0);
-    DedicatedTaskRunner infiniteTaskRunner( &infiniteTask );
+    DedicatedTaskRunner infiniteTaskRunner(&infiniteTask);
     infiniteTaskRunner.start();
-    Thread::sleep( 500 );
+    Thread::sleep(500);
     ASSERT_TRUE(infiniteTask.getCount() != 0);
     infiniteTaskRunner.shutdown();
     unsigned int count = infiniteTask.getCount();
-    Thread::sleep( 250 );
+    Thread::sleep(250);
     ASSERT_TRUE(infiniteTask.getCount() == count);
 }

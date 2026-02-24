@@ -18,43 +18,44 @@
 #ifndef _ACTIVEMQ_THREADS_DEDICATEDTASKRUNNER_H_
 #define _ACTIVEMQ_THREADS_DEDICATEDTASKRUNNER_H_
 
-#include <activemq/util/Config.h>
-#include <activemq/threads/TaskRunner.h>
 #include <activemq/threads/Task.h>
+#include <activemq/threads/TaskRunner.h>
+#include <activemq/util/Config.h>
 
-#include <decaf/lang/Thread.h>
-#include <decaf/lang/Runnable.h>
-#include <decaf/util/concurrent/Mutex.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/lang/Runnable.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/util/concurrent/Mutex.h>
 #include <atomic>
 
-namespace activemq {
-namespace threads {
+namespace activemq
+{
+namespace threads
+{
 
-    enum class DedicatedTaskRunnerState : int {
-        RUNNING = 0,
+    enum class DedicatedTaskRunnerState : int
+    {
+        RUNNING  = 0,
         STOPPING = 1,
-        STOPPED = 2
+        STOPPED  = 2
     };
 
     class AMQCPP_API DedicatedTaskRunner : public TaskRunner,
-                                           public decaf::lang::Runnable {
+                                           public decaf::lang::Runnable
+    {
     private:
-
-        mutable decaf::util::concurrent::Mutex mutex;
+        mutable decaf::util::concurrent::Mutex    mutex;
         decaf::lang::Pointer<decaf::lang::Thread> thread;
 
         std::atomic<DedicatedTaskRunnerState> state;
-        std::atomic<bool> pending;
-        Task* task;
+        std::atomic<bool>                     pending;
+        Task*                                 task;
 
     private:
-
         DedicatedTaskRunner(const DedicatedTaskRunner&);
         DedicatedTaskRunner& operator=(const DedicatedTaskRunner&);
 
     public:
-
         DedicatedTaskRunner(Task* task);
         virtual ~DedicatedTaskRunner();
 
@@ -71,23 +72,23 @@ namespace threads {
         virtual void shutdown(long long timeout);
 
         /**
-         * Shutdown once the task has finished and the TaskRunner's thread has exited.
+         * Shutdown once the task has finished and the TaskRunner's thread has
+         * exited.
          */
         virtual void shutdown();
 
         /**
-         * Signal the TaskRunner to wakeup and execute another iteration cycle on
-         * the task, the Task instance will be run until its iterate method has
-         * returned false indicating it is done.
+         * Signal the TaskRunner to wakeup and execute another iteration cycle
+         * on the task, the Task instance will be run until its iterate method
+         * has returned false indicating it is done.
          */
         virtual void wakeup();
 
     protected:
-
         virtual void run();
-
     };
 
-}}
+}  // namespace threads
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_THREADS_DEDICATEDTASKRUNNER_H_*/

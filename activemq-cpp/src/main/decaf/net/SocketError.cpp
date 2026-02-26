@@ -26,7 +26,8 @@ using namespace decaf;
 using namespace decaf::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-int SocketError::getErrorCode() {
+int SocketError::getErrorCode()
+{
     // std::system_category maps to WSAGetLastError() on Windows and errno on
     // POSIX, giving us a portable way to retrieve the last socket error.
     return errno;

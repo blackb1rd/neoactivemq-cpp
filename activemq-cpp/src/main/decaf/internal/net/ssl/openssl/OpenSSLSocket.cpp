@@ -840,8 +840,13 @@ int OpenSSLSocket::read(unsigned char* buffer, int size, int offset, int length)
                 if (errCode != 0)
                 {
                     ERR_error_string_n(errCode, errStr, sizeof(errStr));
-                } else {
-                    snprintf(errStr, sizeof(errStr), "SSL_ERROR_SYSCALL errno=%d", errno);
+                }
+                else
+                {
+                    snprintf(errStr,
+                             sizeof(errStr),
+                             "SSL_ERROR_SYSCALL errno=%d",
+                             errno);
                 }
                 AMQ_LOG_ERROR("OpenSSLSocket", "SSL read failed: " << errStr);
                 throw OpenSSLSocketException(__FILE__, __LINE__, errStr);

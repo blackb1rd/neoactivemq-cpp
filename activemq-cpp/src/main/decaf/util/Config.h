@@ -132,15 +132,15 @@
 #endif
 #include <windows.h>
 
-            /*
-             * Add a _very_few_ declarations missing from the restricted set of headers
-             * (If this list becomes extensive, re-enable the required headers above!)
-             *
-             * Winsock headers (winsock2.h, ws2tcpip.h, mswsock.h) are NOT included
-             * here — ASIO manages all socket operations and includes them internally.
-             */
-            #define SW_HIDE             0
-        #endif /* !_WINDOWS_ */
+/*
+ * Add a _very_few_ declarations missing from the restricted set of headers
+ * (If this list becomes extensive, re-enable the required headers above!)
+ *
+ * Winsock headers (winsock2.h, ws2tcpip.h, mswsock.h) are NOT included
+ * here — ASIO manages all socket operations and includes them internally.
+ */
+#define SW_HIDE 0
+#endif /* !_WINDOWS_ */
 
 #else
 #ifndef HAVE_UUID_UUID_H

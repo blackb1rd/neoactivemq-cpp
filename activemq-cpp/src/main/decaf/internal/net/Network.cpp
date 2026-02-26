@@ -138,8 +138,8 @@ Mutex* Network::getRuntimeLock()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Network::initializeNetworking() {
-
+void Network::initializeNetworking()
+{
     // On Windows, ASIO internally calls WSAStartup/WSACleanup via
     // asio::detail::winsock_init when an io_context is created, so no
     // manual Winsock initialization is needed here.

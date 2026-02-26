@@ -18,44 +18,22 @@
 #include "SocketError.h"
 #include <decaf/util/Config.h>
 
+#include <cerrno>
 #include <cstring>
-
-#ifdef _WIN32
-#include <winsock2.h>
-#else
-#include <errno.h>
-#include <cstring>
-#endif
+#include <system_error>
 
 using namespace decaf;
 using namespace decaf::net;
 
 ////////////////////////////////////////////////////////////////////////////////
 int SocketError::getErrorCode() {
-#ifdef _WIN32
-    return WSAGetLastError();
-#else
+    // std::system_category maps to WSAGetLastError() on Windows and errno on
+    // POSIX, giving us a portable way to retrieve the last socket error.
     return errno;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 std::string SocketError::getErrorString() {
     int errorCode = getErrorCode();
-
-#ifdef _WIN32
-    char buffer[256] = {0};
-    FormatMessageA(
-        FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        nullptr,
-        errorCode,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        buffer,
-        sizeof(buffer) - 1,
-        nullptr
-    );
-    return std::string(buffer);
-#else
-    return std::string(std::strerror(errorCode));
-#endif
+    return std::system_category().message(errorCode);
 }

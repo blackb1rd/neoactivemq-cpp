@@ -49,9 +49,7 @@
 #include <condition_variable>
 #include <thread>
 
-#ifdef _WIN32
-    #include <winsock2.h>
-#endif
+#include <cerrno>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -643,11 +641,7 @@ int OpenSSLSocket::read(unsigned char* buffer, int size, int offset, int length)
                 if (errCode != 0) {
                     ERR_error_string_n(errCode, errStr, sizeof(errStr));
                 } else {
-#ifdef _WIN32
-                    snprintf(errStr, sizeof(errStr), "SSL_ERROR_SYSCALL WSA=%d", WSAGetLastError());
-#else
                     snprintf(errStr, sizeof(errStr), "SSL_ERROR_SYSCALL errno=%d", errno);
-#endif
                 }
                 AMQ_LOG_ERROR("OpenSSLSocket", "SSL read failed: " << errStr);
                 throw OpenSSLSocketException(__FILE__, __LINE__, errStr);

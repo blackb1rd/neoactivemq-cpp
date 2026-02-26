@@ -24,11 +24,7 @@
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/internal/util/ResourceLifecycleManager.h>
 
-#ifdef WIN32
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#pragma comment(lib, "ws2_32.lib")
-#else
+#ifndef _WIN32
 #include <signal.h>
 #endif
 
@@ -117,15 +113,10 @@ Mutex* Network::getRuntimeLock() {
 ////////////////////////////////////////////////////////////////////////////////
 void Network::initializeNetworking() {
 
-#ifdef WIN32
-    // Initialize Winsock
-    WSADATA wsaData;
-    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (result != 0) {
-        throw IllegalStateException(__FILE__, __LINE__,
-            "WSAStartup failed with error: %d", result);
-    }
-#else
+    // On Windows, ASIO internally calls WSAStartup/WSACleanup via
+    // asio::detail::winsock_init when an io_context is created, so no
+    // manual Winsock initialization is needed here.
+#ifndef _WIN32
     // Remove the SIGPIPE so that the application isn't aborted if a connected
     // socket breaks during a read or write.
     struct sigaction sa;
@@ -141,10 +132,6 @@ void Network::initializeNetworking() {
 ////////////////////////////////////////////////////////////////////////////////
 void Network::shutdownNetworking() {
     delete Network::networkRuntime;
-
-#ifdef WIN32
-    WSACleanup();
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

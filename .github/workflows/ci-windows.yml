@@ -17,6 +17,10 @@ on:
       - 'LICENSE'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # Windows Clang-CL build job (builds and uploads artifacts for test jobs)
   windows-build-test:
@@ -39,8 +43,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install Ninja
-      run: choco install ninja -y
 
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.9
@@ -91,6 +93,8 @@ jobs:
         path: |
           output/build/${{ matrix.config.preset }}/bin/
           output/build/${{ matrix.config.preset }}/lib/
+          output/build/${{ matrix.config.preset }}/CTestTestfile.cmake
+          output/build/${{ matrix.config.preset }}/**/CTestTestfile.cmake
         retention-days: 1
 
   # Windows Clang-CL unit test jobs (run in parallel after build, no Docker on Windows CI)
@@ -115,8 +119,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install Ninja
-      run: choco install ninja -y
 
     - name: Setup MSVC Developer Command Prompt
       uses: ilammy/msvc-dev-cmd@v1
@@ -179,17 +181,13 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { preset: x64-windows-clang-debug-test, build_type: Debug, arch: amd64, ssl: true }
           - { preset: x64-windows-clang-release-test, build_type: Release, arch: amd64, ssl: true }
-          - { preset: x64-windows-clang-debug-no-ssl-test, build_type: Debug, arch: amd64, ssl: false }
           - { preset: x64-windows-clang-release-no-ssl-test, build_type: Release, arch: amd64, ssl: false }
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install Ninja
-      run: choco install ninja -y
 
     - name: Setup MSVC Developer Command Prompt
       uses: ilammy/msvc-dev-cmd@v1
@@ -267,8 +265,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install Ninja
-      run: choco install ninja -y
 
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.9
@@ -335,8 +331,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install Ninja
-      run: choco install ninja -y
 
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.9
@@ -387,6 +381,8 @@ jobs:
         path: |
           output/build/${{ matrix.config.preset }}/bin/
           output/build/${{ matrix.config.preset }}/lib/
+          output/build/${{ matrix.config.preset }}/CTestTestfile.cmake
+          output/build/${{ matrix.config.preset }}/**/CTestTestfile.cmake
         retention-days: 1
 
   # Windows CL unit test jobs (run in parallel after build)
@@ -413,8 +409,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install Ninja
-      run: choco install ninja -y
 
     - name: Setup MSVC Developer Command Prompt
       uses: ilammy/msvc-dev-cmd@v1
@@ -477,19 +471,14 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { preset: x86-windows-cl-debug-test, build_type: Debug, arch: x86, ssl: true }
           - { preset: x86-windows-cl-release-test, build_type: Release, arch: x86, ssl: true }
-          - { preset: x64-windows-cl-debug-test, build_type: Debug, arch: x64, ssl: true }
           - { preset: x64-windows-cl-release-test, build_type: Release, arch: x64, ssl: true }
-          - { preset: x64-windows-cl-debug-no-ssl-test, build_type: Debug, arch: x64, ssl: false }
           - { preset: x64-windows-cl-release-no-ssl-test, build_type: Release, arch: x64, ssl: false }
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install Ninja
-      run: choco install ninja -y
 
     - name: Setup MSVC Developer Command Prompt
       uses: ilammy/msvc-dev-cmd@v1

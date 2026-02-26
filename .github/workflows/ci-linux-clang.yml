@@ -17,6 +17,10 @@ on:
       - 'LICENSE'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # Linux build job (builds and uploads artifacts for test jobs)
   linux-build-test:
@@ -42,7 +46,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build clang
+        sudo apt-get install -y clang
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -86,6 +90,8 @@ jobs:
         path: |
           output/build/${{ matrix.config.preset }}/bin/
           output/build/${{ matrix.config.preset }}/lib/
+          output/build/${{ matrix.config.preset }}/CTestTestfile.cmake
+          output/build/${{ matrix.config.preset }}/**/CTestTestfile.cmake
         retention-days: 1
 
   # Linux unit test jobs (run in parallel after build)
@@ -113,7 +119,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build clang
+        sudo apt-get install -y clang
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -173,9 +179,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { preset: x64-linux-clang-debug-test, build_type: Debug, ssl: true }
           - { preset: x64-linux-clang-release-test, build_type: Release, ssl: true }
-          - { preset: x64-linux-clang-debug-no-ssl-test, build_type: Debug, ssl: false }
           - { preset: x64-linux-clang-release-no-ssl-test, build_type: Release, ssl: false }
 
     steps:
@@ -185,7 +189,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build clang
+        sudo apt-get install -y clang
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -257,7 +261,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build clang
+        sudo apt-get install -y clang
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -353,7 +357,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build clang
+        sudo apt-get install -y clang
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -452,7 +456,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build clang
+        sudo apt-get install -y clang
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -546,10 +550,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y ninja-build
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV

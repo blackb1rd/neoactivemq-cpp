@@ -17,6 +17,10 @@ on:
       - 'LICENSE'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # macOS build job (builds and uploads artifacts for test jobs)
   macos-build-test:
@@ -39,8 +43,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install system dependencies
-      run: brew install ninja
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -84,6 +86,8 @@ jobs:
         path: |
           output/build/${{ matrix.config.preset }}/bin/
           output/build/${{ matrix.config.preset }}/lib/
+          output/build/${{ matrix.config.preset }}/CTestTestfile.cmake
+          output/build/${{ matrix.config.preset }}/**/CTestTestfile.cmake
         retention-days: 1
 
   # macOS unit test jobs (run in parallel after build)
@@ -108,8 +112,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install system dependencies
-      run: brew install ninja
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -169,17 +171,13 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { runner: macos-latest, preset: arm64-osx-debug-test, arch: arm64, build_type: Debug, ssl: true }
           - { runner: macos-latest, preset: arm64-osx-release-test, arch: arm64, build_type: Release, ssl: true }
-          - { runner: macos-latest, preset: arm64-osx-debug-no-ssl-test, arch: arm64, build_type: Debug, ssl: false }
           - { runner: macos-latest, preset: arm64-osx-release-no-ssl-test, arch: arm64, build_type: Release, ssl: false }
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install system dependencies
-      run: brew install ninja
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -248,8 +246,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install system dependencies
-      run: brew install ninja
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV

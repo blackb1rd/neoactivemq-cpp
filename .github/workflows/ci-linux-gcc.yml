@@ -50,15 +50,20 @@ jobs:
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.9
 
-    - name: Create vcpkg binary cache directory
-      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+    - name: Create vcpkg cache directories
+      run: |
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: ${{ github.workspace }}/.cache/vcpkg/archives
-        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg/archives
+          ${{ github.workspace }}/.cache/vcpkg/downloads
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.ssl && 'ssl' || 'no-ssl' }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.ssl && 'ssl' || 'no-ssl' }}-
           vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake
@@ -113,15 +118,20 @@ jobs:
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Create vcpkg binary cache directory
-      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+    - name: Create vcpkg cache directories
+      run: |
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: ${{ github.workspace }}/.cache/vcpkg/archives
-        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg/archives
+          ${{ github.workspace }}/.cache/vcpkg/downloads
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.ssl && 'ssl' || 'no-ssl' }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.ssl && 'ssl' || 'no-ssl' }}-
           vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake (for CTest)
@@ -180,15 +190,20 @@ jobs:
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Create vcpkg binary cache directory
-      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+    - name: Create vcpkg cache directories
+      run: |
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: ${{ github.workspace }}/.cache/vcpkg/archives
-        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg/archives
+          ${{ github.workspace }}/.cache/vcpkg/downloads
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.ssl && 'ssl' || 'no-ssl' }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.ssl && 'ssl' || 'no-ssl' }}-
           vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake (for CTest)
@@ -245,15 +260,20 @@ jobs:
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Create vcpkg binary cache directory
-      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+    - name: Create vcpkg cache directories
+      run: |
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: ${{ github.workspace }}/.cache/vcpkg/archives
-        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg/archives
+          ${{ github.workspace }}/.cache/vcpkg/downloads
+        key: vcpkg-binary-${{ runner.os }}-no-ssl-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
+          vcpkg-binary-${{ runner.os }}-no-ssl-
           vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake (for CTest)
@@ -334,15 +354,20 @@ jobs:
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Create vcpkg binary cache directory
-      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+    - name: Create vcpkg cache directories
+      run: |
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: ${{ github.workspace }}/.cache/vcpkg/archives
-        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg/archives
+          ${{ github.workspace }}/.cache/vcpkg/downloads
+        key: vcpkg-binary-${{ runner.os }}-ssl-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
+          vcpkg-binary-${{ runner.os }}-ssl-
           vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake (for CTest)
@@ -425,15 +450,20 @@ jobs:
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Create vcpkg binary cache directory
-      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+    - name: Create vcpkg cache directories
+      run: |
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: ${{ github.workspace }}/.cache/vcpkg/archives
-        key: vcpkg-binary-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg/archives
+          ${{ github.workspace }}/.cache/vcpkg/downloads
+        key: vcpkg-binary-${{ runner.os }}-ssl-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
+          vcpkg-binary-${{ runner.os }}-ssl-
           vcpkg-binary-${{ runner.os }}-
 
     - name: Configure CMake (for CTest)

@@ -113,8 +113,8 @@ namespace io
          * The default implementation of this method simply calls the
          * doWriteArrayBounded method which writes the contents of the array
          * using the doWriteByte method repeatedly.  It is recommended that a
-         * subclass override doWriteArrayBounded to provide more performant means
-         * of writing the array.
+         * subclass override doWriteArrayBounded to provide more performant
+         * means of writing the array.
          *
          * @param buffer
          *      The array of bytes to write.

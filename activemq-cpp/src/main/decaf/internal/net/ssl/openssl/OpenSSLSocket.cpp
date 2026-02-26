@@ -123,8 +123,8 @@ namespace internal
                     // NOTE: Do NOT enable TLS 1.3 without replacing these two
                     // mutexes with a single I/O lock.  TLS 1.3 allows
                     // SSL_read() to internally call SSL_write() (e.g. for
-                    // KeyUpdate responses), which would race with an application
-                    // SSL_write() that only holds writeMutex.
+                    // KeyUpdate responses), which would race with an
+                    // application SSL_write() that only holds writeMutex.
                     std::mutex readMutex;
                     std::mutex writeMutex;
 

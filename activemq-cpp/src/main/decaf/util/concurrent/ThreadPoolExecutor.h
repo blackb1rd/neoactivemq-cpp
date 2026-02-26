@@ -301,8 +301,8 @@ namespace util
              * Sets the maximum number of workers this Executor is allowed to
              * have at any given time above the core pool size.  This new value
              * overrides any set in the constructor and if smaller than the
-             * current value worker threads will terminate as they complete their
-             * current tasks and become idle.
+             * current value worker threads will terminate as they complete
+             * their current tasks and become idle.
              *
              * @param maxSize
              *      The new maximum allowed worker pool size.

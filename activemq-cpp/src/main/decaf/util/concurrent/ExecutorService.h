@@ -42,13 +42,14 @@ namespace util
          *
          * An ExecutorService can be shut down, which will cause it to reject
          * new tasks. Two different methods are provided for shutting down an
-         * ExecutorService. The shutdown() method will allow previously submitted
-         * tasks to execute before terminating, while the shutdownNow() method
-         * prevents waiting tasks from starting and attempts to stop currently
-         * executing tasks. Upon termination, an executor has no tasks actively
-         * executing, no tasks awaiting execution, and no new tasks can be
-         * submitted. An unused ExecutorService should be shut down to allow
-         * reclamation of its resources.
+         * ExecutorService. The shutdown() method will allow previously
+         * submitted tasks to execute before terminating, while the
+         * shutdownNow() method prevents waiting tasks from starting and
+         * attempts to stop currently executing tasks. Upon termination, an
+         * executor has no tasks actively executing, no tasks awaiting
+         * execution, and no new tasks can be submitted. An unused
+         * ExecutorService should be shut down to allow reclamation of its
+         * resources.
          *
          * Method submit extends base method
          * Executor.execute(decaf.lang.Runnable) by creating and returning a

@@ -44,9 +44,9 @@ namespace util
      * operations (get and put), assuming the hash function disperses the
      * elements properly among the buckets. Iteration over collection views
      * requires time proportional to the "capacity" of the HashMap instance (the
-     * number of buckets) plus its size (the number of key-value mappings). Thus,
-     * it's very important not to set the initial capacity too high (or the load
-     * factor too low) if iteration performance is important.
+     * number of buckets) plus its size (the number of key-value mappings).
+     * Thus, it's very important not to set the initial capacity too high (or
+     * the load factor too low) if iteration performance is important.
      *
      * An instance of HashMap has two parameters that affect its performance:
      * initial capacity and load factor. The capacity is the number of buckets

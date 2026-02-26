@@ -96,11 +96,11 @@ namespace util
          * methods achieve their effects atomically using internal locks or
          * other forms of concurrency control. However, the <em>bulk</em>
          * Collection operations <tt>addAll</tt>, <tt>containsAll</tt>,
-         * <tt>retainAll</tt> and <tt>removeAll</tt> are <em>not</em> necessarily
-         * performed atomically unless specified otherwise in an implementation.
-         * So it is possible, for example, for <tt>addAll(c)</tt> to fail
-         * (throwing an exception) after adding only some of the elements in
-         * <tt>c</tt>.
+         * <tt>retainAll</tt> and <tt>removeAll</tt> are <em>not</em>
+         * necessarily performed atomically unless specified otherwise in an
+         * implementation. So it is possible, for example, for
+         * <tt>addAll(c)</tt> to fail (throwing an exception) after adding only
+         * some of the elements in <tt>c</tt>.
          *
          * A <tt>BlockingQueue</tt> does <em>not</em> intrinsically support any
          * kind of &quot;close&quot; or &quot;shutdown&quot; operation to

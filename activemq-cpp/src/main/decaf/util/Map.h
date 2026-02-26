@@ -87,13 +87,14 @@ namespace util
      * map contains a mapping for a key k such that (key == k)." This
      * specification should not be construed to imply that invoking
      * Map.containsKey with a non-null argument key will cause (key == k) to be
-     * invoked for any key k. Implementations are free to implement optimizations
-     * whereby the equals invocation is avoided, for example, by first comparing
-     * the hash codes of the two keys. (The Object.hashCode() specification
-     * guarantees that two objects with unequal hash codes cannot be equal.)
-     * More generally, implementations of the various Collections Framework
-     * interfaces are free to take advantage of the specified behavior of
-     * underlying Object methods wherever the implementor deems it appropriate.
+     * invoked for any key k. Implementations are free to implement
+     * optimizations whereby the equals invocation is avoided, for example, by
+     * first comparing the hash codes of the two keys. (The Object.hashCode()
+     * specification guarantees that two objects with unequal hash codes cannot
+     * be equal.) More generally, implementations of the various Collections
+     * Framework interfaces are free to take advantage of the specified behavior
+     * of underlying Object methods wherever the implementor deems it
+     * appropriate.
      *
      * @since 1.0
      */
@@ -329,8 +330,8 @@ namespace util
          * operation), the results of the iteration are undefined. The set
          * supports element removal, which removes the corresponding mapping
          * from the map, via the Iterator.remove, Set.remove, removeAll,
-         * retainAll, and clear operations. It does not support the add or addAll
-         * operations.
+         * retainAll, and clear operations. It does not support the add or
+         * addAll operations.
          *
          * @return a set view of the keys contained in this map,
          */

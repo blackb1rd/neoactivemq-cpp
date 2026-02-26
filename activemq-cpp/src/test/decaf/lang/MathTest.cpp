@@ -699,9 +699,9 @@ TEST_F(MathTest, test_toDegreesD)
 //             ::ulp(+0.0f)) << ("Returned incorrect value");
 //     ASSERT_EQ(//            Math::ulp(-0.0f), Float::MIN_VALUE) << ("Returned
 //     incorrect value"); ASSERT_EQ(//            2.028241E31f,
-//     Math::ulp(Float::MAX_VALUE)) << ("Returned incorrect value"); ASSERT_EQ(//
-//     2.028241E31f, Math::ulp(-Float::MAX_VALUE)) << ("Returned incorrect
-//     value");
+//     Math::ulp(Float::MAX_VALUE)) << ("Returned incorrect value");
+//     ASSERT_EQ(// 2.028241E31f, Math::ulp(-Float::MAX_VALUE)) << ("Returned
+//     incorrect value");
 //
 //     ASSERT_EQ(//            1.4E-45f, Math::ulp( Float::MIN_VALUE )) <<
 //     ("Returned incorrect value"); ASSERT_EQ(//            1.4E-45f,

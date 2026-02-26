@@ -192,9 +192,9 @@ namespace internal
                 /**
                  * Notifies all waiting threads for the given Monitor.  If there
                  * are no threads currently waiting on the given monitor
-                 * instance then no action is taken.  The calling thread must own
-                 * the given monitor otherwise an IllegalMonitorStateException
-                 * is thrown.
+                 * instance then no action is taken.  The calling thread must
+                 * own the given monitor otherwise an
+                 * IllegalMonitorStateException is thrown.
                  *
                  * @param monitor
                  *      The monitor handle that is to have all of its waiting
@@ -318,10 +318,10 @@ namespace internal
                  *
                  * This method is called to obtain a ThreadHandle that
                  * references an thread that was not created using the Decaf
-                 * Thread class.  A parent Thread instance is passed to associate
-                 * with the target thread so that a call to getCurrentThread can
-                 * return a Decaf Thread as it would for any thread created
-                 * using Thread.
+                 * Thread class.  A parent Thread instance is passed to
+                 * associate with the target thread so that a call to
+                 * getCurrentThread can return a Decaf Thread as it would for
+                 * any thread created using Thread.
                  *
                  * @param parent
                  *      The Decaf thread instace to associate with this thread

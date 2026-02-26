@@ -35,8 +35,8 @@ namespace io
      * caller must ensure that the supplied buffer remain in scope, or is not
      * deleted before this ByteArrayInputStream is freed.  If the own argument
      * of one of the constructors that accepts an array pointer is set to true
-     * than the ByteArrayInputStream instance will take ownership of the supplied
-     * pointer and delete it when that instance is destroyed.
+     * than the ByteArrayInputStream instance will take ownership of the
+     * supplied pointer and delete it when that instance is destroyed.
      *
      * Closing a ByteArrayInputStream has no effect. The methods in this class
      * can be called after the stream has been closed without generating an

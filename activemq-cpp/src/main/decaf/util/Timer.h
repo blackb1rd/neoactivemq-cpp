@@ -234,11 +234,11 @@ namespace util
          *
          * In fixed-delay execution, each execution is scheduled relative to the
          * actual execution time of the previous execution. If an execution is
-         * delayed for any reason (such as other background activity), subsequent
-         * executions will be delayed as well. In the long run, the frequency of
-         * execution will generally be slightly lower than the reciprocal of the
-         * specified period (assuming the system clock underlying
-         * Object.wait(long long) is accurate).
+         * delayed for any reason (such as other background activity),
+         * subsequent executions will be delayed as well. In the long run, the
+         * frequency of execution will generally be slightly lower than the
+         * reciprocal of the specified period (assuming the system clock
+         * underlying Object.wait(long long) is accurate).
          *
          * Fixed-delay execution is appropriate for recurring activities that
          * require "smoothness." In other words, it is appropriate for
@@ -269,11 +269,11 @@ namespace util
          *
          * In fixed-delay execution, each execution is scheduled relative to the
          * actual execution time of the previous execution. If an execution is
-         * delayed for any reason (such as other background activity), subsequent
-         * executions will be delayed as well. In the long run, the frequency of
-         * execution will generally be slightly lower than the reciprocal of the
-         * specified period (assuming the system clock underlying
-         * Object.wait(long long) is accurate).
+         * delayed for any reason (such as other background activity),
+         * subsequent executions will be delayed as well. In the long run, the
+         * frequency of execution will generally be slightly lower than the
+         * reciprocal of the specified period (assuming the system clock
+         * underlying Object.wait(long long) is accurate).
          *
          * Fixed-delay execution is appropriate for recurring activities that
          * require "smoothness." In other words, it is appropriate for
@@ -316,11 +316,11 @@ namespace util
          *
          * In fixed-delay execution, each execution is scheduled relative to the
          * actual execution time of the previous execution. If an execution is
-         * delayed for any reason (such as other background activity), subsequent
-         * executions will be delayed as well. In the long run, the frequency of
-         * execution will generally be slightly lower than the reciprocal of the
-         * specified period (assuming the system clock underlying
-         * Object.wait(long long) is accurate).
+         * delayed for any reason (such as other background activity),
+         * subsequent executions will be delayed as well. In the long run, the
+         * frequency of execution will generally be slightly lower than the
+         * reciprocal of the specified period (assuming the system clock
+         * underlying Object.wait(long long) is accurate).
          *
          * Fixed-delay execution is appropriate for recurring activities that
          * require "smoothness." In other words, it is appropriate for
@@ -350,11 +350,11 @@ namespace util
          *
          * In fixed-delay execution, each execution is scheduled relative to the
          * actual execution time of the previous execution. If an execution is
-         * delayed for any reason (such as other background activity), subsequent
-         * executions will be delayed as well. In the long run, the frequency of
-         * execution will generally be slightly lower than the reciprocal of the
-         * specified period (assuming the system clock underlying
-         * Object.wait(long long) is accurate).
+         * delayed for any reason (such as other background activity),
+         * subsequent executions will be delayed as well. In the long run, the
+         * frequency of execution will generally be slightly lower than the
+         * reciprocal of the specified period (assuming the system clock
+         * underlying Object.wait(long long) is accurate).
          *
          * Fixed-delay execution is appropriate for recurring activities that
          * require "smoothness." In other words, it is appropriate for
@@ -397,21 +397,21 @@ namespace util
          *
          * In fixed-rate execution, each execution is scheduled relative to the
          * scheduled execution time of the initial execution. If an execution is
-         * delayed for any reason (such as garbage collection or other background
-         * activity), two or more executions will occur in rapid succession to
-         * "catch up." In the long run, the frequency of execution will be
-         * exactly the reciprocal of the specified period (assuming the system
-         * clock underlying Object.wait(long) is accurate).
+         * delayed for any reason (such as garbage collection or other
+         * background activity), two or more executions will occur in rapid
+         * succession to "catch up." In the long run, the frequency of execution
+         * will be exactly the reciprocal of the specified period (assuming the
+         * system clock underlying Object.wait(long) is accurate).
          *
          * Fixed-rate execution is appropriate for recurring activities that are
          * sensitive to absolute time, such as ringing a chime every hour on the
-         * hour, or running scheduled maintenance every day at a particular time.
-         * It is also appropriate for recurring activities where the total time
-         * to perform a fixed number of executions is important, such as a count
-         * down timer that ticks once every second for ten seconds. Finally,
-         * fixed-rate execution is appropriate for scheduling multiple repeating
-         * timer tasks that must remain synchronized with respect to one
-         * another.
+         * hour, or running scheduled maintenance every day at a particular
+         * time. It is also appropriate for recurring activities where the total
+         * time to perform a fixed number of executions is important, such as a
+         * count down timer that ticks once every second for ten seconds.
+         * Finally, fixed-rate execution is appropriate for scheduling multiple
+         * repeating timer tasks that must remain synchronized with respect to
+         * one another.
          *
          * @param task - task to be scheduled.
          * @param delay - delay in milliseconds before task is to be executed.
@@ -436,21 +436,21 @@ namespace util
          *
          * In fixed-rate execution, each execution is scheduled relative to the
          * scheduled execution time of the initial execution. If an execution is
-         * delayed for any reason (such as garbage collection or other background
-         * activity), two or more executions will occur in rapid succession to
-         * "catch up." In the long run, the frequency of execution will be
-         * exactly the reciprocal of the specified period (assuming the system
-         * clock underlying Object.wait(long) is accurate).
+         * delayed for any reason (such as garbage collection or other
+         * background activity), two or more executions will occur in rapid
+         * succession to "catch up." In the long run, the frequency of execution
+         * will be exactly the reciprocal of the specified period (assuming the
+         * system clock underlying Object.wait(long) is accurate).
          *
          * Fixed-rate execution is appropriate for recurring activities that are
          * sensitive to absolute time, such as ringing a chime every hour on the
-         * hour, or running scheduled maintenance every day at a particular time.
-         * It is also appropriate for recurring activities where the total time
-         * to perform a fixed number of executions is important, such as a
-         * countdown timer that ticks once every second for ten seconds. Finally,
-         * fixed-rate execution is appropriate for scheduling multiple repeating
-         * timer tasks that must remain synchronized with respect to one
-         * another.
+         * hour, or running scheduled maintenance every day at a particular
+         * time. It is also appropriate for recurring activities where the total
+         * time to perform a fixed number of executions is important, such as a
+         * countdown timer that ticks once every second for ten seconds.
+         * Finally, fixed-rate execution is appropriate for scheduling multiple
+         * repeating timer tasks that must remain synchronized with respect to
+         * one another.
          *
          * @param task - task to be scheduled.
          * @param delay - delay in milliseconds before task is to be executed.
@@ -484,21 +484,21 @@ namespace util
          *
          * In fixed-rate execution, each execution is scheduled relative to the
          * scheduled execution time of the initial execution. If an execution is
-         * delayed for any reason (such as garbage collection or other background
-         * activity), two or more executions will occur in rapid succession to
-         * "catch up." In the long run, the frequency of execution will be
-         * exactly the reciprocal of the specified period (assuming the system
-         * clock underlying Object.wait(long) is accurate).
+         * delayed for any reason (such as garbage collection or other
+         * background activity), two or more executions will occur in rapid
+         * succession to "catch up." In the long run, the frequency of execution
+         * will be exactly the reciprocal of the specified period (assuming the
+         * system clock underlying Object.wait(long) is accurate).
          *
          * Fixed-rate execution is appropriate for recurring activities that are
          * sensitive to absolute time, such as ringing a chime every hour on the
-         * hour, or running scheduled maintenance every day at a particular time.
-         * It is also appropriate for recurring activities where the total time
-         * to perform a fixed number of executions is important, such as a
-         * countdown timer that ticks once every second for ten seconds. Finally,
-         * fixed-rate execution is appropriate for scheduling multiple repeating
-         * timer tasks that must remain synchronized with respect to one
-         * another.
+         * hour, or running scheduled maintenance every day at a particular
+         * time. It is also appropriate for recurring activities where the total
+         * time to perform a fixed number of executions is important, such as a
+         * countdown timer that ticks once every second for ten seconds.
+         * Finally, fixed-rate execution is appropriate for scheduling multiple
+         * repeating timer tasks that must remain synchronized with respect to
+         * one another.
          *
          * @param task - task to be scheduled.
          * @param firstTime - First time at which task is to be executed.
@@ -521,21 +521,21 @@ namespace util
          *
          * In fixed-rate execution, each execution is scheduled relative to the
          * scheduled execution time of the initial execution. If an execution is
-         * delayed for any reason (such as garbage collection or other background
-         * activity), two or more executions will occur in rapid succession to
-         * "catch up." In the long run, the frequency of execution will be
-         * exactly the reciprocal of the specified period (assuming the system
-         * clock underlying Object.wait(long) is accurate).
+         * delayed for any reason (such as garbage collection or other
+         * background activity), two or more executions will occur in rapid
+         * succession to "catch up." In the long run, the frequency of execution
+         * will be exactly the reciprocal of the specified period (assuming the
+         * system clock underlying Object.wait(long) is accurate).
          *
          * Fixed-rate execution is appropriate for recurring activities that are
          * sensitive to absolute time, such as ringing a chime every hour on the
-         * hour, or running scheduled maintenance every day at a particular time.
-         * It is also appropriate for recurring activities where the total time
-         * to perform a fixed number of executions is important, such as a
-         * countdown timer that ticks once every second for ten seconds. Finally,
-         * fixed-rate execution is appropriate for scheduling multiple repeating
-         * timer tasks that must remain synchronized with respect to one
-         * another.
+         * hour, or running scheduled maintenance every day at a particular
+         * time. It is also appropriate for recurring activities where the total
+         * time to perform a fixed number of executions is important, such as a
+         * countdown timer that ticks once every second for ten seconds.
+         * Finally, fixed-rate execution is appropriate for scheduling multiple
+         * repeating timer tasks that must remain synchronized with respect to
+         * one another.
          *
          * @param task - task to be scheduled.
          * @param firstTime - First time at which task is to be executed.

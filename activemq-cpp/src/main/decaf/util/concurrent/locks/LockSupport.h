@@ -145,9 +145,9 @@ namespace util
                  *
                  * This method does not report which of these caused the method
                  * to return. Callers should re-check the conditions which
-                 * caused the thread to park in the first place. Callers may also
-                 * determine, for example, the interrupt status of the thread
-                 * upon return.
+                 * caused the thread to park in the first place. Callers may
+                 * also determine, for example, the interrupt status of the
+                 * thread upon return.
                  */
                 static void park();
 
@@ -169,9 +169,9 @@ namespace util
                  *
                  * This method does not report which of these caused the method
                  * to return. Callers should re-check the conditions which
-                 * caused the thread to park in the first place. Callers may also
-                 * determine, for example, the interrupt status of the thread,
-                 * or the elapsed time upon return.
+                 * caused the thread to park in the first place. Callers may
+                 * also determine, for example, the interrupt status of the
+                 * thread, or the elapsed time upon return.
                  *
                  * @param nanos the maximum number of nanoseconds to wait
                  */
@@ -194,9 +194,9 @@ namespace util
                  *
                  * This method does not report which of these caused the method
                  * to return. Callers should re-check the conditions which
-                 * caused the thread to park in the first place. Callers may also
-                 * determine, for example, the interrupt status of the thread,
-                 * or the current time upon return.
+                 * caused the thread to park in the first place. Callers may
+                 * also determine, for example, the interrupt status of the
+                 * thread, or the current time upon return.
                  *
                  * @param deadline the absolute time, in milliseconds from the
                  * Epoch, to wait until

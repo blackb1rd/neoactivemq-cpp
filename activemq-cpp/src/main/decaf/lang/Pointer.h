@@ -444,10 +444,10 @@ namespace lang
      * Object being Pointed to and not the value of the contained pointer in the
      * Pointer instance.  This can be useful in the case where a series of
      * values in a Collection is more efficiently accessed in the Objects
-     * Natural Order and not the underlying pointers location in memory. <p> Also
-     * this allows Pointer objects that Point to different instances of the same
-     * type to be compared based on the comparison of the object itself and not
-     * just the value of the pointer.
+     * Natural Order and not the underlying pointers location in memory. <p>
+     * Also this allows Pointer objects that Point to different instances of the
+     * same type to be compared based on the comparison of the object itself and
+     * not just the value of the pointer.
      */
     template <typename T,
               typename R = decaf::util::concurrent::atomic::AtomicRefCounter>

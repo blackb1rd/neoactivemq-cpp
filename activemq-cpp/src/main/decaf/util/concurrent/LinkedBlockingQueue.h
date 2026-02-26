@@ -45,9 +45,9 @@ namespace util
          * A BlockingQueue derivative that allows for a bound to be placed on
          * the number of elements that can be enqueued at any one time. Elements
          * are inserted and removed in FIFO order. The internal structure of the
-         * queue is based on a linked nodes which provides for better performance
-         * over their array based versions but the performance is less
-         * predictable.
+         * queue is based on a linked nodes which provides for better
+         * performance over their array based versions but the performance is
+         * less predictable.
          *
          * The capacity bound of this class default to Integer::MAX_VALUE.
          *

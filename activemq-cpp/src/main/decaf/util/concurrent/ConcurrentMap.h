@@ -49,10 +49,9 @@ namespace util
 
             /**
              * If the specified key is not already associated with a value,
-             * associate it with the given value. This is equivalent to <pre> if(
-             * !map.containsKey( key ) ) { map.put( key, value ); return true;
-             *     } else {
-             *         return false;
+             * associate it with the given value. This is equivalent to <pre>
+             * if( !map.containsKey( key ) ) { map.put( key, value ); return
+             * true; } else { return false;
              *     }
              * </pre>
              * except that the action is performed atomically.

@@ -80,9 +80,9 @@ namespace util
              * Lock implementations provide additional functionality over the
              * use of synchronized methods and statements by providing a
              * non-blocking attempt to acquire a lock (tryLock()), an attempt to
-             * acquire the lock that can be interrupted (lockInterruptibly(), and
-             * an attempt to acquire the lock that can timeout (tryLock(long,
-             * TimeUnit)).
+             * acquire the lock that can be interrupted (lockInterruptibly(),
+             * and an attempt to acquire the lock that can timeout
+             * (tryLock(long, TimeUnit)).
              *
              * Note that Lock instances are just normal objects and can
              * themselves be used as the target in a synchronized statement.

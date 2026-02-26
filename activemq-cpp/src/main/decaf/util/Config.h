@@ -134,16 +134,11 @@
             /*
              * Add a _very_few_ declarations missing from the restricted set of headers
              * (If this list becomes extensive, re-enable the required headers above!)
-             * winsock headers were excluded by WIN32_LEAN_AND_MEAN, so include them now
+             *
+             * Winsock headers (winsock2.h, ws2tcpip.h, mswsock.h) are NOT included
+             * here — ASIO manages all socket operations and includes them internally.
              */
             #define SW_HIDE             0
-            #ifndef _WIN32_WCE
-                #include <winsock2.h>
-                #include <ws2tcpip.h>
-                #include <mswsock.h>
-            #else
-                #include <winsock.h>
-            #endif
         #endif /* !_WINDOWS_ */
 
     #else
